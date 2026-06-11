@@ -156,6 +156,9 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .restbtn.go{background:linear-gradient(180deg,rgba(201,168,76,.34),rgba(201,168,76,.12));border-color:rgba(201,168,76,.5);color:var(--gold2)}
 #voicebtn.listening{color:#ff6a5a;border-color:#5a2018;background:#1a0b0a;animation:voicepulse 1s ease-in-out infinite}
 @keyframes voicepulse{0%,100%{opacity:1}50%{opacity:.5}}
+.confetti-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:5}
+.confetti-layer i{position:absolute;top:-16px;width:9px;height:15px;border-radius:2px;opacity:.95;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(115vh) rotate(680deg);opacity:.25}}
 
 /* boss */
 .bossname{font-family:var(--disp);font-size:40px;letter-spacing:.04em;color:var(--gold2);text-align:center;line-height:.95}
@@ -1055,7 +1058,7 @@ async function requestWakeLock(){try{if(("wakeLock"in navigator)&&!_wakeLock){_w
 function releaseWakeLock(){try{if(_wakeLock){_wakeLock.release();_wakeLock=null;}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&state.session&&state.step==="logging")requestWakeLock();});
 function ensureTimers(){if(state.session){if(!state.wtInt)state.wtInt=setInterval(tickWork,1000);if(!state.restInt)state.restInt=setInterval(tickRest,1000);}}
-function restStart(){const dur=state.data.u.restTime||120;state.restEnd=Date.now()+dur*1000;state.restTimer=dur;state.restRunning=true;const el=$("rest-display");if(el){el.textContent=fmtTime(dur);el.parentElement.style.borderColor="";}showRestOverlay(dur);}
+function restStart(defer){const dur=state.data.u.restTime||120;state.restEnd=Date.now()+dur*1000;state.restTimer=dur;state.restRunning=true;state._restOrigTotal=dur;const el=$("rest-display");if(el){el.textContent=fmtTime(dur);el.parentElement.style.borderColor="";}if(defer){state._restPending=true;}else{state._restPending=false;showRestOverlay(dur);}}
 
 /* ========================= START WORKOUT (Rule 6: unbroken path) ========================= */
 function startWorkout(splitId,dayIdx){
@@ -1078,28 +1081,31 @@ function setReadiness(r){state.session.readiness=r;state.step="logging";startTim
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;} // no render (Rule 1 spirit)
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const s=state.session.exercises[ei].sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";restStart();liveCheckPR(ei,si);}render();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");}render();}
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
 function liveCheckPR(ei,si){
   const exObj=state.session.exercises[ei];const s=exObj.sets[si];
-  if(!s||!s.done||s.type==="W")return;            // warm-ups never count as PRs
+  if(!s||!s.done||s.type==="W")return null;            // warm-ups never count as PRs
   const ex=exFor(exObj.name);const e1=setE1RM(ex,s);
-  if(!e1)return;
+  if(!e1)return null;
   const committed=(state.data.prs[exObj.name]&&state.data.prs[exObj.name].orm)||0;
-  if(e1<=committed+0.01)return;                    // not a PR
+  if(e1<=committed+0.01)return null;                    // not a PR
   state.session.liveBest=state.session.liveBest||{};
   state.session.bossed=state.session.bossed||{};
+  let fired=null;
   if(e1>(state.session.liveBest[exObj.name]||0)){
     state.session.liveBest[exObj.name]=e1;
     showPRToast(exObj.name,e1,committed);          // always toast the new best
+    fired="pr";
   }
   if(!state.session.bossed[exObj.name]){           // boss fires once per exercise per session
     state.session.bossed[exObj.name]=true;
     const pr={name:exObj.name,orm:e1,prevOrm:committed,improve:committed?((e1-committed)/committed*100):0,first:!committed,w:setLoad(ex,s.w),r:+s.r||0,ex};
     const boss=pickBoss([pr]);
-    if(boss)showBossFight(boss,()=>render()); // after the fight, back to logging — session continues
+    if(boss){showBossFight(boss,()=>render());fired="boss";} // boss takes over the screen; rest overlay defers until it's dismissed
   }
+  return fired;
 }
 function showPRToast(name,e1,prev){
   const t=$("toast");if(!t)return;
@@ -1199,7 +1205,7 @@ const KO_FINISH=[
   {t:"SUBMISSION",l:"Rear-naked choke cinched. He taps. It's over."}
 ];
 function showBossFight(boss,onDone){
-  state._bossDone=onDone;
+  state._bossDone=onDone;state._bossActive=true;
   let hp=100,n=0;
   const dmgPer=boss.pr.first?40:clamp(28+(boss.pr.improve||6),28,46);
   $("ovcard").innerHTML=`
@@ -1243,8 +1249,23 @@ function showBossFight(boss,onDone){
   clearTimeout(state._bossT);
   state._bossT=setTimeout(strike,820);      // auto-start the combination
 }
+function confettiBurst(){
+  const host=$("overlay");if(!host)return;
+  const layer=document.createElement("div");layer.className="confetti-layer";
+  const cols=["#E8C56A","#E8453C","#2ECC71","#7c96ff","#ffffff","#ff9f43"];
+  for(let i=0;i<54;i++){const p=document.createElement("i");
+    p.style.left=(Math.random()*100)+"%";
+    p.style.background=cols[i%cols.length];
+    p.style.width=(6+Math.random()*6).toFixed(0)+"px";
+    p.style.animationDelay=(Math.random()*0.35).toFixed(2)+"s";
+    p.style.animationDuration=(1.5+Math.random()*1.3).toFixed(2)+"s";
+    layer.appendChild(p);}
+  host.appendChild(layer);
+  setTimeout(()=>layer.remove(),3400);
+}
 function bossVictory(boss,ko){
   ko=ko||KO_FINISH[0];
+  confettiBurst();
   state.data.bossWins.push({villain:boss.v,ex:boss.pr.name,w:boss.pr.w,r:boss.pr.r,orm:Math.round(boss.pr.orm),prevOrm:Math.round(boss.pr.prevOrm),date:new Date().toISOString()});
   checkAchievements();save();
   if(navigator.vibrate)navigator.vibrate([60,40,120,40,200]);beep(990);
@@ -1260,9 +1281,11 @@ function bossVictory(boss,ko){
       <div class="row sp"><span class="muted">Best set</span><b>${Math.round(boss.pr.w)}kg × ${boss.pr.r}</b></div>
       ${boss.pr.first?"":`<div class="row sp"><span class="muted">Improvement</span><b class="green">+${boss.pr.improve.toFixed(1)}%</b></div>`}
     </div>
-    <button class="btn gold" onclick="closeOverlay();state._bossDone&&state._bossDone()">NEXT MISSION →</button>
+    <button class="btn gold" onclick="closeBossFight()">NEXT MISSION →</button>
   </div>`;
 }
+function closeBossFight(){closeOverlay();state._bossActive=false;const cb=state._bossDone;state._bossDone=null;if(cb)cb();resumePendingRest();}
+function resumePendingRest(){if(!state._restPending)return;state._restPending=false;if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0)return;showRestOverlay(state._restOrigTotal||rem);updateRestOverlay(rem);}
 
 /* ========================= COMEBACK ========================= */
 function checkComebackDefeat(prs){
@@ -1333,6 +1356,31 @@ function suggestionFor(name){
   const pr=state.data.prs[name];if(!pr)return null;
   const r=state.session.readiness;const mult=r==="fresh"?1.025:r==="tired"?0.97:1.0;
   return Math.round(pr.w*mult);
+}
+// Most recent logged top working set for a lift (scans workout history, newest first).
+function lastBestSet(name){
+  const ws=state.data.workouts||[];const ex=exFor(name);
+  for(const w of ws){
+    const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;
+    let best=null,bv=-1;
+    (e.sets||[]).forEach(s=>{if(s.type==="W")return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
+    if(best)return {w:+best.w||0,r:+best.r||0,date:w.date,e1:bv};
+  }
+  return null;
+}
+// Double-progression coach: read last performance, tell the lifter exactly what to chase.
+function nextTarget(name){
+  const ex=exFor(name);const lb=lastBestSet(name);
+  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
+  const r=lb.r;let lo,hi;
+  if(r<=5){lo=4;hi=6;}else if(r<=9){lo=6;hi=10;}else if(r<=14){lo=10;hi=15;}else{lo=15;hi=20;}
+  if(ex.bw){
+    if(r<hi)return `last ${r} reps${lb.w?" +"+lb.w+"kg":""} → chase <b>${r+1}+ reps</b>`;
+    return `you maxed ${r} reps → <b>add ${lb.w?"2.5kg":"a vest/belt"}</b>, reset to ${lo}`;
+  }
+  const inc=(r<=6&&lb.w>=60)?5:2.5;
+  if(r<hi)return `<b>${lb.w}kg × ${r+1}+</b> — beat last week's reps (aim ${lo}–${hi})`;
+  return `maxed ${hi} reps → <b>+${inc}kg to ${fmtNum(lb.w+inc)}kg × ${lo}</b>`;
 }
 // Warm-up: only suggested the first time a session touches a given primary muscle.
 // Light and short — "feel the movement", not an exhausting ramp. Body is warm after the first lift.
@@ -1419,6 +1467,7 @@ function renderLogging(){
         <button class="btn ghost sm" style="width:auto;padding:8px 10px;color:var(--text3)" onclick="removeExercise(${ei})">✕</button>
       </div>
       ${sug?`<div class="mini" style="margin-bottom:6px">💡 Intel: last best ≈ ${sug}kg ${ex.bw?"added":""}. ${ses.readiness==="tired"?"Tired — match it.":"Beat it."}</div>`:""}
+      ${(()=>{const nt=nextTarget(e.name);return nt?`<div class="mini" style="margin-bottom:6px;color:var(--green);line-height:1.4">🎯 <b>Next target:</b> ${nt}</div>`:"";})()}
       ${(ex.c&&ex.c[0])?`<div class="mini" style="margin-bottom:6px;color:var(--blue);line-height:1.4">🧪 ${esc(ex.c[0])}${ex.c.length>1?` <span onclick="showCues('${esc(e.name).replace(/'/g,"")}')" style="color:var(--gold2);cursor:pointer">+${ex.c.length-1} more</span>`:""}</div>`:""}
       ${(()=>{const w=warmupSuggest(ei);return w?`<div class="card" style="margin:6px 0;padding:10px;background:#1a1305;border-color:var(--gold-dim,#6b5420)">
         <div class="mini" style="color:var(--gold2);margin-bottom:4px">🔥 Warm-up — ${esc(w.muscles)} still cold</div>
@@ -1491,7 +1540,7 @@ function handleVoice(t){
   const open=findOpenSet();
   if(!open){toast("No open set to log — add a set first.");return;}
   const s=state.session.exercises[open.ei].sets[open.si];
-  s.w=String(w);s.r=String(r);s.done=true;haptic("done");restStart();liveCheckPR(open.ei,open.si);
+  s.w=String(w);s.r=String(r);s.done=true;haptic("done");const ev2=liveCheckPR(open.ei,open.si);restStart(ev2==="boss");
   toast("✓ "+w+"kg × "+r+" — "+esc(state.session.exercises[open.ei].name));
   render();
 }
@@ -1523,7 +1572,10 @@ function regionTip(ex){
   if(p==="biceps")return /incline/.test(n)?"Long-head (outer) emphasis: arms behind the body stretch the long head — that stretch is the point of incline curls.":/preacher|spider/.test(n)?"Short-head (inner) emphasis: arms in front of the body bias the short head and the bottom-range stretch.":"Biceps has a long (outer) and short (inner) head. Arms-behind (incline) biases the long head; arms-in-front (preacher) biases the short head.";
   return "";
 }
-function showCues(name){const ex=exFor(name);const rt=regionTip(ex);openSheet(`<div class="ttl">${esc(name)} — coaching cues</div>${(ex.c||[]).map(c=>`<div class="row" style="align-items:flex-start;margin-bottom:9px"><span class="gold" style="font-family:var(--disp);font-size:18px;line-height:1">▸</span><span style="font-size:14px">${esc(c)}</span></div>`).join("")}${rt?`<div class="card" style="margin-top:8px;padding:11px;background:#0d1520;border-color:#1c3050"><div class="mini" style="color:var(--blue);margin-bottom:3px">🎯 WHICH PART YOU'RE HITTING</div><div style="font-size:13px;line-height:1.5;color:var(--text2)">${esc(rt)}</div></div>`:""}<button class="btn" style="margin-top:10px" onclick="closeSheet()">Got it</button>`);}
+function showCues(name){const ex=exFor(name);const rt=regionTip(ex);const notes=(state.data.exNotes&&state.data.exNotes[name])||[];const safe=esc(name).replace(/'/g,"");openSheet(`<div class="ttl">${esc(name)} — coaching cues</div>${(ex.c||[]).map(c=>`<div class="row" style="align-items:flex-start;margin-bottom:9px"><span class="gold" style="font-family:var(--disp);font-size:18px;line-height:1">▸</span><span style="font-size:14px">${esc(c)}</span></div>`).join("")}${rt?`<div class="card" style="margin-top:8px;padding:11px;background:#0d1520;border-color:#1c3050"><div class="mini" style="color:var(--blue);margin-bottom:3px">🎯 WHICH PART YOU'RE HITTING</div><div style="font-size:13px;line-height:1.5;color:var(--text2)">${esc(rt)}</div></div>`:""}
+<div class="card" style="margin-top:8px;padding:11px"><div class="mini" style="color:var(--gold2);margin-bottom:7px">📝 YOUR NOTES</div>${notes.length?notes.slice(0,6).map(nt=>`<div class="mini" style="margin-bottom:6px;line-height:1.45">• ${esc(nt.note)} <span style="color:var(--text3)">· ${new Date(nt.date).toLocaleDateString()}</span></div>`).join(""):`<div class="mini" style="color:var(--text3);margin-bottom:6px">No notes yet — jot a setup cue, a tweak, or how it felt.</div>`}<div class="row" style="gap:6px;margin-top:6px"><input id="exnote-in" placeholder="e.g. elbows tucked, felt strong" style="flex:1;padding:9px"/><button class="btn gold sm" style="width:auto" onclick="addExNote('${safe}')">Add</button></div></div>
+<button class="btn" style="margin-top:10px" onclick="closeSheet()">Got it</button>`);}
+function addExNote(name){const el=$("exnote-in");if(!el)return;const v=(el.value||"").trim();if(!v)return;state.data.exNotes=state.data.exNotes||{};(state.data.exNotes[name]=state.data.exNotes[name]||[]).unshift({date:new Date().toISOString(),note:v});save();haptic("tap");showCues(name);}
 
 /* ========================= EXERCISE PICKER (Rule 1: oninput -> updateExList only) ========================= */
 function openPicker(){
@@ -2401,12 +2453,39 @@ function deloadCard(){
   }
   return `<div class="card"><div class="ttl">🩹 Deload readiness</div><div class="banner" style="background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)"><span>✓</span><div class="mini">Recovery looks managed — no deload needed yet. Keep progressing.</div></div></div>`;
 }
+// Plateau breaker: per-lift e1RM history; flag lifts with no new best across their last 3 outings (≥10d span).
+function plateauCard(){
+  const ws=(state.data.workouts||[]);if(ws.length<4)return "";
+  const byEx={};
+  for(let i=ws.length-1;i>=0;i--){const w=ws[i];const ex0=w.date;
+    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);let best=0;
+      (e.sets||[]).forEach(s=>{if(s.type==="W")return;const v=setE1RM(ex,s);if(v>best)best=v;});
+      if(best>0)(byEx[e.name]=byEx[e.name]||[]).push({date:ex0,e1:best});});
+  }
+  const PROTO=["Back off ~10% and rebuild over 2 weeks — fresh runway beats grinding.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: go heavier for 4–6 reps and let the nervous system adapt.","Reset the weight, then add a single rep every set until you own the top of the range.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
+  const stalled=[];
+  Object.keys(byEx).forEach(name=>{const arr=byEx[name];if(arr.length<4)return;
+    const last3=arr.slice(-3),prior=arr.slice(0,-3);
+    const recentPeak=Math.max(...last3.map(a=>a.e1)),priorPeak=Math.max(...prior.map(a=>a.e1));
+    const span=(new Date(last3[last3.length-1].date)-new Date(last3[0].date))/86400000;
+    if(recentPeak<=priorPeak*1.005&&span>=10){
+      stalled.push({name,e1:Math.round(recentPeak),weeks:Math.round(span/7),idx:stalled.length});}
+  });
+  if(!stalled.length)return "";
+  stalled.sort((a,b)=>b.e1-a.e1);
+  let h=`<div class="card" style="border-color:rgba(232,69,60,.4);background:linear-gradient(180deg,rgba(232,69,60,.07),transparent)"><div class="ttl" style="color:#ff6b5c">🧱 Plateau breaker</div><div class="mini" style="margin-bottom:10px;color:var(--text2)">These lifts haven't set a new estimated 1RM in a while. Time to change the stimulus.</div>`;
+  stalled.slice(0,3).forEach((s,k)=>{h+=`<div style="border-top:1px solid var(--border);padding:9px 0">
+    <div class="row sp"><b>${esc(s.name)}</b><span class="chip" style="font-size:11px">stuck ~${s.weeks||1}w · ${s.e1}kg</span></div>
+    <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45">🔓 ${PROTO[k%PROTO.length]}</div></div>`;});
+  h+=`</div>`;return h;
+}
 function renderStrategy(){
   const d=state.data;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">STRATEGY</h1><div class="tag" style="margin-bottom:12px">Volume map · balance · schedule</div>`;
   html+=volMapCard();
   html+=weeklyBalanceCard();
   html+=deloadCard();
+  html+=plateauCard();
   // schedule
   html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">Training days per week</div><span class="chip on">${trainingDayCount()} / week</span></div>
     <div class="row" style="gap:6px;margin:10px 0 12px">${[2,3,4,5,6].map(n=>`<button class="chip ${trainingDayCount()===n?'on':''} g" style="justify-content:center" onclick="setDaysPerWeek(${n})">${n} days</button>`).join("")}</div>
