@@ -133,6 +133,30 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .sheetbg{position:fixed;inset:0;z-index:69;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.28s}
 .sheetbg.on{opacity:1;pointer-events:auto}
 
+/* ===== Liquid-glass rest timer overlay ===== */
+#restov{position:fixed;inset:0;z-index:75;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:24px;
+  background:radial-gradient(circle at 50% 36%,rgba(22,36,58,.6),rgba(4,6,10,.88));
+  backdrop-filter:blur(24px) saturate(140%);-webkit-backdrop-filter:blur(24px) saturate(140%)}
+#restov.on{display:flex;animation:fade .28s ease both}
+#restov.done{background:radial-gradient(circle at 50% 36%,rgba(20,62,40,.58),rgba(4,9,6,.9))}
+.restlabel{font-family:var(--disp);letter-spacing:.24em;font-size:13px;color:var(--blue);text-transform:uppercase}
+#restov.done .restlabel{color:var(--green)}
+.restring{position:relative;width:250px;height:250px;display:flex;align-items:center;justify-content:center}
+.restring .glasscircle{position:absolute;inset:8px;border-radius:50%;
+  background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.02) 60%);
+  border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 46px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -18px 40px -22px rgba(0,0,0,.6);
+  animation:restbreathe 4s ease-in-out infinite}
+#restov.done .restring .glasscircle{border-color:rgba(46,204,113,.5);box-shadow:0 0 54px -6px rgba(46,204,113,.5),inset 0 1px 0 rgba(255,255,255,.22);animation:none}
+@keyframes restbreathe{0%,100%{transform:scale(.92);opacity:.86}50%{transform:scale(1.07);opacity:1}}
+.restring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.restnum{position:relative;z-index:2;font-family:var(--disp);font-size:60px;color:#eaf2ff;letter-spacing:.02em;text-shadow:0 2px 18px rgba(0,0,0,.55)}
+.resthint{font-size:12.5px;color:var(--text2);letter-spacing:.05em;min-height:18px;transition:opacity .6s}
+.restbtns{display:flex;gap:12px}
+.restbtn{padding:13px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));color:#e9eef6;font-family:var(--disp);letter-spacing:.06em;font-size:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.restbtn.go{background:linear-gradient(180deg,rgba(201,168,76,.34),rgba(201,168,76,.12));border-color:rgba(201,168,76,.5);color:var(--gold2)}
+#voicebtn.listening{color:#ff6a5a;border-color:#5a2018;background:#1a0b0a;animation:voicepulse 1s ease-in-out infinite}
+@keyframes voicepulse{0%,100%{opacity:1}50%{opacity:.5}}
+
 /* boss */
 .bossname{font-family:var(--disp);font-size:40px;letter-spacing:.04em;color:var(--gold2);text-align:center;line-height:.95}
 .bossemoji{font-size:72px;text-align:center;margin:6px 0;filter:drop-shadow(0 0 18px rgba(201,168,76,.4))}
@@ -244,6 +268,20 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 <div class="sheetbg" id="sheetbg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet"></div>
 <div class="toast" id="toast"></div>
+<div id="restov">
+  <div class="restlabel" id="restlabel">Recovery</div>
+  <div class="restring">
+    <div class="glasscircle"></div>
+    <svg viewBox="0 0 250 250"><circle cx="125" cy="125" r="116" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/><circle id="restprog" cx="125" cy="125" r="116" fill="none" stroke="var(--blue)" stroke-width="6" stroke-linecap="round" stroke-dasharray="728.8" stroke-dashoffset="0" style="transition:stroke-dashoffset .9s linear"/></svg>
+    <div class="restnum" id="restnum">2:00</div>
+  </div>
+  <div class="resthint" id="resthint">Breathe in…</div>
+  <div class="restbtns">
+    <button class="restbtn" onclick="addRest(-15)">−15s</button>
+    <button class="restbtn go" onclick="skipRest()">SKIP REST</button>
+    <button class="restbtn" onclick="addRest(30)">+30s</button>
+  </div>
+</div>
 <div id="offline-pill">⚡ Offline · all data saved on this device</div>
 <div id="modal"><div class="mbg"></div><div class="mcard" id="mcard"></div></div>
 <script>
@@ -997,12 +1035,27 @@ function checkAchievements(){
 
 /* ========================= TIMERS (Rule 2: no render() in setInterval) ========================= */
 function beep(p){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=p||660;g.gain.value=.12;o.start();g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.18);o.stop(c.currentTime+.2);}catch(e){}}
+/* Centralized haptics — one place to tune feel. Silently no-ops where unsupported (iOS Safari). */
+const HAPTIC={tap:14,toggle:[12,18,26],done:[18,24,40],pr:[30,30,60],hit:38,ko:[60,40,120,40,200],rest:200,success:[40,30,80],warn:[80,40,80]};
+function haptic(kind){try{if(navigator.vibrate)navigator.vibrate(HAPTIC[kind]||kind||14);}catch(e){}}
 function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInterval(state.wtInt);state.wtInt=null;}return;}const el=$("wt-display");const secs=Math.floor((Date.now()-state.session.startedAt)/1000);state.workoutTimer=secs;if(el)el.textContent=fmtTime(secs);}
-function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;if(navigator.vibrate)navigator.vibrate(200);beep(880);if(el){el.textContent="DONE";el.parentElement.style.borderColor="var(--green)";}return;}state.restTimer=rem;if(el)el.textContent=fmtTime(rem);}
-function startTimers(){clearInterval(state.wtInt);clearInterval(state.restInt);state.wtInt=setInterval(tickWork,1000);state.restInt=setInterval(tickRest,1000);}
-function stopTimers(){clearInterval(state.wtInt);clearInterval(state.restInt);state.wtInt=state.restInt=null;state.restRunning=false;}
+function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");beep(880);if(el){el.textContent="DONE";el.parentElement.style.borderColor="var(--green)";}restDone();return;}state.restTimer=rem;if(el)el.textContent=fmtTime(rem);updateRestOverlay(rem);}
+/* ----- Liquid-glass rest overlay (transient element — never re-rendered, so no lag) ----- */
+function showRestOverlay(dur){const ov=$("restov");if(!ov)return;state._restTotal=dur;ov.classList.remove("done");const lb=$("restlabel");if(lb)lb.textContent="Recovery";const h=$("resthint");if(h)h.textContent="Breathe in…";ov.classList.add("on");updateRestOverlay(dur);}
+function updateRestOverlay(rem){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;const n=$("restnum");if(n)n.textContent=fmtTime(Math.max(0,rem));const tot=state._restTotal||1,C=728.8,frac=Math.max(0,Math.min(1,rem/tot)),prog=$("restprog");if(prog)prog.style.strokeDashoffset=(C*(1-frac)).toFixed(1);const hint=$("resthint");if(hint&&!ov.classList.contains("done"))hint.textContent=(Math.floor(Date.now()/4000)%2)?"Breathe out…":"Breathe in…";}
+function restDone(){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;ov.classList.add("done");const lb=$("restlabel");if(lb)lb.textContent="Recovered";const n=$("restnum");if(n)n.textContent="GO";const h=$("resthint");if(h)h.textContent="Back to work, sir.";const p=$("restprog");if(p)p.style.strokeDashoffset=0;clearTimeout(state._restCloseT);state._restCloseT=setTimeout(closeRestOverlay,1700);}
+function closeRestOverlay(){const ov=$("restov");if(ov)ov.classList.remove("on","done");}
+function addRest(delta){if(!state.restRunning){closeRestOverlay();return;}state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);let rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();return;}haptic("tap");updateRestOverlay(rem);const el=$("rest-display");if(el)el.textContent=fmtTime(Math.max(0,rem));}
+function skipRest(){state.restRunning=false;state.restTimer=0;haptic("tap");closeRestOverlay();const el=$("rest-display");if(el){el.textContent="REST";el.parentElement.style.borderColor="";}}
+function startTimers(){clearInterval(state.wtInt);clearInterval(state.restInt);state.wtInt=setInterval(tickWork,1000);state.restInt=setInterval(tickRest,1000);requestWakeLock();}
+function stopTimers(){clearInterval(state.wtInt);clearInterval(state.restInt);state.wtInt=state.restInt=null;state.restRunning=false;releaseWakeLock();}
+/* ----- Wake-lock: keep the screen on while a session is live (gym-friendly). Guarded for unsupported browsers. ----- */
+let _wakeLock=null;
+async function requestWakeLock(){try{if(("wakeLock"in navigator)&&!_wakeLock){_wakeLock=await navigator.wakeLock.request("screen");_wakeLock.addEventListener("release",()=>{_wakeLock=null;});}}catch(e){_wakeLock=null;}}
+function releaseWakeLock(){try{if(_wakeLock){_wakeLock.release();_wakeLock=null;}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&state.session&&state.step==="logging")requestWakeLock();});
 function ensureTimers(){if(state.session){if(!state.wtInt)state.wtInt=setInterval(tickWork,1000);if(!state.restInt)state.restInt=setInterval(tickRest,1000);}}
-function restStart(){const dur=state.data.u.restTime||120;state.restEnd=Date.now()+dur*1000;state.restTimer=dur;state.restRunning=true;const el=$("rest-display");if(el){el.textContent=fmtTime(dur);el.parentElement.style.borderColor="";}}
+function restStart(){const dur=state.data.u.restTime||120;state.restEnd=Date.now()+dur*1000;state.restTimer=dur;state.restRunning=true;const el=$("rest-display");if(el){el.textContent=fmtTime(dur);el.parentElement.style.borderColor="";}showRestOverlay(dur);}
 
 /* ========================= START WORKOUT (Rule 6: unbroken path) ========================= */
 function startWorkout(splitId,dayIdx){
@@ -1025,7 +1078,7 @@ function setReadiness(r){state.session.readiness=r;state.step="logging";startTim
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;} // no render (Rule 1 spirit)
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const s=state.session.exercises[ei].sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";restStart();liveCheckPR(ei,si);}render();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";restStart();liveCheckPR(ei,si);}render();}
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
 function liveCheckPR(ei,si){
@@ -1053,7 +1106,7 @@ function showPRToast(name,e1,prev){
   const tag=prev?("+"+Math.round(e1-prev)+"kg"):"first record";
   t.innerHTML=`<span style="font-size:16px">🏆</span> <b style="color:var(--gold2)">NEW PR</b> · ${esc(name)} <b>${Math.round(e1)}kg</b> <span style="opacity:.7;font-size:12px">est. 1RM (${tag})</span>`;
   t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove("on");t.innerHTML="";},3200);
-  if(navigator.vibrate)navigator.vibrate([30,30,60]);
+  haptic("pr");
 }
 function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();}
 function delSet(ei,si){state.session.exercises[ei].sets.splice(si,1);render();}
@@ -1163,10 +1216,12 @@ function showBossFight(boss,onDone){
       <div class="hpwrap" style="margin-top:10px"><i id="fhp" style="width:100%;background:linear-gradient(90deg,${boss.c},#ff8c7c)"></i></div>
       <div class="combatlog" id="flog">⚔️ The cage door locks. ${esc(boss.v)} steps in across from you.</div>
       <div class="mini" style="margin:4px 0 8px">${esc(boss.pr.name)} — new 1RM ${Math.round(boss.pr.orm)}kg ${boss.pr.first?"(first record!)":"(+"+boss.pr.improve.toFixed(1)+"%)"}</div>
-      <button class="btn gold" id="atkbtn" style="font-size:19px;padding:15px">🥊 STRIKE</button>
+      <button class="btn ghost sm" id="atkbtn" style="width:auto;opacity:.78">Skip to finish ▶</button>
     </div>`;
-  const re=(el,cls)=>{el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);};
+  const re=(el,cls)=>{if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);};
+  // The fight now plays out on its own — Batman lands the combination automatically, no button mashing.
   const strike=()=>{
+    if(!$("fstage"))return;                 // overlay was replaced — abort the chain
     const s=MMA_STRIKES[n%MMA_STRIKES.length];n++;
     hp=Math.max(0,hp-dmgPer-Math.random()*6);
     const ko=hp<=0;
@@ -1174,16 +1229,19 @@ function showBossFight(boss,onDone){
     re(hero,"lunge");re(stage,"shake");re(flash,"on");
     re(bossEl,ko?"ko":"recoil");
     strk.textContent=s.fx;re(strk,"fly");
-    // floating damage number
     const pop=document.createElement("div");pop.className="dmgpop";pop.textContent="-"+Math.round(dmgPer);
     pop.style.left=(46+Math.random()*22)+"%";stage.appendChild(pop);setTimeout(()=>pop.remove(),900);
     $("fhp").style.width=hp+"%";
     $("flog").innerHTML=`<b style="color:var(--gold)">${s.n}.</b> ${s.l}`;
-    if(navigator.vibrate)navigator.vibrate(ko?[60,40,120]:38);beep(420+Math.min(n,6)*150);
-    if(ko){const btn=$("atkbtn");if(btn)btn.disabled=true;setTimeout(()=>bossVictory(boss,KO_FINISH[Math.floor(Math.random()*KO_FINISH.length)]),620);}
+    haptic(ko?"ko":"hit");beep(420+Math.min(n,6)*150);
+    if(ko){clearTimeout(state._bossT);setTimeout(()=>bossVictory(boss,KO_FINISH[Math.floor(Math.random()*KO_FINISH.length)]),640);}
+    else{state._bossT=setTimeout(strike,700);}
   };
-  $("atkbtn").onclick=strike;
+  const skip=()=>{clearTimeout(state._bossT);const bossEl=$("fboss");re(bossEl,"ko");if($("fhp"))$("fhp").style.width="0%";const btn=$("atkbtn");if(btn)btn.disabled=true;haptic("ko");beep(990);setTimeout(()=>bossVictory(boss,KO_FINISH[Math.floor(Math.random()*KO_FINISH.length)]),520);};
+  const ab=$("atkbtn");if(ab)ab.onclick=skip;
   openOverlay();
+  clearTimeout(state._bossT);
+  state._bossT=setTimeout(strike,820);      // auto-start the combination
 }
 function bossVictory(boss,ko){
   ko=ko||KO_FINISH[0];
@@ -1345,7 +1403,7 @@ function renderLogging(){
   </div>
   <div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
-    <button class="btn gold sm" onclick="finishWorkout()">FINISH</button>
+    <div class="row" style="gap:8px"><button class="btn ghost sm" id="voicebtn" style="width:auto" onclick="voiceLog()">🎤 Voice log</button><button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
   </div>`;
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
   html+=`<div class="card glow" style="padding:13px"><div class="ttl">⚡ Tonight's damage report</div>${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div></div>`;
@@ -1395,6 +1453,47 @@ function renderLogging(){
 function metricOpts(metric,val){
   const arr=metric==="rir"?["","0","1","2","3","4+"]:["","6","7","8","9","10"];
   return arr.map(o=>`<option ${String(val)===o?"selected":""}>${o}</option>`).join("");
+}
+/* ===== Voice logging (Web Speech API) — say "80 kilos 8 reps" to fill the next open set. Guarded for unsupported browsers. ===== */
+const NUMW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fourty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+function wordsToNums(t){
+  const words=t.replace(/[^a-z0-9.\s-]/g," ").split(/[\s-]+/).filter(Boolean);
+  const out=[];let i=0;
+  while(i<words.length){
+    let w=words[i];
+    if(NUMW[w]!=null){
+      let val=NUMW[w];
+      if(val>=20&&val%10===0&&NUMW[words[i+1]]!=null&&NUMW[words[i+1]]<10){val+=NUMW[words[i+1]];i++;}
+      if(words[i+1]==="hundred"){val*=100;i++;if(NUMW[words[i+1]]!=null){val+=NUMW[words[i+1]];i++;}}
+      out.push(String(val));
+    }else if(w==="hundred"){out.push("100");}
+    else out.push(w);
+    i++;
+  }
+  return out.join(" ");
+}
+function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
+function voiceLog(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast("Voice logging isn't supported in this browser — try Chrome.");return;}
+  if(state._rec){try{state._rec.stop();}catch(e){}state._rec=null;return;}
+  const rec=new SR();rec.lang="en-US";rec.interimResults=false;rec.maxAlternatives=1;state._rec=rec;
+  const btn=$("voicebtn");if(btn){btn.classList.add("listening");btn.textContent="● Listening…";}
+  rec.onresult=(e)=>{const t=(e.results[0][0].transcript||"").toLowerCase();handleVoice(t);};
+  rec.onerror=(e)=>{toast("Didn't catch that ("+e.error+").");};
+  rec.onend=()=>{state._rec=null;const b=$("voicebtn");if(b){b.classList.remove("listening");b.innerHTML="🎤 Voice log";}};
+  try{rec.start();haptic("tap");}catch(e){toast("Mic busy — try again.");}
+}
+function handleVoice(t){
+  const nums=(wordsToNums(t).match(/\d+(?:\.\d+)?/g)||[]).map(Number);
+  if(nums.length<2){toast('Heard "'+t+'". Say weight then reps — e.g. "80 kilos 8 reps".');return;}
+  const w=nums[0],r=Math.round(nums[1]);
+  const open=findOpenSet();
+  if(!open){toast("No open set to log — add a set first.");return;}
+  const s=state.session.exercises[open.ei].sets[open.si];
+  s.w=String(w);s.r=String(r);s.done=true;haptic("done");restStart();liveCheckPR(open.ei,open.si);
+  toast("✓ "+w+"kg × "+r+" — "+esc(state.session.exercises[open.ei].name));
+  render();
 }
 function regionTip(ex){
   const p=(ex.p&&ex.p[0])||"",n=(ex.n||"").toLowerCase();
@@ -2670,12 +2769,60 @@ function alfredMusclePicker(){
     <div class="mini" style="margin-bottom:9px;color:var(--text2)">Tap any group for a full dossier — anatomy, your recovery, weekly volume vs landmarks, and what to train next.</div>
     <div class="row" style="flex-wrap:wrap;gap:7px">${M12.map(m=>`<button class="chip g" onclick="muscleDrill('${m}')">${MNAME[m]}</button>`).join("")}</div></div>`;
 }
+function caveStat(v,l){return `<div style="flex:1;min-width:64px;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:8px 4px;background:var(--bg2)"><div style="font-family:var(--disp);font-size:22px;color:var(--gold2);line-height:1.05">${v}</div><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">${l}</div></div>`;}
+/* Alfred's weekly "Cave review" — fight-camp recap of the last 7 days with proactive flags. */
+function alfredCaveReview(){
+  const wk=now()-7*864e5;
+  const ws=(state.data.workouts||[]).filter(w=>new Date(w.date).getTime()>=wk);
+  if(!ws.length)return "";
+  const vol=ws.reduce((a,w)=>a+(w.totalVol||(w.exercises||[]).reduce((x,e)=>x+(e.sets||[]).reduce((y,s)=>y+((+s.w||0)*(+s.r||0)),0),0)),0);
+  let sets=0;ws.forEach(w=>(w.exercises||[]).forEach(e=>sets+=(e.sets||[]).filter(s=>s.done&&s.type!=="W").length));
+  const prWins=(state.data.bossWins||[]).filter(b=>new Date(b.date).getTime()>=wk);
+  const PUSH=["chest","shoulders","triceps"],PULL=["back","biceps","forearms"];
+  const ps=PUSH.reduce((a,m)=>a+weeklySets(m),0),pl=PULL.reduce((a,m)=>a+weeklySets(m),0);
+  const under=M12.filter(m=>{const s=weeklySets(m);return s>0&&s<(VL[m]||{mev:8}).mev;});
+  const over=M12.filter(m=>weeklySets(m)>(VL[m]||{mrv:20}).mrv);
+  const fried=M12.filter(m=>(state.data.muscleVol[m]||0)>0&&getRecovery(m)<50);
+  const goal=state.data.u.weeklyGoal||4;
+  let flags="";
+  if(prWins.length)flags+=`<div class="mini" style="margin-bottom:5px;color:var(--green)">🏆 ${prWins.length} PR${prWins.length>1?"s":""} banked — ${[...new Set(prWins.map(b=>b.ex))].slice(0,3).join(", ")}.</div>`;
+  if(ps>pl*1.35)flags+=`<div class="mini" style="margin-bottom:5px">⚖️ Push (${ps}) is outrunning pull (${pl}) — add a row or rear-delt set to stay square.</div>`;
+  else if(pl>ps*1.35)flags+=`<div class="mini" style="margin-bottom:5px">⚖️ Pull (${pl}) is ahead of push (${ps}) — balance it with pressing.</div>`;
+  under.slice(0,2).forEach(m=>flags+=`<div class="mini" style="margin-bottom:5px">📉 <b>${MNAME[m]}</b> is below MEV — a couple more sets or it stalls.</div>`);
+  over.slice(0,2).forEach(m=>flags+=`<div class="mini" style="margin-bottom:5px">🔥 <b>${MNAME[m]}</b> is over MRV — past the point of return, ease back.</div>`);
+  if(fried.length>=4)flags+=`<div class="mini" style="margin-bottom:5px">🩹 ${fried.length} groups under 50% recovered — a deload week would pay off, sir.</div>`;
+  if(!flags)flags=`<div class="mini" style="color:var(--green)">✓ Balanced week. Volume's where it should be and recovery's holding. Keep the standard.</div>`;
+  const verdict=ws.length>=goal?`Target hit — ${ws.length}/${goal} sessions. Disciplined work.`:`${ws.length}/${goal} sessions logged — ${goal-ws.length} more to hit your week.`;
+  return `<div class="card glow"><div class="ttl">🦇 The Cave — week in review</div>
+    <div class="row" style="gap:8px;margin-bottom:9px;flex-wrap:wrap">
+      ${caveStat(ws.length,"sessions")}${caveStat(sets,"hard sets")}${caveStat(fmtNum(Math.round(vol))+"kg","moved")}${caveStat(prWins.length,"PRs")}
+    </div>
+    <div class="mini" style="margin-bottom:8px;color:var(--gold2)">${verdict}</div>
+    ${flags}</div>`;
+}
+/* MMA fight record — every PR is a KO over a Gotham villain. */
+function fightRecordCard(){
+  const wins=(state.data.bossWins||[]);
+  if(!wins.length)return `<div class="card"><div class="ttl">🥊 Fight record</div><div class="mini">No KOs yet. Beat a logged lift and your first villain steps into the cage.</div></div>`;
+  const wk=now()-7*864e5,wkKO=wins.filter(b=>new Date(b.date).getTime()>=wk).length;
+  const tally={};wins.forEach(b=>tally[b.villain]=(tally[b.villain]||0)+1);
+  const ranked=Object.entries(tally).sort((a,b)=>b[1]-a[1]),nem=ranked[0];
+  const recent=wins.slice(-5).reverse();
+  return `<div class="card"><div class="ttl">🥊 Fight record</div>
+    <div class="row" style="gap:8px;margin-bottom:9px">
+      ${caveStat(wins.length,"total KOs")}${caveStat(wkKO,"this week")}${caveStat(ranked.length,"villains")}
+    </div>
+    <div class="mini" style="margin-bottom:6px"><b style="color:var(--gold2)">Top rival:</b> ${esc(nem[0])} — KO'd ${nem[1]}×</div>
+    <div class="row" style="gap:5px;flex-wrap:wrap">${recent.map(b=>`<span class="chip" style="background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.4);color:var(--green)">KO · ${esc(b.villain)}</span>`).join("")}</div></div>`;
+}
 function renderAlfred(){
   const has=!!geminiKey();state.data.u.aiKeySet=has;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach</div>`;
   // local coaching — always available, no API key needed
   html+=alfredBriefing();
+  html+=alfredCaveReview();
   html+=alfredDebrief();
+  html+=fightRecordCard();
   html+=alfredMusclePicker();
   if(!has){html+=`<div class="card"><div class="row" style="gap:10px;align-items:center"><div style="font-size:32px">🤖</div><div><h3 style="font-size:17px;color:var(--gold2);margin:0 0 2px">Want Alfred to talk back?</h3>
     <p class="muted" style="font-size:12.5px;margin:0">Add a free Google Gemini key in Settings for live chat &amp; physique scans. The briefing above always works without it.</p></div></div>
@@ -2736,6 +2883,7 @@ function openSettings(){
     <button class="btn ghost sm" style="margin-bottom:8px" onclick="importRival()">📥 Import a rival</button>
     <button class="btn ghost sm" style="margin-bottom:8px" onclick="backupData()">💾 Backup data (JSON)</button>
     <button class="btn ghost sm" style="margin-bottom:8px" onclick="restoreData()">📂 Restore data</button>
+    <button class="btn ghost sm" style="margin-bottom:8px" onclick="exportCSV()">📊 Export workouts (CSV)</button>
     <button class="btn ghost sm" style="margin-bottom:8px" onclick="state.showOnboarding=true;state.obStep=0;state.obTmp={};closeOverlay();render()">Edit hero profile</button>
     <button class="btn danger" onclick="wipeData()">Wipe everything</button>
     <button class="btn" style="margin-top:10px" onclick="closeOverlay();render()">Done</button>`;
@@ -2746,6 +2894,21 @@ function exportRival(){const d=state.data;const code=btoa(unescape(encodeURIComp
   if(navigator.clipboard)navigator.clipboard.writeText(code);appAlert({title:"Sparring code",ok:"Done",html:`Copied to your clipboard. Send this to a rival:<input readonly value="${esc(code)}" style="margin-top:10px" onclick="this.select()"/>`});}
 function importRival(){appPrompt({title:"Add rival",body:"Paste a rival's sparring code:",ok:"Spar"}).then(c=>{if(!c)return;try{const r=JSON.parse(decodeURIComponent(escape(atob(c.trim()))));state.data.rival=r;save();toast("Now sparring with "+r.name);closeOverlay();render();}catch(e){toast("Invalid code.");}});}
 function backupData(){const blob=new Blob([JSON.stringify(state.data)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gainstracker-backup.json";a.click();}
+function exportCSV(){
+  const rows=[["date","exercise","set","weight_kg","reps","type","est_1rm_kg"]];
+  (state.data.workouts||[]).slice().reverse().forEach(w=>{
+    const d=(w.date||"").slice(0,10);
+    (w.exercises||[]).forEach(e=>{
+      (e.sets||[]).forEach((s,i)=>{
+        const ex=exFor(e.name);let e1="";try{e1=setE1RM(ex,s);}catch(err){}
+        rows.push([d,e.name,i+1,s.w||"",s.r||"",s.type||"NRM",e1?Math.round(e1):""]);
+      });
+    });
+  });
+  if(rows.length<2){toast("No workouts to export yet.");return;}
+  const csv=rows.map(r=>r.map(c=>{c=String(c);return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gainstracker-workouts.csv";a.click();toast("Exported "+(rows.length-1)+" sets to CSV.");
+}
 function restoreData(){const i=document.createElement("input");i.type="file";i.accept=".json";i.onchange=()=>{const f=i.files[0];const r=new FileReader();r.onload=()=>{try{state.data=Object.assign(blankData(),JSON.parse(r.result));save();toast("Data restored.");closeOverlay();render();}catch(e){toast("Bad file.");}};r.readAsText(f);};i.click();}
 function wipeData(){appConfirm({title:"Erase everything",body:"This permanently deletes ALL your data — workouts, PRs, splits, progress. It cannot be undone.",ok:"Erase all",cancel:"Keep my data",danger:true}).then(ok=>{if(!ok)return;localStorage.removeItem("gt_data");state.data=blankData();save();state.showOnboarding=true;state.obStep=0;closeOverlay();render();});}
 
