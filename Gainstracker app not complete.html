@@ -544,7 +544,7 @@ u:{name:"",bodyweight:75,goal:"build",natty:"maybe",xp:0,totalWorkouts:0,totalVo
  weekSchedule:{0:true,1:false,2:true,3:false,4:true,5:false,6:false},
  physiqueAnalysis:{weakPoints:[],strongPoints:[],mainImbalance:"",overallRating:null,date:null},
  measurements:{chest:null,waist:null,leftArm:null,rightArm:null,leftThigh:null,rightThigh:null,history:[]},
- aiUses:0,shares:0,metric:"rpe",lastMissedMuscle:"chest"},
+ aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest"},
 muscleVol:{},muscleLastTrained:{},muscleLastVol:{},muscleLastFails:{},
 prs:{},bossWins:[],bossReturns:[],workouts:[],splits:[],activeSplitId:null,customEx:{},
 rival:null,experienceLevel:null,onboardingDone:false,plates:DEF_PLATES.slice(),
@@ -571,6 +571,8 @@ function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.p
   // Migration: older builds seeded muscleVol from experience at onboarding, inflating the level.
   // Real volume only ever comes from logged workouts, so volume with zero workouts = seeded -> clear.
   if((!d.workouts||!d.workouts.length)&&d.muscleVol&&Object.keys(d.muscleVol).length){d.muscleVol={};d.muscleLastTrained={};d.muscleLastVol={};d.muscleLastFails={};}
+  // Migration: default the effort metric to RIR (reps-in-reserve) — clearer than RPE. One-time flip, respects later manual changes.
+  if(!d.u._rirMig){d.u.metric="rir";d.u._rirMig=true;}
   state.data=d;}}catch(e){}}
 
 /* ========================= UTILS ========================= */
