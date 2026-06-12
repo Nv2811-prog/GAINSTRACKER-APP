@@ -85,7 +85,7 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 #nav::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(235,199,107,.3),transparent)}
 #nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--text3);border-radius:10px;transition:.15s}
 #nav button .ic{font-size:20px;filter:grayscale(1) opacity(.5);transition:.15s}
-#nav button .lb{font-family:var(--disp);font-size:11px;letter-spacing:.1em}
+#nav button .lb{font-family:var(--disp);font-size:9.5px;letter-spacing:.04em}
 #nav button.on{color:var(--gold2)}
 #nav button.on .ic{filter:none;transform:translateY(-1px);text-shadow:0 0 12px rgba(235,199,107,.5)}
 
@@ -1577,7 +1577,7 @@ function appPrompt(o){o=_normOpts(o,"Enter");return new Promise(res=>{
 function discardSession(){appConfirm({title:"Discard session",body:"End this session and discard everything logged so far?",ok:"Discard",cancel:"Keep training",danger:true}).then(ok=>{if(ok)endSession();});}
 
 /* ========================= NAV ========================= */
-const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["case","📈","CASE FILE"],["strategy","📋","STRATEGY"],["alfred","🤖","ALFRED"],["suit","💪","THE SUIT"]];
+const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["fuel","🍽️","FUEL"],["case","📈","CASE"],["strategy","📋","PLAN"],["alfred","🤖","ALFRED"],["suit","💪","SUIT"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.showOnboarding){$("nav").classList.add("hide");return;}
   $("nav").classList.remove("hide");
@@ -1593,7 +1593,7 @@ function render(){
   if(state.subpage==="archive"){renderArchive();renderNav();return;}
   if(state.subpage==="garage"){renderGarage();renderNav();return;}
   if(state.subpage==="infirmary"){renderInfirmary();renderNav();return;}
-  const fn={gotham:renderGotham,mission:renderMission,case:renderCase,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit}[state.tab]||renderGotham;
+  const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderCase,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit}[state.tab]||renderGotham;
   fn();renderNav();
 }
 
@@ -2946,6 +2946,12 @@ function forgeLoadable(target){               // round DOWN to nearest barbell-l
   return{w:bar+used.reduce((a,b)=>a+b,0)*2,used};
 }
 const FORGE_PCT=[{p:100,r:"1",n:"Max single"},{p:95,r:"2",n:"Heavy double"},{p:90,r:"3-4",n:"Strength"},{p:85,r:"5",n:"Power"},{p:80,r:"6-7",n:"Strength-hyper."},{p:75,r:"8-9",n:"Hypertrophy"},{p:70,r:"10-11",n:"Volume"},{p:65,r:"12-14",n:"Pump"},{p:60,r:"15+",n:"Metabolic"}];
+// Plate-jump suggester: the smallest barbell-loadable progressions above the current weight.
+function nextPlateJump(w){
+  const plates=forgePlates();const small=plates.length?plates[plates.length-1]:1.25;const step=small*2;
+  const base=forgeLoadable(w).w;const rungs=[];
+  for(let i=1;i<=4;i++)rungs.push({w:Math.round((base+step*i)*100)/100,n:i});
+  return {step,small,base,rungs};}
 function openForge(prefW,prefR){
   state._forgeW=prefW!=null?prefW:(state._forgeW||"");
   state._forgeR=prefR!=null?prefR:(state._forgeR||"");
@@ -2976,6 +2982,16 @@ function drawForge(){
       steps.map((s,i)=>{const ld=forgeLoadable(w*s.p);return `<div class="row sp" style="padding:5px 0"><span class="mini">Set ${i+1} · ${Math.round(s.p*100)}%</span><b>${Math.round(ld.w)}kg × ${s.r}</b></div>`;}).join("")+
       `<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span class="mini gold">Working</span><b class="gold">${w}kg × ${r||"?"}</b></div></div>`;
   }
+  // plate-jump ladder — smallest real progressions from the entered weight
+  let jump="";
+  if(w&&w>=bar){
+    const j=nextPlateJump(w);
+    const rung=(rg,i)=>`<div class="row sp" style="padding:6px 0${i===0?'':';border-top:1px solid var(--border)'}"><span class="mini">+${(j.step*(i+1)).toFixed(j.step%1?2:0)}kg <span style="color:var(--text3)">(${i+1}× ${j.small}kg/side)</span></span><b style="color:${i===0?'var(--gold2)':'var(--text)'}">${rg.w}kg</b></div>`;
+    jump=`<div class="card" style="margin:10px 0 0;padding:12px"><div class="ttl" style="margin-bottom:2px">📈 Next plate jump</div>
+      <div class="mini" style="margin-bottom:6px;color:var(--text2)">Smallest loadable step on your bar is <b class="gold">+${(j.step).toFixed(j.step%1?2:0)}kg</b> (one ${j.small}kg plate per side). Beat your reps, then climb a rung:</div>
+      ${j.rungs.map(rung).join("")}
+      <div class="mini" style="margin-top:7px;color:var(--text3)">Add load only once you own the top of your rep range with clean form — the bar doesn't care about ego.</div></div>`;
+  }
   $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center;gap:6px">🛠️ THE FORGE <span class="mini" style="font-weight:400;color:var(--text2)">load lab</span></div>
     <div class="mini" style="margin-bottom:8px">Enter a real set. The Forge estimates your 1RM and lays out every training percentage — rounded to weight you can actually load.</div>
     <div class="row g" style="gap:8px">
@@ -2984,6 +3000,7 @@ function drawForge(){
     </div>
     ${orm?`<div class="card glow center" style="margin:12px 0 4px;padding:14px"><div class="mini">ESTIMATED 1 REP MAX</div><div class="big" style="font-size:40px;color:var(--gold2)">${Math.round(orm)}<span style="font-size:20px">kg</span></div><div class="mini">${w}kg × ${r} · Epley formula</div></div>`:`<p class="muted center" style="margin:16px 0">Enter a weight and reps to forge your numbers.</p>`}
     ${warm}
+    ${jump}
     ${orm?`<div class="card" style="margin:10px 0;padding:6px 14px 12px">${rows}</div>`:""}
     <button class="btn" style="margin-top:8px" onclick="closeSheet()">Close</button>`;
 }
@@ -3084,7 +3101,7 @@ function weekCardio(){const wk=now()-7*864e5;return (state.data.cardioLog||[]).f
 function addCardio(mins,type){state.data.cardioLog=state.data.cardioLog||[];state.data.cardioLog.unshift({date:new Date().toISOString(),type,mins});save();haptic("done");toast("+"+mins+" min "+type+" logged");renderInfirmary();}
 // ---- supplements ----
 function suppToday(){return (state.data.suppLog=state.data.suppLog||{})[infDateKey()]||{};}
-function toggleSupp(item){const k=infDateKey();const map=state.data.suppLog[k]=state.data.suppLog[k]||{};map[item]=!map[item];save();haptic("tap");renderInfirmary();}
+function toggleSupp(item){const k=infDateKey();const map=state.data.suppLog[k]=state.data.suppLog[k]||{};map[item]=!map[item];save();haptic("tap");if(state.subpage==="infirmary")renderInfirmary();else render();}
 function creatineStreak(){
   const log=state.data.suppLog||{};let n=0;const d=new Date();d.setHours(0,0,0,0);
   const key=x=>x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
@@ -3162,18 +3179,21 @@ function renderInfirmary(){
 const INDEX_ITEMS=[
   ["🦇","Gotham home","Tonight's mission, readiness, daily challenges","go('gotham')"],
   ["⚔️","Mission / log a workout","Start or log tonight's session","go('mission')"],
+  ["🍽️","FUEL — nutrition","Calories, macros, food log, water, supplements, weigh-ins","go('fuel')"],
   ["📈","Case File","Records, defeats, history & analytics","go('case')"],
-  ["📋","Strategy","Splits, volume map, deload readiness","go('strategy')"],
+  ["📋","Strategy / Plan","Splits, volume map, deload readiness","go('strategy')"],
   ["🤖","Alfred","AI coach, physique scan, the Chronicle","go('alfred')"],
   ["💪","The Suit","Your muscle figure & recovery map","go('suit')"],
   ["📊","THE ARCHIVE","Strength curves, PR timeline, forecasts","openArchive()"],
-  ["🛠️","THE FORGE","1RM & percentage load calculator","openForge()"],
+  ["🛠️","THE FORGE","1RM, percentage loading & next plate jump","openForge()"],
   ["🚗","THE GARAGE","Vehicles you've unlocked by milestones","openGarage()"],
   ["🚑","THE INFIRMARY","Sleep, soreness, cardio, supplements, injuries","openInfirmary()"],
   ["📡","Batcomputer","Full analytics dashboard","openBatcomputer()"],
-  ["📂","Monthly report","Your month, crunched","monthlyReport()"],
-  ["🍽️","The Mess Hall","Nutrition & water logging","openMessHall()"],
+  ["📂","Batcomputer report","30-day · 90-day · yearly review","periodReport(30)"],
+  ["🍽️","The Mess Hall","Deep food log, macro rings & carb cycling","openMessHall()"],
   ["🤝","Justice League","Compare with allies' Patrol Cards","openJusticeLeague()"],
+  ["🏆","Leaderboard","Rank yourself vs allies by Vigilante Score","openLeaderboard()"],
+  ["⚔️","Co-op Raid","Team up on a boss; pool your tonnage","openRaid()"],
   ["📐","Measurements","Log body measurements","openMeasure()"],
   ["💡","Training tips","The full tips & science library","openTips()"],
   ["⚙️","Settings","Profile, equipment, data backup","openSettings()"]
@@ -3355,6 +3375,9 @@ function renderGotham(){
     <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openGarage()">🚗 Garage ${GARAGE.filter(v=>v.req(gothamStats())).length}/${GARAGE.length} ›</button>
     <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openInfirmary()">🚑 Infirmary ›</button></div>`;
 
+  // co-op raid — shared boss with an ally
+  html+=raidCard();
+
   // training age clock
   html+=trainingAgeCard();
   // iron ledger (tap for full lifetime page) + cityscape skyline + PR velocity
@@ -3500,7 +3523,8 @@ function openJusticeLeague(){
     <div class="mini" style="margin:-2px 0 11px;color:var(--text2)">Train with friends — no account, no server. Share your Patrol Card as a code, add theirs to compare. Everything stays on your devices.</div>
     ${cardMini(me,true)}
     <div class="row wrap" style="gap:5px;margin-top:8px">${lifts}</div>
-    <button class="btn gold sm" style="margin-top:11px" onclick="shareMyCard()">📋 Copy my Patrol Card</button>
+    <button class="btn sm" style="margin-top:11px" onclick="openLeaderboard()">🏆 League Leaderboard — rank everyone</button>
+    <button class="btn gold sm" style="margin-top:7px" onclick="shareMyCard()">📋 Copy my Patrol Card</button>
     <textarea id="my-code" readonly onclick="this.select()" style="width:100%;margin-top:7px;height:50px;font-size:10px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none">${code}</textarea>
     <div class="hr"></div>
     <div class="ttl" style="margin:0 0 6px">Add an ally</div>
@@ -3508,6 +3532,88 @@ function openJusticeLeague(){
     <button class="btn sm" style="margin-top:7px" onclick="addAlly()">＋ Add to League</button>
     <div style="margin-top:4px">${allyHtml}</div>
     <button class="btn ghost" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
+}
+// Composite "Vigilante Score" — one number to rank yourself against your League.
+function vigilanteScore(c){if(!c)return 0;return Math.round((c.sl||0)*10+(c.vol||0)/1000+(c.w||0)*2+(c.boss||0)*8+(c.days||0)*0.5);}
+function openLeaderboard(){
+  const me=Object.assign({},myPatrolCard(),{_you:true});
+  const board=[me].concat((state.data.allies||[]).map(a=>Object.assign({},a)));
+  board.forEach(c=>c._score=vigilanteScore(c));
+  board.sort((a,b)=>b._score-a._score);
+  const medal=i=>i===0?"🥇":i===1?"🥈":i===2?"🥉":`<span class="mini" style="color:var(--text3)">#${i+1}</span>`;
+  const max=board[0]._score||1;
+  const rows=board.map((c,i)=>{const you=c._you;const pct=clamp(Math.round(c._score/max*100),6,100);
+    return `<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:10px 11px;margin-top:8px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
+      <div class="row sp"><div class="row g" style="gap:9px;min-width:0"><span style="font-size:20px;flex:none;width:26px;text-align:center">${medal(i)}</span><b style="font-family:var(--disp);font-size:15px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b></div><b style="color:${you?'var(--gold2)':'var(--text)'}">${fmtNum(c._score)}</b></div>
+      <div style="height:7px;border-radius:5px;background:var(--bg);overflow:hidden;margin-top:7px"><div style="height:100%;width:${pct}%;background:${you?'linear-gradient(90deg,var(--gold3),var(--gold))':'#3a4252'};border-radius:5px"></div></div>
+      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl} · ${(c.vol/1000).toFixed(1)}t · ${c.w} sessions · ${c.boss} villains</div></div>`;}).join("");
+  const myRank=board.findIndex(c=>c._you)+1;
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:6px">🏆 League Leaderboard</div>
+    <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — strength level, tonnage, sessions, villains and nights on patrol, fused into one number.</div>
+    <div class="banner" style="margin-bottom:4px"><span>🦇</span><div class="mini">${board.length<2?"Add allies in the Justice League to fill the board — for now the cave is yours alone.":myRank===1?"You sit at the top of the League. Defend the cowl.":`You're ranked #${myRank} of ${board.length}. ${fmtNum((board[myRank-2]._score-me._score))} points behind the vigilante above you.`}</div></div>
+    ${rows}
+    <button class="btn" style="margin-top:13px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
+}
+/* ===== CO-OP RAIDS (#26): team with an ally against a colossal boss; tonnage pools ===== */
+const RAID_BOSSES=[
+  {n:"Bane — Breaking the Bat",e:"💪",c:"#b07a3a",target:40000,q:"Together you'll move what no single Bat could."},
+  {n:"Ra's al Ghul — The Demon's Head",e:"🗡️",c:"#2e8b57",target:75000,q:"The League of Shadows tests your alliance. Pool your iron."},
+  {n:"Darkseid — Apokolips",e:"🌑",c:"#9b6fce",target:120000,q:"A god-tier raid. Only a true partnership moves this much."},
+  {n:"Doomsday — Unleashed",e:"☠️",c:"#d0463a",target:200000,q:"The endgame raid. Two vigilantes, a quarter-million kilos of fury."}
+];
+function raidMine(){const r=state.data.raid;if(!r)return 0;const t0=new Date(r.start).getTime();return state.data.workouts.filter(w=>new Date(w.date).getTime()>=t0).reduce((a,w)=>a+(w.totalVol||0),0);}
+function raidProgress(){const r=state.data.raid;if(!r)return null;const mine=raidMine(),ally=+r.ally||0,combined=mine+ally;return {mine,ally,combined,pct:clamp(combined/r.target*100,0,100),done:combined>=r.target};}
+function startRaid(idx){const b=RAID_BOSSES[idx];if(!b)return;const nm=(($("raid-ally")||{}).value||"").trim();
+  if(!nm){toast("Give your ally a name first, sir.");return;}
+  let allyStart=null;const code=($("raid-code")||{}).value||"";if(code.trim()){const c=decodeCard(code);if(c)allyStart=c.vol||0;}
+  state.data.raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:nm.slice(0,20),allyStartVol:allyStart,ally:0};
+  save();haptic("done");toast("Raid begun vs "+b.n);openRaid();}
+function syncRaidAlly(){const r=state.data.raid;if(!r)return;const c=decodeCard(($("raid-sync")||{}).value||"");
+  if(!c){toast("That Patrol Card didn't read.");return;}
+  if(r.allyStartVol==null)r.allyStartVol=c.vol||0;
+  r.ally=Math.max(0,(c.vol||0)-(r.allyStartVol||0));save();haptic("done");toast(r.allyName+" synced — "+fmtNum(r.ally)+"kg in");openRaid();}
+function addRaidAlly(kg){const r=state.data.raid;if(!r)return;r.ally=Math.max(0,(+r.ally||0)+kg);if(r.allyStartVol==null)r.allyStartVol=0;save();haptic("light");openRaid();}
+function endRaid(){appConfirm({title:"Abandon raid",body:"Your shared progress will be lost. Sure?",ok:"Abandon",cancel:"Keep raiding",danger:true}).then(ok=>{if(!ok)return;state.data.raid=null;save();haptic("warn");closeSheet();render();});}
+function claimRaid(){const r=state.data.raid,p=raidProgress();if(!r||!p||!p.done)return;
+  state.data.bossWins=state.data.bossWins||[];
+  state.data.bossWins.unshift({villain:r.boss+" — co-op w/ "+r.allyName,ex:"Co-op Raid",w:0,r:0,orm:0,prevOrm:0,date:new Date().toISOString()});
+  state.data.raid=null;save();haptic("done");closeSheet();
+  appAlert({title:"RAID COMPLETE",ok:"For Gotham",html:`${r.e} <b>${esc(r.boss)}</b> has fallen to you and ${esc(r.allyName)}. <b>${fmtNum(p.combined)}kg</b> moved together — logged to your Hall of Defeats.`});
+  render();}
+function openRaid(){
+  const r=state.data.raid;
+  if(!r){
+    openSheet(`<div class="ttl">⚔️ Co-op Raid</div>
+      <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Team up with an ally against a colossal boss. Your tonnage and theirs pool toward one target — no server; you sync their total from their Patrol Card.</div>
+      <label class="mini">Ally's name</label><input id="raid-ally" placeholder="e.g. Dick" style="margin-bottom:8px"/>
+      <label class="mini">Ally's Patrol Card <span style="color:var(--text3)">(optional — to sync their tonnage)</span></label>
+      <textarea id="raid-code" placeholder="Paste their card to track their contribution…" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none;margin-bottom:9px"></textarea>
+      <label class="mini">Choose your raid boss</label>
+      <div style="margin-top:6px">${RAID_BOSSES.map((b,i)=>`<button class="row sp" onclick="startRaid(${i})" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:10px;margin-bottom:7px;cursor:pointer;text-align:left"><div class="row g" style="gap:10px;min-width:0"><span style="font-size:26px;flex:none">${b.e}</span><div style="min-width:0"><b style="font-size:14px;color:var(--gold2)">${esc(b.n)}</b><div class="mini" style="color:var(--text3)">Pooled target ${fmtNum(b.target)}kg</div></div></div><span style="color:var(--gold2);flex:none">▶</span></button>`).join("")}</div>
+      <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
+    return;
+  }
+  const p=raidProgress();const barCol=p.done?"#2ECC71":r.c;
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:6px">${r.e} ${esc(r.boss)}</div>
+    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Co-op raid with <b class="gold">${esc(r.allyName)}</b> · pooled target ${fmtNum(r.target)}kg</div>
+    <div class="card glow center" style="padding:14px">
+      <div class="big" style="font-size:34px;color:${p.done?'var(--green)':'var(--gold2)'}">${fmtNum(p.combined)}<span style="font-size:16px">/${fmtNum(r.target)}kg</span></div>
+      <div style="height:12px;border-radius:7px;background:var(--bg2);overflow:hidden;margin:10px 0 6px"><div style="height:100%;width:${p.pct}%;background:${barCol};transition:width .4s"></div></div>
+      <div class="row sp"><span class="mini">You: <b class="gold">${fmtNum(p.mine)}kg</b></span><span class="mini">${esc(r.allyName)}: <b style="color:#7cc4ff">${fmtNum(p.ally)}kg</b></span></div>
+    </div>
+    ${p.done?`<button class="btn gold" style="margin-top:11px" onclick="claimRaid()">⚔️ Claim the kill</button>`:`<div class="mini" style="margin:11px 0 5px;color:var(--text2)">Your tonnage tracks automatically from every session logged since the raid began. Sync ${esc(r.allyName)}'s total from their latest Patrol Card:</div>
+      <textarea id="raid-sync" placeholder="Paste ${esc(r.allyName)}'s latest Patrol Card…" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none"></textarea>
+      <button class="btn sm" style="margin-top:6px" onclick="syncRaidAlly()">Sync ${esc(r.allyName)}'s tonnage</button>
+      <div class="row g" style="gap:7px;margin-top:6px"><button class="btn ghost sm" onclick="addRaidAlly(1000)">+1t manual</button><button class="btn ghost sm" onclick="addRaidAlly(5000)">+5t manual</button></div>`}
+    <button class="btn ghost sm" style="margin-top:12px;color:var(--text3)" onclick="endRaid()">Abandon raid</button>
+    <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
+}
+function raidCard(){const r=state.data.raid;
+  if(!r)return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim)" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0">⚔️ Co-op Raid</div><span class="mini" style="color:var(--gold2)">start ›</span></div><div class="mini" style="color:var(--text2)">Team up with an ally against a colossal boss — pool your tonnage toward one shared target.</div></div>`;
+  const p=raidProgress();
+  return `<div class="card glow" style="cursor:pointer" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0">${r.e} Raid: ${esc(r.boss.split(" — ")[0])}</div><span class="chip ${p.done?'on':''}">${Math.round(p.pct)}%</span></div>
+    <div style="height:10px;border-radius:6px;background:var(--bg2);overflow:hidden;margin:8px 0 5px"><div style="height:100%;width:${p.pct}%;background:${p.done?'#2ECC71':r.c}"></div></div>
+    <div class="mini" style="color:var(--text2)">${p.done?`Target smashed — tap to claim the kill with ${esc(r.allyName)}.`:`${fmtNum(p.combined)}/${fmtNum(r.target)}kg with ${esc(r.allyName)} · tap to sync & view`}</div></div>`;
 }
 function setActiveSplit(id){state.data.activeSplitId=id;state.data._nextDay=0;save();render();}
 function open1RM(){openSheet(`<div class="ttl">1RM calculator (Epley)</div>
@@ -3962,7 +4068,7 @@ function renderCase(){
   if(d.workouts.length)html+=`<button class="btn" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px;border-color:var(--gold-dim)" onclick="openArchive()">📈 Open THE ARCHIVE — strength curves & records</button>`;
   // monthly report
   if(daysSince(d.workouts[d.workouts.length-1]?.date)>=30||d.u.totalWorkouts>=12)
-    html+=`<button class="btn" style="margin-bottom:13px" onclick="monthlyReport()">📂 Open monthly Batcomputer report</button>`;
+    html+=`<button class="btn" style="margin-bottom:13px" onclick="periodReport(30)">📂 Batcomputer report — 30d · 90d · yearly</button>`;
   // PRs
   const prs=Object.entries(d.prs).sort((a,b)=>b[1].orm-a[1].orm).slice(0,10);
   html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🎯 Records (est. 1RM) <span class="mini" style="font-weight:400">— tap for full history</span></div><button class="btn ghost sm" style="width:auto" onclick="openForge()">🛠️ Forge</button></div>${prs.length?prs.map(([n,p])=>`<div class="row sp" style="margin-bottom:6px;cursor:pointer" onclick="openForge(${p.w},${p.r})"><span style="font-size:13px">${esc(n)} ›</span><b class="gold">${Math.round(p.orm)}kg <span class="mini">${p.w}×${p.r}</span></b></div>`).join(""):'<p class="muted">No PRs yet. Go set one.</p>'}<div class="mini" style="color:var(--text3);margin-top:4px">Tap a record to open it in The Forge · plan every working set by percentage.</div></div>`;
@@ -4047,20 +4153,39 @@ function exportICS(){
     setTimeout(()=>URL.revokeObjectURL(url),1500);toast(ws.length+" sessions exported to calendar.");
   }catch(e){toast("Export failed on this device.");}
 }
-function monthlyReport(){
-  const d=state.data;const wk=now()-30*864e5;const ws=d.workouts.filter(w=>new Date(w.date).getTime()>=wk);
+function monthlyReport(){periodReport(30);}        // back-compat entry point
+const REPORT_PERIODS=[[30,"30-DAY","30D"],[90,"90-DAY","90D"],[365,"ANNUAL","1YR"]];
+function periodReport(days){
+  days=days||30;
+  const d=state.data;const wk=now()-days*864e5;const ws=d.workouts.filter(w=>new Date(w.date).getTime()>=wk);
+  const meta=REPORT_PERIODS.find(p=>p[0]===days)||REPORT_PERIODS[0];
   const byDay={};ws.forEach(w=>{const dn=DAYS[(new Date(w.date).getDay()+6)%7];byDay[dn]=(byDay[dn]||0)+w.totalVol;});
   const bestDay=Object.entries(byDay).sort((a,b)=>b[1]-a[1])[0];
   let neglected=M12.map(m=>[m,weeklySets(m)]).sort((a,b)=>a[1]-b[1])[0];
   const avgLen=ws.length?Math.round(ws.reduce((a,w)=>a+w.duration,0)/ws.length/60):0;
+  const totVol=ws.reduce((a,w)=>a+w.totalVol,0);
+  const prCount=ws.reduce((a,w)=>a+(w.prs?.length||0),0);
+  const villains=(d.bossWins||[]).filter(b=>new Date(b.date).getTime()>=wk).length;
+  const weeks=Math.max(1,days/7);const perWeek=(ws.length/weeks).toFixed(1);
+  // best month — only meaningful over the annual window
+  let bestMonthRow="";
+  if(days>=180){
+    const byMonth={};ws.forEach(w=>{const dt=new Date(w.date);const k=dt.toLocaleDateString(undefined,{month:"short",year:"2-digit"});byMonth[k]=(byMonth[k]||0)+1;});
+    const bm=Object.entries(byMonth).sort((a,b)=>b[1]-a[1])[0];
+    if(bm)bestMonthRow=`> BIGGEST MONTH: <b class="gold">${bm[0]} — ${bm[1]} sessions</b><br/>`;
+  }
+  const tabs=REPORT_PERIODS.map(p=>`<button class="chip ${p[0]===days?'on':''} g" style="flex:1" onclick="periodReport(${p[0]})">${p[2]}</button>`).join("");
   openOverlay();$("ovcard").innerHTML=`<div class="classified">
-    <div class="row sp"><span class="stamp">CLASSIFIED</span><span class="mini">${ws.length} sessions / 30d</span></div>
-    <div style="margin-top:14px;font-size:13.5px;line-height:1.7">
+    <div class="row sp"><span class="stamp">CLASSIFIED</span><span class="mini">${ws.length} sessions / ${days}d</span></div>
+    <div class="row g" style="gap:6px;margin:11px 0 4px">${tabs}</div>
+    <div class="mini" style="letter-spacing:.14em;color:var(--gold-dim);margin-bottom:2px">${meta[1]} BATCOMPUTER REPORT</div>
+    <div style="margin-top:8px;font-size:13.5px;line-height:1.7">
     > BEST TRAINING DAY: <b class="gold">${bestDay?bestDay[0]:"—"}</b><br/>
     > MOST NEGLECTED SECTOR: <b class="red">${neglected?MNAME[neglected[0]]:"—"}</b> (${neglected?neglected[1]:0} sets/wk)<br/>
-    > AVG SESSION: <b>${avgLen} min</b><br/>
-    > TOTAL MOVED: <b class="gold">${fmtNum(ws.reduce((a,w)=>a+w.totalVol,0))}kg</b><br/>
-    > PRs SET: <b>${ws.reduce((a,w)=>a+(w.prs?.length||0),0)}</b>
+    > AVG SESSION: <b>${avgLen} min</b> · <b>${perWeek}</b>/week<br/>
+    ${bestMonthRow}> TOTAL MOVED: <b class="gold">${fmtNum(totVol)}kg</b> (${(totVol/1000).toFixed(1)}t)<br/>
+    > VILLAINS FELLED: <b>${villains}</b><br/>
+    > PRs SET: <b>${prCount}</b>
     </div>
     <div class="hr"></div>
     <div class="mini" style="font-style:italic">"${esc(alfredMonthSummary(ws,bestDay,neglected))}"</div>
@@ -4329,13 +4454,15 @@ function cycledTargets(n,mode){
   return {cals,protein,carbs,fat};
 }
 function waterTargetGlasses(n){const bw=+(n&&n.bw)||+state.data.u.bodyweight||80;return clamp(Math.round(bw*0.033/0.25),6,16);}
-function addFood(i){const fd=FOODS[i];if(!fd)return;foodDay().items.push({n:fd.n,k:fd.k,p:fd.p,c:fd.c,f:fd.f});haptic("light");save();openMessHall();}
-function removeFood(i){const day=foodDay();day.items.splice(i,1);haptic("light");save();openMessHall();}
+// Refresh whichever surface launched a food action: the Mess Hall sheet if open, else the FUEL tab.
+function fuelRefresh(){if($("sheet")&&$("sheet").classList.contains("on"))openMessHall();else render();}
+function addFood(i){const fd=FOODS[i];if(!fd)return;foodDay().items.push({n:fd.n,k:fd.k,p:fd.p,c:fd.c,f:fd.f});haptic("light");save();fuelRefresh();}
+function removeFood(i){const day=foodDay();day.items.splice(i,1);haptic("light");save();fuelRefresh();}
 function addCustomFood(){const nm=($("mh-name")||{}).value||"",k=+($("mh-k")||{}).value||0,p=+($("mh-p")||{}).value||0,c=+($("mh-c")||{}).value||0,f=+($("mh-f")||{}).value||0;
   if(!nm.trim()||(!k&&!p)){toast("Add a name and at least calories or protein.");return;}
-  foodDay().items.push({n:nm.trim().slice(0,28),k:k||Math.round(p*4+c*4+f*9),p,c,f});haptic("done");save();openMessHall();}
-function addWater(d){const day=foodDay();day.water=clamp((day.water||0)+d,0,30);haptic("light");save();openMessHall();}
-function clearFoodToday(){const fl=state.data.foodLog||{};fl[todayKey()]={items:[],water:0};haptic("warn");save();openMessHall();}
+  foodDay().items.push({n:nm.trim().slice(0,28),k:k||Math.round(p*4+c*4+f*9),p,c,f});haptic("done");save();fuelRefresh();}
+function addWater(d){const day=foodDay();day.water=clamp((day.water||0)+d,0,30);haptic("light");save();fuelRefresh();}
+function clearFoodToday(){const fl=state.data.foodLog||{};fl[todayKey()]={items:[],water:0};haptic("warn");save();fuelRefresh();}
 function openMessHall(){
   const n=state.data.u.nutrition;
   if(!n||!n.cals){
@@ -4408,6 +4535,60 @@ function openMessHall(){
 
     <div class="row g" style="gap:8px;margin-top:4px"><button class="btn ghost" onclick="state._afterFuel=openMessHall;openFuel()">Edit targets</button><button class="btn ghost" onclick="closeSheet()">Done</button></div>`);
 }
+/* ========================================================================
+   THE FUEL TAB — nutrition's own home. Pulls together the Fuel protocol,
+   quick food logging, hydration, the daily supplement stack and a bodyweight
+   weigh-in + trend, so the whole eating side of training lives in one place.
+   ======================================================================== */
+function logBW(){const el=$("fuel-bw");const v=el?parseFloat(el.value):NaN;
+  if(!v||v<20||v>400){toast("Enter your bodyweight in kg.");return;}
+  const kg=Math.round(v*10)/10;state.data.bwLog=state.data.bwLog||[];
+  state.data.bwLog.push({date:new Date().toISOString(),kg});state.data.u.bodyweight=kg;
+  save();haptic("done");toast("Weigh-in logged · "+kg+"kg");render();}
+function renderFuel(){
+  const d=state.data,u=d.u;const n=u.nutrition;
+  let html=`<div class="row sp"><div><h1 style="font-size:34px;color:var(--gold2)">FUEL</h1><div class="tag" style="margin-bottom:2px">Eat for the mission</div></div><button class="btn ghost sm" style="width:auto" onclick="openIndex()" title="Find anything">🧭</button></div>
+    <div class="muted" style="font-style:italic;font-size:13px;margin:2px 0 12px">"You are what you eat, Master Wayne. Make it count." — Alfred</div>`;
+  // 1) Fuel protocol — targets + carb-cycle + Mess Hall link (reused card)
+  html+=fuelProtocolCard();
+  if(n&&n.cals){
+    const day=foodDay();const tot=foodTotals(day);const train=isTrainingToday();const tgt=cycledTargets(n,train?"train":"rest");
+    // 2) Quick food log right on the tab
+    const chips=FOODS.map((fd,i)=>`<button class="chip g" style="margin:0 5px 6px 0;text-align:left" onclick="addFood(${i})">+ ${esc(fd.n)} <span class="mini" style="color:var(--text3)">${fd.s} · ${fd.p}p</span></button>`).join("");
+    const logRows=(day.items||[]).length?day.items.map((it,i)=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)">
+        <div class="g"><b style="font-size:13.5px">${esc(it.n)}</b><div class="mini" style="color:var(--text3)">${it.k}kcal · P${it.p} C${it.c} F${it.f}</div></div>
+        <button class="btn ghost sm" style="width:auto;padding:5px 9px;color:#ff8a7a" onclick="removeFood(${i})">✕</button></div>`).join("")
+      :`<p class="mini" style="color:var(--text3);padding:8px 0">Nothing logged yet today. Tap a food below or open the Mess Hall for custom entries.</p>`;
+    html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">📋 Today's intake</div><span class="mini"><b style="color:${tot.k>tgt.cals?'#ff8a7a':'var(--gold2)'}">${tot.k}</b>/${tgt.cals} kcal · ${tot.p}/${tgt.protein}g P</span></div>
+      ${logRows}
+      <div class="hr"></div>
+      <div class="mini" style="margin-bottom:6px;color:var(--text2)">Quick add</div>
+      <div class="row wrap">${chips}</div>
+      <button class="btn gold sm" style="margin-top:9px" onclick="openMessHall()">Open the Mess Hall — full log, rings & custom foods ›</button></div>`;
+  }
+  // 3) Hydration (works even before a protocol is set)
+  const day2=foodDay();const wT=waterTargetGlasses(n);const wHave=day2.water||0;
+  const glasses=Array.from({length:wT},(_,i)=>`<span style="font-size:17px;filter:grayscale(${i<wHave?0:1});opacity:${i<wHave?1:.4}">💧</span>`).join("");
+  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">💧 Hydration</div><span class="mini">${wHave}/${wT} glasses · ${(wHave*0.25).toFixed(2)}L</span></div>
+    <div style="margin:8px 0;line-height:1.9">${glasses}</div>
+    <div class="row g" style="gap:8px"><button class="btn ghost sm" onclick="addWater(1)">+ Glass</button><button class="btn ghost sm" style="flex:0 0 auto;width:auto" onclick="addWater(-1)">−</button></div></div>`;
+  // 4) Daily supplement stack (shared with Infirmary; toggleSupp is context-aware)
+  const supp=suppToday();const cStreak=creatineStreak();
+  const items=[["creatine","Creatine 5g","💊"],["protein","Protein target","🥩"],["omega","Omega-3","🐟"],["vitd","Vitamin D","☀️"],["water","Hydration","💧"]];
+  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">💊 Daily stack</div>${cStreak?`<span class="chip on" style="color:var(--gold2)">🔥 ${cStreak}d creatine</span>`:""}</div>
+    <div style="margin-top:6px">${items.map(([k,l,e])=>{const on=!!supp[k];return `<button class="row sp" onclick="toggleSupp('${k}')" style="width:100%;background:none;border:none;padding:9px 0;border-top:1px solid var(--border);cursor:pointer"><span style="font-size:13.5px;color:${on?'var(--text)':'var(--text2)'}">${e} ${l}</span><span style="font-size:18px">${on?'✅':'⬜️'}</span></button>`;}).join("")}</div>
+    <div class="mini" style="margin-top:7px;color:var(--text3);font-style:italic">Creatine monohydrate 3–5g daily is the most evidence-backed legal supplement — consistency is the whole game.</div></div>`;
+  // 5) Bodyweight weigh-in + trend
+  const log=(d.bwLog||[]);const vals=log.slice(-16).map(e=>+e.kg).filter(v=>v>0);
+  const first=vals.length?vals[0]:null,last=vals.length?vals[vals.length-1]:null;const delta=(first!=null&&last!=null)?(last-first):null;
+  const curve=vals.length>=2&&typeof trendChart==="function"?trendChart(vals,{color:"#7cc4ff",unit:"kg"}):"";
+  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">⚖️ Bodyweight</div><span class="big" style="font-size:24px">${u.bodyweight||"—"}<span style="font-size:13px">kg</span></span></div>
+    ${curve?`<div style="margin:8px 0 2px">${curve}</div><div class="mini" style="color:${delta>0?'#7cc4ff':delta<0?'#ff8a7a':'var(--text3)'}">${delta!=null?(delta>0?"▲ +":delta<0?"▼ ":"")+ (delta?Math.abs(delta).toFixed(1)+"kg across last "+vals.length+" weigh-ins":"holding steady"):""}</div>`:`<div class="mini" style="color:var(--text3);margin:4px 0">Log a few weigh-ins to draw your trend curve.</div>`}
+    <div class="row g" style="gap:8px;margin-top:9px"><input id="fuel-bw" inputmode="decimal" placeholder="${u.bodyweight||75} kg" style="flex:1"/><button class="btn gold sm" style="width:auto" onclick="logBW()">Log weigh-in</button></div>
+    <div class="mini" style="margin-top:7px;color:var(--text3)">Weigh first thing, same conditions. Track the weekly average, not the daily noise.</div></div>`;
+  $("app").innerHTML=html;
+}
+
 /* ===== Wave L — The Gotham Chronicle: a story campaign that unlocks with real milestones ===== */
 const STORY=[
   {id:"vow",t:"The Vow",e:"🕯️",req:s=>true,need:s=>"",
@@ -4475,7 +4656,7 @@ function renderAlfred(){
   html+=storyCampaignCard();
   html+=alfredCaveReview();
   html+=alfredDebrief();
-  html+=fuelProtocolCard();
+  html+=`<div class="card" style="cursor:pointer;display:flex;align-items:center;gap:12px;border-color:var(--gold-dim)" onclick="go('fuel')"><div style="font-size:30px">🍽️</div><div style="flex:1"><div class="ttl" style="margin:0">Fuel &amp; nutrition moved</div><div class="mini" style="color:var(--text2)">Calories, macros, water, supplements &amp; weigh-ins now live in their own <b style="color:var(--gold2)">FUEL</b> tab — bottom bar.</div></div><span style="color:var(--gold2);font-size:20px">›</span></div>`;
   html+=fightRecordCard();
   html+=alfredMusclePicker();
   if(!has){html+=`<div class="card"><div class="row" style="gap:10px;align-items:center"><div style="font-size:32px">🤖</div><div><h3 style="font-size:17px;color:var(--gold2);margin:0 0 2px">Want Alfred to talk back?</h3>
