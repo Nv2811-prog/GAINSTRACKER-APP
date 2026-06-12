@@ -2516,6 +2516,44 @@ function fatigueMini(){const f=fatigueDebt();
   <div class="bar" style="margin-top:8px"><i style="width:${f.pct}%;background:${f.color}"></i></div>
   <div class="mini" style="margin-top:6px;color:var(--text2)">${esc(f.status)}</div></div>`;
 }
+// Patrol Readiness — one daily score fusing recovery, sleep and accumulated fatigue.
+function patrolReadiness(){
+  const d=state.data,trained=M12.filter(m=>(d.muscleVol[m]||0)>0);
+  const rec=trained.length?clamp(100-fatigueDebt().pct,0,100):85;
+  // sleep — latest log within 40h
+  let sleep=72,sleepKnown=false;
+  const sl=(d.sleepLog||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+  if(sl&&(now()-new Date(sl.date).getTime())<40*36e5){
+    const q=sl.quality?clamp(sl.quality/5,0,1):null,h=sl.hours?clamp(sl.hours/8,0,1):null;
+    const parts=[q,h].filter(v=>v!=null);
+    if(parts.length){sleep=Math.round(parts.reduce((a,b)=>a+b,0)/parts.length*100);sleepKnown=true;}
+  }
+  // freshness — consecutive training days fatigue the CNS
+  const cons=consecutiveDays();
+  const fresh=clamp(100-Math.max(0,cons-1)*11,30,100);
+  const score=clamp(Math.round(rec*0.45+sleep*0.30+fresh*0.25),0,100);
+  const bands=[[80,"PRIMED","var(--green)","Green light — attack the hardest session on your plan."],
+    [60,"READY","var(--gold2)","Good to go. Train as planned, push the top sets."],
+    [40,"GUARDED","var(--orange)","Below peak. Favour quality over junk volume tonight."],
+    [0,"DEPLETED","var(--red)","Recovery is the mission today. Back off or rest, sir."]];
+  let b=bands[bands.length-1];for(const x of bands)if(score>=x[0]){b=x;break;}
+  return {score,label:b[1],color:b[2],line:b[3],rec:Math.round(rec),sleep,fresh,sleepKnown};
+}
+function readinessCard(){
+  const r=patrolReadiness(),C=326.7,off=(C*(1-r.score/100)).toFixed(1);
+  const fac=(l,v)=>`<div style="flex:1;text-align:center"><div class="mini" style="font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)">${l}</div><div style="font-family:var(--disp);font-size:16px;color:var(--text2)">${v}</div></div>`;
+  return `<div class="card glow" style="margin-bottom:13px"><div class="row" style="gap:16px;align-items:center">
+    <div style="position:relative;width:104px;height:104px;flex:none">
+      <svg viewBox="0 0 120 120" style="transform:rotate(-90deg)"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/><circle cx="60" cy="60" r="52" fill="none" stroke="${r.color}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" style="transition:stroke-dashoffset .9s ease"/></svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--disp);font-size:30px;color:${r.color};line-height:1">${r.score}</div><div class="mini" style="font-size:8.5px;letter-spacing:.1em;color:var(--text3)">/ 100</div></div>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div class="mini" style="letter-spacing:.16em;text-transform:uppercase;color:var(--text3)">Patrol readiness</div>
+      <div style="font-family:var(--disp);font-size:22px;color:${r.color};line-height:1.1;margin:1px 0 4px">${r.label}</div>
+      <div class="mini" style="color:var(--text2);line-height:1.45">${esc(r.line)}</div>
+    </div></div>
+    <div class="row" style="gap:6px;margin-top:11px;border-top:1px solid var(--border);padding-top:9px">${fac("Recovery",r.rec+"%")}${fac("Sleep",r.sleepKnown?r.sleep+"%":"—")}${fac("Freshness",r.fresh+"%")}</div></div>`;
+}
 // Training Age Clock
 const TA_MILES=[[7,"First Week","🌑"],[30,"One Month","🌘"],[90,"90 Nights","🌗"],[180,"Half a Year","🌖"],[365,"One Year","🌕"],[730,"Two Years","⭐"],[1825,"Five Years","🦇"],[3650,"A Decade in the Cave","🔱"]];
 function firstWorkoutDate(){const ws=state.data.workouts;if(!ws.length)return null;let mn=Infinity;ws.forEach(w=>{const t=new Date(w.date).getTime();if(t<mn)mn=t;});return mn;}
@@ -2661,6 +2699,7 @@ function renderGotham(){
     <h1 style="font-size:34px;color:var(--gold2)">${u.name?esc(u.name.toUpperCase()):"GOTHAM"}</h1></div></div>
     <button class="btn ghost sm" style="width:auto" onclick="openSettings()">⚙︎</button></div>
     <div class="muted" style="font-style:italic;font-size:13px;margin:-2px 0 12px">${gothamWeather()}</div>`;
+  html+=readinessCard();
   html+=`<div class="grid2" style="margin-bottom:13px">${threatCard()}${fatigueMini()}</div>`;
 
   // rest day warning (4+ consecutive)
