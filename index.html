@@ -228,6 +228,11 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 @keyframes breathe{0%,100%{transform:scaleY(1) translateY(0)}50%{transform:scaleY(1.02) translateY(-2px)}}
 .suit-breathe{animation:breathe 4s ease-in-out infinite;transform-origin:bottom center}
 .fade{animation:fade .35s ease both}@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ssgroup{position:relative;border-left:2px solid rgba(232,69,60,.55);border-radius:0 14px 14px 0;padding-left:9px;margin-bottom:13px;background:linear-gradient(90deg,rgba(232,69,60,.07),transparent 55%)}
+.ssgroup .card{margin-bottom:8px}
+.ssgroup .card:last-of-type{margin-bottom:4px}
+.sshead{display:flex;align-items:center;gap:6px;font-family:var(--disp);letter-spacing:.13em;font-size:12px;color:#ff8378;padding:9px 4px 5px}
+.sshead em{font-style:normal;font-family:inherit;letter-spacing:normal;color:var(--text3);font-weight:400;font-size:11px;text-transform:none}
 .heat{display:grid;grid-template-columns:repeat(26,1fr);gap:2px}
 .heat i{aspect-ratio:1;border-radius:2px;background:var(--bg4)}
 .spark{display:flex;align-items:flex-end;gap:3px;height:38px}
@@ -1149,6 +1154,9 @@ function showPRToast(name,e1,prev){
 function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();}
 function delSet(ei,si){state.session.exercises[ei].sets.splice(si,1);render();}
 function removeExercise(ei){appConfirm({title:"Remove exercise",body:"Remove this exercise from the session?",ok:"Remove",danger:true}).then(ok=>{if(ok){state.session.exercises.splice(ei,1);render();}});}
+// Supersets/circuits: link this exercise with the next into one back-to-back group.
+function linkNext(ei){const ex=state.session.exercises;if(ei>=ex.length-1)return;const g=ex[ei].group||ex[ei+1].group||("ss"+now());ex[ei].group=g;ex[ei+1].group=g;haptic&&haptic("tap");render();}
+function unlinkGroup(ei){const ex=state.session.exercises;const g=ex[ei].group;if(!g)return;ex.forEach(e=>{if(e.group===g)delete e.group;});render();}
 function addExerciseToSession(name){if(!state.session.exercises.some(e=>e.name===name))state.session.exercises.push({name,sets:seedSets(name)});closeSheet();render();}
 
 /* ========================= COMMIT WORKOUT ========================= */
@@ -1488,8 +1496,21 @@ function renderLogging(){
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
   html+=`<div class="card glow" style="padding:13px"><div class="ttl">⚡ Tonight's damage report</div>${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div></div>`;
   sessionVolNotes().forEach(nt=>{html+=`<div class="banner" style="background:rgba(232,197,106,.10);border-color:rgba(232,197,106,.4);margin-bottom:8px"><span>🧠</span><div class="mini" style="line-height:1.5">${nt.text}</div></div>`;});
+  // Supersets & circuits: consecutive exercises sharing e.group render inside a linked wrapper.
+  const gCount={};ses.exercises.forEach(e=>{if(e.group)gCount[e.group]=(gCount[e.group]||0)+1;});
+  let curG=null,gLetters={},gSeq=0;
   ses.exercises.forEach((e,ei)=>{
     const ex=exFor(e.name);const sug=suggestionFor(e.name);
+    const inGroup=e.group&&gCount[e.group]>1;
+    if((e.group||null)!==curG){
+      if(curG&&gCount[curG]>1)html+=`</div>`;            // close previous group wrapper
+      curG=e.group||null;
+      if(inGroup){
+        if(!gLetters[e.group])gLetters[e.group]=String.fromCharCode(65+(gSeq++));
+        const isCirc=gCount[e.group]>=3;
+        html+=`<div class="ssgroup"><div class="sshead">${secIcon('link','#ff8378')}${isCirc?'CIRCUIT':'SUPERSET'} ${gLetters[e.group]} <em>· ${gCount[e.group]} moves, back-to-back — rest after the round</em></div>`;
+      }
+    }
     html+=`<div class="card">
       <div class="row" style="margin-bottom:8px">
         ${thumb(ex,true)}
@@ -1519,12 +1540,18 @@ function renderLogging(){
         <td><div class="sdone ${s.done?"on":""}" onclick="toggleDone(${ei},${si})">${s.done?"✓":""}</div></td>
       </tr>`;
     });
+    const canLink=ei<ses.exercises.length-1;
+    const linkBtn=inGroup
+      ? `<button class="btn ghost sm" style="width:auto;display:flex;align-items:center;gap:4px;color:#ff8378" onclick="unlinkGroup(${ei})">${secIcon('link','#ff8378')}Unlink</button>`
+      : (canLink?`<button class="btn ghost sm" style="width:auto;display:flex;align-items:center;gap:4px" title="Superset with the next exercise" onclick="linkNext(${ei})">${secIcon('link')}Superset ↓</button>`:"");
     html+=`</tbody></table>
-      <div class="row" style="margin-top:9px;gap:8px">
+      <div class="row wrap" style="margin-top:9px;gap:8px">
         <button class="btn ghost sm g" onclick="addSet(${ei})">+ Add set</button>
         <button class="btn ghost sm" style="width:auto" onclick="showCues('${esc(e.name).replace(/'/g,"")}')">ℹ️ Cues</button>
+        ${linkBtn}
       </div></div>`;
   });
+  if(curG&&gCount[curG]>1)html+=`</div>`;                  // close trailing group wrapper
   html+=`<button class="btn" onclick="openPicker()">＋ Add exercise</button>
     <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
   $("app").innerHTML=html;
@@ -2523,6 +2550,7 @@ function secIcon(key,c){
     suit:'<path d="M12 3.5l6 2.4v5.1c0 4-2.6 7-6 9.5-3.4-2.5-6-5.5-6-9.5V5.9z"/>',
     radar:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 3.5v17M3.5 12h17"/>',
     plate:'<rect x="2.5" y="7" width="3" height="10" rx="1"/><rect x="6.5" y="9" width="2.6" height="6" rx="1"/><path d="M9.1 12h5.8"/><rect x="14.9" y="9" width="2.6" height="6" rx="1"/><rect x="18.5" y="7" width="3" height="10" rx="1"/>',
+    link:'<path d="M9.5 14.5l5-5M10.5 6.8l1.7-1.7a3.4 3.4 0 014.9 4.9l-2.2 2.2M13.5 17.2l-1.7 1.7a3.4 3.4 0 01-4.9-4.9l2.2-2.2"/>',
     flame:'<path d="M12 3.5c.6 3 3.5 4.2 3.5 7.5a3.5 3.5 0 01-7 0c0-1 .4-1.7.9-2.4C10.8 9.6 12 8 12 3.5z"/><path d="M8.6 13a5 5 0 109.6 1.8c0-3.4-2.4-5-3.4-7"/>'
   };
   return `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;flex:none;filter:drop-shadow(0 1px 4px rgba(201,168,76,.35))">${P[key]||''}</svg>`;
