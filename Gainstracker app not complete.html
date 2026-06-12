@@ -1495,14 +1495,14 @@ function renderLogging(){
         ${thumb(ex,true)}
         <div class="g"><div class="exname">${esc(e.name)}</div>
           <div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")}${ex.bw?" · bodyweight":""}</div></div>
-        ${ex.eq==="barbell"||ex.eq==="smith"||ex.eq==="ez bar"||ex.eq==="trap bar"?`<button class="btn ghost sm" style="width:auto;padding:8px 10px" onclick="openPlateSheet(${ei})">🔧</button>`:""}
+        ${ex.eq==="barbell"||ex.eq==="smith"||ex.eq==="ez bar"||ex.eq==="trap bar"?`<button class="btn ghost sm" style="width:auto;padding:8px 9px;display:flex;align-items:center" title="Plate calculator" onclick="openPlateSheet(${ei})">${secIcon('plate')}</button>`:""}
         <button class="btn ghost sm" style="width:auto;padding:8px 10px;color:var(--text3)" onclick="removeExercise(${ei})">✕</button>
       </div>
       ${sug?`<div class="mini" style="margin-bottom:6px">💡 Intel: last best ≈ ${sug}kg ${ex.bw?"added":""}. ${ses.readiness==="tired"?"Tired — match it.":"Beat it."}</div>`:""}
       ${(()=>{const nt=nextTarget(e.name);return nt?`<div class="mini" style="margin-bottom:6px;color:var(--green);line-height:1.4">🎯 <b>Next target:</b> ${nt}</div>`:"";})()}
       ${(ex.c&&ex.c[0])?`<div class="mini" style="margin-bottom:6px;color:var(--blue);line-height:1.4">🧪 ${esc(ex.c[0])}${ex.c.length>1?` <span onclick="showCues('${esc(e.name).replace(/'/g,"")}')" style="color:var(--gold2);cursor:pointer">+${ex.c.length-1} more</span>`:""}</div>`:""}
       ${(()=>{const w=warmupSuggest(ei);return w?`<div class="card" style="margin:6px 0;padding:10px;background:#1a1305;border-color:var(--gold-dim,#6b5420)">
-        <div class="mini" style="color:var(--gold2);margin-bottom:4px">🔥 Warm-up — ${esc(w.muscles)} still cold</div>
+        <div class="mini" style="color:var(--gold2);margin-bottom:4px;display:flex;align-items:center">${secIcon('flame')}Warm-up — ${esc(w.muscles)} still cold</div>
         <div class="mini" style="margin-bottom:6px">${w.sets.map(s=>s.w+"kg × "+s.r).join("  ·  ")} <span style="color:var(--text3)">— primes the pattern, doesn't count as working volume</span></div>
         <div class="row" style="gap:8px"><button class="btn gold sm g" onclick="addWarmups(${ei})">Add warm-up</button><button class="btn ghost sm" style="width:auto" onclick="dismissWarm(${ei})">Skip</button></div></div>`:"";})()}
       <table class="settbl"><thead><tr><th>SET</th><th>PREVIOUS</th><th>${ex.bw?"+KG":"KG"}</th><th>REPS</th><th>TYPE</th><th>${metric==="rir"?"RIR":"RPE"}</th><th>✓</th></tr></thead><tbody>`;
@@ -1642,14 +1642,35 @@ function openPlateSheet(ei){
     plates.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});
     return used;
   };
-  const render3=(target)=>{
-    const used=calc(target);const colors={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};
-    $("sheet").querySelector("#plate-out").innerHTML=used.length?
-      `<div class="row wrap" style="justify-content:center;gap:5px;margin:10px 0">${used.map(p=>`<span style="background:${colors[p]||'#888'};color:#000;font-weight:700;font-size:12px;padding:5px 8px;border-radius:5px">${p}</span>`).join("")}</div>
-       <div class="mini center">Per side · bar ${bar}kg · total ${(bar+used.reduce((a,b)=>a+b,0)*2)}kg</div>`
-      :`<p class="muted center" style="margin:10px">Just the bar (${bar}kg) or set a higher target.</p>`;
+  const colors={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};
+  // To-scale loaded-barbell graphic: plates mirror both sleeves, height ∝ weight, real plate colours.
+  const barSVG=(used)=>{
+    const H=96,cy=H/2,sleeve=26,W=300,cx=W/2;
+    const ph=p=>26+p*1.55;               // 25kg→64.75, 1.25→27.9
+    const pw=p=>p>=20?12:p>=10?10:p>=5?8:6;
+    let gap=2,xR=cx+sleeve,xL=cx-sleeve,plates="";
+    used.forEach(p=>{
+      const h=ph(p),w=pw(p),col=colors[p]||"#888";
+      plates+=`<rect x="${xR}" y="${cy-h/2}" width="${w}" height="${h}" rx="2.5" fill="${col}" stroke="#05080c" stroke-opacity=".55" stroke-width="1"/>`;
+      plates+=`<rect x="${xL-w}" y="${cy-h/2}" width="${w}" height="${h}" rx="2.5" fill="${col}" stroke="#05080c" stroke-opacity=".55" stroke-width="1"/>`;
+      xR+=w+gap;xL-=w+gap;
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">
+      <defs><linearGradient id="barSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#aeb6c2"/><stop offset=".5" stop-color="#7b828f"/><stop offset="1" stop-color="#4c525c"/></linearGradient></defs>
+      <rect x="20" y="${cy-3}" width="${W-40}" height="6" rx="3" fill="url(#barSteel)"/>
+      <rect x="${cx-sleeve}" y="${cy-7}" width="${sleeve*2}" height="14" rx="3" fill="url(#barSteel)"/>
+      <rect x="${cx-1}" y="${cy-9}" width="2" height="18" fill="#2a2f3a"/>
+      ${plates}</svg>`;
   };
-  $("sheet").innerHTML=`<div class="ttl">🔧 Plate calculator</div>
+  const render3=(target)=>{
+    const used=calc(target);const leftover=Math.max(0,(target-bar)/2-used.reduce((a,b)=>a+b,0));
+    $("sheet").querySelector("#plate-out").innerHTML=used.length?
+      `<div class="stage" style="border-radius:14px;padding:14px 10px 10px;margin:10px 0">${barSVG(used)}</div>
+       <div class="row wrap" style="justify-content:center;gap:5px;margin:4px 0">${used.map(p=>`<span style="background:${colors[p]||'#888'};color:#000;font-weight:700;font-size:12px;padding:5px 8px;border-radius:5px;box-shadow:0 2px 8px -2px rgba(0,0,0,.6)">${p}</span>`).join("")}</div>
+       <div class="mini center">Per side · bar ${bar}kg · <b class="gold">total ${(bar+used.reduce((a,b)=>a+b,0)*2)}kg</b>${leftover>0?` · <span style="color:#e8a52a">${leftover.toFixed(2)}kg/side short — micro-plates needed</span>`:""}</div>`
+      :`<p class="muted center" style="margin:14px 10px">Just the bar (${bar}kg) — or set a higher target.</p>`;
+  };
+  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center">${secIcon('plate')}Plate calculator</div>
     <input id="plate-target" inputmode="decimal" placeholder="Target total weight (kg)" oninput="window._plate(this.value)"/>
     <div id="plate-out"></div>
     <button class="btn" style="margin-top:8px" onclick="closeSheet()">Close</button>`;
@@ -2500,7 +2521,9 @@ function secIcon(key,c){
     strength:'<path d="M6.5 6.5v11M3.5 9v5M17.5 6.5v11M20.5 9v5M6.5 12h11"/>',
     schedule:'<rect x="3.5" y="5.5" width="17" height="15" rx="2.2"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/>',
     suit:'<path d="M12 3.5l6 2.4v5.1c0 4-2.6 7-6 9.5-3.4-2.5-6-5.5-6-9.5V5.9z"/>',
-    radar:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 3.5v17M3.5 12h17"/>'
+    radar:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 3.5v17M3.5 12h17"/>',
+    plate:'<rect x="2.5" y="7" width="3" height="10" rx="1"/><rect x="6.5" y="9" width="2.6" height="6" rx="1"/><path d="M9.1 12h5.8"/><rect x="14.9" y="9" width="2.6" height="6" rx="1"/><rect x="18.5" y="7" width="3" height="10" rx="1"/>',
+    flame:'<path d="M12 3.5c.6 3 3.5 4.2 3.5 7.5a3.5 3.5 0 01-7 0c0-1 .4-1.7.9-2.4C10.8 9.6 12 8 12 3.5z"/><path d="M8.6 13a5 5 0 109.6 1.8c0-3.4-2.4-5-3.4-7"/>'
   };
   return `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;flex:none;filter:drop-shadow(0 1px 4px rgba(201,168,76,.35))">${P[key]||''}</svg>`;
 }
