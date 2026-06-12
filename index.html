@@ -92,6 +92,22 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .tbtn:active{transform:scale(.95)}
 .tbtn.wide{color:var(--gold2);border-color:var(--gold-dim);background:var(--gold-bg)}
 .tbtn .tbl{font-family:var(--disp);font-size:11px;letter-spacing:.06em}
+/* Accordion sections — expand/collapse for dense areas */
+.accsec{border:1px solid var(--border);border-radius:15px;margin-bottom:12px;overflow:hidden;background:linear-gradient(160deg,#121217,#0d0d11)}
+.acc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 15px;cursor:pointer;user-select:none}
+.acc-head:active{background:rgba(235,199,107,.05)}
+.acc-head .acc-ttl{display:flex;align-items:center;gap:9px;font-family:var(--disp);font-size:15px;letter-spacing:.02em;color:var(--gold2)}
+.acc-head .acc-sub{font-size:11px;color:var(--text3);font-family:var(--sans);letter-spacing:0}
+.acc-arrow{color:var(--text3);font-size:13px;transition:transform .22s ease;display:inline-block}
+.acc-arrow.cl{transform:rotate(-90deg)}
+.acc-body{padding:0 12px 13px}
+.acc-body.hide{display:none}
+/* Command Center tiles */
+.cc-tile{text-align:left;padding:13px 12px;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:74px}
+.cc-tile .cc-ic{font-size:22px;line-height:1}
+.cc-tile .cc-nm{font-family:var(--disp);font-size:13.5px;color:var(--text);letter-spacing:.01em;margin-top:3px}
+.cc-tile .cc-ds{font-size:10.5px;color:var(--text3);line-height:1.3}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 /* Rank ladder */
 .rl-row{display:flex;align-items:center;gap:11px;padding:9px 11px;border:1px solid var(--border);border-radius:12px;margin-bottom:7px;background:linear-gradient(160deg,#0f0f13,#0c0c0f)}
 .rl-row.cur{border-color:var(--gold-dim);background:var(--gold-bg);box-shadow:0 0 24px rgba(235,199,107,.12)}
@@ -1604,7 +1620,7 @@ function discardSession(){appConfirm({title:"Discard session",body:"End this ses
 
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
-const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["case","📈","CASE"],["strategy","📋","PLAN"],["suit","💪","SUIT"]];
+const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["case","📈","CASE"],["suit","💪","SUIT"]];
 const MORE_TABS=[["fuel","🍽️","FUEL","Calories, macros, food log, water & weigh-ins"],["alfred","🤖","ALFRED","AI coach, physique scan & the Chronicle"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.showOnboarding){$("nav").classList.add("hide");return;}
@@ -1622,6 +1638,24 @@ function topBar(){
     <div style="display:flex;gap:6px">${jump.slice(1).map(b=>`<button class="tbtn" title="${b[2]}" onclick="${b[0]}">${b[1]}</button>`).join("")}</div>
   </div>`;
 }
+/* ===================== ACCORDION (expand/collapse for dense sections) ===================== */
+function accIsOpen(id,def){state.accOpen=state.accOpen||{};return state.accOpen[id]!==undefined?state.accOpen[id]:!!def;}
+function acc(id,icon,title,inner,def,sub){
+  const open=accIsOpen(id,def);
+  return `<div class="accsec"><div class="acc-head" onclick="toggleAcc('${id}')">
+    <div class="acc-ttl">${icon} <span>${title}${sub?` <span class="acc-sub">· ${sub}</span>`:""}</span></div>
+    <span class="acc-arrow ${open?"":"cl"}" id="arr_${id}">▾</span></div>
+    <div id="${id}" class="acc-body ${open?"":"hide"}">${inner}</div></div>`;
+}
+function toggleAcc(id){
+  const b=$(id);if(!b)return;
+  const willOpen=b.classList.contains("hide");
+  b.classList.toggle("hide");
+  const a=$("arr_"+id);if(a)a.classList.toggle("cl",!willOpen);
+  state.accOpen=state.accOpen||{};state.accOpen[id]=willOpen;
+  if(willOpen)haptic();
+}
+function goPlan(){state.accOpen=state.accOpen||{};state.accOpen["m-plan"]=true;go("mission");}
 /* ===================== COMMAND CENTER (the ☰ MORE menu) ===================== */
 function openMenu(){
   const big=MORE_TABS.map(t=>`<button class="card" style="text-align:left;padding:15px;display:flex;gap:13px;align-items:center;cursor:pointer" onclick="closeSheet();go('${t[0]}')">
@@ -1642,17 +1676,30 @@ function openMenu(){
     ["openTDEE","🍳","Fuel Math","TDEE & macro estimator"],
     ["openCombos","🥊","Combo Trainer","Random MMA strings"]
   ];
-  const fHtml=features.map(f=>`<button class="card" style="text-align:left;padding:13px;cursor:pointer" onclick="closeSheet();${f[0]}()">
-    <div style="font-size:23px">${f[1]}</div><div class="ttl" style="margin:4px 0 1px;font-size:14px">${f[2]}</div><div class="mini" style="color:var(--text3);line-height:1.35">${f[3]}</div></button>`).join("");
-  const tools=[["openForge","⚒️ Forge"],["openGarage","🏍️ Garage"],["openInfirmary","🏥 Infirmary"],["openArchive","🗄️ Archive"],["openBatcomputer","🧠 Batcomputer"],["openJusticeLeague","🦸 League"],["openRoundTimer","🥊 Rounds"],["openMessHall","🍽️ Mess Hall"],["openSettings","⚙️ Settings"],["openIndex","🧭 Search all"]];
+  const tile=(fn,ic,nm,ds)=>`<button class="card cc-tile" onclick="closeSheet();${fn}()"><div class="cc-ic">${ic}</div><div class="cc-nm">${nm}</div>${ds?`<div class="cc-ds">${ds}</div>`:""}</button>`;
+  const fHtml=features.map(f=>tile(f[0],f[1],f[2],f[3])).join("");
+  const tools=[
+    ["openForge","⚒️","Forge","Plate-load calculator"],
+    ["openGarage","🏍️","Garage","Milestone ride unlocks"],
+    ["openInfirmary","🏥","Infirmary","Recovery, sleep & injuries"],
+    ["openArchive","🗄️","Archive","Full workout history"],
+    ["openBatcomputer","🧠","Batcomputer","Deep analytics"],
+    ["openJusticeLeague","🦸","League","Train with friends"],
+    ["openRoundTimer","🥊","Rounds","Round / interval timer"],
+    ["openMessHall","🍽️","Mess Hall","Meals & nutrition"],
+    ["openGym","🏋️","My Gym","Equipment you own"],
+    ["openSettings","⚙️","Settings","Preferences & data"]
+  ];
+  const tHtml=tools.map(t=>tile(t[0],t[1],t[2],t[3])).join("");
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:8px">☰ Command Center</div>
-    <div class="mini" style="color:var(--text2);margin:-2px 0 12px">Everything that isn't a main tab — sections, new tools & gadgets, one tap away.</div>
+    <div class="mini" style="color:var(--text2);margin:-2px 0 11px">Everything that isn't a main tab — tap any tile.</div>
+    <button class="btn ghost sm" style="width:100%;margin-bottom:14px;justify-content:center" onclick="closeSheet();openIndex()">🧭 &nbsp;Search every tool & exercise…</button>
     <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">SECTIONS</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">${big}</div>
-    <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">NEW GADGETS</div>
-    <div class="grid2" style="margin-bottom:14px">${fHtml}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:15px">${big}</div>
+    <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">GADGETS</div>
+    <div class="grid3" style="margin-bottom:15px">${fHtml}</div>
     <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">TOOLS</div>
-    <div class="row wrap">${tools.map(t=>`<button class="chip g" style="margin:0 5px 6px 0" onclick="closeSheet();${t[0]}()">${t[1]}</button>`).join("")}</div>
+    <div class="grid3" style="margin-bottom:4px">${tHtml}</div>
     <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 function go(tab){state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}render();window.scrollTo(0,0);}
@@ -3259,7 +3306,7 @@ const INDEX_ITEMS=[
   ["⚔️","Mission / log a workout","Start or log tonight's session","go('mission')"],
   ["🍽️","FUEL — nutrition","Calories, macros, food log, water, supplements, weigh-ins","go('fuel')"],
   ["📈","Case File","Records, defeats, history & analytics","go('case')"],
-  ["📋","Strategy / Plan","Splits, volume map, deload readiness","go('strategy')"],
+  ["📋","Plan & schedule","Splits, training days, volume map","goPlan()"],
   ["🤖","Alfred","AI coach, physique scan, the Chronicle","go('alfred')"],
   ["💪","The Suit","Your muscle figure & recovery map","go('suit')"],
   ["🦾","WAYNE TECH","The gadget hub — every tool in one tab","go('tech')"],
@@ -3442,7 +3489,7 @@ function renderGotham(){
       html+=`<div class="row sp"><div class="row g" style="gap:11px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${ni})">${dayThumb(nextDay)}<div><h2 style="font-size:26px">${esc(nextDay.name)} <span class="mini" style="color:var(--gold2)">›</span></h2><div class="mini">${esc(sp.name)} · ${nextDay.exercises.length} exercises · tap to preview</div></div></div>
         <button class="btn gold sm" onclick="startWorkout('${sp.id}',${ni})">START ▶</button></div>`;
     }
-  }else html+=`<p class="muted">No split selected. Head to STRATEGY to build one, or start a free session.</p><button class="btn gold sm" style="margin-top:8px" onclick="freeWorkout()">FREE SESSION ▶</button>`;
+  }else html+=`<p class="muted">No split selected. <a onclick="goPlan()" style="color:var(--gold2);cursor:pointer;text-decoration:underline">Build one in Mission → Plan</a>, or start a free session.</p><button class="btn gold sm" style="margin-top:8px" onclick="freeWorkout()">FREE SESSION ▶</button>`;
   html+=`</div>`;
 
   // The Gauntlet — daily finisher challenge
@@ -3461,7 +3508,7 @@ function renderGotham(){
   html+=`<div class="grid3" style="margin-bottom:13px">
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.streakDays}</div><div class="mini">day streak ›</div></div>
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.totalWorkouts}</div><div class="mini">missions ›</div></div>
-    <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('strategy')"><div class="big" style="font-size:30px">${weekCount()}/${u.weeklyGoal}</div><div class="mini">this week ›</div></div></div>`;
+    <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="goPlan()"><div class="big" style="font-size:30px">${weekCount()}/${u.weeklyGoal}</div><div class="mini">this week ›</div></div></div>`;
   html+=`<div class="grid2" style="margin-bottom:13px">
     <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openGarage()">🚗 Garage ${GARAGE.filter(v=>v.req(gothamStats())).length}/${GARAGE.length} ›</button>
     <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openInfirmary()">🚑 Infirmary ›</button></div>`;
@@ -3539,8 +3586,12 @@ function overloadIntel(){  const out=[];const seen=new Set();
 /* ========================= MISSION TAB ========================= */
 function renderMission(){
   const d=state.data;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">MISSION</h1><div class="tag" style="margin-bottom:12px">Choose your patrol</div>`;
-  if(!d.splits.length)html+=`<div class="card"><p class="muted">No splits yet. Build one in STRATEGY, or jump into a free session.</p></div>`;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">MISSION</h1><div class="tag" style="margin-bottom:12px">Patrol · plan · schedule · science</div>`;
+  // ---------- PRIMARY: tonight's patrol (always visible, no hunting) ----------
+  if(!d.splits.length){
+    html+=`<div class="card"><p class="muted" style="margin:0 0 10px">No splits yet. Build your first one below, or jump straight into a free session.</p>
+      <button class="btn gold" onclick="newSplit();toggleAcc('m-plan')">＋ Build a split</button></div>`;
+  }
   d.splits.forEach(sp=>{
     html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${d.activeSplitId===sp.id?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
       <div style="margin-top:8px">${sp.days.map((day,i)=>isRest(day)
@@ -3548,15 +3599,23 @@ function renderMission(){
         : `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px">${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span></b><div class="mini">${day.exercises.length} exercises · tap to preview</div></div></div><button class="btn gold sm" style="width:auto" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`
       ).join("")}</div></div>`;
   });
-  html+=`<button class="btn" onclick="freeWorkout()">⚡ Free session</button>
-    <div class="card" style="margin-top:13px"><div class="ttl" onclick="toggleBelt()" style="cursor:pointer">🔧 Utility belt ▾</div>
-      <div id="belt" class="hide">
-        <button class="btn ghost sm" style="margin:6px 0" onclick="openPlateSheet(-1)">Plate calculator</button>
-        <button class="btn ghost sm" style="margin-bottom:6px" onclick="open1RM()">1RM calculator</button>
-        <button class="btn ghost sm" style="margin-bottom:6px" onclick="openRoundTimer()">Round timer</button>
-        <button class="btn ghost sm" style="margin-bottom:6px" onclick="openGym()">My gym &amp; equipment</button>
-        <button class="btn ghost sm" onclick="openJusticeLeague()">Justice League — train with friends</button>
-      </div></div>`;
+  html+=`<button class="btn" style="margin-bottom:14px" onclick="freeWorkout()">⚡ Free session</button>`;
+  // ---------- COLLAPSIBLE: plan & schedule (the old STRATEGY editor) ----------
+  html+=acc("m-plan","📋","Plan & schedule",
+    scheduleEditorHtml()+splitsEditorHtml(), false, "build splits, set training days");
+  // ---------- COLLAPSIBLE: volume & science ----------
+  html+=acc("m-sci","🧪","Volume & science",
+    scienceCardsHtml(), false, "volume map, balance, deload, plateau");
+  // ---------- COLLAPSIBLE: utility belt (quick tools) ----------
+  html+=acc("m-belt","🔧","Utility belt",
+    `<div class="grid2">
+      <button class="btn ghost sm" onclick="openPlateSheet(-1)">⚖️ Plate calc</button>
+      <button class="btn ghost sm" onclick="open1RM()">🏋️ 1RM calc</button>
+      <button class="btn ghost sm" onclick="openRoundTimer()">🥊 Round timer</button>
+      <button class="btn ghost sm" onclick="openGym()">🏠 My gym</button>
+      <button class="btn ghost sm" onclick="openForge()">⚒️ Forge</button>
+      <button class="btn ghost sm" onclick="openJusticeLeague()">🦸 League</button>
+    </div>`, false, "plate calc, 1RM, timer & more");
   $("app").innerHTML=html;
 }
 function toggleBelt(){$("belt").classList.toggle("hide");}
@@ -3894,16 +3953,12 @@ function scienceLabCard(){
     <div style="font-family:var(--disp);font-size:15px;color:${vc};line-height:1.35;margin:5px 0 2px">${esc(verdict)}</div>
     ${dist}${junkHtml}${sfrBlock}</div>`;
 }
-function renderStrategy(){
+function scienceCardsHtml(){
+  return volMapCard()+scienceLabCard()+weeklyBalanceCard()+deloadCard()+plateauCard();
+}
+function scheduleEditorHtml(){
   const d=state.data;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">STRATEGY</h1><div class="tag" style="margin-bottom:12px">Volume map · balance · schedule · science</div>`;
-  html+=volMapCard();
-  html+=scienceLabCard();
-  html+=weeklyBalanceCard();
-  html+=deloadCard();
-  html+=plateauCard();
-  // schedule
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center">${secIcon('schedule')}Training days per week</div><span class="chip on">${trainingDayCount()} / week</span></div>
+  return `<div class="card"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center">${secIcon('schedule')}Training days per week</div><span class="chip on">${trainingDayCount()} / week</span></div>
     <div class="row" style="gap:6px;margin:10px 0 12px">${[2,3,4,5,6].map(n=>`<button class="chip ${trainingDayCount()===n?'on':''} g" style="justify-content:center" onclick="setDaysPerWeek(${n})">${n} days</button>`).join("")}</div>
     <div class="ttl" style="margin:0 0 7px">Which days do you train?</div>
     <div class="row" style="gap:5px;justify-content:space-between">
@@ -3911,7 +3966,9 @@ function renderStrategy(){
       <div style="font-family:var(--disp);font-size:13px;color:${d.u.weekSchedule[i]!==false?'var(--gold2)':'var(--text3)'}">${dn}</div>
       <div style="line-height:1">${d.u.weekSchedule[i]!==false?trainIcon(15):restIcon(15)}</div></button>`).join("")}</div>
     <div class="mini" style="margin-top:8px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">${trainIcon(13)} training · ${restIcon(13)} rest. Your weekly goal updates automatically. Villains only taunt you for missed <b>training</b> days.</div></div>`;
-  // splits
+}
+function splitsEditorHtml(){
+  const d=state.data;let html="";
   d.splits.forEach(sp=>{
     html+=`<div class="card"><div class="row sp"><input value="${esc(sp.name)}" onchange="renameSplit('${sp.id}',this.value)" style="font-weight:700;border:none;background:transparent;padding:4px 0;font-size:16px"/>
       <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delSplit('${sp.id}')">🗑</button></div>`;
@@ -3931,7 +3988,12 @@ function renderStrategy(){
     html+=`<div class="row" style="gap:6px;margin-top:8px"><button class="btn ghost sm" onclick="addDay('${sp.id}')">+ Training day</button><button class="btn ghost sm" onclick="addRestDay('${sp.id}')">+ Rest day</button></div></div>`;
   });
   html+=`<button class="btn" onclick="newSplit()">＋ New split</button>`;
-  $("app").innerHTML=html;
+  return html;
+}
+function renderStrategy(){
+  // STRATEGY is now merged into MISSION — render the merged tab in place (no nested render()).
+  state.tab="mission";try{localStorage.setItem("gt_tab","mission");}catch(e){}
+  renderMission();
 }
 function trainingDayCount(){let c=0;for(let i=0;i<7;i++)if(state.data.u.weekSchedule[i]!==false)c++;return c;}
 function syncWeeklyGoal(){state.data.u.weeklyGoal=clamp(trainingDayCount(),1,7);}
