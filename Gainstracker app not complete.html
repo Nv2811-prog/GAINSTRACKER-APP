@@ -379,27 +379,29 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"EIeI8Vf","eq":"barbell","p":["
 const M12=["chest","back","shoulders","biceps","triceps","forearms","quads","hamstrings","glutes","calves","abs","traps"];
 const MNAME={chest:"Chest",back:"Back",shoulders:"Shoulders",biceps:"Biceps",triceps:"Triceps",forearms:"Forearms",quads:"Quads",hamstrings:"Hamstrings",glutes:"Glutes",calves:"Calves",abs:"Abs",traps:"Traps"};
 const MEMOJI={chest:"🛡️",back:"🦇",shoulders:"⚡",biceps:"💪",triceps:"🔱",forearms:"✊",quads:"🦵",hamstrings:"🦿",glutes:"🍑",calves:"🐊",abs:"📐",traps:"⛰️"};
-/* Custom per-muscle glyphs — anatomical line-icons in the same stroked-gold visual language as
-   secIcon(). Each evokes the actual muscle (pec slabs, lat wings, delt dome, bicep peak, tricep
-   horseshoe, quad teardrop, ham bellies, glute, calf diamond, six-pack, trap kite). Replaces the
-   generic emoji set everywhere a muscle is labelled. 24×24 viewBox, fill:none, round caps. */
+/* Custom per-muscle icons — FILLED anatomical silhouettes (not abstract line glyphs). Each is the
+   actual shape of the muscle as seen on an anatomy chart: pectoral fans, lat wings, deltoid cap,
+   flexed biceps, triceps horseshoe, tapered forearm, quad teardrop, hamstring bellies, glutes,
+   calf heads, six-pack, trapezius kite. Body fills with currentColor (so recovery tints apply);
+   _MF darker fibre strokes give the muscle striation. 24×24 viewBox. */
+const _MF=`fill="none" stroke="rgba(18,12,2,.5)" stroke-width="0.7" stroke-linecap="round"`;
 const MICON={
- chest:`<path d="M11.5 7.5C8 7 5.5 9 5.5 12 5.5 14.3 7.5 16 10 15.6"/><path d="M12.5 7.5C16 7 18.5 9 18.5 12 18.5 14.3 16.5 16 14 15.6"/><path d="M12 7v8"/>`,
- back:`<path d="M12 5v14"/><path d="M12 8C8.5 9 6 13 5 18"/><path d="M12 8C15.5 9 18 13 19 18"/><path d="M9.5 7 12 5l2.5 2"/>`,
- shoulders:`<path d="M4.5 15C4.5 9.5 7.5 6 12 6 16.5 6 19.5 9.5 19.5 15"/><path d="M4.5 15h15"/><path d="M9 6.6V12M15 6.6V12"/>`,
- biceps:`<path d="M6 19v-6c0-3.3 2.7-6 6-6"/><path d="M6 13c3-1.5 6 0 7 3l1 3"/>`,
- triceps:`<path d="M9 6C6.5 8 6 12 8 17"/><path d="M15 6C17.5 8 18 12 16 17"/><path d="M9 6C11 5 13 5 15 6"/>`,
- forearms:`<path d="M7 5C8 9 9 13 11 18"/><path d="M13 5C12.5 8 12 11 12.5 14"/><path d="M6.5 5h6"/><path d="M10.5 18h3"/>`,
- quads:`<path d="M12 5C8 7 6.5 12 8 19"/><path d="M12 5C16 7 17.5 12 16 19"/><path d="M12 6v11"/>`,
- hamstrings:`<path d="M9 5C8 10 8 15 9.5 19"/><path d="M15 5C16 10 16 15 14.5 19"/><path d="M9 5C11 4 13 4 15 5"/>`,
- glutes:`<path d="M12 6C8.5 6 6 8.5 6 12 6 15.5 8.5 18 12 18 15.5 18 18 15.5 18 12 18 8.5 15.5 6 12 6Z"/><path d="M12 6v12"/>`,
- calves:`<path d="M12 4v16"/><path d="M12 6C8.5 9 8.5 13.5 11 16.5"/><path d="M12 6C15.5 9 15.5 13.5 13 16.5"/>`,
- abs:`<rect x="8" y="5" width="8" height="14" rx="2.5"/><path d="M12 5v14"/><path d="M8.2 10h7.6"/><path d="M8.2 14h7.6"/>`,
- traps:`<path d="M12 5 5 13h4l3 6 3-6h4z"/>`
+ chest:`<path fill="currentColor" d="M11.3 6.7C8.6 6.1 5 6.6 3.9 9.4 3.1 11.6 4.6 13.9 7.5 14.1 9.6 14.3 11.3 13 11.3 10.6Z"/><path fill="currentColor" d="M12.7 6.7C15.4 6.1 19 6.6 20.1 9.4 20.9 11.6 19.4 13.9 16.5 14.1 14.4 14.3 12.7 13 12.7 10.6Z"/><g ${_MF}><path d="M10.4 8.2C8.6 8 6.5 8.3 5.5 9.7"/><path d="M10.3 10.6C8.5 10.6 6.8 11 5.8 11.9"/><path d="M13.6 8.2C15.4 8 17.5 8.3 18.5 9.7"/><path d="M13.7 10.6C15.5 10.6 17.2 11 18.2 11.9"/></g>`,
+ back:`<path fill="currentColor" d="M12 5.2C10.6 6.4 8.8 7.2 6.8 7.2 5.2 7.2 4.3 8.4 4.7 9.9L7 18C7.3 19 8.5 19.2 9 18.2 10 16.2 10.6 13.8 10.7 11.2 11 10.4 11.4 10 12 10 12.6 10 13 10.4 13.3 11.2 13.4 13.8 14 16.2 15 18.2 15.5 19.2 16.7 19 17 18L19.3 9.9C19.7 8.4 18.8 7.2 17.2 7.2 15.2 7.2 13.4 6.4 12 5.2Z"/><g ${_MF}><path d="M10.4 11.4C9 12 7.7 13.6 7 16"/><path d="M13.6 11.4C15 12 16.3 13.6 17 16"/><path d="M12 7.6 12 10"/></g>`,
+ shoulders:`<path fill="currentColor" d="M12 5.4C7.5 5.4 4.4 8.7 4.4 13.4 4.4 14.3 5 15 6 15L18 15C19 15 19.6 14.3 19.6 13.4 19.6 8.7 16.5 5.4 12 5.4Z"/><g ${_MF}><path d="M9 6.5C8.5 9 8.5 12 9.1 14.7"/><path d="M15 6.5C15.5 9 15.5 12 14.9 14.7"/></g>`,
+ biceps:`<path fill="currentColor" d="M7 20L7 13C7 9.6 9.4 6.9 12.8 7.3 14.6 7.5 15.4 9.2 14.4 10.6 13.1 9.4 11.3 9.3 9.9 10.4 12.4 10.7 14.7 12.1 15.5 14.5L16.8 20 12.1 20 11.1 17C10.4 15.1 9 14.3 7 14.6Z"/><path ${_MF} d="M9.3 11.6C11 10.9 12.9 11.3 14.2 12.8"/>`,
+ triceps:`<path fill="currentColor" d="M12 5.6C8.4 5.6 6.3 8.7 6.8 13.3 7.1 15.9 8.4 18 10 18.6 9.1 16 8.9 13 9.3 10.4 10.9 10.7 13.1 10.7 14.7 10.4 15.1 13 14.9 16 14 18.6 15.6 18 16.9 15.9 17.2 13.3 17.7 8.7 15.6 5.6 12 5.6Z"/>`,
+ forearms:`<path fill="currentColor" d="M8.6 5.4C7.4 5.2 6.6 6.1 7 7.3L10.5 17.7C10.8 18.5 11.3 18.9 12 18.9 12.7 18.9 13.2 18.5 13.5 17.7L16.4 9.1C16.9 7.6 16.1 6.2 14.4 5.9Z"/><path ${_MF} d="M9 8.1C10.6 8.5 12.6 8.3 14.3 7.4"/>`,
+ quads:`<path fill="currentColor" d="M12 5.4C8.4 5.4 6.2 8.5 6.2 13.1 6.2 16.7 7.9 19.4 10.4 19.4 11.6 19.4 12 18.5 12 17.1 12 18.5 12.4 19.4 13.6 19.4 16.1 19.4 17.8 16.7 17.8 13.1 17.8 8.5 15.6 5.4 12 5.4Z"/><g ${_MF}><path d="M12 6.9 12 16.4"/><path d="M9.4 9C8.9 12 9.1 15 10.1 17.6"/><path d="M14.6 9C15.1 12 14.9 15 13.9 17.6"/></g>`,
+ hamstrings:`<path fill="currentColor" d="M9 5.4C7.4 5.5 6.9 6.6 7.1 8.6 7.5 12.6 8.1 16.1 9.4 19.2 9.8 18.1 10 15 9.8 11.4 11 11.7 13 11.7 14.2 11.4 14 15 14.2 18.1 14.6 19.2 15.9 16.1 16.5 12.6 16.9 8.6 17.1 6.6 16.6 5.5 15 5.4Z"/><path ${_MF} d="M12 7 12 11.2"/>`,
+ glutes:`<path fill="currentColor" d="M12 6.4C8.9 6.4 6.4 8.3 6.4 11.4 6.4 14.2 8.3 16.2 11 16.4 11.7 16.5 12 15.9 12 14.7 12 15.9 12.3 16.5 13 16.4 15.7 16.2 17.6 14.2 17.6 11.4 17.6 8.3 15.1 6.4 12 6.4Z"/><path ${_MF} d="M12 6.9 12 15.9"/>`,
+ calves:`<path fill="currentColor" d="M12 5C10.4 5 9.4 6.1 9.3 8.1 9.1 11.2 9.7 13.7 11 15.7L11 19C11 19.6 11.4 20 12 20 12.6 20 13 19.6 13 19L13 15.7C14.3 13.7 14.9 11.2 14.7 8.1 14.6 6.1 13.6 5 12 5Z"/><path ${_MF} d="M12 6 12 15.2"/>`,
+ abs:`<path fill="currentColor" d="M7.8 5.4C6.8 5.4 6.3 5.9 6.3 6.9L6.3 15.6C6.3 17.7 8.4 19.4 12 20 15.6 19.4 17.7 17.7 17.7 15.6L17.7 6.9C17.7 5.9 17.2 5.4 16.2 5.4Z"/><g fill="none" stroke="rgba(18,12,2,.55)" stroke-width="0.9" stroke-linecap="round"><path d="M12 6 12 19"/><path d="M7 10 17 10"/><path d="M7 13.4 17 13.4"/><path d="M7.6 16.6C9.6 17.4 14.4 17.4 16.4 16.6"/></g>`,
+ traps:`<path fill="currentColor" d="M12 5 8 7.4C6 8.6 4 9.9 3.5 11.4 3.2 12.2 4 12.7 5 12.4L10 10.9 11 19C11.1 19.8 11.5 20.2 12 20.2 12.5 20.2 12.9 19.8 13 19L14 10.9 19 12.4C20 12.7 20.8 12.2 20.5 11.4 20 9.9 18 8.6 16 7.4Z"/>`
 };
-function mIcon(m,sz,c){sz=sz||17;c=c||"#E8C56A";return `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">${MICON[m]||MICON.chest}</svg>`;}
+function mIcon(m,sz,c){sz=sz||17;c=c||"#E8C56A";return `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" style="color:${c};vertical-align:-3px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.55))">${MICON[m]||MICON.chest}</svg>`;}
 // Embed a muscle glyph inside an existing <svg> (centred at cx,cy) — for radar/figure labels.
-function mGlyph(m,cx,cy,scale,c){scale=scale||1;c=c||"#E8C56A";return `<g transform="translate(${(cx-12*scale).toFixed(1)},${(cy-12*scale).toFixed(1)}) scale(${scale})" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${MICON[m]||MICON.chest}</g>`;}
+function mGlyph(m,cx,cy,scale,c){scale=scale||1;c=c||"#E8C56A";return `<g transform="translate(${(cx-12*scale).toFixed(1)},${(cy-12*scale).toFixed(1)}) scale(${scale})" style="color:${c}">${MICON[m]||MICON.chest}</g>`;}
 /* Rest day = a crescent moon with a faint "z" (recovery/sleep). Training day = a dumbbell.
    Custom line-glyphs replacing the old 🛡️/⚔️ emojis so the whole schedule reads in one language. */
 const _REST_P=`<path d="M20.4 14.3A7.6 7.6 0 1 1 10.2 4.5 6 6 0 0 0 20.4 14.3Z"/>`;
@@ -593,6 +595,7 @@ exNotes:{},            // exerciseName -> [{date, note}] coaching notes
 photos:[],             // {id, date, img(dataURL), bw, note} progress photos
 allies:[],             // {n,sl,rk,re,vol,w,boss,days,lifts} imported Patrol Cards (Justice League)
 foodLog:{},            // "YYYY-MM-DD" -> {items:[{n,k,p,c,f}], water:Number} Mess Hall daily intake
+gauntlet:{done:{},streak:0,best:0,last:null}, // The Gauntlet: daily finisher challenge -> done["YYYY-MM-DD"]=true
 prefs:{weather:true,boot:true,particles:true}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
@@ -2799,6 +2802,102 @@ function coverageRadar(){
       <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#E8453C"></i> over MRV</span></div>
     <div class="mini" style="text-align:center;color:var(--text3);margin-top:6px">Outer ring = your MAV (top of the growth zone). An even web = balanced coverage; spikes & dents reveal what's lagging or over-cooked.</div></div>`;
 }
+/* ========================================================================
+   THE FORGE — estimated-1RM lab + percentage-based loading calculator
+   with warm-up ramp and real plate rounding. Reachable from Case File.
+   ======================================================================== */
+function forgePlates(){return (state.data.plates&&state.data.plates.length?state.data.plates:DEF_PLATES).slice().sort((a,b)=>b-a);}
+function forgeLoadable(target){               // round DOWN to nearest barbell-loadable weight
+  const bar=state.data.u.barWeight||20;if(target<=bar)return{w:bar,used:[]};
+  let per=(target-bar)/2;const used=[];forgePlates().forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});
+  return{w:bar+used.reduce((a,b)=>a+b,0)*2,used};
+}
+const FORGE_PCT=[{p:100,r:"1",n:"Max single"},{p:95,r:"2",n:"Heavy double"},{p:90,r:"3-4",n:"Strength"},{p:85,r:"5",n:"Power"},{p:80,r:"6-7",n:"Strength-hyper."},{p:75,r:"8-9",n:"Hypertrophy"},{p:70,r:"10-11",n:"Volume"},{p:65,r:"12-14",n:"Pump"},{p:60,r:"15+",n:"Metabolic"}];
+function openForge(prefW,prefR){
+  state._forgeW=prefW!=null?prefW:(state._forgeW||"");
+  state._forgeR=prefR!=null?prefR:(state._forgeR||"");
+  drawForge();
+  openSheet($("sheet").innerHTML);
+}
+function drawForge(){
+  const w=+state._forgeW||0,r=+state._forgeR||0;
+  const bar=state.data.u.barWeight||20;
+  const orm=(w&&r)?epley(w,r):0;
+  const colors={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};
+  let rows="";
+  if(orm){
+    rows=FORGE_PCT.map(row=>{
+      const tgt=orm*row.p/100;const ld=forgeLoadable(tgt);
+      const chips=ld.used.length?ld.used.map(p=>`<span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${colors[p]||'#888'};margin-right:2px"></span>`).join(""):`<span class="mini" style="color:var(--text3)">bar</span>`;
+      const isWork=row.p===80;
+      return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)${isWork?';background:rgba(201,168,76,.06)':''}">
+        <div style="min-width:78px"><b class="gold" style="font-size:15px">${row.p}%</b> <span class="mini" style="color:var(--text2)">~${row.r} reps</span><div class="mini" style="color:var(--text3)">${esc(row.n)}</div></div>
+        <div style="text-align:right"><b style="font-size:16px">${Math.round(ld.w)}<span class="mini" style="font-weight:400">kg</span></b><div style="margin-top:2px">${chips}</div></div></div>`;
+    }).join("");
+  }
+  // warm-up ramp toward the entered weight (treated as working weight)
+  let warm="";
+  if(w&&w>bar){
+    const steps=[{p:0.4,r:8},{p:0.6,r:5},{p:0.75,r:3},{p:0.9,r:1}];
+    warm=`<div class="card" style="margin:10px 0 0;padding:12px"><div class="ttl" style="margin-bottom:6px">🔥 Warm-up ramp → ${w}kg</div>`+
+      steps.map((s,i)=>{const ld=forgeLoadable(w*s.p);return `<div class="row sp" style="padding:5px 0"><span class="mini">Set ${i+1} · ${Math.round(s.p*100)}%</span><b>${Math.round(ld.w)}kg × ${s.r}</b></div>`;}).join("")+
+      `<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span class="mini gold">Working</span><b class="gold">${w}kg × ${r||"?"}</b></div></div>`;
+  }
+  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center;gap:6px">🛠️ THE FORGE <span class="mini" style="font-weight:400;color:var(--text2)">load lab</span></div>
+    <div class="mini" style="margin-bottom:8px">Enter a real set. The Forge estimates your 1RM and lays out every training percentage — rounded to weight you can actually load.</div>
+    <div class="row g" style="gap:8px">
+      <div style="flex:1"><label class="mini">Weight (kg)</label><input inputmode="decimal" value="${state._forgeW}" oninput="state._forgeW=this.value;drawForge()" placeholder="100"/></div>
+      <div style="flex:1"><label class="mini">Reps</label><input inputmode="numeric" value="${state._forgeR}" oninput="state._forgeR=this.value;drawForge()" placeholder="5"/></div>
+    </div>
+    ${orm?`<div class="card glow center" style="margin:12px 0 4px;padding:14px"><div class="mini">ESTIMATED 1 REP MAX</div><div class="big" style="font-size:40px;color:var(--gold2)">${Math.round(orm)}<span style="font-size:20px">kg</span></div><div class="mini">${w}kg × ${r} · Epley formula</div></div>`:`<p class="muted center" style="margin:16px 0">Enter a weight and reps to forge your numbers.</p>`}
+    ${warm}
+    ${orm?`<div class="card" style="margin:10px 0;padding:6px 14px 12px">${rows}</div>`:""}
+    <button class="btn" style="margin-top:8px" onclick="closeSheet()">Close</button>`;
+}
+
+/* ========================================================================
+   THE GAUNTLET — a rotating daily finisher / conditioning challenge.
+   Deterministic by date so it's the same all day; tracks a completion streak.
+   ======================================================================== */
+const GAUNTLET=[
+  {e:"🥊",n:"Bane's Grip",d:"Dead hang from a bar — accumulate 90 seconds total. Crush the grip that breaks backs."},
+  {e:"🦇",n:"Rooftop Sprint",d:"100 bodyweight squats for time. Gotham's rooftops don't wait."},
+  {e:"💀",n:"Joker's Laughter",d:"3 rounds: 15 push-ups + 15 sit-ups. No rest between exercises."},
+  {e:"🧊",n:"Mr. Freeze",d:"Hold a wall-sit for 3 minutes total, broken into as few sets as you dare."},
+  {e:"⚡",n:"Electrocution",d:"50 burpees for time. Log the clock. Beat it next time it appears."},
+  {e:"🗡️",n:"Talia's Blades",d:"100 walking lunges (50/leg). Slow, controlled, lethal."},
+  {e:"🪀",n:"Riddler's Plank",d:"Plank for 4 minutes total. Solve the riddle of a steel core."},
+  {e:"🐧",n:"Penguin's Waddle",d:"4 rounds of 20 glute bridges + 20 calf raises. Waddle with power."},
+  {e:"🌪️",n:"Scarecrow's Fear",d:"Face the burn: 4×20 air squats with 30s rest. Fear is the mind-killer."},
+  {e:"🦇",n:"The Long Patrol",d:"Carry something heavy (DBs/plates) for 5 minutes of walking. Farmer's patrol."},
+  {e:"🔥",n:"Ra's al Ghul",d:"3 rounds: 10 push-ups, 10 squats, 10 sit-ups, every minute on the minute for 9 min."},
+  {e:"🥋",n:"Shadow Drill",d:"5 minutes of continuous shadow-boxing. Keep your hands up, footwork sharp."},
+  {e:"🧗",n:"The Climb",d:"Find stairs. 10 ascents at pace, or 5 minutes of step-ups. Rise from the pit."},
+  {e:"⛓️",n:"Broken Chains",d:"Max push-ups in one set, then max again after 60s rest. Add the two."}
+];
+function gauntletIdx(){const now=new Date();const start=new Date(now.getFullYear(),0,0);const doy=Math.floor((now-start)/864e5);return doy%GAUNTLET.length;}
+function gauntletKey(){const t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
+function gauntletDoneToday(){return !!(state.data.gauntlet&&state.data.gauntlet.done&&state.data.gauntlet.done[gauntletKey()]);}
+function completeGauntlet(){
+  const g=state.data.gauntlet;const k=gauntletKey();if(g.done[k])return;
+  // streak: increment if yesterday done, else reset to 1
+  const y=new Date();y.setDate(y.getDate()-1);const yk=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
+  g.streak=(g.done[yk]?g.streak:0)+1;g.best=Math.max(g.best||0,g.streak);g.done[k]=true;g.last=k;
+  save();haptic("pr");toast("Gauntlet cleared — "+g.streak+" day streak 🔥");render();
+}
+function gauntletCard(){
+  const ch=GAUNTLET[gauntletIdx()];const done=gauntletDoneToday();const g=state.data.gauntlet||{streak:0,best:0};
+  return `<div class="card" style="position:relative;overflow:hidden;border-color:${done?'var(--green)':'var(--gold-dim)'}">
+    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🩸 THE GAUNTLET</div>
+      <span class="chip ${g.streak?'on':''}" style="color:${g.streak?'var(--gold2)':'var(--text2)'}">🔥 ${g.streak||0} day${g.streak===1?'':'s'}${g.best>g.streak?` · best ${g.best}`:''}</span></div>
+    <div class="row g" style="gap:11px;margin-top:8px;align-items:flex-start">
+      <div style="font-size:34px;line-height:1">${ch.e}</div>
+      <div style="flex:1"><h2 style="font-size:21px;color:var(--gold2);margin:0">${esc(ch.n)}</h2>
+        <div class="mini" style="color:var(--text2);line-height:1.5;margin-top:3px">${esc(ch.d)}</div></div></div>
+    ${done?`<div class="center" style="margin-top:11px"><span class="chip on" style="color:var(--green)">✓ Cleared today — back tomorrow</span></div>`
+      :`<button class="btn gold sm" style="margin-top:11px" onclick="completeGauntlet()">MARK CLEARED ✓</button>`}
+    <div class="mini" style="margin-top:8px;color:var(--text3);font-style:italic">A new trial every night at midnight. Optional — but Batman never skips conditioning.</div></div>`;
+}
 function renderGotham(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
   const ironT=(u.totalVolume/1000).toFixed(1);
@@ -2837,6 +2936,9 @@ function renderGotham(){
     }
   }else html+=`<p class="muted">No split selected. Head to STRATEGY to build one, or start a free session.</p><button class="btn gold sm" style="margin-top:8px" onclick="freeWorkout()">FREE SESSION ▶</button>`;
   html+=`</div>`;
+
+  // The Gauntlet — daily finisher challenge
+  html+=gauntletCard();
 
   // muscle figure + stats
   html+=`<div class="card"><div class="row sp"><div class="ttl">The Suit</div><span class="chip" onclick="go('suit')">STR ${sl} · ${r.emoji} ${r.name}</span></div><div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-top:4px">${buildSuit()}</div></div>`;
@@ -3458,7 +3560,7 @@ function renderCase(){
     html+=`<button class="btn" style="margin-bottom:13px" onclick="monthlyReport()">📂 Open monthly Batcomputer report</button>`;
   // PRs
   const prs=Object.entries(d.prs).sort((a,b)=>b[1].orm-a[1].orm).slice(0,10);
-  html+=`<div class="card"><div class="ttl">🎯 Records (est. 1RM) <span class="mini" style="font-weight:400">— tap for full history</span></div>${prs.length?prs.map(([n,p])=>`<div class="row sp" style="margin-bottom:6px;cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')"><span style="font-size:13px">${esc(n)} ›</span><b class="gold">${Math.round(p.orm)}kg <span class="mini">${p.w}×${p.r}</span></b></div>`).join(""):'<p class="muted">No PRs yet. Go set one.</p>'}</div>`;
+  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🎯 Records (est. 1RM) <span class="mini" style="font-weight:400">— tap for full history</span></div><button class="btn ghost sm" style="width:auto" onclick="openForge()">🛠️ Forge</button></div>${prs.length?prs.map(([n,p])=>`<div class="row sp" style="margin-bottom:6px;cursor:pointer" onclick="openForge(${p.w},${p.r})"><span style="font-size:13px">${esc(n)} ›</span><b class="gold">${Math.round(p.orm)}kg <span class="mini">${p.w}×${p.r}</span></b></div>`).join(""):'<p class="muted">No PRs yet. Go set one.</p>'}<div class="mini" style="color:var(--text3);margin-top:4px">Tap a record to open it in The Forge · plan every working set by percentage.</div></div>`;
   // MMA title belts (bodyweight-ratio championships)
   html+=titleBeltsCard();
   // combat rating — per-exercise rank tuned by movement (replaces freeweight-only standards)
