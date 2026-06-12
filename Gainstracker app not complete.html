@@ -609,6 +609,8 @@ patrol:[],             // {date, mood:1-5, energy:1-5, note, day} session journa
 templates:[],          // {id, name, exercises:[{name, setCount}]}
 contracts:[],          // {id, type:lift|bw|vol|sessions, name, start, target, created, deadline}
 orders:null,           // {date, done:[idx]} — Wayne's Orders daily directives
+musclePriority:{},     // {muscle: priorityKey} — how often a district needs patrol
+suitSkin:null,         // selected cosmetic suit skin id (Wave 9)
 injuries:{},           // muscleKey -> {since, note}
 nemesisLift:null,      // {name, target, startW, startDate}
 periodisation:{active:false,startDate:null,phaseIndex:0,weekInPhase:0},
@@ -1626,6 +1628,9 @@ function openMenu(){
     <div style="font-size:30px">${t[1]}</div><div class="g"><div class="ttl" style="margin:0;font-size:16px">${t[2]}</div><div class="mini" style="color:var(--text3);line-height:1.4">${t[3]}</div></div>
     <div style="color:var(--text3);font-size:20px">›</div></button>`).join("");
   const features=[
+    ["openDistricts","🗺️","District Control","Secure Gotham's sectors"],
+    ["openArkham","🃏","Arkham Gallery","Capture the rogues"],
+    ["openSkins","💠","Wardrobe & Belts","Suit skins & titles"],
     ["openOrders","🎯","Wayne's Orders","Today's directives"],
     ["openRankLadder","🎖️","Rank Ladder","Your climb to Legend"],
     ["openRecordsHall","🧊","Records Hall","Every all-time best"],
@@ -2406,12 +2411,12 @@ function symmetryCard(){
   return html+`</div>`;
 }
 function renderSuit(){
-  const sl=strengthLevel();const r=rankFor(sl);
+  const sl=strengthLevel();const r=rankFor(sl);const skin=activeSkin();
   const compromised=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)<50);
   let html=`<h1 style="font-size:34px;color:var(--gold2)">THE BATSUIT</h1><div class="tag" style="margin-bottom:10px">Sector status — tap a plate for detail</div>`;
   if(compromised.length>=3)html+=`<div class="banner alert"><span>🛠️</span><div><b>Multiple sectors compromised, sir.</b><div class="mini">The Batsuit needs repair before the next mission. ${compromised.map(m=>MNAME[m]).join(", ")} below 50%.</div></div></div>`;
-  html+=`<div class="card"><div class="center" style="margin-bottom:6px"><span class="chip on">STR ${sl} · ${r.emoji} ${r.name}</span></div>
-    <div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-bottom:6px">${buildSuit()}</div>
+  html+=`<div class="card" style="border-color:${skin.c}44"><div class="center" style="margin-bottom:6px"><span class="chip on">STR ${sl} · ${r.emoji} ${r.name}</span> <button class="chip g" style="margin-left:4px" onclick="openSkins()">${skin.e} ${esc(skin.n)}</button></div>
+    <div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-bottom:6px;box-shadow:inset 0 0 40px ${skin.c}18">${buildSuit()}</div>
     <div class="row" style="justify-content:center;gap:14px;margin-top:8px">
       <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--green)"></i> ≥80%</span>
       <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--yellow)"></i> 50–79%</span>
@@ -2429,6 +2434,10 @@ function renderSuit(){
   }).join("")}</div>`;
   // weekly coverage radar
   html+=coverageRadar();
+  // Gotham Lives — district control + collectibles
+  html+=districtSummary();
+  html+=`<div class="grid2"><button class="card" style="text-align:left;padding:14px;cursor:pointer" onclick="openArkham()"><div style="font-size:26px">🃏</div><div class="ttl" style="margin:4px 0 1px;font-size:14px">Arkham Gallery</div><div class="mini" style="color:var(--text3)">Capture the rogues' gallery</div></button>
+    <button class="card" style="text-align:left;padding:14px;cursor:pointer" onclick="openSkins()"><div style="font-size:26px">💠</div><div class="ttl" style="margin:4px 0 1px;font-size:14px">Wardrobe & Titles</div><div class="mini" style="color:var(--text3)">Suit skins & championship belts</div></button></div>`;
   // measurements
   const me=state.data.u.measurements;
   html+=`<div class="card"><div class="row sp"><div class="ttl">Body measurements</div><button class="btn ghost sm" style="width:auto" onclick="openMeasure()">Edit</button></div>
@@ -3254,6 +3263,9 @@ const INDEX_ITEMS=[
   ["🤖","Alfred","AI coach, physique scan, the Chronicle","go('alfred')"],
   ["💪","The Suit","Your muscle figure & recovery map","go('suit')"],
   ["🦾","WAYNE TECH","The gadget hub — every tool in one tab","go('tech')"],
+  ["🗺️","District Control","Muscles as Gotham districts; set patrol priority","openDistricts()"],
+  ["🃏","Arkham Gallery","Capture rogues by hitting milestones","openArkham()"],
+  ["💠","Wardrobe & Belts","Suit skins & championship belts","openSkins()"],
   ["🗓️","Patrol Calendar","26-week training heatmap","go('tech')"],
   ["🔮","Oracle","Rank & lift projections, ETAs","openOracle()"],
   ["🏆","Trophy Room","All 26 honors & progress to locked ones","openTrophyRoom()"],
@@ -4666,6 +4678,128 @@ function renderFuel(){
     <div class="row g" style="gap:8px;margin-top:9px"><input id="fuel-bw" inputmode="decimal" placeholder="${u.bodyweight||75} kg" style="flex:1"/><button class="btn gold sm" style="width:auto" onclick="logBW()">Log weigh-in</button></div>
     <div class="mini" style="margin-top:7px;color:var(--text3)">Weigh first thing, same conditions. Track the weekly average, not the daily noise.</div></div>`;
   $("app").innerHTML=html;
+}
+
+/* =================================================================================
+   ===== WAVE 9 — GOTHAM LIVES: muscle priority, district control, Arkham, skins, belts =====
+   ================================================================================= */
+/* ---- Muscle Priority (controls how fast a district breeds crime) ---- */
+const PRIORITIES=[
+  {k:"priority",n:"Priority",e:"🔴",target:4,desc:"Hit hard, hit often"},
+  {k:"standard",n:"Standard",e:"🟠",target:6,desc:"Regular rotation"},
+  {k:"low",n:"Low",e:"🟡",target:10,desc:"Occasional work"},
+  {k:"maint",n:"Maintenance",e:"🟢",target:14,desc:"Just keep it alive"}
+];
+function prioDef(k){return PRIORITIES.find(p=>p.k===k)||PRIORITIES[1];}
+function musclePrio(m){return (state.data.musclePriority&&state.data.musclePriority[m])||"standard";}
+function setMusclePrio(m,k){state.data.musclePriority=state.data.musclePriority||{};state.data.musclePriority[m]=k;save();haptic("tap");}
+function cycleMusclePrio(m){const order=PRIORITIES.map(p=>p.k);const cur=order.indexOf(musclePrio(m));setMusclePrio(m,order[(cur+1)%order.length]);openDistricts();}
+
+/* ---- District Control ---- */
+const MUSCLE_DISTRICT={chest:"The Narrows",back:"Bristol Docks",shoulders:"Burnley Heights",biceps:"Otisburg",triceps:"Coventry",forearms:"The Cauldron",quads:"Robinson Park",hamstrings:"Park Row",glutes:"Amusement Mile",calves:"Tricorner Yards",abs:"Old Gotham",traps:"Diamond District"};
+function daysSinceMuscle(m){const t=state.data.muscleLastTrained&&state.data.muscleLastTrained[m];if(!t)return null;return (now()-t)/864e5;}
+function districtCrime(m){
+  const trained=(state.data.muscleVol[m]||0)>0;const ds=daysSinceMuscle(m);
+  if(!trained||ds==null)return {crime:85,ds:null,untrained:true};
+  const tg=prioDef(musclePrio(m)).target;
+  return {crime:clamp(Math.round((ds/tg)*60),0,100),ds,untrained:false};
+}
+function districtBand(c){return c<20?["SECURED","var(--green)"]:c<45?["PATROLLED","var(--gold2)"]:c<70?["RISING","var(--orange)"]:c<90?["CONTESTED","var(--red)"]:["OVERRUN","#ff3b30"];}
+function cityCrime(){let s=0;M12.forEach(m=>s+=districtCrime(m).crime);return Math.round(s/M12.length);}
+function districtSummary(){
+  const cc=cityCrime();const band=districtBand(cc);
+  const worst=M12.map(m=>({m,...districtCrime(m)})).sort((a,b)=>b.crime-a.crime).slice(0,3);
+  return `<div class="card" style="padding:14px"><div class="row sp"><div class="ttl" style="margin:0">🗺️ District Control</div><b style="color:${band[1]}">${band[0]} · ${cc}%</b></div>
+    <div class="mini" style="color:var(--text2);margin:3px 0 8px">Gotham's worst hotspots tonight — secure them under iron.</div>
+    ${worst.map(w=>{const b=districtBand(w.crime);return `<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${mIcon(w.m,15)} ${esc(MUSCLE_DISTRICT[w.m])} <span class="mini" style="color:var(--text3)">(${MNAME[w.m]})</span></span><span class="mini" style="color:${b[1]}">${b[0]} ${w.crime}%</span></div>`;}).join("")}
+    <button class="btn ghost sm" style="margin-top:9px" onclick="openDistricts()">Open the map & set priorities ›</button></div>`;
+}
+function openDistricts(){
+  const cc=cityCrime();const band=districtBand(cc);
+  const rows=M12.slice().map(m=>({m,dc:districtCrime(m)})).sort((a,b)=>b.dc.crime-a.dc.crime).map(({m,dc})=>{
+    const b=districtBand(dc.crime);const p=prioDef(musclePrio(m));
+    const sub=dc.untrained?"Never secured — unclaimed territory":`Last patrol ${dc.ds<1?"today":Math.round(dc.ds)+"d ago"}`;
+    return `<div class="rl-row" style="align-items:flex-start"><div style="font-size:20px;padding-top:2px">${mIcon(m,20)}</div><div class="g"><div class="row sp"><b style="font-size:14px">${esc(MUSCLE_DISTRICT[m])}</b><button class="chip g" style="padding:2px 8px;margin:0" onclick="cycleMusclePrio('${m}')">${p.e} ${p.n}</button></div>
+      <div class="mini" style="color:var(--text3)">${MNAME[m]} · ${esc(sub)}</div>
+      <div style="height:6px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${dc.crime}%;background:${b[1]};transition:.3s"></div></div>
+      <div class="mini" style="margin-top:3px;color:${b[1]}">${b[0]} · crime ${dc.crime}%</div></div></div>`;
+  }).join("");
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🗺️ District Control</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+    <div class="card" style="text-align:center;padding:16px"><div style="font-size:30px;font-family:var(--disp);font-weight:700;color:${band[1]}">${band[0]}</div><div class="mini" style="color:var(--text2)">city-wide crime ${cc}%</div></div>
+    <div class="mini" style="color:var(--text2);margin:12px 0 8px">Tap a district's priority chip to set how often it needs patrol. Low-priority districts breed crime slower — but neglect one entirely and the rogues still move in.</div>
+    ${rows}
+    <button class="btn" style="margin-top:12px" onclick="closeOverlay()">Close</button>`;
+}
+
+/* ---- Arkham Gallery (PRs & milestones capture rogues) ---- */
+const ROGUES=[
+  {id:"firefly",n:"Firefly",e:"🔥",stat:"streakDays",need:7,d:"Burned out — your streak caged him"},
+  {id:"pengu",n:"The Penguin",e:"🐧",stat:"totalWorkouts",need:10,d:"The Iceberg Lounge, shut down"},
+  {id:"riddler",n:"The Riddler",e:"❓",stat:"prCount",need:5,d:"Riddle solved: progressive overload"},
+  {id:"harley",n:"Harley Quinn",e:"🃏",stat:"prCount",need:15,d:"Outmuscled, not outsmarted"},
+  {id:"croc",n:"Killer Croc",e:"🐊",stat:"totalVolume",need:100000,d:"Dragged from the sewers"},
+  {id:"freeze",n:"Mr. Freeze",e:"❄️",stat:"streakDays",need:14,d:"Your heat melted his plans"},
+  {id:"ivy",n:"Poison Ivy",e:"🌿",stat:"bossCount",need:3,d:"Rooted out of the greenhouse"},
+  {id:"scare",n:"Scarecrow",e:"🌾",stat:"failureSets",need:30,d:"Faced your fear of the last rep"},
+  {id:"twoface",n:"Two-Face",e:"🪙",stat:"totalWorkouts",need:50,d:"Both sides of him, defeated"},
+  {id:"bane",n:"Bane",e:"💉",stat:"bossCount",need:10,d:"He didn't break you — you broke him"},
+  {id:"raas",n:"Ra's al Ghul",e:"⚔️",stat:"maxLevel",need:12,d:"The Demon's Head bows to your discipline"},
+  {id:"joker",n:"The Joker",e:"🤡",stat:"prCount",need:50,d:"Chaos, finally contained"},
+  {id:"deathstroke",n:"Deathstroke",e:"🗡️",stat:"totalVolume",need:500000,d:"The world's deadliest, outworked"},
+  {id:"darkseid",n:"Darkseid",e:"💥",stat:"maxLevel",need:18,d:"A god of war, brought low"}
+];
+function arkhamHint(r){const map={prCount:"PRs",bossCount:"bosses beaten",totalVolume:"kg lifted",streakDays:"day streak",maxLevel:"muscle level",totalWorkouts:"workouts",failureSets:"sets to failure"};return `${fmtNum(r.need)} ${map[r.stat]||""} to capture`;}
+function openArkham(){
+  const w=achStats();
+  const cards=ROGUES.map(r=>{const cur=w[r.stat]||0;const have=cur>=r.need;const pct=clamp(cur/r.need*100,0,100);
+    return `<div class="card" style="padding:13px;text-align:center;opacity:${have?1:.62};border-color:${have?'var(--gold-dim)':'var(--border)'}">
+      <div style="font-size:30px;filter:${have?'none':'grayscale(1) brightness(.55)'}">${have?r.e:'🦹'}</div>
+      <div class="ttl" style="font-size:13px;margin:5px 0 1px">${have?esc(r.n):'? ? ?'}</div>
+      <div class="mini" style="color:var(--text3);min-height:28px;line-height:1.3">${have?esc(r.d):esc(arkhamHint(r))}</div>
+      ${have?'<div class="mini" style="color:var(--gold2);margin-top:4px">⛓️ CAPTURED</div>':`<div style="height:5px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--gold2)"></div></div><div class="mini" style="color:var(--text3);margin-top:3px">${fmtNum(Math.round(cur))}/${fmtNum(r.need)}</div>`}</div>`;
+  }).join("");
+  const got=ROGUES.filter(r=>(w[r.stat]||0)>=r.need).length;
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🃏 Arkham Gallery</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 12px">Every milestone captures a rogue. <b style="color:var(--gold2)">${got}/${ROGUES.length}</b> behind bars — fill Arkham.</div>
+    <div class="grid2">${cards}</div>
+    <button class="btn" style="margin-top:14px" onclick="closeOverlay()">Close</button>`;
+}
+
+/* ---- Suit Skins + Championship Belts ---- */
+const SKINS=[
+  {id:"classic",n:"Classic Cowl",e:"🦇",lvl:0,c:"#EBC76B",d:"Where the legend began"},
+  {id:"tactical",n:"Tactical Grey",e:"🌫️",lvl:6,c:"#9aa3ad",d:"Vigilante field issue"},
+  {id:"armored",n:"Armored Knight",e:"🛡️",lvl:12,c:"#6f7bdc",d:"Built to take the hits"},
+  {id:"beyond",n:"Batman Beyond",e:"🔴",lvl:20,c:"#ff4d4d",d:"The future of the cowl"},
+  {id:"gold",n:"Midas Plate",e:"🥇",lvl:28,c:"#ffd34d",d:"Legend-tier. Untouchable."}
+];
+function skinUnlocked(s){return strengthLevel()>=s.lvl;}
+function activeSkin(){const s=SKINS.find(x=>x.id===state.data.suitSkin&&skinUnlocked(x));if(s)return s;const un=SKINS.filter(skinUnlocked);return un[un.length-1]||SKINS[0];}
+function selectSkin(id){const s=SKINS.find(x=>x.id===id);if(!s)return;if(!skinUnlocked(s)){haptic("warn");toast("🔒 Reach strength level "+s.lvl);return;}state.data.suitSkin=id;save();haptic("success");toast(s.e+" "+s.n+" equipped");openSkins();}
+const BELTS=[
+  {id:"iron",n:"Iron Belt",e:"🥉",stat:"totalWorkouts",need:25},
+  {id:"steel",n:"Steel Belt",e:"🥈",stat:"totalWorkouts",need:100},
+  {id:"title",n:"Title Belt",e:"🏆",stat:"bossCount",need:10},
+  {id:"will",n:"Iron Will Belt",e:"🔥",stat:"streakDays",need:30},
+  {id:"heavy",n:"Heavyweight Belt",e:"🦏",stat:"totalVolume",need:500000},
+  {id:"undisp",n:"Undisputed Belt",e:"👑",stat:"maxLevel",need:15}
+];
+function beltRack(){const w=achStats();
+  const items=BELTS.map(b=>{const have=(w[b.stat]||0)>=b.need;return `<div style="text-align:center;opacity:${have?1:.35};min-width:64px"><div style="font-size:30px;filter:${have?'none':'grayscale(1)'}">${b.e}</div><div class="mini" style="color:${have?'var(--gold2)':'var(--text3)'};line-height:1.2">${esc(b.n)}</div></div>`;}).join("");
+  const got=BELTS.filter(b=>(w[b.stat]||0)>=b.need).length;
+  return `<div class="mini" style="color:var(--text3);letter-spacing:.1em;margin:16px 0 8px">🏅 CHAMPIONSHIP BELTS · ${got}/${BELTS.length}</div><div class="row" style="justify-content:space-around;flex-wrap:wrap;gap:12px">${items}</div>`;
+}
+function openSkins(){
+  const act=activeSkin();
+  const cards=SKINS.map(s=>{const un=skinUnlocked(s);const on=act.id===s.id;
+    return `<button class="card" style="padding:13px;text-align:center;cursor:pointer;border-color:${on?'var(--gold2)':un?'var(--gold-dim)':'var(--border)'};opacity:${un?1:.6}" onclick="selectSkin('${s.id}')">
+      <div style="font-size:28px;filter:${un?'none':'grayscale(1)'}">${s.e}</div><div class="ttl" style="font-size:13px;margin:5px 0 1px;color:${on?'var(--gold2)':'var(--text)'}">${esc(s.n)}</div>
+      <div class="mini" style="color:var(--text3)">${un?esc(s.d):'🔒 Level '+s.lvl}</div>${on?'<div class="mini" style="color:var(--gold2);margin-top:3px">● EQUIPPED</div>':un?'<div class="mini" style="color:var(--text3);margin-top:3px">tap to equip</div>':''}</button>`;}).join("");
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">💠 Wardrobe & Titles</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 12px">Earn the cowl. Suit skins unlock with your strength level; belts with your milestones.</div>
+    <div class="grid2">${cards}</div>
+    ${beltRack()}
+    <button class="btn" style="margin-top:16px" onclick="closeOverlay()">Close</button>`;
 }
 
 /* =================================================================================
