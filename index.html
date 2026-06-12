@@ -2758,6 +2758,58 @@ function strengthStandardsCard(){
   return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('strength')}Strength standards <span class="mini" style="font-weight:400;margin-left:4px">vs ${bw}kg bodyweight</span></div>${rows}
     <div class="mini" style="margin-top:8px;color:var(--text3)">Multiples of bodyweight for a 1RM. Beginner → Elite based on common strength-standard data. e1RM is estimated, so treat tiers as a guide, not a verdict.</div></div>`;
 }
+/* ===== COMBAT RATING (#2, adapted) =====
+   Per-exercise rank tuned by MOVEMENT so machines, cables and isolation rank fairly —
+   not punished against a single barbell bodyweight-ratio. Each lift earns
+   Street → Vigilante → Dark Knight → Legend, and they roll into the overall Fighter Rank. */
+const CR_RANKS=[["STREET","#9aa0ab","👊"],["VIGILANTE","#7FC8FF","🌃"],["DARK KNIGHT","#E8C56A","🦇"],["LEGEND","#F0524A","🔱"]];
+// "Dark Knight" = a strong-but-attainable e1RM÷bodyweight for a representative movement of each muscle.
+const CR_BASE={quads:2.0,glutes:2.4,hamstrings:1.4,back:1.3,chest:1.35,shoulders:0.85,biceps:0.6,triceps:0.72,forearms:0.5,calves:1.85,abs:0.75,traps:1.45};
+// Equipment lets you load differently — raise the bar where loads run high so machines don't over-rank.
+const CR_EQUIP={machine:1.28,lever:1.28,smith:1.15,cable:0.82,barbell:1.0,"ez bar":0.9,"trap bar":1.06,dumbbell:0.85,kettlebell:0.7,band:0.5,bodyweight:1.0};
+function combatStd(ex){
+  const prim=MM_NORM((ex.p&&ex.p[0])||"chest");
+  let dk=CR_BASE[prim]||1.0;
+  const eq=(ex.eq||"").toLowerCase();
+  dk*=(CR_EQUIP[eq]!=null?CR_EQUIP[eq]:1.0);
+  if(ex.bw)dk+=1.0;                              // bodyweight is baked into the e1RM
+  return {vig:dk*0.62,dk:dk,legend:dk*1.34};
+}
+function combatRank(ratio,std){return ratio>=std.legend?3:ratio>=std.dk?2:ratio>=std.vig?1:0;}
+function combatRatingCard(){
+  const bw=bodyW();if(!bw)return "";
+  const prs=Object.entries(state.data.prs||{}).filter(([n,p])=>p&&p.orm>0);
+  const sl=strengthLevel(),fr=rankFor(sl);
+  const head=`<div class="ttl" style="display:flex;align-items:center">${secIcon('radar')}Combat rating <span class="mini" style="font-weight:400;margin-left:4px">— per move, tuned fairly</span></div>`;
+  if(!prs.length)return `<div class="card">${head}<p class="muted" style="margin-top:6px">Log a few working sets and every exercise earns a combat rank — machines and cables included, judged against their own movement, not the barbell.</p></div>`;
+  const rows=prs.map(([n,p])=>{const ex=exFor(n);const std=combatStd(ex);const ratio=p.orm/bw;return {n,p,ex,std,ratio,ri:combatRank(ratio,std)};})
+    .sort((a,b)=>b.ri-a.ri||(b.ratio/b.std.dk)-(a.ratio/a.std.dk)).slice(0,12);
+  const body=rows.map(r=>{
+    const[rn,rc]=CR_RANKS[r.ri];
+    const scale=r.std.legend*1.18;
+    const pct=clamp(r.ratio/scale*100,3,100);
+    const tv=clamp(r.std.vig/scale*100,0,100),td=clamp(r.std.dk/scale*100,0,100),tl=clamp(r.std.legend/scale*100,0,100);
+    const nextR=r.ri<3?CR_RANKS[r.ri+1]:null;
+    const nextRatio=r.ri===0?r.std.vig:r.ri===1?r.std.dk:r.std.legend;
+    const nextKg=Math.round(nextRatio*bw);
+    const hint=nextR?`<span class="mini" style="color:var(--text3)">▲ +${Math.max(0,Math.round(nextKg-r.p.orm))}kg → ${nextR[0]}</span>`:`<span class="mini" style="color:${rc}">★ maxed — defend it</span>`;
+    return `<div style="padding:9px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(r.n).replace(/'/g,"")}')">
+      <div class="row sp"><span style="font-size:13px">${esc(r.n)} <span class="mini">${Math.round(r.p.orm)}kg · ${r.ratio.toFixed(2)}×BW</span></span><b style="color:${rc};font-size:11px;letter-spacing:.06em">${rn}</b></div>
+      <div style="position:relative;height:8px;border-radius:4px;background:#15171d;margin-top:6px;overflow:hidden">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${rc};box-shadow:0 0 8px ${rc}66"></div>
+        <i style="position:absolute;left:${tv}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28)"></i>
+        <i style="position:absolute;left:${td}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.4)"></i>
+        <i style="position:absolute;left:${tl}%;top:0;bottom:0;width:1px;background:rgba(240,82,74,.6)"></i></div>
+      <div class="row sp" style="margin-top:3px">${hint}<span class="mini" style="color:var(--text3)">ticks: Vigilante · Dark Knight · Legend</span></div></div>`;
+  }).join("");
+  return `<div class="card">${head}
+    <div class="stage" style="border-radius:13px;padding:11px 13px;margin:4px 0 8px;display:flex;align-items:center;justify-content:space-between">
+      <div><div class="mini" style="color:var(--text3);letter-spacing:.1em">FIGHTER RANK</div><b style="font-size:18px;color:var(--gold2)">${fr.emoji} ${fr.name}</b></div>
+      <div style="text-align:right"><div class="mini" style="color:var(--text3)">overall</div><b class="gold" style="font-size:22px">Lv ${sl}</b></div>
+    </div>
+    ${body}
+    <div class="mini" style="margin-top:8px;color:var(--text3)">Each lift is judged against a standard tuned to its movement and equipment, so a cable or machine lift can rank Legend on its own terms. e1RM is estimated — treat ranks as a guide.</div></div>`;
+}
 // ---- staleness detector + muscle balance analyzer ----
 function stalenessReport(){
   const out=[],cut=now()-35*864e5,byName={};
@@ -2819,8 +2871,8 @@ function renderCase(){
   html+=`<div class="card"><div class="ttl">🎯 Records (est. 1RM) <span class="mini" style="font-weight:400">— tap for full history</span></div>${prs.length?prs.map(([n,p])=>`<div class="row sp" style="margin-bottom:6px;cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')"><span style="font-size:13px">${esc(n)} ›</span><b class="gold">${Math.round(p.orm)}kg <span class="mini">${p.w}×${p.r}</span></b></div>`).join(""):'<p class="muted">No PRs yet. Go set one.</p>'}</div>`;
   // MMA title belts (bodyweight-ratio championships)
   html+=titleBeltsCard();
-  // strength standards (bodyweight-relative)
-  html+=strengthStandardsCard();
+  // combat rating — per-exercise rank tuned by movement (replaces freeweight-only standards)
+  html+=combatRatingCard();
   // staleness + balance intelligence
   html+=analysisCard();
   // tappable progress-by-exercise picker
