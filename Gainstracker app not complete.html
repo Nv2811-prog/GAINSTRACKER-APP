@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet"/>
 <style>
 :root{
---bg:#070809;--bg2:#0f1116;--bg3:#131620;--bg4:#171a21;
+--bg:#0b0e15;--bg2:#151a25;--bg3:#1a2030;--bg4:#222937;
 --gold:#C9A84C;--gold2:#EBC76B;--gold3:#F7DD93;--gold-dim:#8B6B2A;--gold-bg:#1A1305;
 --red:#F0524A;--green:#34D27B;--yellow:#E8C53C;--orange:#E8923C;--blue:#4F93E8;--purple:#9C5CE8;--steel:#5B7CA6;
 --text:#F3EFE3;--text2:#97a0ad;--text3:#5b626e;
@@ -25,7 +25,7 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.45;
 overflow-x:hidden;-webkit-font-smoothing:antialiased;
-background-image:radial-gradient(circle at 50% -6%,rgba(235,199,107,.11),transparent 42%),radial-gradient(circle at 50% 3%,rgba(91,124,166,.10),transparent 52%),radial-gradient(circle at 88% 108%,rgba(91,124,166,.06),transparent 46%);background-attachment:fixed;}
+background-image:radial-gradient(circle at 50% -8%,rgba(235,199,107,.17),transparent 46%),radial-gradient(circle at 50% 2%,rgba(91,124,166,.15),transparent 58%),radial-gradient(circle at 86% 112%,rgba(124,92,232,.09),transparent 50%),radial-gradient(circle at 10% 120%,rgba(91,124,166,.08),transparent 48%);background-attachment:fixed;}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 background-image:linear-gradient(rgba(91,124,166,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(91,124,166,.045) 1px,transparent 1px);background-size:36px 36px;
 -webkit-mask-image:radial-gradient(circle at 50% 24%,#000,transparent 76%);mask-image:radial-gradient(circle at 50% 24%,#000,transparent 76%);}
@@ -44,12 +44,19 @@ img{display:block;max-width:100%}
 .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:700}
 
 /* cards — frosted glass */
-.card{background:linear-gradient(180deg,rgba(26,30,40,.66),rgba(12,14,20,.5));backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:15px;margin-bottom:13px;position:relative;overflow:hidden;
-box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.02),0 16px 40px -24px rgba(0,0,0,.95)}
+.card{background:linear-gradient(180deg,rgba(37,43,58,.82),rgba(20,24,34,.66));backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:15px;margin-bottom:13px;position:relative;overflow:hidden;
+box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.025),0 20px 46px -22px rgba(0,0,0,.9),0 2px 10px -4px rgba(0,0,0,.55)}
 .card::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(235,199,107,.24),transparent);pointer-events:none}
 .card::after{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent 38%)}
 .card.glow{border-color:rgba(201,168,76,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(201,168,76,.2),0 18px 48px -18px rgba(201,168,76,.36)}
 .card.glow::before{background:linear-gradient(90deg,transparent,rgba(247,221,147,.6),transparent);height:1px}
+/* glow-pop: lifts any element off the dark so you can see it's there */
+.pop{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(201,168,76,.16),0 8px 26px -10px rgba(201,168,76,.26),0 22px 52px -26px rgba(0,0,0,.9)!important}
+.pop-red{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(240,82,74,.22),0 10px 30px -10px rgba(240,82,74,.3)!important}
+.pop-green{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(52,210,123,.22),0 10px 30px -10px rgba(52,210,123,.28)!important}
+/* figure stage: a lit pedestal so the Batsuit pops off the black */
+.stage{position:relative;background:radial-gradient(ellipse 70% 60% at 50% 34%,#2a2f3c 0%,#13161f 55%,#070809 100%)!important;border:1px solid rgba(201,168,76,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 60px -20px rgba(124,150,255,.18),0 0 0 1px rgba(201,168,76,.1),0 18px 50px -24px rgba(0,0,0,.9)!important}
+.stage::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse 60% 42% at 50% 96%,rgba(201,168,76,.12),transparent 70%)}
 .card h2,.card h3{color:var(--gold2)}
 .ttl{font-family:var(--disp);font-size:13px;letter-spacing:.17em;text-transform:uppercase;color:var(--gold2);opacity:.82;margin-bottom:10px}
 .big{font-family:var(--disp);font-size:46px;color:var(--gold2);line-height:.9;text-shadow:0 0 22px rgba(235,199,107,.2)}
@@ -665,15 +672,17 @@ function suitFigure(view,colFn,style){
   const P=suitProps();
   const body=(view==="back"?_backBody:_frontBody)(125,P);
   state._figColor=prev;
-  return `<svg viewBox="58 40 134 380" preserveAspectRatio="xMidYMid meet" style="${style||'width:100%;height:100%;display:block'}">${body}</svg>`;
+  const defs=(state._figShade||state._figGlow)?SUIT_DEFS:'';
+  return `<svg viewBox="58 40 134 380" preserveAspectRatio="xMidYMid meet" style="${style||'width:100%;height:100%;display:block'}">${defs}${body}</svg>`;
 }
 function suitFigureFB(colFn){
   const prev=state._figColor;state._figColor=colFn;
+  const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
   const P=suitProps();
-  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#6B5420">${t}</text>`;
+  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#8B6B2A">${t}</text>`;
   const div=`<line x1="250" y1="12" x2="250" y2="418" stroke="#2A2520" stroke-width="1" stroke-dasharray="4,4"/>`;
-  const svg=`<svg viewBox="0 0 500 430" preserveAspectRatio="xMidYMid meet" style="width:100%;display:block">${lbl(125,"FRONT")}${lbl(375,"BACK")}${div}${_frontBody(125,P)}${_backBody(375,P)}</svg>`;
-  state._figColor=prev;
+  const svg=`<svg viewBox="0 0 500 430" preserveAspectRatio="xMidYMid meet" style="width:100%;display:block">${SUIT_DEFS}${lbl(125,"FRONT")}${lbl(375,"BACK")}${div}${_frontBody(125,P)}${_backBody(375,P)}</svg>`;
+  state._figColor=prev;state._figShade=ps;state._figGlow=pg;
   return svg;
 }
 function bodyFig(ex){
@@ -687,7 +696,7 @@ function bodyFig(ex){
 function sessionMuscleMap(muscleList){
   const hi=new Set((muscleList||[]).map(MM_NORM));
   const col=m=> hi.has(m)?{fill:"#E8453C",op:".95"}:{fill:"#E8C56A",op:".07"};
-  return `<div style="background:radial-gradient(circle at 50% 30%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);padding:4px 4px 2px">${suitFigureFB(col)}</div>`;
+  return `<div class="stage" style="border-radius:14px;overflow:hidden;padding:6px 6px 2px">${suitFigureFB(col)}</div>`;
 }
 // Intensity heat: a muscle's red brightness scales with its WEEKLY working-set volume vs its landmarks.
 // 0 sets = cool grey; MEV = dim ember; MAV = bright red; ≥MRV = white-hot (overreaching).
@@ -713,8 +722,10 @@ function muscleHeatFig(m){
   const nm=MM_NORM(m), view=MM_BACK.has(nm)?"back":"front";
   const hc=heatColor(nm), col=mm=> mm===nm?{fill:hc,op:".95"}:{fill:"#E8C56A",op:".06"};
   const [lab,lc]=heatLabel(nm), s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20};
+  const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
+  const fig=suitFigure(view,col);state._figShade=ps;state._figGlow=pg;
   return `<div class="row" style="gap:12px;align-items:center;margin-bottom:10px">
-    <div style="width:104px;height:104px;flex:none;background:radial-gradient(circle at 50% 32%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)">${suitFigure(view,col)}</div>
+    <div class="stage" style="width:104px;height:104px;flex:none;border-radius:14px;overflow:hidden">${fig}</div>
     <div style="min-width:0">
       <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:2px">INTENSITY HEAT</div>
       <div style="font-weight:800;color:${lc};font-size:15px;line-height:1.1">${lab}</div>
@@ -1757,13 +1768,23 @@ function shareWorkout(){const R=state.lastResult;state.data.u.shares++;save();co
 function dim(lvl,base,max){return base+clamp(lvl/15,0,1)*(max-base);}
 function rcHex(r){return r>=80?"#2ECC71":r>=50?"#E8C53C":"#E8453C";}
 function suitColor(m){if(!(state.data.muscleVol[m]||0))return null;return rcHex(getRecovery(m));}
+// Shared suit defs: 3D shading gradients + a soft bloom for worked muscles. Injected into every suit body.
+const SUIT_DEFS=`<defs>`
+  +`<linearGradient id="sOcc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".34"/></linearGradient>`
+  +`<radialGradient id="sGloss" cx="34%" cy="22%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>`
+  +`<filter id="suitGlow" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="3.2" result="b"/><feComponentTransfer in="b" result="bd"><feFuncA type="linear" slope="0.7"/></feComponentTransfer><feMerge><feMergeNode in="bd"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`
+  +`</defs>`;
 function reg(m,d,extra){
   // _figColor override lets the same anatomy be recoloured for non-recovery views (e.g. a day's target map)
-  if(state._figColor){const fc=state._figColor(m);
-    return `<path d="${d}" fill="${fc.fill}" fill-opacity="${fc.op}" stroke="#05080c" stroke-opacity=".5" stroke-width="1.1" stroke-linejoin="round" style="pointer-events:none"/>`;}
-  const c=suitColor(m);
+  const fc=state._figColor?state._figColor(m):null;
+  const c=fc?null:suitColor(m);
+  const lit=fc?fc.op>=0.4:!!c;
+  const fAttr=(state._figGlow&&lit)?' filter="url(#suitGlow)"':'';
+  const shade=state._figShade?`<path d="${d}" fill="url(#sOcc)" style="pointer-events:none"/><path d="${d}" fill="url(#sGloss)" style="pointer-events:none"/>`:'';
+  if(fc){
+    return `<path d="${d}" fill="${fc.fill}" fill-opacity="${fc.op}" stroke="#05080c" stroke-opacity=".5" stroke-width="1.1" stroke-linejoin="round"${fAttr} style="pointer-events:none"/>${shade}`;}
   const fill=c||"#E8C56A";const op=c?".92":".08";
-  return `<path d="${d}" fill="${fill}" fill-opacity="${op}" stroke="#05080c" stroke-opacity=".5" stroke-width="1.1" stroke-linejoin="round" onclick="muscleDrill('${m}')" style="cursor:pointer" ${extra||""}/>`;
+  return `<path d="${d}" fill="${fill}" fill-opacity="${op}" stroke="#05080c" stroke-opacity=".5" stroke-width="1.1" stroke-linejoin="round"${fAttr} onclick="muscleDrill('${m}')" style="cursor:pointer" ${extra||""}/>${shade}`;
 }
 function suitProps(){
   const sl=clamp(M12.reduce((a,m)=>a+muscleLevel(m),0)/M12.length,0,15);
@@ -1774,12 +1795,12 @@ function suitProps(){
 function setSuitView(v){state.suitView=v;render();}
 function headShape(cx){
   // Pure anatomy: simple oval head, no cowl, no decoration
-  return `<ellipse cx="${cx}" cy="60" rx="18" ry="23" fill="#16140e" stroke="#332e24" stroke-width="1.2"/>`;
+  return `<ellipse cx="${cx}" cy="60" rx="18" ry="23" fill="#1b1f28" stroke="#3a4150" stroke-width="1.2"/>`;
 }
 // Shared geometry builders parameterised on cx — same math, different centre point
 function _suitCommon(cx, P) {
   const S=P.sh,PE=P.pec,W=P.waist,H=P.hip,TH=P.th,CF=P.cf,NK=P.neck;
-  const body="#161309";
+  const body="#1c2029";
   const torso=`M${cx-PE} 106 Q${cx} 100 ${cx+PE} 106 Q${cx+PE-1} 150 ${cx+W} 206 Q${cx} 216 ${cx-W} 206 Q${cx-PE+1} 150 ${cx-PE} 106 Z`;
   const armBk=s=>`M${cx+s*(PE-2)} 104 Q${cx+s*(S+3)} 104 ${cx+s*(S)} 132 L${cx+s*(S-2)} 176 Q${cx+s*(S-3)} 202 ${cx+s*(S-6)} 230 Q${cx+s*(S-9)} 235 ${cx+s*(S-12)} 230 Q${cx+s*(S-10)} 200 ${cx+s*(S-9)} 176 L${cx+s*(S-9)} 134 Q${cx+s*(S-9)} 112 ${cx+s*(PE-6)} 108 Z`;
   const legBk=s=>`M${cx+s*1} 210 L${cx+s*(H)} 210 Q${cx+s*(H+1)} 252 ${cx+s*(TH-1)} 300 Q${cx+s*(TH-2)} 318 ${cx+s*(CF+3)} 326 L${cx+s*(CF+4)} 338 Q${cx+s*(CF+4)} 374 ${cx+s*(CF)} 402 Q${cx+s*(CF-4)} 410 ${cx+s*3} 404 L${cx+s*2} 326 Q${cx+s*1} 300 ${cx+s*1} 210 Z`;
@@ -1832,12 +1853,15 @@ function _backBody(cx, P) {
 function buildSuit(){
   const P=suitProps();
   const cxF=125,cxB=375;
-  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#6B5420">${t}</text>`;
+  const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
+  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#8B6B2A">${t}</text>`;
   const div=`<line x1="250" y1="12" x2="250" y2="418" stroke="#2A2520" stroke-width="1" stroke-dasharray="4,4"/>`;
-  return `<svg viewBox="0 0 500 430" class="suit-breathe" style="width:100%;display:block">` +
-    lbl(cxF,"FRONT")+lbl(cxB,"BACK")+div+
+  const svg=`<svg viewBox="0 0 500 430" class="suit-breathe" style="width:100%;display:block">` +
+    SUIT_DEFS+lbl(cxF,"FRONT")+lbl(cxB,"BACK")+div+
     _frontBody(cxF,P)+_backBody(cxB,P)+
     `</svg>`;
+  state._figShade=ps;state._figGlow=pg;
+  return svg;
 }
 function miniSuit(hit){
   const front=["chest","shoulders","biceps","forearms","abs","quads","calves","traps"];
@@ -1915,7 +1939,7 @@ function renderSuit(){
   let html=`<h1 style="font-size:34px;color:var(--gold2)">THE BATSUIT</h1><div class="tag" style="margin-bottom:10px">Sector status — tap a plate for detail</div>`;
   if(compromised.length>=3)html+=`<div class="banner alert"><span>🛠️</span><div><b>Multiple sectors compromised, sir.</b><div class="mini">The Batsuit needs repair before the next mission. ${compromised.map(m=>MNAME[m]).join(", ")} below 50%.</div></div></div>`;
   html+=`<div class="card"><div class="center" style="margin-bottom:6px"><span class="chip on">STR ${sl} · ${r.emoji} ${r.name}</span></div>
-    ${buildSuit()}
+    <div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-bottom:6px">${buildSuit()}</div>
     <div class="row" style="justify-content:center;gap:14px;margin-top:8px">
       <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--green)"></i> ≥80%</span>
       <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--yellow)"></i> 50–79%</span>
@@ -2323,7 +2347,7 @@ function renderGotham(){
   html+=`</div>`;
 
   // muscle figure + stats
-  html+=`<div class="card"><div class="row sp"><div class="ttl">The Suit</div><span class="chip" onclick="go('suit')">STR ${sl} · ${r.emoji} ${r.name}</span></div>${buildSuit()}</div>`;
+  html+=`<div class="card"><div class="row sp"><div class="ttl">The Suit</div><span class="chip" onclick="go('suit')">STR ${sl} · ${r.emoji} ${r.name}</span></div><div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-top:4px">${buildSuit()}</div></div>`;
 
   // glanceable recovery rings (heartbeat dials)
   html+=recoveryRings();
@@ -2456,7 +2480,7 @@ const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 // Full-body heat map: every muscle tinted by its weekly working-set volume.
 function volMapBodies(){
   const col=m=>{const s=weeklySets(m);return s>0?{fill:heatColor(m),op:".95"}:{fill:"#E8C56A",op:".06"};};
-  return `<div style="background:radial-gradient(circle at 50% 30%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);padding:4px 4px 2px">${suitFigureFB(col)}</div>`;
+  return `<div class="stage" style="border-radius:14px;overflow:hidden;padding:6px 6px 2px">${suitFigureFB(col)}</div>`;
 }
 function volMapCard(){
   const rows=M12.map(m=>({m,s:weeklySets(m),lm:VL[m]||{mev:8,mav:14,mrv:20}}))
