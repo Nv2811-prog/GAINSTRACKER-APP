@@ -1586,6 +1586,7 @@ function render(){
   if(state.step==="readiness"){renderReadiness();renderNav();return;}
   if(state.step==="logging"){renderLogging();renderNav();return;}
   if(state.subpage==="archive"){renderArchive();renderNav();return;}
+  if(state.subpage==="garage"){renderGarage();renderNav();return;}
   const fn={gotham:renderGotham,mission:renderMission,case:renderCase,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit}[state.tab]||renderGotham;
   fn();renderNav();
 }
@@ -3053,15 +3054,114 @@ function twoFaceCard(){
         <div class="mini" style="color:var(--text2);line-height:1.5;margin-top:3px">${dir}</div></div></div>
     <div class="mini" style="margin-top:8px;color:var(--text3);font-style:italic">The coin decides at midnight. No choosing — that's the point. Heads you win, tails you win.</div></div>`;
 }
+/* ===== Shared milestone stats for garage/most-wanted ===== */
+function gothamStats(){const d=state.data,a=(typeof trainingAge==="function"?trainingAge():null);
+  return {w:d.workouts.length,vol:d.u.totalVolume||0,boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0,prs:Object.keys(d.prs).length};}
+
+/* ===== THE BATMOBILE GARAGE (#11): a fleet that unlocks with real milestones ===== */
+const GARAGE=[
+  {e:"🪝",n:"Grappling Hook",d:"Standard issue. Every Bat starts here.",req:s=>true,how:"Unlocked"},
+  {e:"🏍️",n:"Batcycle",d:"Nimble and fast. Earned through showing up.",req:s=>s.w>=5,how:"5 missions"},
+  {e:"🚙",n:"The Tumbler",d:"Armored prototype. It does not brake for criminals.",req:s=>s.w>=25,how:"25 missions"},
+  {e:"🚤",n:"The Batboat",d:"Gotham harbor patrol craft.",req:s=>s.streak>=14,how:"14-day streak"},
+  {e:"🦇",n:"The Batmobile",d:"The legend itself. 100 tonnes of moved iron forged it.",req:s=>s.vol>=100000,how:"100,000kg lifted"},
+  {e:"🚁",n:"The Batwing",d:"Air superiority over the Narrows.",req:s=>s.boss>=10,how:"10 villains felled"},
+  {e:"✈️",n:'"The Bat"',d:"VTOL command craft. Reserved for the prime of the Dark Knight.",req:s=>s.w>=50,how:"50 missions"},
+  {e:"🛸",n:"Justice Cruiser",d:"Beyond Gotham. League-grade hardware.",req:s=>s.sl>=25,how:"Strength Lv 25"},
+  {e:"🏎️",n:"Wayne Hypercar",d:"Bruce's personal ride. Quarter-million kilos says you earned the keys.",req:s=>s.vol>=250000,how:"250,000kg lifetime"}
+];
+function openGarage(){state.subpage="garage";render();window.scrollTo(0,0);}
+function closeGarage(){state.subpage=null;go("gotham");}
+function renderGarage(){
+  const s=gothamStats();const unlocked=GARAGE.filter(v=>v.req(s)).length;
+  let html=`<div class="fade">
+    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeGarage()">‹ Gotham</button><span class="chip on">${unlocked}/${GARAGE.length} unlocked</span></div>
+    <h1 style="font-size:34px;color:var(--gold2)">THE GARAGE</h1>
+    <div class="tag" style="margin-bottom:14px">Every milestone earns a new ride for the cave</div>`;
+  html+=GARAGE.map(v=>{const on=v.req(s);
+    return `<div class="card" style="display:flex;gap:13px;align-items:center;${on?'border-color:var(--gold-dim)':'opacity:.62'}">
+      <div style="font-size:40px;line-height:1;flex:none;${on?'filter:drop-shadow(0 0 10px rgba(232,197,106,.4))':'filter:grayscale(1) brightness(.6)'}">${on?v.e:"🔒"}</div>
+      <div style="flex:1;min-width:0"><h2 style="font-size:19px;margin:0;color:${on?'var(--gold2)':'var(--text3)'}">${on?esc(v.n):"▓▓▓▓▓▓"}</h2>
+        <div class="mini" style="color:var(--text2);line-height:1.45;margin-top:2px">${on?esc(v.d):"Locked vehicle"}</div>
+        <div class="mini" style="margin-top:4px;color:${on?'var(--green)':'var(--gold-dim)'}">${on?"✓ "+esc(v.how):"🔒 "+esc(v.how)}</div></div></div>`;
+  }).join("");
+  html+=`<button class="btn ghost" style="margin:6px 0 20px" onclick="closeGarage()">‹ Back to Gotham</button></div>`;
+  $("app").innerHTML=html;
+}
+
+/* ===== WEEKLY MOST WANTED (#12): the weakest sector as a bounty with a target ===== */
+function mostWantedCard(){
+  const m=weakestMuscle();if(!m)return "";
+  const lm=VL[m]||{mev:8,mav:14};const target=lm.mev;const cur=weeklySets(m);
+  const done=cur>=target;const pct=clamp(cur/Math.max(1,target)*100,0,100);
+  const nm=NEMESIS_MAP[m];const villain=nm?nm.villain:"The Rogues";
+  return `<div class="card" style="border-color:${done?'var(--green)':'#E8453C66'}">
+    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🎯 MOST WANTED</div><span class="chip" style="color:${done?'var(--green)':'#E8453C'}">${done?'CLAIMED':'BOUNTY OPEN'}</span></div>
+    <div class="row g" style="gap:12px;margin-top:8px;align-items:center">
+      <div style="flex:none">${mIcon(m,38,done?'#2ECC71':'#E8453C')}</div>
+      <div style="flex:1;min-width:0"><h2 style="font-size:20px;margin:0;color:${done?'var(--green)':'var(--gold2)'}">${MNAME[m]}</h2>
+        <div class="mini" style="color:var(--text2);line-height:1.45">Your weakest sector this week — ${esc(villain)} is exploiting it. Bounty: hit <b>${target} sets</b> to bring ${MNAME[m].toLowerCase()} back to the growth zone.</div></div></div>
+    <div class="bar" style="height:9px;background:var(--bg4);margin-top:10px"><i style="width:${pct}%;background:${done?'var(--green)':'linear-gradient(90deg,#E8453C,#E8A52A)'}"></i></div>
+    <div class="row sp" style="margin-top:4px"><span class="mini" style="color:var(--text3)">${cur}/${target} sets this week</span>${done?`<span class="mini green">✓ Bounty collected — sector secured</span>`:`<span class="mini" style="color:#E8A52A">${target-cur} set${target-cur===1?'':'s'} to go</span>`}</div></div>`;
+}
+
+/* ===== BAT-RANK INSIGNIA EVOLUTION (#9): an emblem that visibly upgrades by tier ===== */
+function batEmblem(tier,size){
+  size=size||72;const cols=["#8a8a8a","#9aa0ab","#7FC8FF","#cd7f32","#c0c0c0","#E8C56A","#E8C56A","#F0524A","#FFD36E"];
+  const c=cols[clamp(tier,0,cols.length-1)];const rings=Math.min(tier,4);
+  let deco="";for(let i=0;i<rings;i++){const rr=46-i*5;deco+=`<circle cx="50" cy="50" r="${rr}" fill="none" stroke="${c}" stroke-opacity="${0.18+i*0.05}" stroke-width="1.4"/>`;}
+  // bat emblem path (stylised, symmetric)
+  const bat=`<path fill="${c}" d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z"/>`;
+  const glow=tier>=5?`filter:drop-shadow(0 0 ${4+tier}px ${c}aa)`:`filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))`;
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" style="${glow};flex:none">
+    <circle cx="50" cy="50" r="48" fill="rgba(0,0,0,.35)" stroke="${c}" stroke-opacity=".55" stroke-width="2"/>${deco}${bat}</svg>`;
+}
+function batRankCard(){
+  const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
+  const cur=RANKS[ri],next=RANKS[ri+1];
+  const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
+  return `<div class="card" style="display:flex;gap:14px;align-items:center">
+    ${batEmblem(ri,76)}
+    <div style="flex:1;min-width:0">
+      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">Rank ${ri+1}/${RANKS.length} · Strength Lv ${sl}</div>
+      <h2 style="font-size:24px;margin:1px 0 2px;color:var(--gold2)">${esc(cur[1])} ${cur[2]}</h2>
+      ${next?`<div class="bar" style="height:8px;background:var(--bg4)"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
+        <div class="mini" style="margin-top:3px;color:var(--text2)">${Math.max(0,hi-sl)} strength level${(hi-sl)===1?'':'s'} to <b>${esc(next[1])}</b> ${next[2]}</div>`
+      :`<div class="mini" style="color:var(--gold2)">⭑ Maximum rank reached — you are the Legend of Gotham.</div>`}
+    </div></div>`;
+}
+
+/* ===== NIGHTLY PATROL REPORT (#10): a cinematic crime-log recap of a mission ===== */
+function patrolReport(idx){
+  const w=state.data.workouts[idx];if(!w){toast("No mission found");return;}
+  const avg=avgWeekVol()||1;const ratio=w.totalVol/avg;
+  const heavy=ratio>=1.15?"a heavy haul":ratio>=0.85?"a solid patrol":"a tactical, lighter sweep";
+  const muscles=[...new Set((w.exercises||[]).flatMap(e=>(exFor(e.name).p||[])))].map(m=>MNAME[m]);
+  let top=null,topV=0;(w.exercises||[]).forEach(e=>{const v=(e.sets||[]).reduce((a,s)=>a+((+s.w||0)*(+s.r||0)),0);if(v>topV){topV=v;top=e.name;}});
+  const prs=(w.prs||[]);
+  const dt=new Date(w.date);
+  const open=`The Bat-Signal cut through the fog at ${dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}. ${esc(w.name)} — ${heavy}.`;
+  const mid=`${w.exercises.length} engagements across ${fmtTime(w.duration)}. ${fmtNum(w.totalVol)}kg of iron moved through ${muscles.slice(0,3).join(", ")||"the dark"}.${top?` ${esc(top)} carried the night.`:""}`;
+  const end=prs.length?`Gotham's underworld lost ${prs.length} of its own tonight — ${prs.map(esc).join(", ")} fell to new records. The city sleeps a little safer.`:`No records broken, but the war was waged. Every rep is a brick in the wall between Gotham and the dark.`;
+  openSheet(`<div class="center" style="font-size:40px;margin-bottom:2px">📜</div>
+    <div class="mini center" style="text-align:center;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)">Patrol Report · ${dt.toLocaleDateString()}</div>
+    <h2 style="text-align:center;font-family:var(--disp);color:var(--gold2);font-size:23px;margin:3px 0 13px">${esc(w.name)}</h2>
+    <p style="font-size:14.5px;line-height:1.8;color:var(--text);font-style:italic">${open}<br><br>${mid}<br><br>${end}</p>
+    <div class="row" style="gap:7px;flex-wrap:wrap;margin:14px 0 2px;justify-content:center">
+      <span class="chip">${fmtNum(w.totalVol)}kg</span><span class="chip">${w.exercises.length} lifts</span><span class="chip">${fmtTime(w.duration)}</span>${prs.length?`<span class="chip on" style="color:var(--green)">${prs.length} PR</span>`:""}</div>
+    <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close the file</button>`);
+}
+
 function renderGotham(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
   const ironT=(u.totalVolume/1000).toFixed(1);
   const ledger=u.totalVolume<10000?"New to the vault.":u.totalVolume<50000?"A respectable deposit.":u.totalVolume<100000?"Wayne would notice.":u.totalVolume<500000?"The cave is full.":"Beyond the cave. Into legend.";
   let html=`<div class="row sp"><div class="row g" style="gap:11px"><img class="brandlogo sm" src="logo_t.png" alt=""><div><div class="tag">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}</div>
-    <h1 style="font-size:34px;color:var(--gold2)">${u.name?esc(u.name.toUpperCase()):"GOTHAM"}</h1></div></div>
+    <h1 style="font-size:34px;color:var(--gold2)">${u.name?esc(u.name.toUpperCase()):"GOTHAM"}</h1>${earnedTitle()?`<div class="mini" style="color:var(--gold-dim);letter-spacing:.08em;margin-top:-2px">🎖️ ${esc(earnedTitle())}</div>`:""}</div></div>
     <button class="btn ghost sm" style="width:auto" onclick="openSettings()">⚙︎</button></div>
     <div class="muted" style="font-style:italic;font-size:13px;margin:-2px 0 12px">${gothamWeather()}</div>`;
   html+=readinessCard();
+  html+=batRankCard();
   html+=`<div class="grid2" style="margin-bottom:13px">${threatCard()}${fatigueMini()}</div>`;
 
   // rest day warning (4+ consecutive)
@@ -3103,6 +3203,8 @@ function renderGotham(){
   html+=gauntletCard();
   // Two-Face's daily call — heavy vs volume directive
   html+=twoFaceCard();
+  // Weekly Most Wanted bounty — weakest sector
+  html+=mostWantedCard();
 
   // muscle figure + stats
   html+=`<div class="card"><div class="row sp"><div class="ttl">The Suit</div><span class="chip" onclick="go('suit')">STR ${sl} · ${r.emoji} ${r.name}</span></div><div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-top:4px">${buildSuit()}</div></div>`;
@@ -3114,6 +3216,7 @@ function renderGotham(){
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.streakDays}</div><div class="mini">day streak ›</div></div>
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.totalWorkouts}</div><div class="mini">missions ›</div></div>
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('strategy')"><div class="big" style="font-size:30px">${weekCount()}/${u.weeklyGoal}</div><div class="mini">this week ›</div></div></div>`;
+  html+=`<button class="btn" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px;border-color:var(--gold-dim)" onclick="openGarage()">🚗 The Garage — ${GARAGE.filter(v=>v.req(gothamStats())).length}/${GARAGE.length} vehicles unlocked ›</button>`;
 
   // training age clock
   html+=trainingAgeCard();
@@ -3746,7 +3849,7 @@ function renderCase(){
     <div class="acbar"><i style="width:${pct}%"></i></div>
     <div class="grid3" style="grid-template-columns:repeat(4,1fr)">${acSorted.map(a=>{const g=d.u.earnedBadges.includes(a.id);return `<div class="badge ${g?'earned':'locked'}"><div class="be">${a.e}</div><div class="bn">${esc(a.n)}</div></div>`;}).join("")}</div></div>`;
   // history
-  html+=`<div class="card"><div class="ttl">Recent missions</div>${d.workouts.slice(0,12).map(w=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border);cursor:pointer" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><div><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><b class="gold">${fmtNum(w.totalVol)}kg</b></div>`).join("")||'<p class="muted">No history yet.</p>'}</div>`;
+  html+=`<div class="card"><div class="ttl">Recent missions <span class="mini" style="font-weight:400">— 📜 for the patrol report</span></div>${d.workouts.slice(0,12).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><div class="row g" style="gap:9px;align-items:center"><b class="gold">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 9px" onclick="patrolReport(${i})">📜</button></div></div>`).join("")||'<p class="muted">No history yet.</p>'}</div>`;
   $("app").innerHTML=html;
 }
 function heatmap(){
@@ -4187,8 +4290,16 @@ const STORY=[
   {id:"knight",t:"The Dark Knight",e:"🦇",req:s=>s.w>=50||s.boss>=3,need:s=>`${s.w}/50 workouts or ${s.boss}/3 villains felled`,
    body:"Fifty sessions. Rogues in the cells. You've become the thing criminals tell stories about to frighten each other. The cowl fits like it grew there. This is the prime of the Dark Knight — feared, relentless, in control."},
   {id:"legend",t:"Legend of Gotham",e:"🔱",req:s=>s.days>=365||s.w>=100,need:s=>`${Math.min(s.days,365)}/365 nights on patrol or ${s.w}/100 workouts`,
-   body:"A year in the dark. A hundred battles in the iron. You're no longer a man who trains — you're a legend the next generation measures itself against. Gotham sleeps a little safer because you never stopped showing up."}
+   body:"A year in the dark. A hundred battles in the iron. You're no longer a man who trains — you're a legend the next generation measures itself against. Gotham sleeps a little safer because you never stopped showing up."},
+  {id:"war",t:"The War on Weakness",e:"⚔️",req:s=>s.boss>=25||s.vol>=300000,need:s=>`${s.boss}/25 villains felled or ${fmtNum(s.vol)}/300,000kg moved`,
+   body:"Twenty-five rogues in the cells. Three hundred tonnes of iron behind you. The war isn't a season anymore — it's who you are. Criminals don't test the gym you patrol. They've learned. Now the only opponent left strong enough to challenge you is the person you were last year."},
+  {id:"order",t:"No Man's Land",e:"🏚️",req:s=>s.w>=150,need:s=>`${s.w}/150 workouts logged`,
+   body:"They said the city would break you. A hundred and fifty nights answered them. When everything around the bar fell apart — bad days, cold mornings, every excuse Gotham could invent — you still showed up and moved the weight. That is the discipline that outlasts motivation."},
+  {id:"immortal",t:"The Lazarus Pit",e:"🟢",req:s=>s.days>=730||s.w>=250,need:s=>`${Math.min(s.days,730)}/730 nights or ${s.w}/250 workouts`,
+   body:"Two years. Ra's al Ghul chased immortality in a green pool. You found it the honest way — in the thousand quiet reps that rebuilt you, cell by cell, into something that doesn't fade. The cowl was never the legend. You were. You always were."}
 ];
+const STORY_TITLES={vow:"The Initiate",first:"Recruit of the Cave",cave:"Cave-Dweller",iron:"Iron-Forged",rogues:"Rogue-Hunter",night:"Watcher of Gotham",becoming:"The Becoming",knight:"The Dark Knight",legend:"Legend of Gotham",war:"Warlord of the Cave",order:"Unbreakable",immortal:"The Immortal"};
+function earnedTitle(){const s=storyStats();let t="";STORY.forEach(c=>{if(c.req(s))t=STORY_TITLES[c.id]||t;});return t;}
 function storyStats(){const d=state.data,a=(typeof trainingAge==="function"?trainingAge():null);
   return {w:d.workouts.length,vol:d.u.totalVolume||0,boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0};}
 function storyCampaignCard(){
@@ -4216,6 +4327,7 @@ function openStoryChapter(id){
     <div class="mini center" style="text-align:center;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)">Chapter ${i+1}</div>
     <h2 style="text-align:center;font-family:var(--disp);color:var(--gold2);font-size:25px;margin:3px 0 13px">${esc(c.t)}</h2>
     <p style="font-size:14.5px;line-height:1.75;color:var(--text);font-style:italic">${esc(c.body)}</p>
+    ${STORY_TITLES[c.id]?`<div class="banner" style="margin-top:14px;background:var(--gold-bg);border-color:var(--gold-dim)"><span>🎖️</span><div><b style="color:var(--gold2)">Title earned: ${esc(STORY_TITLES[c.id])}</b><div class="mini">Your highest title shows under your name on the Gotham screen.</div></div></div>`:""}
     <button class="btn" style="margin-top:15px" onclick="closeSheet()">Close the file</button>`);
 }
 function renderAlfred(){
