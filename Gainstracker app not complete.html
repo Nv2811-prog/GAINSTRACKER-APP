@@ -544,7 +544,7 @@ u:{name:"",bodyweight:75,goal:"build",natty:"maybe",xp:0,totalWorkouts:0,totalVo
  weekSchedule:{0:true,1:false,2:true,3:false,4:true,5:false,6:false},
  physiqueAnalysis:{weakPoints:[],strongPoints:[],mainImbalance:"",overallRating:null,date:null},
  measurements:{chest:null,waist:null,leftArm:null,rightArm:null,leftThigh:null,rightThigh:null,history:[]},
- aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest"},
+ aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null},
 muscleVol:{},muscleLastTrained:{},muscleLastVol:{},muscleLastFails:{},
 prs:{},bossWins:[],bossReturns:[],workouts:[],splits:[],activeSplitId:null,customEx:{},
 rival:null,experienceLevel:null,onboardingDone:false,plates:DEF_PLATES.slice(),
@@ -3396,6 +3396,59 @@ function fightRecordCard(){
     <div class="mini" style="margin-bottom:6px"><b style="color:var(--gold2)">Top rival:</b> ${esc(nem[0])} — KO'd ${nem[1]}×</div>
     <div class="row" style="gap:5px;flex-wrap:wrap">${recent.map(b=>`<span class="chip" style="background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.4);color:var(--green)">KO · ${esc(b.villain)}</span>`).join("")}</div></div>`;
 }
+/* ===== Fuel Protocol — Alfred's nutrition calculator (Mifflin-St Jeor → goal-matched macros) ===== */
+const FUEL_ACT=[["1.2","Desk job, little exercise"],["1.375","Light — 1-3 sessions/wk"],["1.55","Moderate — 3-5 sessions/wk"],["1.725","Hard — 6-7 sessions/wk"],["1.9","Athlete — 2-a-days / physical job"]];
+const FUEL_GOALS={build:["Build muscle","+12%",0.12,2.0],lean:["Lean gain","+6%",0.06,2.1],maintain:["Maintain","±0",0,1.9],cut:["Cut fat","−20%",-0.20,2.2]};
+function calcFuel(p){
+  const kg=+p.bw||0,cm=+p.height||0,age=+p.age||0,act=+p.activity||1.55;
+  if(!kg||!cm||!age)return null;
+  const bmr=10*kg+6.25*cm-5*age+(p.sex==="f"?-161:5);
+  const tdee=bmr*act;
+  const g=FUEL_GOALS[p.goal]||FUEL_GOALS.build;
+  const cals=Math.round((tdee*(1+g[2]))/10)*10;
+  const protein=Math.round(kg*g[3]);
+  const fat=Math.round(kg*0.9);
+  const carbs=Math.max(0,Math.round((cals-protein*4-fat*9)/4));
+  return {bmr:Math.round(bmr),tdee:Math.round(tdee),cals,protein,fat,carbs,goalLabel:g[0],goalAdj:g[1]};
+}
+function fuelProtocolCard(){
+  const n=state.data.u.nutrition;
+  if(!n||!n.cals){
+    return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><button class="btn gold sm" style="width:auto" onclick="openFuel()">Set up</button></div>
+      <div class="mini" style="color:var(--text2)">Let Alfred calculate the exact calories and macros to match your goal — build, lean gain, maintain or cut. Two minutes, sir.</div></div>`;
+  }
+  const macro=(v,l,c)=>`<div style="flex:1;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:9px 4px;background:var(--bg2)"><div style="font-family:var(--disp);font-size:21px;color:${c}">${v}<span style="font-size:12px">g</span></div><div class="mini" style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase">${l}</div></div>`;
+  return `<div class="card glow"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><button class="btn ghost sm" style="width:auto" onclick="openFuel()">Edit</button></div>
+    <div class="center" style="margin:2px 0 4px"><span class="chip on">${esc(n.goalLabel)} · ${n.goalAdj} maintenance</span></div>
+    <div class="center" style="font-family:var(--disp);font-size:42px;color:var(--gold2);line-height:1.1">${fmtNum(n.cals)}<span style="font-size:15px;color:var(--text2)"> kcal/day</span></div>
+    <div class="row" style="gap:8px;margin-top:10px">${macro(n.protein,"Protein","#ff8a7a")}${macro(n.carbs,"Carbs","#E8C56A")}${macro(n.fat,"Fat","#7cc4ff")}</div>
+    <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">Maintenance ≈ ${fmtNum(n.tdee)} kcal. Hit <b style="color:#ff8a7a">${n.protein}g protein</b> every day — it's the non-negotiable. ${n.goalLabel==="Cut fat"?"Weigh in weekly; if the scale stalls 2 weeks, drop carbs ~30g.":n.goalLabel==="Maintain"?"Keep it steady and let training drive the change.":"Aim to gain ~0.25–0.5kg/week; faster is mostly fat."}</div></div>`;
+}
+function openFuel(){
+  const u=state.data.u,n=u.nutrition||{};
+  const sex=n.sex||"m",goal=n.goal||(u.goal==="lose"?"cut":u.goal==="build"?"build":"build");
+  const actSel=n.activity||"1.55";
+  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div>
+    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Alfred runs the numbers (Mifflin-St Jeor) and matches macros to your goal.</div>
+    <label class="mini">Sex</label><div class="row" style="gap:8px;margin-bottom:8px"><button class="chip g fuelsex ${sex==='m'?'on':''}" data-v="m" onclick="fuelSex('m')">Male</button><button class="chip g fuelsex ${sex==='f'?'on':''}" data-v="f" onclick="fuelSex('f')">Female</button></div>
+    <div class="row g" style="gap:8px"><div style="flex:1"><label class="mini">Bodyweight (kg)</label><input id="fu-bw" inputmode="decimal" value="${n.bw||Math.round(u.bodyweight)||""}" oninput="fuelLive()"/></div>
+      <div style="flex:1"><label class="mini">Height (cm)</label><input id="fu-h" inputmode="numeric" value="${n.height||""}" oninput="fuelLive()"/></div>
+      <div style="flex:1"><label class="mini">Age</label><input id="fu-a" inputmode="numeric" value="${n.age||""}" oninput="fuelLive()"/></div></div>
+    <label class="mini" style="margin-top:8px;display:block">Activity</label>
+    <select id="fu-act" onchange="fuelLive()" style="margin-bottom:8px">${FUEL_ACT.map(([v,l])=>`<option value="${v}" ${v===actSel?"selected":""}>${l}</option>`).join("")}</select>
+    <label class="mini">Goal</label>
+    <select id="fu-goal" onchange="fuelLive()" style="margin-bottom:10px">${Object.entries(FUEL_GOALS).map(([k,g])=>`<option value="${k}" ${k===goal?"selected":""}>${g[0]} (${g[1]})</option>`).join("")}</select>
+    <div id="fu-out" class="center" style="min-height:60px"></div>
+    <button class="btn gold" style="margin-top:10px" onclick="saveFuel()">Save plan</button>
+    <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Cancel</button>`);
+  state._fuelSex=sex;fuelLive();
+}
+function fuelSex(v){state._fuelSex=v;document.querySelectorAll(".fuelsex").forEach(b=>b.classList.toggle("on",b.getAttribute("data-v")===v));fuelLive();}
+function fuelParams(){return {sex:state._fuelSex||"m",bw:($("fu-bw")||{}).value,height:($("fu-h")||{}).value,age:($("fu-a")||{}).value,activity:($("fu-act")||{}).value,goal:($("fu-goal")||{}).value};}
+function fuelLive(){const r=calcFuel(fuelParams());const el=$("fu-out");if(!el)return;
+  el.innerHTML=r?`<div style="font-family:var(--disp);font-size:36px;color:var(--gold2)">${fmtNum(r.cals)}<span style="font-size:14px;color:var(--text2)"> kcal</span></div><div class="mini" style="color:var(--text2)">P ${r.protein}g · C ${r.carbs}g · F ${r.fat}g · maint ≈ ${fmtNum(r.tdee)}</div>`:`<div class="mini" style="color:var(--text3)">Fill in bodyweight, height and age.</div>`;}
+function saveFuel(){const p=fuelParams();const r=calcFuel(p);if(!r){toast("Add bodyweight, height and age first.");return;}
+  state.data.u.nutrition=Object.assign({},p,r);save();haptic("done");closeSheet();toast("Fuel protocol saved");render();}
 function renderAlfred(){
   const has=!!geminiKey();state.data.u.aiKeySet=has;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach</div>`;
@@ -3403,6 +3456,7 @@ function renderAlfred(){
   html+=alfredBriefing();
   html+=alfredCaveReview();
   html+=alfredDebrief();
+  html+=fuelProtocolCard();
   html+=fightRecordCard();
   html+=alfredMusclePicker();
   if(!has){html+=`<div class="card"><div class="row" style="gap:10px;align-items:center"><div style="font-size:32px">🤖</div><div><h3 style="font-size:17px;color:var(--gold2);margin:0 0 2px">Want Alfred to talk back?</h3>
