@@ -182,6 +182,19 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .mma-dots i.done{background:#ff6a5a;box-shadow:0 0 8px rgba(255,80,70,.6)}
 .mma-dots i.cur{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.7)}
 .mma-next{font-size:12.5px;color:var(--text2);letter-spacing:.05em;min-height:18px}
+/* ===== Progress photos ===== */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.pcell{position:relative;aspect-ratio:3/4;border-radius:11px;overflow:hidden;border:1px solid var(--border);background:var(--bg2);cursor:pointer}
+.pcell img{width:100%;height:100%;object-fit:cover;display:block}
+.pcell .pdate{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;font-size:10px;color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.78),transparent);font-family:var(--disp);letter-spacing:.04em}
+.pcell.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-style:dashed;border-color:rgba(201,168,76,.5);color:var(--gold2)}
+.pframe{position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(201,168,76,.55);box-shadow:0 0 30px -6px rgba(201,168,76,.4),inset 0 0 40px -10px rgba(0,0,0,.7)}
+.pframe img{width:100%;display:block}
+.pframe .pcorner{position:absolute;top:8px;left:8px;width:34px;height:34px;opacity:.92;filter:drop-shadow(0 2px 5px rgba(0,0,0,.6))}
+.pframe .pcap{position:absolute;left:0;right:0;bottom:0;padding:14px 12px 9px;background:linear-gradient(0deg,rgba(0,0,0,.82),transparent);color:#fff}
+.pcompare{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pcompare .pframe{border-width:1px}
+.pcompare .plbl{position:absolute;top:8px;right:8px;font-size:10px;font-family:var(--disp);letter-spacing:.08em;padding:2px 8px;border-radius:20px;background:rgba(0,0,0,.6);color:var(--gold2);border:1px solid rgba(201,168,76,.4)}
 #voicebtn.listening{color:#ff6a5a;border-color:#5a2018;background:#1a0b0a;animation:voicepulse 1s ease-in-out infinite}
 @keyframes voicepulse{0%,100%{opacity:1}50%{opacity:.5}}
 .confetti-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:5}
@@ -548,6 +561,7 @@ debriefs:[],           // {weekStart, text, date}
 confessions:[],        // {date, text} Alfred's Confessions unlocks
 experiments:[],        // {id, exercise, mode, startW, startDate, done, result} Two-Face coin
 exNotes:{},            // exerciseName -> [{date, note}] coaching notes
+photos:[],             // {id, date, img(dataURL), bw, note} progress photos
 prefs:{weather:true,boot:true,particles:true}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
@@ -2207,7 +2221,66 @@ function renderSuit(){
   const me=state.data.u.measurements;
   html+=`<div class="card"><div class="row sp"><div class="ttl">Body measurements</div><button class="btn ghost sm" style="width:auto" onclick="openMeasure()">Edit</button></div>
     <div class="grid3 center">${[["chest","Chest"],["waist","Waist"],["leftArm","L Arm"],["rightArm","R Arm"],["leftThigh","L Thigh"],["rightThigh","R Thigh"]].map(([k,l])=>`<div><div class="num gold" style="font-size:22px">${me[k]?me[k]+"":"—"}</div><div class="mini">${l}${me[k]?" cm":""}</div></div>`).join("")}</div></div>`;
+  // progress photos — the transformation record
+  html+=progressPhotosCard();
   $("app").innerHTML=html;
+}
+function progressPhotosCard(){
+  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
+  const cmp=ph.length>=2?`<button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button>`:"";
+  const cells=ph.map(p=>`<div class="pcell" onclick="viewProgress('${p.id}')"><img src="${p.img}" alt=""><div class="pdate">${fmtP(p.date)}${p.bw?" · "+p.bw+"kg":""}</div></div>`).join("");
+  const add=`<label class="pcell add"><input type="file" accept="image/*" capture="environment" style="display:none" onchange="addProgress(this)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#E8C56A" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg><span class="mini">Add photo</span></label>`;
+  return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
+    <div class="mini" style="margin:-2px 0 8px;color:var(--text2)">Your transformation, framed. Stored only on this device — nothing leaves the cave.</div>
+    <div class="pgrid">${add}${cells}</div></div>`;
+}
+function addProgress(input){
+  const f=input.files&&input.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{
+    const im=new Image();
+    im.onload=()=>{
+      const max=820,sc=Math.min(1,max/Math.max(im.width,im.height));
+      const cw=Math.round(im.width*sc),ch=Math.round(im.height*sc);
+      const cv=document.createElement("canvas");cv.width=cw;cv.height=ch;
+      cv.getContext("2d").drawImage(im,0,0,cw,ch);
+      let img;try{img=cv.toDataURL("image/jpeg",0.72);}catch(err){img=e.target.result;}
+      state.data.photos=state.data.photos||[];
+      state.data.photos.push({id:"ph"+now(),date:new Date().toISOString(),img,bw:Math.round(state.data.u.bodyweight)||null,note:""});
+      try{save();haptic("done");toast("Progress photo saved");}
+      catch(err){state.data.photos.pop();toast("Storage full — delete an old photo first.");}
+      render();
+    };
+    im.onerror=()=>toast("Couldn't read that image.");
+    im.src=e.target.result;
+  };
+  rd.readAsDataURL(f);
+}
+function viewProgress(id){
+  const p=(state.data.photos||[]).find(x=>x.id===id);if(!p)return;
+  const dt=new Date(p.date).toLocaleDateString(undefined,{weekday:"short",month:"long",day:"numeric",year:"numeric"});
+  openSheet(`<div class="pframe"><img src="${p.img}" alt=""><img class="pcorner" src="logo.png" alt="">
+      <div class="pcap"><b style="font-size:15px">${dt}</b>${p.bw?`<div class="mini" style="color:var(--gold2)">Bodyweight ${p.bw}kg</div>`:""}</div></div>
+    <button class="btn ghost sm" style="margin-top:10px" onclick="delProgress('${p.id}')">Delete this photo</button>
+    <button class="btn" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
+}
+function delProgress(id){
+  state.data.photos=(state.data.photos||[]).filter(x=>x.id!==id);
+  save();haptic("tap");closeSheet();render();
+}
+function compareProgress(){
+  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(ph.length<2)return;
+  const first=ph[0],last=ph[ph.length-1];
+  const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
+  const days=Math.round((new Date(last.date)-new Date(first.date))/86400000);
+  const dbw=(first.bw&&last.bw)?(last.bw-first.bw):null;
+  const cell=(p,lbl)=>`<div class="pframe"><img src="${p.img}" alt=""><span class="plbl">${lbl}</span><img class="pcorner" src="logo.png" alt="" style="width:24px;height:24px"><div class="pcap"><b style="font-size:12px">${fmtP(p.date)}</b>${p.bw?`<div class="mini" style="color:var(--gold2)">${p.bw}kg</div>`:""}</div></div>`;
+  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Transformation</div>
+    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">${days} day${days===1?"":"s"} apart${dbw!=null?` · ${dbw>0?"+":""}${dbw}kg bodyweight`:""}</div>
+    <div class="pcompare">${cell(first,"BEFORE")}${cell(last,"NOW")}</div>
+    <button class="btn" style="margin-top:11px" onclick="closeSheet()">Close</button>`);
 }
 function muscleDrill(m){
   const f=muscleFatigue(m),rec=getRecovery(m),x=muscleXP(m),trained=(state.data.muscleVol[m]||0)>0;
