@@ -544,7 +544,7 @@ u:{name:"",bodyweight:75,goal:"build",natty:"maybe",xp:0,totalWorkouts:0,totalVo
  weekSchedule:{0:true,1:false,2:true,3:false,4:true,5:false,6:false},
  physiqueAnalysis:{weakPoints:[],strongPoints:[],mainImbalance:"",overallRating:null,date:null},
  measurements:{chest:null,waist:null,leftArm:null,rightArm:null,leftThigh:null,rightThigh:null,history:[]},
- aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null},
+ aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null,gym:null},
 muscleVol:{},muscleLastTrained:{},muscleLastVol:{},muscleLastFails:{},
 prs:{},bossWins:[],bossReturns:[],workouts:[],splits:[],activeSplitId:null,customEx:{},
 rival:null,experienceLevel:null,onboardingDone:false,plates:DEF_PLATES.slice(),
@@ -1845,11 +1845,34 @@ function showCues(name){const ex=exFor(name);const rt=regionTip(ex);const notes=
 function addExNote(name){const el=$("exnote-in");if(!el)return;const v=(el.value||"").trim();if(!v)return;state.data.exNotes=state.data.exNotes||{};(state.data.exNotes[name]=state.data.exNotes[name]||[]).unshift({date:new Date().toISOString(),note:v});save();haptic("tap");showCues(name);}
 
 /* ========================= EXERCISE PICKER (Rule 1: oninput -> updateExList only) ========================= */
+/* ===== My Gym — equipment profile so suggestions match what's actually in front of you ===== */
+const GYM_EQUIP=[["barbell","Barbells"],["dumbbell","Dumbbells"],["machine","Machines"],["cable","Cables"],["smith","Smith machine"],["ez bar","EZ bar"],["trap bar","Trap bar"],["bodyweight","Bodyweight / bars"],["band","Bands"],["kettlebell","Kettlebells"],["other","Other"]];
+function gymAllows(eq){const g=state.data.u.gym;if(!g||!g.equip)return true;return g.equip[eq]!==false;}
+function openGym(){
+  const g=state.data.u.gym||{name:"",equip:{}};
+  const chips=GYM_EQUIP.map(([k,l])=>`<button class="chip g gymeq ${g.equip[k]!==false?'on':''}" data-k="${k}" onclick="toggleGymEq('${k}')">${l}</button>`).join("");
+  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}My gym</div>
+    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Tell the app what you've got and it only suggests exercises you can actually do.</div>
+    <label class="mini">Gym name</label><input id="gym-name" value="${esc(g.name||'')}" placeholder="e.g. Fitness X — Gym80" style="margin-bottom:10px"/>
+    <label class="mini" style="display:block;margin-bottom:5px">Equipment available</label>
+    <div class="row" style="flex-wrap:wrap;gap:7px">${chips}</div>
+    <button class="btn gold" style="margin-top:12px" onclick="saveGym()">Save gym</button>
+    <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Cancel</button>`);
+  state._gymTmp=Object.assign({},g.equip);
+}
+function toggleGymEq(k){state._gymTmp=state._gymTmp||{};state._gymTmp[k]=state._gymTmp[k]===false?true:false;document.querySelectorAll(".gymeq").forEach(b=>{const kk=b.getAttribute("data-k");b.classList.toggle("on",state._gymTmp[kk]!==false);});}
+function saveGym(){const name=($("gym-name")||{}).value||"";state.data.u.gym={name:name.trim(),equip:Object.assign({},state._gymTmp||{})};state.gymFilter=true;save();haptic("done");closeSheet();toast(name?("Gym set: "+name.trim()):"Gym saved");render();}
+function toggleGymFilter(){state.gymFilter=!state.gymFilter;const c=$("gymfilter-chip");if(c)c.classList.toggle("on",state.gymFilter);updateExList();}
 function openPicker(){
   state.pickerOpen=true;state.pickerQuery="";state.pickerMuscle="all";
+  if(state.gymFilter===undefined)state.gymFilter=!!(state.data.u.gym&&state.data.u.gym.equip);
+  const hasGym=!!(state.data.u.gym&&state.data.u.gym.equip);
   $("sheet").innerHTML=`<div class="ttl">Add exercise <span class="muted" style="font-weight:400">— ${EXDB.length} loaded</span></div>
     <input id="ex-search" placeholder="Search e.g. bench, squat, curl…" autocomplete="off" oninput="updateExList()"/>
-    <div class="scroll-x" id="ex-musc" style="margin:9px 0 4px">${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')">${m==='all'?'All':MNAME[m]}</button>`).join("")}</div>
+    <div class="row sp" style="margin:9px 0 4px;align-items:center">
+      <div class="scroll-x" id="ex-musc" style="flex:1">${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')">${m==='all'?'All':MNAME[m]}</button>`).join("")}</div>
+      ${hasGym?`<button id="gymfilter-chip" class="chip g ${state.gymFilter?'on':''}" style="flex:none;margin-left:6px" onclick="toggleGymFilter()" title="Only show my gym's equipment">🏠 My gym</button>`:`<button class="chip g" style="flex:none;margin-left:6px" onclick="openGym()">＋ Set gym</button>`}
+    </div>
     <div id="ex-list" style="max-height:54vh;overflow:auto;margin-top:6px"></div>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
   updateExList();setTimeout(()=>{const s=$("ex-search");},50);
@@ -1860,6 +1883,7 @@ function updateExList(){
   state.pickerQuery=q;
   let list=EXDB;
   if(state.pickerMuscle!=="all")list=list.filter(e=>(e.p||[]).includes(state.pickerMuscle));
+  if(state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip)list=list.filter(e=>gymAllows(e.eq));
   if(q)list=list.filter(e=>e.n.toLowerCase().includes(q));
   list=list.slice(0,80);
   const el=$("ex-list");if(!el)return;
@@ -2762,7 +2786,8 @@ function renderMission(){
       <div id="belt" class="hide">
         <button class="btn ghost sm" style="margin:6px 0" onclick="openPlateSheet(-1)">Plate calculator</button>
         <button class="btn ghost sm" style="margin-bottom:6px" onclick="open1RM()">1RM calculator</button>
-        <button class="btn ghost sm" onclick="openRoundTimer()">Round timer</button>
+        <button class="btn ghost sm" style="margin-bottom:6px" onclick="openRoundTimer()">Round timer</button>
+        <button class="btn ghost sm" onclick="openGym()">My gym &amp; equipment</button>
       </div></div>`;
   $("app").innerHTML=html;
 }
