@@ -1669,6 +1669,7 @@ function openMenu(){
     ["openRankLadder","🎖️","Rank Ladder","Your climb to Legend"],
     ["openRecordsHall","🧊","Records Hall","Every all-time best"],
     ["openReportCard","🏅","Report Card","Grade your week"],
+    ["openTestDay","🎯","1RM Test Day","Guided ramp to a true max"],
     ["openTempo","⏱️","Tempo Trainer","Rep-cadence metronome"],
     ["openRoulette","🎲","Random Patrol","Surprise workout"],
     ["openTimeMachine","🗓️","This Day","Your training history"],
@@ -1797,6 +1798,93 @@ function dismissWarm(ei){
   const ses=state.session;ses.warmDismiss=ses.warmDismiss||{};
   ses.warmDismiss[ses.exercises[ei].name]=true;render();
 }
+/* ===== Wave 10 — The Arsenal: swap engine, antagonist/forearm pairing, 1RM test day ===== */
+/* Exercise-swap: replace a lift mid-session with one that trains the same primary muscle. Sets carry over. */
+function openSwap(ei){
+  const e=state.session.exercises[ei];if(!e)return;const cur=exFor(e.name);const prim=(cur.p&&cur.p[0])||null;
+  const inSession=new Set(state.session.exercises.map(x=>x.name));
+  let alts=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim&&!inSession.has(x.n));
+  const gymOn=state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip;
+  if(gymOn)alts=alts.filter(x=>gymAllows(x.eq));
+  alts.sort((a,b)=>{const sa=a.eq===cur.eq?0:1,sb=b.eq===cur.eq?0:1;return sa-sb||a.n.localeCompare(b.n);});
+  alts=alts.slice(0,40);
+  const rows=alts.length?alts.map(x=>`<div class="exrow" onclick="swapExercise(${ei},'${x.n.replace(/'/g,"\\'")}')">
+    ${thumb(x)}<div class="g"><div class="exname">${esc(x.n)}</div><div class="exmeta">${(x.p||[]).map(m=>MNAME[m]).join(" · ")} · ${esc(x.eq)}</div></div>
+    <span class="gold" style="font-size:20px">⇄</span></div>`).join(""):`<p class="muted center" style="padding:20px">No alternatives${gymOn?" in your gym — turn off the 🏠 filter for more":""}.</p>`;
+  openSheet(`<div class="ttl">⇄ Swap ${esc(e.name)}</div>
+    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">Same primary muscle (${prim?MNAME[prim]:"—"}) — your logged sets stay put.</div>
+    <div style="max-height:60vh;overflow:auto">${rows}</div>
+    <button class="btn" style="margin-top:10px" onclick="closeSheet()">Cancel</button>`);
+}
+function swapExercise(ei,name){
+  const e=state.session.exercises[ei];if(!e)return;e.name=name;
+  const lb=lastBestSet(name);
+  (e.sets||[]).forEach(s=>{s.prevW=lb?lb.w:null;s.prevR=lb?lb.r:null;s.prevType=lb?"NRM":null;});
+  haptic("done");closeSheet();toast("Swapped to "+name);render();
+}
+/* Antagonist / forearm pairing — the only superset-style tool, kept purposeful:
+   pair a lift with its true antagonist (or the other forearm side) and run them back-to-back. */
+const ANTAG={biceps:"triceps",triceps:"biceps",chest:"back",back:"chest",quads:"hamstrings",hamstrings:"quads"};
+function openPair(ei){
+  const e=state.session.exercises[ei];if(!e)return;const cur=exFor(e.name);const prim=(cur.p&&cur.p[0])||null;
+  let targetMuscle,title,intro,forearm=false;
+  if(prim==="forearms"){forearm=true;targetMuscle="forearms";title="🤝 Forearm pairing";intro="Train the other side — pair wrist flexion with extension, back-to-back.";}
+  else{targetMuscle=ANTAG[prim];title="🤝 Antagonist pair";intro=targetMuscle?`Pair with its antagonist (${MNAME[targetMuscle]}) — one rests while the other works, zero wasted time.`:"";}
+  if(!targetMuscle){toast("No natural antagonist for this lift — use Superset ↓ instead.");return;}
+  const inSession=new Set(state.session.exercises.map(x=>x.name));
+  let alts=EXDB.filter(x=>(x.p&&x.p[0])===targetMuscle&&!inSession.has(x.n)&&x.n!==e.name);
+  if(forearm){const isExt=/reverse|extensor|extension/i.test(e.name);const opp=x=>isExt?!/reverse|extensor|extension/i.test(x.n):/reverse|extensor|extension/i.test(x.n);alts.sort((a,b)=>(opp(a)?0:1)-(opp(b)?0:1));}
+  const gymOn=state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip;
+  if(gymOn)alts=alts.filter(x=>gymAllows(x.eq));
+  const logged=new Set(loggedExerciseNames());
+  alts.sort((a,b)=>(logged.has(b.n)?1:0)-(logged.has(a.n)?1:0));
+  alts=alts.slice(0,40);
+  const rows=alts.length?alts.map(x=>`<div class="exrow" onclick="addPair(${ei},'${x.n.replace(/'/g,"\\'")}')">
+    ${thumb(x)}<div class="g"><div class="exname">${esc(x.n)}</div><div class="exmeta">${(x.p||[]).map(m=>MNAME[m]).join(" · ")} · ${esc(x.eq)}</div></div>
+    <span class="gold" style="font-size:20px">＋</span></div>`).join(""):`<p class="muted center" style="padding:20px">No options found${gymOn?" in your gym — turn off the 🏠 filter":""}.</p>`;
+  openSheet(`<div class="ttl">${title}</div><div class="mini" style="color:var(--text2);margin:-2px 0 10px">${intro}</div>
+    <div style="max-height:60vh;overflow:auto">${rows}</div>
+    <button class="btn" style="margin-top:10px" onclick="closeSheet()">Cancel</button>`);
+}
+function addPair(ei,name){
+  const ses=state.session;const e=ses.exercises[ei];if(!e)return;
+  const grp=e.group||("pair"+now());e.group=grp;
+  ses.exercises.splice(ei+1,0,{name,group:grp,sets:seedSets(name)});
+  haptic("done");closeSheet();toast("Paired with "+name);render();
+}
+/* 1RM Test Day — a guided warm-up-to-max ramp built from your current estimated max. */
+function testRamp(name){
+  const ex=exFor(name);const pr=state.data.prs[name];let m=pr&&pr.orm?pr.orm:0;
+  if(!m){const lb=lastBestSet(name);if(lb)m=lb.e1||(lb.w&&lb.r?epley(lb.w,lb.r):0);}
+  if(!m)m=ex.bw?40:60;
+  const round=x=>Math.max(0,Math.round(x/2.5)*2.5);
+  const warm=[[0.4,8],[0.55,5],[0.7,3],[0.82,2],[0.9,1]].map(([p,r])=>({w:round(m*p),r,type:"W"}));
+  const tops=[{w:round(m*0.97),r:1,type:"NRM"},{w:round(m),r:1,type:"NRM"},{w:"",r:1,type:"NRM"}];
+  return {m:Math.round(m),warm,tops,ex};
+}
+function openTestDay(name){
+  const names=loggedExerciseNames();
+  if(!names.length){openSheet(`<div class="ttl">🎯 1RM Test Day</div><p class="muted">Log a few sessions first — test day builds your ramp from a lift's history.</p><button class="btn" style="margin-top:10px" onclick="closeSheet()">Close</button>`);return;}
+  name=name||state._testEx||names[0];if(!names.includes(name))name=names[0];state._testEx=name;
+  const r=testRamp(name);const bar=state.data.u.barWeight||20;
+  const warmRows=r.warm.map(s=>`<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span class="mini">Warm-up</span><b>${s.w||bar}kg × ${s.r}</b></div>`).join("");
+  const topRows=r.tops.map((s,i)=>`<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span class="mini" style="color:${i===2?'var(--gold2)':'var(--text2)'}">${i===2?"New-max attempt":"Top single"}</span><b>${s.w?s.w+"kg":"push it"} × ${s.r}</b></div>`).join("");
+  openSheet(`<div class="ttl">🎯 1RM Test Day</div>
+    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">A guided ramp to a true 1-rep max. Estimated current max: <b class="gold">${r.m}kg</b>.</div>
+    <select onchange="openTestDay(this.value)" style="width:100%;padding:10px;margin-bottom:10px">${names.map(n=>`<option ${n===name?"selected":""}>${esc(n)}</option>`).join("")}</select>
+    <div class="card" style="padding:12px"><div class="ttl" style="margin:0 0 4px;font-size:14px">The ramp</div>${warmRows}${topRows}
+      <div class="mini" style="margin-top:8px;color:var(--text3);line-height:1.5">Rest 3–5 min between the heavy singles. Stop when bar speed dies — a grindy single is your true max. A new top single logs as a PR automatically.</div></div>
+    <button class="btn gold" style="margin-top:12px" onclick="startTestDay('${name.replace(/'/g,"\\'")}')">Load test session ▶</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">Cancel</button>`);
+}
+function startTestDay(name){
+  const r=testRamp(name);const bar=state.data.u.barWeight||20;
+  const sets=r.warm.map(s=>({w:String(s.w||bar),r:String(s.r),type:"W",done:false,rpe:""}))
+    .concat(r.tops.map(s=>({w:s.w?String(s.w):"",r:String(s.r),type:"NRM",done:false,rpe:""})));
+  state.session={split:"Test Day",day:"1RM — "+name,readiness:"okay",startedAt:now(),exercises:[{name,sets}]};
+  state.workoutTimer=0;state.restTimer=0;state.restRunning=false;state.step="logging";
+  closeSheet();haptic("done");render();
+}
 /* ===== Intensity protocols (#6): drop-set / rest-pause / myo-reps =====
    Pick a technique and it appends the correctly-structured sets, seeded from your
    working weight. Tagged D/RP/M so volume + fatigue maths treat them honestly. */
@@ -1918,6 +2006,8 @@ function renderLogging(){
       <div class="row wrap" style="margin-top:9px;gap:8px">
         <button class="btn ghost sm g" onclick="addSet(${ei})">+ Add set</button>
         <button class="btn ghost sm" style="width:auto;display:flex;align-items:center;gap:4px" title="Drop-set / rest-pause / myo-reps" onclick="openProtocolSheet(${ei})">${secIcon('bolt')}Protocol</button>
+        <button class="btn ghost sm" style="width:auto" title="Swap for a similar lift" onclick="openSwap(${ei})">⇄ Swap</button>
+        <button class="btn ghost sm" style="width:auto" title="Add the antagonist / other forearm side" onclick="openPair(${ei})">🤝 Pair</button>
         <button class="btn ghost sm" style="width:auto" onclick="showCues('${esc(e.name).replace(/'/g,"")}')">ℹ️ Cues</button>
         ${linkBtn}
       </div></div>`;
@@ -3611,6 +3701,7 @@ function renderMission(){
     `<div class="grid2">
       <button class="btn ghost sm" onclick="openPlateSheet(-1)">⚖️ Plate calc</button>
       <button class="btn ghost sm" onclick="open1RM()">🏋️ 1RM calc</button>
+      <button class="btn ghost sm" onclick="openTestDay()">🎯 1RM test day</button>
       <button class="btn ghost sm" onclick="openRoundTimer()">🥊 Round timer</button>
       <button class="btn ghost sm" onclick="openGym()">🏠 My gym</button>
       <button class="btn ghost sm" onclick="openForge()">⚒️ Forge</button>
