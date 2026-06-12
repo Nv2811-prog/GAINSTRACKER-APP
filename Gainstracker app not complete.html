@@ -3187,9 +3187,39 @@ function villainCampaignCard(){
     <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Your Rogues Gallery. Set PRs to take them down one by one — stronger villains unlock as your Fighter level climbs.</div>
     <div class="vcamp"><div class="vrail"></div>${rows}</div></div>`;
 }
+/* ===== Batcomputer — full analytics dashboard ===== */
+function weeklySeries(weeks,fn){const out=[];for(let i=weeks-1;i>=0;i--){const s=now()-(i+1)*7*864e5,e=now()-i*7*864e5;const ws=state.data.workouts.filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;});out.push(fn(ws));}return out;}
+function openBatcomputer(){
+  const d=state.data,u=d.u;
+  if(!d.workouts.length){openSheet(`<div class="ttl">📡 Batcomputer</div><p class="muted">No mission data yet, sir. Log a session and the analytics come online.</p><button class="btn" onclick="closeSheet()">Close</button>`);return;}
+  const sessions=d.workouts.length;
+  const hrs=Math.round((u.totalDuration||0)/3600*10)/10;
+  const prc=Object.keys(d.prs).length;
+  const ton=weeklySeries(10,ws=>Math.round(ws.reduce((a,w)=>a+(w.totalVol||0),0)));
+  const sess=weeklySeries(10,ws=>new Set(ws.map(w=>new Date(w.date).toDateString())).size);
+  const smx=Math.max(1,...sess);
+  const mv=M12.map(m=>({m,s:weeklySets(m)})).sort((a,b)=>b.s-a.s);
+  const mmx=Math.max(1,...mv.map(x=>x.s));
+  const movers=loggedExerciseNames().map(n=>{const rows=exerciseRows(n);if(!rows||rows.length<2)return null;const e=rows.map(r=>r.e1rm);return {n,gain:Math.round(e[e.length-1]-e[0]),now:e[e.length-1]};}).filter(x=>x&&x.gain>0).sort((a,b)=>b.gain-a.gain).slice(0,5);
+  const mBar=x=>{const lm=VL[x.m]||{mev:8,mav:14,mrv:20};const col=x.s===0?'#3a3a3a':x.s<lm.mev?'#8a8a8a':x.s<=lm.mav?'#2ECC71':x.s<=lm.mrv?'#E8C56A':'#E8453C';
+    return `<div style="margin-bottom:6px"><div class="row sp" style="margin-bottom:2px"><span class="mini">${MNAME[x.m]}</span><span class="mini" style="color:${col}">${x.s} set${x.s===1?'':'s'}</span></div><div class="bar" style="height:7px;background:var(--bg4)"><i style="width:${(x.s/mmx*100).toFixed(0)}%;background:${col}"></i></div></div>`;};
+  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('radar')}Batcomputer</div>
+    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Every patrol, crunched. The full picture of your war on weakness.</div>
+    <div class="row" style="gap:7px;flex-wrap:wrap;margin-bottom:13px">${caveStat(fmtNum(Math.round(u.totalVolume||0))+"kg","lifted")}${caveStat(sessions,"sessions")}${caveStat(hrs+"h","under iron")}${caveStat(prc,"records")}</div>
+    <div class="ttl" style="font-size:14px">Weekly tonnage · 10 wk</div>
+    ${trendChart(ton,{color:"#7FC8FF",unit:"kg"})}
+    <div class="ttl" style="font-size:14px;margin-top:10px">Sessions per week</div>
+    <div class="spark" style="margin:6px 0 4px;height:46px">${sess.map(v=>`<i style="height:${clamp(v/smx*100,6,100)}%;background:var(--gold-dim)" title="${v}"></i>`).join("")}</div>
+    <div class="ttl" style="font-size:14px;margin-top:12px">Volume by muscle · this week</div>
+    <div style="margin-top:6px">${mv.map(mBar).join("")}</div>
+    ${movers.length?`<div class="ttl" style="font-size:14px;margin-top:12px">Top movers · e1RM gained</div>
+      ${movers.map(x=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><span style="font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.n)}</span><b class="gold" style="white-space:nowrap;margin-left:8px">+${x.gain}kg <span class="mini" style="color:var(--text3)">→ ${x.now}</span></b></div>`).join("")}`:""}
+    <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
+}
 function renderCase(){
   const d=state.data;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">CASE FILE</h1><div class="tag" style="margin-bottom:12px">Records, defeats & history</div>`;
+  if(d.workouts.length)html+=`<button class="btn gold" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="openBatcomputer()">${secIcon('radar','#0c0f15')}Open Batcomputer analytics</button>`;
   // monthly report
   if(daysSince(d.workouts[d.workouts.length-1]?.date)>=30||d.u.totalWorkouts>=12)
     html+=`<button class="btn" style="margin-bottom:13px" onclick="monthlyReport()">📂 Open monthly Batcomputer report</button>`;
