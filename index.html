@@ -251,9 +251,14 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
 .dots i{width:7px;height:7px;border-radius:50%;background:var(--border2)}
 .dots i.on{background:var(--gold2)}
-.badge{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border:1px solid var(--border);border-radius:11px;background:var(--bg2);text-align:center}
+.badge{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border:1px solid var(--border);border-radius:11px;background:var(--bg2);text-align:center;position:relative;transition:transform .12s}
 .badge.locked{opacity:.32;filter:grayscale(1)}
+.badge.earned{border-color:rgba(232,197,106,.4);background:linear-gradient(180deg,rgba(232,197,106,.1),var(--bg2));box-shadow:0 0 14px -4px rgba(232,197,106,.45)}
+.badge.earned .be{filter:drop-shadow(0 2px 6px rgba(232,197,106,.5))}
+.badge:active{transform:scale(.94)}
 .badge .be{font-size:24px}.badge .bn{font-size:10px;line-height:1.1;color:var(--text2)}
+.acbar{height:6px;border-radius:4px;background:var(--bg2);overflow:hidden;margin:2px 0 10px;border:1px solid var(--border)}
+.acbar i{display:block;height:100%;background:linear-gradient(90deg,#c9a84c,#e8c56a);box-shadow:0 0 8px rgba(232,197,106,.6)}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
 .classified{background:#0c0c0c;border:1px dashed var(--border2);border-radius:12px;padding:16px;font-family:'DM Mono',ui-monospace,monospace}
@@ -2920,8 +2925,11 @@ function renderCase(){
   html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div>
     <div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
   // achievements
-  html+=`<div class="card"><div class="row sp"><div class="ttl">🏅 Achievements</div><span class="chip">${d.u.earnedBadges.length}/${ACHIEVEMENTS.length}</span></div>
-    <div class="grid3" style="grid-template-columns:repeat(4,1fr)">${ACHIEVEMENTS.map(a=>{const g=d.u.earnedBadges.includes(a.id);return `<div class="badge ${g?'':'locked'}"><div class="be">${a.e}</div><div class="bn">${esc(a.n)}</div></div>`;}).join("")}</div></div>`;
+  const ec=d.u.earnedBadges.length,tc=ACHIEVEMENTS.length,pct=Math.round(ec/tc*100);
+  const acSorted=ACHIEVEMENTS.slice().sort((a,b)=>{const ga=d.u.earnedBadges.includes(a.id),gb=d.u.earnedBadges.includes(b.id);return ga===gb?0:ga?-1:1;});
+  html+=`<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('strength')}Achievements</div><span class="chip">${ec}/${tc}</span></div>
+    <div class="acbar"><i style="width:${pct}%"></i></div>
+    <div class="grid3" style="grid-template-columns:repeat(4,1fr)">${acSorted.map(a=>{const g=d.u.earnedBadges.includes(a.id);return `<div class="badge ${g?'earned':'locked'}"><div class="be">${a.e}</div><div class="bn">${esc(a.n)}</div></div>`;}).join("")}</div></div>`;
   // history
   html+=`<div class="card"><div class="ttl">Recent missions</div>${d.workouts.slice(0,12).map(w=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border);cursor:pointer" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><div><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><b class="gold">${fmtNum(w.totalVol)}kg</b></div>`).join("")||'<p class="muted">No history yet.</p>'}</div>`;
   $("app").innerHTML=html;
