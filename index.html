@@ -562,6 +562,7 @@ confessions:[],        // {date, text} Alfred's Confessions unlocks
 experiments:[],        // {id, exercise, mode, startW, startDate, done, result} Two-Face coin
 exNotes:{},            // exerciseName -> [{date, note}] coaching notes
 photos:[],             // {id, date, img(dataURL), bw, note} progress photos
+allies:[],             // {n,sl,rk,re,vol,w,boss,days,lifts} imported Patrol Cards (Justice League)
 prefs:{weather:true,boot:true,particles:true}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
@@ -2219,6 +2220,51 @@ function openDayBriefing(splitId,dayIdx){
 }
 
 /* ========================= THE SUIT TAB ========================= */
+/* ===== Wave K — Symmetry score + measurement trends ===== */
+function symmetryScore(){
+  const me=state.data.u.measurements;
+  const pairs=[["leftArm","rightArm","Arms"],["leftThigh","rightThigh","Thighs"]];
+  const got=pairs.filter(p=>me[p[0]]&&me[p[1]]).map(([l,r,name])=>{
+    const a=+me[l],b=+me[r],big=Math.max(a,b)||1,diff=Math.abs(a-b);
+    return {name,l:a,r:b,diff:Math.round(diff*10)/10,pct:Math.round(diff/big*1000)/10,
+      sym:Math.round(clamp(100-(diff/big*100)*4,0,100)),side:a>b?"left":a<b?"right":"even"};
+  });
+  if(!got.length)return null;
+  return {rows:got,overall:Math.round(got.reduce((s,r)=>s+r.sym,0)/got.length)};
+}
+function symmetryCard(){
+  const s=symmetryScore();
+  const hist=(state.data.u.measurements.history||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!s&&hist.length<2)return "";
+  let html=`<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('balance')}Symmetry &amp; measurement trends</div>`;
+  if(s){
+    const col=s.overall>=90?"var(--green)":s.overall>=78?"var(--gold2)":"var(--orange)";
+    const lbl=s.overall>=90?"BALANCED":s.overall>=78?"MINOR LEAN":"WORTH WATCHING";
+    html+=`<div class="row sp" style="align-items:flex-end;margin-bottom:9px"><div><div class="mini" style="text-transform:uppercase;letter-spacing:.12em;color:var(--text3)">Left / right symmetry</div><div style="font-family:var(--disp);font-size:30px;color:${col};line-height:1.05">${s.overall}<span style="font-size:14px;color:var(--text3)">/100</span></div></div><div style="font-family:var(--disp);font-size:15px;color:${col}">${lbl}</div></div>`;
+    s.rows.forEach(r=>{
+      const lp=clamp(r.l/(r.l+r.r)*100,8,92),dc=r.pct<=2?"var(--green)":r.pct<=5?"var(--gold2)":"var(--orange)";
+      html+=`<div style="margin-bottom:9px"><div class="row sp"><span class="mini">${r.name} <span style="color:var(--text3)">L ${r.l} · R ${r.r} cm</span></span><span class="mini" style="color:${dc}">${r.side==="even"?"even":(r.diff+"cm "+(r.side==="left"?"L":"R")+" bigger")}</span></div>
+        <div style="position:relative;height:8px;border-radius:5px;margin-top:4px;background:#15171d;overflow:hidden"><div style="position:absolute;left:0;width:${lp.toFixed(1)}%;height:100%;background:#7FC8FF"></div><i style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.55)"></i></div></div>`;
+    });
+    html+=`<div class="mini" style="color:var(--text3);margin-top:2px">A small gap is normal. A persistent &gt;5% lean is worth a few extra unilateral sets on the smaller side.</div>`;
+  }
+  if(hist.length>=2){
+    const metrics=[["chest","Chest"],["waist","Waist"],["leftArm","L Arm"],["rightArm","R Arm"],["leftThigh","L Thigh"],["rightThigh","R Thigh"]];
+    const avail=metrics.filter(([k])=>hist.filter(h=>h[k]!=null).length>=2);
+    if(avail.length){
+      const sel=avail.some(([k])=>k===state.suitTrend)?state.suitTrend:avail[0][0];
+      const selLbl=avail.find(a=>a[0]===sel)[1];
+      const vals=hist.filter(h=>h[sel]!=null).map(h=>+h[sel]);
+      const d=Math.round((vals[vals.length-1]-vals[0])*10)/10,up=d>0;
+      const dc=d===0?"var(--text2)":(sel==="waist"?(up?"var(--orange)":"var(--green)"):(up?"var(--green)":"var(--orange)"));
+      html+=`<div class="hr" style="margin:11px 0 9px"></div>
+        <div class="row wrap" style="gap:5px;margin-bottom:8px">${avail.map(([k,l])=>`<button class="chip ${k===sel?'on':''}" style="font-size:11px;padding:5px 9px" onclick="state.suitTrend='${k}';render()">${l}</button>`).join("")}</div>
+        <div class="row sp" style="margin-bottom:2px"><span class="mini">${selLbl} · ${vals.length} check-ins</span><b style="color:${dc}">${d>0?"+":""}${d}cm</b></div>
+        ${trendChart(vals,{color:"#7FC8FF",unit:"cm"})}`;
+    }
+  }
+  return html+`</div>`;
+}
 function renderSuit(){
   const sl=strengthLevel();const r=rankFor(sl);
   const compromised=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)<50);
@@ -2247,6 +2293,8 @@ function renderSuit(){
   const me=state.data.u.measurements;
   html+=`<div class="card"><div class="row sp"><div class="ttl">Body measurements</div><button class="btn ghost sm" style="width:auto" onclick="openMeasure()">Edit</button></div>
     <div class="grid3 center">${[["chest","Chest"],["waist","Waist"],["leftArm","L Arm"],["rightArm","R Arm"],["leftThigh","L Thigh"],["rightThigh","R Thigh"]].map(([k,l])=>`<div><div class="num gold" style="font-size:22px">${me[k]?me[k]+"":"—"}</div><div class="mini">${l}${me[k]?" cm":""}</div></div>`).join("")}</div></div>`;
+  // symmetry score + measurement trends
+  html+=symmetryCard();
   // progress photos — the transformation record
   html+=progressPhotosCard();
   $("app").innerHTML=html;
@@ -2826,11 +2874,75 @@ function renderMission(){
         <button class="btn ghost sm" style="margin:6px 0" onclick="openPlateSheet(-1)">Plate calculator</button>
         <button class="btn ghost sm" style="margin-bottom:6px" onclick="open1RM()">1RM calculator</button>
         <button class="btn ghost sm" style="margin-bottom:6px" onclick="openRoundTimer()">Round timer</button>
-        <button class="btn ghost sm" onclick="openGym()">My gym &amp; equipment</button>
+        <button class="btn ghost sm" style="margin-bottom:6px" onclick="openGym()">My gym &amp; equipment</button>
+        <button class="btn ghost sm" onclick="openJusticeLeague()">Justice League — train with friends</button>
       </div></div>`;
   $("app").innerHTML=html;
 }
 function toggleBelt(){$("belt").classList.toggle("hide");}
+/* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
+function myPatrolCard(){
+  const d=state.data,u=d.u,sl=strengthLevel(),r=rankFor(sl),a=(typeof trainingAge==="function"?trainingAge():null);
+  const lifts=Object.entries(d.prs||{}).map(([n,p])=>({n,o:Math.round((p&&p.orm)||0)})).filter(x=>x.o>0).sort((a,b)=>b.o-a.o).slice(0,3);
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,lifts};
+}
+function encodeCard(c){try{return "GTJL1:"+btoa(unescape(encodeURIComponent(JSON.stringify(c))));}catch(e){return "";}}
+function decodeCard(code){try{code=(code||"").trim();const i=code.indexOf("GTJL1:");if(i>=0)code=code.slice(i+6);code=code.replace(/\s+/g,"");const j=JSON.parse(decodeURIComponent(escape(atob(code))));return (j&&typeof j==="object"&&"sl" in j)?j:null;}catch(e){return null;}}
+function shareMyCard(){
+  const code=encodeCard(myPatrolCard());if(!code){toast("Couldn't build your card.");return;}
+  const done=()=>{toast("Patrol Card copied — send it to a friend.");haptic("done");};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done).catch(()=>{const t=$("my-code");if(t)t.select();toast("Select the code above and copy it.");});}
+  else{const t=$("my-code");if(t)t.select();toast("Select the code above and copy it.");}
+}
+function addAlly(){
+  const inp=$("ally-code");if(!inp)return;const c=decodeCard(inp.value);
+  if(!c){toast("That code didn't read — check you pasted all of it.");return;}
+  state.data.allies=state.data.allies||[];
+  const ex=state.data.allies.findIndex(a=>a.n===c.n);
+  if(ex>=0)state.data.allies[ex]=c;else state.data.allies.push(c);
+  save();haptic("done");toast(`${c.n} added to the League`);openJusticeLeague();
+}
+function delAlly(i){(state.data.allies||[]).splice(i,1);save();openJusticeLeague();}
+function compareAlly(i){
+  const me=myPatrolCard(),a=(state.data.allies||[])[i];if(!a)return;
+  const row=(lab,m,t,unit,disp)=>{const win=m===t?0:(m>t?1:-1);
+    const mc=win>0?"var(--green)":win<0?"var(--text2)":"var(--gold2)",tc=win<0?"var(--green)":win>0?"var(--text2)":"var(--gold2)";
+    const dm=disp?disp(m):m,dt=disp?disp(t):t;
+    return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><b style="color:${mc};min-width:60px;text-align:left">${dm}${unit||""}</b><span class="mini" style="flex:1;text-align:center;color:var(--text3)">${lab}</span><b style="color:${tc};min-width:60px;text-align:right">${dt}${unit||""}</b></div>`;};
+  let wins=0,losses=0;["sl","vol","w","boss","days"].forEach(k=>{if(me[k]>a[k])wins++;else if(me[k]<a[k])losses++;});
+  const verdict=wins>losses?`You lead ${esc(a.n)} ${wins}–${losses}. Stay hungry.`:wins<losses?`${esc(a.n)} is ahead ${losses}–${wins}. Back to the cave.`:`Dead even with ${esc(a.n)}. The rivalry is real.`;
+  const t1=esc((state.data.u.name||"You").slice(0,16)),t2=esc(a.n.slice(0,16));
+  openSheet(`<div class="ttl center" style="justify-content:center;text-align:center">⚔️ ${t1} vs ${t2}</div>
+    <div class="row sp" style="margin:6px 0 2px"><b class="gold">${t1}</b><b class="gold">${t2}</b></div>
+    ${row("Strength level",me.sl,a.sl)}
+    ${row("Lifetime tonnage",me.vol,a.vol,"t",v=>(v/1000).toFixed(1))}
+    ${row("Sessions",me.w,a.w)}
+    ${row("Villains felled",me.boss,a.boss)}
+    ${row("Nights on patrol",me.days,a.days)}
+    <div class="banner" style="margin-top:12px"><span>🦇</span><div class="mini">${verdict}</div></div>
+    <button class="btn" style="margin-top:11px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
+}
+function openJusticeLeague(){
+  const me=myPatrolCard(),allies=state.data.allies||[],code=encodeCard(me);
+  const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
+  const cardMini=(c,you)=>`<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:11px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
+    <div class="row sp"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b><span class="mini">${c.re} ${esc(c.rk)}</span></div>
+    <div class="row" style="gap:6px;margin-top:9px">${caveStat("STR "+c.sl,"strength")}${caveStat((c.vol/1000).toFixed(1)+"t","moved")}${caveStat(c.w,"sessions")}${caveStat(c.boss,"villains")}</div></div>`;
+  const allyHtml=allies.length?allies.map((a,i)=>`<div style="margin-top:9px">${cardMini(a,false)}
+    <div class="row" style="gap:6px;margin-top:5px"><button class="btn ghost sm" onclick="compareAlly(${i})">Compare</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delAlly(${i})">Remove</button></div></div>`).join(""):'<div class="mini" style="margin-top:8px;color:var(--text3)">No allies yet. Paste a friend\u2019s Patrol Card below to start your League.</div>';
+  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('link')}Justice League</div>
+    <div class="mini" style="margin:-2px 0 11px;color:var(--text2)">Train with friends — no account, no server. Share your Patrol Card as a code, add theirs to compare. Everything stays on your devices.</div>
+    ${cardMini(me,true)}
+    <div class="row wrap" style="gap:5px;margin-top:8px">${lifts}</div>
+    <button class="btn gold sm" style="margin-top:11px" onclick="shareMyCard()">📋 Copy my Patrol Card</button>
+    <textarea id="my-code" readonly onclick="this.select()" style="width:100%;margin-top:7px;height:50px;font-size:10px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none">${code}</textarea>
+    <div class="hr"></div>
+    <div class="ttl" style="margin:0 0 6px">Add an ally</div>
+    <textarea id="ally-code" placeholder="Paste a friend's Patrol Card code…" style="width:100%;height:50px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none"></textarea>
+    <button class="btn sm" style="margin-top:7px" onclick="addAlly()">＋ Add to League</button>
+    <div style="margin-top:4px">${allyHtml}</div>
+    <button class="btn ghost" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
+}
 function setActiveSplit(id){state.data.activeSplitId=id;state.data._nextDay=0;save();render();}
 function open1RM(){openSheet(`<div class="ttl">1RM calculator (Epley)</div>
   <label class="mini">Weight (kg)</label><input id="o-w" inputmode="decimal" oninput="calc1rm()" style="margin-bottom:8px"/>
@@ -2959,10 +3071,71 @@ function plateauCard(){
     <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45">🔓 ${PROTO[k%PROTO.length]}</div></div>`;});
   h+=`</div>`;return h;
 }
+/* ===== Wave J — Sports Science Lab: junk-volume detector + stimulus-to-fatigue (SFR) ratings ===== */
+// Aggregate each exercise's effective hard-set stimulus over the last N days.
+function recentExerciseStim(days){
+  const cut=now()-days*864e5,agg={};
+  (state.data.workouts||[]).forEach(w=>{
+    if(new Date(w.date).getTime()<cut)return;
+    (w.exercises||[]).forEach(e=>{
+      const working=(e.sets||[]).filter(s=>s.done&&s.type!=="W");
+      if(!working.length)return;
+      const a=agg[e.name]||(agg[e.name]={name:e.name,sets:0,stim:0,ex:exFor(e.name)});
+      a.sets+=working.length; a.stim+=working.reduce((x,s)=>x+setStim(s),0);
+    });
+  });
+  return Object.values(agg);
+}
+// Stimulus-to-fatigue ratio: localized stimulus per unit of systemic fatigue cost.
+// avg proximity-to-failure ÷ how much of the body the lift taxes (extra muscles + axial spinal load).
+function sfrScore(a){
+  const ex=a.ex||{},sec=(ex.s||[]).length,prim=Math.max(1,(ex.p||[]).length);
+  const axial=/squat|deadlift|clean|snatch|good ?morning|thruster/i.test(a.name)?0.7:0;
+  const systemic=1+0.16*sec+0.22*(prim-1)+axial;
+  return (a.stim/Math.max(1,a.sets))/systemic;
+}
+function scienceLabCard(){
+  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
+  if(trained.length<3)return "";
+  let below=0,growth=0; const junk=[];
+  M12.forEach(m=>{const s=weeklySets(m),lm=VL[m]||{mev:8,mav:16,mrv:20};
+    if(s<=0)return;
+    if(s<lm.mev)below++;
+    else if(s<=lm.mrv)growth++;
+    else junk.push({m,s,mrv:lm.mrv});});
+  let verdict,vc;
+  if(junk.length>=2){verdict=`Junk-volume risk — ${junk.length} muscles past MRV. Recovery, not more sets, is the limiter now.`;vc="var(--red)";}
+  else if(junk.length===1){verdict=`${MNAME[junk[0].m]} has crept past MRV. Trim ~2 sets to keep every rep productive.`;vc="var(--orange)";}
+  else if(below>=4){verdict=`${below} muscles sit below maintenance — clean runway to add productive volume.`;vc="var(--gold2)";}
+  else {verdict="Volume is well-distributed across the growth zone. Textbook week, sir.";vc="var(--green)";}
+  const dist=`<div class="row" style="gap:6px;margin:9px 0 4px">
+    <div style="flex:${Math.max(below,0.001)};height:9px;border-radius:5px;background:#3a3a44"></div>
+    <div style="flex:${Math.max(growth,0.001)};height:9px;border-radius:5px;background:var(--green)"></div>
+    <div style="flex:${Math.max(junk.length,0.001)};height:9px;border-radius:5px;background:var(--red)"></div></div>
+    <div class="row sp"><span class="mini" style="color:var(--text3)">${below} maintaining</span><span class="mini" style="color:var(--green)">${growth} growing</span><span class="mini" style="color:var(--red)">${junk.length} over MRV</span></div>`;
+  const junkHtml=junk.length?`<div class="banner" style="margin-top:9px;background:rgba(232,69,60,.10);border-color:rgba(232,69,60,.4)"><span>🩸</span><div class="mini">Past MRV: ${junk.map(j=>`<b>${MNAME[j.m]}</b> (${j.s}/${j.mrv})`).join(", ")}. Extra sets here add fatigue, not muscle — bank them for a lagging group.</div></div>`:"";
+  // SFR leaderboard over last 14 days
+  const lab=recentExerciseStim(14).filter(a=>a.sets>=2);
+  lab.forEach(a=>a.sfr=sfrScore(a));
+  lab.sort((a,b)=>b.sfr-a.sfr);
+  const tier=v=>v>=1.05?["S","#E8C56A"]:v>=0.85?["A","#2ECC71"]:v>=0.62?["B","#7FC8FF"]:["C","#9aa0ab"];
+  const sfrRows=lab.slice(0,6).map(a=>{const[t,tc]=tier(a.sfr);
+    return `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)">
+      <span style="font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.name)} <span class="mini">${a.sets} set${a.sets===1?"":"s"}</span></span>
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:${tc}22;border:1px solid ${tc}66;color:${tc};font-family:var(--disp);font-size:13px;flex:none">${t}</span></div>`;}).join("");
+  const sfrBlock=sfrRows?`<div class="ttl" style="margin:13px 0 0;display:flex;align-items:center">${secIcon('bolt')}Stimulus-to-fatigue ratings <span class="mini" style="font-weight:400;margin-left:4px">— last 14 days</span></div>
+    <div class="mini" style="margin:4px 0 2px;color:var(--text2)">Localized stimulus per unit of systemic fatigue. <b style="color:#E8C56A">S/A</b> = high bang-for-buck (taken close to failure, low whole-body tax). <b style="color:#9aa0ab">C</b> = costly — worth it only if it's a priority lift.</div>
+    ${sfrRows}`:"";
+  return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center">${secIcon('bolt')}Sports science lab</div>
+    <div class="mini" style="color:var(--text2)">Weekly verdict across all 12 sectors:</div>
+    <div style="font-family:var(--disp);font-size:15px;color:${vc};line-height:1.35;margin:5px 0 2px">${esc(verdict)}</div>
+    ${dist}${junkHtml}${sfrBlock}</div>`;
+}
 function renderStrategy(){
   const d=state.data;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">STRATEGY</h1><div class="tag" style="margin-bottom:12px">Volume map · balance · schedule</div>`;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">STRATEGY</h1><div class="tag" style="margin-bottom:12px">Volume map · balance · schedule · science</div>`;
   html+=volMapCard();
+  html+=scienceLabCard();
   html+=weeklyBalanceCard();
   html+=deloadCard();
   html+=plateauCard();
@@ -3543,11 +3716,62 @@ function fuelLive(){const r=calcFuel(fuelParams());const el=$("fu-out");if(!el)r
   el.innerHTML=r?`<div style="font-family:var(--disp);font-size:36px;color:var(--gold2)">${fmtNum(r.cals)}<span style="font-size:14px;color:var(--text2)"> kcal</span></div><div class="mini" style="color:var(--text2)">P ${r.protein}g · C ${r.carbs}g · F ${r.fat}g · maint ≈ ${fmtNum(r.tdee)}</div>`:`<div class="mini" style="color:var(--text3)">Fill in bodyweight, height and age.</div>`;}
 function saveFuel(){const p=fuelParams();const r=calcFuel(p);if(!r){toast("Add bodyweight, height and age first.");return;}
   state.data.u.nutrition=Object.assign({},p,r);save();haptic("done");closeSheet();toast("Fuel protocol saved");render();}
+/* ===== Wave L — The Gotham Chronicle: a story campaign that unlocks with real milestones ===== */
+const STORY=[
+  {id:"vow",t:"The Vow",e:"🕯️",req:s=>true,need:s=>"",
+   body:"In the rain, on a Gotham backstreet, a boy makes a promise to a city that took everything. He doesn't know the iron yet — only the resolve. This is where every Dark Knight begins. You showed up. The vow is made."},
+  {id:"first",t:"First Blood",e:"🩸",req:s=>s.w>=1,need:s=>`Log your first workout (${Math.min(s.w,1)}/1)`,
+   body:"The first session is the hardest door to walk through — and you walked through it. The body remembers nothing yet, but the mind has already changed. Bruce trained on six continents; every one of them started with a single rep like yours."},
+  {id:"cave",t:"Into the Cave",e:"🦇",req:s=>s.w>=5,need:s=>`${s.w}/5 workouts logged`,
+   body:"Five nights in. Beneath the manor the cave opens up — cold, vast, yours. The bats don't startle you anymore. Training has become a place you go to, not a thing you force yourself to do."},
+  {id:"iron",t:"Forging the Iron",e:"⚒️",req:s=>s.w>=12||s.vol>=40000,need:s=>`${s.w}/12 workouts or ${fmtNum(s.vol)}/40,000kg moved`,
+   body:"The body is answering now. Tendons thicken, the bar feels less like an enemy. Bruce called it the boring work — the thousand quiet reps no one sees. This is where strength is actually built, in the dark, without applause."},
+  {id:"rogues",t:"The Rogues Appear",e:"🎭",req:s=>s.boss>=1,need:s=>`Defeat your first villain (${s.boss}/1)`,
+   body:"Gotham's underworld has noticed you. The first of the rogues steps out of the shadows — and falls. Every PR is a villain beaten. The city is starting to whisper a name it doesn't yet understand."},
+  {id:"night",t:"The Long Night",e:"🌙",req:s=>s.streak>=7,need:s=>`${s.streak}/7-day streak`,
+   body:"Seven nights, no surrender. The signal has burned over Gotham every one of them. Consistency is the real superpower — not the heaviest lift, but the one that shows up when it's cold and dark and easy to quit."},
+  {id:"becoming",t:"Becoming",e:"⚡",req:s=>s.w>=25||s.sl>=6,need:s=>`${s.w}/25 workouts (or reach strength Lv 6 — at ${s.sl})`,
+   body:"Somewhere in the reps, the man and the mission became the same thing. You're not training to get into shape anymore. You ARE in shape — and now you're sharpening it into something Gotham can rely on."},
+  {id:"knight",t:"The Dark Knight",e:"🦇",req:s=>s.w>=50||s.boss>=3,need:s=>`${s.w}/50 workouts or ${s.boss}/3 villains felled`,
+   body:"Fifty sessions. Rogues in the cells. You've become the thing criminals tell stories about to frighten each other. The cowl fits like it grew there. This is the prime of the Dark Knight — feared, relentless, in control."},
+  {id:"legend",t:"Legend of Gotham",e:"🔱",req:s=>s.days>=365||s.w>=100,need:s=>`${Math.min(s.days,365)}/365 nights on patrol or ${s.w}/100 workouts`,
+   body:"A year in the dark. A hundred battles in the iron. You're no longer a man who trains — you're a legend the next generation measures itself against. Gotham sleeps a little safer because you never stopped showing up."}
+];
+function storyStats(){const d=state.data,a=(typeof trainingAge==="function"?trainingAge():null);
+  return {w:d.workouts.length,vol:d.u.totalVolume||0,boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0};}
+function storyCampaignCard(){
+  const s=storyStats();
+  const states=STORY.map(c=>c.req(s));
+  const unlocked=states.filter(Boolean).length,nextIdx=states.indexOf(false);
+  const chip="display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:11px;margin-bottom:7px";
+  const em="font-size:23px;flex:none;width:28px;text-align:center";
+  const ti="font-family:var(--disp);font-size:14px";
+  const chap=STORY.map((c,i)=>{
+    if(states[i])return `<div style="${chip};border:1px solid var(--gold-dim);background:var(--gold-bg);cursor:pointer" onclick="openStoryChapter('${c.id}')">
+      <div style="${em}">${c.e}</div><div style="flex:1;min-width:0"><div style="${ti};color:var(--gold2)">Ch ${i+1} — ${c.t}</div><div class="mini" style="color:var(--text3)">Unlocked · tap to read</div></div><span style="color:var(--gold2)">›</span></div>`;
+    if(i===nextIdx)return `<div style="${chip};border:1px dashed var(--border2);background:var(--bg2)">
+      <div style="${em};filter:grayscale(1);opacity:.55">${c.e}</div><div style="flex:1;min-width:0"><div style="${ti};color:var(--text2)">Ch ${i+1} — ${c.t}</div><div class="mini" style="color:var(--gold-dim)">🔒 ${esc(c.need(s))}</div></div></div>`;
+    return `<div style="${chip};border:1px solid var(--border);background:var(--bg2);opacity:.6">
+      <div style="${em};opacity:.4">🔒</div><div style="flex:1"><div style="${ti};color:var(--text3)">Ch ${i+1} — ▓▓▓▓▓</div></div></div>`;
+  }).join("");
+  return `<div class="card glow"><div class="row sp"><div class="ttl" style="display:flex;align-items:center;margin:0">${secIcon('radar')}The Gotham Chronicle</div><span class="chip on">${unlocked}/${STORY.length}</span></div>
+    <div class="mini" style="margin:6px 0 11px;color:var(--text2)">Your training, told as the rise of the Dark Knight. Every milestone writes the next chapter.</div>
+    ${chap}</div>`;
+}
+function openStoryChapter(id){
+  const i=STORY.findIndex(c=>c.id===id);if(i<0)return;const c=STORY[i];
+  openSheet(`<div class="center" style="font-size:46px;margin-bottom:2px">${c.e}</div>
+    <div class="mini center" style="text-align:center;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)">Chapter ${i+1}</div>
+    <h2 style="text-align:center;font-family:var(--disp);color:var(--gold2);font-size:25px;margin:3px 0 13px">${esc(c.t)}</h2>
+    <p style="font-size:14.5px;line-height:1.75;color:var(--text);font-style:italic">${esc(c.body)}</p>
+    <button class="btn" style="margin-top:15px" onclick="closeSheet()">Close the file</button>`);
+}
 function renderAlfred(){
   const has=!!geminiKey();state.data.u.aiKeySet=has;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach</div>`;
   // local coaching — always available, no API key needed
   html+=alfredBriefing();
+  html+=storyCampaignCard();
   html+=alfredCaveReview();
   html+=alfredDebrief();
   html+=fuelProtocolCard();
