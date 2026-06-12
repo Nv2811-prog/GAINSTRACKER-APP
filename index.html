@@ -659,20 +659,35 @@ function muscleBodySVG(view,col){
   const ov=L+`<g transform="matrix(-1 0 0 1 100 0)">${L}</g>`+C;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="display:block">${defs}${legs}${arms}${torso}${head}${ov}</svg>`;
 }
+// ===== Unified anatomy: the Batsuit body (same one in the SUIT & GOTHAM tabs) used EVERYWHERE. col(muscle)->{fill,op} =====
+function suitFigure(view,colFn,style){
+  const prev=state._figColor;state._figColor=colFn;
+  const P=suitProps();
+  const body=(view==="back"?_backBody:_frontBody)(125,P);
+  state._figColor=prev;
+  return `<svg viewBox="58 40 134 380" preserveAspectRatio="xMidYMid meet" style="${style||'width:100%;height:100%;display:block'}">${body}</svg>`;
+}
+function suitFigureFB(colFn){
+  const prev=state._figColor;state._figColor=colFn;
+  const P=suitProps();
+  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#6B5420">${t}</text>`;
+  const div=`<line x1="250" y1="12" x2="250" y2="418" stroke="#2A2520" stroke-width="1" stroke-dasharray="4,4"/>`;
+  const svg=`<svg viewBox="0 0 500 430" preserveAspectRatio="xMidYMid meet" style="width:100%;display:block">${lbl(125,"FRONT")}${lbl(375,"BACK")}${div}${_frontBody(125,P)}${_backBody(375,P)}</svg>`;
+  state._figColor=prev;
+  return svg;
+}
 function bodyFig(ex){
   const prim=MM_NORM((ex.p&&ex.p[0])||"chest");
-  const sec=(ex.s||[]).map(MM_NORM);
+  const sec=new Set((ex.s||[]).map(MM_NORM));
   const view=MM_BACK.has(prim)?"back":"front";
-  const hi=new Set([prim,...sec]);
-  const col=m=> m===prim?"url(#mrg)":(hi.has(m)?"#df7a5f":"#5b6471");
-  return muscleBodySVG(view,col);
+  const col=m=> m===prim?{fill:"#E8453C",op:".95"}:(sec.has(m)?{fill:"#E8C56A",op:".5"}:{fill:"#E8C56A",op:".06"});
+  return suitFigure(view,col);
 }
-// Live session muscle map: front + back bodies lighting up every muscle hit so far.
+// Live session muscle map: front + back Batsuit lighting up every muscle hit so far.
 function sessionMuscleMap(muscleList){
   const hi=new Set((muscleList||[]).map(MM_NORM));
-  const col=m=> hi.has(m)?"url(#mrg)":"#5b6471";
-  const cell=v=>`<div style="flex:1;background:radial-gradient(circle at 50% 32%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)">${muscleBodySVG(v,col)}<div class="mini center" style="padding:2px 0 5px;color:#8b93a3;font-weight:700;letter-spacing:.12em">${v.toUpperCase()}</div></div>`;
-  return `<div class="row" style="gap:10px;align-items:stretch">${cell("front")}${cell("back")}</div>`;
+  const col=m=> hi.has(m)?{fill:"#E8453C",op:".95"}:{fill:"#E8C56A",op:".07"};
+  return `<div style="background:radial-gradient(circle at 50% 30%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);padding:4px 4px 2px">${suitFigureFB(col)}</div>`;
 }
 // Intensity heat: a muscle's red brightness scales with its WEEKLY working-set volume vs its landmarks.
 // 0 sets = cool grey; MEV = dim ember; MAV = bright red; ≥MRV = white-hot (overreaching).
@@ -696,10 +711,10 @@ function heatLabel(m){
 // Compact heat body: lights the tapped muscle by training intensity, on a Gym80-style dark tile.
 function muscleHeatFig(m){
   const nm=MM_NORM(m), view=MM_BACK.has(nm)?"back":"front";
-  const hc=heatColor(nm), col=mm=> mm===nm?hc:"#3f4754";
+  const hc=heatColor(nm), col=mm=> mm===nm?{fill:hc,op:".95"}:{fill:"#E8C56A",op:".06"};
   const [lab,lc]=heatLabel(nm), s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20};
   return `<div class="row" style="gap:12px;align-items:center;margin-bottom:10px">
-    <div style="width:96px;flex:none;background:radial-gradient(circle at 50% 32%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)">${muscleBodySVG(view,col)}</div>
+    <div style="width:104px;height:104px;flex:none;background:radial-gradient(circle at 50% 32%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)">${suitFigure(view,col)}</div>
     <div style="min-width:0">
       <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:2px">INTENSITY HEAT</div>
       <div style="font-weight:800;color:${lc};font-size:15px;line-height:1.1">${lab}</div>
@@ -2440,9 +2455,8 @@ const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 /* ===== Wave 2: Strategy = weekly volume map (MEV/MAV/MRV), balance & deload readiness ===== */
 // Full-body heat map: every muscle tinted by its weekly working-set volume.
 function volMapBodies(){
-  const col=m=>heatColor(m);
-  const cell=v=>`<div style="flex:1;background:radial-gradient(circle at 50% 30%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)">${muscleBodySVG(v,col)}<div class="mini center" style="padding:1px 0 5px;color:#8b93a3;font-weight:700;letter-spacing:.12em">${v.toUpperCase()}</div></div>`;
-  return `<div class="row" style="gap:10px;align-items:stretch">${cell("front")}${cell("back")}</div>`;
+  const col=m=>{const s=weeklySets(m);return s>0?{fill:heatColor(m),op:".95"}:{fill:"#E8C56A",op:".06"};};
+  return `<div style="background:radial-gradient(circle at 50% 30%,#1d1e25,#08080b 92%);border-radius:14px;overflow:hidden;border:1px solid rgba(232,69,60,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);padding:4px 4px 2px">${suitFigureFB(col)}</div>`;
 }
 function volMapCard(){
   const rows=M12.map(m=>({m,s:weeklySets(m),lm:VL[m]||{mev:8,mav:14,mrv:20}}))
