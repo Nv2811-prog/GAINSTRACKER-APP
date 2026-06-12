@@ -1585,6 +1585,7 @@ function render(){
   if(state.showOnboarding){renderOnboarding();renderNav();return;}
   if(state.step==="readiness"){renderReadiness();renderNav();return;}
   if(state.step==="logging"){renderLogging();renderNav();return;}
+  if(state.subpage==="archive"){renderArchive();renderNav();return;}
   const fn={gotham:renderGotham,mission:renderMission,case:renderCase,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit}[state.tab]||renderGotham;
   fn();renderNav();
 }
@@ -2559,6 +2560,131 @@ function volBar(sets,lm){
     <div class="mini" style="text-align:center;margin-top:5px;color:${zc}"><b>${sets} sets/week — ${zt}</b></div>
   </div>`;
 }
+/* ========================================================================
+   THE ARCHIVE — a full-screen progression destination. Turns buried lift
+   data into an over-the-top page: a rising Strength Index curve, the Hall of
+   Defeats PR/villain timeline, per-lift strength forecasts, the Iron Efficiency
+   leaderboard, and the full searchable exercise list with live curves.
+   ======================================================================== */
+function openArchive(){state.subpage="archive";state._archQ=state._archQ||"";render();window.scrollTo(0,0);}
+function closeArchive(){state.subpage=null;go("case");}
+function setArchQ(v){state._archQ=v;const list=$("arch-list");if(list)list.innerHTML=archExerciseList();}
+// running composite Strength Index across the user's top main lifts
+function strengthIndexSeries(){
+  const names=loggedExerciseNames().slice(0,8);
+  const events=[];                                  // {t, name, e1rm}
+  names.forEach(n=>exerciseRows(n).forEach(r=>events.push({t:new Date(r.date).getTime(),name:n,e1rm:r.e1rm})));
+  if(events.length<2)return {vals:[],labels:[]};
+  events.sort((a,b)=>a.t-b.t);
+  const best={};const vals=[],labels=[];let lastT=0;
+  events.forEach(e=>{best[e.name]=Math.max(best[e.name]||0,e.e1rm);
+    const sum=Object.values(best).reduce((a,b)=>a+b,0);
+    if(e.t!==lastT){vals.push(Math.round(sum));labels.push(e.t);lastT=e.t;}
+    else vals[vals.length-1]=Math.round(sum);});
+  return {vals,labels};
+}
+function strengthForecast(){
+  const out=[];
+  loggedExerciseNames().forEach(n=>{
+    const rows=exerciseRows(n);if(rows.length<3)return;
+    const recent=rows.slice(-4);
+    const t0=new Date(recent[0].date).getTime(),t1=new Date(recent[recent.length-1].date).getTime();
+    const dd=(t1-t0)/864e5;if(dd<=0)return;
+    const slope=(recent[recent.length-1].e1rm-recent[0].e1rm)/dd; // kg/day
+    const cur=rows[rows.length-1].e1rm;const nextMilestone=Math.ceil((cur+0.5)/5)*5;
+    if(slope<=0.01){out.push({n,cur,target:nextMilestone,days:null});return;}
+    const days=Math.ceil((nextMilestone-cur)/slope);
+    if(days>0&&days<400)out.push({n,cur,target:nextMilestone,days,slope});
+  });
+  return out.filter(o=>o.days).sort((a,b)=>a.days-b.days).slice(0,5);
+}
+function ironEfficiency(){
+  const out=[];
+  loggedExerciseNames().forEach(n=>{
+    const rows=exerciseRows(n);if(rows.length<2)return;
+    const gain=rows[rows.length-1].e1rm-rows[0].e1rm;
+    const perSession=gain/(rows.length-1);
+    out.push({n,gain,perSession,sessions:rows.length});
+  });
+  return out.sort((a,b)=>b.perSession-a.perSession);
+}
+function archExerciseList(){
+  const q=(state._archQ||"").toLowerCase().trim();
+  let names=loggedExerciseNames();
+  if(q)names=names.filter(n=>n.toLowerCase().includes(q));
+  if(!names.length)return `<p class="muted center" style="padding:14px 0">No lifts match "${esc(q)}".</p>`;
+  return names.map(n=>{
+    const rows=exerciseRows(n);const e1s=rows.map(r=>r.e1rm);const best=e1s.length?Math.max(...e1s):0;
+    const d=e1s.length>1?e1s[e1s.length-1]-e1s[0]:0;
+    const dl=d>0?`<span class="green">+${d}</span>`:d<0?`<span class="red">${d}</span>`:`<span class="muted">—</span>`;
+    return `<div class="row sp" style="padding:11px 0;border-top:1px solid var(--border);cursor:pointer;gap:10px" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
+      <div style="min-width:0;flex:1"><b style="font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</b><span class="mini">${rows.length} session${rows.length>1?"s":""} · ${dl}kg</span></div>
+      ${miniSpark(e1s)}<b class="gold" style="white-space:nowrap">${best}kg ›</b></div>`;
+  }).join("");
+}
+function renderArchive(){
+  const d=state.data;
+  const si=strengthIndexSeries();
+  const wins=(d.bossWins||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const fc=strengthForecast();
+  const eff=ironEfficiency();
+  const totalPRs=Object.values(d.prs).reduce((a,p)=>a+(p.count||1),0);
+  let html=`<div class="fade">
+    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeArchive()">‹ Case File</button><span class="chip">${wins.length} defeats</span></div>
+    <h1 style="font-size:34px;color:var(--gold2)">THE ARCHIVE</h1>
+    <div class="tag" style="margin-bottom:14px">Every curve, every record, every villain you've put down</div>`;
+
+  // Strength Index hero
+  html+=`<div class="card glow"><div class="ttl">📈 Strength Index <span class="mini" style="font-weight:400">— combined est-1RM of your main lifts over time</span></div>`;
+  if(si.vals.length>=2){const first=si.vals[0],last=si.vals[si.vals.length-1],up=last>=first,pct=first?Math.round((last-first)/first*100):0;
+    html+=`<div class="row sp" style="align-items:flex-end;margin:2px 0 4px"><div class="big" style="font-size:38px;color:var(--gold2)">${last}<span style="font-size:16px;color:var(--text3)"> idx</span></div><span class="chip ${up?'on':''}" style="color:${up?'var(--green)':'var(--red)'}">${up?'▲':'▼'} ${pct>0?'+':''}${pct}% since start</span></div>
+    ${trendChart(si.vals,{color:"#E8C56A"})}
+    <div class="mini" style="text-align:center;color:var(--text3);margin-top:2px">Sum of your best est-1RM across up to 8 top lifts, tracked every session.</div>`;
+  }else html+=`<p class="muted" style="padding:10px 0">Log a few sessions across your main lifts and your Strength Index curve will rise here.</p>`;
+  html+=`</div>`;
+
+  // Strength forecast
+  if(fc.length){
+    html+=`<div class="card"><div class="ttl">🔮 Strength Forecast <span class="mini" style="font-weight:400">— at your current pace</span></div>`;
+    fc.forEach(o=>{const dt=new Date(Date.now()+o.days*864e5);
+      html+=`<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><div style="min-width:0;flex:1"><b style="font-size:13px">${esc(o.n)}</b><div class="mini">${o.cur}kg → <b class="gold">${o.target}kg</b></div></div>
+        <div style="text-align:right"><b style="font-size:14px">~${o.days}d</b><div class="mini" style="color:var(--text3)">by ${dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div></div></div>`;});
+    html+=`<div class="mini" style="color:var(--text3);margin-top:7px;font-style:italic">Projections from your recent rate of progress. Keep showing up and these dates move closer.</div></div>`;
+  }
+
+  // Iron efficiency
+  if(eff.length){
+    const mx=Math.max(...eff.map(e=>Math.abs(e.perSession)),0.1);
+    html+=`<div class="card"><div class="ttl">⚙️ Iron Efficiency <span class="mini" style="font-weight:400">— est-1RM gained per session</span></div>`;
+    eff.slice(0,8).forEach((e,i)=>{const w=clamp(Math.abs(e.perSession)/mx*100,3,100);const pos=e.perSession>=0;
+      html+=`<div style="padding:7px 0;border-top:1px solid var(--border)"><div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px"><b style="color:var(--text3)">#${i+1}</b> ${esc(e.n)}</span><b class="${pos?'gold':'red'}">${pos?'+':''}${e.perSession.toFixed(1)}kg/session</b></div>
+        <div class="bar" style="height:6px;background:var(--bg4)"><i style="width:${w}%;background:${pos?'linear-gradient(90deg,var(--gold),var(--gold2))':'var(--red)'}"></i></div></div>`;});
+    html+=`<div class="mini" style="color:var(--text3);margin-top:7px;font-style:italic">Your highest-return lifts. The leaders are where progressive overload is working hardest.</div></div>`;
+  }
+
+  // Hall of Defeats — PR/villain timeline
+  html+=`<div class="card"><div class="ttl">⚔️ Hall of Defeats <span class="mini" style="font-weight:400">— ${totalPRs} PRs · ${wins.length} bosses felled</span></div>`;
+  if(wins.length){
+    html+=`<div style="position:relative;padding-left:6px">`+wins.slice(0,40).map(b=>{
+      const bo=BOSSES.find(x=>x.v===b.villain)||{e:"🦇",c:"#E8C56A"};
+      const jump=b.prevOrm?`<span class="green">${b.prevOrm}→${b.orm}kg</span>`:`<b class="gold">${b.orm}kg</b>`;
+      return `<div class="row" style="gap:11px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--border)">
+        <div style="font-size:24px;line-height:1;flex:none;filter:drop-shadow(0 0 6px ${bo.c}66)">${bo.e}</div>
+        <div style="flex:1;min-width:0"><div class="row sp"><b style="font-size:14px;color:${bo.c}">${esc(b.villain)} down</b><span class="mini">${new Date(b.date).toLocaleDateString()}</span></div>
+          <div class="mini" style="color:var(--text2)">${esc(b.ex)} · ${b.w}kg × ${b.r} · ${jump} est-1RM</div></div></div>`;
+    }).join("")+`</div>`;
+  }else html+=`<p class="muted" style="padding:10px 0">No bosses felled yet. Set a PR on any lift and a villain falls — the moment lands here forever.</p>`;
+  html+=`</div>`;
+
+  // Full exercise list with search + curves
+  html+=`<div class="card"><div class="ttl">📚 Every lift <span class="mini" style="font-weight:400">— tap any for full charts</span></div>
+    <input placeholder="🔍 Search lifts…" value="${esc(state._archQ||"")}" oninput="setArchQ(this.value)" style="margin:6px 0 2px"/>
+    <div id="arch-list">${archExerciseList()}</div></div>`;
+
+  html+=`<button class="btn ghost" style="margin:6px 0 20px" onclick="closeArchive()">‹ Back to Case File</button></div>`;
+  $("app").innerHTML=html;
+}
+
 function openMeasure(){
   const me=state.data.u.measurements;
   openSheet(`<div class="ttl">Body measurements (cm)</div>
@@ -3554,7 +3680,8 @@ function openBatcomputer(){
 function renderCase(){
   const d=state.data;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">CASE FILE</h1><div class="tag" style="margin-bottom:12px">Records, defeats & history</div>`;
-  if(d.workouts.length)html+=`<button class="btn gold" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="openBatcomputer()">${secIcon('radar','#0c0f15')}Open Batcomputer analytics</button>`;
+  if(d.workouts.length)html+=`<button class="btn gold" style="margin-bottom:9px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="openBatcomputer()">${secIcon('radar','#0c0f15')}Open Batcomputer analytics</button>`;
+  if(d.workouts.length)html+=`<button class="btn" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px;border-color:var(--gold-dim)" onclick="openArchive()">📈 Open THE ARCHIVE — strength curves & records</button>`;
   // monthly report
   if(daysSince(d.workouts[d.workouts.length-1]?.date)>=30||d.u.totalWorkouts>=12)
     html+=`<button class="btn" style="margin-bottom:13px" onclick="monthlyReport()">📂 Open monthly Batcomputer report</button>`;
