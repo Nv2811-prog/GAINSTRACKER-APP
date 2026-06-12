@@ -3024,6 +3024,35 @@ function gauntletCard(){
       :`<button class="btn gold sm" style="margin-top:11px" onclick="completeGauntlet()">MARK CLEARED ✓</button>`}
     <div class="mini" style="margin-top:8px;color:var(--text3);font-style:italic">A new trial every night at midnight. Optional — but Batman never skips conditioning.</div></div>`;
 }
+/* ===== Stalled-lift detector (#2): flags lifts with no est-1RM progress in 3+ sessions ===== */
+function stalledLifts(){
+  const out=[];
+  loggedExerciseNames().forEach(n=>{
+    const rows=exerciseRows(n);if(rows.length<4)return;
+    const prior=rows[rows.length-4].e1rm;
+    const recent=rows.slice(-3).map(r=>r.e1rm);
+    if(Math.max(...recent)<=prior)out.push({n,best:Math.max(...rows.map(r=>r.e1rm)),sessions:rows.length});
+  });
+  return out;
+}
+/* ===== Two-Face daily coin (#13): a deterministic 50/50 directive for tonight ===== */
+function twoFaceSide(){const now=new Date();const start=new Date(now.getFullYear(),0,0);const doy=Math.floor((now-start)/864e5);return doy%2;}
+function twoFaceCard(){
+  const heads=twoFaceSide()===0;
+  const face=heads?"🪙":"🩸";
+  const title=heads?"HEADS — Go Heavy":"TAILS — Chase Volume";
+  const dir=heads
+    ? "Two-Face calls it: tonight is about <b style='color:var(--gold2)'>top-end strength</b>. Work up to a heavy top single or triple on your first compound, then back off. Move real iron."
+    : "Two-Face calls it: tonight is about <b style='color:var(--gold2)'>accumulation</b>. Keep 1–2 reps in reserve, add a back-off set, and chase 2 extra reps on everything. Bury the muscle in volume.";
+  const col=heads?"var(--gold2)":"#E8453C";
+  return `<div class="card" style="border-color:${col}44">
+    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🪙 TWO-FACE'S CALL</div><span class="chip" style="color:${col}">${heads?"HEADS":"TAILS"}</span></div>
+    <div class="row g" style="gap:12px;margin-top:8px;align-items:center">
+      <div style="font-size:34px;line-height:1;filter:drop-shadow(0 0 8px ${col}66)">${face}</div>
+      <div style="flex:1"><h2 style="font-size:19px;color:${col};margin:0">${title}</h2>
+        <div class="mini" style="color:var(--text2);line-height:1.5;margin-top:3px">${dir}</div></div></div>
+    <div class="mini" style="margin-top:8px;color:var(--text3);font-style:italic">The coin decides at midnight. No choosing — that's the point. Heads you win, tails you win.</div></div>`;
+}
 function renderGotham(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
   const ironT=(u.totalVolume/1000).toFixed(1);
@@ -3046,6 +3075,13 @@ function renderGotham(){
   const cb=d.bossReturns.find(b=>!b.defeated);
   if(cb)html+=`<div class="banner"><span>👁️</span><div><b>${esc(cb.villain)} has returned.</b><div class="mini">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-defeat.</div></div></div>`;
 
+  // stalled-lift detector — proactive Alfred nudge when lifts plateau
+  const stalled=stalledLifts();
+  if(stalled.length>=2&&!d.dismissed.stall){
+    const nm=stalled.slice(0,3).map(s=>esc(s.n)).join(", ");
+    html+=`<div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩺</span><div><b>Alfred:</b> <span class="mini">${stalled.length} lifts have stalled — no new est-1RM in 3 sessions (${nm}). Change one variable: a feeler heavy single, a close variation, or a light week to let strength rebound.</span></div><span class="x" onclick="d_dismiss('stall')">NOTED</span></div>`;
+  }
+
   // today's mission
   const sp=d.splits.find(s=>s.id===d.activeSplitId)||d.splits[0];
   const todayIdx=(new Date().getDay()+6)%7;
@@ -3065,6 +3101,8 @@ function renderGotham(){
 
   // The Gauntlet — daily finisher challenge
   html+=gauntletCard();
+  // Two-Face's daily call — heavy vs volume directive
+  html+=twoFaceCard();
 
   // muscle figure + stats
   html+=`<div class="card"><div class="row sp"><div class="ttl">The Suit</div><span class="chip" onclick="go('suit')">STR ${sl} · ${r.emoji} ${r.name}</span></div><div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-top:4px">${buildSuit()}</div></div>`;
