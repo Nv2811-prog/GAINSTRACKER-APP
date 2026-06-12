@@ -252,9 +252,9 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .banner .x{margin-left:auto;color:var(--text3);font-size:20px;flex:none;padding:0 4px}
 .splash{position:fixed;inset:0;z-index:90;background:#060606;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 .batlogo{font-size:90px;animation:pulseLogo 1.4s ease-in-out infinite}
-.brandlogo{width:118px;height:118px;object-fit:contain;animation:pulseLogo 2.6s ease-in-out infinite}
-.brandlogo.sm{width:30px;height:30px;animation:none;filter:drop-shadow(0 2px 8px rgba(201,168,76,.4))}
-.brandlogo.splash{width:150px;height:150px}
+.brandlogo{width:132px;height:132px;object-fit:contain;display:block;margin:0 auto;animation:pulseLogo 2.6s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(201,168,76,.32))}
+.brandlogo.sm{width:34px;height:34px;margin:0;animation:none;filter:drop-shadow(0 2px 8px rgba(201,168,76,.45))}
+.brandlogo.splash{width:172px;height:172px}
 .ob-dots{display:flex;gap:7px;justify-content:center;margin:0 0 14px}
 .ob-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16);transition:.25s}
 .ob-dots i.on{background:var(--gold2);width:22px;border-radius:4px;box-shadow:0 0 10px rgba(201,168,76,.55)}
@@ -379,6 +379,35 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"EIeI8Vf","eq":"barbell","p":["
 const M12=["chest","back","shoulders","biceps","triceps","forearms","quads","hamstrings","glutes","calves","abs","traps"];
 const MNAME={chest:"Chest",back:"Back",shoulders:"Shoulders",biceps:"Biceps",triceps:"Triceps",forearms:"Forearms",quads:"Quads",hamstrings:"Hamstrings",glutes:"Glutes",calves:"Calves",abs:"Abs",traps:"Traps"};
 const MEMOJI={chest:"🛡️",back:"🦇",shoulders:"⚡",biceps:"💪",triceps:"🔱",forearms:"✊",quads:"🦵",hamstrings:"🦿",glutes:"🍑",calves:"🐊",abs:"📐",traps:"⛰️"};
+/* Custom per-muscle glyphs — anatomical line-icons in the same stroked-gold visual language as
+   secIcon(). Each evokes the actual muscle (pec slabs, lat wings, delt dome, bicep peak, tricep
+   horseshoe, quad teardrop, ham bellies, glute, calf diamond, six-pack, trap kite). Replaces the
+   generic emoji set everywhere a muscle is labelled. 24×24 viewBox, fill:none, round caps. */
+const MICON={
+ chest:`<path d="M11.5 7.5C8 7 5.5 9 5.5 12 5.5 14.3 7.5 16 10 15.6"/><path d="M12.5 7.5C16 7 18.5 9 18.5 12 18.5 14.3 16.5 16 14 15.6"/><path d="M12 7v8"/>`,
+ back:`<path d="M12 5v14"/><path d="M12 8C8.5 9 6 13 5 18"/><path d="M12 8C15.5 9 18 13 19 18"/><path d="M9.5 7 12 5l2.5 2"/>`,
+ shoulders:`<path d="M4.5 15C4.5 9.5 7.5 6 12 6 16.5 6 19.5 9.5 19.5 15"/><path d="M4.5 15h15"/><path d="M9 6.6V12M15 6.6V12"/>`,
+ biceps:`<path d="M6 19v-6c0-3.3 2.7-6 6-6"/><path d="M6 13c3-1.5 6 0 7 3l1 3"/>`,
+ triceps:`<path d="M9 6C6.5 8 6 12 8 17"/><path d="M15 6C17.5 8 18 12 16 17"/><path d="M9 6C11 5 13 5 15 6"/>`,
+ forearms:`<path d="M7 5C8 9 9 13 11 18"/><path d="M13 5C12.5 8 12 11 12.5 14"/><path d="M6.5 5h6"/><path d="M10.5 18h3"/>`,
+ quads:`<path d="M12 5C8 7 6.5 12 8 19"/><path d="M12 5C16 7 17.5 12 16 19"/><path d="M12 6v11"/>`,
+ hamstrings:`<path d="M9 5C8 10 8 15 9.5 19"/><path d="M15 5C16 10 16 15 14.5 19"/><path d="M9 5C11 4 13 4 15 5"/>`,
+ glutes:`<path d="M12 6C8.5 6 6 8.5 6 12 6 15.5 8.5 18 12 18 15.5 18 18 15.5 18 12 18 8.5 15.5 6 12 6Z"/><path d="M12 6v12"/>`,
+ calves:`<path d="M12 4v16"/><path d="M12 6C8.5 9 8.5 13.5 11 16.5"/><path d="M12 6C15.5 9 15.5 13.5 13 16.5"/>`,
+ abs:`<rect x="8" y="5" width="8" height="14" rx="2.5"/><path d="M12 5v14"/><path d="M8.2 10h7.6"/><path d="M8.2 14h7.6"/>`,
+ traps:`<path d="M12 5 5 13h4l3 6 3-6h4z"/>`
+};
+function mIcon(m,sz,c){sz=sz||17;c=c||"#E8C56A";return `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">${MICON[m]||MICON.chest}</svg>`;}
+// Embed a muscle glyph inside an existing <svg> (centred at cx,cy) — for radar/figure labels.
+function mGlyph(m,cx,cy,scale,c){scale=scale||1;c=c||"#E8C56A";return `<g transform="translate(${(cx-12*scale).toFixed(1)},${(cy-12*scale).toFixed(1)}) scale(${scale})" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${MICON[m]||MICON.chest}</g>`;}
+/* Rest day = a crescent moon with a faint "z" (recovery/sleep). Training day = a dumbbell.
+   Custom line-glyphs replacing the old 🛡️/⚔️ emojis so the whole schedule reads in one language. */
+const _REST_P=`<path d="M20.4 14.3A7.6 7.6 0 1 1 10.2 4.5 6 6 0 0 0 20.4 14.3Z"/>`;
+const _TRAIN_P=`<path d="M4 9.5v5M6.6 7.4v9.2M17.4 7.4v9.2M20 9.5v5M6.6 12h10.8"/>`;
+function _svgIcon(inner,sz,c,sw){return `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw||1.8}" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">${inner}</svg>`;}
+function restIcon(sz,c){return _svgIcon(_REST_P+`<path d="M14.4 5.2h2.8l-2.8 3h2.8" stroke-width="1.2"/>`,sz||16,c||"#E8C56A");}
+function trainIcon(sz,c){return _svgIcon(_TRAIN_P,sz||16,c||"#E8C56A");}
+function restGlyph(cx,cy,scale,c){scale=scale||1;c=c||"#E8C56A";return `<g transform="translate(${(cx-12*scale).toFixed(1)},${(cy-12*scale).toFixed(1)}) scale(${scale})" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${_REST_P}</g>`;}
 const MC=MNAME; // alias used by gotham weather spec
 // runtime muscle mapping for the full on-demand DB
 const RMAP={pectorals:"chest",chest:"chest","upper chest":"chest","serratus anterior":"abs",lats:"back","latissimus dorsi":"back","upper back":"back","lower back":"back",rhomboids:"back",back:"back",spine:"back",delts:"shoulders",deltoids:"shoulders",shoulders:"shoulders","rear deltoids":"shoulders","rotator cuff":"shoulders","levator scapulae":"traps",biceps:"biceps",brachialis:"biceps",triceps:"triceps",forearms:"forearms","wrist extensors":"forearms","wrist flexors":"forearms",wrists:"forearms","grip muscles":"forearms",quadriceps:"quads",quads:"quads","hip flexors":"quads",adductors:"quads","inner thighs":"quads",groin:"quads",hamstrings:"hamstrings",glutes:"glutes",abductors:"glutes",calves:"calves",soleus:"calves",shins:"calves",abs:"abs",abdominals:"abs",core:"abs",obliques:"abs","lower abs":"abs",traps:"traps",trapezius:"traps"};
@@ -563,6 +592,7 @@ experiments:[],        // {id, exercise, mode, startW, startDate, done, result} 
 exNotes:{},            // exerciseName -> [{date, note}] coaching notes
 photos:[],             // {id, date, img(dataURL), bw, note} progress photos
 allies:[],             // {n,sl,rk,re,vol,w,boss,days,lifts} imported Patrol Cards (Justice League)
+foodLog:{},            // "YYYY-MM-DD" -> {items:[{n,k,p,c,f}], water:Number} Mess Hall daily intake
 prefs:{weather:true,boot:true,particles:true}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
@@ -2016,7 +2046,7 @@ function summaryCard2(R){
   const hit=Object.keys(R.sessVol).sort((a,b)=>R.sessVol[b]-R.sessVol[a]);
   return `<div class="tag center">Muscle intel</div><h1 style="font-size:34px;text-align:center;color:var(--gold2);margin-bottom:10px">SECTORS HIT</h1>
   <div class="card">${miniSuit(R.musclesHit)}</div>
-  <div class="card">${hit.map(m=>`<div class="row sp" style="margin-bottom:7px"><span>${MEMOJI[m]} ${MNAME[m]}</span><b class="${R.musclesHit[m]>=1?'gold':'muted'}">${fmtNum(R.sessVol[m])}kg ${R.musclesHit[m]<1?'<span class="mini">(secondary)</span>':''}</b></div>`).join("")}</div>`;
+  <div class="card">${hit.map(m=>`<div class="row sp" style="margin-bottom:7px"><span>${mIcon(m,16)} ${MNAME[m]}</span><b class="${R.musclesHit[m]>=1?'gold':'muted'}">${fmtNum(R.sessVol[m])}kg ${R.musclesHit[m]<1?'<span class="mini">(secondary)</span>':''}</b></div>`).join("")}</div>`;
 }
 function summaryCard3(R){
   let bestSet=null,bestORM=0,rpeSum=0,rpeN=0;
@@ -2040,10 +2070,10 @@ function summaryCard4(R){
   const rec=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)<80).sort((a,b)=>getRecovery(a)-getRecovery(b));
   return `<div class="tag center">Next mission</div><h1 style="font-size:34px;text-align:center;color:var(--gold2);margin-bottom:10px">WHAT'S READY</h1>
   <div class="card"><div class="ttl">Ready to strike (≥80%)</div>
-    ${ready.length?ready.map(m=>`<div class="row sp" style="margin-bottom:6px"><span>${MEMOJI[m]} ${MNAME[m]}</span><b class="green">✓ ${getRecovery(m)}%</b></div>`).join(""):'<p class="muted">Everything is still recovering. Rest is a weapon.</p>'}
+    ${ready.length?ready.map(m=>`<div class="row sp" style="margin-bottom:6px"><span>${mIcon(m,16)} ${MNAME[m]}</span><b class="green">✓ ${getRecovery(m)}%</b></div>`).join(""):'<p class="muted">Everything is still recovering. Rest is a weapon.</p>'}
   </div>
   <div class="card"><div class="ttl">Still recovering</div>
-    ${rec.length?rec.map(m=>`<div class="row sp" style="margin-bottom:6px"><span>${MEMOJI[m]} ${MNAME[m]}</span><span class="muted">~${hoursToReady(m)}h</span></div>`).join(""):'<p class="muted">All sectors green.</p>'}
+    ${rec.length?rec.map(m=>`<div class="row sp" style="margin-bottom:6px"><span>${mIcon(m,16)} ${MNAME[m]}</span><span class="muted">~${hoursToReady(m)}h</span></div>`).join(""):'<p class="muted">All sectors green.</p>'}
   </div>
   ${sessionNoteBlock(R)}
   <button class="btn gold" onclick="shareWorkout()">📤 SHARE MISSION</button>`;
@@ -2076,8 +2106,8 @@ function reg(m,d,extra){
 function suitProps(){
   const sl=clamp(M12.reduce((a,m)=>a+muscleLevel(m),0)/M12.length,0,15);
   return {sl,cx:120,
-    neck:dim(sl,9,12.5), sh:dim(sl,40,56), pec:dim(sl,28,39), waist:dim(sl,19,25), hip:dim(sl,23,29),
-    ua:dim(sl,9.5,14.5), fa:dim(sl,7.5,11), th:dim(sl,15.5,22), cf:dim(sl,10.5,15.5)};
+    neck:dim(sl,9.5,12.5), sh:dim(sl,43,60), pec:dim(sl,30,42), waist:dim(sl,18,23.5), hip:dim(sl,23,29),
+    ua:dim(sl,11,16.5), fa:dim(sl,8.5,12), th:dim(sl,17,24), cf:dim(sl,11.5,17)};
 }
 function setSuitView(v){state.suitView=v;render();}
 function headShape(cx){
@@ -2116,7 +2146,24 @@ function _frontBody(cx, P) {
     reg("forearms",g.fa(-1))+reg("forearms",g.fa(1))+
     reg("abs",abs)+abln+g.belt+
     reg("quads",quad(-1))+reg("quads",quad(1))+
-    reg("calves",g.cf(-1))+reg("calves",g.cf(1));
+    reg("calves",g.cf(-1))+reg("calves",g.cf(1))+
+    _frontDetail(cx,P);
+}
+// Anatomical separation lines (dark grooves + faint highlights) — pointer-events:none so the
+// clickable reg() muscle paths underneath still receive taps. Makes muscle bellies read clearly.
+function _frontDetail(cx,P){
+  const S=P.sh,PE=P.pec,W=P.waist,H=P.hip,TH=P.th,CF=P.cf;
+  const d=`stroke="#04060a" stroke-opacity=".4" stroke-width="1.1" fill="none" stroke-linecap="round"`;
+  const hl=`stroke="#fff" stroke-opacity=".1" stroke-width="1" fill="none" stroke-linecap="round"`;
+  const sternum=`<line x1="${cx}" y1="115" x2="${cx}" y2="150" ${d}/>`;
+  const pecLow=s=>`<path d="M${cx+s*3} 141 Q${cx+s*(PE*0.5)} 150 ${cx+s*(PE-8)} 139" ${d}/>`;
+  const delt=s=>`<path d="M${cx+s*(PE-1)} 110 Q${cx+s*(S-6)} 110 ${cx+s*(S-2)} 124" ${d}/><path d="M${cx+s*(PE)} 117 Q${cx+s*(S-7)} 119 ${cx+s*(S-3)} 128" ${d}/>`;
+  const bi=s=>`<path d="M${cx+s*(S-7)} 122 Q${cx+s*(S-5)} 145 ${cx+s*(S-8)} 166" ${hl}/>`;
+  const serr=s=>`<path d="M${cx+s*(PE-7)} 150 L${cx+s*(W*0.7)} 158 M${cx+s*(PE-8)} 158 L${cx+s*(W*0.7)} 165" ${d}/>`;
+  const quadIn=s=>`<path d="M${cx+s*(H*0.5)} 224 Q${cx+s*(TH*0.45)} 268 ${cx+s*(CF+5)} 306" ${d}/>`;
+  const quadSweep=s=>`<path d="M${cx+s*(TH-2)} 256 Q${cx+s*(TH-4)} 285 ${cx+s*(CF+6)} 309" ${d}/>`;
+  const calf=s=>`<line x1="${cx+s*(CF*0.5)}" y1="334" x2="${cx+s*4.5}" y2="382" ${d}/>`;
+  return `<g style="pointer-events:none">${sternum}${pecLow(-1)}${pecLow(1)}${delt(-1)}${delt(1)}${serr(-1)}${serr(1)}${bi(-1)}${bi(1)}${quadIn(-1)}${quadIn(1)}${quadSweep(-1)}${quadSweep(1)}${calf(-1)}${calf(1)}</g>`;
 }
 function _backBody(cx, P) {
   const S=P.sh,PE=P.pec,W=P.waist,H=P.hip,TH=P.th,CF=P.cf,NK=P.neck;
@@ -2135,7 +2182,20 @@ function _backBody(cx, P) {
     reg("forearms",g.fa(-1))+reg("forearms",g.fa(1))+g.belt+
     reg("glutes",glute(-1))+reg("glutes",glute(1))+
     reg("hamstrings",ham(-1))+reg("hamstrings",ham(1))+
-    reg("calves",g.cf(-1))+reg("calves",g.cf(1));
+    reg("calves",g.cf(-1))+reg("calves",g.cf(1))+
+    _backDetail(cx,P);
+}
+function _backDetail(cx,P){
+  const S=P.sh,PE=P.pec,W=P.waist,H=P.hip,TH=P.th,CF=P.cf;
+  const d=`stroke="#04060a" stroke-opacity=".4" stroke-width="1.1" fill="none" stroke-linecap="round"`;
+  const hl=`stroke="#fff" stroke-opacity=".08" stroke-width="1" fill="none" stroke-linecap="round"`;
+  const trapV=s=>`<path d="M${cx} 97 Q${cx+s*(PE*0.45)} 122 ${cx+s*4} 150" ${d}/>`;
+  const latLine=s=>`<path d="M${cx+s*(PE-5)} 130 Q${cx+s*(PE-7)} 162 ${cx+s*(W+1)} 200" ${d}/>`;
+  const tri=s=>`<path d="M${cx+s*(S-7)} 122 Q${cx+s*(S-5)} 145 ${cx+s*(S-9)} 167" ${hl}/>`;
+  const gluteCrease=s=>`<path d="M${cx+s*3} 214 Q${cx+s*(W)} 220 ${cx+s*(H)} 233" ${d}/>`;
+  const hamLine=s=>`<line x1="${cx+s*(TH*0.5)}" y1="262" x2="${cx+s*(CF+5)}" y2="312" ${d}/>`;
+  const calf=s=>`<line x1="${cx+s*(CF*0.5)}" y1="334" x2="${cx+s*4.5}" y2="382" ${d}/>`;
+  return `<g style="pointer-events:none">${trapV(-1)}${trapV(1)}${latLine(-1)}${latLine(1)}${tri(-1)}${tri(1)}${gluteCrease(-1)}${gluteCrease(1)}${hamLine(-1)}${hamLine(1)}${calf(-1)}${calf(1)}</g>`;
 }
 function buildSuit(){
   const P=suitProps();
@@ -2154,7 +2214,7 @@ function miniSuit(hit){
   const front=["chest","shoulders","biceps","forearms","abs","quads","calves","traps"];
   return `<div class="grid3" style="grid-template-columns:repeat(4,1fr)">${M12.map(m=>{
     const on=hit&&hit[m];const col=on>=1?"var(--gold2)":on?"var(--gold-dim)":"var(--text3)";
-    return `<div class="center" style="opacity:${on?1:.4}"><div style="font-size:20px">${MEMOJI[m]}</div><div class="mini" style="color:${col}">${MNAME[m]}</div></div>`;
+    return `<div class="center" style="opacity:${on?1:.4}"><div style="line-height:1">${mIcon(m,22,on?'#E8C56A':'#7c7c7c')}</div><div class="mini" style="color:${col}">${MNAME[m]}</div></div>`;
   }).join("")}</div>`;
 }
 
@@ -2175,7 +2235,7 @@ function _dayColorFn(prim,sec){return (m)=> prim[m]?{fill:"#E8453C",op:".95"} : 
 function dayDominantSide(prim){let f=0,b=0;Object.keys(prim).forEach(m=>{if(FRONT_MUSCLES.has(m))f++;else if(BACK_MUSCLES.has(m))b++;});return b>f?"back":"front";}
 // small list thumbnail — one body, dominant side
 function dayThumb(day){
-  if(isRest(day))return `<span class="exwrap"><svg viewBox="0 0 100 100" style="width:100%;height:100%"><text x="50" y="62" text-anchor="middle" font-size="42">🛡️</text></svg></span>`;
+  if(isRest(day))return `<span class="exwrap"><svg viewBox="0 0 100 100" style="width:100%;height:100%">${restGlyph(50,50,2.7,'#7c6a3a')}</svg></span>`;
   const {prim,sec}=dayMuscles(day);const side=dayDominantSide(prim);
   const prev=state._figColor;state._figColor=_dayColorFn(prim,sec);
   const P=suitProps();const body=side==="back"?_backBody(125,P):_frontBody(125,P);
@@ -2196,15 +2256,15 @@ function dayHeatFigure(day){
 function openDayBriefing(splitId,dayIdx){
   const sp=state.data.splits.find(s=>s.id===splitId);if(!sp)return;
   const day=sp.days[dayIdx];if(!day)return;
-  if(isRest(day)){openSheet(`<div class="row sp"><div class="ttl">🛡️ ${esc(day.name)}</div><span class="chip">recovery</span></div>
+  if(isRest(day)){openSheet(`<div class="row sp"><div class="ttl" style="display:flex;align-items:center;gap:7px">${restIcon(20)} ${esc(day.name)}</div><span class="chip">recovery</span></div>
     <p class="muted" style="font-size:13.5px;line-height:1.5;margin:8px 0 14px">${esc(restLine())}</p>
     <button class="btn gold" onclick="logRestDay();closeSheet()">REST ✓ — log recovery</button>
     <button class="btn ghost" style="margin-top:8px" onclick="freeWorkout()">Feeling fresh? Train anyway</button>`);return;}
   const {prim,sec}=dayMuscles(day);
   const primList=Object.keys(prim).sort((a,b)=>prim[b]-prim[a]);
   const secList=Object.keys(sec).filter(m=>!prim[m]);
-  const chips=primList.map(m=>`<span class="chip on" style="font-size:12px">${MEMOJI[m]} ${MNAME[m]} <b class="mini" style="color:var(--gold2)">×${prim[m]}</b></span>`).join("")
-    +secList.map(m=>`<span class="chip" style="font-size:12px;opacity:.75">${MEMOJI[m]} ${MNAME[m]} <span class="mini">assist</span></span>`).join("");
+  const chips=primList.map(m=>`<span class="chip on" style="font-size:12px">${mIcon(m,16)} ${MNAME[m]} <b class="mini" style="color:var(--gold2)">×${prim[m]}</b></span>`).join("")
+    +secList.map(m=>`<span class="chip" style="font-size:12px;opacity:.75">${mIcon(m,16)} ${MNAME[m]} <span class="mini">assist</span></span>`).join("");
   const exList=(day.exercises||[]).map(n=>{const ex=exFor(n);return `<div class="row" style="gap:9px;padding:7px 0;border-top:1px solid var(--border)">
     ${thumb(ex,true)}<div class="g"><div class="exname" style="font-size:14px">${esc(n)}</div><div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")}${ex.bw?" · bodyweight":""}</div></div></div>`;}).join("");
   openSheet(`<div class="row sp"><div><div class="tag">${esc(sp.name)}</div><div class="ttl" style="margin:0;font-size:22px">${esc(day.name)}</div></div><span class="chip">${(day.exercises||[]).length} exercises</span></div>
@@ -2283,7 +2343,7 @@ function renderSuit(){
   html+=`<div class="card"><div class="ttl">Sector readiness</div>${M12.map(m=>{
     const rec=getRecovery(m),lvl=muscleLevel(m),trained=(state.data.muscleVol[m]||0)>0;
     return `<div onclick="muscleDrill('${m}')" style="cursor:pointer;margin-bottom:9px">
-      <div class="row sp" style="margin-bottom:3px"><span>${MEMOJI[m]} ${MNAME[m]} <span class="mini">Lv ${lvl}</span></span>
+      <div class="row sp" style="margin-bottom:3px"><span>${mIcon(m,16)} ${MNAME[m]} <span class="mini">Lv ${lvl}</span></span>
       <span class="mini" style="color:${trained?recoveryColor(rec):'var(--text3)'}">${trained?rec+"%":"—"}</span></div>
       <div class="bar"><i style="width:${trained?rec:0}%;background:${trained?recoveryColor(rec):'var(--bg4)'}"></i></div></div>`;
   }).join("")}</div>`;
@@ -2334,7 +2394,7 @@ function addProgress(input){
 function viewProgress(id){
   const p=(state.data.photos||[]).find(x=>x.id===id);if(!p)return;
   const dt=new Date(p.date).toLocaleDateString(undefined,{weekday:"short",month:"long",day:"numeric",year:"numeric"});
-  openSheet(`<div class="pframe"><img src="${p.img}" alt=""><img class="pcorner" src="logo.png" alt="">
+  openSheet(`<div class="pframe"><img src="${p.img}" alt=""><img class="pcorner" src="logo_t.png" alt="">
       <div class="pcap"><b style="font-size:15px">${dt}</b>${p.bw?`<div class="mini" style="color:var(--gold2)">Bodyweight ${p.bw}kg</div>`:""}</div></div>
     <button class="btn ghost sm" style="margin-top:10px" onclick="delProgress('${p.id}')">Delete this photo</button>
     <button class="btn" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
@@ -2350,7 +2410,7 @@ function compareProgress(){
   const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
   const days=Math.round((new Date(last.date)-new Date(first.date))/86400000);
   const dbw=(first.bw&&last.bw)?(last.bw-first.bw):null;
-  const cell=(p,lbl)=>`<div class="pframe"><img src="${p.img}" alt=""><span class="plbl">${lbl}</span><img class="pcorner" src="logo.png" alt="" style="width:24px;height:24px"><div class="pcap"><b style="font-size:12px">${fmtP(p.date)}</b>${p.bw?`<div class="mini" style="color:var(--gold2)">${p.bw}kg</div>`:""}</div></div>`;
+  const cell=(p,lbl)=>`<div class="pframe"><img src="${p.img}" alt=""><span class="plbl">${lbl}</span><img class="pcorner" src="logo_t.png" alt="" style="width:24px;height:24px"><div class="pcap"><b style="font-size:12px">${fmtP(p.date)}</b>${p.bw?`<div class="mini" style="color:var(--gold2)">${p.bw}kg</div>`:""}</div></div>`;
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Transformation</div>
     <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">${days} day${days===1?"":"s"} apart${dbw!=null?` · ${dbw>0?"+":""}${dbw}kg bodyweight`:""}</div>
     <div class="pcompare">${cell(first,"BEFORE")}${cell(last,"NOW")}</div>
@@ -2385,7 +2445,7 @@ function muscleDrill(m){
   } else if(trained){
     coach=`<div class="banner" style="margin-top:8px;background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.35)"><span>✓</span><div class="mini">All major angles of the ${MNAME[m].toLowerCase()} are covered this week. Balanced work — nice.</div></div>`;
   }
-  openSheet(`<div class="row sp"><div class="ttl">${MEMOJI[m]} ${MNAME[m]}</div><span class="chip">Lv ${x.lvl}</span></div>
+  openSheet(`<div class="row sp"><div class="ttl">${mIcon(m,16)} ${MNAME[m]}</div><span class="chip">Lv ${x.lvl}</span></div>
     <div class="bar xpbar" style="margin:6px 0"><i style="width:${x.pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
     <div class="mini" style="margin-bottom:12px">${fmtNum(x.cur)} / ${fmtNum(x.need)} XP to Lv ${x.lvl+1}</div>
     ${muscleHeatFig(m)}
@@ -2708,7 +2768,7 @@ function recoveryRings(){
         <circle cx="20" cy="20" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 20 20)" style="filter:drop-shadow(0 0 3px ${col}88)"/>
         <text x="20" y="20" font-size="9.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">${rec}</text>
       </svg>
-      <div style="text-align:center;font-size:14px;margin-top:1px">${MEMOJI[m]}</div>
+      <div style="text-align:center;line-height:1;margin-top:2px">${mIcon(m,17,col)}</div>
       <div class="mini" style="text-align:center;color:var(--text3);font-size:9px">${hrs>0?hrs+"h":"ready"}</div>
     </div>`;
   };
@@ -2724,7 +2784,7 @@ function coverageRadar(){
   let grid="";[0.25,0.5,0.75,1].forEach(f=>{const pts=muscles.map((m,i)=>pt(i,R*f).map(v=>v.toFixed(1)).join(",")).join(" ");grid+=`<polygon points="${pts}" fill="none" stroke="#2a2a2a" stroke-width="1"/>`;});
   let spokes="",labels="";
   muscles.forEach((m,i)=>{const[ex,ey]=pt(i,R);spokes+=`<line x1="${cx}" y1="${cy}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="#222" stroke-width="1"/>`;
-    const[lx,ly]=pt(i,R+15);labels+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" font-size="13" text-anchor="middle" dominant-baseline="central">${MEMOJI[m]}</text>`;});
+    const[lx,ly]=pt(i,R+16);labels+=mGlyph(m,lx,ly,0.82);});
   const dataP=muscles.map((m,i)=>{const sets=weeklySets(m),lm=VL[m]||{mav:14};return pt(i,R*clamp(sets/lm.mav,0,1.16));});
   const poly=dataP.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ");
   const dots=dataP.map((p,i)=>{const m=muscles[i],sets=weeklySets(m),lm=VL[m]||{mev:8,mav:14,mrv:20};const col=sets<lm.mev?"#8a8a8a":sets<=lm.mav?"#2ECC71":sets<=lm.mrv?"#E8C56A":"#E8453C";return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.7" fill="${col}"/>`;}).join("");
@@ -2743,7 +2803,7 @@ function renderGotham(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
   const ironT=(u.totalVolume/1000).toFixed(1);
   const ledger=u.totalVolume<10000?"New to the vault.":u.totalVolume<50000?"A respectable deposit.":u.totalVolume<100000?"Wayne would notice.":u.totalVolume<500000?"The cave is full.":"Beyond the cave. Into legend.";
-  let html=`<div class="row sp"><div class="row g" style="gap:11px"><img class="brandlogo sm" src="logo.png" alt=""><div><div class="tag">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}</div>
+  let html=`<div class="row sp"><div class="row g" style="gap:11px"><img class="brandlogo sm" src="logo_t.png" alt=""><div><div class="tag">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}</div>
     <h1 style="font-size:34px;color:var(--gold2)">${u.name?esc(u.name.toUpperCase()):"GOTHAM"}</h1></div></div>
     <button class="btn ghost sm" style="width:auto" onclick="openSettings()">⚙︎</button></div>
     <div class="muted" style="font-style:italic;font-size:13px;margin:-2px 0 12px">${gothamWeather()}</div>`;
@@ -2767,7 +2827,7 @@ function renderGotham(){
   html+=`<div class="card glow"><div class="ttl">Tonight's mission</div>`;
   if(sp){const ni=d._nextDay||0;const nextDay=sp.days[ni]||sp.days[0];
     if(isRest(nextDay)){
-      html+=`<div class="row sp"><div><h2 style="font-size:26px">🛡️ ${esc(nextDay.name)}</h2><div class="mini">${esc(sp.name)} · recovery is part of the plan</div></div>
+      html+=`<div class="row sp"><div><h2 style="font-size:26px;display:flex;align-items:center;gap:8px">${restIcon(24)} ${esc(nextDay.name)}</h2><div class="mini">${esc(sp.name)} · recovery is part of the plan</div></div>
         <button class="btn gold sm" onclick="logRestDay()">REST ✓</button></div>
         <div class="mini" style="margin-top:9px;color:var(--text2);font-style:italic;line-height:1.5">${esc(restLine())}</div>
         <button class="btn ghost sm" style="margin-top:9px" onclick="freeWorkout()">Feeling fresh? Train anyway ▶</button>`;
@@ -2864,7 +2924,7 @@ function renderMission(){
   d.splits.forEach(sp=>{
     html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${d.activeSplitId===sp.id?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
       <div style="margin-top:8px">${sp.days.map((day,i)=>isRest(day)
-        ? `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px">🛡️ ${esc(day.name)}</b><div class="mini">Planned recovery — not counted against your streak</div></div></div><button class="btn ghost sm" style="width:auto" onclick="logRestDay()">REST ✓</button></div>`
+        ? `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px;display:inline-flex;align-items:center;gap:6px">${restIcon(15)} ${esc(day.name)}</b><div class="mini">Planned recovery — not counted against your streak</div></div></div><button class="btn ghost sm" style="width:auto" onclick="logRestDay()">REST ✓</button></div>`
         : `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px">${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span></b><div class="mini">${day.exercises.length} exercises · tap to preview</div></div></div><button class="btn gold sm" style="width:auto" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`
       ).join("")}</div></div>`;
   });
@@ -3007,7 +3067,7 @@ function volMapCard(){
     const [lab,lc]=heatLabel(m), pct=clamp(s/lm.mrv*100,2,100);
     const mev=clamp(lm.mev/lm.mrv*100,0,100), mav=clamp(lm.mav/lm.mrv*100,0,100);
     return `<div onclick="muscleDrill('${m}')" style="cursor:pointer;padding:8px 0;border-top:1px solid var(--border)">
-      <div class="row sp"><span style="font-size:13px">${MEMOJI[m]} ${MNAME[m]} ›</span><span class="mini" style="color:${lc};font-weight:700">${s} set${s===1?"":"s"} · ${lab}</span></div>
+      <div class="row sp"><span style="font-size:13px">${mIcon(m,16)} ${MNAME[m]} ›</span><span class="mini" style="color:${lc};font-weight:700">${s} set${s===1?"":"s"} · ${lab}</span></div>
       <div style="position:relative;height:9px;border-radius:5px;margin-top:5px;background:#15171d;overflow:hidden">
         <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${heatColor(m)}"></div>
         <i style="position:absolute;left:${mev}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28)"></i>
@@ -3146,8 +3206,8 @@ function renderStrategy(){
     <div class="row" style="gap:5px;justify-content:space-between">
     ${DAYS.map((dn,i)=>`<button onclick="toggleDay(${i})" class="center" style="flex:1;padding:8px 2px;border-radius:9px;border:1px solid ${d.u.weekSchedule[i]!==false?'var(--gold-dim)':'var(--border)'};background:${d.u.weekSchedule[i]!==false?'var(--gold-bg)':'var(--bg2)'}">
       <div style="font-family:var(--disp);font-size:13px;color:${d.u.weekSchedule[i]!==false?'var(--gold2)':'var(--text3)'}">${dn}</div>
-      <div style="font-size:14px">${d.u.weekSchedule[i]!==false?'⚔️':'🛡️'}</div></button>`).join("")}</div>
-    <div class="mini" style="margin-top:8px">⚔️ training · 🛡️ rest. Your weekly goal updates automatically. Villains only taunt you for missed <b>training</b> days.</div></div>`;
+      <div style="line-height:1">${d.u.weekSchedule[i]!==false?trainIcon(15):restIcon(15)}</div></button>`).join("")}</div>
+    <div class="mini" style="margin-top:8px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">${trainIcon(13)} training · ${restIcon(13)} rest. Your weekly goal updates automatically. Villains only taunt you for missed <b>training</b> days.</div></div>`;
   // splits
   d.splits.forEach(sp=>{
     html+=`<div class="card"><div class="row sp"><input value="${esc(sp.name)}" onchange="renameSplit('${sp.id}',this.value)" style="font-weight:700;border:none;background:transparent;padding:4px 0;font-size:16px"/>
@@ -3155,7 +3215,7 @@ function renderStrategy(){
     sp.days.forEach((day,i)=>{
       if(isRest(day)){
         html+=`<div style="border-top:1px solid var(--border);padding:9px 0;background:linear-gradient(90deg,rgba(124,150,255,.06),transparent)">
-          <div class="row sp"><div class="row" style="gap:7px;align-items:center"><span>🛡️</span><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0"/></div>
+          <div class="row sp"><div class="row" style="gap:7px;align-items:center"><span style="line-height:1">${restIcon(15)}</span><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0"/></div>
           <div class="row" style="gap:4px"><button class="btn ghost sm" style="width:auto;font-size:11px" onclick="toggleRestDay('${sp.id}',${i})">Make training</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delDay('${sp.id}',${i})">🗑</button></div></div>
           <div class="mini" style="margin-top:4px;color:#7c96ff">Planned recovery — growth happens here. Not counted against your streak.</div></div>`;
       }else{
@@ -3206,7 +3266,7 @@ function toggleRestDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s)
   save();render();}
 function delDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s||s.days.length<=1)return;s.days.splice(i,1);if((state.data._nextDay||0)>=s.days.length)state.data._nextDay=0;save();render();}
 function advanceDay(){const sp=state.data.splits.find(s=>s.id===state.data.activeSplitId)||state.data.splits[0];if(sp&&sp.days.length)state.data._nextDay=((state.data._nextDay||0)+1)%sp.days.length;}
-function logRestDay(){state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();toast("🛡️ "+restLine());render();}
+function logRestDay(){state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();toast(restLine());render();}
 
 /* ========================= CASE FILE TAB ========================= */
 // ---- strength standards (bodyweight-relative, evidence-based multipliers) ----
@@ -3578,11 +3638,11 @@ function alfredBriefing(){
   let rows="";
   // opener
   if(!isTrainDay){
-    rows+=`<div class="banner" style="margin-bottom:7px"><span>🛡️</span><div class="mini">Today is a scheduled rest day, sir. Recovery is where the adaptation actually happens — don't mistake it for idleness. ${recovering.length?`Your ${MNAME[recovering[0].m].toLowerCase()} are still ${recovering[0].r}% recovered — good timing.`:"Everything's fresh by tomorrow."}</div></div>`;
+    rows+=`<div class="banner" style="margin-bottom:7px"><span style="line-height:1">${restIcon(16)}</span><div class="mini">Today is a scheduled rest day, sir. Recovery is where the adaptation actually happens — don't mistake it for idleness. ${recovering.length?`Your ${MNAME[recovering[0].m].toLowerCase()} are still ${recovering[0].r}% recovered — good timing.`:"Everything's fresh by tomorrow."}</div></div>`;
   } else if(prime.length){
-    rows+=`<div class="banner" style="margin-bottom:7px"><span>⚔️</span><div class="mini"><b>Tonight's targets:</b> ${prime.map(m=>MNAME[m]).join(", ")} — recovered and still below your weekly MAV, so there's productive volume on the table.</div></div>`;
+    rows+=`<div class="banner" style="margin-bottom:7px"><span style="line-height:1">${trainIcon(16)}</span><div class="mini"><b>Tonight's targets:</b> ${prime.map(m=>MNAME[m]).join(", ")} — recovered and still below your weekly MAV, so there's productive volume on the table.</div></div>`;
   } else if(ready.length){
-    rows+=`<div class="banner" style="margin-bottom:7px"><span>⚔️</span><div class="mini"><b>Fresh and ready:</b> ${ready.slice(0,4).map(m=>MNAME[m]).join(", ")}. The rest are mid-recovery — train the ready ones hard.</div></div>`;
+    rows+=`<div class="banner" style="margin-bottom:7px"><span style="line-height:1">${trainIcon(16)}</span><div class="mini"><b>Fresh and ready:</b> ${ready.slice(0,4).map(m=>MNAME[m]).join(", ")}. The rest are mid-recovery — train the ready ones hard.</div></div>`;
   } else {
     rows+=`<div class="banner" style="margin-bottom:7px"><span>⏳</span><div class="mini">Everything you've trained is still recovering, sir. A lighter session or a focus on an untrained group would serve you better than grinding fatigued tissue.</div></div>`;
   }
@@ -3685,11 +3745,14 @@ function fuelProtocolCard(){
       <div class="mini" style="color:var(--text2)">Let Alfred calculate the exact calories and macros to match your goal — build, lean gain, maintain or cut. Two minutes, sir.</div></div>`;
   }
   const macro=(v,l,c)=>`<div style="flex:1;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:9px 4px;background:var(--bg2)"><div style="font-family:var(--disp);font-size:21px;color:${c}">${v}<span style="font-size:12px">g</span></div><div class="mini" style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase">${l}</div></div>`;
-  return `<div class="card glow"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><button class="btn ghost sm" style="width:auto" onclick="openFuel()">Edit</button></div>
+  const _day=foodDay();const _tot=foodTotals(_day);const _train=isTrainingToday();const _tgt=cycledTargets(n,_train?"train":"rest");const _left=_tgt.cals-_tot.k;const _logged=(_day.items||[]).length;
+  return `<div class="card glow"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><span class="chip ${_train?'on':''}" style="font-size:10.5px">${_train?trainIcon(12):restIcon(12)} ${_train?'Training':'Rest'}</span></div>
     <div class="center" style="margin:2px 0 4px"><span class="chip on">${esc(n.goalLabel)} · ${n.goalAdj} maintenance</span></div>
-    <div class="center" style="font-family:var(--disp);font-size:42px;color:var(--gold2);line-height:1.1">${fmtNum(n.cals)}<span style="font-size:15px;color:var(--text2)"> kcal/day</span></div>
-    <div class="row" style="gap:8px;margin-top:10px">${macro(n.protein,"Protein","#ff8a7a")}${macro(n.carbs,"Carbs","#E8C56A")}${macro(n.fat,"Fat","#7cc4ff")}</div>
-    <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">Maintenance ≈ ${fmtNum(n.tdee)} kcal. Hit <b style="color:#ff8a7a">${n.protein}g protein</b> every day — it's the non-negotiable. ${n.goalLabel==="Cut fat"?"Weigh in weekly; if the scale stalls 2 weeks, drop carbs ~30g.":n.goalLabel==="Maintain"?"Keep it steady and let training drive the change.":"Aim to gain ~0.25–0.5kg/week; faster is mostly fat."}</div></div>`;
+    <div class="center" style="font-family:var(--disp);font-size:42px;color:var(--gold2);line-height:1.1">${fmtNum(_tgt.cals)}<span style="font-size:15px;color:var(--text2)"> kcal today</span></div>
+    <div class="row" style="gap:8px;margin-top:10px">${macro(_tgt.protein,"Protein","#ff8a7a")}${macro(_tgt.carbs,"Carbs","#E8C56A")}${macro(_tgt.fat,"Fat","#7cc4ff")}</div>
+    ${_logged?`<div class="row sp" style="margin-top:10px;padding:8px 10px;border:1px solid var(--border2);border-radius:11px;background:var(--bg2)"><span class="mini">Logged today · ${_tot.k} kcal · ${_tot.p}g protein</span><b class="mini" style="color:${_left<0?'#ff8a7a':'var(--gold2)'}">${_left>=0?fmtNum(_left)+" left":fmtNum(-_left)+" over"}</b></div>`:""}
+    <button class="btn gold" style="margin-top:11px" onclick="openMessHall()">${_logged?"Open the Mess Hall — log food":"Log today's food — Mess Hall"}</button>
+    <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">${_train?"Training day — carbs cycled up to fuel the work.":"Rest day — carbs trimmed, protein held high for recovery."} Hit <b style="color:#ff8a7a">${_tgt.protein}g protein</b> every day; it's the non-negotiable. ${n.goalLabel==="Cut fat"?"If the scale stalls 2 weeks, drop carbs ~30g.":n.goalLabel==="Maintain"?"Keep it steady and let training drive the change.":"Aim for ~0.25–0.5kg/week; faster is mostly fat."}</div></div>`;
 }
 function openFuel(){
   const u=state.data.u,n=u.nutrition||{};
@@ -3715,7 +3778,129 @@ function fuelParams(){return {sex:state._fuelSex||"m",bw:($("fu-bw")||{}).value,
 function fuelLive(){const r=calcFuel(fuelParams());const el=$("fu-out");if(!el)return;
   el.innerHTML=r?`<div style="font-family:var(--disp);font-size:36px;color:var(--gold2)">${fmtNum(r.cals)}<span style="font-size:14px;color:var(--text2)"> kcal</span></div><div class="mini" style="color:var(--text2)">P ${r.protein}g · C ${r.carbs}g · F ${r.fat}g · maint ≈ ${fmtNum(r.tdee)}</div>`:`<div class="mini" style="color:var(--text3)">Fill in bodyweight, height and age.</div>`;}
 function saveFuel(){const p=fuelParams();const r=calcFuel(p);if(!r){toast("Add bodyweight, height and age first.");return;}
-  state.data.u.nutrition=Object.assign({},p,r);save();haptic("done");closeSheet();toast("Fuel protocol saved");render();}
+  state.data.u.nutrition=Object.assign({},p,r);save();haptic("done");closeSheet();toast("Fuel protocol saved");if(state._afterFuel){const f=state._afterFuel;state._afterFuel=null;f();}else render();}
+
+/* ===== THE MESS HALL — deep daily fuel command (food log · macro rings · water · carb cycling) =====
+   Reached from the Fuel protocol card. Tracks today's intake against goal-matched targets, cycles
+   carbs for training vs rest days, and gives meal-split + fibre/micros guidance. */
+const FOODS=[
+ {n:"Chicken breast",s:"100g",k:165,p:31,c:0,f:3.6},
+ {n:"Whey shake",s:"1 scoop",k:120,p:24,c:3,f:1.5},
+ {n:"Whole eggs",s:"2 large",k:156,p:13,c:1,f:11},
+ {n:"Greek yogurt",s:"170g",k:100,p:17,c:6,f:0.7},
+ {n:"Lean beef 90%",s:"100g",k:176,p:20,c:0,f:10},
+ {n:"Salmon",s:"100g",k:208,p:20,c:0,f:13},
+ {n:"Tuna (can)",s:"1 can",k:128,p:29,c:0,f:1},
+ {n:"Cottage cheese",s:"150g",k:147,p:20,c:5,f:6},
+ {n:"White rice",s:"1 cup",k:205,p:4,c:45,f:0.4},
+ {n:"Oats",s:"80g dry",k:303,p:11,c:54,f:5},
+ {n:"Sweet potato",s:"150g",k:130,p:2,c:30,f:0.2},
+ {n:"Banana",s:"1 med",k:105,p:1,c:27,f:0.4},
+ {n:"Bread",s:"2 slices",k:160,p:6,c:30,f:2},
+ {n:"Pasta",s:"1 cup",k:220,p:8,c:43,f:1.3},
+ {n:"Apple",s:"1 med",k:95,p:0.5,c:25,f:0.3},
+ {n:"Milk 2%",s:"250ml",k:122,p:8,c:12,f:5},
+ {n:"Almonds",s:"30g",k:174,p:6,c:6,f:15},
+ {n:"Peanut butter",s:"1 tbsp",k:94,p:4,c:3,f:8},
+ {n:"Olive oil",s:"1 tbsp",k:119,p:0,c:0,f:14},
+ {n:"Protein bar",s:"1 bar",k:220,p:20,c:22,f:7},
+ {n:"Broccoli",s:"100g",k:34,p:2.8,c:7,f:0.4},
+ {n:"Avocado",s:"1/2",k:120,p:1.5,c:6,f:11}
+];
+function todayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function foodDay(key){key=key||todayKey();const fl=state.data.foodLog||(state.data.foodLog={});if(!fl[key])fl[key]={items:[],water:0};if(!fl[key].items)fl[key].items=[];if(typeof fl[key].water!=="number")fl[key].water=0;return fl[key];}
+function foodTotals(day){let k=0,p=0,c=0,f=0;(day.items||[]).forEach(it=>{k+=+it.k||0;p+=+it.p||0;c+=+it.c||0;f+=+it.f||0;});return{k:Math.round(k),p:Math.round(p),c:Math.round(c),f:Math.round(f)};}
+function isTrainingToday(){const ws=state.data.u.weekSchedule||{};const idx=(new Date().getDay()+6)%7;return ws[idx]!==false;}
+// Carb-cycle the saved macros: training day pulls carbs up (+18%) & fat down slightly; rest day
+// trims carbs (−22%) & nudges fat up. Protein is held constant — the non-negotiable.
+function cycledTargets(n,mode){
+  const train=mode==="train";
+  const carbs=Math.round(n.carbs*(train?1.18:0.78));
+  const fat=Math.round(n.fat*(train?0.92:1.12));
+  const protein=n.protein;
+  const cals=Math.round((protein*4+carbs*4+fat*9)/10)*10;
+  return {cals,protein,carbs,fat};
+}
+function waterTargetGlasses(n){const bw=+(n&&n.bw)||+state.data.u.bodyweight||80;return clamp(Math.round(bw*0.033/0.25),6,16);}
+function addFood(i){const fd=FOODS[i];if(!fd)return;foodDay().items.push({n:fd.n,k:fd.k,p:fd.p,c:fd.c,f:fd.f});haptic("light");save();openMessHall();}
+function removeFood(i){const day=foodDay();day.items.splice(i,1);haptic("light");save();openMessHall();}
+function addCustomFood(){const nm=($("mh-name")||{}).value||"",k=+($("mh-k")||{}).value||0,p=+($("mh-p")||{}).value||0,c=+($("mh-c")||{}).value||0,f=+($("mh-f")||{}).value||0;
+  if(!nm.trim()||(!k&&!p)){toast("Add a name and at least calories or protein.");return;}
+  foodDay().items.push({n:nm.trim().slice(0,28),k:k||Math.round(p*4+c*4+f*9),p,c,f});haptic("done");save();openMessHall();}
+function addWater(d){const day=foodDay();day.water=clamp((day.water||0)+d,0,30);haptic("light");save();openMessHall();}
+function clearFoodToday(){const fl=state.data.foodLog||{};fl[todayKey()]={items:[],water:0};haptic("warn");save();openMessHall();}
+function openMessHall(){
+  const n=state.data.u.nutrition;
+  if(!n||!n.cals){
+    openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}The Mess Hall</div>
+      <p class="muted" style="font-size:13.5px;line-height:1.5">Set up your Fuel protocol first, sir — Alfred needs your stats to set daily targets before we track a single calorie.</p>
+      <button class="btn gold" onclick="state._afterFuel=openMessHall;openFuel()">Set up Fuel protocol</button>
+      <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Later</button>`);return;
+  }
+  const train=isTrainingToday();
+  const tgt=cycledTargets(n,train?"train":"rest");
+  const day=foodDay();const tot=foodTotals(day);
+  const pct=(v,t)=>clamp(Math.round(v/Math.max(1,t)*100),0,140);
+  const bar=(lbl,v,t,col,unit)=>{const p=pct(v,t),over=v>t*1.05;return `<div style="margin-bottom:9px">
+    <div class="row sp" style="margin-bottom:3px"><span class="mini" style="letter-spacing:.06em;text-transform:uppercase;color:var(--text2)">${lbl}</span><span class="mini"><b style="color:${over?'#ff8a7a':'var(--gold2)'}">${v}</b><span style="color:var(--text3)">/${t}${unit||"g"}</span></span></div>
+    <div style="height:8px;border-radius:5px;background:var(--bg2);overflow:hidden"><div style="height:100%;width:${Math.min(100,p)}%;background:${col};border-radius:5px;transition:width .35s"></div></div></div>`;};
+  // Big calorie ring
+  const calR=42,calC=2*Math.PI*calR,calPct=clamp(tot.k/Math.max(1,tgt.cals),0,1),calOff=calC*(1-calPct);
+  const left=tgt.cals-tot.k;
+  const ring=`<svg viewBox="0 0 110 110" width="132" height="132" style="display:block;margin:0 auto">
+    <circle cx="55" cy="55" r="${calR}" fill="none" stroke="#1e1e1e" stroke-width="9"/>
+    <circle cx="55" cy="55" r="${calR}" fill="none" stroke="${left<0?'#ff8a7a':'#E8C56A'}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${calC.toFixed(1)}" stroke-dashoffset="${calOff.toFixed(1)}" transform="rotate(-90 55 55)" style="filter:drop-shadow(0 0 5px rgba(232,197,106,.5))"/>
+    <text x="55" y="50" text-anchor="middle" font-family="var(--disp)" font-size="27" fill="var(--gold2)">${tot.k}</text>
+    <text x="55" y="68" text-anchor="middle" font-size="9.5" fill="var(--text2)">/ ${tgt.cals} kcal</text></svg>`;
+  // Water
+  const wT=waterTargetGlasses(n),wHave=day.water||0;
+  const glasses=Array.from({length:wT},(_,i)=>`<span style="font-size:17px;filter:grayscale(${i<wHave?0:1});opacity:${i<wHave?1:.4}">💧</span>`).join("");
+  // Food log
+  const logRows=(day.items||[]).length?day.items.map((it,i)=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)">
+      <div class="g"><b style="font-size:13.5px">${esc(it.n)}</b><div class="mini" style="color:var(--text3)">${it.k}kcal · P${it.p} C${it.c} F${it.f}</div></div>
+      <button class="btn ghost sm" style="width:auto;padding:5px 9px;color:#ff8a7a" onclick="removeFood(${i})">✕</button></div>`).join("")
+    :`<p class="mini" style="color:var(--text3);padding:8px 0">No food logged yet today. Add from the list below, sir.</p>`;
+  // Quick-add chips
+  const chips=FOODS.map((fd,i)=>`<button class="chip g" style="margin:0 5px 6px 0;text-align:left" onclick="addFood(${i})">+ ${esc(fd.n)} <span class="mini" style="color:var(--text3)">${fd.s} · ${fd.p}p</span></button>`).join("");
+  // Meal split — protein across meals
+  const meals=4,perMeal=Math.round(tgt.protein/meals);
+  // Fibre target
+  const fibre=Math.round(tgt.cals/1000*14);
+  openSheet(`<div class="row sp"><div class="ttl" style="display:flex;align-items:center;margin:0">${secIcon('flame')}The Mess Hall</div><span class="chip ${train?'on':''}">${train?trainIcon(13):restIcon(13)} ${train?'Training day':'Rest day'}</span></div>
+    <div class="mini" style="margin:2px 0 10px;color:var(--text2)">${train?'Carbs cycled <b style="color:var(--gold2)">up</b> — fuel the work and the recovery.':'Carbs cycled <b style="color:var(--gold2)">down</b> — lean into recovery, hold protein high.'}</div>
+
+    <div class="card glow" style="padding:14px 12px">
+      ${ring}
+      <div class="center" style="margin-top:2px"><span class="chip ${left<0?'':'on'}">${left>=0?`${fmtNum(left)} kcal left`:`${fmtNum(-left)} kcal over`}</span></div>
+      <div style="margin-top:12px">
+        ${bar("Protein",tot.p,tgt.protein,"#ff8a7a")}
+        ${bar("Carbs",tot.c,tgt.carbs,"#E8C56A")}
+        ${bar("Fat",tot.f,tgt.fat,"#7cc4ff")}
+      </div>
+    </div>
+
+    <div class="card"><div class="row sp"><div class="ttl" style="margin:0;font-size:15px">Hydration</div><span class="mini">${wHave}/${wT} glasses · ${(wHave*0.25).toFixed(2)}L</span></div>
+      <div style="margin:8px 0;line-height:1.9">${glasses}</div>
+      <div class="row g" style="gap:8px"><button class="btn ghost sm" onclick="addWater(1)">+ Glass</button><button class="btn ghost sm" onclick="addWater(-1)" style="flex:0 0 auto;width:auto">−</button></div></div>
+
+    <div class="card"><div class="row sp"><div class="ttl" style="margin:0;font-size:15px">Today's log</div>${(day.items||[]).length?`<button class="btn ghost sm" style="width:auto;padding:4px 9px" onclick="clearFoodToday()">Clear</button>`:""}</div>
+      ${logRows}</div>
+
+    <div class="card"><div class="ttl" style="margin:0 0 7px;font-size:15px">Quick add</div>
+      <div class="row wrap">${chips}</div>
+      <div class="hr"></div>
+      <div class="mini" style="margin-bottom:6px;color:var(--text2)">Custom food</div>
+      <input id="mh-name" placeholder="Name (e.g. Burrito)" style="margin-bottom:6px"/>
+      <div class="row g" style="gap:6px"><input id="mh-k" inputmode="numeric" placeholder="kcal" style="flex:1"/><input id="mh-p" inputmode="numeric" placeholder="P" style="flex:1"/><input id="mh-c" inputmode="numeric" placeholder="C" style="flex:1"/><input id="mh-f" inputmode="numeric" placeholder="F" style="flex:1"/></div>
+      <button class="btn gold sm" style="margin-top:8px" onclick="addCustomFood()">Add to log</button></div>
+
+    <div class="card"><div class="ttl" style="margin:0 0 7px;font-size:15px">Alfred's guidance</div>
+      <div class="row sp" style="margin-bottom:6px"><span class="mini">Protein per meal (${meals} meals)</span><b class="mini" style="color:#ff8a7a">~${perMeal}g</b></div>
+      <div class="row sp" style="margin-bottom:6px"><span class="mini">Daily fibre target</span><b class="mini" style="color:var(--gold2)">${fibre}g</b></div>
+      <div class="mini" style="color:var(--text2);line-height:1.55;margin-top:4px">Spread protein across the day — the body can only use so much per sitting. Eat fruit & veg of several colours for micronutrients; salt your water on hard training days. ${train?'Most carbs around the session, sir.':'Lighter carbs today — prioritise protein, fats and sleep.'}</div></div>
+
+    <div class="row g" style="gap:8px;margin-top:4px"><button class="btn ghost" onclick="state._afterFuel=openMessHall;openFuel()">Edit targets</button><button class="btn ghost" onclick="closeSheet()">Done</button></div>`);
+}
 /* ===== Wave L — The Gotham Chronicle: a story campaign that unlocks with real milestones ===== */
 const STORY=[
   {id:"vow",t:"The Vow",e:"🕯️",req:s=>true,need:s=>"",
@@ -3889,7 +4074,7 @@ function renderOnboarding(){
   let html='<div class="fade" style="padding-top:18px">';
   const dots=`<div class="ob-dots">${[0,1,2].map(i=>`<i class="${i===s?'on':''}"></i>`).join("")}</div>`;
   if(s===0){
-    html+=`<div class="center"><img class="brandlogo" src="logo.png" alt=""></div>
+    html+=`<div class="center"><img class="brandlogo" src="logo_t.png" alt=""></div>
     <h1 style="font-size:38px;text-align:center;color:var(--gold2);margin:10px 0 4px">GOTHAM NEEDS A HERO</h1>
     <p class="muted center" style="font-size:13px;margin:0 0 14px">Forge the discipline. Become the weapon.</p>
     ${dots}
@@ -3938,7 +4123,7 @@ async function obScan(input){const f=input.files[0];if(!f)return;$("ob-scan-out"
 function obFinish(){
   state.data.onboardingDone=true;save();state.showOnboarding=false;
   // splash
-  $("app").innerHTML=`<div class="splash"><img class="brandlogo splash" src="logo.png" alt=""><h1 style="font-size:30px;color:var(--gold2);text-align:center">Welcome to Gotham,<br/>${esc(state.data.u.name||"hero")}.</h1></div>`;
+  $("app").innerHTML=`<div class="splash"><img class="brandlogo splash" src="logo_t.png" alt=""><h1 style="font-size:30px;color:var(--gold2);text-align:center">Welcome to Gotham,<br/>${esc(state.data.u.name||"hero")}.</h1></div>`;
   $("nav").classList.add("hide");
   setTimeout(()=>{state.tab="gotham";render();},2200);
 }
