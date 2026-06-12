@@ -114,6 +114,8 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .stype.F{color:var(--red);border-color:#4a2420;background:#15080000}
 .stype.D{color:var(--orange);border-color:#5a3a1a;background:#150e0000}
 .stype.L,.stype.R{color:var(--blue);border-color:#1a3a5a;background:#00102000}
+.stype.RP{color:#c89bff;border-color:#3a2a5a;background:rgba(124,92,232,.07);font-size:12px}
+.stype.M{color:#5fd0c0;border-color:#1a4a45;background:rgba(46,200,180,.07)}
 .sdone{width:36px;height:36px;border-radius:9px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:17px;transition:.1s}
 .sdone.on{background:var(--green);border-color:var(--green);color:#04180a;box-shadow:0 0 10px rgba(46,204,113,.25)}
 
@@ -939,6 +941,8 @@ function setStim(s){
   let prox=1;                          // default normal working set ≈ 2 RIR
   if(s.type==="F")prox=1.5;            // taken to failure
   else if(s.type==="D")prox=1.4;       // drop set
+  else if(s.type==="RP")prox=1.5;      // rest-pause — repeated failure
+  else if(s.type==="M")prox=1.45;      // myo-reps — near-failure mini-sets
   else{const rpe=+s.rpe; if(rpe>=5&&rpe<=10)prox=0.6+(rpe-5)*0.18;} // RPE5→.6 … RPE10→1.5
   return prox;
 }
@@ -1455,6 +1459,34 @@ function dismissWarm(ei){
   const ses=state.session;ses.warmDismiss=ses.warmDismiss||{};
   ses.warmDismiss[ses.exercises[ei].name]=true;render();
 }
+/* ===== Intensity protocols (#6): drop-set / rest-pause / myo-reps =====
+   Pick a technique and it appends the correctly-structured sets, seeded from your
+   working weight. Tagged D/RP/M so volume + fatigue maths treat them honestly. */
+function protocolBase(ei){
+  const e=state.session.exercises[ei];
+  for(const s of e.sets){if(s.type!=="W"&&+s.w>0)return +s.w;}
+  return suggestionFor(e.name)||0;
+}
+function openProtocolSheet(ei){
+  const W=protocolBase(ei);
+  const round=x=>Math.max(0,Math.round(x/2.5)*2.5);
+  const OPT=[
+    {k:"D",nm:"Drop set",col:"#f0a23c",d:"Top set to ~1 rep in reserve, then strip the weight and rep again with no rest. One or two drops — savage metabolic stress.",sets:[{w:round(W*.8)},{w:round(W*.65)}],t:"D",note:"2 drops · −20% then −35%"},
+    {k:"RP",nm:"Rest-pause",col:"#c89bff",d:"Take the set to failure, rack it, breathe ~15s, then squeeze out more — twice. Same weight, more reps in less time.",sets:[{w:W||""},{w:W||""}],t:"RP",note:"2 bursts · same weight · 15s rest"},
+    {k:"M",nm:"Myo-reps",col:"#5fd0c0",d:"One activation set to ~1 RIR, then 3–4 mini-sets of 3–5 reps with ~10s rest. Near-failure reps, minimum time.",sets:[{w:W||""},{w:W||""},{w:W||""},{w:W||""}],t:"M",note:"4 mini-sets · 3–5 reps · 10s rest"}
+  ];
+  window._proto=(k)=>{const o=OPT.find(x=>x.k===k);if(!o)return;const e=state.session.exercises[ei];
+    e.sets=e.sets.concat(o.sets.map(s=>({w:s.w,r:"",type:o.t,done:false,rpe:""})));closeSheet();haptic("tap");render();};
+  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center">${secIcon('bolt')}Intensity protocol</div>
+    <div class="mini" style="margin:-4px 0 10px;color:var(--text2)">Extend your top set with a proven technique${W?` · seeded from ${W}kg`:""}.</div>
+    ${OPT.map(o=>`<div class="card" style="padding:12px;margin-bottom:9px;border-color:${o.col}44">
+      <div class="row sp"><b style="color:${o.col};font-size:15px">${o.nm}</b><span class="chip" style="font-size:11px">${o.note}</span></div>
+      <div class="mini" style="margin:6px 0 9px;line-height:1.45;color:var(--text2)">${o.d}</div>
+      <button class="btn sm" style="background:${o.col};color:#0b0e15;font-weight:700" onclick="window._proto('${o.k}')">Add ${o.nm.toLowerCase()} →</button>
+    </div>`).join("")}
+    <button class="btn ghost" style="margin-top:2px" onclick="closeSheet()">Close</button>`;
+  $("sheet").classList.add("on");$("sheetbg").classList.add("on");
+}
 /* ===== Softened per-SESSION volume guard (junk-volume aware of region spread) =====
    Rules: ~4-6 working sets per muscle per session, ~3 max per sub-region. Credit spread across
    exercises/regions — several lat moves at 2-3 sets each is NOT junk. Tone: encouraging, never scolding.
@@ -1547,6 +1579,7 @@ function renderLogging(){
     html+=`</tbody></table>
       <div class="row wrap" style="margin-top:9px;gap:8px">
         <button class="btn ghost sm g" onclick="addSet(${ei})">+ Add set</button>
+        <button class="btn ghost sm" style="width:auto;display:flex;align-items:center;gap:4px" title="Drop-set / rest-pause / myo-reps" onclick="openProtocolSheet(${ei})">${secIcon('bolt')}Protocol</button>
         <button class="btn ghost sm" style="width:auto" onclick="showCues('${esc(e.name).replace(/'/g,"")}')">ℹ️ Cues</button>
         ${linkBtn}
       </div></div>`;
@@ -2551,6 +2584,7 @@ function secIcon(key,c){
     radar:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 3.5v17M3.5 12h17"/>',
     plate:'<rect x="2.5" y="7" width="3" height="10" rx="1"/><rect x="6.5" y="9" width="2.6" height="6" rx="1"/><path d="M9.1 12h5.8"/><rect x="14.9" y="9" width="2.6" height="6" rx="1"/><rect x="18.5" y="7" width="3" height="10" rx="1"/>',
     link:'<path d="M9.5 14.5l5-5M10.5 6.8l1.7-1.7a3.4 3.4 0 014.9 4.9l-2.2 2.2M13.5 17.2l-1.7 1.7a3.4 3.4 0 01-4.9-4.9l2.2-2.2"/>',
+    bolt:'<path d="M13 2.5L5.5 13.5H11l-1 8 8.5-11.5H13z"/>',
     flame:'<path d="M12 3.5c.6 3 3.5 4.2 3.5 7.5a3.5 3.5 0 01-7 0c0-1 .4-1.7.9-2.4C10.8 9.6 12 8 12 3.5z"/><path d="M8.6 13a5 5 0 109.6 1.8c0-3.4-2.4-5-3.4-7"/>'
   };
   return `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;flex:none;filter:drop-shadow(0 1px 4px rgba(201,168,76,.35))">${P[key]||''}</svg>`;
