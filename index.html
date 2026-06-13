@@ -3365,6 +3365,49 @@ function twoFaceCard(){
    ======================================================================== */
 function openInfirmary(){state.subpage="infirmary";render();window.scrollTo(0,0);}
 function closeInfirmary(){state.subpage=null;go("gotham");}
+/* ===== Wave 11 — THE CAVE: injury-risk workload ratio (ACWR) =====
+   Acute:Chronic Workload Ratio — this week's training load vs the rolling 4-week average.
+   A genuine sports-science marker: sudden load spikes (ratio >1.5) are the strongest
+   modifiable predictor of soft-tissue injury; 0.8–1.3 is the "sweet spot". Load = tonnage. */
+function weeklyLoad(weekIdx){
+  const e=now()-weekIdx*7*864e5, s=e-7*864e5;
+  return (state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0);
+}
+function acwrInfo(){
+  const acute=weeklyLoad(0);
+  const chronic=(weeklyLoad(0)+weeklyLoad(1)+weeklyLoad(2)+weeklyLoad(3))/4;
+  const ratio=chronic>0?acute/chronic:0;
+  let zone,col,msg;
+  if(chronic<=0||(state.data.workouts||[]).length<3){zone="building";col="var(--text3)";msg="A couple more weeks of logging and your workload ratio comes online.";}
+  else if(ratio>1.5){zone="spike";col="var(--red)";msg="Load is spiking well above your 4-week norm — the sharpest injury-risk window. Hold volume here; don't add more this week.";}
+  else if(ratio>1.3){zone="high";col="var(--orange)";msg="Climbing fast. Fine for one planned overload week, but don't stack another jump on top of it.";}
+  else if(ratio>=0.8){zone="sweet";col="var(--green)";msg="In the sweet spot (0.8–1.3). Load is progressing at a tissue-safe rate — keep nudging it.";}
+  else{zone="detrain";col="var(--gold2)";msg="Below 0.8 — you're coasting / detraining slightly. Room to add work and rebuild momentum.";}
+  return {acute:Math.round(acute),chronic:Math.round(chronic),ratio,zone,col,msg};
+}
+function workloadCard(){
+  const a=acwrInfo();
+  const head=`<div class="ttl" style="display:flex;align-items:center;gap:7px">🩻 Workload watch <span class="mini" style="font-weight:400">— injury-risk ratio</span></div>`;
+  if(a.zone==="building")return `<div class="card">${head}<p class="muted" style="margin-top:6px">${a.msg}</p></div>`;
+  // gauge 0 → 2.0, sweet band 0.8–1.3
+  const max=2.0, pos=clamp(a.ratio/max*100,2,99);
+  const sweetL=0.8/max*100, sweetR=1.3/max*100, dangerL=1.5/max*100;
+  return `<div class="card">${head}
+    <div class="row sp" style="align-items:flex-end;margin:2px 0 6px"><div class="big" style="color:${a.col}">${a.ratio.toFixed(2)}<span style="font-size:15px;color:var(--text3)"> ACWR</span></div><span class="chip" style="color:${a.col};text-transform:capitalize">${a.zone==="sweet"?"sweet spot":a.zone}</span></div>
+    <div style="position:relative;height:11px;border-radius:6px;background:linear-gradient(90deg,#7c8aa0 0%,#7c8aa0 ${sweetL}%,#2ECC71 ${sweetL}%,#2ECC71 ${sweetR}%,#E8A52A ${sweetR}%,#E8A52A ${dangerL}%,#E8453C ${dangerL}%,#E8453C 100%)">
+      <i style="position:absolute;left:${pos}%;top:-4px;width:3px;height:19px;border-radius:2px;background:#fff;box-shadow:0 0 7px #000;transform:translateX(-50%)"></i></div>
+    <div class="row sp" style="margin-top:3px"><span class="mini" style="color:var(--text3)">detrain</span><span class="mini" style="color:var(--green)">0.8–1.3 sweet</span><span class="mini" style="color:var(--red)">spike</span></div>
+    <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">${a.msg}</div>
+    <div class="row sp" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span class="mini">This week's load</span><b class="gold">${fmtNum(a.acute)}kg</b></div>
+    <div class="row sp"><span class="mini">4-week average</span><b style="color:var(--text2)">${fmtNum(a.chronic)}kg</b></div></div>`;
+}
+/* ===== Sleep debt — cumulative shortfall vs an 8h/night target over the last 7 nights ===== */
+function sleepDebt(){
+  const target=8, cut=now()-7*864e5; let nights=0,total=0;
+  (state.data.sleepLog||[]).forEach(s=>{if(s.hours&&new Date(s.date).getTime()>=cut){nights++;total+=+s.hours;}});
+  if(!nights)return null;
+  return {nights,total:Math.round(total*10)/10,avg:Math.round(total/nights*10)/10,debt:Math.round((target*nights-total)*10)/10};
+}
 function infDateKey(){return gauntletKey();}
 // ---- sleep ----
 function sleepToday(){const k=new Date();k.setHours(0,0,0,0);return (state.data.sleepLog||[]).find(s=>{const d=new Date(s.date);d.setHours(0,0,0,0);return d.getTime()===k.getTime();});}
@@ -3415,7 +3458,10 @@ function renderInfirmary(){
   html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">😴 Last night's sleep</div>${sl&&sl.hours?`<b class="gold">${sl.hours}h</b>`:""}</div>
     <div class="mini" style="margin:4px 0 8px">Feeds your Patrol Readiness directly. Quality:</div>
     <div class="row" style="gap:6px">${[1,2,3,4,5].map(q=>`<button class="btn ${sl&&sl.quality===q?'gold':'ghost'} sm" onclick="setSleepField('quality',${q})" style="font-size:18px;padding:8px 0">${qEmo[q-1]}</button>`).join("")}</div>
-    <div class="row sp" style="margin-top:10px;align-items:center"><span class="mini">Hours slept</span><div class="row g" style="gap:8px;align-items:center"><button class="btn ghost sm" style="width:auto;padding:4px 12px" onclick="setSleepField('hours',-0.5)">−</button><b style="font-size:17px;min-width:42px;text-align:center">${sl&&sl.hours?sl.hours+"h":"—"}</b><button class="btn ghost sm" style="width:auto;padding:4px 12px" onclick="setSleepField('hours',0.5)">+</button></div></div></div>`;
+    <div class="row sp" style="margin-top:10px;align-items:center"><span class="mini">Hours slept</span><div class="row g" style="gap:8px;align-items:center"><button class="btn ghost sm" style="width:auto;padding:4px 12px" onclick="setSleepField('hours',-0.5)">−</button><b style="font-size:17px;min-width:42px;text-align:center">${sl&&sl.hours?sl.hours+"h":"—"}</b><button class="btn ghost sm" style="width:auto;padding:4px 12px" onclick="setSleepField('hours',0.5)">+</button></div></div>
+    ${(()=>{const sd=sleepDebt();if(!sd)return "";const over=sd.debt<=0;const col=over?"var(--green)":sd.debt>=10?"var(--red)":sd.debt>=5?"var(--orange)":"var(--gold2)";
+      return `<div class="row sp" style="margin-top:10px;padding-top:9px;border-top:1px solid var(--border)"><span class="mini">Sleep debt <span style="color:var(--text3)">· last ${sd.nights} night${sd.nights===1?"":"s"} · avg ${sd.avg}h</span></span><b style="color:${col}">${over?"none — banked ✓":"−"+sd.debt+"h"}</b></div>
+      <div class="mini" style="margin-top:5px;color:var(--text2);line-height:1.5">${over?"You're meeting your 8h target — recovery, testosterone and PR potential all thank you.":sd.debt>=10?"Heavy debt. Sleep is where muscle is built; cut a set before you cut an hour of sleep.":"Running a small shortfall vs 8h/night. A couple of early nights repays it."}</div>`;})()}</div>`;
 
   // SORENESS MAP
   const sLab=["","mild","moderate","severe"];const sCol=["#3a3a3a","#E8C56A","#E8A52A","#E8453C"];
@@ -3423,6 +3469,9 @@ function renderInfirmary(){
   html+=`<div class="card"><div class="ttl">🩹 Soreness map <span class="mini" style="font-weight:400">— tap a sector to cycle</span></div>
     <div class="row wrap" style="gap:7px;margin-top:6px">${M12.map(m=>{const lv=sore[m]||0;return `<button class="chip" onclick="toggleSore('${m}')" style="display:flex;align-items:center;gap:5px;border-color:${lv?sCol[lv]:'var(--border)'};color:${lv?sCol[lv]:'var(--text2)'}">${mIcon(m,15,lv?sCol[lv]:'#888')} ${MNAME[m]}${lv?` · ${sLab[lv]}`:''}</button>`;}).join("")}</div>
     <div class="mini" style="margin-top:9px;color:var(--text2)">${soreList.length?`Sore today: <b>${soreList.map(m=>MNAME[m]).join(", ")}</b>. Train around them or keep volume light — DOMS isn't a scorecard, but pain is information.`:"Nothing flagged sore. Tap a sector if it's tender so Alfred can factor it in."}</div></div>`;
+
+  // WORKLOAD WATCH (ACWR — injury-risk ratio)
+  html+=workloadCard();
 
   // CARDIO / PATROL MILEAGE
   const cPct=clamp(wkC/cGoal*100,0,100);const C2=326.7,off2=(C2*(1-cPct/100)).toFixed(1);
@@ -4018,13 +4067,18 @@ function deloadCard(){
   const fried=trained.filter(m=>getRecovery(m)<50);
   const overMrv=M12.filter(m=>weeklySets(m)>((VL[m]||{}).mrv||99));
   const need=fried.length>=4||overMrv.length>=3;
+  const snoozed=state.data.dismissed&&state.data.dismissed.deload&&(now()-state.data.dismissed.deload)<5*864e5;
   if(need){
     const names=[...new Set([...fried,...overMrv])].slice(0,5).map(m=>MNAME[m]).join(", ");
-    return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('deload')}Deload readiness</div>
-      <div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩹</span><div class="mini">Fatigue is stacking up (${names}). A lighter week — same lifts, ~2 fewer sets each and a couple more reps in reserve — would let it all rebuild. Deloading is strategy, not weakness.</div></div></div>`;
+    if(snoozed)return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('deload')}Deload readiness</div><div class="banner" style="background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)"><span>👍</span><div class="mini">Deload suggestion snoozed — your call, sir. Fatigue (${names}) is still elevated, so push smart. <a onclick="unsnoozeDeload()" style="color:var(--gold2);cursor:pointer">Show it again</a></div></div></div>`;
+    return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center;margin:0">${secIcon('deload')}Deload readiness</div><span class="mini" style="color:var(--text3)">optional</span></div>
+      <div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩹</span><div class="mini">Fatigue is stacking up (${names}). A lighter week — same lifts, ~2 fewer sets each and a couple more reps in reserve — would let it all rebuild. Deloading is strategy, not weakness.</div></div>
+      <div class="mini" style="margin-top:8px;color:var(--text3);text-align:center;cursor:pointer" onclick="snoozeDeload()">Not now — dismiss for 5 days</div></div>`;
   }
   return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('deload')}Deload readiness</div><div class="banner" style="background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)"><span>✓</span><div class="mini">Recovery looks managed — no deload needed yet. Keep progressing.</div></div></div>`;
 }
+function snoozeDeload(){state.data.dismissed=state.data.dismissed||{};state.data.dismissed.deload=now();save();haptic("tap");toast("Deload suggestion snoozed for 5 days");render();}
+function unsnoozeDeload(){if(state.data.dismissed)delete state.data.dismissed.deload;save();render();}
 // Plateau breaker: per-lift e1RM history; flag lifts with no new best across their last 3 outings (≥10d span).
 function plateauCard(){
   const ws=(state.data.workouts||[]);if(ws.length<4)return "";
@@ -4112,7 +4166,7 @@ function scienceLabCard(){
     ${dist}${junkHtml}${sfrBlock}</div>`;
 }
 function scienceCardsHtml(){
-  return volMapCard()+scienceLabCard()+weeklyBalanceCard()+deloadCard()+plateauCard();
+  return volMapCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+deloadCard()+plateauCard();
 }
 function scheduleEditorHtml(){
   const d=state.data;
@@ -4559,6 +4613,7 @@ async function geminiCall(parts){
   throw new Error(lastErr?("Alfred unavailable: "+lastErr+". Try again shortly."):"Alfred couldn't reach any Gemini model. Try again later.");
 }
 let ALFRED_MSGS=[];
+let ALFRED_VOICE="";
 /* ---- Alfred LOCAL coaching (works with NO API key) — pre-session briefing,
    post-session debrief, and ask-about-a-muscle. Pure local science. ---- */
 function fmtHrs(h){h=Math.max(0,Math.round(h));if(h<1)return "ready now";if(h<24)return h+"h";const dd=Math.floor(h/24),hh=h%24;return dd+"d"+(hh?" "+hh+"h":"");}
@@ -4600,7 +4655,8 @@ function alfredBriefing(){
   // coverage gap (top 1)
   if(gaps.length)rows+=`<div class="mini" style="margin-bottom:5px">🎯 <b>${MNAME[gaps[0].m]}:</b> ${esc(gaps[0].text)}</div>`;
   if(!under.length&&!over.length&&!gaps.length)rows+=`<div class="mini" style="color:var(--green);margin-bottom:4px">✓ Volume and coverage look balanced this week. Maintain the standard.</div>`;
-  return `<div class="card glow"><div class="ttl">🎩 Alfred's briefing</div>${rows}</div>`;
+  ALFRED_VOICE=("Briefing, sir. "+rows).replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+  return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center;justify-content:space-between">🎩 Alfred's briefing<button class="chip" style="padding:3px 9px" title="Read aloud" onclick="alfredSpeak(ALFRED_VOICE)">🔊 Voice</button></div>${rows}</div>`;
 }
 function alfredDebrief(){
   const w=state.data.workouts[0];if(!w)return "";
@@ -4774,6 +4830,39 @@ function addCustomFood(){const nm=($("mh-name")||{}).value||"",k=+($("mh-k")||{}
   foodDay().items.push({n:nm.trim().slice(0,28),k:k||Math.round(p*4+c*4+f*9),p,c,f});haptic("done");save();fuelRefresh();}
 function addWater(d){const day=foodDay();day.water=clamp((day.water||0)+d,0,30);haptic("light");save();fuelRefresh();}
 function clearFoodToday(){const fl=state.data.foodLog||{};fl[todayKey()]={items:[],water:0};haptic("warn");save();fuelRefresh();}
+/* ===== Wave 12 — meal templates: save today's logged food as a reusable one-tap meal ===== */
+function saveMealTemplate(){
+  const day=foodDay();if(!(day.items||[]).length){toast("Log some food first, then save it as a meal.");return;}
+  appPrompt({title:"Save meal",body:"Name this meal (e.g. “Post-patrol shake”):",ok:"Save"}).then(nm=>{
+    if(!nm)return;nm=(nm+"").trim().slice(0,28);if(!nm)return;
+    state.data.mealTemplates=state.data.mealTemplates||[];
+    state.data.mealTemplates.unshift({id:"mt"+now(),name:nm,items:day.items.map(it=>({n:it.n,k:it.k,p:it.p,c:it.c,f:it.f}))});
+    if(state.data.mealTemplates.length>24)state.data.mealTemplates.length=24;
+    save();haptic("done");toast("Saved “"+nm+"” — re-add it any day in one tap");fuelRefresh();
+  });
+}
+function addMealTemplate(id){const t=(state.data.mealTemplates||[]).find(x=>x.id===id);if(!t)return;const day=foodDay();(t.items||[]).forEach(it=>day.items.push({n:it.n,k:it.k,p:it.p,c:it.c,f:it.f}));haptic("done");save();toast(t.name+" added to today");fuelRefresh();}
+function delMealTemplate(id){state.data.mealTemplates=(state.data.mealTemplates||[]).filter(x=>x.id!==id);save();haptic("tap");fuelRefresh();}
+function mealTemplatesHtml(){
+  const ts=state.data.mealTemplates||[];
+  const chips=ts.map(t=>{const tot=foodTotals({items:t.items});return `<div class="chip g" style="margin:0 6px 6px 0;display:inline-flex;align-items:center;gap:7px"><span onclick="addMealTemplate('${t.id}')" style="cursor:pointer">🍱 ${esc(t.name)} <span class="mini" style="color:var(--text3)">${tot.k}k·${tot.p}p</span></span><span onclick="delMealTemplate('${t.id}')" style="cursor:pointer;color:#ff8a7a;font-size:11px">✕</span></div>`;}).join("");
+  return `<div class="hr"></div><div class="row sp"><span class="mini" style="color:var(--text2)">🍱 Saved meals <span style="color:var(--text3)">— one-tap re-add</span></span><button class="btn ghost sm" style="width:auto;padding:4px 10px" onclick="saveMealTemplate()">+ Save today's log</button></div>
+    ${ts.length?`<div class="row wrap" style="margin-top:8px">${chips}</div>`:`<div class="mini" style="color:var(--text3);margin-top:6px">No saved meals yet. Log a meal you eat often, then tap <b>Save today's log</b> to reuse it instantly.</div>`}`;
+}
+/* ===== Wave 12 — Alfred's voice: speak a line aloud via the browser's Web Speech API ===== */
+function alfredSpeak(text){
+  try{
+    if(!("speechSynthesis" in window)){toast("Voice isn't supported on this browser.");return;}
+    const synth=window.speechSynthesis;
+    if(synth.speaking){synth.cancel();return;} // tap again to stop
+    const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
+    u.rate=0.95;u.pitch=0.9;
+    const vs=synth.getVoices()||[];
+    const pick=vs.find(v=>/en-GB/i.test(v.lang)&&/male|daniel|arthur|oliver|george/i.test(v.name))||vs.find(v=>/en-GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang));
+    if(pick)u.voice=pick;
+    haptic("tap");synth.speak(u);
+  }catch(e){toast("Couldn't start voice.");}
+}
 function openMessHall(){
   const n=state.data.u.nutrition;
   if(!n||!n.cals){
@@ -4875,7 +4964,8 @@ function renderFuel(){
       <div class="hr"></div>
       <div class="mini" style="margin-bottom:6px;color:var(--text2)">Quick add</div>
       <div class="row wrap">${chips}</div>
-      <button class="btn gold sm" style="margin-top:9px" onclick="openMessHall()">Open the Mess Hall — full log, rings & custom foods ›</button></div>`;
+      ${mealTemplatesHtml()}
+      <button class="btn gold sm" style="margin-top:11px" onclick="openMessHall()">Open the Mess Hall — full log, rings & custom foods ›</button></div>`;
   }
   // 3) Hydration (works even before a protocol is set)
   const day2=foodDay();const wT=waterTargetGlasses(n);const wHave=day2.water||0;
@@ -5077,7 +5167,7 @@ const WISDOM=[
 ];
 function wisdomToday(){const i=(state._wisdomI!=null)?state._wisdomI:(_daySeed()%WISDOM.length);return WISDOM[i%WISDOM.length];}
 function nextWisdom(){state._wisdomI=((state._wisdomI!=null?state._wisdomI:_daySeed())+1)%WISDOM.length;haptic("tap");render();}
-function wisdomCard(){const w=wisdomToday();return `<div class="card" style="padding:15px"><div style="font-size:14.5px;font-style:italic;line-height:1.6;color:var(--text)">"${esc(w[0])}"</div><div class="row sp" style="margin-top:9px"><span class="mini" style="color:var(--gold2)">— ${esc(w[1])}</span><button class="btn ghost sm" style="width:auto;padding:5px 11px" onclick="nextWisdom()">↻ Next</button></div></div>`;}
+function wisdomCard(){const w=wisdomToday();return `<div class="card" style="padding:15px"><div style="font-size:14.5px;font-style:italic;line-height:1.6;color:var(--text)">"${esc(w[0])}"</div><div class="row sp" style="margin-top:9px"><span class="mini" style="color:var(--gold2)">— ${esc(w[1])}</span><div class="row g" style="gap:6px"><button class="btn ghost sm" style="width:auto;padding:5px 11px" onclick="alfredSpeak('${esc(w[0]).replace(/'/g,"\\'")}')" title="Hear it from Alfred">🔊</button><button class="btn ghost sm" style="width:auto;padding:5px 11px" onclick="nextWisdom()">↻ Next</button></div></div></div>`;}
 
 /* ---- 3) Rank Ladder ---- */
 function openRankLadder(){
