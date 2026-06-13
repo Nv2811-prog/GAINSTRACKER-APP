@@ -35,6 +35,7 @@ h1,h2,h3,.disp{font-family:var(--disp);font-weight:400;letter-spacing:.04em;line
 button{font-family:var(--body);cursor:pointer;border:none;background:none;color:inherit;font-size:15px}
 input,select,textarea{font-family:var(--body);font-size:16px;background:var(--bg4);border:1px solid var(--border2);color:var(--text);border-radius:9px;padding:11px 12px;width:100%}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold-dim)}
+.lbl{display:block;font-family:var(--disp);font-size:12px;letter-spacing:.06em;color:var(--gold2);margin-bottom:3px}
 img{display:block;max-width:100%}
 .muted{color:var(--text2)}.dim{color:var(--text3)}
 .gold{color:var(--gold2)}.red{color:var(--red)}.green{color:var(--green)}.blue{color:var(--blue)}
@@ -454,7 +455,143 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"EIeI8Vf","eq":"barbell","p":["
 {"n":"Machine Standing Calf Raise","id":"g80cf1","eq":"machine","p":["calves"],"s":[],"c":["Full stretch at the bottom, pause there","Drive up onto the big toe to max height","Hard pause on top, no bouncing"],"bw":1},
 {"n":"Smith Standing Calf Raise","id":"g80cf2","eq":"smith","p":["calves"],"s":[],"c":["Balls of the feet on a plate or step","Full stretch down, full contraction up","Pause on top, slow and controlled"],"bw":1},
 {"n":"Machine Ab Crunch","id":"g80ab1","eq":"machine","p":["abs"],"s":[],"c":["Round the spine, crunch the ribs to the pelvis","Abs do the work, not the hip flexors","Resist the stretch on the way up"]},
-{"n":"Captain's Chair Leg Raise","id":"g80ab2","eq":"bodyweight","p":["abs"],"s":["quads"],"c":["Back against the pad, no swinging","Curl the pelvis up, not just the legs","Lower slowly under control"],"bw":1}];
+{"n":"Captain's Chair Leg Raise","id":"g80ab2","eq":"bodyweight","p":["abs"],"s":["quads"],"c":["Back against the pad, no swinging","Curl the pelvis up, not just the legs","Lower slowly under control"],"bw":1},
+{"n":"Incline Dumbbell Fly","id":"x001","eq":"dumbbell","p":["chest"],"s":["shoulders"],"c":["30-45° bench, soft constant elbow bend","Big stretch at the bottom, hug at the top","Feel the upper chest, not the front delt"]},
+{"n":"Flat Dumbbell Fly","id":"x002","eq":"dumbbell","p":["chest"],"s":["shoulders"],"c":["Soft elbow bend held the whole rep","Deep stretch then squeeze at the midline","Don't turn it into a press"]},
+{"n":"Low-to-High Cable Fly","id":"x003","eq":"cable","p":["chest"],"s":["shoulders"],"c":["Pulleys low, sweep hands up and together","Bias the upper chest at the top","Control the stretch on the way down"]},
+{"n":"High-to-Low Cable Fly","id":"x004","eq":"cable","p":["chest"],"s":["triceps"],"c":["Pulleys high, drive hands down and in","Squeeze the lower chest at the bottom","Slow controlled stretch back up"]},
+{"n":"Smith Decline Press","id":"x005","eq":"smith","p":["chest"],"s":["triceps"],"c":["Decline bench biases the lower chest","Bar to the lower-chest line, elbows tucked","Fixed path lets you push close to failure"]},
+{"n":"Incline Machine Press","id":"x006","eq":"machine","p":["chest"],"s":["shoulders","triceps"],"c":["Handles at upper-chest height","Press up and slightly in","Control the stretch, don't slam the stack"]},
+{"n":"Dumbbell Floor Press","id":"x007","eq":"dumbbell","p":["chest"],"s":["triceps"],"c":["Triceps touch the floor, brief pause","Reduced range protects the shoulders","Drive up hard, lock out the triceps"]},
+{"n":"Barbell Floor Press","id":"x008","eq":"barbell","p":["chest"],"s":["triceps"],"c":["Upper arms rest on the floor each rep","Elbows tucked, no bounce off the floor","Powerful lockout for triceps and chest"]},
+{"n":"Dumbbell Squeeze Press","id":"x009","eq":"dumbbell","p":["chest"],"s":["triceps"],"c":["Press the bells hard together the whole set","Constant inner-chest tension","Slow stretch, squeeze at the top"]},
+{"n":"Landmine Press","id":"x010","eq":"barbell","p":["chest"],"s":["shoulders","triceps"],"c":["Press the bar up and slightly across","Great for shoulder-friendly pressing","Brace the core, don't lean back"]},
+{"n":"Cable Bench Press","id":"x011","eq":"cable","p":["chest"],"s":["triceps","shoulders"],"c":["Constant tension through the whole press","Drive the handles together at lockout","Control the stretch back to the chest"]},
+{"n":"Weighted Chest Dip","id":"x012","eq":"bodyweight","p":["chest"],"s":["triceps","shoulders"],"c":["Lean forward to bias the chest","Deep stretch at the bottom, elbows back","Add a belt and load to keep progressing"],"bw":1},
+{"n":"Svend Press","id":"x013","eq":"other","p":["chest"],"s":["shoulders"],"c":["Press two plates together at chest height","Push straight out, squeezing the inner chest","Slow return, never lose the squeeze"]},
+{"n":"Wide Grip Lat Pulldown","id":"x014","eq":"cable","p":["back"],"s":["biceps"],"c":["Wide grip, drive elbows down and out","Pull to the upper chest, chest proud","Full stretch up top, no shrug"]},
+{"n":"Close Grip Lat Pulldown","id":"x015","eq":"cable","p":["back"],"s":["biceps"],"c":["Neutral close grip, elbows drive down","Pull to the sternum, big lat squeeze","Control the stretch overhead"]},
+{"n":"Neutral Grip Lat Pulldown","id":"x016","eq":"cable","p":["back"],"s":["biceps"],"c":["Palms-facing grip is shoulder-friendly","Lead with the elbows, chest up","Full stretch, no leaning back"]},
+{"n":"Single Arm Lat Pulldown","id":"x017","eq":"cable","p":["back"],"s":["biceps"],"c":["One arm to fix side-to-side imbalances","Big stretch overhead, pull to the ribs","Squeeze the lat, slow eccentric"]},
+{"n":"Chest Supported Dumbbell Row","id":"x018","eq":"dumbbell","p":["back"],"s":["biceps"],"c":["Chest on an incline bench, no momentum","Row to the hips, elbows past the torso","Strict — the bench removes all cheating"]},
+{"n":"Chest Supported Machine Row","id":"x019","eq":"machine","p":["back"],"s":["biceps"],"c":["Chest on the pad, pull to the waist","Squeeze the shoulder blades together","Control the stretch, don't round forward"]},
+{"n":"Pendlay Row","id":"x020","eq":"barbell","p":["back"],"s":["biceps"],"c":["Bar resets on the floor each rep","Flat back, explosive pull to the lower chest","Strict torso angle, no hips rising early"]},
+{"n":"Meadows Row","id":"x021","eq":"barbell","p":["back"],"s":["biceps","forearms"],"c":["Landmine bar, staggered stance","Pull with the elbow high and back","Big stretch at the bottom"]},
+{"n":"Seal Row","id":"x022","eq":"dumbbell","p":["back"],"s":["biceps"],"c":["Face down on a raised bench, zero leg drive","Row to the hips, pure back work","Pause and squeeze each rep"]},
+{"n":"Rack Pull","id":"x023","eq":"barbell","p":["back"],"s":["hamstrings","traps"],"c":["Bar set just below the knees","Drive the hips, lock out tall","Overload the upper back and traps"]},
+{"n":"Reverse Grip Lat Pulldown","id":"x024","eq":"cable","p":["back"],"s":["biceps"],"c":["Underhand grip hits the lower lats","Pull to the lower chest, elbows tucked","Full stretch, squeeze at the bottom"]},
+{"n":"Weighted Pull-up","id":"x025","eq":"bodyweight","p":["back"],"s":["biceps"],"c":["Add a belt and plate as you progress","Dead hang to full stretch each rep","Chest to bar, own the lowering phase"],"bw":1},
+{"n":"Wide Grip Pull-up","id":"x026","eq":"bodyweight","p":["back"],"s":["biceps"],"c":["Wide overhand grip biases the lats","Drive elbows down and back","No kipping, full range"],"bw":1},
+{"n":"Standing Barbell Overhead Press","id":"x027","eq":"barbell","p":["shoulders"],"s":["triceps"],"c":["Glutes and abs braced, no leg drive","Bar travels straight, head back then through","Lock out with the biceps by the ears"]},
+{"n":"Dumbbell Standing Shoulder Press","id":"x028","eq":"dumbbell","p":["shoulders"],"s":["triceps"],"c":["Stand tall, brace the core","Press in a slight arc to meet at the top","Lower to ear height under control"]},
+{"n":"Z Press","id":"x029","eq":"barbell","p":["shoulders"],"s":["triceps","abs"],"c":["Seated on the floor, legs straight","No back support — total core brace","Press straight overhead, strict"]},
+{"n":"Cable Rope Face Pull","id":"x030","eq":"cable","p":["shoulders"],"s":["back","traps"],"c":["Rope at face height, pull to the forehead","Elbows high, externally rotate at the end","Rear delts and upper back, not biceps"]},
+{"n":"Dumbbell Y Raise","id":"x031","eq":"dumbbell","p":["shoulders"],"s":["traps"],"c":["Raise in a Y, thumbs up","Lower-trap and rear-delt friendly","Light load, no swinging"],"bw":1},
+{"n":"Leaning Cable Lateral Raise","id":"x032","eq":"cable","p":["shoulders"],"s":["traps"],"c":["Lean away from the stack for a longer range","Lead with the elbow, pour-the-jug","Constant cable tension at the bottom"],"bw":1},
+{"n":"Lu Raise","id":"x033","eq":"dumbbell","p":["shoulders"],"s":["traps"],"c":["Raise overhead in a wide arc","Full range hits all three delt heads","Slow and controlled, very light"],"bw":1},
+{"n":"Cable Rear Delt Fly","id":"x034","eq":"cable","p":["shoulders"],"s":["back"],"c":["Cross the cables, pull arms wide and back","Squeeze the rear delts, no trap shrug","Control the return, constant tension"]},
+{"n":"Dumbbell Seated Lateral Raise","id":"x035","eq":"dumbbell","p":["shoulders"],"s":["traps"],"c":["Seated removes leg drive and momentum","Lead with the elbows to shoulder height","Slow negative, strict reps"],"bw":1},
+{"n":"Behind-the-Back Cable Lateral Raise","id":"x036","eq":"cable","p":["shoulders"],"s":["traps"],"c":["Cable behind the body for max stretch","Raise to shoulder height, no swing","Side-delt tension from the very bottom"],"bw":1},
+{"n":"Bradford Press","id":"x037","eq":"barbell","p":["shoulders"],"s":["triceps"],"c":["Press front to back over the head","Stop just short of lockout for constant tension","Light load, smooth controlled path"]},
+{"n":"Viking Press","id":"x038","eq":"machine","p":["shoulders"],"s":["triceps"],"c":["Neutral grip, shoulder-friendly angle","Press up and slightly forward","Brace, don't lean back"]},
+{"n":"Cable Upright Row","id":"x039","eq":"cable","p":["shoulders"],"s":["traps","biceps"],"c":["Pull to lower-chest height, elbows lead","Keep the bar close to the body","Don't shrug, control down"]},
+{"n":"Dumbbell Upright Row","id":"x040","eq":"dumbbell","p":["shoulders"],"s":["traps","biceps"],"c":["Lead with the elbows, wide grip","Pull to chest height, no higher","Control the lowering, no swing"]},
+{"n":"EZ Bar Curl","id":"x041","eq":"ez bar","p":["biceps"],"s":["forearms"],"c":["Angled grip is wrist-friendly","Elbows pinned, no swinging","Full stretch low, hard squeeze on top"]},
+{"n":"Concentration Curl","id":"x042","eq":"dumbbell","p":["biceps"],"s":["forearms"],"c":["Elbow braced on the inner thigh","Curl with a peak squeeze at the top","Slow 2-3s negative every rep"]},
+{"n":"Spider Curl","id":"x043","eq":"dumbbell","p":["biceps"],"s":["forearms"],"c":["Chest on an incline, arms hanging straight","Curl with zero shoulder swing","Constant tension, big peak contraction"]},
+{"n":"Bayesian Cable Curl","id":"x044","eq":"cable","p":["biceps"],"s":["forearms"],"c":["Cable behind you, arm back for a stretch","Curl keeping the elbow behind the torso","Loaded stretch is great for growth"]},
+{"n":"Dumbbell Preacher Curl","id":"x045","eq":"dumbbell","p":["biceps"],"s":["forearms"],"c":["Back of the arm flat on the pad","One arm at a time, full range","Keep tension at the bottom, slow lower"]},
+{"n":"EZ Bar Preacher Curl","id":"x046","eq":"ez bar","p":["biceps"],"s":["forearms"],"c":["Arms flat on the preacher pad","Don't relax at the bottom","Full squeeze on top, slow eccentric"]},
+{"n":"Drag Curl","id":"x047","eq":"barbell","p":["biceps"],"s":["forearms"],"c":["Drag the bar up the body, elbows back","Bar stays close, long head emphasis","Squeeze, then control down"]},
+{"n":"Cable Rope Hammer Curl","id":"x048","eq":"cable","p":["biceps"],"s":["forearms"],"c":["Neutral rope grip, elbows fixed","Hits the brachialis and forearm","Constant cable tension, no swing"]},
+{"n":"Zottman Curl","id":"x049","eq":"dumbbell","p":["biceps"],"s":["forearms"],"c":["Curl up supinated, rotate at the top","Lower with a pronated (reverse) grip","Builds biceps and forearms together"]},
+{"n":"Cross Body Hammer Curl","id":"x050","eq":"dumbbell","p":["biceps"],"s":["forearms"],"c":["Curl across the body toward the opposite pec","Neutral grip, elbow stays at the side","Big brachialis and forearm hit"]},
+{"n":"21s Barbell Curl","id":"x051","eq":"barbell","p":["biceps"],"s":["forearms"],"c":["7 bottom-half, 7 top-half, 7 full reps","Brutal pump and time under tension","Keep the elbows pinned throughout"]},
+{"n":"Cable Overhead Curl","id":"x052","eq":"cable","p":["biceps"],"s":["forearms"],"c":["Arms out wide at shoulder height","Curl the hands toward the ears","Squeeze hard, great peak contraction"]},
+{"n":"Seated Dumbbell Curl","id":"x053","eq":"dumbbell","p":["biceps"],"s":["forearms"],"c":["Seated removes momentum","Supinate as you curl, elbows fixed","Slow controlled negative"]},
+{"n":"EZ Bar Reverse Curl","id":"x054","eq":"ez bar","p":["biceps"],"s":["forearms"],"c":["Overhand grip, elbows pinned","Curl with the forearm, no swing","Slow lower for the brachioradialis"]},
+{"n":"Machine Hammer Curl","id":"x055","eq":"machine","p":["biceps"],"s":["forearms"],"c":["Neutral grip handles, elbows fixed","Smooth curl, squeeze the top","Slow eccentric, no stack slam"]},
+{"n":"Rope Pushdown","id":"x056","eq":"cable","p":["triceps"],"s":["forearms"],"c":["Spread the rope apart at the bottom","Elbows locked to the sides","Full lockout, squeeze the triceps"]},
+{"n":"Overhead Rope Extension","id":"x057","eq":"cable","p":["triceps"],"s":["shoulders"],"c":["Rope overhead, elbows pointed up","Deep stretch behind the head","Extend to a hard lockout"]},
+{"n":"Dumbbell Overhead Extension","id":"x058","eq":"dumbbell","p":["triceps"],"s":["shoulders"],"c":["One or two hands overhead","Lower behind the head for a big stretch","Elbows stay tight, extend fully"]},
+{"n":"EZ Bar Overhead Extension","id":"x059","eq":"ez bar","p":["triceps"],"s":["shoulders"],"c":["Seated, bar lowered behind the head","Elbows pointed up and still","Loaded stretch on the long head"]},
+{"n":"Single Arm Cable Pushdown","id":"x060","eq":"cable","p":["triceps"],"s":["forearms"],"c":["Reverse or neutral grip, one arm","Fixes side-to-side imbalances","Full lockout, slow return"]},
+{"n":"Bench Dip","id":"x061","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Hands on a bench, feet out front","Lower until the elbows hit ~90°","Add a plate on the lap to load it"],"bw":1},
+{"n":"Dumbbell Tate Press","id":"x062","eq":"dumbbell","p":["triceps"],"s":["chest"],"c":["Bells lowered toward the chest, elbows flared","Squeeze the triceps to extend","Slow and controlled, light to moderate"]},
+{"n":"Cable Cross Body Extension","id":"x063","eq":"cable","p":["triceps"],"s":["shoulders"],"c":["Extend the cable across and down the body","Targets the long head","Lock out, squeeze, slow return"]},
+{"n":"Diamond Push-up","id":"x064","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Hands together forming a diamond","Body rigid, lower the chest to the hands","Press up and lock out the triceps"],"bw":1},
+{"n":"EZ Bar Skullcrusher","id":"x065","eq":"ez bar","p":["triceps"],"s":["shoulders"],"c":["Only the forearms move, elbows still","Lower to the forehead or just behind","Stretch, then extend to lockout"]},
+{"n":"Rolling Dumbbell Extension","id":"x066","eq":"dumbbell","p":["triceps"],"s":["shoulders"],"c":["Lower the bells past the head, then roll back","Big stretch then powerful extension","Easier on the elbows than a skullcrusher"]},
+{"n":"Close Grip Push-up","id":"x067","eq":"bodyweight","p":["triceps"],"s":["chest"],"c":["Hands inside shoulder width","Elbows tucked close to the body","Full range, lock out the triceps"],"bw":1},
+{"n":"Reverse EZ Bar Curl","id":"x068","eq":"ez bar","p":["forearms"],"s":["biceps"],"c":["Overhand grip, elbows pinned","Curl with the forearms, no swing","Slow lower, brachioradialis focus"]},
+{"n":"Behind-the-Back Wrist Curl","id":"x069","eq":"barbell","p":["forearms"],"s":[],"c":["Bar behind the body, curl the wrists up","Full stretch down, squeeze up","Light load, fully controlled"]},
+{"n":"Plate Pinch Hold","id":"x070","eq":"other","p":["forearms"],"s":[],"c":["Pinch two plates smooth-side out","Hold for time, crush grip","Builds pinch and thumb strength"]},
+{"n":"Cable Reverse Wrist Curl","id":"x071","eq":"cable","p":["forearms"],"s":["biceps"],"c":["Forearms on the thighs, palms down","Extend the wrists up against the cable","Slow lower, constant tension"]},
+{"n":"Wrist Roller","id":"x072","eq":"other","p":["forearms"],"s":[],"c":["Roll the weight up on a cord, then down","Full forearm burn, both directions","Keep the arms out in front"]},
+{"n":"Dumbbell Reverse Wrist Curl","id":"x073","eq":"dumbbell","p":["forearms"],"s":[],"c":["Palms down, forearms on the bench","Extend the wrists up, pause","Slow lower for the extensors"]},
+{"n":"Farmer's Hold","id":"x074","eq":"dumbbell","p":["forearms"],"s":["traps"],"c":["Hold heavy dumbbells at the sides","Stand tall, brace, hold for time","Grip, traps and core all work"]},
+{"n":"EZ Bar Wrist Curl","id":"x075","eq":"ez bar","p":["forearms"],"s":[],"c":["Forearms on the thighs, palms up","Curl the wrists, full stretch and squeeze","Light load, strict reps"]},
+{"n":"Bulgarian Split Squat","id":"x076","eq":"dumbbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Rear foot elevated, weight on the front leg","Drop straight down, torso fairly tall","Push through the front heel to stand"]},
+{"n":"Dumbbell Walking Lunge","id":"x077","eq":"dumbbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Long strides, drop the back knee down","Front knee tracks over the toes","Drive through the front heel each step"]},
+{"n":"Dumbbell Reverse Lunge","id":"x078","eq":"dumbbell","p":["quads"],"s":["glutes"],"c":["Step back, drop the knee straight down","Easier on the knees than forward lunges","Drive through the front heel to stand"]},
+{"n":"Dumbbell Step-up","id":"x079","eq":"dumbbell","p":["quads"],"s":["glutes"],"c":["Tall box, drive through the top foot","Minimal push off the bottom leg","Control the descent, don't drop"]},
+{"n":"Barbell Hack Squat","id":"x080","eq":"barbell","p":["quads"],"s":["glutes"],"c":["Bar behind the legs, heels elevated","Stay upright, quad-dominant pattern","Drive up through the whole foot"]},
+{"n":"Belt Squat","id":"x081","eq":"machine","p":["quads"],"s":["glutes"],"c":["Load hangs from a hip belt, spine-friendly","Sit deep, knees track over the toes","Drive straight up, full range"]},
+{"n":"Cyclist Squat","id":"x082","eq":"barbell","p":["quads"],"s":["glutes"],"c":["Heels elevated, narrow stance","Maximum quad bias, stay upright","Full depth, controlled descent"]},
+{"n":"Single Leg Leg Press","id":"x083","eq":"machine","p":["quads"],"s":["glutes","hamstrings"],"c":["One foot centered on the platform","Full range, knee tracks over the toes","Fixes leg imbalances"]},
+{"n":"Single Leg Extension","id":"x084","eq":"machine","p":["quads"],"s":[],"c":["One leg at a time, full lockout","Squeeze the quad hard on top","Slow the negative, no swinging"]},
+{"n":"Heels Elevated Goblet Squat","id":"x085","eq":"dumbbell","p":["quads"],"s":["glutes"],"c":["Heels on a plate for more depth","Hold the weight at the chest, stay tall","Sit between the hips, drive up"]},
+{"n":"Smith Reverse Lunge","id":"x086","eq":"smith","p":["quads"],"s":["glutes"],"c":["Bar on the back, step straight back","Fixed path keeps you balanced","Drive through the front heel"]},
+{"n":"Zercher Squat","id":"x087","eq":"barbell","p":["quads"],"s":["glutes","abs"],"c":["Bar in the crook of the elbows","Stay upright, big core brace","Sit deep, drive straight up"]},
+{"n":"Landmine Squat","id":"x088","eq":"barbell","p":["quads"],"s":["glutes"],"c":["Hold the bar end at the chest","Sit back and down, heels planted","Beginner-friendly, knee-friendly squat"]},
+{"n":"Single Leg Romanian Deadlift","id":"x089","eq":"dumbbell","p":["hamstrings"],"s":["glutes"],"c":["Hinge on one leg, back leg extends behind","Chase the hamstring stretch, flat back","Squeeze the glute to stand"]},
+{"n":"Single Leg Seated Leg Curl","id":"x090","eq":"machine","p":["hamstrings"],"s":["calves"],"c":["One leg at a time on the seated curl","Full curl, squeeze the hamstring","Hips pressed into the pad"]},
+{"n":"Nordic Curl","id":"x091","eq":"bodyweight","p":["hamstrings"],"s":["glutes"],"c":["Anchor the ankles, lower under control","Resist all the way down with the hams","Push off lightly to reset"],"bw":1},
+{"n":"Dumbbell Stiff Leg Deadlift","id":"x092","eq":"dumbbell","p":["hamstrings"],"s":["glutes","back"],"c":["Near-straight legs, hinge at the hips","Bells close to the legs, flat back","Stretch the hamstrings, then stand tall"]},
+{"n":"Cable Romanian Deadlift","id":"x093","eq":"cable","p":["hamstrings"],"s":["glutes"],"c":["Low pulley, constant tension hinge","Push the hips back, soft knees","Squeeze the glutes at the top"]},
+{"n":"Dumbbell Swing","id":"x094","eq":"dumbbell","p":["hamstrings"],"s":["glutes"],"c":["Hinge and snap the hips forward","Power from the hips, not the arms","Flat back, glutes and hams drive it"]},
+{"n":"45 Degree Back Extension","id":"x095","eq":"bodyweight","p":["hamstrings"],"s":["glutes","back"],"c":["Hinge over the pad, round or flat back","Squeeze the glutes and hams to rise","Add a plate to the chest to load it"],"bw":1},
+{"n":"Weighted Glute Ham Raise","id":"x096","eq":"bodyweight","p":["hamstrings"],"s":["glutes","back"],"c":["Hold a plate to the chest for load","Lower under control with the hamstrings","Drive back up, squeeze the glutes"],"bw":1},
+{"n":"Barbell Hip Thrust","id":"x097","eq":"barbell","p":["glutes"],"s":["hamstrings"],"c":["Upper back on the bench, bar over the hips","Drive through the heels, full lockout","Ribs down, squeeze hard at the top"]},
+{"n":"Single Leg Hip Thrust","id":"x098","eq":"bodyweight","p":["glutes"],"s":["hamstrings"],"c":["One foot planted, other leg extended","Drive the hip up, squeeze the glute","Keep the hips level, no rotation"],"bw":1},
+{"n":"Cable Hip Abduction","id":"x099","eq":"cable","p":["glutes"],"s":["hamstrings"],"c":["Cuff on the ankle, leg out to the side","Lead with the heel, squeeze the glute","Keep the hips square, slow return"]},
+{"n":"Frog Pump","id":"x100","eq":"bodyweight","p":["glutes"],"s":["hamstrings"],"c":["Soles together, knees out wide","Drive the hips up, squeeze the glutes","High reps, constant tension"],"bw":1},
+{"n":"Reverse Hyperextension","id":"x101","eq":"machine","p":["glutes"],"s":["hamstrings","back"],"c":["Hips on the pad, legs swing up and back","Squeeze the glutes at the top","Control the swing, no momentum"]},
+{"n":"Banded Hip Thrust","id":"x102","eq":"band","p":["glutes"],"s":["hamstrings"],"c":["Band around the knees for abduction","Drive the hips up, push the knees out","Squeeze hard, high reps"]},
+{"n":"Glute Kickback Machine","id":"x103","eq":"machine","p":["glutes"],"s":["hamstrings"],"c":["Press the foot back against the pad","Squeeze the glute at full extension","Keep the hips square, slow return"]},
+{"n":"Sumo Deadlift","id":"x104","eq":"barbell","p":["glutes"],"s":["hamstrings","quads"],"c":["Wide stance, toes out, grip inside knees","Push the floor away, hips and chest rise together","Lock out with a glute squeeze"]},
+{"n":"Single Leg Glute Bridge","id":"x105","eq":"bodyweight","p":["glutes"],"s":["hamstrings"],"c":["One foot planted, other leg straight up","Drive the hip up, squeeze the glute","Keep the hips level"],"bw":1},
+{"n":"Leg Press Calf Raise","id":"x106","eq":"machine","p":["calves"],"s":[],"c":["Balls of the feet on the platform edge","Full stretch at the bottom, pause","Drive up onto the toes, hard squeeze"]},
+{"n":"Single Leg Standing Calf Raise","id":"x107","eq":"bodyweight","p":["calves"],"s":[],"c":["One leg on a step, full stretch down","Drive up onto the big toe","Pause on top, slow controlled reps"],"bw":1},
+{"n":"Smith Seated Calf Raise","id":"x108","eq":"smith","p":["calves"],"s":["hamstrings"],"c":["Bar on the knees, soleus emphasis","Full stretch then full contraction","Slow, no bouncing"]},
+{"n":"Dumbbell Standing Calf Raise","id":"x109","eq":"dumbbell","p":["calves"],"s":[],"c":["Dumbbells at the sides, balls of feet on a plate","Full stretch, drive onto the toes","Hard pause on top, no bounce"],"bw":1},
+{"n":"Tibialis Raise","id":"x110","eq":"bodyweight","p":["calves"],"s":[],"c":["Heels on a plate, lift the toes up","Strengthens the shin / tibialis","Great for knee and ankle health"],"bw":1},
+{"n":"Bent Knee Calf Raise","id":"x111","eq":"machine","p":["calves"],"s":[],"c":["Knees bent biases the soleus","Full stretch then full contraction","Slow controlled reps, no bounce"]},
+{"n":"Standing Cable Crunch","id":"x112","eq":"cable","p":["abs"],"s":[],"c":["Rope behind the head, crunch the ribs down","Hips fixed, abs do all the work","Resist the stretch on the way up"]},
+{"n":"Hanging Knee Raise","id":"x113","eq":"bodyweight","p":["abs"],"s":["quads"],"c":["Dead hang, curl the knees to the chest","Roll the pelvis up, no swinging","Lower slowly under control"],"bw":1},
+{"n":"Ab Wheel Rollout","id":"x114","eq":"bodyweight","p":["abs"],"s":["shoulders"],"c":["Brace hard, roll out as far as you control","Don't let the lower back sag","Pull back with the abs, not the hips"],"bw":1},
+{"n":"Decline Sit-up","id":"x115","eq":"bodyweight","p":["abs"],"s":["quads"],"c":["Curl up segment by segment","Don't yank with the hip flexors","Add a plate to the chest to load it"],"bw":1},
+{"n":"Bicycle Crunch","id":"x116","eq":"bodyweight","p":["abs"],"s":[],"c":["Opposite elbow to knee, twist from the core","Slow and controlled, not frantic","Full extension on the straight leg"],"bw":1},
+{"n":"Dead Bug","id":"x117","eq":"bodyweight","p":["abs"],"s":[],"c":["Lower back pressed flat the whole time","Extend opposite arm and leg slowly","Anti-extension core control"],"bw":1},
+{"n":"Mountain Climbers","id":"x118","eq":"bodyweight","p":["abs"],"s":["shoulders"],"c":["Plank position, drive the knees in","Hips stay low and level","Controlled pace, brace the core"],"bw":1},
+{"n":"Side Plank","id":"x119","eq":"bodyweight","p":["abs"],"s":["shoulders"],"c":["Body in one straight line on the side","Hips up, brace the obliques","Hold for time, both sides evenly"],"bw":1},
+{"n":"Toes to Bar","id":"x120","eq":"bodyweight","p":["abs"],"s":["back"],"c":["Hang and curl the toes up to the bar","Control the swing, no kipping","Lower slowly with the abs"],"bw":1},
+{"n":"Cable Woodchopper","id":"x121","eq":"cable","p":["abs"],"s":["shoulders"],"c":["Rotate from high to low across the body","Pivot the back foot, hips follow","Control both directions, brace the core"]},
+{"n":"Barbell Behind-the-Back Shrug","id":"x122","eq":"barbell","p":["traps"],"s":["shoulders"],"c":["Bar behind the body, shrug straight up","Pulls the shoulders back, upper-trap focus","Pause and squeeze at the top"]},
+{"n":"Trap Bar Shrug","id":"x123","eq":"trap bar","p":["traps"],"s":["shoulders"],"c":["Neutral handles, load heavy","Shrug straight up toward the ears","Full stretch at the bottom, no rolling"]},
+{"n":"Power Shrug","id":"x124","eq":"barbell","p":["traps"],"s":["shoulders"],"c":["Slight hip drive to move heavy loads","Explode the shoulders up to the ears","Control back down, big traps overload"]},
+{"n":"Incline Dumbbell Shrug","id":"x125","eq":"dumbbell","p":["traps"],"s":["shoulders","back"],"c":["Chest on an incline bench","Shrug up and slightly back","Hits the mid and lower traps"]},
+{"n":"Cable Upright Shrug","id":"x126","eq":"cable","p":["traps"],"s":["shoulders"],"c":["Low cable, shrug straight up","Constant tension at the bottom","Pause and squeeze the traps on top"]},
+{"n":"Kelso Shrug","id":"x127","eq":"dumbbell","p":["traps"],"s":["back"],"c":["Chest supported, row-like shrug","Retract the shoulder blades together","Mid-trap and rhomboid focus"]},
+{"n":"Cable Rope Upface Pull","id":"x128","eq":"cable","p":["traps"],"s":["shoulders","back"],"c":["Pull the rope up toward the eyes","Elbows high, squeeze the upper back","Great for posture and rear delts"]},
+{"n":"Pec Deck (Machine)","id":"x129","eq":"machine","p":["chest"],"s":["shoulders"],"c":["Forearms on the pads, squeeze together","Constant inner-chest tension","Control the stretch, pause at the squeeze"]},
+{"n":"Cable Incline Press","id":"x130","eq":"cable","p":["chest"],"s":["shoulders","triceps"],"c":["Bench between the pulleys, press up and in","Constant tension on the upper chest","Slow controlled stretch back"]},
+{"n":"Machine Reverse Fly","id":"x131","eq":"machine","p":["shoulders"],"s":["back","traps"],"c":["Targets the rear delts, soft elbows","Open the arms back, squeeze","Don't shrug the traps into it"]},
+{"n":"Smith Calf Raise","id":"x132","eq":"smith","p":["calves"],"s":[],"c":["Bar on the back, balls of feet on a plate","Full stretch at the bottom, pause","Drive onto the toes, hard squeeze"],"bw":1},
+{"n":"Dumbbell Pullover (Chest)","id":"x133","eq":"dumbbell","p":["chest"],"s":["back","triceps"],"c":["Slight elbow bend, big stretch overhead","Pull through the chest, ribs down","Don't arch the lower back"]},
+{"n":"Cable Lateral Raise (Single Arm)","id":"x134","eq":"cable","p":["shoulders"],"s":["traps"],"c":["One arm at a time, constant tension","Lead with the elbow to shoulder height","Slight forward lean, zero swing"],"bw":1},
+{"n":"Hammer Strength Row","id":"x135","eq":"machine","p":["back"],"s":["biceps","forearms"],"c":["Plate-loaded, chest on the pad","Pull each handle to the hip","Squeeze the mid-back, control the stretch"]},
+{"n":"Incline Hammer Curl","id":"x136","eq":"dumbbell","p":["biceps"],"s":["forearms"],"c":["Seated on an incline, arms hanging back","Neutral grip, big stretch on the long head","No swing, squeeze and slow lower"]}];
 
 /* ========================= CONSTANTS ========================= */
 const M12=["chest","back","shoulders","biceps","triceps","forearms","quads","hamstrings","glutes","calves","abs","traps"];
@@ -673,7 +810,7 @@ u:{name:"",bodyweight:75,goal:"build",natty:"maybe",xp:0,totalWorkouts:0,totalVo
  measurements:{chest:null,waist:null,leftArm:null,rightArm:null,leftThigh:null,rightThigh:null,history:[]},
  aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null,gym:null},
 muscleVol:{},muscleLastTrained:{},muscleLastVol:{},muscleLastFails:{},
-prs:{},bossWins:[],bossReturns:[],workouts:[],splits:[],activeSplitId:null,customEx:{},
+prs:{},bossWins:[],bossReturns:[],workouts:[],splits:[],activeSplitId:null,customEx:[],
 rival:null,experienceLevel:null,onboardingDone:false,plates:DEF_PLATES.slice(),
 dismissed:{},nemesis:null,aiKeySet:false,
 // ---- extended (Batch 3+) persistent state; back-filled by Object.assign on load ----
@@ -1044,6 +1181,9 @@ function askAlfredAbout(topic){
 
 /* ========================= EXERCISE DB LOADING ========================= */
 function indexEx(){EXBYNAME={};EXDB.forEach(e=>{if(!EXBYNAME[e.n.toLowerCase()])EXBYNAME[e.n.toLowerCase()]=e;});}
+// User-created exercises live in state.data.customEx (array). Merge them into the active EXDB.
+function customExList(){const ce=state&&state.data&&state.data.customEx;if(Array.isArray(ce))return ce;if(ce&&typeof ce==="object")return Object.values(ce);return [];}
+function mergeCustomEx(){const have=new Set(EXDB.map(e=>e.id));customExList().forEach(e=>{if(e&&e.id&&!have.has(e.id)){EXDB.push(e);have.add(e.id);}});indexEx();}
 /* free-exercise-db (public-domain, The Unlicense) supplies real exercise photos.
    We use ONLY the curated CORE_EX list as the library — no more 1,400-exercise dump
    (that was the source of kettlebell spam, 20 duplicate variants, lever/machine dupes,
@@ -1085,7 +1225,7 @@ function exImg(ex){
 }
 function buildPairs(arr){FBPAIRS=arr.map(p=>({i:p[1],t:exToks(p[0])}));FB_DF={};FBPAIRS.forEach(p=>{new Set(p.t).forEach(t=>FB_DF[t]=(FB_DF[t]||0)+1);});}
 function loadExDB(){
-  EXDB=CORE_EX.slice(); indexEx();
+  EXDB=CORE_EX.slice(); mergeCustomEx();
   try{const c=localStorage.getItem("gt_fbpairs");if(c){buildPairs(JSON.parse(c)||[]);resolveImages();}}catch(e){}
   fetch("https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json")
    .then(r=>r.ok?r.json():null).then(raw=>{
@@ -2292,9 +2432,66 @@ function openPicker(multi){
       <div class="scroll-x" id="ex-musc" style="flex:1">${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')">${m==='all'?'All':MNAME[m]}</button>`).join("")}</div>
       ${hasGym?`<button id="gymfilter-chip" class="chip g ${state.gymFilter?'on':''}" style="flex:none;margin-left:6px" onclick="toggleGymFilter()" title="Only show my gym's equipment">🏠 My gym</button>`:`<button class="chip g" style="flex:none;margin-left:6px" onclick="openGym()">＋ Set gym</button>`}
     </div>
-    <div id="ex-list" style="max-height:54vh;overflow:auto;margin-top:6px"></div>`;
+    <button class="btn" style="margin:6px 0 2px;border-style:dashed;width:100%" onclick="openCustomCreator()">🛠️ Create custom exercise</button>
+    <div id="ex-list" style="max-height:48vh;overflow:auto;margin-top:6px"></div>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
   updateExList();setTimeout(()=>{const s=$("ex-search");},50);
+}
+
+/* ===== CUSTOM EXERCISE CREATOR ===== */
+function openCustomCreator(){
+  state.cxReturnMulti=state.pickerMulti||null;   // remember multi-add context to restore after saving
+  state.cxDraft={n:"",eq:"dumbbell",p:[],s:[],bw:0,c:[]};
+  state.pickerOpen=false;
+  renderCustomCreator();
+}
+function cxSyncInputs(){
+  const n=$("cx-name");if(n)state.cxDraft.n=n.value;
+  const c=$("cx-cues");if(c)state.cxDraft.c=c.value.split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,4);
+}
+function cxToggleMuscle(which,m){
+  cxSyncInputs();const d=state.cxDraft;const other=which==="p"?"s":"p";
+  const arr=d[which],oa=d[other];const i=arr.indexOf(m);
+  if(i>=0)arr.splice(i,1); else {arr.push(m);const j=oa.indexOf(m);if(j>=0)oa.splice(j,1);}
+  renderCustomCreator();
+}
+function cxSetEq(eq){cxSyncInputs();state.cxDraft.eq=eq;renderCustomCreator();}
+function cxToggleBw(){cxSyncInputs();state.cxDraft.bw=state.cxDraft.bw?0:1;renderCustomCreator();}
+function renderCustomCreator(){
+  const d=state.cxDraft;
+  const chip=(m,on,which)=>`<button class="chip ${on?'on':''}" onclick="cxToggleMuscle('${which}','${m}')">${MNAME[m]}</button>`;
+  $("sheet").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🛠️ Custom exercise</div>
+      <button class="btn sm" style="width:auto" onclick="closeCustomCreator()">← Back</button></div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 8px">Build a movement that isn't in the library. It saves to your collection and shows up in the picker.</div>
+    <label class="lbl">Name</label>
+    <input id="cx-name" placeholder="e.g. Cable Y-Raise" autocomplete="off" value="${esc(d.n||"")}"/>
+    <label class="lbl" style="margin-top:10px">Equipment</label>
+    <div class="scroll-x" style="margin:4px 0">${GYM_EQUIP.map(g=>`<button class="chip ${d.eq===g[0]?'on':''}" onclick="cxSetEq('${g[0]}')">${g[1]}</button>`).join("")}</div>
+    <label class="lbl" style="margin-top:10px">Primary muscle(s) <span class="muted">— what it mainly hits</span></label>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin:4px 0">${M12.map(m=>chip(m,d.p.includes(m),"p")).join("")}</div>
+    <label class="lbl" style="margin-top:8px">Secondary muscle(s) <span class="muted">— optional assist</span></label>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin:4px 0">${M12.map(m=>chip(m,d.s.includes(m),"s")).join("")}</div>
+    <button class="chip ${d.bw?'on':''}" style="margin:8px 0" onclick="cxToggleBw()">${d.bw?'✓ ':''}Bodyweight movement</button>
+    <label class="lbl" style="margin-top:6px">Form cues <span class="muted">— optional, one per line</span></label>
+    <textarea id="cx-cues" rows="3" placeholder="Squeeze at the top\nControl the negative" style="width:100%">${esc((d.c||[]).join("\n"))}</textarea>
+    <button class="btn gold" style="width:100%;margin-top:12px" onclick="saveCustomEx()">Save exercise</button>`;
+  $("sheet").classList.add("on");$("sheetbg").classList.add("on");
+}
+function closeCustomCreator(){const m=state.cxReturnMulti;state.cxReturnMulti=null;openPicker(m);}
+function saveCustomEx(){
+  cxSyncInputs();const d=state.cxDraft;
+  const name=(d.n||"").trim();
+  if(!name){toast&&toast("Give it a name first");return;}
+  if(!d.p.length){toast&&toast("Pick at least one primary muscle");return;}
+  if(EXBYNAME[name.toLowerCase()]){toast&&toast("That name already exists");return;}
+  const ex={n:name,id:"cx"+Date.now().toString(36),eq:d.eq||"other",p:d.p.slice(),s:d.s.slice(),c:(d.c||[]).slice(),custom:1};
+  if(d.bw)ex.bw=1;
+  if(!Array.isArray(state.data.customEx))state.data.customEx=[];
+  state.data.customEx.push(ex);
+  mergeCustomEx();save();
+  toast&&toast("“"+name+"” added to your library");
+  const m=state.cxReturnMulti;state.cxReturnMulti=null;state.cxDraft=null;
+  openPicker(m);
 }
 // exercises already in the split-day being edited (multi-add highlight)
 function pickerAddedList(){if(!state.pickerMulti)return null;const s=state.data.splits.find(x=>x.id===state.pickerMulti.id);return (s&&s.days[state.pickerMulti.i])?s.days[state.pickerMulti.i].exercises:[];}
