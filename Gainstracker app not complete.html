@@ -91,7 +91,12 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .tbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:38px;height:34px;padding:0 11px;border:1px solid var(--border);border-radius:11px;background:linear-gradient(160deg,#15151a,#0e0e12);color:var(--text2);font-size:15px;transition:.15s}
 .tbtn:active{transform:scale(.95)}
 .tbtn.wide{color:var(--gold2);border-color:var(--gold-dim);background:var(--gold-bg)}
+.tbtn.on{color:var(--gold2);border-color:var(--gold-dim);background:var(--gold-bg);box-shadow:0 0 0 1px rgba(232,197,106,.18)}
 .tbtn .tbl{font-family:var(--disp);font-size:11px;letter-spacing:.06em}
+.subtabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:5px}
+.subtab{flex:1;padding:10px 6px;border:none;border-radius:9px;background:none;color:var(--text2);font-family:var(--disp);font-size:12.5px;letter-spacing:.04em;transition:.15s;cursor:pointer}
+.subtab.on{color:var(--gold2);background:var(--gold-bg);box-shadow:inset 0 0 0 1px var(--gold-dim)}
+.subtab:active{transform:scale(.97)}
 /* Accordion sections — expand/collapse for dense areas */
 .accsec{border:1px solid var(--border);border-radius:15px;margin-bottom:12px;overflow:hidden;background:linear-gradient(160deg,#121217,#0d0d11)}
 .acc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 15px;cursor:pointer;user-select:none}
@@ -338,6 +343,12 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 ::-webkit-scrollbar{width:0;height:0}
 .toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%) translateY(20px);z-index:80;background:#181818;border:1px solid var(--gold-dim);color:var(--gold2);padding:11px 16px;border-radius:30px;font-weight:600;font-size:13.5px;opacity:0;transition:.3s;pointer-events:none;max-width:90%;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.unlock-pop{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translate(-50%,-170%);z-index:9999;display:flex;align-items:center;gap:12px;width:calc(100% - 26px);max-width:360px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#1b1408,#251a09);border:1px solid var(--gold-dim);box-shadow:0 16px 44px rgba(0,0,0,.55),0 0 22px rgba(232,197,106,.14);opacity:0;cursor:pointer;transition:transform .42s cubic-bezier(.18,.9,.24,1),opacity .42s}
+.unlock-pop.on{transform:translate(-50%,0);opacity:1}
+.unlock-pop .up-emoji{font-size:30px;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.unlock-pop .up-ttl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);font-weight:700}
+.unlock-pop .up-name{font-family:var(--disp);font-size:15px;color:var(--text);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unlock-pop .up-x{color:var(--gold2);font-size:20px;flex:none}
 
 /* in-app modal (replaces native confirm/alert/prompt; works on all mobile browsers) */
 #modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
@@ -1293,7 +1304,30 @@ function achStats(){
 function checkAchievements(){
   const w=achStats(),got=[];
   ACHIEVEMENTS.forEach(a=>{if(!state.data.u.earnedBadges.includes(a.id)&&a.d(w)){state.data.u.earnedBadges.push(a.id);got.push(a);}});
-  if(got.length){save();setTimeout(()=>toast(got[0].e+" Unlocked: "+got[0].n),800);}
+  if(got.length){save();got.forEach((a,i)=>setTimeout(()=>unlockToast({e:a.e,title:"Achievement unlocked",name:a.n,kind:"badge"}),700+i*1700));}
+}
+/* ===== UNLOCK NOTIFICATIONS — fires for ANY newly-unlocked feature, not just PRs:
+   story chapters, garage vehicles & achievement badges all surface a slide-in banner. ===== */
+function unlockToast(x){
+  try{haptic("done");beep(880);}catch(e){}
+  const el=document.createElement("div");el.className="unlock-pop";
+  el.innerHTML=`<div class="up-emoji">${x.e||"✨"}</div><div style="flex:1;min-width:0"><div class="up-ttl">${esc(x.title||"Unlocked")}</div><div class="up-name">${esc(x.name||"")}</div></div><div class="up-x">›</div>`;
+  el.onclick=()=>{el.classList.remove("on");setTimeout(()=>el.remove(),300);
+    if(x.kind==="chapter"&&x.id){go("alfred");setTimeout(()=>openStoryChapter(x.id),80);}
+    else if(x.kind==="vehicle"){openGarage();}};
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add("on"));
+  setTimeout(()=>{el.classList.remove("on");setTimeout(()=>el.remove(),420);},4200);
+}
+function checkUnlocks(){
+  const u=state.data.u;
+  const firstRun=!u.seenUnlocks;
+  u.seenUnlocks=u.seenUnlocks||{};u.seenUnlocks.story=u.seenUnlocks.story||[];u.seenUnlocks.garage=u.seenUnlocks.garage||[];
+  const newly=[];
+  try{const ss=storyStats();STORY.forEach((c,i)=>{if(c.req(ss)&&u.seenUnlocks.story.indexOf(c.id)<0){u.seenUnlocks.story.push(c.id);newly.push({e:c.e,title:"New chapter unlocked",name:"Ch "+(i+1)+" — "+c.t,kind:"chapter",id:c.id});}});}catch(e){}
+  try{const gs=gothamStats();GARAGE.forEach(v=>{if(v.req(gs)&&u.seenUnlocks.garage.indexOf(v.n)<0){u.seenUnlocks.garage.push(v.n);newly.push({e:v.e,title:"New vehicle in the Garage",name:v.n,kind:"vehicle"});}});}catch(e){}
+  if(newly.length){save();if(!firstRun)newly.forEach((x,i)=>setTimeout(()=>unlockToast(x),900+i*1900));}
+  return newly;
 }
 
 /* ========================= TIMERS (Rule 2: no render() in setInterval) ========================= */
@@ -1532,6 +1566,7 @@ function finishWorkout(){
   // boss returns check (defeat comeback if PR beats target)
   checkComebackDefeat(prsThis);
   checkAchievements();
+  checkUnlocks();
   // advance the case-file rotation when the session came from a planned split (not a free session)
   if(ses.split&&ses.split!=="Free Session")advanceDay();
   save();
@@ -1637,7 +1672,7 @@ function bossVictory(boss,ko){
   ko=ko||KO_FINISH[0];
   confettiBurst();
   state.data.bossWins.push({villain:boss.v,ex:boss.pr.name,w:boss.pr.w,r:boss.pr.r,orm:Math.round(boss.pr.orm),prevOrm:Math.round(boss.pr.prevOrm),date:new Date().toISOString()});
-  checkAchievements();save();
+  checkAchievements();checkUnlocks();save();
   if(navigator.vibrate)navigator.vibrate([60,40,120,40,200]);beep(990);
   $("ovcard").innerHTML=`<div class="center fade">
     <div class="roundbadge" style="color:var(--green);border-color:var(--green)">● ${esc(ko.t)}</div>
@@ -1690,8 +1725,8 @@ function discardSession(){appConfirm({title:"Discard session",body:"End this ses
 
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
-const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","📈","CASE"],["fuel","🍽️","FUEL"],["alfred","🤖","ALFRED"]];
-const MORE_TABS=[["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
+const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","📈","CASE"]];
+const MORE_TABS=[["fuel","🍽️","FUEL","Calories, macros, water, meal templates & weigh-ins"],["alfred","🤖","ALFRED","Your evidence-based AI coach, chat & physique scans"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.showOnboarding){$("nav").classList.add("hide");return;}
   $("nav").classList.remove("hide");
@@ -1700,9 +1735,15 @@ function renderNav(){
 }
 /* Slim utility bar injected at the top of every tab — quick reach to the moved sections + menu. */
 function topBar(){
+  const a=t=>state.tab===t?" on":"";
   return `<div class="topbar">
     <button class="tbtn wide" onclick="openMenu()"><span style="font-size:16px;line-height:1">☰</span><span class="tbl">COMMAND CENTER</span></button>
-    <div style="display:flex;gap:6px"><button class="tbtn" title="Search everything" onclick="openIndex()">🧭</button><button class="tbtn" title="Wayne Tech" onclick="go('tech')">🦾</button></div>
+    <div style="display:flex;gap:6px">
+      <button class="tbtn${a('fuel')}" title="Fuel" onclick="go('fuel')">🍽️</button>
+      <button class="tbtn${a('alfred')}" title="Alfred" onclick="go('alfred')">🤖</button>
+      <button class="tbtn${a('tech')}" title="Wayne Tech" onclick="go('tech')">🦾</button>
+      <button class="tbtn" title="Search everything" onclick="openIndex()">🧭</button>
+    </div>
   </div>`;
 }
 /* ===================== ACCORDION (expand/collapse for dense sections) ===================== */
@@ -1722,7 +1763,7 @@ function toggleAcc(id){
   state.accOpen=state.accOpen||{};state.accOpen[id]=willOpen;
   if(willOpen)haptic();
 }
-function goPlan(){state.accOpen=state.accOpen||{};state.accOpen["m-plan"]=true;go("mission");}
+function goPlan(){state.mSub="plan";go("mission");}
 /* ===================== COMMAND CENTER (the ☰ MORE menu) ===================== */
 function openMenu(){
   const big=MORE_TABS.map(t=>`<button class="card" style="text-align:left;padding:15px;display:flex;gap:13px;align-items:center;cursor:pointer" onclick="closeSheet();go('${t[0]}')">
@@ -3790,10 +3831,13 @@ function overloadIntel(){  const out=[];const seen=new Set();
 function renderMission(){
   const d=state.data;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">MISSION</h1><div class="tag" style="margin-bottom:12px">Patrol · body · plan · schedule · science</div>`;
-  // ---------- PRIMARY: tonight's patrol (always visible, no hunting) ----------
+  // ===== 1) MUSCLE MAP on top — the body figure + what-to-train-next coach =====
+  html+=acc("m-body","🩻","Body & frequency",
+    missionBodyHtml(), true, "what to train next · suit status");
+  // ===== 2) SPLITS directly under the map — tonight's patrol =====
   if(!d.splits.length){
     html+=`<div class="card"><p class="muted" style="margin:0 0 10px">No splits yet. Build your first one below, or jump straight into a free session.</p>
-      <button class="btn gold" onclick="newSplit();toggleAcc('m-plan')">＋ Build a split</button></div>`;
+      <button class="btn gold" onclick="newSplit();setMSub('plan')">＋ Build a split</button></div>`;
   }
   d.splits.forEach(sp=>{
     html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${d.activeSplitId===sp.id?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
@@ -3802,28 +3846,38 @@ function renderMission(){
         : `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px">${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span></b><div class="mini">${day.exercises.length} exercises · tap to preview</div></div></div><button class="btn gold sm" style="width:auto" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`
       ).join("")}</div></div>`;
   });
-  html+=`<button class="btn" style="margin-bottom:14px" onclick="freeWorkout()">⚡ Free session</button>`;
-  // ---------- COLLAPSIBLE: body & frequency (suit + what-to-train coach) ----------
-  html+=acc("m-body","🩻","Body & frequency",
-    missionBodyHtml(), true, "what to train next · suit status");
-  // ---------- COLLAPSIBLE: plan & schedule (the old STRATEGY editor) ----------
-  html+=acc("m-plan","📋","Plan & schedule",
-    scheduleEditorHtml()+splitsEditorHtml(), false, "build splits, set training days");
-  // ---------- COLLAPSIBLE: volume & science ----------
-  html+=acc("m-sci","🧪","Volume & science",
-    scienceCardsHtml(), false, "volume map, balance, deload, plateau");
-  // ---------- COLLAPSIBLE: utility belt (quick tools) ----------
-  html+=acc("m-belt","🔧","Utility belt",
-    `<div class="grid2">
-      <button class="btn ghost sm" onclick="openPlateSheet(-1)">⚖️ Plate calc</button>
-      <button class="btn ghost sm" onclick="open1RM()">🏋️ 1RM calc</button>
-      <button class="btn ghost sm" onclick="openTestDay()">🎯 1RM test day</button>
-      <button class="btn ghost sm" onclick="openRoundTimer()">🥊 Round timer</button>
-      <button class="btn ghost sm" onclick="openGym()">🏠 My gym</button>
-      <button class="btn ghost sm" onclick="openForge()">⚒️ Forge</button>
-      <button class="btn ghost sm" onclick="openJusticeLeague()">🦸 League</button>
-    </div>`, false, "plate calc, 1RM, timer & more");
+  html+=`<button class="btn" onclick="freeWorkout()">⚡ Free session</button>`;
+  // ===== 3) FEATURE SUB-TABS — two clean homes for everything else =====
+  html+=missionSubTabs();
   $("app").innerHTML=html;
+}
+/* Mission sub-tabs: keep the dense planning + science tools out of the way but one tap deep. */
+function setMSub(s){state.mSub=(s==="lab"?"lab":"plan");haptic("tap");render();}
+function missionSubTabs(){
+  const sub=state.mSub==="lab"?"lab":"plan";
+  const bar=`<div class="subtabs" style="margin:18px 0 12px">
+    <button class="subtab ${sub==='plan'?'on':''}" onclick="setMSub('plan')">📋 PLAN</button>
+    <button class="subtab ${sub==='lab'?'on':''}" onclick="setMSub('lab')">🧪 LAB &amp; TOOLS</button></div>`;
+  let body="";
+  if(sub==="plan"){
+    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Build your splits and set which nights you patrol.</div>`
+      +scheduleEditorHtml()+splitsEditorHtml();
+  }else{
+    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, deload & every quick tool — all in one place.</div>`
+      +scienceCardsHtml()
+      +`<div class="ttl" style="font-size:14px;margin:18px 0 9px;display:flex;align-items:center;gap:7px">🔧 Utility belt</div>
+        <div class="grid2">
+          <button class="btn ghost sm" onclick="openPlateSheet(-1)">⚖️ Plate calc</button>
+          <button class="btn ghost sm" onclick="open1RM()">🏋️ 1RM calc</button>
+          <button class="btn ghost sm" onclick="openTestDay()">🎯 1RM test day</button>
+          <button class="btn ghost sm" onclick="openRoundTimer()">🥊 Round timer</button>
+          <button class="btn ghost sm" onclick="openGym()">🏠 My gym</button>
+          <button class="btn ghost sm" onclick="openForge()">⚒️ Forge</button>
+          <button class="btn ghost sm" onclick="openJusticeLeague()">🦸 League</button>
+          <button class="btn ghost sm" onclick="openMeasure()">📐 Measure</button>
+        </div>`;
+  }
+  return bar+`<div class="fade">${body}</div>`;
 }
 function toggleBelt(){$("belt").classList.toggle("hide");}
 /* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
@@ -5692,21 +5746,24 @@ function openStoryChapter(id){
 function renderAlfred(){
   const has=!!geminiKey();state.data.u.aiKeySet=has;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach</div>`;
-  // local coaching — always available, no API key needed
+  // ===== CHAT FIRST — sits at the very top of the tab =====
+  if(has){
+    html+=`<div class="row" style="gap:8px;margin-bottom:10px"><button class="btn gold sm g" onclick="scanPhysique()">🔍 Scan physique</button><button class="btn ghost sm g" onclick="alfredQuick()">💬 Ask Alfred</button></div>
+      <div class="card" id="alfred-chat" style="min-height:120px">${ALFRED_MSGS.length?ALFRED_MSGS.map(m=>`<div style="margin-bottom:10px"><b class="${m.role==='user'?'muted':'gold'}">${m.role==='user'?'You':'Alfred'}:</b> <span style="font-size:14px">${esc(m.text)}</span></div>`).join(""):'<p class="muted">Alfred is online. Ask anything — programming, recovery, weak points.</p>'}</div>
+      <div class="row" style="gap:8px;margin-bottom:16px"><input id="alfred-in" placeholder="Message Alfred…" onkeydown="if(event.key==='Enter')sendAlfred()"/><button class="btn gold sm" style="width:auto" onclick="sendAlfred()">Send</button></div>`;
+  }else{
+    html+=`<div class="card" style="margin-bottom:16px"><div class="row" style="gap:10px;align-items:center"><div style="font-size:32px">🤖</div><div><h3 style="font-size:17px;color:var(--gold2);margin:0 0 2px">Want Alfred to talk back?</h3>
+      <p class="muted" style="font-size:12.5px;margin:0">Add a free Google Gemini key in Settings for live chat &amp; physique scans. The briefing below always works without it.</p></div></div>
+      <button class="btn gold sm" style="margin-top:11px" onclick="openSettings()">Activate live chat</button></div>`;
+  }
+  // ===== then the always-on local coaching =====
   html+=alfredBriefing();
   html+=storyCampaignCard();
   html+=alfredCaveReview();
   html+=alfredDebrief();
-  html+=`<div class="card" style="cursor:pointer;display:flex;align-items:center;gap:12px;border-color:var(--gold-dim)" onclick="go('fuel')"><div style="font-size:30px">🍽️</div><div style="flex:1"><div class="ttl" style="margin:0">Fuel &amp; nutrition moved</div><div class="mini" style="color:var(--text2)">Calories, macros, water, supplements &amp; weigh-ins now live in their own <b style="color:var(--gold2)">FUEL</b> tab — bottom bar.</div></div><span style="color:var(--gold2);font-size:20px">›</span></div>`;
+  html+=`<div class="card" style="cursor:pointer;display:flex;align-items:center;gap:12px;border-color:var(--gold-dim)" onclick="go('fuel')"><div style="font-size:30px">🍽️</div><div style="flex:1"><div class="ttl" style="margin:0">Fuel &amp; nutrition</div><div class="mini" style="color:var(--text2)">Calories, macros, water, supplements &amp; weigh-ins live in the <b style="color:var(--gold2)">FUEL</b> tab — top bar 🍽️.</div></div><span style="color:var(--gold2);font-size:20px">›</span></div>`;
   html+=fightRecordCard();
   html+=alfredMusclePicker();
-  if(!has){html+=`<div class="card"><div class="row" style="gap:10px;align-items:center"><div style="font-size:32px">🤖</div><div><h3 style="font-size:17px;color:var(--gold2);margin:0 0 2px">Want Alfred to talk back?</h3>
-    <p class="muted" style="font-size:12.5px;margin:0">Add a free Google Gemini key in Settings for live chat &amp; physique scans. The briefing above always works without it.</p></div></div>
-    <button class="btn gold sm" style="margin-top:11px" onclick="openSettings()">Activate live chat</button></div>`;
-    $("app").innerHTML=html;return;}
-  html+=`<div class="row" style="gap:8px;margin-bottom:12px"><button class="btn gold sm g" onclick="scanPhysique()">🔍 Scan physique</button><button class="btn ghost sm g" onclick="alfredQuick()">💬 Ask Alfred</button></div>
-    <div class="card" id="alfred-chat" style="min-height:120px">${ALFRED_MSGS.length?ALFRED_MSGS.map(m=>`<div style="margin-bottom:10px"><b class="${m.role==='user'?'muted':'gold'}">${m.role==='user'?'You':'Alfred'}:</b> <span style="font-size:14px">${esc(m.text)}</span></div>`).join(""):'<p class="muted">Alfred is online. Ask anything — programming, recovery, weak points.</p>'}</div>
-    <div class="row" style="gap:8px"><input id="alfred-in" placeholder="Message Alfred…" onkeydown="if(event.key==='Enter')sendAlfred()"/><button class="btn gold sm" style="width:auto" onclick="sendAlfred()">Send</button></div>`;
   $("app").innerHTML=html;
 }
 function alfredQuick(){const i=$("alfred-in");if(i)i.focus();}
@@ -5876,7 +5933,7 @@ function boot(){
   if(!state.data.onboardingDone){state.showOnboarding=true;state.obStep=0;state.obTmp={};}
   else{state.tab="gotham";}  // The Cave auto-home: always land on the glanceable Cowl dashboard, never the last-used tab
   render();
-  if(state.data.onboardingDone)checkVillainTaunt();
+  if(state.data.onboardingDone){checkVillainTaunt();checkUnlocks();/* silent baseline on first run so only NEW unlocks notify later */}
   // service worker
   if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
   // offline indicator: reflects real connectivity, reassures data is local
