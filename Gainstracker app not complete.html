@@ -927,7 +927,7 @@ u:{name:"",bodyweight:75,goal:"build",natty:"maybe",xp:0,totalWorkouts:0,totalVo
  weekSchedule:{0:true,1:false,2:true,3:false,4:true,5:false,6:false},
  physiqueAnalysis:{weakPoints:[],strongPoints:[],mainImbalance:"",overallRating:null,date:null},
  measurements:{chest:null,waist:null,leftArm:null,rightArm:null,leftThigh:null,rightThigh:null,history:[]},
- aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null,gym:null,coachVoice:true},
+ aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null,gym:null,coachVoice:true,coachVoiceName:""},
 muscleVol:{},muscleLastTrained:{},muscleLastVol:{},muscleLastFails:{},
 prs:{},bossWins:[],bossReturns:[],workouts:[],splits:[],activeSplitId:null,customEx:[],
 rival:null,experienceLevel:null,onboardingDone:false,plates:DEF_PLATES.slice(),
@@ -1846,6 +1846,46 @@ function activeExIdx(){const o=findOpenSet();return o?o.ei:-1;}
 function isExOpen(ei){const e=state.session.exercises[ei];if(!e)return false;const active=activeExIdx();if(ei===active)return e._open!==false;return e._open===true;}
 function toggleExCollapse(ei){const e=state.session.exercises[ei];if(!e)return;e._open=!isExOpen(ei);haptic("tap");render();}
 function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>s.done||parseFloat(s.r)>0).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
+// ---- Hold-to-drag exercise reordering (touch + mouse). Reorders DOM live, commits to the array once on drop — no re-render mid-drag, so it stays smooth. ----
+function initDragReorder(){
+  if(window._dragInit)return;window._dragInit=true;
+  const lp={timer:null,active:false,node:null,startY:0,startX:0,suppress:false,pid:null};
+  window._lpDrag=lp;
+  const getRow=(t)=>{while(t&&t!==document.body){if(t.classList&&t.classList.contains("exrow"))return t;t=t.parentElement;}return null;};
+  const clearTimer=()=>{if(lp.timer){clearTimeout(lp.timer);lp.timer=null;}};
+  const lift=(row)=>{row.style.transition="transform .12s ease,box-shadow .12s ease,opacity .12s ease";row.style.transform="scale(1.025)";row.style.boxShadow="0 14px 34px rgba(0,0,0,.6)";row.style.opacity="0.97";row.style.position="relative";row.style.zIndex="30";};
+  document.addEventListener("pointerdown",(e)=>{
+    if(state.step!=="logging"||lp.active)return;
+    if(e.target.closest&&e.target.closest("button,input,select,textarea,a,.stype,.sdone"))return;
+    const row=getRow(e.target);if(!row)return;
+    lp.startX=e.clientX;lp.startY=e.clientY;lp.pid=e.pointerId;clearTimer();
+    lp.timer=setTimeout(()=>{lp.timer=null;lp.active=true;lp.node=row;lift(row);document.body.style.userSelect="none";haptic("done");},340);
+  },{passive:true});
+  document.addEventListener("pointermove",(e)=>{
+    if(lp.timer&&(Math.abs(e.clientX-lp.startX)>10||Math.abs(e.clientY-lp.startY)>10))clearTimer(); // moved early = it's a scroll, not a hold
+    if(!lp.active||!lp.node)return;
+    e.preventDefault();
+    const row=getRow(document.elementFromPoint(e.clientX,e.clientY));
+    if(!row||row===lp.node||!row.classList.contains("exrow"))return;
+    const rect=row.getBoundingClientRect();const before=e.clientY<rect.top+rect.height/2;const parent=row.parentElement;
+    if(before){if(row.previousElementSibling!==lp.node)parent.insertBefore(lp.node,row);}
+    else{if(row.nextElementSibling!==lp.node)parent.insertBefore(lp.node,row.nextElementSibling);}
+  },{passive:false});
+  const end=()=>{
+    clearTimer();
+    if(lp.active&&lp.node){
+      const order=[...document.querySelectorAll("#app .exrow")].map(n=>parseInt(n.getAttribute("data-ei"))).filter(i=>!isNaN(i));
+      const arr=state.session&&state.session.exercises;
+      if(arr&&order.length===arr.length){const na=order.map(i=>arr[i]);if(na.every(Boolean))state.session.exercises=na;}
+      lp.suppress=true;setTimeout(()=>{lp.suppress=false;},700); // swallow the click that follows a drag; auto-clear if none comes
+      document.body.style.userSelect="";haptic("tap");
+      lp.active=false;lp.node=null;render();
+    }
+  };
+  document.addEventListener("pointerup",end);
+  document.addEventListener("pointercancel",end);
+  document.addEventListener("click",(e)=>{if(lp.suppress){lp.suppress=false;e.stopPropagation();e.preventDefault();}},true);
+}
 // Bottom-sheet menu for a single set: change type, reorder, duplicate, delete.
 const STYPE_LABEL={NRM:"Normal",W:"Warm-up",F:"Failure",D:"Drop set",L:"Left",R:"Right"};
 function openSetSheet(ei,si){
@@ -2415,7 +2455,7 @@ function renderLogging(){
   </div>
   <div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
-    <div class="row" style="gap:8px">${voiceSupported()?`<button class="btn ghost sm ${state._rec?'listening':''}" id="voicebtn" style="width:auto" onclick="voiceLog()">${state._rec?'● Tap to stop':'🎤 Voice log'}</button>`:''}<button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
+    <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button>${voiceSupported()?`<button class="btn ghost sm ${state._rec?'listening':''}" id="voicebtn" style="width:auto" onclick="voiceLog()">${state._rec?'● Tap to stop':'🎤 Voice log'}</button>`:''}<button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
   </div>`;
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
   html+=`<div class="card glow" style="padding:13px"><div class="ttl">⚡ Tonight's damage report</div>${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div></div>`;
@@ -2437,19 +2477,19 @@ function renderLogging(){
     }
     if(!isExOpen(ei)){
       const pr=exProgress(e);
-      html+=`<div class="card exfold" onclick="toggleExCollapse(${ei})" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px;${pr.allDone?'opacity:.7':''}">
+      html+=`<div class="card exfold exrow" data-ei="${ei}" onclick="toggleExCollapse(${ei})" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px;${pr.allDone?'opacity:.7':''}">
         ${thumb(ex,true)}
         <div class="g" style="min-width:0"><div class="exname" style="font-size:16px">${esc(e.name)}</div>
           <div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")} · ${pr.allDone?`<span style="color:var(--green)">✓ ${pr.total} done</span>`:`${pr.doneN}/${pr.total} sets`}</div></div>
-        <div style="color:var(--text3);font-size:15px;font-weight:700">${pr.allDone?'✓':'▸'}</div>
+        <div style="color:var(--text3);font-size:15px;font-weight:700;letter-spacing:1px">⠿ ${pr.allDone?'✓':'▸'}</div>
       </div>`;
       return;
     }
-    html+=`<div class="card">
+    html+=`<div class="card exrow" data-ei="${ei}">
       <div class="row" style="margin-bottom:8px">
         ${thumb(ex,true)}
         <div class="g" onclick="toggleExCollapse(${ei})" style="cursor:pointer"><div class="exname">${esc(e.name)} <span style="color:var(--text3);font-size:13px;font-weight:700">▾</span></div>
-          <div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")}${ex.bw?" · bodyweight":""}</div></div>
+          <div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")}${ex.bw?" · bodyweight":""} <span style="color:var(--text3)">· ⠿ hold to reorder</span></div></div>
         ${ex.eq==="barbell"||ex.eq==="smith"||ex.eq==="ez bar"||ex.eq==="trap bar"?`<button class="btn ghost sm" style="width:auto;padding:8px 9px;display:flex;align-items:center" title="Plate calculator" onclick="openPlateSheet(${ei})">${secIcon('plate')}</button>`:""}
         <button class="btn ghost sm" style="width:auto;padding:8px 9px;color:var(--text3)" title="Move up" ${ei===0?'disabled style="opacity:.3;width:auto;padding:8px 9px"':''} onclick="moveExercise(${ei},-1)">↑</button>
         <button class="btn ghost sm" style="width:auto;padding:8px 9px;color:var(--text3)" title="Move down" ${ei===ses.exercises.length-1?'disabled style="opacity:.3;width:auto;padding:8px 9px"':''} onclick="moveExercise(${ei},1)">↓</button>
@@ -2496,6 +2536,7 @@ function renderLogging(){
   $("app").innerHTML=html;
   ensureTimers();
   if(!state.wtInt)startTimers();
+  initDragReorder();
 }
 function metricOpts(metric,val){
   const arr=metric==="rir"?["","0","1","2","3","4+"]:["","6","7","8","9","10"];
@@ -5411,20 +5452,31 @@ function mealTemplatesHtml(){
 let _alfredVoices=[];
 function loadAlfredVoices(){try{_alfredVoices=window.speechSynthesis.getVoices()||[];}catch(e){}}
 if(typeof window!=="undefined"&&"speechSynthesis" in window){loadAlfredVoices();try{window.speechSynthesis.onvoiceschanged=loadAlfredVoices;}catch(e){}}
+// Best available "Alfred" voice: a refined British butler. The OS supplies the voice;
+// we pick the closest one (Arthur/Daniel are iOS's British males) or honour the user's choice.
 function pickAlfredVoice(){
   const vs=(_alfredVoices&&_alfredVoices.length)?_alfredVoices:(function(){loadAlfredVoices();return _alfredVoices;})();
-  return vs.find(v=>/en-GB/i.test(v.lang)&&/male|daniel|arthur|oliver|george/i.test(v.name))||vs.find(v=>/en-GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;
+  if(!vs||!vs.length)return null;
+  const want=(state.data&&state.data.u&&state.data.u.coachVoiceName)||"";
+  if(want){const exact=vs.find(v=>v.name===want);if(exact)return exact;}
+  const by=(re)=>vs.find(v=>re.test(v.name));
+  return by(/arthur/i)||by(/daniel/i)||by(/oliver/i)||by(/george/i)||by(/jamie/i)
+    ||vs.find(v=>/en-GB/i.test(v.lang)&&/male/i.test(v.name))
+    ||vs.find(v=>/en-GB/i.test(v.lang))
+    ||vs.find(v=>/^en/i.test(v.lang))||null;
+}
+function _alfredUtter(text,rate,pitch){
+  const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
+  u.rate=rate;u.pitch=pitch;u.volume=1;
+  const pick=pickAlfredVoice();if(pick)u.voice=pick;
+  return u;
 }
 function alfredSpeak(text){
   try{
     if(!("speechSynthesis" in window)){toast("Voice isn't supported on this browser.");return;}
     const synth=window.speechSynthesis;
     if(synth.speaking){synth.cancel();return;} // tap again to stop
-    const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
-    u.rate=0.95;u.pitch=0.9;
-    const pick=pickAlfredVoice();
-    if(pick)u.voice=pick;
-    haptic("tap");synth.speak(u);
+    haptic("tap");synth.speak(_alfredUtter(text,0.9,0.82));
   }catch(e){toast("Couldn't start voice.");}
 }
 /* Auto-coaching voice — fires after a logged set. Cancels any in-flight line, never toggles. Silent if disabled/unsupported. */
@@ -5433,21 +5485,48 @@ function alfredVoiceLine(text){
     if(!state.data.u.coachVoice)return;
     if(!("speechSynthesis" in window))return;
     const synth=window.speechSynthesis;synth.cancel();
-    const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
-    u.rate=0.97;u.pitch=0.9;
-    const pick=pickAlfredVoice();if(pick)u.voice=pick;
-    synth.speak(u);
+    synth.speak(_alfredUtter(text,0.9,0.84)); // slower + deeper = measured, older butler
   }catch(e){}
 }
-const _ALFRED_SET=["Logged. Recover, sir.","Set down — breathe and reset.","Good work. Rest up.","Noted, sir. Catch your breath.","One more in the bank.","Clean rep, sir. Recover."];
-const _ALFRED_LAST=["Exercise complete, sir. On to the next.","That's the lot — move on when ready.","Done here. Next target, sir.","Finished. Well struck, sir."];
+function previewAlfredVoice(){
+  try{
+    if(!("speechSynthesis" in window)){toast("Voice not supported in this browser.");return;}
+    const synth=window.speechSynthesis;synth.cancel();
+    synth.speak(_alfredUtter("Good evening, sir. Shall we begin the session?",0.9,0.84));
+  }catch(e){}
+}
+function alfredVoiceOptions(){
+  const vs=(_alfredVoices&&_alfredVoices.length)?_alfredVoices:(loadAlfredVoices(),_alfredVoices);
+  const en=(vs||[]).filter(v=>/^en/i.test(v.lang));
+  const cur=(state.data.u.coachVoiceName)||"";
+  // British voices first — they sound the most like Alfred
+  en.sort((a,b)=>(/(en-GB)/i.test(b.lang)?1:0)-(/(en-GB)/i.test(a.lang)?1:0));
+  let html='<option value="">Auto — best British voice</option>';
+  en.forEach(v=>{html+=`<option value="${esc(v.name)}" ${v.name===cur?'selected':''}>${esc(v.name)} · ${esc(v.lang)}</option>`;});
+  return html;
+}
+function toggleCoachVoice(){
+  const u=state.data.u;u.coachVoice=!u.coachVoice;save();haptic("tap");
+  if(u.coachVoice){toast("🎩 Alfred's voice on");alfredVoiceLine("At your service, sir.");}
+  else{try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}toast("🔇 Alfred muted");}
+  render();
+}
+// Bigger line pool + no immediate repeats so Alfred never parrots himself.
+const _ALFRED_SET=["Logged. Recover, sir.","Set down — breathe and reset.","Good work. Rest now.","Noted, sir. Catch your breath.","One more in the bank.","Clean rep, sir.","Strong set. Recover well.","In the books. Steady now.","Well done, sir. Rest up.","That's the standard. Hold it.","Solid. Let the muscle settle.","Logged, sir. Keep the form sharp.","Good tempo. Recover.","Banked it. Breathe deep.","Precise work, sir.","Quality over ego — well played.","That'll do nicely, sir."];
+const _ALFRED_LAST=["Exercise complete, sir. On to the next.","That's the lot — move on when ready.","Done here. Next target, sir.","Finished — well struck, sir.","All sets in. Onward.","Complete, sir. The next awaits.","That's this one done. Press on."];
+const _ALFRED_PR=["A new record, sir. Outstanding.","A personal best — exemplary work.","Record broken. Master Bruce would approve.","New high, sir. Remarkable.","That's a record. Magnificent.","You've outdone yourself, sir."];
+let _lastLineIdx={};
+function _pickLine(arr,key){
+  if(arr.length<2)return arr[0];
+  let i,tries=0;do{i=Math.floor(Math.random()*arr.length);}while(i===_lastLineIdx[key]&&++tries<8);
+  _lastLineIdx[key]=i;return arr[i];
+}
 function alfredCoachLine(ei,si,ev){
   const e=state.session.exercises[ei];if(!e)return _ALFRED_SET[0];
   const working=(e.sets||[]).filter(s=>s.type!=="W");
   const doneN=working.filter(s=>s.done).length;const last=working.length>0&&doneN>=working.length;
-  if(ev==="pr"||ev==="boss")return "A new record, sir. Outstanding.";
-  const arr=last?_ALFRED_LAST:_ALFRED_SET;
-  return arr[Math.floor(Math.random()*arr.length)];
+  if(ev==="pr"||ev==="boss")return _pickLine(_ALFRED_PR,"pr");
+  return last?_pickLine(_ALFRED_LAST,"last"):_pickLine(_ALFRED_SET,"set");
 }
 function openMessHall(){
   const n=state.data.u.nutrition;
@@ -6343,7 +6422,10 @@ function openSettings(){
     <label class="mini">Autoregulation metric</label>
     <div class="row" style="gap:8px;margin-bottom:12px"><button class="chip ${u.metric==='rpe'?'on':''} g" onclick="u_set('metric','rpe');openSettings()">RPE</button><button class="chip ${u.metric==='rir'?'on':''} g" onclick="u_set('metric','rir');openSettings()">RIR</button></div>
     <label class="mini">Alfred's voice (speaks after each set)</label>
-    <div class="row" style="gap:8px;margin-bottom:12px"><button class="chip ${u.coachVoice?'on':''} g" onclick="u_set('coachVoice',true);openSettings()">On</button><button class="chip ${!u.coachVoice?'on':''} g" onclick="u_set('coachVoice',false);openSettings()">Off</button></div>
+    <div class="row" style="gap:8px;margin-bottom:6px"><button class="chip ${u.coachVoice?'on':''} g" onclick="u_set('coachVoice',true);openSettings()">On</button><button class="chip ${!u.coachVoice?'on':''} g" onclick="u_set('coachVoice',false);openSettings()">Off</button></div>
+    <select onchange="u_set('coachVoiceName',this.value);openSettings()" style="margin-bottom:6px">${alfredVoiceOptions()}</select>
+    <button class="btn ghost sm" style="margin-bottom:6px" onclick="previewAlfredVoice()">🔊 Preview Alfred's voice</button>
+    <div class="mini" style="color:var(--text3);margin-bottom:12px;line-height:1.45">For a richer butler voice on iPhone: Settings → Accessibility → Spoken Content → Voices → English → download <b>Arthur</b> or <b>Daniel (Enhanced)</b>, then pick it above.</div>
     <label class="mini">Gemini 1.5 Flash API key (stored on this device only)</label>
     <input value="${esc(geminiKey())}" placeholder="Paste key to activate Alfred" oninput="setGemKey(this.value)" style="margin-bottom:14px"/>
     <div class="hr"></div>
