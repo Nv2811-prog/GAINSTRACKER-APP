@@ -29,7 +29,7 @@ background-image:radial-gradient(circle at 50% -8%,rgba(235,199,107,.17),transpa
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 background-image:linear-gradient(rgba(91,124,166,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(91,124,166,.045) 1px,transparent 1px);background-size:36px 36px;
 -webkit-mask-image:radial-gradient(circle at 50% 24%,#000,transparent 76%);mask-image:radial-gradient(circle at 50% 24%,#000,transparent 76%);}
-#app{max-width:560px;margin:0 auto;padding:14px 14px 96px;min-height:100%}
+#app{max-width:560px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 14px 96px;min-height:100%}
 h1,h2,h3,.disp{font-family:var(--disp);font-weight:400;letter-spacing:.04em;line-height:.98}
 .num{font-family:var(--disp);letter-spacing:.02em}
 button{font-family:var(--body);cursor:pointer;border:none;background:none;color:inherit;font-size:15px}
@@ -83,9 +83,9 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 #nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(8,9,12,.9);backdrop-filter:blur(16px) saturate(1.25);
 border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;padding:6px 2px calc(6px + env(safe-area-inset-bottom))}
 #nav::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(235,199,107,.3),transparent)}
-#nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--text3);border-radius:10px;transition:.15s}
-#nav button .ic{font-size:19px;filter:grayscale(1) opacity(.5);transition:.15s}
-#nav button .lb{font-family:var(--disp);font-size:9.5px;letter-spacing:.03em}
+#nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 1px;color:var(--text3);border-radius:10px;transition:.15s}
+#nav button .ic{font-size:18px;filter:grayscale(1) opacity(.5);transition:.15s}
+#nav button .lb{font-family:var(--disp);font-size:8.5px;letter-spacing:.02em}
 /* Top utility bar (Command Center quick-reach) */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .tbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:38px;height:34px;padding:0 11px;border:1px solid var(--border);border-radius:11px;background:linear-gradient(160deg,#15151a,#0e0e12);color:var(--text2);font-size:15px;transition:.15s}
@@ -1148,6 +1148,76 @@ function weeklySets(m){
   });
   return Math.round(c);
 }
+/* ===== Training FREQUENCY per muscle — distinct sessions this week + days since last stimulus.
+   Science: each muscle grows best trained ~2× / week (every ~72h). We use that to tell the
+   user exactly which muscles to train next and which are already covered. ===== */
+function muscleSessionsThisWeek(m){
+  const wk=now()-7*864e5, days=new Set();
+  (state.data.workouts||[]).forEach(w=>{
+    if(new Date(w.date).getTime()<wk)return;
+    let hit=false;
+    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
+      const working=(e.sets||[]).filter(s=>s.done&&s.type!=="W").length;
+      if(working&&((ex.p&&ex.p.includes(m))||(ex.s&&ex.s.includes(m))))hit=true;});
+    if(hit)days.add(new Date(w.date).toDateString());
+  });
+  return days.size;
+}
+function muscleLastTrained(m){
+  let best=null;
+  (state.data.workouts||[]).forEach(w=>{
+    let hit=false;
+    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
+      const working=(e.sets||[]).filter(s=>s.done&&s.type!=="W").length;
+      if(working&&((ex.p&&ex.p.includes(m))||(ex.s&&ex.s.includes(m))))hit=true;});
+    if(hit){const t=new Date(w.date).getTime();if(best===null||t>best)best=t;}
+  });
+  return best;
+}
+// Bucket each muscle: "train" (overdue / under-volume), "soon" (due-ish), "ok" (good frequency).
+function freqInfo(m){
+  const trained=(state.data.muscleVol[m]||0)>0;
+  const last=muscleLastTrained(m);
+  const dsl=last!=null?Math.floor((now()-last)/864e5):null;
+  const sets=weeklySets(m), sess=muscleSessionsThisWeek(m);
+  const mev=(VL[m]||{mev:8}).mev;
+  let stat,col,note;
+  if(!trained||last==null){stat="train";col="var(--text3)";note="never trained — open the account";}
+  else if(dsl>=4){stat="train";col="var(--red)";note=`${dsl}d since last hit · train it`;}
+  else if(sets<mev){stat="train";col="var(--red)";note=`only ${sets} set${sets===1?"":"s"}/wk (under MEV ${mev})`;}
+  else if(sess<2||dsl>=3){stat="soon";col="var(--yellow)";note=sess<2?`hit 1× this week — due again`:`${dsl}d ago · due soon`;}
+  else{stat="ok";col="var(--green)";note=`${sess}× this week · ${sets} sets — good`;}
+  return {m,stat,col,note,sets,sess,dsl};
+}
+// The card that answers "what do I train next, what's already covered?"
+function freqGuideCard(){
+  const items=M12.map(freqInfo);
+  const train=items.filter(i=>i.stat==="train");
+  const soon=items.filter(i=>i.stat==="soon");
+  const ok=items.filter(i=>i.stat==="ok");
+  const row=i=>`<div class="row sp" onclick="muscleDrill('${i.m}')" style="cursor:pointer;padding:7px 0;border-top:1px solid var(--border)">
+    <span class="row g" style="gap:8px">${mIcon(i.m,16)} <b style="font-size:13.5px">${MNAME[i.m]}</b></span>
+    <span class="mini" style="color:${i.col};text-align:right">${i.note}</span></div>`;
+  const block=(ic,lab,arr,emptyTxt)=>`<div style="margin-bottom:11px"><div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:1px">${ic} ${lab} · ${arr.length}</div>${arr.length?arr.map(row).join(""):`<div class="mini" style="color:var(--text3);padding:7px 0;border-top:1px solid var(--border)">${emptyTxt}</div>`}</div>`;
+  const lead=train.length?`<b class="gold">${train.length} muscle${train.length===1?"":"s"}</b> need work — train one tonight.`:soon.length?`Solid frequency. ${soon.length} coming due — keep the rotation tight.`:`Every sector is on a 2×/week rhythm. Textbook frequency, sir.`;
+  return `<div class="card"><div class="ttl" style="display:flex;align-items:center;gap:7px">🎯 Frequency coach</div>
+    <div class="mini" style="margin:-2px 0 10px;color:var(--text2);line-height:1.5">${lead} <span style="color:var(--text3)">Each muscle grows best trained ~2×/week.</span></div>
+    ${block("🔴","TRAIN NEXT",train,"Nothing overdue — nice.")}
+    ${block("🟡","DUE SOON",soon,"None coming due.")}
+    ${block("🟢","WELL COVERED",ok,"Train something to start a streak.")}
+    <button class="btn ghost sm" style="margin-top:2px" onclick="go('suit')">Open full Batsuit ›</button></div>`;
+}
+// Compact suit figure + sector readiness, surfaced inside MISSION (mirrors THE BATSUIT tab).
+function missionBodyHtml(){
+  let h=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">The Batsuit</div><span class="chip" onclick="go('suit')">full view ›</span></div>
+    <div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-top:4px">${buildSuit()}</div>
+    <div class="row" style="justify-content:center;gap:12px;margin-top:6px">
+      <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--green)"></i> ready</span>
+      <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--yellow)"></i> recovering</span>
+      <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--red)"></i> fatigued</span></div></div>`;
+  h+=freqGuideCard();
+  return h;
+}
 
 /* ========================= SUBGROUP VOLUME + COVERAGE COACH =========================
    Per sub-region weekly working sets, and a coach that flags missing angles / stretch-debt.
@@ -1620,22 +1690,19 @@ function discardSession(){appConfirm({title:"Discard session",body:"End this ses
 
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
-const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["case","📈","CASE"],["suit","💪","SUIT"]];
-const MORE_TABS=[["fuel","🍽️","FUEL","Calories, macros, food log, water & weigh-ins"],["alfred","🤖","ALFRED","AI coach, physique scan & the Chronicle"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
+const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","📈","CASE"],["fuel","🍽️","FUEL"],["alfred","🤖","ALFRED"]];
+const MORE_TABS=[["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.showOnboarding){$("nav").classList.add("hide");return;}
   $("nav").classList.remove("hide");
-  const moreOn=MORE_TABS.some(t=>t[0]===state.tab);
   const tabs=TABS.map(t=>`<button class="${state.tab===t[0]?"on":""}" onclick="go('${t[0]}')"><span class="ic">${t[1]}</span><span class="lb">${t[2]}</span></button>`).join("");
-  const more=`<button class="${moreOn?"on":""}" onclick="openMenu()"><span class="ic">☰</span><span class="lb">MORE</span></button>`;
-  $("nav").innerHTML=tabs+more;
+  $("nav").innerHTML=tabs;
 }
 /* Slim utility bar injected at the top of every tab — quick reach to the moved sections + menu. */
 function topBar(){
-  const jump=[["openMenu()","☰","Menu"],["go('fuel')","🍽️","Fuel"],["go('alfred')","🤖","Alfred"],["go('tech')","🦾","Tech"]];
   return `<div class="topbar">
     <button class="tbtn wide" onclick="openMenu()"><span style="font-size:16px;line-height:1">☰</span><span class="tbl">COMMAND CENTER</span></button>
-    <div style="display:flex;gap:6px">${jump.slice(1).map(b=>`<button class="tbtn" title="${b[2]}" onclick="${b[0]}">${b[1]}</button>`).join("")}</div>
+    <div style="display:flex;gap:6px"><button class="tbtn" title="Search everything" onclick="openIndex()">🧭</button><button class="tbtn" title="Wayne Tech" onclick="go('tech')">🦾</button></div>
   </div>`;
 }
 /* ===================== ACCORDION (expand/collapse for dense sections) ===================== */
@@ -3589,9 +3656,6 @@ function renderGotham(){
   // Weekly Most Wanted bounty — weakest sector
   html+=mostWantedCard();
 
-  // muscle figure + stats
-  html+=`<div class="card"><div class="row sp"><div class="ttl">The Suit</div><span class="chip" onclick="go('suit')">STR ${sl} · ${r.emoji} ${r.name}</span></div><div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-top:4px">${buildSuit()}</div></div>`;
-
   // glanceable recovery rings (heartbeat dials)
   html+=recoveryRings();
 
@@ -3676,7 +3740,7 @@ function overloadIntel(){  const out=[];const seen=new Set();
 /* ========================= MISSION TAB ========================= */
 function renderMission(){
   const d=state.data;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">MISSION</h1><div class="tag" style="margin-bottom:12px">Patrol · plan · schedule · science</div>`;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">MISSION</h1><div class="tag" style="margin-bottom:12px">Patrol · body · plan · schedule · science</div>`;
   // ---------- PRIMARY: tonight's patrol (always visible, no hunting) ----------
   if(!d.splits.length){
     html+=`<div class="card"><p class="muted" style="margin:0 0 10px">No splits yet. Build your first one below, or jump straight into a free session.</p>
@@ -3690,6 +3754,9 @@ function renderMission(){
       ).join("")}</div></div>`;
   });
   html+=`<button class="btn" style="margin-bottom:14px" onclick="freeWorkout()">⚡ Free session</button>`;
+  // ---------- COLLAPSIBLE: body & frequency (suit + what-to-train coach) ----------
+  html+=acc("m-body","🩻","Body & frequency",
+    missionBodyHtml(), true, "what to train next · suit status");
   // ---------- COLLAPSIBLE: plan & schedule (the old STRATEGY editor) ----------
   html+=acc("m-plan","📋","Plan & schedule",
     scheduleEditorHtml()+splitsEditorHtml(), false, "build splits, set training days");
