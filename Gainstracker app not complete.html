@@ -1851,7 +1851,7 @@ function initDragReorder(){
   if(window._dragInit)return;window._dragInit=true;
   const lp={timer:null,active:false,node:null,startY:0,startX:0,suppress:false,pid:null};
   window._lpDrag=lp;
-  const getRow=(t)=>{while(t&&t!==document.body){if(t.classList&&t.classList.contains("exrow"))return t;t=t.parentElement;}return null;};
+  const getRow=(t)=>{while(t&&t!==document.body){if(t.classList&&t.classList.contains("exdrag"))return t;t=t.parentElement;}return null;};
   const clearTimer=()=>{if(lp.timer){clearTimeout(lp.timer);lp.timer=null;}};
   const lift=(row)=>{row.style.transition="transform .12s ease,box-shadow .12s ease,opacity .12s ease";row.style.transform="scale(1.025)";row.style.boxShadow="0 14px 34px rgba(0,0,0,.6)";row.style.opacity="0.97";row.style.position="relative";row.style.zIndex="30";};
   document.addEventListener("pointerdown",(e)=>{
@@ -1866,7 +1866,7 @@ function initDragReorder(){
     if(!lp.active||!lp.node)return;
     e.preventDefault();
     const row=getRow(document.elementFromPoint(e.clientX,e.clientY));
-    if(!row||row===lp.node||!row.classList.contains("exrow"))return;
+    if(!row||row===lp.node||!row.classList.contains("exdrag"))return;
     const rect=row.getBoundingClientRect();const before=e.clientY<rect.top+rect.height/2;const parent=row.parentElement;
     if(before){if(row.previousElementSibling!==lp.node)parent.insertBefore(lp.node,row);}
     else{if(row.nextElementSibling!==lp.node)parent.insertBefore(lp.node,row.nextElementSibling);}
@@ -1874,7 +1874,7 @@ function initDragReorder(){
   const end=()=>{
     clearTimer();
     if(lp.active&&lp.node){
-      const order=[...document.querySelectorAll("#app .exrow")].map(n=>parseInt(n.getAttribute("data-ei"))).filter(i=>!isNaN(i));
+      const order=[...document.querySelectorAll("#app .exdrag")].map(n=>parseInt(n.getAttribute("data-ei"))).filter(i=>!isNaN(i));
       const arr=state.session&&state.session.exercises;
       if(arr&&order.length===arr.length){const na=order.map(i=>arr[i]);if(na.every(Boolean))state.session.exercises=na;}
       lp.suppress=true;setTimeout(()=>{lp.suppress=false;},700); // swallow the click that follows a drag; auto-clear if none comes
@@ -1943,8 +1943,9 @@ function finishWorkout(){
   if(u.lastTrainedDate){const d=Math.round(daysSince(u.lastTrainedDate));const ld=new Date(u.lastTrainedDate).toDateString();
     if(ld===today){}else if(d<=1.5){u.streakDays++;}else{u.streakDays=1;}}else u.streakDays=1;
   u.lastTrainedDate=t;
-  // totals + xp
-  const xpGain=Math.round(totalVol/50)+prsThis.length*40+30;
+  // totals + xp — paced so levels mean something: capped volume bonus + flat base + PR reward.
+  // (Volume is kg×reps and balloons fast, so it's divided hard and capped; PRs and showing up carry the weight.)
+  const xpGain=Math.min(Math.round(totalVol/160),55)+prsThis.length*25+20;
   u.totalWorkouts++;u.totalVolume+=totalVol;u.totalDuration+=dur;u.xp+=xpGain;u.failureSets+=fails;
   // weakest muscle for taunt memory
   let weak=M12[0],wl=999;M12.forEach(m=>{const l=muscleLevel(m);if((state.data.muscleVol[m]||0)>0&&l<wl){wl=l;weak=m;}});u.lastMissedMuscle=weak;
@@ -2477,15 +2478,19 @@ function renderLogging(){
     }
     if(!isExOpen(ei)){
       const pr=exProgress(e);
-      html+=`<div class="card exfold exrow" data-ei="${ei}" onclick="toggleExCollapse(${ei})" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px;${pr.allDone?'opacity:.7':''}">
+      html+=`<div class="card exfold exrow exdrag" data-ei="${ei}" onclick="toggleExCollapse(${ei})" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px;${pr.allDone?'opacity:.7':''}">
         ${thumb(ex,true)}
         <div class="g" style="min-width:0"><div class="exname" style="font-size:16px">${esc(e.name)}</div>
           <div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")} · ${pr.allDone?`<span style="color:var(--green)">✓ ${pr.total} done</span>`:`${pr.doneN}/${pr.total} sets`}</div></div>
+        <div class="row" style="gap:2px;flex:none" onclick="event.stopPropagation()">
+          <button class="btn ghost sm" style="width:auto;padding:6px 8px;color:var(--text3)" title="Move up" ${ei===0?'disabled style="opacity:.25;width:auto;padding:6px 8px"':''} onclick="moveExercise(${ei},-1)">↑</button>
+          <button class="btn ghost sm" style="width:auto;padding:6px 8px;color:var(--text3)" title="Move down" ${ei===ses.exercises.length-1?'disabled style="opacity:.25;width:auto;padding:6px 8px"':''} onclick="moveExercise(${ei},1)">↓</button>
+        </div>
         <div style="color:var(--text3);font-size:15px;font-weight:700;letter-spacing:1px">⠿ ${pr.allDone?'✓':'▸'}</div>
       </div>`;
       return;
     }
-    html+=`<div class="card exrow" data-ei="${ei}">
+    html+=`<div class="card exdrag" data-ei="${ei}">
       <div class="row" style="margin-bottom:8px">
         ${thumb(ex,true)}
         <div class="g" onclick="toggleExCollapse(${ei})" style="cursor:pointer"><div class="exname">${esc(e.name)} <span style="color:var(--text3);font-size:13px;font-weight:700">▾</span></div>
@@ -4756,7 +4761,13 @@ function splitsEditorHtml(){
         html+=`<div style="border-top:1px solid var(--border);padding:9px 0">
           <div class="row sp"><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0;width:52%"/>
           <div class="row" style="gap:4px"><button class="btn ghost sm" style="width:auto" onclick="addDayExercise('${sp.id}',${i})">+ ex</button><button class="btn ghost sm" style="width:auto;font-size:11px" onclick="toggleRestDay('${sp.id}',${i})">Make rest</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delDay('${sp.id}',${i})">🗑</button></div></div>
-          <div class="row wrap" style="gap:5px;margin-top:5px">${day.exercises.map((n,j)=>`<span class="chip" style="font-size:12px;padding:5px 9px">${esc(n)} <span style="color:var(--text3)" onclick="rmDayEx('${sp.id}',${i},${j})">×</span></span>`).join("")||'<span class="mini">No exercises yet</span>'}</div></div>`;
+          <div style="margin-top:6px">${day.exercises.length?day.exercises.map((n,j)=>`<div class="row sp" style="gap:6px;padding:4px 0;border-top:1px solid rgba(255,255,255,.04)">
+            <span style="flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</span>
+            <div class="row" style="gap:2px;flex:none">
+              <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Move up" ${j===0?'disabled style="opacity:.25;width:auto;padding:5px 8px"':''} onclick="moveDayEx('${sp.id}',${i},${j},-1)">↑</button>
+              <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Move down" ${j===day.exercises.length-1?'disabled style="opacity:.25;width:auto;padding:5px 8px"':''} onclick="moveDayEx('${sp.id}',${i},${j},1)">↓</button>
+              <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Remove" onclick="rmDayEx('${sp.id}',${i},${j})">×</button>
+            </div></div>`).join(""):'<span class="mini">No exercises yet</span>'}</div></div>`;
       }
     });
     html+=`<div class="row" style="gap:6px;margin-top:8px"><button class="btn ghost sm" onclick="addDay('${sp.id}')">+ Training day</button><button class="btn ghost sm" onclick="addRestDay('${sp.id}')">+ Rest day</button></div></div>`;
@@ -4782,6 +4793,7 @@ function delSplit(id){appConfirm({title:"Delete split",body:"Delete this split p
 function addDay(id){const s=state.data.splits.find(x=>x.id===id);s.days.push({name:"Day "+(s.days.length+1),exercises:[]});save();render();}
 function renameDay(id,i,v){const s=state.data.splits.find(x=>x.id===id);s.days[i].name=v;save();}
 function rmDayEx(id,i,j){const s=state.data.splits.find(x=>x.id===id);s.days[i].exercises.splice(j,1);save();render();}
+function moveDayEx(id,i,j,dir){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const arr=s.days[i].exercises;const k=j+dir;if(k<0||k>=arr.length)return;const t=arr[j];arr[j]=arr[k];arr[k]=t;save();render();}
 function addDayExercise(id,i){
   state._addTo={id,i};openPicker({id,i});   // multi-add: pick several at once, list stays open
 }
