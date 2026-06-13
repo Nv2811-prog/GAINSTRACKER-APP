@@ -587,32 +587,47 @@ const NEMESIS_MAP={chest:{villain:"Bane",quote:"The chest is the shield of Gotha
 const EXP_FILL={RECRUIT:{chest:800,back:700,shoulders:600,biceps:400,triceps:400,forearms:200,quads:1200,hamstrings:600,glutes:500,calves:300,abs:400,traps:250},VIGILANTE:{chest:30000,back:26000,shoulders:22000,biceps:14000,triceps:14000,forearms:6000,quads:45000,hamstrings:22000,glutes:18000,calves:11000,abs:15000,traps:9000},DARK_KNIGHT:{chest:75000,back:65000,shoulders:55000,biceps:35000,triceps:35000,forearms:15000,quads:110000,hamstrings:55000,glutes:45000,calves:27000,abs:38000,traps:22000}};
 
 const ACHIEVEMENTS=[
+// ── Operations: sessions logged ──
 {id:"firstnight",e:"🥋",n:"First Night",d:w=>w.totalWorkouts>=1},
 {id:"swornin",e:"🦇",n:"Sworn In",d:w=>w.totalWorkouts>=10},
 {id:"guardian",e:"🔱",n:"Guardian",d:w=>w.totalWorkouts>=50},
 {id:"darkknight",e:"💯",n:"Dark Knight",d:w=>w.totalWorkouts>=100},
-{id:"veteran",e:"🌑",n:"Veteran",d:w=>w.totalWorkouts>=250},
+// ── PRs ──
 {id:"firststrike",e:"🎯",n:"First Strike",d:w=>w.prCount>=1},
 {id:"villainslayer",e:"⚔️",n:"Villain Slayer",d:w=>w.prCount>=25},
 {id:"arkham",e:"👑",n:"Arkham Emptied",d:w=>w.prCount>=100},
+// ── Bosses ──
 {id:"henchman",e:"💀",n:"Henchman Handled",d:w=>w.bossCount>=1},
 {id:"jokernm",e:"🃏",n:"Joker's Nightmare",d:w=>w.bossCount>=10},
 {id:"rogues",e:"🌹",n:"Rogues Gallery",d:w=>w.bossCount>=50},
+// ── Lifetime tonnage ──
 {id:"warmup",e:"🏋️",n:"Warming Up",d:w=>w.totalVolume>=50000},
 {id:"batmobile",e:"🚗",n:"Batmobile Bench",d:w=>w.totalVolume>=100000},
 {id:"wayne",e:"🏰",n:"Moving Wayne Manor",d:w=>w.totalVolume>=500000},
 {id:"skyline",e:"🌋",n:"Gotham Skyline",d:w=>w.totalVolume>=1000000},
+// ── Consistency / streaks ──
 {id:"week",e:"🔥",n:"Week in the Cave",d:w=>w.streakDays>=7},
-{id:"twoweek",e:"🌙",n:"Two Weeks on Patrol",d:w=>w.streakDays>=14},
 {id:"alfredapp",e:"🧘",n:"Alfred Approves",d:w=>w.streakDays>=30},
 {id:"discipline",e:"💎",n:"The Discipline",d:w=>w.streakDays>=60},
+// ── Strength standards ──
 {id:"upgrade",e:"💪",n:"Suit Upgrade",d:w=>w.maxLevel>=5},
 {id:"elite",e:"🔱",n:"Elite Operative",d:w=>w.maxLevel>=10},
 {id:"aboveavg",e:"🎖️",n:"Above Average",d:w=>w.bwRatio>=1},
 {id:"batstd",e:"👑",n:"Batman Standard",d:w=>w.bwRatio>=2},
 {id:"edge",e:"💀",n:"To The Edge",d:w=>w.failureSets>=50},
+// ── Allies / social hub ──
+{id:"league",e:"🤝",n:"Justice League",d:w=>w.allies>=1},
+{id:"assembled",e:"🛡️",n:"League Assembled",d:w=>w.allies>=3},
+{id:"sparring",e:"🥊",n:"Sparring Partner",d:w=>w.hasRival>=1},
+// ── Whole-body & tracking features ──
+{id:"fullsuit",e:"🦾",n:"Full Batsuit",d:w=>w.allTrainedWeek},
 {id:"connected",e:"🤖",n:"Alfred Connected",d:w=>w.aiUses>=10},
-{id:"fullsuit",e:"🦾",n:"Full Batsuit",d:w=>w.allTrainedWeek}
+{id:"tale",e:"📐",n:"Tale of the Tape",d:w=>w.measures>=1},
+{id:"casephoto",e:"📸",n:"Case Photo",d:w=>w.photos>=1},
+{id:"nightpatrol",e:"🏃",n:"Night Patrol",d:w=>w.cardio>=5},
+{id:"stack",e:"💊",n:"Stack Locked In",d:w=>w.suppBest>=7},
+{id:"mealprep",e:"🍽️",n:"Meal Prepped",d:w=>w.foodDays>=7},
+{id:"gauntlet",e:"🧤",n:"Gauntlet Veteran",d:w=>w.gauntletBest>=5}
 ];
 
 /* ========================= STATE ========================= */
@@ -1297,9 +1312,19 @@ function achStats(){
   bwRatio=bestORM/bodyW();
   // all 12 trained this week?
   const allTrainedWeek=M12.every(m=>weeklySets(m)>0);
+  // ── feature-tracking stats (allies, sparring, measurements, photos, cardio, supps, food, gauntlet) ──
+  const allies=(d.allies||[]).length;
+  const hasRival=d.rival?1:0;
+  const measures=((d.u.measurements&&d.u.measurements.history)||[]).length;
+  const photos=(d.photos||[]).length;
+  const cardio=(d.cardioLog||[]).length;
+  const suppBest=(typeof creatineStreak==="function"?creatineStreak():0);
+  const foodDays=Object.keys(d.foodLog||{}).length;
+  const gauntletBest=(d.gauntlet&&d.gauntlet.best)||0;
   return{totalWorkouts:d.u.totalWorkouts,totalVolume:d.u.totalVolume,streakDays:d.u.streakDays,
     prCount:Object.values(d.prs).reduce((a,p)=>a+(p.count||1),0),bossCount:d.bossWins.length,
-    failureSets:d.u.failureSets,aiUses:d.u.aiUses,maxLevel,bwRatio,allTrainedWeek};
+    failureSets:d.u.failureSets,aiUses:d.u.aiUses,maxLevel,bwRatio,allTrainedWeek,
+    allies,hasRival,measures,photos,cardio,suppBest,foodDays,gauntletBest};
 }
 function checkAchievements(){
   const w=achStats(),got=[];
@@ -2714,7 +2739,7 @@ function addProgress(input){
       let img;try{img=cv.toDataURL("image/jpeg",0.72);}catch(err){img=e.target.result;}
       state.data.photos=state.data.photos||[];
       state.data.photos.push({id:"ph"+now(),date:new Date().toISOString(),img,bw:Math.round(state.data.u.bodyweight)||null,note:""});
-      try{save();haptic("done");toast("Progress photo saved");}
+      try{save();checkAchievements();haptic("done");toast("Progress photo saved");}
       catch(err){state.data.photos.pop();toast("Storage full — delete an old photo first.");}
       render();
     };
@@ -3042,7 +3067,7 @@ function openMeasure(){
   const me=state.data.u.measurements;
   openSheet(`<div class="ttl">Body measurements (cm)</div>
     ${[["chest","Chest"],["waist","Waist"],["leftArm","Left arm"],["rightArm","Right arm"],["leftThigh","Left thigh"],["rightThigh","Right thigh"]].map(([k,l])=>`<label class="mini">${l}</label><input inputmode="decimal" value="${me[k]||""}" oninput="state.data.u.measurements['${k}']=parseFloat(this.value)||null" style="margin-bottom:8px"/>`).join("")}
-    <button class="btn gold" onclick="state.data.u.measurements.history.unshift({date:new Date().toISOString(),...state.data.u.measurements});save();closeSheet();render();toast('Measurements saved.')">Save</button>`);
+    <button class="btn gold" onclick="state.data.u.measurements.history.unshift({date:new Date().toISOString(),...state.data.u.measurements});save();checkAchievements();closeSheet();render();toast('Measurements saved.')">Save</button>`);
 }
 
 /* ========================= GOTHAM TAB ========================= */
@@ -3379,7 +3404,7 @@ function completeGauntlet(){
   // streak: increment if yesterday done, else reset to 1
   const y=new Date();y.setDate(y.getDate()-1);const yk=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
   g.streak=(g.done[yk]?g.streak:0)+1;g.best=Math.max(g.best||0,g.streak);g.done[k]=true;g.last=k;
-  save();haptic("pr");toast("Gauntlet cleared — "+g.streak+" day streak 🔥");render();
+  save();checkAchievements();haptic("pr");toast("Gauntlet cleared — "+g.streak+" day streak 🔥");render();
 }
 function gauntletCard(){
   const ch=GAUNTLET[gauntletIdx()];const done=gauntletDoneToday();const g=state.data.gauntlet||{streak:0,best:0};
@@ -3487,10 +3512,10 @@ function soreToday(){return (state.data.soreness=state.data.soreness||{})[infDat
 function toggleSore(m){const k=infDateKey();const map=state.data.soreness[k]=state.data.soreness[k]||{};map[m]=((map[m]||0)+1)%4;if(!map[m])delete map[m];save();haptic("tap");renderInfirmary();}
 // ---- cardio / patrol mileage ----
 function weekCardio(){const wk=now()-7*864e5;return (state.data.cardioLog||[]).filter(c=>new Date(c.date).getTime()>=wk).reduce((a,c)=>a+(+c.mins||0),0);}
-function addCardio(mins,type){state.data.cardioLog=state.data.cardioLog||[];state.data.cardioLog.unshift({date:new Date().toISOString(),type,mins});save();haptic("done");toast("+"+mins+" min "+type+" logged");renderInfirmary();}
+function addCardio(mins,type){state.data.cardioLog=state.data.cardioLog||[];state.data.cardioLog.unshift({date:new Date().toISOString(),type,mins});save();checkAchievements();haptic("done");toast("+"+mins+" min "+type+" logged");renderInfirmary();}
 // ---- supplements ----
 function suppToday(){return (state.data.suppLog=state.data.suppLog||{})[infDateKey()]||{};}
-function toggleSupp(item){const k=infDateKey();const map=state.data.suppLog[k]=state.data.suppLog[k]||{};map[item]=!map[item];save();haptic("tap");if(state.subpage==="infirmary")renderInfirmary();else render();}
+function toggleSupp(item){const k=infDateKey();const map=state.data.suppLog[k]=state.data.suppLog[k]||{};map[item]=!map[item];save();checkAchievements();haptic("tap");if(state.subpage==="infirmary")renderInfirmary();else render();}
 function creatineStreak(){
   const log=state.data.suppLog||{};let n=0;const d=new Date();d.setHours(0,0,0,0);
   const key=x=>x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
@@ -3911,7 +3936,7 @@ function addAlly(){
   state.data.allies=state.data.allies||[];
   const ex=state.data.allies.findIndex(a=>a.n===c.n);
   if(ex>=0)state.data.allies[ex]=c;else state.data.allies.push(c);
-  save();haptic("done");toast(`${c.n} added to the League`);openJusticeLeague();
+  save();checkAchievements();haptic("done");toast(`${c.n} added to the League`);openJusticeLeague();
 }
 function delAlly(i){(state.data.allies||[]).splice(i,1);save();openJusticeLeague();}
 function compareAlly(i){
@@ -4927,7 +4952,7 @@ function cycledTargets(n,mode){
 function waterTargetGlasses(n){const bw=+(n&&n.bw)||+state.data.u.bodyweight||80;return clamp(Math.round(bw*0.033/0.25),6,16);}
 // Refresh whichever surface launched a food action: the Mess Hall sheet if open, else the FUEL tab.
 function fuelRefresh(){if($("sheet")&&$("sheet").classList.contains("on"))openMessHall();else render();}
-function addFood(i){const fd=FOODS[i];if(!fd)return;foodDay().items.push({n:fd.n,k:fd.k,p:fd.p,c:fd.c,f:fd.f});haptic("light");save();fuelRefresh();}
+function addFood(i){const fd=FOODS[i];if(!fd)return;foodDay().items.push({n:fd.n,k:fd.k,p:fd.p,c:fd.c,f:fd.f});haptic("light");save();checkAchievements();fuelRefresh();}
 function removeFood(i){const day=foodDay();day.items.splice(i,1);haptic("light");save();fuelRefresh();}
 function addCustomFood(){const nm=($("mh-name")||{}).value||"",k=+($("mh-k")||{}).value||0,p=+($("mh-p")||{}).value||0,c=+($("mh-c")||{}).value||0,f=+($("mh-f")||{}).value||0;
   if(!nm.trim()||(!k&&!p)){toast("Add a name and at least calories or protein.");return;}
@@ -5515,16 +5540,17 @@ function patrolCalendar(){
     <span class="mini" style="color:var(--text3)">less <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:rgba(255,255,255,.06);margin:0 2px"></span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:rgba(235,199,107,.4);margin:0 2px"></span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:rgba(235,199,107,1);margin:0 2px"></span> more</span></div>`;
 }
 /* ---- Trophy Room ---- */
-const ACH_REQ={firstnight:"Log 1 workout",swornin:"Log 10 workouts",guardian:"Log 50 workouts",darkknight:"Log 100 workouts",veteran:"Log 250 workouts",firststrike:"Set 1 PR",villainslayer:"Set 25 PRs",arkham:"Set 100 PRs",henchman:"Beat 1 boss",jokernm:"Beat 10 bosses",rogues:"Beat 50 bosses",warmup:"50,000kg lifetime volume",batmobile:"100,000kg lifetime volume",wayne:"500,000kg lifetime volume",skyline:"1,000,000kg lifetime volume",week:"7-day streak",twoweek:"14-day streak",alfredapp:"30-day streak",discipline:"60-day streak",upgrade:"Any muscle to level 5",elite:"Any muscle to level 10",aboveavg:"1RM = bodyweight",batstd:"1RM = 2× bodyweight",edge:"50 sets to failure",connected:"Use Alfred AI 10×",fullsuit:"Train all 12 muscles in one week"};
+const ACH_REQ={firstnight:"Log 1 workout",swornin:"Log 10 workouts",guardian:"Log 50 workouts",darkknight:"Log 100 workouts",firststrike:"Set 1 PR",villainslayer:"Set 25 PRs",arkham:"Set 100 PRs",henchman:"Beat 1 boss",jokernm:"Beat 10 bosses",rogues:"Beat 50 bosses",warmup:"50,000kg lifetime volume",batmobile:"100,000kg lifetime volume",wayne:"500,000kg lifetime volume",skyline:"1,000,000kg lifetime volume",week:"7-day streak",alfredapp:"30-day streak",discipline:"60-day streak",upgrade:"Any muscle to level 5",elite:"Any muscle to level 10",aboveavg:"1RM = bodyweight",batstd:"1RM = 2× bodyweight",edge:"50 sets to failure",connected:"Use Alfred AI 10×",fullsuit:"Train all 12 muscles in one week",league:"Add 1 ally to your League",assembled:"Add 3 allies",sparring:"Import a rival to spar",tale:"Log your body measurements",casephoto:"Add 1 progress photo",nightpatrol:"Log 5 cardio sessions",stack:"7-day creatine streak",mealprep:"Log food on 7 days",gauntlet:"5-day Gauntlet streak"};
 function achProgress(a,w){
   // returns {cur,goal} where parseable, else null
   const reqNum=(s)=>{const m=(""+s).replace(/,/g,"").match(/[\d.]+/);return m?parseFloat(m[0]):null;};
   const G=reqNum(ACH_REQ[a.id]);if(G==null)return null;
-  const M={firstnight:w.totalWorkouts,swornin:w.totalWorkouts,guardian:w.totalWorkouts,darkknight:w.totalWorkouts,veteran:w.totalWorkouts,
+  const M={firstnight:w.totalWorkouts,swornin:w.totalWorkouts,guardian:w.totalWorkouts,darkknight:w.totalWorkouts,
     firststrike:w.prCount,villainslayer:w.prCount,arkham:w.prCount,henchman:w.bossCount,jokernm:w.bossCount,rogues:w.bossCount,
     warmup:w.totalVolume,batmobile:w.totalVolume,wayne:w.totalVolume,skyline:w.totalVolume,
-    week:w.streakDays,twoweek:w.streakDays,alfredapp:w.streakDays,discipline:w.streakDays,
-    upgrade:w.maxLevel,elite:w.maxLevel,aboveavg:w.bwRatio,batstd:w.bwRatio,edge:w.failureSets,connected:w.aiUses};
+    week:w.streakDays,alfredapp:w.streakDays,discipline:w.streakDays,
+    upgrade:w.maxLevel,elite:w.maxLevel,aboveavg:w.bwRatio,batstd:w.bwRatio,edge:w.failureSets,connected:w.aiUses,
+    league:w.allies,assembled:w.allies,sparring:w.hasRival,tale:w.measures,casephoto:w.photos,nightpatrol:w.cardio,stack:w.suppBest,mealprep:w.foodDays,gauntlet:w.gauntletBest};
   if(M[a.id]==null)return null;return {cur:M[a.id],goal:G};
 }
 function openTrophyRoom(){
@@ -5875,7 +5901,7 @@ function u_set(k,v){state.data.u[k]=v;save();}
 function setGemKey(v){if(v.trim())localStorage.setItem("gt_gemini",v.trim());else localStorage.removeItem("gt_gemini");state.data.u.aiKeySet=!!v.trim();save();}
 function exportRival(){const d=state.data;const code=btoa(unescape(encodeURIComponent(JSON.stringify({name:d.u.name||"Vigilante",totalVol:d.u.totalVolume,totalWorkouts:d.u.totalWorkouts,streak:d.u.streakDays,prs:d.prs}))));
   if(navigator.clipboard)navigator.clipboard.writeText(code);appAlert({title:"Sparring code",ok:"Done",html:`Copied to your clipboard. Send this to a rival:<input readonly value="${esc(code)}" style="margin-top:10px" onclick="this.select()"/>`});}
-function importRival(){appPrompt({title:"Add rival",body:"Paste a rival's sparring code:",ok:"Spar"}).then(c=>{if(!c)return;try{const r=JSON.parse(decodeURIComponent(escape(atob(c.trim()))));state.data.rival=r;save();toast("Now sparring with "+r.name);closeOverlay();render();}catch(e){toast("Invalid code.");}});}
+function importRival(){appPrompt({title:"Add rival",body:"Paste a rival's sparring code:",ok:"Spar"}).then(c=>{if(!c)return;try{const r=JSON.parse(decodeURIComponent(escape(atob(c.trim()))));state.data.rival=r;save();checkAchievements();toast("Now sparring with "+r.name);closeOverlay();render();}catch(e){toast("Invalid code.");}});}
 function backupData(){const blob=new Blob([JSON.stringify(state.data)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gainstracker-backup.json";a.click();}
 function exportCSV(){
   const rows=[["date","exercise","set","weight_kg","reps","type","est_1rm_kg"]];
