@@ -389,9 +389,9 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 ::-webkit-scrollbar{width:0;height:0}
 .toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%) translateY(20px);z-index:80;background:#181818;border:1px solid var(--gold-dim);color:var(--gold2);padding:11px 16px;border-radius:30px;font-weight:600;font-size:13.5px;opacity:0;transition:.3s;pointer-events:none;max-width:90%;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.prpop{position:fixed;left:50%;bottom:96px;transform:translate(-50%,140%);z-index:90;width:calc(100% - 26px);max-width:380px;border-radius:20px;padding:16px 17px 15px;background:linear-gradient(150deg,#1d1606 0%,#241a07 48%,#15100a 100%);border:1px solid var(--gold-dim);box-shadow:0 20px 54px rgba(0,0,0,.62),0 0 30px rgba(232,197,106,.18);opacity:0;cursor:pointer;transition:transform .5s cubic-bezier(.16,.9,.22,1.02),opacity .4s;overflow:hidden}
+.prpop{position:fixed;left:50%;bottom:96px;transform:translate(-50%,140%);z-index:90;width:calc(100% - 26px);max-width:380px;border-radius:20px;padding:16px 17px 15px;background:linear-gradient(150deg,#1d1606 0%,#241a07 48%,#15100a 100%);border:1px solid var(--gold-dim);box-shadow:0 20px 54px rgba(0,0,0,.62),0 0 30px rgba(232,197,106,.18);opacity:0;cursor:pointer;pointer-events:none;transition:transform .5s cubic-bezier(.16,.9,.22,1.02),opacity .4s;overflow:hidden}
 .prpop:before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 50% -10%,rgba(232,197,106,.22),transparent 60%);pointer-events:none}
-.prpop.on{opacity:1;transform:translate(-50%,0)}
+.prpop.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .prpop .prhead{display:flex;align-items:center;gap:10px;margin-bottom:11px;position:relative}
 .prpop .prbadge{font-size:30px;line-height:1;filter:drop-shadow(0 0 9px rgba(232,197,106,.6));animation:prSpin .7s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes prSpin{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
@@ -435,21 +435,21 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .entr-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .entr-beam{position:absolute;top:48%;left:50%;width:140vw;height:64vh;transform:translate(-50%,-50%);background:conic-gradient(from 90deg at 0% 50%,transparent 78deg,rgba(232,197,106,.16) 90deg,transparent 102deg);opacity:0;animation:entrBeam 1.4s .55s ease-out forwards;pointer-events:none}
 @keyframes entrBeam{0%{opacity:0}30%{opacity:.9}100%{opacity:0}}
-.entr-veh{font-size:118px;line-height:1;filter:drop-shadow(0 14px 20px rgba(0,0,0,.7)) drop-shadow(0 0 26px rgba(232,197,106,.32));transform:translateX(-135%) scale(.55);opacity:0;animation:entrDrive 1.5s .35s cubic-bezier(.2,.85,.2,1) forwards}
+.entr-veh{font-size:118px;line-height:1;filter:drop-shadow(0 14px 20px rgba(0,0,0,.7)) drop-shadow(0 0 26px rgba(232,197,106,.32));transform:translateX(-135%) scale(.55);opacity:0;animation:entrDrive 1.95s .35s cubic-bezier(.2,.85,.2,1) forwards}
 @keyframes entrDrive{0%{transform:translateX(-135%) scale(.55);opacity:0}22%{opacity:1}65%{transform:translateX(6%) scale(1.08)}82%{transform:translateX(-2%) scale(1)}100%{transform:translateX(0) scale(1)}}
 .entr-veh .glints{position:absolute}
 .entr-streak{position:absolute;top:48%;left:0;width:60%;height:4px;border-radius:4px;background:linear-gradient(90deg,transparent,rgba(232,197,106,.55),transparent);opacity:0;animation:entrStreak .55s ease-out forwards}
 .entr-streak.s2{top:42%;height:3px;animation-delay:.5s}.entr-streak.s3{top:55%;height:3px;animation-delay:.62s}.entr-streak.s1{animation-delay:.45s}
 @keyframes entrStreak{0%{transform:translateX(70vw);opacity:0}30%{opacity:.9}100%{transform:translateX(120vw);opacity:0}}
-.entr-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;animation:entrFlash 1.3s .9s ease-out forwards}
+.entr-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;animation:entrFlash 1.3s 1.5s ease-out forwards}
 @keyframes entrFlash{0%{opacity:0}6%{opacity:.55}26%{opacity:0}100%{opacity:0}}
-.entr-cap{text-align:center;margin-top:20px;opacity:0;animation:entrTitle .6s 1.25s cubic-bezier(.16,.9,.22,1) forwards}
+.entr-cap{text-align:center;margin-top:20px;opacity:0;animation:entrTitle .6s 1.75s cubic-bezier(.16,.9,.22,1) forwards}
 .entr-kick{letter-spacing:5px;font-size:11.5px;font-weight:700;color:var(--gold2);text-transform:uppercase}
 .entr-name{font-family:var(--disp);font-size:38px;line-height:1.02;color:#fff;text-shadow:0 3px 24px rgba(232,197,106,.4);margin-top:3px}
 .entr-sub{font-size:12.5px;color:var(--text2);letter-spacing:1px;margin-top:5px;text-transform:uppercase}
 @keyframes entrTitle{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.unlock-pop{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translate(-50%,-170%);z-index:9999;display:flex;align-items:center;gap:12px;width:calc(100% - 26px);max-width:360px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#1b1408,#251a09);border:1px solid var(--gold-dim);box-shadow:0 16px 44px rgba(0,0,0,.55),0 0 22px rgba(232,197,106,.14);opacity:0;cursor:pointer;transition:transform .42s cubic-bezier(.18,.9,.24,1),opacity .42s}
-.unlock-pop.on{transform:translate(-50%,0);opacity:1}
+.unlock-pop{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translate(-50%,-170%);z-index:9999;display:flex;align-items:center;gap:12px;width:calc(100% - 26px);max-width:360px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#1b1408,#251a09);border:1px solid var(--gold-dim);box-shadow:0 16px 44px rgba(0,0,0,.55),0 0 22px rgba(232,197,106,.14);opacity:0;cursor:pointer;pointer-events:none;transition:transform .42s cubic-bezier(.18,.9,.24,1),opacity .42s}
+.unlock-pop.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .unlock-pop .up-emoji{font-size:30px;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .unlock-pop .up-ttl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);font-weight:700}
 .unlock-pop .up-name{font-family:var(--disp);font-size:15px;color:var(--text);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1919,7 +1919,7 @@ function playEntrance(name){
   document.body.appendChild(ov);
   ov.addEventListener("click",()=>fin());
   let done=false;const fin=()=>{if(done)return;done=true;state._entrLock=false;ov.classList.add("out");setTimeout(()=>{try{ov.remove();}catch(_){}}, 520);};
-  setTimeout(fin,2350);
+  setTimeout(fin,3450);
 }
 function seedSets(name){
   const last=lastSetFor(name);
@@ -2347,10 +2347,7 @@ function openMenu(){
     ["openRecordsHall","🧊","Records Hall","Every all-time best"],
     ["openReportCard","🏅","Report Card","Grade your week"],
     ["openTestDay","🎯","1RM Test Day","Guided ramp to a true max"],
-    ["openRoulette","🎲","Random Patrol","Surprise workout"],
-    ["openTimeMachine","🗓️","This Day","Your training history"],
-    ["openHype","😤","Pre-Patrol Hype","Fire up before you lift"],
-    ["openCombos","🥊","Combo Trainer","Random MMA strings"]
+    ["openTimeMachine","🗓️","This Day","Your training history"]
   ];
   const tile=(fn,ic,nm,ds)=>`<button class="card cc-tile" onclick="closeSheet();${fn}()"><div class="cc-ic">${ic}</div><div class="cc-nm">${nm}</div>${ds?`<div class="cc-ds">${ds}</div>`:""}</button>`;
   const fHtml=features.map(f=>tile(f[0],f[1],f[2],f[3])).join("");
@@ -2360,7 +2357,6 @@ function openMenu(){
     ["openInfirmary","🏥","Infirmary","Recovery, sleep & injuries"],
     ["openBatcomputer","🧠","Batcomputer","Deep analytics"],
     ["openMessHall","🍽️","Mess Hall","Meals & nutrition"],
-    ["openGym","🏋️","My Gym","Equipment you own"],
     ["openSettings","⚙️","Settings","Preferences & data"]
   ];
   const tHtml=tools.map(t=>tile(t[0],t[1],t[2],t[3])).join("");
@@ -2375,7 +2371,15 @@ function openMenu(){
     <div class="grid3" style="margin-bottom:4px">${tHtml}</div>
     <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
-function go(tab){state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}render();window.scrollTo(0,0);}
+function go(tab){
+  // A tab tap must ALWAYS land on that tab — leave any open subpage, sheet or overlay first,
+  // otherwise the router (which checks subpage before tab) would keep you stuck. This is the
+  // root of the "can't switch tabs" bug on phone.
+  state.subpage=null;state.pickerOpen=false;state.pickerMulti=null;
+  try{var s=$("sheet"),sb=$("sheetbg");if(s)s.classList.remove("on");if(sb)sb.classList.remove("on");}catch(e){}
+  try{var ov=$("overlay");if(ov)ov.classList.remove("on");}catch(e){}
+  try{var pp=$("prpop");if(pp)pp.classList.remove("on");}catch(e){}
+  state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}render();window.scrollTo(0,0);}
 
 /* ========================= ROUTER ========================= */
 function render(){
@@ -2839,15 +2843,13 @@ function toggleGymFilter(){state.gymFilter=!state.gymFilter;const c=$("gymfilter
 function openPicker(multi){
   state.pickerMulti=multi||null;
   state.pickerOpen=true;state.pickerQuery="";state.pickerMuscle="all";
-  if(state.gymFilter===undefined)state.gymFilter=!!(state.data.u.gym&&state.data.u.gym.equip);
-  const hasGym=!!(state.data.u.gym&&state.data.u.gym.equip);
+  state.gymFilter=false;
   const mm=!!state.pickerMulti;
   $("sheet").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">Add exercise${mm?'s':''} <span class="muted" style="font-weight:400">— ${EXDB.length} loaded</span></div>${mm?`<button class="btn gold sm" style="width:auto" onclick="finishMultiAdd()">Done <span id="picker-cnt"></span></button>`:''}</div>
     ${mm?`<div class="mini" style="color:var(--text2);margin:2px 0 0">Tap to add several — they stay listed and checked. Tap again to remove. Hit <b>Done</b> when finished.</div>`:''}
     <input id="ex-search" placeholder="Search e.g. bench, squat, curl…" autocomplete="off" oninput="updateExList()"/>
     <div class="row sp" style="margin:9px 0 4px;align-items:center">
       <div class="scroll-x" id="ex-musc" style="flex:1">${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')">${m==='all'?'All':MNAME[m]}</button>`).join("")}</div>
-      ${hasGym?`<button id="gymfilter-chip" class="chip g ${state.gymFilter?'on':''}" style="flex:none;margin-left:6px" onclick="toggleGymFilter()" title="Only show my gym's equipment">🏠 My gym</button>`:`<button class="chip g" style="flex:none;margin-left:6px" onclick="openGym()">＋ Set gym</button>`}
     </div>
     <button class="btn" style="margin:6px 0 2px;border-style:dashed;width:100%" onclick="openCustomCreator()">🛠️ Create custom exercise</button>
     <div id="ex-list" style="max-height:48vh;overflow:auto;margin-top:6px"></div>`;
@@ -4567,7 +4569,6 @@ function missionSubTabs(){
           <button class="btn ghost sm" onclick="openPlateSheet(-1)">⚖️ Plate calc</button>
           <button class="btn ghost sm" onclick="open1RM()">🏋️ 1RM calc</button>
           <button class="btn ghost sm" onclick="openTestDay()">🎯 1RM test day</button>
-          <button class="btn ghost sm" onclick="openGym()">🏠 My gym</button>
           <button class="btn ghost sm" onclick="openForge()">⚒️ Forge</button>
           <button class="btn ghost sm" onclick="openMeasure()">📐 Measure</button>
         </div>`;
@@ -6287,7 +6288,7 @@ function renderTech(){
     <div style="font-size:26px">${t[1]}</div><div class="ttl" style="margin:4px 0 2px;font-size:15px">${t[2]}</div>
     <div class="mini" style="color:var(--text3);line-height:1.4">${t[3]}</div></button>`).join("")}</div>`;
   // Jump-to chips (deep links to tools that live elsewhere)
-  const jumps=[["openForge","⚒️ Plate Forge"],["openGarage","🏍️ Batmobile"],["openInfirmary","🏥 Infirmary"],["openBatcomputer","🧠 Batcomputer"],["openJusticeLeague","🦸 Justice League"],["openGym","🏠 My Gym"]];
+  const jumps=[["openForge","⚒️ Plate Forge"],["openGarage","🏍️ Batmobile"],["openInfirmary","🏥 Infirmary"],["openBatcomputer","🧠 Batcomputer"],["openJusticeLeague","🦸 Justice League"]];
   html+=`<div class="card" style="margin-top:10px;padding:13px"><div class="ttl" style="margin:0 0 8px;font-size:14px">⚡ Quick jump</div>
     <div class="row wrap">${jumps.map(j=>`<button class="chip g" style="margin:0 5px 6px 0" onclick="${j[0]}()">${j[1]}</button>`).join("")}</div></div>`;
   $("app").innerHTML=html;
