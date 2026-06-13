@@ -136,6 +136,10 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 /* exercise thumb */
 .exrow{display:flex;gap:13px;align-items:center;padding:13px 12px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(160deg,#0f0f13,#0c0c0f);margin-bottom:9px}
 .exrow.added{border-color:rgba(46,204,113,.55);background:linear-gradient(160deg,rgba(46,204,113,.12),rgba(12,12,15,.9))}
+/* Workout exercise cards: never virtualize them (stops the screen jumping when you tap a set),
+   and block text selection / the iOS copy-callout so holding to drag never grabs text. Inputs stay editable. */
+.exdrag{content-visibility:visible;contain-intrinsic-size:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.exdrag input,.exdrag select,.exdrag textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .exthumb{display:none}
 .exthumb-ph{display:none}
 .exwrap{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:14px;background:radial-gradient(circle at 50% 32%,#1d1e25,#08080b 92%);border:1px solid rgba(232,69,60,.3);flex:none;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 3px 10px -5px #000}
@@ -5466,16 +5470,30 @@ function loadAlfredVoices(){try{_alfredVoices=window.speechSynthesis.getVoices()
 if(typeof window!=="undefined"&&"speechSynthesis" in window){loadAlfredVoices();try{window.speechSynthesis.onvoiceschanged=loadAlfredVoices;}catch(e){}}
 // Best available "Alfred" voice: a refined British butler. The OS supplies the voice;
 // we pick the closest one (Arthur/Daniel are iOS's British males) or honour the user's choice.
+// Score a voice for "formal human butler" quality. The OS supplies the voices; some are
+// high-fidelity (Apple "Enhanced/Premium", Siri, neural/natural) and some are old robotic
+// synths (compact, Eloquence, novelty). We rank, so the least-robotic option wins.
+function _voiceScore(v){
+  const n=(v.name||"").toLowerCase(), uri=(v.voiceURI||"").toLowerCase(), s=n+" "+uri;
+  let sc=0;
+  if(/premium|enhanced|neural|natural/.test(s))sc+=80;   // Apple/Google high-fidelity downloads
+  if(/siri/.test(s))sc+=55;
+  if(v.localService===false)sc+=18;                       // server voices tend to be richer
+  if(/daniel|arthur|oliver|george|jamie|ryan|thomas/.test(n))sc+=34; // British males = closest to Alfred
+  if(/serena|stephanie|kate|sonia|libby/.test(n))sc+=16;  // refined British females, if no male
+  if(/en-gb/i.test(v.lang))sc+=24; else if(/en-au|en-ie/i.test(v.lang))sc+=10; else if(/^en/i.test(v.lang))sc+=6;
+  // robotic / novelty / low-quality → push to the bottom
+  if(/compact|eloquence|albert|zarvox|trinoids|bahh|bells|boing|bubbles|cellos|deranged|hysterical|jester|organ|superstar|whisper|wobble|ralph|fred|junior|kathy|grandma|grandpa|good news|bad news|pipe|rocko|shelley|sandy|flo|reed|eddy/.test(n))sc-=90;
+  return sc;
+}
 function pickAlfredVoice(){
   const vs=(_alfredVoices&&_alfredVoices.length)?_alfredVoices:(function(){loadAlfredVoices();return _alfredVoices;})();
   if(!vs||!vs.length)return null;
   const want=(state.data&&state.data.u&&state.data.u.coachVoiceName)||"";
   if(want){const exact=vs.find(v=>v.name===want);if(exact)return exact;}
-  const by=(re)=>vs.find(v=>re.test(v.name));
-  return by(/arthur/i)||by(/daniel/i)||by(/oliver/i)||by(/george/i)||by(/jamie/i)
-    ||vs.find(v=>/en-GB/i.test(v.lang)&&/male/i.test(v.name))
-    ||vs.find(v=>/en-GB/i.test(v.lang))
-    ||vs.find(v=>/^en/i.test(v.lang))||null;
+  let best=null,bs=-1e9;
+  vs.forEach(v=>{if(!/^en/i.test(v.lang))return;const sc=_voiceScore(v);if(sc>bs){bs=sc;best=v;}});
+  return best||vs.find(v=>/^en/i.test(v.lang))||null;
 }
 function _alfredUtter(text,rate,pitch){
   const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
@@ -5488,7 +5506,7 @@ function alfredSpeak(text){
     if(!("speechSynthesis" in window)){toast("Voice isn't supported on this browser.");return;}
     const synth=window.speechSynthesis;
     if(synth.speaking){synth.cancel();return;} // tap again to stop
-    haptic("tap");synth.speak(_alfredUtter(text,0.9,0.82));
+    haptic("tap");synth.speak(_alfredUtter(text,0.92,0.95));
   }catch(e){toast("Couldn't start voice.");}
 }
 /* Auto-coaching voice — fires after a logged set. Cancels any in-flight line, never toggles. Silent if disabled/unsupported. */
@@ -5497,24 +5515,24 @@ function alfredVoiceLine(text){
     if(!state.data.u.coachVoice)return;
     if(!("speechSynthesis" in window))return;
     const synth=window.speechSynthesis;synth.cancel();
-    synth.speak(_alfredUtter(text,0.9,0.84)); // slower + deeper = measured, older butler
+    synth.speak(_alfredUtter(text,0.92,0.95)); // measured pace, near-natural pitch (deep pitch sounded robotic)
   }catch(e){}
 }
 function previewAlfredVoice(){
   try{
     if(!("speechSynthesis" in window)){toast("Voice not supported in this browser.");return;}
     const synth=window.speechSynthesis;synth.cancel();
-    synth.speak(_alfredUtter("Good evening, sir. Shall we begin the session?",0.9,0.84));
+    synth.speak(_alfredUtter("Good evening, sir. Shall we begin the session?",0.92,0.95));
   }catch(e){}
 }
 function alfredVoiceOptions(){
   const vs=(_alfredVoices&&_alfredVoices.length)?_alfredVoices:(loadAlfredVoices(),_alfredVoices);
   const en=(vs||[]).filter(v=>/^en/i.test(v.lang));
   const cur=(state.data.u.coachVoiceName)||"";
-  // British voices first — they sound the most like Alfred
-  en.sort((a,b)=>(/(en-GB)/i.test(b.lang)?1:0)-(/(en-GB)/i.test(a.lang)?1:0));
-  let html='<option value="">Auto — best British voice</option>';
-  en.forEach(v=>{html+=`<option value="${esc(v.name)}" ${v.name===cur?'selected':''}>${esc(v.name)} · ${esc(v.lang)}</option>`;});
+  // Most natural / least-robotic first (Enhanced & British voices rise to the top)
+  en.sort((a,b)=>_voiceScore(b)-_voiceScore(a));
+  let html='<option value="">Auto — best (most human) voice</option>';
+  en.forEach(v=>{const hi=/premium|enhanced|neural|natural|siri/i.test((v.name||"")+" "+(v.voiceURI||""));html+=`<option value="${esc(v.name)}" ${v.name===cur?'selected':''}>${esc(v.name)} · ${esc(v.lang)}${hi?' ✦':''}</option>`;});
   return html;
 }
 function toggleCoachVoice(){
