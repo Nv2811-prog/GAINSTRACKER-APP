@@ -1725,7 +1725,7 @@ function discardSession(){appConfirm({title:"Discard session",body:"End this ses
 
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
-const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","📈","CASE"]];
+const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","📈","CASE"],["allies","🤝","ALLIES"],["history","📜","HISTORY"]];
 const MORE_TABS=[["fuel","🍽️","FUEL","Calories, macros, water, meal templates & weigh-ins"],["alfred","🤖","ALFRED","Your evidence-based AI coach, chat & physique scans"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.showOnboarding){$("nav").classList.add("hide");return;}
@@ -1791,9 +1791,7 @@ function openMenu(){
     ["openForge","⚒️","Forge","Plate-load calculator"],
     ["openGarage","🏍️","Garage","Milestone ride unlocks"],
     ["openInfirmary","🏥","Infirmary","Recovery, sleep & injuries"],
-    ["openArchive","🗄️","Archive","Full workout history"],
     ["openBatcomputer","🧠","Batcomputer","Deep analytics"],
-    ["openJusticeLeague","🦸","League","Train with friends"],
     ["openRoundTimer","🥊","Rounds","Round / interval timer"],
     ["openMessHall","🍽️","Mess Hall","Meals & nutrition"],
     ["openGym","🏋️","My Gym","Equipment you own"],
@@ -1821,7 +1819,7 @@ function render(){
   if(state.subpage==="archive"){renderArchive();renderNav();return;}
   if(state.subpage==="garage"){renderGarage();renderNav();return;}
   if(state.subpage==="infirmary"){renderInfirmary();renderNav();return;}
-  const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderCase,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
+  const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderCase,allies:renderAllies,history:renderHistory,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
   fn();
   const app=$("app");if(app)app.insertAdjacentHTML("afterbegin",topBar());
   renderNav();
@@ -2896,7 +2894,7 @@ function volBar(sets,lm){
    Defeats PR/villain timeline, per-lift strength forecasts, the Iron Efficiency
    leaderboard, and the full searchable exercise list with live curves.
    ======================================================================== */
-function openArchive(){state.subpage="archive";state._archQ=state._archQ||"";render();window.scrollTo(0,0);}
+function openArchive(){state._archQ=state._archQ||"";go("history");}
 function closeArchive(){state.subpage=null;go("case");}
 function setArchQ(v){state._archQ=v;const list=$("arch-list");if(list)list.innerHTML=archExerciseList();}
 // running composite Strength Index across the user's top main lifts
@@ -2952,18 +2950,14 @@ function archExerciseList(){
       ${miniSpark(e1s)}<b class="gold" style="white-space:nowrap">${best}kg ›</b></div>`;
   }).join("");
 }
-function renderArchive(){
+function archiveCardsHtml(){
   const d=state.data;
   const si=strengthIndexSeries();
   const wins=(d.bossWins||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
   const fc=strengthForecast();
   const eff=ironEfficiency();
   const totalPRs=Object.values(d.prs).reduce((a,p)=>a+(p.count||1),0);
-  let html=`<div class="fade">
-    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeArchive()">‹ Case File</button><span class="chip">${wins.length} defeats</span></div>
-    <h1 style="font-size:34px;color:var(--gold2)">THE ARCHIVE</h1>
-    <div class="tag" style="margin-bottom:14px">Every curve, every record, every villain you've put down</div>`;
-
+  let html="";
   // Strength Index hero
   html+=`<div class="card glow"><div class="ttl">📈 Strength Index <span class="mini" style="font-weight:400">— combined est-1RM of your main lifts over time</span></div>`;
   if(si.vals.length>=2){const first=si.vals[0],last=si.vals[si.vals.length-1],up=last>=first,pct=first?Math.round((last-first)/first*100):0;
@@ -3010,8 +3004,37 @@ function renderArchive(){
   html+=`<div class="card"><div class="ttl">📚 Every lift <span class="mini" style="font-weight:400">— tap any for full charts</span></div>
     <input placeholder="🔍 Search lifts…" value="${esc(state._archQ||"")}" oninput="setArchQ(this.value)" style="margin:6px 0 2px"/>
     <div id="arch-list">${archExerciseList()}</div></div>`;
-
+  return html;
+}
+function renderArchive(){
+  const wins=(state.data.bossWins||[]);
+  let html=`<div class="fade">
+    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeArchive()">‹ Case File</button><span class="chip">${wins.length} defeats</span></div>
+    <h1 style="font-size:34px;color:var(--gold2)">THE ARCHIVE</h1>
+    <div class="tag" style="margin-bottom:14px">Every curve, every record, every villain you've put down</div>`;
+  html+=archiveCardsHtml();
   html+=`<button class="btn ghost" style="margin:6px 0 20px" onclick="closeArchive()">‹ Back to Case File</button></div>`;
+  $("app").innerHTML=html;
+}
+/* ===== HISTORY TAB — the Archive promoted to a first-class tab, plus the
+   chronological patrol log, activity heatmap & body-measurement trends. ===== */
+function renderHistory(){
+  const d=state.data;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">HISTORY</h1>
+    <div class="tag" style="margin-bottom:13px">Curves, records, patrol log & every villain felled</div>`;
+  if(!d.workouts.length){
+    html+=`<div class="card"><p class="muted" style="margin:0">No history yet, sir. Log your first session and your strength curves, forecasts and patrol log will fill this page.</p>
+      <button class="btn gold sm" style="margin-top:11px" onclick="go('mission')">Go to Mission ▶</button></div>`;
+    $("app").innerHTML=html;return;
+  }
+  html+=archiveCardsHtml();
+  // Activity heatmap
+  html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div>
+    <div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
+  // Patrol log (chronological)
+  html+=`<div class="card"><div class="ttl">📜 Patrol log <span class="mini" style="font-weight:400">— tap a mission for the full report</span></div>${d.workouts.slice(0,20).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><div class="row g" style="gap:9px;align-items:center"><b class="gold">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 9px" onclick="patrolReport(${i})">📜</button></div></div>`).join("")}</div>`;
+  // Body measurements & trends
+  html+=`<button class="btn" style="margin:4px 0 18px;border-color:var(--gold-dim)" onclick="openMeasure()">📐 Body measurements & trends</button>`;
   $("app").innerHTML=html;
 }
 
@@ -3757,9 +3780,6 @@ function renderGotham(){
     <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openGarage()">🚗 Garage ${GARAGE.filter(v=>v.req(gothamStats())).length}/${GARAGE.length} ›</button>
     <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openInfirmary()">🚑 Infirmary ›</button></div>`;
 
-  // co-op raid — shared boss with an ally
-  html+=raidCard();
-
   // training age clock
   html+=trainingAgeCard();
   // iron ledger (tap for full lifetime page) + cityscape skyline + PR velocity
@@ -3773,14 +3793,6 @@ function renderGotham(){
   const nem=weakestMuscle();
   if(nem&&NEMESIS_MAP[nem]&&!d.dismissed["nem_"+nem]){const nm=NEMESIS_MAP[nem];
     html+=`<div class="banner"><span>😈</span><div><b>${esc(nm.villain)} taunts you:</b><div class="mini" style="font-style:italic">"${esc(nm.quote)}"</div></div><span class="x" onclick="d_dismiss('nem_${nem}')">NOTED</span></div>`;}
-
-  // sparring
-  if(d.rival){const myAvg=avgWeekVol();const theirAvg=d.rival.totalVol/Math.max(1,d.rival.totalWorkouts);
-    const ahead=myAvg>=theirAvg;
-    html+=`<div class="card"><div class="ttl">👥 Sparring with ${esc(d.rival.name)}</div>
-      <div class="row sp"><span class="muted">Their avg session</span><b>${fmtNum(theirAvg)}kg</b></div>
-      <div class="row sp"><span class="muted">Your avg this week</span><b>${fmtNum(myAvg)}kg</b></div>
-      <div class="center" style="margin-top:8px"><span class="chip ${ahead?'on':''}" style="color:${ahead?'var(--green)':'var(--red)'}">${ahead?'⬆️ You lead':'⬇️ They lead'} by ${fmtNum(Math.abs(myAvg-theirAvg))}kg</span></div></div>`;}
 
   // next mission intel (overload)
   const intel=overloadIntel();
@@ -3873,7 +3885,6 @@ function missionSubTabs(){
           <button class="btn ghost sm" onclick="openRoundTimer()">🥊 Round timer</button>
           <button class="btn ghost sm" onclick="openGym()">🏠 My gym</button>
           <button class="btn ghost sm" onclick="openForge()">⚒️ Forge</button>
-          <button class="btn ghost sm" onclick="openJusticeLeague()">🦸 League</button>
           <button class="btn ghost sm" onclick="openMeasure()">📐 Measure</button>
         </div>`;
   }
@@ -4480,11 +4491,56 @@ function openBatcomputer(){
       ${movers.map(x=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><span style="font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.n)}</span><b class="gold" style="white-space:nowrap;margin-left:8px">+${x.gain}kg <span class="mini" style="color:var(--text3)">→ ${x.now}</span></b></div>`).join("")}`:""}
     <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
 }
+/* ===== ALLIES TAB — one social hub: your Patrol Card, the Justice League,
+   the Leaderboard, Co-op Raids & 1-v-1 Sparring, grouped in one place. ===== */
+function renderAllies(){
+  const d=state.data;
+  const me=myPatrolCard();const score=vigilanteScore(me);
+  const allies=d.allies||[];
+  const board=[Object.assign({_you:true},me)].concat(allies.map(a=>Object.assign({},a)));
+  board.forEach(c=>c._score=vigilanteScore(c));board.sort((a,b)=>b._score-a._score);
+  const myRank=board.findIndex(c=>c._you)+1;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">ALLIES</h1>
+    <div class="tag" style="margin-bottom:13px">Your League · leaderboard · co-op raids · sparring</div>`;
+  // My Patrol Card hero
+  const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
+  html+=`<div class="card glow"><div class="row sp"><div class="ttl" style="margin:0">${me.re} ${esc(me.n)} <span class="mini" style="color:var(--text3)">(you)</span></div><span class="chip on">${esc(me.rk)}</span></div>
+    <div class="row" style="gap:6px;margin:11px 0">${caveStat("STR "+me.sl,"strength")}${caveStat((me.vol/1000).toFixed(1)+"t","moved")}${caveStat(me.w,"sessions")}${caveStat(me.boss,"villains")}</div>
+    <div class="row sp" style="margin:2px 0 9px"><span class="mini">Vigilante Score</span><b class="gold" style="font-size:18px">${fmtNum(score)}</b></div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px">${lifts}</div>
+    <button class="btn gold sm" onclick="shareMyCard()">🔗 Share my Patrol Card</button></div>`;
+  // Justice League
+  html+=`<div class="card" style="cursor:pointer" onclick="openJusticeLeague()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🦸 Justice League</div><span class="chip">${allies.length} all${allies.length===1?'y':'ies'}</span></div>
+    <div class="mini" style="color:var(--text2);margin-top:5px">Paste a friend's Patrol Card to add them, then compare strength head-to-head. ›</div></div>`;
+  // Leaderboard
+  html+=`<div class="card" style="cursor:pointer" onclick="openLeaderboard()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🏆 Leaderboard</div><span class="chip ${myRank===1&&board.length>1?'on':''}">${board.length>1?'#'+myRank+' of '+board.length:'just you'}</span></div>
+    <div class="mini" style="color:var(--text2);margin-top:5px">Everyone ranked by Vigilante Score — strength, tonnage, sessions & villains fused into one number. ›</div></div>`;
+  // Co-op Raid
+  const r=d.raid;const rp=r?raidProgress():null;
+  html+=`<div class="card" style="cursor:pointer" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">⚔️ Co-op Raid</div>${r?`<span class="chip on">${Math.round(rp.pct)}%</span>`:`<span class="chip">team boss</span>`}</div>
+    ${r?`<div class="mini" style="color:var(--text2);margin-top:6px">${r.e} <b>${esc(r.boss)}</b> with ${esc(r.allyName)} — ${fmtNum(rp.combined)}/${fmtNum(r.target)}kg pooled.</div>
+      <div class="bar" style="height:7px;margin-top:7px;background:var(--bg4)"><i style="width:${rp.pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>`
+    :`<div class="mini" style="color:var(--text2);margin-top:5px">Team up with an ally against a colossal boss — your tonnage and theirs pool toward one target. ›</div>`}</div>`;
+  // Sparring (1-v-1 rival) — head-to-head inline
+  const rv=d.rival;
+  if(rv){const myAvg=avgWeekVol();const theirAvg=rv.totalVol/Math.max(1,rv.totalWorkouts);const ahead=myAvg>=theirAvg;
+    html+=`<div class="card"><div class="ttl" style="display:flex;align-items:center;gap:7px">🥊 Sparring with ${esc(rv.name||'rival')}</div>
+      <div class="row sp" style="margin-top:4px"><span class="muted">Their avg session</span><b>${fmtNum(theirAvg)}kg</b></div>
+      <div class="row sp"><span class="muted">Your avg this week</span><b>${fmtNum(myAvg)}kg</b></div>
+      <div class="center" style="margin:9px 0 4px"><span class="chip ${ahead?'on':''}" style="color:${ahead?'var(--green)':'var(--red)'}">${ahead?'⬆️ You lead':'⬇️ They lead'} by ${fmtNum(Math.abs(myAvg-theirAvg))}kg</span></div>
+      <div class="row" style="gap:8px;margin-top:8px"><button class="btn ghost sm g" onclick="exportRival()">Share my code</button><button class="btn ghost sm g" onclick="importRival()">Change rival</button></div></div>`;
+  }else{
+    html+=`<div class="card"><div class="ttl" style="display:flex;align-items:center;gap:7px">🥊 Sparring <span class="chip" style="font-weight:400">1-v-1</span></div>
+      <div class="mini" style="color:var(--text2);margin:5px 0 9px">Import a rival's sparring code for a direct head-to-head rivalry — their average session vs yours.</div>
+      <div class="row" style="gap:8px"><button class="btn ghost sm g" onclick="exportRival()">Share my code</button><button class="btn ghost sm g" onclick="importRival()">Import a rival</button></div></div>`;
+  }
+  $("app").innerHTML=html;
+}
 function renderCase(){
   const d=state.data;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">CASE FILE</h1><div class="tag" style="margin-bottom:12px">Records, defeats & history</div>`;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">CASE FILE</h1><div class="tag" style="margin-bottom:12px">Records, standards & achievements</div>`;
   if(d.workouts.length)html+=`<button class="btn gold" style="margin-bottom:9px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="openBatcomputer()">${secIcon('radar','#0c0f15')}Open Batcomputer analytics</button>`;
-  if(d.workouts.length)html+=`<button class="btn" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px;border-color:var(--gold-dim)" onclick="openArchive()">📈 Open THE ARCHIVE — strength curves & records</button>`;
+  if(d.workouts.length)html+=`<button class="btn" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px;border-color:var(--gold-dim)" onclick="go('history')">📜 See full history — strength curves, patrol log & every lift</button>`;
   // monthly report
   if(daysSince(d.workouts[d.workouts.length-1]?.date)>=30||d.u.totalWorkouts>=12)
     html+=`<button class="btn" style="margin-bottom:13px" onclick="periodReport(30)">📂 Batcomputer report — 30d · 90d · yearly</button>`;
@@ -4497,21 +4553,15 @@ function renderCase(){
   html+=combatRatingCard();
   // staleness + balance intelligence
   html+=analysisCard();
-  // tappable progress-by-exercise picker
-  html+=progressByExerciseCard();
   // villain campaign — Rogues Gallery progression path
   html+=villainCampaignCard();
-  // heatmap (monthly, tappable)
-  html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div>
-    <div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
   // achievements
   const ec=d.u.earnedBadges.length,tc=ACHIEVEMENTS.length,pct=Math.round(ec/tc*100);
   const acSorted=ACHIEVEMENTS.slice().sort((a,b)=>{const ga=d.u.earnedBadges.includes(a.id),gb=d.u.earnedBadges.includes(b.id);return ga===gb?0:ga?-1:1;});
   html+=`<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('strength')}Achievements</div><span class="chip">${ec}/${tc}</span></div>
     <div class="acbar"><i style="width:${pct}%"></i></div>
     <div class="grid3" style="grid-template-columns:repeat(4,1fr)">${acSorted.map(a=>{const g=d.u.earnedBadges.includes(a.id);return `<div class="badge ${g?'earned':'locked'}"><div class="be">${a.e}</div><div class="bn">${esc(a.n)}</div></div>`;}).join("")}</div></div>`;
-  // history
-  html+=`<div class="card"><div class="ttl">Recent missions <span class="mini" style="font-weight:400">— 📜 for the patrol report</span></div>${d.workouts.slice(0,12).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><div class="row g" style="gap:9px;align-items:center"><b class="gold">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 9px" onclick="patrolReport(${i})">📜</button></div></div>`).join("")||'<p class="muted">No history yet.</p>'}</div>`;
+  if(d.workouts.length)html+=`<button class="btn ghost" style="margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="go('history')">📜 Patrol log, strength curves & activity → HISTORY</button>`;
   $("app").innerHTML=html;
 }
 function heatmap(){
