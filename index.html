@@ -2415,7 +2415,7 @@ function renderLogging(){
   </div>
   <div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
-    <div class="row" style="gap:8px"><button class="btn ghost sm ${state._rec?'listening':''}" id="voicebtn" style="width:auto" onclick="voiceLog()">${state._rec?'● Tap to stop':'🎤 Voice log'}</button><button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
+    <div class="row" style="gap:8px">${voiceSupported()?`<button class="btn ghost sm ${state._rec?'listening':''}" id="voicebtn" style="width:auto" onclick="voiceLog()">${state._rec?'● Tap to stop':'🎤 Voice log'}</button>`:''}<button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
   </div>`;
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
   html+=`<div class="card glow" style="padding:13px"><div class="ttl">⚡ Tonight's damage report</div>${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div></div>`;
@@ -2520,6 +2520,14 @@ function wordsToNums(t){
   return out.join(" ");
 }
 function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
+// Only Chrome/Edge (desktop) and Chrome (Android) actually run Web Speech recognition.
+// iOS Safari has no API; Opera/Brave have the object but no Google backend → they error at runtime.
+// So: hide the button where the API is absent, and remember if it dies at runtime.
+function voiceSupported(){
+  try{if(localStorage.getItem("gt_voice_dead")==="1")return false;}catch(e){}
+  return !!(window.SpeechRecognition||window.webkitSpeechRecognition);
+}
+function markVoiceDead(){try{localStorage.setItem("gt_voice_dead","1");}catch(e){}}
 function resetVoiceUI(){const b=$("voicebtn");if(b){b.classList.remove("listening");b.innerHTML="🎤 Voice log";}}
 function stopVoice(){const r=state._rec;state._rec=null;clearTimeout(state._recT);state._recT=null;if(r){try{r.onend=null;r.onresult=null;r.onerror=null;}catch(e){}try{r.stop();}catch(e){}try{r.abort&&r.abort();}catch(e){}}resetVoiceUI();}
 function voiceLog(){
@@ -2531,7 +2539,8 @@ function voiceLog(){
   const btn=$("voicebtn");if(btn){btn.classList.add("listening");btn.innerHTML="● Tap to stop";}
   rec.onresult=(e)=>{let t="";try{t=(e.results[e.results.length-1][0].transcript||"").toLowerCase();}catch(_){}handleVoice(t);};
   rec.onerror=(e)=>{const err=e&&e.error;stopVoice();
-    if(err==="not-allowed"||err==="service-not-allowed")toast("Mic permission blocked — enable it in your browser settings.");
+    if(err==="network"||err==="service-not-allowed"){markVoiceDead();toast("Voice logging doesn't work in this browser — use your keyboard's mic on the weight & reps fields instead.");render();}
+    else if(err==="not-allowed")toast("Mic permission blocked — enable it in your browser settings.");
     else if(err==="no-speech")toast("Didn't hear anything — tap and try again.");
     else if(err!=="aborted")toast("Didn't catch that — tap to retry.");};
   rec.onend=()=>{state._rec=null;clearTimeout(state._recT);state._recT=null;resetVoiceUI();};
