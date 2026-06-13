@@ -2623,7 +2623,8 @@ function updateExList(){
   if(state.pickerMuscle!=="all")list=list.filter(e=>(e.p||[]).includes(state.pickerMuscle));
   if(state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip)list=list.filter(e=>gymAllows(e.eq));
   if(q)list=list.filter(e=>e.n.toLowerCase().includes(q));
-  list=list.slice(0,80);
+  // Cap only the unfiltered "all" view (perf); when a muscle filter or search is active, show every match so new exercises at the end of the list are never hidden.
+  if(state.pickerMuscle==="all"&&!q)list=list.slice(0,120);
   const el=$("ex-list");if(!el)return;
   const st=el.scrollTop;                       // preserve scroll so the list doesn't jump on each add
   const added=pickerAddedList();
