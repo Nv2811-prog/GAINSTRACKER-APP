@@ -927,7 +927,7 @@ u:{name:"",bodyweight:75,goal:"build",natty:"maybe",xp:0,totalWorkouts:0,totalVo
  weekSchedule:{0:true,1:false,2:true,3:false,4:true,5:false,6:false},
  physiqueAnalysis:{weakPoints:[],strongPoints:[],mainImbalance:"",overallRating:null,date:null},
  measurements:{chest:null,waist:null,leftArm:null,rightArm:null,leftThigh:null,rightThigh:null,history:[]},
- aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null,gym:null},
+ aiUses:0,shares:0,metric:"rir",lastMissedMuscle:"chest",nutrition:null,gym:null,coachVoice:true},
 muscleVol:{},muscleLastTrained:{},muscleLastVol:{},muscleLastFails:{},
 prs:{},bossWins:[],bossReturns:[],workouts:[],splits:[],activeSplitId:null,customEx:[],
 rival:null,experienceLevel:null,onboardingDone:false,plates:DEF_PLATES.slice(),
@@ -1802,7 +1802,7 @@ function setReadiness(r){state.session.readiness=r;state.step="logging";startTim
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;} // no render (Rule 1 spirit)
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const s=state.session.exercises[ei].sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");}render();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}}render();}
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
 function liveCheckPR(ei,si){
@@ -1841,6 +1841,11 @@ function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=s
 function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
 function setSetType(ei,si,t){state.session.exercises[ei].sets[si].type=t;closeSheet();render();}
 function moveExercise(ei,dir){const arr=state.session.exercises;const j=ei+dir;if(j<0||j>=arr.length)return;const t=arr[ei];arr[ei]=arr[j];arr[j]=t;render();}
+// ---- Collapsible exercises: only the one you're actively on stays expanded; others fold like a list. ----
+function activeExIdx(){const o=findOpenSet();return o?o.ei:-1;}
+function isExOpen(ei){const e=state.session.exercises[ei];if(!e)return false;const active=activeExIdx();if(ei===active)return e._open!==false;return e._open===true;}
+function toggleExCollapse(ei){const e=state.session.exercises[ei];if(!e)return;e._open=!isExOpen(ei);haptic("tap");render();}
+function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>s.done||parseFloat(s.r)>0).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
 // Bottom-sheet menu for a single set: change type, reorder, duplicate, delete.
 const STYPE_LABEL={NRM:"Normal",W:"Warm-up",F:"Failure",D:"Drop set",L:"Left",R:"Right"};
 function openSetSheet(ei,si){
@@ -1866,6 +1871,7 @@ function addExerciseToSession(name){if(!state.session.exercises.some(e=>e.name==
 
 /* ========================= COMMIT WORKOUT ========================= */
 function finishWorkout(){
+  if(typeof stopVoice==="function")stopVoice();
   const ses=state.session;const dur=Math.round((now()-ses.startedAt)/1000);
   const done=ses.exercises.map(e=>({name:e.name,sets:(e.sets||[]).filter(s=>s.done&&(s.w!==""||exFor(e.name).bw)&&s.r!=="")})).filter(e=>e.sets.length);
   if(!done.length){appConfirm({title:"No sets logged",body:"You haven't completed any sets. Discard this session?",ok:"Discard",cancel:"Keep going",danger:true}).then(ok=>{if(ok)endSession();});return;}
@@ -2409,7 +2415,7 @@ function renderLogging(){
   </div>
   <div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
-    <div class="row" style="gap:8px"><button class="btn ghost sm" id="voicebtn" style="width:auto" onclick="voiceLog()">🎤 Voice log</button><button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
+    <div class="row" style="gap:8px"><button class="btn ghost sm ${state._rec?'listening':''}" id="voicebtn" style="width:auto" onclick="voiceLog()">${state._rec?'● Tap to stop':'🎤 Voice log'}</button><button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
   </div>`;
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
   html+=`<div class="card glow" style="padding:13px"><div class="ttl">⚡ Tonight's damage report</div>${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div></div>`;
@@ -2429,10 +2435,20 @@ function renderLogging(){
         html+=`<div class="ssgroup"><div class="sshead">${secIcon('link','#ff8378')}${isCirc?'CIRCUIT':'SUPERSET'} ${gLetters[e.group]} <em>· ${gCount[e.group]} moves, back-to-back — rest after the round</em></div>`;
       }
     }
+    if(!isExOpen(ei)){
+      const pr=exProgress(e);
+      html+=`<div class="card exfold" onclick="toggleExCollapse(${ei})" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px;${pr.allDone?'opacity:.7':''}">
+        ${thumb(ex,true)}
+        <div class="g" style="min-width:0"><div class="exname" style="font-size:16px">${esc(e.name)}</div>
+          <div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")} · ${pr.allDone?`<span style="color:var(--green)">✓ ${pr.total} done</span>`:`${pr.doneN}/${pr.total} sets`}</div></div>
+        <div style="color:var(--text3);font-size:15px;font-weight:700">${pr.allDone?'✓':'▸'}</div>
+      </div>`;
+      return;
+    }
     html+=`<div class="card">
       <div class="row" style="margin-bottom:8px">
         ${thumb(ex,true)}
-        <div class="g"><div class="exname">${esc(e.name)}</div>
+        <div class="g" onclick="toggleExCollapse(${ei})" style="cursor:pointer"><div class="exname">${esc(e.name)} <span style="color:var(--text3);font-size:13px;font-weight:700">▾</span></div>
           <div class="exmeta">${(ex.p||[]).map(m=>MNAME[m]).join(" · ")}${ex.bw?" · bodyweight":""}</div></div>
         ${ex.eq==="barbell"||ex.eq==="smith"||ex.eq==="ez bar"||ex.eq==="trap bar"?`<button class="btn ghost sm" style="width:auto;padding:8px 9px;display:flex;align-items:center" title="Plate calculator" onclick="openPlateSheet(${ei})">${secIcon('plate')}</button>`:""}
         <button class="btn ghost sm" style="width:auto;padding:8px 9px;color:var(--text3)" title="Move up" ${ei===0?'disabled style="opacity:.3;width:auto;padding:8px 9px"':''} onclick="moveExercise(${ei},-1)">↑</button>
@@ -2504,16 +2520,23 @@ function wordsToNums(t){
   return out.join(" ");
 }
 function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
+function resetVoiceUI(){const b=$("voicebtn");if(b){b.classList.remove("listening");b.innerHTML="🎤 Voice log";}}
+function stopVoice(){const r=state._rec;state._rec=null;clearTimeout(state._recT);state._recT=null;if(r){try{r.onend=null;r.onresult=null;r.onerror=null;}catch(e){}try{r.stop();}catch(e){}try{r.abort&&r.abort();}catch(e){}}resetVoiceUI();}
 function voiceLog(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast("Voice logging isn't supported in this browser — try Chrome.");return;}
-  if(state._rec){try{state._rec.stop();}catch(e){}state._rec=null;return;}
-  const rec=new SR();rec.lang="en-US";rec.interimResults=false;rec.maxAlternatives=1;state._rec=rec;
-  const btn=$("voicebtn");if(btn){btn.classList.add("listening");btn.textContent="● Listening…";}
-  rec.onresult=(e)=>{const t=(e.results[0][0].transcript||"").toLowerCase();handleVoice(t);};
-  rec.onerror=(e)=>{toast("Didn't catch that ("+e.error+").");};
-  rec.onend=()=>{state._rec=null;const b=$("voicebtn");if(b){b.classList.remove("listening");b.innerHTML="🎤 Voice log";}};
-  try{rec.start();haptic("tap");}catch(e){toast("Mic busy — try again.");}
+  if(!SR){toast("Voice logging needs Chrome on Android or desktop — your browser doesn't support it. Tap the weight & reps fields instead.");return;}
+  if(state._rec){stopVoice();toast("Voice off.");return;}   // toggle off — always works, never gets stuck
+  let rec;try{rec=new SR();}catch(e){toast("Couldn't start the mic.");return;}
+  rec.lang="en-US";rec.interimResults=false;rec.maxAlternatives=1;rec.continuous=false;state._rec=rec;
+  const btn=$("voicebtn");if(btn){btn.classList.add("listening");btn.innerHTML="● Tap to stop";}
+  rec.onresult=(e)=>{let t="";try{t=(e.results[e.results.length-1][0].transcript||"").toLowerCase();}catch(_){}handleVoice(t);};
+  rec.onerror=(e)=>{const err=e&&e.error;stopVoice();
+    if(err==="not-allowed"||err==="service-not-allowed")toast("Mic permission blocked — enable it in your browser settings.");
+    else if(err==="no-speech")toast("Didn't hear anything — tap and try again.");
+    else if(err!=="aborted")toast("Didn't catch that — tap to retry.");};
+  rec.onend=()=>{state._rec=null;clearTimeout(state._recT);state._recT=null;resetVoiceUI();};
+  state._recT=setTimeout(()=>{toast("Voice timed out — tap to try again.");stopVoice();},12000); // watchdog: never hang
+  try{rec.start();haptic("tap");}catch(e){stopVoice();toast("Mic busy — try again.");}
 }
 function handleVoice(t){
   const nums=(wordsToNums(t).match(/\d+(?:\.\d+)?/g)||[]).map(Number);
@@ -5376,6 +5399,13 @@ function mealTemplatesHtml(){
     ${ts.length?`<div class="row wrap" style="margin-top:8px">${chips}</div>`:`<div class="mini" style="color:var(--text3);margin-top:6px">No saved meals yet. Log a meal you eat often, then tap <b>Save today's log</b> to reuse it instantly.</div>`}`;
 }
 /* ===== Wave 12 — Alfred's voice: speak a line aloud via the browser's Web Speech API ===== */
+let _alfredVoices=[];
+function loadAlfredVoices(){try{_alfredVoices=window.speechSynthesis.getVoices()||[];}catch(e){}}
+if(typeof window!=="undefined"&&"speechSynthesis" in window){loadAlfredVoices();try{window.speechSynthesis.onvoiceschanged=loadAlfredVoices;}catch(e){}}
+function pickAlfredVoice(){
+  const vs=(_alfredVoices&&_alfredVoices.length)?_alfredVoices:(function(){loadAlfredVoices();return _alfredVoices;})();
+  return vs.find(v=>/en-GB/i.test(v.lang)&&/male|daniel|arthur|oliver|george/i.test(v.name))||vs.find(v=>/en-GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;
+}
 function alfredSpeak(text){
   try{
     if(!("speechSynthesis" in window)){toast("Voice isn't supported on this browser.");return;}
@@ -5383,11 +5413,32 @@ function alfredSpeak(text){
     if(synth.speaking){synth.cancel();return;} // tap again to stop
     const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
     u.rate=0.95;u.pitch=0.9;
-    const vs=synth.getVoices()||[];
-    const pick=vs.find(v=>/en-GB/i.test(v.lang)&&/male|daniel|arthur|oliver|george/i.test(v.name))||vs.find(v=>/en-GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang));
+    const pick=pickAlfredVoice();
     if(pick)u.voice=pick;
     haptic("tap");synth.speak(u);
   }catch(e){toast("Couldn't start voice.");}
+}
+/* Auto-coaching voice — fires after a logged set. Cancels any in-flight line, never toggles. Silent if disabled/unsupported. */
+function alfredVoiceLine(text){
+  try{
+    if(!state.data.u.coachVoice)return;
+    if(!("speechSynthesis" in window))return;
+    const synth=window.speechSynthesis;synth.cancel();
+    const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
+    u.rate=0.97;u.pitch=0.9;
+    const pick=pickAlfredVoice();if(pick)u.voice=pick;
+    synth.speak(u);
+  }catch(e){}
+}
+const _ALFRED_SET=["Logged. Recover, sir.","Set down — breathe and reset.","Good work. Rest up.","Noted, sir. Catch your breath.","One more in the bank.","Clean rep, sir. Recover."];
+const _ALFRED_LAST=["Exercise complete, sir. On to the next.","That's the lot — move on when ready.","Done here. Next target, sir.","Finished. Well struck, sir."];
+function alfredCoachLine(ei,si,ev){
+  const e=state.session.exercises[ei];if(!e)return _ALFRED_SET[0];
+  const working=(e.sets||[]).filter(s=>s.type!=="W");
+  const doneN=working.filter(s=>s.done).length;const last=working.length>0&&doneN>=working.length;
+  if(ev==="pr"||ev==="boss")return "A new record, sir. Outstanding.";
+  const arr=last?_ALFRED_LAST:_ALFRED_SET;
+  return arr[Math.floor(Math.random()*arr.length)];
 }
 function openMessHall(){
   const n=state.data.u.nutrition;
@@ -6282,6 +6333,8 @@ function openSettings(){
     <label class="mini">Bar weight (kg)</label><input inputmode="decimal" value="${u.barWeight}" oninput="u_set('barWeight',parseFloat(this.value)||20)" style="margin-bottom:12px"/>
     <label class="mini">Autoregulation metric</label>
     <div class="row" style="gap:8px;margin-bottom:12px"><button class="chip ${u.metric==='rpe'?'on':''} g" onclick="u_set('metric','rpe');openSettings()">RPE</button><button class="chip ${u.metric==='rir'?'on':''} g" onclick="u_set('metric','rir');openSettings()">RIR</button></div>
+    <label class="mini">Alfred's voice (speaks after each set)</label>
+    <div class="row" style="gap:8px;margin-bottom:12px"><button class="chip ${u.coachVoice?'on':''} g" onclick="u_set('coachVoice',true);openSettings()">On</button><button class="chip ${!u.coachVoice?'on':''} g" onclick="u_set('coachVoice',false);openSettings()">Off</button></div>
     <label class="mini">Gemini 1.5 Flash API key (stored on this device only)</label>
     <input value="${esc(geminiKey())}" placeholder="Paste key to activate Alfred" oninput="setGemKey(this.value)" style="margin-bottom:14px"/>
     <div class="hr"></div>
