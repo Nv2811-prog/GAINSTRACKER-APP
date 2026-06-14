@@ -4885,7 +4885,20 @@ function toggleBelt(){$("belt").classList.toggle("hide");}
 function myPatrolCard(){
   const d=state.data,u=d.u,sl=strengthLevel(),r=rankFor(sl),a=(typeof trainingAge==="function"?trainingAge():null);
   const lifts=Object.entries(d.prs||{}).map(([n,p])=>({n,o:Math.round((p&&p.orm)||0)})).filter(x=>x.o>0).sort((a,b)=>b.o-a.o).slice(0,3);
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,lifts};
+  // Optimality = how good (vs the world) your big lifts are, regardless of sheer tonnage. Avg world
+  // percentile across the standard lifts you've logged (machine/variation estimates included).
+  let opt=0,bw=bodyW();const bigKeys={b:"Bench Press",s:"Squat",d:"Deadlift"};const big={};
+  try{const pcts=[];["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].forEach(L=>{
+      const est=liftEstimate(L),std=STD[L];if(est&&std){pcts.push(worldPercentile(est.orm/bw,std));}});
+    if(pcts.length)opt=Math.round(pcts.reduce((x,y)=>x+y,0)/pcts.length);
+    Object.entries(bigKeys).forEach(([k,L])=>{const est=liftEstimate(L);if(est)big[k]=Math.round(est.orm);});
+  }catch(e){}
+  // Recent patrols — the async "see each other's past workouts": last 5 sessions, compact for sharing.
+  const recent=(d.workouts||[]).slice(0,5).map(w=>{
+    let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{const o=epley(+s.w||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
+    return {n:(w.name||"Session").slice(0,16),v:Math.round(w.totalVol||0),t:(w.date||"").slice(0,10),top:top.slice(0,18)};
+  });
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,lifts,bw,opt,big,recent};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
@@ -4927,30 +4940,63 @@ function compareAlly(i){
   const row=(lab,m,t,unit,disp)=>{const win=m===t?0:(m>t?1:-1);
     const mc=win>0?"var(--green)":win<0?"var(--text2)":"var(--gold2)",tc=win<0?"var(--green)":win>0?"var(--text2)":"var(--gold2)";
     const dm=disp?disp(m):m,dt=disp?disp(t):t;
-    return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><b style="color:${mc};min-width:60px;text-align:left">${dm}${unit||""}</b><span class="mini" style="flex:1;text-align:center;color:var(--text3)">${lab}</span><b style="color:${tc};min-width:60px;text-align:right">${dt}${unit||""}</b></div>`;};
-  let wins=0,losses=0;["sl","vol","w","boss","days"].forEach(k=>{if(me[k]>a[k])wins++;else if(me[k]<a[k])losses++;});
-  const verdict=wins>losses?`You lead ${esc(a.n)} ${wins}–${losses}. Stay hungry.`:wins<losses?`${esc(a.n)} is ahead ${losses}–${wins}. Back to the cave.`:`Dead even with ${esc(a.n)}. The rivalry is real.`;
+    return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><b style="color:${mc};min-width:64px;text-align:left">${dm}${unit||""}</b><span class="mini" style="flex:1;text-align:center;color:var(--text3)">${lab}${win>0?' ◂':win<0?' ▸':''}</span><b style="color:${tc};min-width:64px;text-align:right">${dt}${unit||""}</b></div>`;};
+  // Weighted head-to-head — strength & optimality matter most, tonnage least, villains for fun.
+  const cats=[["sl",3],["opt",3],["bigTot",2],["boss",1.5],["vol",1],["w",1]];
+  const bigTot=c=>{const b=c.big||{};return Math.round((b.b||0)+(b.s||0)+(b.d||0));};
+  const mv={sl:me.sl,opt:me.opt||0,bigTot:bigTot(me),boss:me.boss,vol:me.vol,w:me.w};
+  const av={sl:a.sl,opt:a.opt||0,bigTot:bigTot(a),boss:a.boss,vol:a.vol,w:a.w};
+  let myPts=0,aPts=0;cats.forEach(([k,wt])=>{if(mv[k]>av[k])myPts+=wt;else if(mv[k]<av[k])aPts+=wt;});
+  const myR=rivalryScore(me),aR=rivalryScore(a);
+  const verdict=myR>aR?`You edge ${esc(a.n)} on the rivalry board — strength and quality carry the day. Stay hungry, Master.`
+    :myR<aR?`${esc(a.n)} is the stronger vigilante right now. Back to the cave and close the gap.`
+    :`Dead even with ${esc(a.n)}. The rivalry is real.`;
   const t1=esc((state.data.u.name||"You").slice(0,16)),t2=esc(a.n.slice(0,16));
+  const optRow=(me.opt||a.opt)?row("World optimality",me.opt||0,a.opt||0,"%",v=>"Top "+Math.max(1,100-v)):"";
+  const bigRow=(bigTot(me)||bigTot(a))?row("Big-3 estimate",bigTot(me),bigTot(a)," kg",v=>fmtNum(v)):"";
+  const hasRecent=(a.recent&&a.recent.length);
   openSheet(`<div class="ttl center" style="justify-content:center;text-align:center">⚔️ ${t1} vs ${t2}</div>
+    <div class="stage" style="border-radius:12px;padding:10px;margin:4px 0 8px;text-align:center">
+      <div class="mini" style="color:var(--text3);letter-spacing:.1em">RIVALRY SCORE</div>
+      <div class="row sp" style="justify-content:center;gap:14px;align-items:baseline"><b style="color:${myR>=aR?'var(--gold2)':'var(--text2)'};font-size:22px">${fmtNum(myR)}</b><span class="mini" style="color:var(--text3)">vs</span><b style="color:${aR>myR?'var(--gold2)':'var(--text2)'};font-size:22px">${fmtNum(aR)}</b></div>
+      <div class="mini" style="color:var(--text2);margin-top:2px">Category tally ${myPts.toFixed(1)}–${aPts.toFixed(1)}</div></div>
     <div class="row sp" style="margin:6px 0 2px"><b class="gold">${t1}</b><b class="gold">${t2}</b></div>
     ${row("Strength level",me.sl,a.sl)}
+    ${optRow}
+    ${bigRow}
     ${row("Lifetime kilos",me.vol,a.vol," kg",v=>fmtNum(v))}
     ${row("Sessions",me.w,a.w)}
     ${row("Villains felled",me.boss,a.boss)}
     ${row("Nights on patrol",me.days,a.days)}
     <div class="banner" style="margin-top:12px"><span>🦇</span><div class="mini">${verdict}</div></div>
-    <button class="btn" style="margin-top:11px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
+    ${hasRecent?`<button class="btn sm" style="margin-top:9px" onclick="allyLog(${i})">📜 ${t2}'s recent patrols</button>`:`<div class="mini" style="margin-top:9px;color:var(--text3);text-align:center">${t2}'s card has no recent patrols logged — ask them to re-share an updated card.</div>`}
+    <button class="btn" style="margin-top:7px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
+}
+// Async "see each other's past workouts" — read an ally's last sessions straight off their Patrol Card.
+function allyLog(i){
+  const a=(state.data.allies||[])[i];if(!a)return;
+  const rec=a.recent||[];const nm=esc(a.n.slice(0,18));
+  const fmtDate=t=>{if(!t)return"";const d=new Date(t);return isNaN(d)?t:d.toLocaleDateString(undefined,{month:"short",day:"numeric"});};
+  const rows=rec.length?rec.map(w=>`<div style="border:1px solid var(--border2);border-radius:11px;padding:10px 11px;margin-top:8px;background:var(--bg2)">
+      <div class="row sp"><b style="font-size:14px;color:var(--gold2)">${esc(w.n||"Session")}</b><span class="mini" style="color:var(--text3)">${fmtDate(w.t)}</span></div>
+      <div class="row sp" style="margin-top:4px"><span class="mini">Moved <b class="gold">${fmtNum(w.v||0)}kg</b></span>${w.top?`<span class="mini" style="color:var(--text2)">Top lift: ${esc(w.top)}</span>`:""}</div></div>`).join("")
+    :`<div class="mini" style="color:var(--text3);margin-top:8px">No recent patrols on this card.</div>`;
+  openSheet(`<div class="ttl center" style="justify-content:center;text-align:center">📜 ${nm}'s recent patrols</div>
+    <div class="mini" style="margin:-2px 0 4px;color:var(--text2);text-align:center">The last ${rec.length} session${rec.length===1?"":"s"} ${nm} logged, read off their Patrol Card.</div>
+    ${rows}
+    <button class="btn" style="margin-top:12px" onclick="compareAlly(${i})">‹ Back to compare</button>`);
 }
 function openJusticeLeague(){
   const me=myPatrolCard(),allies=state.data.allies||[],code=encodeCard(me);
   const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
   const cardMini=(c,you)=>`<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:11px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
     <div class="row sp"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b><span class="mini">${c.re} ${esc(c.rk)}</span></div>
-    <div class="row" style="gap:6px;margin-top:9px">${caveStat("STR "+c.sl,"strength")}${caveStat(fmtNum(c.vol)+"kg","moved")}${caveStat(c.w,"sessions")}${caveStat(c.boss,"villains")}</div></div>`;
+    <div class="row" style="gap:6px;margin-top:9px">${caveStat("STR "+c.sl,"strength")}${caveStat(fmtNum(c.vol)+"kg","moved")}${caveStat(c.w,"sessions")}${caveStat(c.boss,"villains")}</div>
+    ${c.opt?`<div class="mini" style="margin-top:7px;color:var(--text2);text-align:center">🌍 World optimality — <b class="gold">Top ${Math.max(1,100-c.opt)}%</b> of lifters on their big lifts</div>`:""}</div>`;
   const allyHtml=allies.length?allies.map((a,i)=>`<div style="margin-top:9px">${cardMini(a,false)}
     <div class="row" style="gap:6px;margin-top:5px"><button class="btn ghost sm" onclick="compareAlly(${i})">Compare</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delAlly(${i})">Remove</button></div></div>`).join(""):'<div class="mini" style="margin-top:8px;color:var(--text3)">No allies yet. Paste a friend\u2019s Patrol Card below to start your League.</div>';
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('link')}Justice League</div>
-    <div class="mini" style="margin:-2px 0 11px;color:var(--text2)">Train with friends — no account, no server. Share your Patrol Card as a code, add theirs to compare. Everything stays on your devices.</div>
+    <div class="mini" style="margin:-2px 0 11px;color:var(--text2)">Train with friends — no account, no server. Share your Patrol Card as a code, add theirs to compare strength, world optimality, big-3 and recent patrols. Everything stays on your devices.</div>
     ${cardMini(me,true)}
     <div class="row wrap" style="gap:5px;margin-top:8px">${lifts}</div>
     <button class="btn sm" style="margin-top:11px" onclick="openLeaderboard()">🏆 League Leaderboard — rank everyone</button>
@@ -4964,7 +5010,10 @@ function openJusticeLeague(){
     <button class="btn ghost" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
 }
 // Composite "Vigilante Score" — one number to rank yourself against your League.
-function vigilanteScore(c){if(!c)return 0;return Math.round((c.sl||0)*10+(c.vol||0)/1000+(c.w||0)*2+(c.boss||0)*8+(c.days||0)*0.5);}
+function vigilanteScore(c){if(!c)return 0;return Math.round((c.sl||0)*10+(c.opt||0)*0.9+(c.vol||0)/1000+(c.w||0)*2+(c.boss||0)*8+(c.days||0)*0.5);}
+// Rivalry score — the head-to-head number, weighted toward general STRENGTH and OPTIMALITY (how good
+// your lifts are vs the world), with some villain fun. Less about who simply moved more tonnage.
+function rivalryScore(c){if(!c)return 0;return Math.round((c.sl||0)*12+(c.opt||0)*1.6+(c.vol||0)/2500+(c.boss||0)*10+(c.w||0)*1.5);}
 function openLeaderboard(){
   const me=Object.assign({},myPatrolCard(),{_you:true});
   const board=[me].concat((state.data.allies||[]).map(a=>Object.assign({},a)));
@@ -4976,10 +5025,10 @@ function openLeaderboard(){
     return `<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:10px 11px;margin-top:8px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
       <div class="row sp"><div class="row g" style="gap:9px;min-width:0"><span style="font-size:20px;flex:none;width:26px;text-align:center">${medal(i)}</span><b style="font-family:var(--disp);font-size:15px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b></div><b style="color:${you?'var(--gold2)':'var(--text)'}">${fmtNum(c._score)}</b></div>
       <div style="height:7px;border-radius:5px;background:var(--bg);overflow:hidden;margin-top:7px"><div style="height:100%;width:${pct}%;background:${you?'linear-gradient(90deg,var(--gold3),var(--gold))':'#3a4252'};border-radius:5px"></div></div>
-      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl} · ${fmtNum(c.vol)}kg · ${c.w} sessions · ${c.boss} villains</div></div>`;}).join("");
+      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl}${c.opt?` · Top ${Math.max(1,100-c.opt)}%`:""} · ${fmtNum(c.vol)}kg · ${c.w} sessions · ${c.boss} villains</div></div>`;}).join("");
   const myRank=board.findIndex(c=>c._you)+1;
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:6px">🏆 League Leaderboard</div>
-    <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — strength level, tonnage, sessions, villains and nights on patrol, fused into one number.</div>
+    <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — strength level, world optimality, tonnage, sessions, villains and nights on patrol, fused into one number.</div>
     <div class="banner" style="margin-bottom:4px"><span>🦇</span><div class="mini">${board.length<2?"Add allies in the Justice League to fill the board — for now the cave is yours alone.":myRank===1?"You sit at the top of the League. Defend the cowl.":`You're ranked #${myRank} of ${board.length}. ${fmtNum((board[myRank-2]._score-me._score))} points behind the vigilante above you.`}</div></div>
     ${rows}
     <button class="btn" style="margin-top:13px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
