@@ -1442,11 +1442,12 @@ function heatColor(m){
   return `hsl(${H} ${S}% ${L}%)`;
 }
 function heatLabel(m){
-  const s=weeklySets(MM_NORM(m)), lm=VL[MM_NORM(m)]||{mev:8,mav:14,mrv:20};
+  const nm=MM_NORM(m);
+  const s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20}, eMrv=effectiveMRV(nm);
   if(!(s>0))return ["Untrained","var(--text3)"];
   if(s<lm.mev)return ["Below maintenance","var(--text2)"];
   if(s<lm.mav)return ["Productive zone","var(--yellow)"];
-  if(s<=lm.mrv)return ["Optimal / high","var(--green)"];
+  if(s<=eMrv)return [eMrv>lm.mrv?"Optimal — well spread":"Optimal / high","var(--green)"];
   return ["Over MRV — junk risk","var(--red)"];
 }
 // Compact heat body: lights the tapped muscle by training intensity, on a Gym80-style dark tile.
@@ -1728,6 +1729,25 @@ function weeklySets(m){
     });
   });
   return Math.round(c);
+}
+// How well is this muscle's volume distributed across its heads this week? Uses the same per-head
+// tally the coverage coach does (subSetCounts). covered = sub-regions getting real work (>=2 sets).
+// 6 chest sets spread across upper/mid/lower is real coverage, not 6 junk sets on one head.
+function subSpread(m){
+  const t=subSetCounts(m), ids=Object.keys(t);
+  const covered=ids.filter(id=>t[id]>=2).length;
+  return {covered,total:ids.length,tally:t};
+}
+// Spreading volume across sub-regions raises how much a muscle can productively absorb before sets
+// turn to junk — 20 chest sets split across three heads is far more recoverable than 20 on flat bench.
+// So we lift the effective MRV by ~2 sets per extra sub-region covered (capped), and the analysis
+// uses THIS instead of the raw MRV before crying "junk volume". Honours the directive: don't punish
+// well-distributed volume.
+function effectiveMRV(m){
+  const lm=VL[m]||{mrv:20}; const sp=subSpread(m);
+  if(sp.total<=1)return lm.mrv;
+  const bonus=Math.max(0,sp.covered-1)*2;
+  return lm.mrv+Math.min(bonus,6);
 }
 /* ===== Training FREQUENCY per muscle — distinct sessions this week + days since last stimulus.
    Science: each muscle grows best trained ~2× / week (every ~72h). We use that to tell the
@@ -3751,7 +3771,7 @@ function muscleDrill(m){
     <div class="row sp" style="margin-bottom:4px"><span class="muted">Fatigue / recovery</span><b style="color:${trained?recoveryColor(rec):'var(--text3)'}">${trained?f.pct+"% fatigued · "+rec+"% fresh":"untrained"}</b></div>
     ${trained?`<div class="mini" style="margin-bottom:10px;color:var(--text3)">${f.hrs>0?"≈ "+f.hrs+"h until fully recovered (this muscle's recovery rate ≈ "+(MREC[m]||48)+"h)":"Fully recovered — ready to train"}</div>`:""}
     <div class="ttl" style="font-size:14px;margin-bottom:2px">Weekly volume</div>
-    ${volBar(sets,lm)}
+    ${volBar(sets,lm,m)}
     <div class="ttl" style="font-size:14px;margin:13px 0 4px">Sub-regions <span class="mini" style="font-weight:400;color:var(--text3)">— bar = current fatigue heat</span></div>
     ${subRows}
     ${coach}
@@ -3837,12 +3857,16 @@ function progressByExerciseCard(){
       ${miniSpark(e1s)}<b class="gold" style="white-space:nowrap">${best}kg ›</b></div>`;}).join("")}</div>`;
 }
 // ---- weekly-set volume landmark bar (MEV/MAV/MRV) ----
-function volBar(sets,lm){
-  const cap=Math.max(lm.mrv+5,sets*1.12,lm.mrv*1.25);
+function volBar(sets,lm,m){
+  const eMrv=m?effectiveMRV(m):lm.mrv;                 // spread across sub-regions raises the ceiling
+  const spread=m?subSpread(m):null;
+  const cap=Math.max(eMrv+5,sets*1.12,lm.mrv*1.25);
   const P=v=>clamp(v/cap*100,0,100);
-  const mev=P(lm.mev),mav=P(lm.mav),mrv=P(lm.mrv),cur=clamp(P(sets),0,100);
-  const zc=sets<lm.mev?"#8a8a8a":sets<=lm.mav?"#2ECC71":sets<=lm.mrv?"#E8C56A":"#E8453C";
-  const zt=sets<lm.mev?"below MEV — maintenance only":sets<=lm.mav?"growth zone (MEV–MAV)":sets<=lm.mrv?"high but recoverable (MAV–MRV)":"over MRV — back off";
+  const mev=P(lm.mev),mav=P(lm.mav),mrv=P(eMrv),cur=clamp(P(sets),0,100);
+  const zc=sets<lm.mev?"#8a8a8a":sets<=lm.mav?"#2ECC71":sets<=eMrv?"#E8C56A":"#E8453C";
+  const zt=sets<lm.mev?"below MEV — maintenance only":sets<=lm.mav?"growth zone (MEV–MAV)":sets<=eMrv?"high but recoverable (MAV–MRV)":"over MRV — back off";
+  const spreadNote=(spread&&eMrv>lm.mrv&&sets>lm.mav)
+    ? `<div class="mini" style="text-align:center;margin-top:4px;color:#2ECC71">Spread across ${spread.covered} sub-regions — ceiling raised to ${eMrv}, so this volume still works.</div>` : "";
   return `<div style="margin:6px 0 2px">
     <div style="position:relative;height:15px;border-radius:8px;overflow:hidden;background:#151515">
       <div style="position:absolute;left:0;width:${mev}%;height:100%;background:#333"></div>
@@ -3851,8 +3875,9 @@ function volBar(sets,lm){
       <div style="position:absolute;left:${mrv}%;right:0;height:100%;background:rgba(232,69,60,.45)"></div>
       <div style="position:absolute;left:${cur}%;top:-2px;width:3px;height:19px;background:#fff;border-radius:2px;transform:translateX(-1.5px);box-shadow:0 0 5px #000"></div>
     </div>
-    <div class="mini" style="display:flex;justify-content:space-between;margin-top:3px;color:var(--text3)"><span>0</span><span>MEV ${lm.mev}</span><span>MAV ${lm.mav}</span><span>MRV ${lm.mrv}</span></div>
+    <div class="mini" style="display:flex;justify-content:space-between;margin-top:3px;color:var(--text3)"><span>0</span><span>MEV ${lm.mev}</span><span>MAV ${lm.mav}</span><span>MRV ${eMrv}${eMrv>lm.mrv?"*":""}</span></div>
     <div class="mini" style="text-align:center;margin-top:5px;color:${zc}"><b>${sets} sets/week — ${zt}</b></div>
+    ${spreadNote}
   </div>`;
 }
 /* ========================================================================
@@ -5113,7 +5138,7 @@ function deloadCard(){
   const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
   if(trained.length<3)return "";
   const fried=trained.filter(m=>getRecovery(m)<50);
-  const overMrv=M12.filter(m=>weeklySets(m)>((VL[m]||{}).mrv||99));
+  const overMrv=M12.filter(m=>weeklySets(m)>effectiveMRV(m));
   const need=fried.length>=4||overMrv.length>=3;
   const snoozed=state.data.dismissed&&state.data.dismissed.deload&&(now()-state.data.dismissed.deload)<5*864e5;
   if(need){
@@ -5180,11 +5205,11 @@ function scienceLabCard(){
   const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
   if(trained.length<3)return "";
   let below=0,growth=0; const junk=[];
-  M12.forEach(m=>{const s=weeklySets(m),lm=VL[m]||{mev:8,mav:16,mrv:20};
+  M12.forEach(m=>{const s=weeklySets(m),lm=VL[m]||{mev:8,mav:16,mrv:20},eMrv=effectiveMRV(m);
     if(s<=0)return;
     if(s<lm.mev)below++;
-    else if(s<=lm.mrv)growth++;
-    else junk.push({m,s,mrv:lm.mrv});});
+    else if(s<=eMrv)growth++;          // volume spread across sub-regions earns a higher ceiling
+    else junk.push({m,s,mrv:eMrv});});
   let verdict,vc;
   if(junk.length>=2){verdict=`Junk-volume risk — ${junk.length} muscles past MRV. Recovery, not more sets, is the limiter now.`;vc="var(--red)";}
   else if(junk.length===1){verdict=`${MNAME[junk[0].m]} has crept past MRV. Trim ~2 sets to keep every rep productive.`;vc="var(--orange)";}
@@ -5731,7 +5756,7 @@ function alfredBriefing(){
   const prime=trained.filter(m=>getRecovery(m)>=70&&weeklySets(m)<VL[m].mav)
     .sort((a,b)=>getRecovery(b)-getRecovery(a)).slice(0,3);
   const under=[],over=[];
-  M12.forEach(m=>{const ws=weeklySets(m),vl=VL[m];if(ws>0&&ws<vl.mev)under.push({m,ws,mev:vl.mev});if(ws>vl.mrv)over.push({m,ws,mrv:vl.mrv});});
+  M12.forEach(m=>{const ws=weeklySets(m),vl=VL[m],eMrv=effectiveMRV(m);if(ws>0&&ws<vl.mev)under.push({m,ws,mev:vl.mev});if(ws>eMrv)over.push({m,ws,mrv:eMrv});});
   const gaps=[];trained.forEach(m=>coverageTips(m).slice(0,1).forEach(t=>gaps.push({m,text:t.text})));
   let rows="";
   // opener
@@ -5788,7 +5813,7 @@ function alfredCaveReview(){
   const PUSH=["chest","shoulders","triceps"],PULL=["back","biceps","forearms"];
   const ps=PUSH.reduce((a,m)=>a+weeklySets(m),0),pl=PULL.reduce((a,m)=>a+weeklySets(m),0);
   const under=M12.filter(m=>{const s=weeklySets(m);return s>0&&s<(VL[m]||{mev:8}).mev;});
-  const over=M12.filter(m=>weeklySets(m)>(VL[m]||{mrv:20}).mrv);
+  const over=M12.filter(m=>weeklySets(m)>effectiveMRV(m));
   const fried=M12.filter(m=>(state.data.muscleVol[m]||0)>0&&getRecovery(m)<50);
   const goal=state.data.u.weeklyGoal||4;
   let flags="";
