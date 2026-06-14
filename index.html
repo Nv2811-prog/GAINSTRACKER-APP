@@ -415,6 +415,8 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .prpop .prcell{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(232,197,106,.16);border-radius:12px;padding:8px 9px;text-align:center}
 .prpop .prcell .k{font-size:9.5px;letter-spacing:.6px;color:var(--text3);text-transform:uppercase;font-weight:700}
 .prpop .prcell .v{font-size:15px;color:#fff;font-weight:800;margin-top:2px}
+.prpop .prchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:2px 0 11px;position:relative}
+.prpop .prchip{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;border:1px solid;border-radius:999px;padding:3px 9px;background:rgba(255,255,255,.03);white-space:nowrap}
 .prpop .prtap{text-align:center;color:var(--text3);font-size:10.5px;margin-top:10px;position:relative}
 /* ===== End-of-workout cinematic summary ===== */
 .sumtag{display:block;text-align:center;letter-spacing:3px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;animation:sumFade .6s .05s both}
@@ -1213,6 +1215,15 @@ function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.p
   if((!d.workouts||!d.workouts.length)&&d.muscleVol&&Object.keys(d.muscleVol).length){d.muscleVol={};d.muscleLastTrained={};d.muscleLastVol={};d.muscleLastFails={};}
   // Migration: default the effort metric to RIR (reps-in-reserve) — clearer than RPE. One-time flip, respects later manual changes.
   if(!d.u._rirMig){d.u.metric="rir";d.u._rirMig=true;}
+  // Migration v3: the exercise database was rebuilt from scratch (renamed/removed many lifts), so all
+  // exercise-referencing analytics are now stale. One-time clean slate — keep the profile/gym/settings.
+  if(!d.u._dbV3){
+    d.workouts=[];d.prs={};d.muscleVol={};d.muscleLastTrained={};d.muscleLastVol={};d.muscleLastFails={};
+    d.bossWins=[];d.bossReturns=[];d.experiments=[];d.exNotes={};d.nemesisLift=null;d.debriefs=[];
+    d.u.totalWorkouts=0;d.u.totalVolume=0;d.u.totalDuration=0;d.u.failureSets=0;d.u.xp=0;
+    d.u.streakDays=0;d.u.lastTrainedDate=null;d.u.earnedBadges=[];
+    d.u._dbV3=true;
+  }
   state.data=d;}}catch(e){}}
 
 /* ========================= UTILS ========================= */
@@ -1221,7 +1232,7 @@ const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const now=()=>Date.now();
 const fmtTime=s=>{s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return (m<10?"0":"")+m+":"+((s%60)<10?"0":"")+(s%60);};
-const fmtVol=v=>v>=1000?(v/1000).toFixed(v>=10000?0:1)+"t":Math.round(v)+"kg";
+const fmtVol=v=>Math.round(v).toLocaleString("en-US")+"kg";
 const fmtNum=n=>Math.round(n).toLocaleString("en-US");
 const hoursSince=t=>t?(now()-new Date(t).getTime())/3600000:99999;
 const daysSince=t=>hoursSince(t)/24;
@@ -2079,45 +2090,68 @@ function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!
 function liveCheckPR(ei,si){
   const exObj=state.session.exercises[ei];const s=exObj.sets[si];
   if(!s||!s.done||s.type==="W")return null;            // warm-ups never count as PRs
-  const ex=exFor(exObj.name);const e1=setE1RM(ex,s);
-  if(!e1)return null;
-  const committed=(state.data.prs[exObj.name]&&state.data.prs[exObj.name].orm)||0;
-  if(e1<=committed+0.01)return null;                    // not a PR
+  const ex=exFor(exObj.name);
+  const w=setLoad(ex,s.w),r=+s.r||0;
+  const e1=setE1RM(ex,s),vol=setVolume(ex,s);
+  if(!e1&&!w&&!vol)return null;
+  const rec=state.data.prs[exObj.name]||{};
+  const cOrm=rec.orm||0,cW=rec.maxW||0,cReps=rec.maxReps||0,cVol=rec.maxVol||0;
   state.session.liveBest=state.session.liveBest||{};
   state.session.bossed=state.session.bossed||{};
+  // Tiered PRs: a single set can break several records at once. Track the session's running best
+  // for each tier so we only toast genuine new ground, and rank them — e1RM is the crown.
+  const lb=state.session.liveBest[exObj.name]=state.session.liveBest[exObj.name]||{orm:0,maxW:0,maxReps:0,maxVol:0};
+  const hits=[];
+  if(e1>cOrm+0.01&&e1>lb.orm+0.01){lb.orm=e1;hits.push({t:"e1rm",val:e1,prev:cOrm});}
+  if(w>cW+0.01&&w>lb.maxW+0.01){lb.maxW=w;hits.push({t:"weight",val:w,prev:cW});}
+  if(vol>cVol+0.01&&vol>lb.maxVol+0.01){lb.maxVol=vol;hits.push({t:"vol",val:vol,prev:cVol});}
+  if(r>cReps&&r>lb.maxReps&&r<=12){lb.maxReps=r;hits.push({t:"reps",val:r,prev:cReps});} // rep PRs only count inside the 12-rep ceiling — past that, add weight, don't chase reps
   let fired=null;
-  if(e1>(state.session.liveBest[exObj.name]||0)){
-    state.session.liveBest[exObj.name]=e1;
-    showPRToast(exObj.name,e1,committed,setLoad(ex,s.w),+s.r||0);          // always show the new best
+  if(hits.length){
+    showPRToast(exObj.name,hits,{w,r,e1,vol});
     fired="pr";
   }
-  if(!state.session.bossed[exObj.name]){           // boss fires once per exercise per session
+  // Boss fires once per exercise per session, only on an e1RM crown — the ultimate tier.
+  if(hits.some(h=>h.t==="e1rm")&&!state.session.bossed[exObj.name]){
     state.session.bossed[exObj.name]=true;
-    const pr={name:exObj.name,orm:e1,prevOrm:committed,improve:committed?((e1-committed)/committed*100):0,first:!committed,w:setLoad(ex,s.w),r:+s.r||0,ex};
+    const pr={name:exObj.name,orm:e1,prevOrm:cOrm,improve:cOrm?((e1-cOrm)/cOrm*100):0,first:!cOrm,w,r,ex};
     const boss=pickBoss([pr]);
     if(boss){showBossFight(boss,()=>render());fired="boss";} // boss takes over the screen; rest overlay defers until it's dismissed
   }
   return fired;
 }
-function showPRToast(name,e1,prev,w,r){
+// Tiered PR toast. `hits` is the ranked list of records broken on this set; e1RM is the crown.
+const PR_TIER={
+  e1rm  :{rank:4,badge:"👑",kick:"CROWN · EST 1RM RECORD",unit:"kg est 1RM",accent:"var(--gold2)",fmt:v=>Math.round(v)+"kg"},
+  weight:{rank:3,badge:"🏋️",kick:"NEW MAX WEIGHT",unit:"kg heaviest ever",accent:"#e8b04b",fmt:v=>(Math.round(v*10)/10)+"kg"},
+  vol   :{rank:2,badge:"📊",kick:"NEW SET VOLUME PR",unit:"kg in one set",accent:"#5ec8c0",fmt:v=>Math.round(v)+"kg"},
+  reps  :{rank:1,badge:"🔁",kick:"NEW REP RECORD",unit:"reps · most ever",accent:"#8fa9e8",fmt:v=>v+" reps"}
+};
+function showPRToast(name,hits,info){
   const p=$("prpop");if(!p)return;
-  const orm=Math.round(e1);
-  const dkg=prev?(e1-prev):0;
-  const pct=prev?((e1-prev)/prev*100):0;
+  // Accept the legacy (name,e1,prev,w,r) signature too, for any remaining callers.
+  if(!Array.isArray(hits)){const e1=hits,prev=arguments[2];hits=[{t:"e1rm",val:e1,prev:prev||0}];info={w:arguments[3],r:arguments[4],e1};}
+  hits=hits.slice().sort((a,b)=>PR_TIER[b.t].rank-PR_TIER[a.t].rank);
+  const top=hits[0],cfg=PR_TIER[top.t];
   const round1=v=>Math.round(v*10)/10;
-  const liftStr=(w!=null&&r)?`${round1(w)}kg × ${r}`:`${orm}kg`;
-  const deltaHtml=prev
-    ? `<div class="prdelta">+${round1(dkg)}kg<div class="pct">▲ ${pct>=10?Math.round(pct):round1(pct)}%</div></div>`
-    : `<div class="prdelta" style="color:var(--gold2)">FIRST<div class="pct" style="color:var(--gold2)">record</div></div>`;
-  const prevCell=prev
-    ? `<div class="prcell"><div class="k">Old best</div><div class="v">${Math.round(prev)}<span style="font-size:10px;color:var(--text3)">kg</span></div></div>`
-    : `<div class="prcell"><div class="k">Old best</div><div class="v">—</div></div>`;
-  p.innerHTML=`<div class="prhead"><div class="prbadge">🏆</div><div style="flex:1;min-width:0"><div class="prkick">NEW PERSONAL RECORD</div><div class="prname">${esc(name)}</div></div></div>
-    <div class="prmain"><div class="prbig">${orm}</div><div class="prunit">kg&nbsp;est&nbsp;1RM</div>${deltaHtml}</div>
+  const dval=top.prev?(top.val-top.prev):0;
+  const pct=top.prev?((top.val-top.prev)/top.prev*100):0;
+  const bigStr=top.t==="reps"?top.val:Math.round(top.val);
+  const deltaHtml=top.prev
+    ? `<div class="prdelta" style="color:${cfg.accent}">+${top.t==="reps"?dval:round1(dval)}${top.t==="reps"?"":"kg"}<div class="pct">▲ ${pct>=10?Math.round(pct):round1(pct)}%</div></div>`
+    : `<div class="prdelta" style="color:${cfg.accent}">FIRST<div class="pct" style="color:${cfg.accent}">record</div></div>`;
+  // chips for every record broken on this set (crown highlighted)
+  const chips=hits.map(h=>{const c=PR_TIER[h.t];const crown=h.t==="e1rm";
+    return `<span class="prchip" style="border-color:${c.accent};color:${c.accent}${crown?";box-shadow:0 0 9px "+c.accent+"55":""}">${c.badge} ${c.kick.split(" · ")[0].replace("NEW ","").replace(" RECORD","").replace(" PR","")} · ${c.fmt(h.val)}</span>`;}).join("");
+  const liftStr=(info&&info.w!=null&&info.r)?`${round1(info.w)}kg × ${info.r}`:cfg.fmt(top.val);
+  const crownStripe=hits.some(h=>h.t==="e1rm");
+  p.innerHTML=`<div class="prhead"><div class="prbadge"${crownStripe?' style="filter:drop-shadow(0 0 8px var(--gold2))"':''}>${cfg.badge}</div><div style="flex:1;min-width:0"><div class="prkick" style="color:${cfg.accent}">${cfg.kick}</div><div class="prname">${esc(name)}</div></div></div>
+    <div class="prmain"><div class="prbig" style="color:${cfg.accent}">${bigStr}</div><div class="prunit">${cfg.unit}</div>${deltaHtml}</div>
+    ${hits.length>1?`<div class="prchips">${chips}</div>`:""}
     <div class="prgrid">
       <div class="prcell"><div class="k">The lift</div><div class="v" style="font-size:13.5px">${liftStr}</div></div>
-      <div class="prcell"><div class="k">Est 1RM</div><div class="v">${orm}<span style="font-size:10px;color:var(--text3)">kg</span></div></div>
-      ${prevCell}
+      <div class="prcell"><div class="k">${cfg.kick.includes("1RM")?"Est 1RM":"This PR"}</div><div class="v" style="font-size:14px">${cfg.fmt(top.val)}</div></div>
+      <div class="prcell"><div class="k">Old best</div><div class="v">${top.prev?cfg.fmt(top.prev):"—"}</div></div>
     </div>
     <div class="prtap">tap to dismiss</div>`;
   p.classList.remove("on");void p.offsetWidth;p.classList.add("on");
@@ -2242,22 +2276,36 @@ function finishWorkout(){
   if(!done.length){appConfirm({title:"No sets logged",body:"You haven't completed any sets. Discard this session?",ok:"Discard",cancel:"Keep going",danger:true}).then(ok=>{if(ok)endSession();});return;}
   let totalVol=0,fails=0,sessFails={},sessVol={},musclesHit={};const prsThis=[];
   done.forEach(e=>{
-    const ex=exFor(e.name);let bestORM=0;
+    const ex=exFor(e.name);let bestORM=0,bestW=0,bestReps=0,bestVol=0;
     e.sets.forEach(s=>{const v=setVolume(ex,s);totalVol+=v;
       if(s.type==="F"){fails++;}
       const orm=setE1RM(ex,s);if(orm>bestORM)bestORM=orm;
+      const sw=setLoad(ex,s.w),sr=+s.r||0;
+      if(sw>bestW)bestW=sw; if(sr>bestReps)bestReps=sr; if(v>bestVol)bestVol=v;
       // muscle volume
       (ex.p||[]).forEach(m=>{sessVol[m]=(sessVol[m]||0)+v;musclesHit[m]=Math.max(musclesHit[m]||0,1);if(s.type==="F")sessFails[m]=(sessFails[m]||0)+1;});
       (ex.s||[]).forEach(m=>{sessVol[m]=(sessVol[m]||0)+v*0.4;musclesHit[m]=Math.max(musclesHit[m]||0,.5);});
     });
-    // PR detection on E1RM
+    // Tiered PR commit: e1RM stays the crown (drives boss + summary), but we also persist the
+    // all-time best weight, reps and single-set volume so the live tiered toasts have a baseline.
     const prev=state.data.prs[e.name];
+    const newOrm=Math.max(bestORM,prev&&prev.orm||0);
+    const rec={
+      orm:newOrm,
+      maxW:Math.max(bestW,prev&&prev.maxW||0),
+      maxReps:Math.max(bestReps,prev&&prev.maxReps||0),
+      maxVol:Math.max(bestVol,prev&&prev.maxVol||0),
+      w:(prev&&prev.w)||0,r:(prev&&prev.r)||0,
+      date:(prev&&prev.date)||new Date().toISOString(),
+      count:(prev&&prev.count||0)
+    };
     if(bestORM>0&&(!prev||bestORM>prev.orm+0.01)){
       const bestSet=e.sets.reduce((a,s)=>setE1RM(ex,s)>setE1RM(ex,a)?s:a,e.sets[0]);
       const improve=prev?((bestORM-prev.orm)/prev.orm*100):0;
       prsThis.push({name:e.name,orm:bestORM,prevOrm:prev?prev.orm:0,improve,first:!prev,w:setLoad(ex,bestSet.w),r:+bestSet.r||0,ex});
-      state.data.prs[e.name]={orm:bestORM,w:setLoad(ex,bestSet.w),r:+bestSet.r||0,date:new Date().toISOString(),count:(prev&&prev.count||0)+1};
+      rec.w=setLoad(ex,bestSet.w);rec.r=+bestSet.r||0;rec.date=new Date().toISOString();rec.count=(prev&&prev.count||0)+1;
     }
+    if(bestORM>0||bestW>0)state.data.prs[e.name]=rec;
   });
   // apply muscle state
   const t=new Date().toISOString();
@@ -4137,8 +4185,8 @@ function openIronLedger(){
   const L=ironLedger(),v=prVelocity(),nm=villainNemesis();
   const eq=[['🦇','Batmobiles hoisted',L.batmobiles],['🐘','Elephants moved',L.elephants],['🏔️','Everest ascents',L.climbs]];
   openSheet(`<div class="ttl">🏛️ The Iron Ledger</div>
-  <div class="big" style="font-size:52px">${(L.vol/1000).toFixed(1)}<span style="font-size:22px"> tonnes</span></div>
-  <div class="mini">lifetime tonnage moved through the cave</div>
+  <div class="big" style="font-size:42px">${fmtNum(L.vol)}<span style="font-size:20px"> kg</span></div>
+  <div class="mini">lifetime kilos moved through the cave</div>
   <div class="grid3" style="margin:14px 0">
    <div class="ledcell"><div class="big" style="font-size:26px">${fmtNum(L.workouts)}</div><div class="mini">sessions</div></div>
    <div class="ledcell"><div class="big" style="font-size:26px">${fmtNum(L.sets)}</div><div class="mini">working sets</div></div>
@@ -4634,7 +4682,7 @@ function patrolReport(idx){
 
 function renderGotham(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
-  const ironT=(u.totalVolume/1000).toFixed(1);
+  const ironT=fmtNum(u.totalVolume);
   const ledger=u.totalVolume<10000?"New to the vault.":u.totalVolume<50000?"A respectable deposit.":u.totalVolume<100000?"Wayne would notice.":u.totalVolume<500000?"The cave is full.":"Beyond the cave. Into legend.";
   let html=`<div class="row sp"><div class="row g" style="gap:11px"><img class="brandlogo sm" src="logo_t.png" alt=""><div><div class="tag">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}</div>
     <h1 style="font-size:34px;color:var(--gold2)">${u.name?esc(u.name.toUpperCase()):"GOTHAM"}</h1>${earnedTitle()?`<div class="mini" style="color:var(--gold-dim);letter-spacing:.08em;margin-top:-2px">🎖️ ${esc(earnedTitle())}</div>`:""}</div></div>
@@ -4704,7 +4752,7 @@ function renderGotham(){
   // iron ledger (tap for full lifetime page) + cityscape skyline + PR velocity
   const vel=prVelocity();
   html+=`<div class="card" style="cursor:pointer" onclick="openIronLedger()"><div class="row sp"><div class="ttl" style="margin:0">🏛️ Wayne Iron Ledger</div><span class="mini" style="color:var(--gold2)">full ledger ›</span></div>
-    <div class="row sp" style="align-items:flex-end"><div class="big">${ironT}<span style="font-size:20px"> tonnes</span></div><span class="chip" style="color:${vel.color}">${vel.dir} ${vel.label}</span></div>
+    <div class="row sp" style="align-items:flex-end"><div class="big">${ironT}<span style="font-size:18px"> kg</span></div><span class="chip" style="color:${vel.color}">${vel.dir} ${vel.label}</span></div>
     ${cityscapeBar()}
     <div class="muted" style="font-style:italic;font-size:13px;margin-top:8px">${ledger}</div></div>`;
 
@@ -4861,7 +4909,7 @@ function compareAlly(i){
   openSheet(`<div class="ttl center" style="justify-content:center;text-align:center">⚔️ ${t1} vs ${t2}</div>
     <div class="row sp" style="margin:6px 0 2px"><b class="gold">${t1}</b><b class="gold">${t2}</b></div>
     ${row("Strength level",me.sl,a.sl)}
-    ${row("Lifetime tonnage",me.vol,a.vol,"t",v=>(v/1000).toFixed(1))}
+    ${row("Lifetime kilos",me.vol,a.vol," kg",v=>fmtNum(v))}
     ${row("Sessions",me.w,a.w)}
     ${row("Villains felled",me.boss,a.boss)}
     ${row("Nights on patrol",me.days,a.days)}
@@ -4873,7 +4921,7 @@ function openJusticeLeague(){
   const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
   const cardMini=(c,you)=>`<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:11px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
     <div class="row sp"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b><span class="mini">${c.re} ${esc(c.rk)}</span></div>
-    <div class="row" style="gap:6px;margin-top:9px">${caveStat("STR "+c.sl,"strength")}${caveStat((c.vol/1000).toFixed(1)+"t","moved")}${caveStat(c.w,"sessions")}${caveStat(c.boss,"villains")}</div></div>`;
+    <div class="row" style="gap:6px;margin-top:9px">${caveStat("STR "+c.sl,"strength")}${caveStat(fmtNum(c.vol)+"kg","moved")}${caveStat(c.w,"sessions")}${caveStat(c.boss,"villains")}</div></div>`;
   const allyHtml=allies.length?allies.map((a,i)=>`<div style="margin-top:9px">${cardMini(a,false)}
     <div class="row" style="gap:6px;margin-top:5px"><button class="btn ghost sm" onclick="compareAlly(${i})">Compare</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delAlly(${i})">Remove</button></div></div>`).join(""):'<div class="mini" style="margin-top:8px;color:var(--text3)">No allies yet. Paste a friend\u2019s Patrol Card below to start your League.</div>';
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('link')}Justice League</div>
@@ -4903,7 +4951,7 @@ function openLeaderboard(){
     return `<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:10px 11px;margin-top:8px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
       <div class="row sp"><div class="row g" style="gap:9px;min-width:0"><span style="font-size:20px;flex:none;width:26px;text-align:center">${medal(i)}</span><b style="font-family:var(--disp);font-size:15px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b></div><b style="color:${you?'var(--gold2)':'var(--text)'}">${fmtNum(c._score)}</b></div>
       <div style="height:7px;border-radius:5px;background:var(--bg);overflow:hidden;margin-top:7px"><div style="height:100%;width:${pct}%;background:${you?'linear-gradient(90deg,var(--gold3),var(--gold))':'#3a4252'};border-radius:5px"></div></div>
-      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl} · ${(c.vol/1000).toFixed(1)}t · ${c.w} sessions · ${c.boss} villains</div></div>`;}).join("");
+      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl} · ${fmtNum(c.vol)}kg · ${c.w} sessions · ${c.boss} villains</div></div>`;}).join("");
   const myRank=board.findIndex(c=>c._you)+1;
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:6px">🏆 League Leaderboard</div>
     <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — strength level, tonnage, sessions, villains and nights on patrol, fused into one number.</div>
@@ -5445,7 +5493,7 @@ function renderAllies(){
   // My Patrol Card hero
   const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
   html+=`<div class="card glow"><div class="row sp"><div class="ttl" style="margin:0">${me.re} ${esc(me.n)} <span class="mini" style="color:var(--text3)">(you)</span></div><span class="chip on">${esc(me.rk)}</span></div>
-    <div class="row" style="gap:6px;margin:11px 0">${caveStat("STR "+me.sl,"strength")}${caveStat((me.vol/1000).toFixed(1)+"t","moved")}${caveStat(me.w,"sessions")}${caveStat(me.boss,"villains")}</div>
+    <div class="row" style="gap:6px;margin:11px 0">${caveStat("STR "+me.sl,"strength")}${caveStat(fmtNum(me.vol)+"kg","moved")}${caveStat(me.w,"sessions")}${caveStat(me.boss,"villains")}</div>
     <div class="row sp" style="margin:2px 0 9px"><span class="mini">Vigilante Score</span><b class="gold" style="font-size:18px">${fmtNum(score)}</b></div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px">${lifts}</div>
     <button class="btn gold sm" onclick="shareMyCard()">🔗 Share my Patrol Card</button></div>`;
@@ -5592,7 +5640,7 @@ function periodReport(days){
     > BEST TRAINING DAY: <b class="gold">${bestDay?bestDay[0]:"—"}</b><br/>
     > MOST NEGLECTED SECTOR: <b class="red">${neglected?MNAME[neglected[0]]:"—"}</b> (${neglected?neglected[1]:0} sets/wk)<br/>
     > AVG SESSION: <b>${avgLen} min</b> · <b>${perWeek}</b>/week<br/>
-    ${bestMonthRow}> TOTAL MOVED: <b class="gold">${fmtNum(totVol)}kg</b> (${(totVol/1000).toFixed(1)}t)<br/>
+    ${bestMonthRow}> TOTAL MOVED: <b class="gold">${fmtNum(totVol)}kg</b><br/>
     > VILLAINS FELLED: <b>${villains}</b><br/>
     > PRs SET: <b>${prCount}</b>
     </div>
@@ -5982,6 +6030,8 @@ function toggleCoachVoice(){
 const _ALFRED_SET=["Logged. Recover, sir.","Set down — breathe and reset.","Good work. Rest now.","Noted, sir. Catch your breath.","One more in the bank.","Clean rep, sir.","Strong set. Recover well.","In the books. Steady now.","Well done, sir. Rest up.","That's the standard. Hold it.","Solid. Let the muscle settle.","Logged, sir. Keep the form sharp.","Good tempo. Recover.","Banked it. Breathe deep.","Precise work, sir.","Quality over ego — well played.","That'll do nicely, sir."];
 const _ALFRED_LAST=["Exercise complete, sir. On to the next.","That's the lot — move on when ready.","Done here. Next target, sir.","Finished — well struck, sir.","All sets in. Onward.","Complete, sir. The next awaits.","That's this one done. Press on."];
 const _ALFRED_PR=["A new record, sir. Outstanding.","A personal best — exemplary work.","Record broken. Master Bruce would approve.","New high, sir. Remarkable.","That's a record. Magnificent.","You've outdone yourself, sir.","History, sir — you just rewrote your own ceiling.","The man you were last month couldn't touch that. Extraordinary.","That, Master, is what becoming the weapon looks like.","I'll log it in the records with great pleasure, sir.","A RECORD, sir — and not a soft one. I am genuinely impressed, and I do not say that lightly.","THAT is the man I've been waiting to see. Burn that feeling into memory, Master.","I'd stand and applaud if it were dignified, sir. It was that good.","New ceiling shattered. Gotham's villains should lose sleep tonight, Master.","Bruce himself would tip his cowl to that lift, sir. Phenomenal.","You just became someone slightly more dangerous, Master. Magnificent work."];
+// The 12-rep ceiling: past twelve on a working set, the weight is too light. Alfred nudges — crazy, but loyal.
+const _ALFRED_OVER12=["Past twelve again, sir? Don't be stupid — add weight, Master.","Twelve is the ceiling, Master. You sailed straight past it. Heavier next set, no argument.","That's not training, sir, that's counting. Over twelve reps means the weight is too light — load it.","Counting to fifteen, are we, Master? Charming. Now put real iron on the bar and stop at twelve.","We don't chase reps in this cave, sir — we chase load. Past twelve, you add a plate.","More than twelve, Master. You're building stamina you'll never need. Heavier, fewer, harder.","Stop showing off your cardio, sir. Twelve reps, more weight. That is the protocol.","If you can grind past twelve, the bar is mocking you, Master. Answer it with iron, not reps.","Twelve and done, sir. Anything beyond is ego dressed up as effort — add weight.","I shall say this once more, Master: over twelve, you add load. Don't make me repeat myself.","Endurance is for the marathon, sir, not the cave. Cut the reps, raise the weight.","You're past twelve and still going — which tells me the weight insults you, Master. Fix it."];
 // Objective, harsh-when-warranted lines. Alfred is a butler, not a cheerleader.
 const _ALFRED_WEAK=["Did you mean that as a warm-up, sir? You have a great deal more in you.","Don't show weakness now, Master — that weight is beneath you.","I've watched you move far heavier than that, sir. No half-measures.","That barely bends the bar, sir. Find the real working weight.","A curious choice, sir — you lifted heavier last time without a word of protest.","Ego has no place here, but neither does timidity. Add load, sir.","That's a feather to a man of your strength, sir. Respect the iron.","The cave was not built on light sets, Master. Nor will this physique be.","Bane is not lifting warm-up weights tonight, sir. Why are you?","I've seen you bleed for more than this. Stop negotiating with the bar.","That weight insults you, Master. Correct it.","Comfortable, sir? Comfort is where progress goes to die.","The bar is laughing at you, Master. Wipe the grin off it.","Pitiful, sir. Genuinely. Add weight or stop wasting both our evenings.","I've seen Master Dick warm up with more, and he's half your size. Load it.","Is that effort, or are you afraid of the iron, Master? Add a plate and prove me wrong.","Embarrassing, frankly. Put real weight on the bar and earn the right to be tired.","That set did nothing, sir — nothing. Heavier, now, or go home.","A man becoming Batman does not lift like that. Bump the load and try again.","I'll not log a coward's weight as a working set, Master. More.","You're insulting the time you put in, sir. The bar moves up from here, no argument."];
 const _ALFRED_VERDICT_WEAK=["A light evening's work, sir. Gotham expects more.","Below your standard, Master. The iron noticed, and so did I.","You went through the motions tonight, sir. Tomorrow, we mean it.","Honest assessment: that was maintenance, not progress.","Half-effort, sir. The villains are training harder than that.","You showed up, Master. You did not show out. There is a difference.","That was a rehearsal, sir — not the performance. I expect the real thing next.","The Rogues slept easy tonight, Master. Let us change that.","Bluntly, sir: that was a wasted evening. Add load next session or don't bother changing into your kit.","I'll not flatter you, Master — that was lazy. Beat last week's numbers or we are going backwards.","Disappointing, sir. You have more in you and we both know it. No excuses next time.","That was beneath you, Master. Train like the man you're trying to become, not the one you are."];
@@ -6007,9 +6057,21 @@ function alfredWeakCallout(ei,si){
   if(cur<best*0.55){state.session._weakNag[e.name]=true;return _pickLine(_ALFRED_WEAK,"weak");}
   return null;
 }
+// 12-rep ceiling watchdog. A working set above 12 reps means the load is too light — nudge once per
+// exercise per session so it lands as a sharp correction, not nagging. Warm-ups (type W) are exempt.
+function alfredOver12(ei,si){
+  const e=state.session.exercises[ei];if(!e)return null;
+  const s=e.sets[si];if(!s||s.type==="W")return null;
+  if((+s.r||0)<=12)return null;
+  state.session._over12Nag=state.session._over12Nag||{};
+  if(state.session._over12Nag[e.name])return null;
+  state.session._over12Nag[e.name]=true;
+  return _pickLine(_ALFRED_OVER12,"over12");
+}
 function alfredCoachLine(ei,si,ev){
   const e=state.session.exercises[ei];if(!e)return _ALFRED_SET[0];
   if(ev==="pr"||ev==="boss"){if(state.session)state.session._coachTone="good";return _pickLine(_ALFRED_PR,"pr");}
+  const over=alfredOver12(ei,si);if(over){if(state.session)state.session._coachTone="bad";return over;}
   const weak=alfredWeakCallout(ei,si);if(weak){if(state.session)state.session._coachTone="bad";return weak;}
   if(state.session)state.session._coachTone="ok";
   const working=(e.sets||[]).filter(s=>s.type!=="W");
