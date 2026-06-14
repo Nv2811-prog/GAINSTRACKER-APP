@@ -5327,23 +5327,91 @@ function logRestDay(){state.data.restLog=(state.data.restLog||[]);state.data.res
 // ---- strength standards (bodyweight-relative, evidence-based multipliers) ----
 const STD_MATCH={"Bench Press":["bench press"],"Squat":["squat"],"Deadlift":["deadlift"],"Overhead Press":["overhead press","shoulder press","military press","strict press"],"Barbell Row":["barbell row","bent over row","pendlay","bent-over row"]};
 function bestPRMatching(keys){let best=0,nm=null;Object.entries(state.data.prs).forEach(([n,p])=>{const ln=n.toLowerCase();if(keys.some(k=>ln.includes(k))&&p.orm>best){best=p.orm;nm=n;}});return best?{orm:best,name:nm}:null;}
+// Machine/variation → barbell conversion. When you never log the actual barbell lift but DO train a
+// machine/Smith/variation that builds the same pattern, estimate the equivalent barbell 1RM so it still
+// counts toward your standards. Factor multiplies that lift's e1RM to a barbell-equivalent. Each entry
+// requires the PR's primary muscle to match (m), so e.g. leg press can't masquerade as a bench.
+const STD_LIFT={
+ "Bench Press":{m:"chest",conv:[
+   {kw:["smith"],f:.92,l:"Smith bench"},
+   {kw:["incline"],f:1.12,l:"incline press"},
+   {kw:["machine","hammer","iso-lateral","iso lateral","plate-loaded","chest press"],f:.85,l:"machine press"},
+   {kw:["floor press"],f:.95,l:"floor press"}]},
+ "Squat":{m:"quads",conv:[
+   {kw:["smith"],f:.90,l:"Smith squat"},
+   {kw:["hack"],f:.85,l:"hack squat"},
+   {kw:["front squat"],f:1.18,l:"front squat"},
+   {kw:["belt squat"],f:.88,l:"belt squat"},
+   {kw:["leg press"],f:.42,l:"leg press"}]},
+ "Deadlift":{m:"back",conv:[
+   {kw:["trap bar","trap-bar","hex bar"],f:.95,l:"trap-bar pull"},
+   {kw:["rack pull"],f:.80,l:"rack pull"},
+   {kw:["deficit"],f:1.08,l:"deficit pull"},
+   {kw:["sumo"],f:1.0,l:"sumo pull"}]},
+ "Overhead Press":{m:"shoulders",conv:[
+   {kw:["smith"],f:.90,l:"Smith press"},
+   {kw:["machine","hammer","iso-lateral","iso lateral","plate-loaded"],f:.85,l:"machine press"},
+   {kw:["push press"],f:.80,l:"push press"},
+   {kw:["seated barbell"],f:1.0,l:"seated press"}]},
+ "Barbell Row":{m:"back",conv:[
+   {kw:["pendlay"],f:1.0,l:"Pendlay row"},
+   {kw:["t-bar","t bar","landmine row"],f:.92,l:"T-bar row"},
+   {kw:["chest-supported","chest supported","seal row"],f:.90,l:"supported row"},
+   {kw:["machine row","hammer"],f:.88,l:"machine row"}]}
+};
+// World percentile from a bodyweight-ratio, anchored to the strength-standard tiers
+// (Beginner≈20th, Intermediate≈50th, Advanced≈80th, Elite≈95th of trained lifters), interpolated.
+function worldPercentile(ratio,std){
+  const pts=[[0,1],[std.b,20],[std.i,50],[std.a,80],[std.e,95],[std.e*1.22,99]];
+  if(ratio<=0)return 1;
+  for(let i=1;i<pts.length;i++){const r1=pts[i][0],p1=pts[i][1];if(ratio<=r1){const r0=pts[i-1][0],p0=pts[i-1][1];return p0+(p1-p0)*(ratio-r0)/((r1-r0)||1);}}
+  return 99.5;
+}
+// Best available estimate for a standard lift: the real barbell PR if logged, else the strongest
+// machine/variation converted to a barbell-equivalent (flagged est).
+function liftEstimate(lift){
+  const direct=bestPRMatching(STD_MATCH[lift]);
+  if(direct)return {orm:direct.orm,name:direct.name,est:false};
+  const cfg=STD_LIFT[lift];if(!cfg)return null;
+  let best=null;
+  Object.entries(state.data.prs||{}).forEach(([n,p])=>{if(!p||!(p.orm>0))return;
+    const ex=exFor(n);const pm=MM_NORM((ex.p&&ex.p[0])||"");if(pm!==cfg.m)return;
+    const ln=n.toLowerCase();
+    cfg.conv.forEach(c=>{if(c.kw.some(k=>ln.includes(k))){const e=p.orm*c.f;if(!best||e>best.orm)best={orm:e,name:n,est:true,via:c.l};}});
+  });
+  return best;
+}
 function strengthStandardsCard(){
   const bw=bodyW();const lifts=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"];
+  const pcts=[];
+  const fmtTop=t=>t>=10?Math.round(t)+"%":(Math.round(t*10)/10)+"%";
   const rows=lifts.map(lift=>{
-    const std=STD[lift];const pr=bestPRMatching(STD_MATCH[lift]);
-    if(!pr)return `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${lift}</span><span class="mini">no data</span></div>`;
-    const ratio=pr.orm/bw;
+    const std=STD[lift];const est=liftEstimate(lift);
+    if(!est)return `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${lift}</span><span class="mini">no data</span></div>`;
+    const ratio=est.orm/bw;
     const level=ratio>=std.e?"Elite":ratio>=std.a?"Advanced":ratio>=std.i?"Intermediate":ratio>=std.b?"Beginner":"Untrained";
     const lc={Elite:"#E8C56A",Advanced:"#2ECC71",Intermediate:"#7FC8FF",Beginner:"#cfcfcf",Untrained:"#8a8a8a"}[level];
     const pct=clamp(ratio/std.e*100,4,100);
+    const wp=worldPercentile(ratio,std);pcts.push(wp);
+    const top=Math.max(0.5,100-wp);
     return `<div style="padding:8px 0;border-top:1px solid var(--border)">
-      <div class="row sp"><span style="font-size:13px">${lift} <span class="mini">${Math.round(pr.orm)}kg · ${ratio.toFixed(2)}×BW</span></span><b style="color:${lc};font-size:12px">${level}</b></div>
+      <div class="row sp" style="align-items:flex-start"><span style="font-size:13px;min-width:0">${lift} <span class="mini">${Math.round(est.orm)}kg · ${ratio.toFixed(2)}×BW</span>${est.est?`<div class="mini" style="color:#E8A52A">≈ estimated from ${esc(est.via)}</div>`:""}</span>
+        <span style="text-align:right;flex:none"><b style="color:${lc};font-size:12px">${level}</b><div class="mini" style="color:var(--gold2);font-weight:700">Top ${fmtTop(top)}</div></span></div>
       <div style="position:relative;height:7px;border-radius:4px;background:#1a1a1a;margin-top:5px">
         <div style="position:absolute;left:0;width:${pct}%;height:100%;border-radius:4px;background:${lc}"></div>
       </div></div>`;
   }).join("");
-  return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('strength')}Strength standards <span class="mini" style="font-weight:400;margin-left:4px">vs ${bw}kg bodyweight</span></div>${rows}
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Multiples of bodyweight for a 1RM. Beginner → Elite based on common strength-standard data. e1RM is estimated, so treat tiers as a guide, not a verdict.</div></div>`;
+  // overall standing across logged lifts
+  let overall="";
+  if(pcts.length){const avg=pcts.reduce((a,b)=>a+b,0)/pcts.length;const top=Math.max(0.5,100-avg);
+    overall=`<div class="stage" style="border-radius:12px;padding:11px 13px;margin:2px 0 8px;text-align:center">
+      <div class="mini" style="color:var(--text3);letter-spacing:.1em">WORLD STANDING</div>
+      <b class="gold" style="font-size:20px">Top ${fmtTop(top)} of lifters</b>
+      <div class="mini" style="color:var(--text2);margin-top:2px">stronger than ~${Math.round(avg)}% of trained lifters across your ${pcts.length} logged lift${pcts.length>1?"s":""}</div></div>`;
+  }
+  return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('strength')}Strength standards <span class="mini" style="font-weight:400;margin-left:4px">vs ${bw}kg bodyweight</span></div>
+    ${overall}${rows}
+    <div class="mini" style="margin-top:8px;color:var(--text3)">Percentiles are vs trained lifters, anchored to standard Beginner→Elite data. Machine, Smith &amp; variation lifts are converted to a barbell-equivalent estimate so they still count. e1RM is estimated — treat it as a guide, not a verdict.</div></div>`;
 }
 /* ===== COMBAT RATING (#2, adapted) =====
    Per-exercise rank tuned by MOVEMENT so machines, cables and isolation rank fairly —
