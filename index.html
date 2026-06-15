@@ -315,18 +315,38 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .scnflash{position:fixed;inset:0;z-index:120;background:#fff;opacity:0;pointer-events:none}
 .scnflash.go{animation:scnFlash .5s ease forwards}
 @keyframes scnFlash{0%{opacity:0}18%{opacity:.85}100%{opacity:0}}
-/* ===== Villain DEFEATED reveal — a high-impact "wanted poster" dossier ===== */
+/* ===== Villain DEFEATED reveal — cinematic GCPD booking slate ===== */
 .vreveal{text-align:center;padding:2px 0 4px}
-.vmug{position:relative;width:192px;height:200px;margin:8px auto 2px;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:2.5px solid var(--vc,#888);background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.10),rgba(8,8,12,.96) 62%);box-shadow:0 0 46px -8px var(--vc,#888),inset 0 0 70px rgba(0,0,0,.7);animation:mugIn .55s cubic-bezier(.2,.8,.2,1) both}
+.vmug{position:relative;width:258px;max-width:88vw;margin:8px auto 2px;border-radius:14px;overflow:hidden;border:2.5px solid var(--vc,#888);background:linear-gradient(180deg,#0a0b0f,#070709);box-shadow:0 0 46px -8px var(--vc,#888),inset 0 0 70px rgba(0,0,0,.7);animation:mugIn .55s cubic-bezier(.2,.8,.2,1) both}
 @keyframes mugIn{0%{opacity:0;transform:scale(.82) translateY(14px)}100%{opacity:1;transform:none}}
-.vmug::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 21px,rgba(255,255,255,.06) 21px 23px);z-index:0}
-.vmug::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 32%,rgba(255,255,255,.14),transparent 58%);z-index:0;mix-blend-mode:screen}
-.vmug .heightno{position:absolute;left:7px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;padding:8px 0;font-family:var(--disp);font-size:9px;color:rgba(255,255,255,.28);z-index:1;letter-spacing:.1em}
-.vface{position:relative;z-index:2;font-size:108px;line-height:1;filter:drop-shadow(0 7px 20px rgba(0,0,0,.75));animation:vfaceIn .85s cubic-bezier(.2,.8,.2,1) .08s both}
+/* booking flashbulb */
+.vflash{position:absolute;inset:0;z-index:9;background:radial-gradient(circle at 50% 38%,#fff,rgba(255,255,255,.7) 30%,transparent 66%);opacity:0;pointer-events:none;animation:vbulb 1.05s ease-out .12s 1 both}
+@keyframes vbulb{0%{opacity:0}6%{opacity:1}20%{opacity:.18}100%{opacity:0}}
+/* height rule behind the panels */
+.vrule{position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(0deg,transparent 0 17px,rgba(255,255,255,.05) 17px 18px),repeating-linear-gradient(0deg,transparent 0 85px,rgba(255,255,255,.13) 85px 87px);}
+.vpanels{position:relative;z-index:2;display:flex;gap:5px;padding:11px 10px 6px;justify-content:center}
+.vpanel{position:relative;flex:1;height:128px;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 22%,rgba(255,255,255,.16),rgba(6,6,9,.97) 64%);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 0 34px rgba(0,0,0,.78)}
+.vpanel::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.10) 2px 3px);mix-blend-mode:overlay;opacity:.7}
+.vplabel{position:absolute;top:5px;left:0;right:0;z-index:3;font-family:var(--mono,monospace);font-size:8px;letter-spacing:.22em;color:rgba(255,255,255,.5)}
+.vface{position:relative;z-index:2;font-size:74px;line-height:1;filter:drop-shadow(0 7px 18px rgba(0,0,0,.8)) contrast(1.08) saturate(.92);animation:vfaceIn .85s cubic-bezier(.2,.8,.2,1) .08s both}
+.vface.side{font-size:66px;transform:scaleX(.82);filter:drop-shadow(-6px 7px 16px rgba(0,0,0,.85)) brightness(.62) grayscale(.25) contrast(1.1)}
 @keyframes vfaceIn{0%{opacity:0;transform:scale(.55) translateY(22px)}70%{transform:scale(1.05)}100%{opacity:1;transform:none}}
-.vmugcap{position:absolute;left:0;right:0;bottom:0;z-index:2;font-family:var(--mono,monospace);font-size:9.5px;letter-spacing:.18em;color:rgba(255,255,255,.6);background:linear-gradient(0deg,rgba(0,0,0,.72),transparent);padding:13px 0 4px}
-.vstamp{position:absolute;z-index:5;top:48%;left:50%;font-family:var(--disp);letter-spacing:.12em;font-size:27px;color:#ff3b2f;border:4px solid #ff3b2f;border-radius:7px;padding:4px 13px;background:rgba(24,5,4,.32);text-shadow:0 0 10px rgba(255,40,30,.55);box-shadow:0 0 24px rgba(255,40,30,.4),inset 0 0 14px rgba(255,40,30,.25);transform:translate(-50%,-50%) rotate(-15deg) scale(2.7);opacity:0;animation:stampSlam .46s cubic-bezier(.3,1.5,.45,1) .8s forwards}
+.vface.side{animation:vfaceInS .9s cubic-bezier(.2,.8,.2,1) .14s both}
+@keyframes vfaceInS{0%{opacity:0;transform:scaleX(.82) translateX(14px)}100%{opacity:1;transform:scaleX(.82)}}
+/* held booking slate */
+.vslate{position:relative;z-index:3;margin:0 10px 9px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 9px;border-radius:5px;background:repeating-linear-gradient(135deg,#0e0f12 0 9px,#13151a 9px 18px);border:1px solid rgba(255,255,255,.14);font-family:var(--mono,monospace);font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.82);box-shadow:0 3px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.07)}
+.vslate b{color:var(--vc,#fff);letter-spacing:.18em}
+.vslate .vcase{color:rgba(255,255,255,.55)}
+.vmug::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at 50% -10%,rgba(255,255,255,.16),transparent 55%),radial-gradient(circle at 50% 120%,rgba(0,0,0,.5),transparent 60%);mix-blend-mode:screen}
+.vstamp{position:absolute;z-index:7;top:46%;left:50%;font-family:var(--disp);letter-spacing:.12em;font-size:28px;color:#ff3b2f;border:4px solid #ff3b2f;border-radius:7px;padding:4px 14px;background:rgba(24,5,4,.34);text-shadow:0 0 10px rgba(255,40,30,.55);box-shadow:0 0 24px rgba(255,40,30,.4),inset 0 0 14px rgba(255,40,30,.25);transform:translate(-50%,-50%) rotate(-15deg) scale(2.7);opacity:0;animation:stampSlam .46s cubic-bezier(.3,1.5,.45,1) 1s forwards}
 @keyframes stampSlam{0%{opacity:0;transform:translate(-50%,-50%) rotate(-15deg) scale(2.7)}55%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) rotate(-13deg) scale(1)}}
+/* mini booking tiles in the workout summary */
+.vmini-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+.vmini{position:relative;flex:0 0 auto;width:74px;border-radius:9px;overflow:hidden;border:1.5px solid var(--vc,#888);background:radial-gradient(circle at 50% 26%,rgba(255,255,255,.13),rgba(7,7,10,.97) 66%);box-shadow:0 0 16px -6px var(--vc,#888),inset 0 0 22px rgba(0,0,0,.7);text-align:center;animation:mugIn .5s cubic-bezier(.2,.8,.2,1) both}
+.vmini::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 6px,rgba(255,255,255,.05) 6px 7px);z-index:0}
+.vmini-face{position:relative;z-index:1;font-size:38px;line-height:1;padding:11px 0 2px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.8))}
+.vmini-stamp{position:relative;z-index:2;font-family:var(--disp);font-size:11px;letter-spacing:.14em;color:#ff3b2f;border:1.5px solid #ff3b2f;border-radius:3px;display:inline-block;padding:0 5px;transform:rotate(-7deg);text-shadow:0 0 6px rgba(255,40,30,.5);margin:1px 0 2px}
+.vmini-name{position:relative;z-index:1;font-family:var(--mono,monospace);font-size:8px;letter-spacing:.05em;color:rgba(255,255,255,.7);padding:0 3px 7px;line-height:1.2}
 .vname2{font-family:var(--disp);font-size:30px;letter-spacing:.03em;line-height:1.04;margin:12px 6px 2px;color:#fff;animation:fade .5s 1.05s both}
 .vsub{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--green);font-family:var(--disp);animation:fade .5s 1.18s both}
 .combatlog{text-align:center;font-family:var(--disp);letter-spacing:.05em;font-size:17px;color:var(--gold2);min-height:22px;margin:8px 0 2px}
@@ -2480,13 +2500,18 @@ function bossVictory(boss,ko){
   state.data.bossWins.push({villain:boss.v,ex:boss.pr.name,w:boss.pr.w,r:boss.pr.r,orm:Math.round(boss.pr.orm),prevOrm:Math.round(boss.pr.prevOrm),date:new Date().toISOString()});
   checkAchievements();checkUnlocks();save();
   if(navigator.vibrate)navigator.vibrate([60,40,120,40,200]);beep(990);
+  const _d=new Date();const caseNo="GC-"+String(_d.getFullYear()).slice(2)+("0"+(_d.getMonth()+1)).slice(-2)+("0"+_d.getDate()).slice(-2)+"-"+(1000+((state.data.bossWins.length*37)%9000));
   $("ovcard").innerHTML=`<div class="vreveal fade">
     <div class="roundbadge" style="color:var(--green);border-color:var(--green)">● ${esc(ko.t)}</div>
     <div class="vmug" style="--vc:${boss.c}">
-      <div class="heightno">7'<br>6'<br>5'<br>4'</div>
-      <div class="vface">${boss.e}</div>
+      <div class="vrule"></div>
+      <div class="vflash"></div>
+      <div class="vpanels">
+        <div class="vpanel"><div class="vplabel">FRONT</div><div class="vface">${boss.e}</div></div>
+        <div class="vpanel"><div class="vplabel">PROFILE</div><div class="vface side">${boss.e}</div></div>
+      </div>
+      <div class="vslate"><b>GCPD</b><span>${esc((boss.pr.name||"").toUpperCase()).slice(0,18)}</span><span class="vcase">${caseNo}</span></div>
       <div class="vstamp">DEFEATED</div>
-      <div class="vmugcap">GOTHAM C.P.D. · CASE CLOSED</div>
     </div>
     <div class="vname2" style="color:${boss.c}">${esc(boss.v)}</div>
     <div class="vsub">DOWN FOR THE COUNT</div>
@@ -3290,6 +3315,17 @@ function renderSummary(){
 }
 function closeSummary(){state.lastResult=null;state.step=null;const a=$("app");if(a){a.ontouchstart=null;a.ontouchend=null;}go("gotham");}
 function sumNav(d){if(state.step!=="summary")return;state.sumCard=clamp(state.sumCard+d,0,4);renderSummary();window.scrollTo(0,0);}
+function sessionRoguesGallery(R){
+  if(!R.prsThis||!R.prsThis.length)return"";
+  const seen={};const tiles=[];
+  R.prsThis.forEach(p=>{const b=(typeof pickBoss==="function")?pickBoss([p]):null;if(!b)return;
+    if(seen[b.v])return;seen[b.v]=1;
+    tiles.push(`<div class="vmini" style="--vc:${b.c}"><div class="vmini-face">${b.e}</div><div class="vmini-stamp">BOOKED</div><div class="vmini-name">${esc(b.v)}</div></div>`);});
+  if(!tiles.length)return"";
+  return `<div class="hr"></div>
+    <div class="mini" style="letter-spacing:.16em;color:var(--text3);font-family:var(--mono,monospace);margin-bottom:8px">GCPD · ROGUES BOOKED TONIGHT</div>
+    <div class="vmini-row">${tiles.join("")}</div>`;
+}
 function summaryCard1(R){
   const lvl=accountLevel(),need=xpForLevel(lvl+1),cur=state.data.u.xp;
   const prevNeed=xpForLevel(lvl);const pct=clamp((cur-prevNeed)/(need-prevNeed)*100,0,100);
@@ -3311,6 +3347,7 @@ function summaryCard1(R){
     <div class="row sp" style="margin-bottom:6px"><b class="gold">+${R.xpGain} XP</b><span class="mini">Level ${lvl} → ${fmtNum(need-cur)} XP to next</span></div>
     <div class="bar xpbar"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
     <div class="center" style="margin-top:11px"><span class="chip on">🔥 ${state.data.u.streakDays} day streak</span></div>
+    ${sessionRoguesGallery(R)}
   </div>`;
 }
 function summaryCard2(R){
