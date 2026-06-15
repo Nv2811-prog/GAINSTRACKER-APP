@@ -1269,7 +1269,28 @@ const fmtVol=v=>Math.round(v).toLocaleString("en-US")+"kg";
 const fmtNum=n=>Math.round(n).toLocaleString("en-US");
 const hoursSince=t=>t?(now()-new Date(t).getTime())/3600000:99999;
 const daysSince=t=>hoursSince(t)/24;
-function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),2600);}
+// Toasts queue and play ONE AT A TIME so a burst (coach line + PR + tip) can all be read,
+// instead of overwriting each other. Each shows long enough to read, then a clean gap, then the next.
+let _toastQ=[],_toastBusy=false;
+function toast(msg){
+  if(msg==null)return;msg=String(msg);
+  if(_toastQ.length&&_toastQ[_toastQ.length-1]===msg)return; // ignore back-to-back duplicates
+  if(_toastQ.length>=6)_toastQ.shift();                       // never let a flood build up forever
+  _toastQ.push(msg);_drainToasts();
+}
+function _drainToasts(){
+  if(_toastBusy)return;
+  const t=$("toast");if(!t)return;
+  if(!_toastQ.length)return;
+  const msg=_toastQ.shift();_toastBusy=true;
+  t.textContent=msg;t.classList.add("on");
+  const dur=Math.min(5200,Math.max(2500,1000+msg.length*60)); // longer lines linger longer
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>{
+    t.classList.remove("on");
+    setTimeout(()=>{_toastBusy=false;_drainToasts();},420);   // fade-out + breath before the next
+  },dur);
+}
 function epley(w,r){return w*(1+r/30);}
 function exEmoji(ex){const g=(ex.p&&ex.p[0])||"chest";return MEMOJI[g]||"💪";}
 function muscleSVG(primary,secondary,sz){
@@ -2932,7 +2953,7 @@ function renderLogging(){
   </div>
   <div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
-    <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button>${voiceSupported()?`<button class="btn ghost sm ${state._rec?'listening':''}" id="voicebtn" style="width:auto" onclick="voiceLog()">${state._rec?'● Tap to stop':'🎤 Voice log'}</button>`:''}<button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
+    <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button><button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
   </div>`;
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
   html+=`<div class="card glow" style="padding:13px"><div class="ttl">⚡ Tonight's damage report</div>${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div></div>`;
@@ -3945,7 +3966,7 @@ function liftVerdict(intel){
   if(!intel)return "";
   if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change the stimulus or deload — repeating it won't move it.`;
   if(intel.trend==="up")return `Climbing — +${intel.d}kg (${intel.pct>0?"+":""}${intel.pct}%) of late. Keep the pressure on, sir.`;
-  if(intel.trend==="down")return `Slipping ${intel.d}kg recently. Tighten recovery and attack it next time.`;
+  if(intel.trend==="down")return `Going BACKWARDS, sir — ${intel.d}kg down (${intel.pct}%). I won't sugar-coat it: you were stronger than this. Eat, sleep, and reclaim that weight.`;
   return `Holding steady. Steady isn't growth, Master — go and take the next rep.`;
 }
 function progressByExerciseCard(){
@@ -4988,7 +5009,13 @@ function toggleBelt(){$("belt").classList.toggle("hide");}
 /* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
 function myPatrolCard(){
   const d=state.data,u=d.u,sl=strengthLevel(),r=rankFor(sl),a=(typeof trainingAge==="function"?trainingAge():null);
-  const lifts=Object.entries(d.prs||{}).map(([n,p])=>({n,o:Math.round((p&&p.orm)||0)})).filter(x=>x.o>0).sort((a,b)=>b.o-a.o).slice(0,3);
+  const allLifts=Object.entries(d.prs||{}).map(([n,p])=>({n,o:Math.round((p&&p.orm)||0),w:Math.round((p&&p.maxW)||0),r:(p&&p.maxReps)||0})).filter(x=>x.o>0).sort((a,b)=>b.o-a.o);
+  const lifts=allLifts.slice(0,3);              // top-3 chips (existing usage)
+  const liftsAll=allLifts.slice(0,16);          // deeper per-exercise list for allies to browse
+  // share your ACTIVE split so allies can see exactly what you run (and copy it)
+  let spl=null;try{const sp=(typeof _alfredActiveSplit==="function")?_alfredActiveSplit():(d.splits||[]).find(x=>x.id===d.activeSplitId)||(d.splits||[])[0];
+    if(sp)spl={n:(sp.name||"Split").slice(0,32),d:(sp.days||[]).slice(0,8).map(dd=>({n:(dd.name||"Day").slice(0,24),r:dd.rest?1:0,e:(dd.exercises||[]).slice(0,14).map(x=>String(x).slice(0,30))}))};
+  }catch(e){}
   // Optimality = how good (vs the world) your big lifts are, regardless of sheer tonnage. Avg world
   // percentile across the standard lifts you've logged (machine/variation estimates included).
   let opt=0,bw=bodyW();const bigKeys={b:"Bench Press",s:"Squat",d:"Deadlift"};const big={};
@@ -5002,7 +5029,7 @@ function myPatrolCard(){
     let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{const o=epley(+s.w||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
     return {n:(w.name||"Session").slice(0,16),v:Math.round(w.totalVol||0),t:(w.date||"").slice(0,10),top:top.slice(0,18)};
   });
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,lifts,bw,opt,big,recent};
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,lifts,liftsAll,spl,bw,opt,big,recent};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
@@ -5073,7 +5100,8 @@ function compareAlly(i){
     ${row("Villains felled",me.boss,a.boss)}
     ${row("Nights on patrol",me.days,a.days)}
     <div class="banner" style="margin-top:12px"><span>🦇</span><div class="mini">${verdict}</div></div>
-    ${hasRecent?`<button class="btn sm" style="margin-top:9px" onclick="allyLog(${i})">📜 ${t2}'s recent patrols</button>`:`<div class="mini" style="margin-top:9px;color:var(--text3);text-align:center">${t2}'s card has no recent patrols logged — ask them to re-share an updated card.</div>`}
+    <div class="row" style="gap:6px;margin-top:9px"><button class="btn sm g" onclick="allyLifts(${i})">🏋️ Their lifts</button><button class="btn sm g" onclick="allySplit(${i})">🗂️ Their split</button></div>
+    ${hasRecent?`<button class="btn sm" style="margin-top:7px" onclick="allyLog(${i})">📜 ${t2}'s recent patrols</button>`:`<div class="mini" style="margin-top:7px;color:var(--text3);text-align:center">${t2}'s card has no recent patrols logged — ask them to re-share an updated card.</div>`}
     <button class="btn" style="margin-top:7px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
 }
 // Async "see each other's past workouts" — read an ally's last sessions straight off their Patrol Card.
@@ -5090,6 +5118,49 @@ function allyLog(i){
     ${rows}
     <button class="btn" style="margin-top:12px" onclick="compareAlly(${i})">‹ Back to compare</button>`);
 }
+// Deep ally view — every exercise they've logged a best on, with YOUR number beside it head-to-head.
+function allyLifts(i){
+  const a=(state.data.allies||[])[i];if(!a)return;
+  const nm=esc(a.n.slice(0,18));const list=a.liftsAll||a.lifts||[];
+  const mine={};Object.entries(state.data.prs||{}).forEach(([n,p])=>{mine[(n||"").toLowerCase()]=Math.round((p&&p.orm)||0);});
+  const rows=list.length?list.map(l=>{
+    const m=mine[(l.n||"").toLowerCase()]||0;const win=(m&&l.o)?(m>l.o?1:m<l.o?-1:0):null;
+    const wr=(l.w&&l.r)?`${l.w}kg × ${l.r}`:"";
+    const cmp=m?`<span class="mini" style="color:${win>0?'var(--green)':win<0?'var(--red)':'var(--gold2)'}">you ${m}kg ${win>0?'▴':win<0?'▾':'='}</span>`:`<span class="mini" style="color:var(--text3)">you: —</span>`;
+    return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border);gap:8px;align-items:flex-start">
+      <div style="min-width:0;flex:1"><b style="font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.n)}</b>${wr?`<span class="mini" style="color:var(--text3)">${wr}</span>`:""}</div>
+      <div style="text-align:right;flex:none"><b class="gold" style="white-space:nowrap">${l.o}kg</b><div>${cmp}</div></div></div>`;
+  }).join(""):`<div class="mini" style="color:var(--text3);margin-top:8px">No lifts on this card — ask ${nm} to re-share an updated Patrol Card.</div>`;
+  openSheet(`<div class="ttl center" style="justify-content:center;text-align:center">🏋️ ${nm}'s lifts</div>
+    <div class="mini" style="margin:-2px 0 6px;color:var(--text2);text-align:center">Best estimated 1RM per exercise — your number sits beside it wherever you both train the lift.</div>
+    ${rows}
+    <button class="btn" style="margin-top:12px" onclick="compareAlly(${i})">‹ Back to compare</button>`);
+}
+// Deep ally view — their actual training split, day by day, with one-tap copy into your own splits.
+function allySplit(i){
+  const a=(state.data.allies||[])[i];if(!a)return;const sp=a.spl;const nm=esc(a.n.slice(0,18));
+  if(!sp||!Array.isArray(sp.d)||!sp.d.length){
+    openSheet(`<div class="ttl center" style="justify-content:center;text-align:center">🗂️ ${nm}'s split</div>
+      <div class="mini" style="color:var(--text3);text-align:center;margin-top:10px">${nm} hasn't shared a split yet — ask them to re-share an updated Patrol Card.</div>
+      <button class="btn" style="margin-top:12px" onclick="compareAlly(${i})">‹ Back to compare</button>`);return;}
+  const days=sp.d.map(dd=>`<div style="border:1px solid var(--border2);border-radius:11px;padding:10px 11px;margin-top:8px;background:var(--bg2)">
+    <div class="row sp"><b style="font-size:14px;color:var(--gold2)">${esc(dd.n||"Day")}</b>${dd.r?`<span class="mini" style="color:var(--text3)">rest</span>`:`<span class="mini" style="color:var(--text3)">${(dd.e||[]).length} lift${(dd.e||[]).length===1?"":"s"}</span>`}</div>
+    ${(dd.e||[]).length?`<div style="margin-top:6px">${(dd.e||[]).map(x=>`<span class="mini" style="display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:3px 7px;margin:3px 3px 0 0">${esc(x)}</span>`).join("")}</div>`:""}</div>`).join("");
+  openSheet(`<div class="ttl center" style="justify-content:center;text-align:center">🗂️ ${esc((sp.n||"Split").slice(0,28))}</div>
+    <div class="mini" style="margin:-2px 0 4px;color:var(--text2);text-align:center">${nm}'s split — ${sp.d.length} day${sp.d.length===1?"":"s"}.</div>
+    ${days}
+    <button class="btn gold sm" style="margin-top:11px" onclick="importAllySplit(${i})">📥 Copy this split to mine</button>
+    <button class="btn" style="margin-top:7px" onclick="compareAlly(${i})">‹ Back to compare</button>`);
+}
+function importAllySplit(i){
+  const a=(state.data.allies||[])[i];if(!a||!a.spl||!Array.isArray(a.spl.d)){toast("No split to copy, sir.");return;}
+  const sp={id:"s"+now(),name:((a.spl.n||"Shared Split")+" · "+(a.n||"ally")).slice(0,40),
+    days:a.spl.d.map(dd=>({name:(dd.n||"Day").slice(0,30),rest:!!dd.r,exercises:Array.isArray(dd.e)?dd.e.slice(0,40):[]}))};
+  state.data.splits=state.data.splits||[];state.data.splits.push(sp);
+  if(!state.data.activeSplitId)state.data.activeSplitId=sp.id;
+  save();haptic("done");closeSheet();render();
+  toast(`Copied ${a.n}'s split — ${sp.days.length} days ready to train.`);
+}
 function openJusticeLeague(){
   const me=myPatrolCard(),allies=state.data.allies||[],code=encodeCard(me);
   const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
@@ -5098,7 +5169,7 @@ function openJusticeLeague(){
     <div class="row" style="gap:6px;margin-top:9px">${caveStat("STR "+c.sl,"strength")}${caveStat(fmtNum(c.vol)+"kg","moved")}${caveStat(c.w,"sessions")}${caveStat(c.boss,"villains")}</div>
     ${c.opt?`<div class="mini" style="margin-top:7px;color:var(--text2);text-align:center">🌍 World optimality — <b class="gold">Top ${Math.max(1,100-c.opt)}%</b> of lifters on their big lifts</div>`:""}</div>`;
   const allyHtml=allies.length?allies.map((a,i)=>`<div style="margin-top:9px">${cardMini(a,false)}
-    <div class="row" style="gap:6px;margin-top:5px"><button class="btn ghost sm" onclick="compareAlly(${i})">Compare</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delAlly(${i})">Remove</button></div></div>`).join(""):'<div class="mini" style="margin-top:8px;color:var(--text3)">No allies yet. Paste a friend\u2019s Patrol Card below to start your League.</div>';
+    <div class="row" style="gap:6px;margin-top:5px"><button class="btn ghost sm" onclick="compareAlly(${i})">Compare</button><button class="btn ghost sm" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm" onclick="allySplit(${i})">🗂️ Split</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delAlly(${i})">✕</button></div></div>`).join(""):'<div class="mini" style="margin-top:8px;color:var(--text3)">No allies yet. Paste a friend\u2019s Patrol Card below to start your League.</div>';
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('link')}Justice League</div>
     <div class="mini" style="margin:-2px 0 11px;color:var(--text2)">Train with friends — no account, no server. Share your Patrol Card as a code, add theirs to compare strength, world optimality, big-3 and recent patrols. Everything stays on your devices.</div>
     ${cardMini(me,true)}
@@ -6458,6 +6529,9 @@ const _ALFRED_PR=["A new record, sir. Outstanding.","A personal best — exempla
 const _ALFRED_OVER12=["Past twelve again, sir? Don't be stupid — add weight, Master.","Twelve is the ceiling, Master. You sailed straight past it. Heavier next set, no argument.","That's not training, sir, that's counting. Over twelve reps means the weight is too light — load it.","Counting to fifteen, are we, Master? Charming. Now put real iron on the bar and stop at twelve.","We don't chase reps in this cave, sir — we chase load. Past twelve, you add a plate.","More than twelve, Master. You're building stamina you'll never need. Heavier, fewer, harder.","Stop showing off your cardio, sir. Twelve reps, more weight. That is the protocol.","If you can grind past twelve, the bar is mocking you, Master. Answer it with iron, not reps.","Twelve and done, sir. Anything beyond is ego dressed up as effort — add weight.","I shall say this once more, Master: over twelve, you add load. Don't make me repeat myself.","Endurance is for the marathon, sir, not the cave. Cut the reps, raise the weight.","You're past twelve and still going — which tells me the weight insults you, Master. Fix it."];
 // Objective, harsh-when-warranted lines. Alfred is a butler, not a cheerleader.
 const _ALFRED_WEAK=["Did you mean that as a warm-up, sir? You have a great deal more in you.","Don't show weakness now, Master — that weight is beneath you.","I've watched you move far heavier than that, sir. No half-measures.","That barely bends the bar, sir. Find the real working weight.","A curious choice, sir — you lifted heavier last time without a word of protest.","Ego has no place here, but neither does timidity. Add load, sir.","That's a feather to a man of your strength, sir. Respect the iron.","The cave was not built on light sets, Master. Nor will this physique be.","Bane is not lifting warm-up weights tonight, sir. Why are you?","I've seen you bleed for more than this. Stop negotiating with the bar.","That weight insults you, Master. Correct it.","Comfortable, sir? Comfort is where progress goes to die.","The bar is laughing at you, Master. Wipe the grin off it.","Pitiful, sir. Genuinely. Add weight or stop wasting both our evenings.","I've seen Master Dick warm up with more, and he's half your size. Load it.","Is that effort, or are you afraid of the iron, Master? Add a plate and prove me wrong.","Embarrassing, frankly. Put real weight on the bar and earn the right to be tired.","That set did nothing, sir — nothing. Heavier, now, or go home.","A man becoming Batman does not lift like that. Bump the load and try again.","I'll not log a coward's weight as a working set, Master. More.","You're insulting the time you put in, sir. The bar moves up from here, no argument."];
+// REGRESSION anger — you've handled heavier on this very lift recently and now you've gone backwards.
+// This is the line Alfred reaches for when you drop down from a high weight. Genuinely irritated.
+const _ALFRED_REGRESS=["You've gone BACKWARDS, sir. You lifted heavier than this not long ago — what happened?","I have it in the records, Master: you moved more than this recently. Explain yourself, then add weight.","Down from where you were, sir. That is not a plateau — that is retreat. I won't pretend otherwise.","You handled more than this a few sessions ago, Master. Going backwards is the one thing I will not abide.","Lighter than your recent best, sir. We do not regress in this cave. Load the bar to where it belongs.","I refuse to applaud a backward step, Master. You've lifted heavier — go and lift it again.","That number was higher last time, sir. Don't insult the work you already put in by sliding back now.","Backwards, Master. You spent weeks earning that weight — pick it back up, don't surrender it.","You've slipped, sir, and we both know it. Recover properly, eat, and reclaim what was yours.","This is beneath your recent self, Master. The man from two weeks ago is ashamed. Add load.","No, sir. You were stronger than this days ago. I will not log a retreat as if it were progress.","Going down from a high weight, Master? That is how strength quietly dies. Stop it now — heavier."];
 const _ALFRED_VERDICT_WEAK=["A light evening's work, sir. Gotham expects more.","Below your standard, Master. The iron noticed, and so did I.","You went through the motions tonight, sir. Tomorrow, we mean it.","Honest assessment: that was maintenance, not progress.","Half-effort, sir. The villains are training harder than that.","You showed up, Master. You did not show out. There is a difference.","That was a rehearsal, sir — not the performance. I expect the real thing next.","The Rogues slept easy tonight, Master. Let us change that.","Bluntly, sir: that was a wasted evening. Add load next session or don't bother changing into your kit.","I'll not flatter you, Master — that was lazy. Beat last week's numbers or we are going backwards.","Disappointing, sir. You have more in you and we both know it. No excuses next time.","That was beneath you, Master. Train like the man you're trying to become, not the one you are."];
 const _ALFRED_VERDICT_OK=["Solid, disciplined work, sir. The standard holds.","A respectable session, Master. Consistency is the weapon.","Good, controlled volume tonight. Recover and repeat.","Clean and deliberate, sir. Exactly as it should be.","No fireworks, sir — but the brick was laid. Walls are built this way.","Dependable work, Master. The kind that quietly wins wars."];
 const _ALFRED_VERDICT_STRONG=["Ferocious work tonight, sir. Master Bruce would be proud.","That was war on the iron, Master. Outstanding.","You left nothing in the tank, sir. Precisely the standard.","A statement session, Master. The Rogues should be worried.","Magnificent, sir. Gotham is safer for what you did tonight.","You went to a dark place and came back stronger, Master. That is the work.","I have rarely seen you this dangerous, sir. Keep it.","That, Master, was the weapon being forged. Spectacular.","I am proud of you tonight, sir — and I do not hand that out. You earned every word of it.","THAT is the standard. Remember exactly how that felt, Master, because that is who you are now.","Extraordinary session, sir. If the Rogues could see this, they'd surrender. Truly elite work.","You didn't train tonight, Master — you declared war, and you won. Outstanding from the first set to the last."];
@@ -6481,6 +6555,30 @@ function alfredWeakCallout(ei,si){
   if(cur<best*0.55){state.session._weakNag[e.name]=true;return _pickLine(_ALFRED_WEAK,"weak");}
   return null;
 }
+// REGRESSION watchdog. The user's explicit ask: if you go from a high weight and then drop down much,
+// Alfred gets MAD. Compares this top-effort set against the established level from your RECENT prior
+// sessions (history only — the live session isn't committed yet). Fires once per exercise per session,
+// and only on your first 1–2 working sets so honest back-off sets are never punished.
+function alfredRegressionCallout(ei,si){
+  const ses=state.session,e=ses&&ses.exercises[ei];if(!e)return null;
+  const s=e.sets[si];if(!s||s.type==="W"||!s.done)return null;
+  const ex=exFor(e.name);
+  const cur=setE1RM(ex,s);if(!cur)return null;
+  const working=(e.sets||[]).filter(x=>x.type!=="W");
+  if(working.indexOf(s)>1)return null;                       // back-off sets are allowed to drop
+  const rows=(typeof exerciseRows==="function")?exerciseRows(e.name):[];
+  if(rows.length<1)return null;
+  const recentBest=Math.max.apply(null,rows.slice(-4).map(r=>r.e1rm||0));
+  if(recentBest<25)return null;                              // not enough proven load to judge
+  ses._regNag=ses._regNag||{};
+  if(ses._regNag[e.name])return null;
+  // 55%–90% of your recent best = a real backward step (below 55% the weak-callout handles it harder)
+  if(cur>=recentBest*0.55&&cur<recentBest*0.90){
+    ses._regNag[e.name]=true;
+    return _pickLine(_ALFRED_REGRESS,"regress");
+  }
+  return null;
+}
 // 12-rep ceiling watchdog. A working set above 12 reps means the load is too light — nudge once per
 // exercise per session so it lands as a sharp correction, not nagging. Warm-ups (type W) are exempt.
 function alfredOver12(ei,si){
@@ -6497,6 +6595,7 @@ function alfredCoachLine(ei,si,ev){
   if(ev==="pr"||ev==="boss"){if(state.session)state.session._coachTone="good";return _pickLine(_ALFRED_PR,"pr");}
   const over=alfredOver12(ei,si);if(over){if(state.session)state.session._coachTone="bad";return over;}
   const weak=alfredWeakCallout(ei,si);if(weak){if(state.session)state.session._coachTone="bad";return weak;}
+  const reg=alfredRegressionCallout(ei,si);if(reg){if(state.session)state.session._coachTone="bad";return reg;}
   if(state.session)state.session._coachTone="ok";
   const working=(e.sets||[]).filter(s=>s.type!=="W");
   const doneN=working.filter(s=>s.done).length;const last=working.length>0&&doneN>=working.length;
