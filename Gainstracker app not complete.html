@@ -3817,7 +3817,13 @@ function exerciseHistory(name){
   const vals=mode==="weight"?tws:mode==="vol"?vols:e1s;
   const col=mode==="vol"?"#7FC8FF":mode==="weight"?"#E8C56A":"#2ECC71";
   const safe=esc(name).replace(/'/g,"");
+  const intel=liftIntel(name);
+  const verdict=intel?liftVerdict(intel):"";
+  const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
+  const tgtBlock=intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"";
   openSheet(`<div class="row sp"><div class="ttl">${esc(name)}</div><span class="chip">${rows.length} sessions</span></div>
+    ${verdict?`<div class="banner" style="margin:2px 0 10px"><span>🎩</span><div class="mini" style="color:${vcol}">${esc(verdict)}</div></div>`:""}
+    ${tgtBlock}
     <div class="row" style="gap:16px;margin:4px 0 12px">
       <div><div class="mini">Best e1RM</div><b class="gold" style="font-size:20px">${Math.max(...e1s)}kg</b></div>
       <div><div class="mini">Top weight</div><b style="font-size:20px">${Math.max(...tws)}kg</b></div>
@@ -3847,8 +3853,46 @@ function loggedExerciseNames(){
   state.data.workouts.forEach(w=>(w.exercises||[]).forEach(e=>{if((e.sets||[]).some(s=>s.done&&s.type!=="W"))m.set(e.name,(m.get(e.name)||0)+1);}));
   return [...m.entries()].sort((a,b)=>b[1]-a[1]).map(([n])=>n);
 }
+// Most-recent-first ordering for the history/progress lists (what the user actually scans).
+function loggedExerciseNamesByRecency(){
+  const seen=new Map();
+  state.data.workouts.forEach(w=>{const t=new Date(w.date).getTime();(w.exercises||[]).forEach(e=>{
+    if((e.sets||[]).some(s=>s.done&&s.type!=="W")){if(!seen.has(e.name)||t>seen.get(e.name))seen.set(e.name,t);}});});
+  return [...seen.entries()].sort((a,b)=>b[1]-a[1]).map(([n])=>n);
+}
+// Per-lift coaching read: trend verdict, stall detection and the weight/reps to beat next time.
+// Pure analysis over exerciseRows — no side effects, safe to call anywhere.
+function liftIntel(name){
+  const ex=exFor(name),rows=exerciseRows(name);
+  if(!rows.length)return null;
+  const last=rows[rows.length-1],e1s=rows.map(r=>r.e1rm);
+  const bestE=Math.max(...e1s),lastDate=new Date(last.date);
+  const daysAgo=Math.floor((Date.now()-lastDate.getTime())/864e5);
+  // stall: best e1RM hasn't improved across the last 3+ sessions
+  let stalled=false,sinceImprove=0;
+  if(rows.length>=3){const peakIdx=e1s.lastIndexOf(bestE);sinceImprove=rows.length-1-peakIdx;stalled=sinceImprove>=3&&last.e1rm<bestE-0.5;}
+  // trend across last up-to-5 sessions
+  const win=rows.slice(-5),d=win.length>1?win[win.length-1].e1rm-win[0].e1rm:0;
+  const pct=win.length>1&&win[0].e1rm?Math.round(d/win[0].e1rm*100):0;
+  const trend=d>1?"up":d<-1?"down":"flat";
+  // next target: beat last top working set — same weight +1 rep, or if reps high, +load
+  let tgt=null;
+  if(last.bset){const w=+last.bset.w||0,r=+last.bset.r||0;
+    if(r>=12)tgt={type:"load",w:Math.round((w+(w>=60?5:2.5))*10)/10,r:Math.max(6,r-3),txt:`${Math.round((w+(w>=60?5:2.5))*10)/10}kg — drop to ~${Math.max(6,r-3)} reps and climb again`};
+    else tgt={type:"rep",w,r:r+1,txt:`${w}${ex&&ex.bw?"+":""}kg × ${r+1} reps (beat last by one rep)`};
+  }
+  return {bestE,last,daysAgo,stalled,sinceImprove,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
+}
+// One-line verdict in Alfred's voice, harsh or proud as the data earns.
+function liftVerdict(intel){
+  if(!intel)return "";
+  if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change the stimulus or deload — repeating it won't move it.`;
+  if(intel.trend==="up")return `Climbing — +${intel.d}kg (${intel.pct>0?"+":""}${intel.pct}%) of late. Keep the pressure on, sir.`;
+  if(intel.trend==="down")return `Slipping ${intel.d}kg recently. Tighten recovery and attack it next time.`;
+  return `Holding steady. Steady isn't growth, Master — go and take the next rep.`;
+}
 function progressByExerciseCard(){
-  const names=loggedExerciseNames();
+  const names=loggedExerciseNamesByRecency();
   if(!names.length)return "";
   return `<div class="card"><div class="ttl">📈 Progress by exercise <span class="mini" style="font-weight:400">— tap any for full charts</span></div>${names.map(n=>{
     const rows=exerciseRows(n);const e1s=rows.map(r=>r.e1rm);const best=e1s.length?Math.max(...e1s):0;
@@ -3930,15 +3974,18 @@ function ironEfficiency(){
 }
 function archExerciseList(){
   const q=(state._archQ||"").toLowerCase().trim();
-  let names=loggedExerciseNames();
+  let names=loggedExerciseNamesByRecency();           // most recently trained first
   if(q)names=names.filter(n=>n.toLowerCase().includes(q));
   if(!names.length)return `<p class="muted center" style="padding:14px 0">No lifts match "${esc(q)}".</p>`;
+  const fmtAgo=da=>da<=0?"today":da===1?"yesterday":da<7?da+"d ago":da<30?Math.round(da/7)+"w ago":Math.round(da/30)+"mo ago";
   return names.map(n=>{
     const rows=exerciseRows(n);const e1s=rows.map(r=>r.e1rm);const best=e1s.length?Math.max(...e1s):0;
     const d=e1s.length>1?e1s[e1s.length-1]-e1s[0]:0;
     const dl=d>0?`<span class="green">+${d}</span>`:d<0?`<span class="red">${d}</span>`:`<span class="muted">—</span>`;
-    return `<div class="row sp" style="padding:11px 0;border-top:1px solid var(--border);cursor:pointer;gap:10px" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
-      <div style="min-width:0;flex:1"><b style="font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</b><span class="mini">${rows.length} session${rows.length>1?"s":""} · ${dl}kg</span></div>
+    const intel=liftIntel(n);const ago=intel?fmtAgo(intel.daysAgo):"";
+    const flag=intel&&intel.stalled?`<span class="chip" style="background:rgba(232,69,60,.15);color:#ff6a5e;border-color:rgba(232,69,60,.4);font-size:9px;padding:1px 6px">STALLED</span>`:"";
+    return `<div class="row sp exrow" style="padding:11px 0;border-top:1px solid var(--border);cursor:pointer;gap:10px" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
+      <div style="min-width:0;flex:1"><b style="font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)} ${flag}</b><span class="mini">${ago} · ${rows.length} session${rows.length>1?"s":""} · ${dl}kg</span></div>
       ${miniSpark(e1s)}<b class="gold" style="white-space:nowrap">${best}kg ›</b></div>`;
   }).join("");
 }
@@ -5001,6 +5048,7 @@ function openJusticeLeague(){
     <div class="row wrap" style="gap:5px;margin-top:8px">${lifts}</div>
     <button class="btn sm" style="margin-top:11px" onclick="openLeaderboard()">🏆 League Leaderboard — rank everyone</button>
     <button class="btn gold sm" style="margin-top:7px" onclick="shareMyCard()">📋 Copy my Patrol Card</button>
+    <div class="row" style="gap:6px;margin-top:7px"><button class="btn ghost sm g" onclick="openShareSplitPicker()">📤 Share a split</button><button class="btn ghost sm" style="width:auto" onclick="openImportSplit()">📥 Import</button></div>
     <textarea id="my-code" readonly onclick="this.select()" style="width:100%;margin-top:7px;height:50px;font-size:10px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none">${code}</textarea>
     <div class="hr"></div>
     <div class="ttl" style="margin:0 0 6px">Add an ally</div>
@@ -5305,7 +5353,7 @@ function splitsEditorHtml(){
   const d=state.data;let html="";
   d.splits.forEach(sp=>{
     html+=`<div class="card"><div class="row sp"><input value="${esc(sp.name)}" onchange="renameSplit('${sp.id}',this.value)" style="font-weight:700;border:none;background:transparent;padding:4px 0;font-size:16px"/>
-      <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delSplit('${sp.id}')">🗑</button></div>`;
+      <div class="row" style="gap:4px;flex:none"><button class="btn ghost sm" style="width:auto;color:var(--gold2)" title="Share this split" onclick="shareSplit('${sp.id}')">📤</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delSplit('${sp.id}')">🗑</button></div></div>`;
     sp.days.forEach((day,i)=>{
       if(isRest(day)){
         html+=`<div style="border-top:1px solid var(--border);padding:9px 0;background:linear-gradient(90deg,rgba(124,150,255,.06),transparent)">
@@ -5317,7 +5365,7 @@ function splitsEditorHtml(){
           <div class="row sp"><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0;width:52%"/>
           <div class="row" style="gap:4px"><button class="btn ghost sm" style="width:auto" onclick="addDayExercise('${sp.id}',${i})">+ ex</button><button class="btn ghost sm" style="width:auto;font-size:11px" onclick="toggleRestDay('${sp.id}',${i})">Make rest</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delDay('${sp.id}',${i})">🗑</button></div></div>
           <div style="margin-top:6px">${day.exercises.length?day.exercises.map((n,j)=>`<div class="row sp" style="gap:6px;padding:4px 0;border-top:1px solid rgba(255,255,255,.04)">
-            <span style="flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</span>
+            <span style="flex:1;min-width:0"><span style="font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</span>${splitExHint(n)}</span>
             <div class="row" style="gap:2px;flex:none">
               <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Move up" ${j===0?'disabled style="opacity:.25;width:auto;padding:5px 8px"':''} onclick="moveDayEx('${sp.id}',${i},${j},-1)">↑</button>
               <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Move down" ${j===day.exercises.length-1?'disabled style="opacity:.25;width:auto;padding:5px 8px"':''} onclick="moveDayEx('${sp.id}',${i},${j},1)">↓</button>
@@ -5327,7 +5375,7 @@ function splitsEditorHtml(){
     });
     html+=`<div class="row" style="gap:6px;margin-top:8px"><button class="btn ghost sm" onclick="addDay('${sp.id}')">+ Training day</button><button class="btn ghost sm" onclick="addRestDay('${sp.id}')">+ Rest day</button></div></div>`;
   });
-  html+=`<button class="btn" onclick="newSplit()">＋ New split</button>`;
+  html+=`<div class="row" style="gap:7px"><button class="btn" style="flex:1" onclick="newSplit()">＋ New split</button><button class="btn ghost" style="flex:1;border-color:var(--gold-dim);color:var(--gold2)" onclick="openImportSplit()">📥 Import a split</button></div>`;
   return html;
 }
 function renderStrategy(){
@@ -5345,9 +5393,84 @@ function toggleDay(i){const ws=state.data.u.weekSchedule;ws[i]=ws[i]===false?tru
 function newSplit(){const id="s"+now();state.data.splits.push({id,name:"New Split",days:[{name:"Day 1",exercises:[]}]});if(!state.data.activeSplitId)state.data.activeSplitId=id;save();render();}
 function renameSplit(id,v){const s=state.data.splits.find(x=>x.id===id);if(s)s.name=v;save();}
 function delSplit(id){appConfirm({title:"Delete split",body:"Delete this split permanently?",ok:"Delete",danger:true}).then(ok=>{if(!ok)return;state.data.splits=state.data.splits.filter(x=>x.id!==id);if(state.data.activeSplitId===id)state.data.activeSplitId=state.data.splits[0]?.id||null;save();render();});}
+/* ===== SHAREABLE SPLITS — "Split Card" codes (cousin-proof: one tap to copy, one paste to import) ===== */
+// Same url-safe base64 trick as Patrol Cards so codes survive messaging apps. We share only the routine
+// (name + days + exercise names) — no personal data. Imported splits get a fresh id so nothing collides.
+function encodeSplit(sp){try{
+  const lean={n:(sp.name||"Split").slice(0,40),d:(sp.days||[]).map(day=>({n:(day.name||"Day").slice(0,30),r:day.rest?1:0,e:(day.exercises||[]).slice(0,40)}))};
+  const b=btoa(unescape(encodeURIComponent(JSON.stringify(lean))));
+  return "GTSPL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}catch(e){return "";}}
+function decodeSplit(code){try{
+  code=(code||"").trim();const i=code.lastIndexOf("GTSPL1:");if(i>=0)code=code.slice(i+7);
+  code=code.replace(/[\u2018\u2019\u201C\u201D\u201E\u00AB\u00BB]/g,"");
+  code=code.replace(/-/g,"+").replace(/_/g,"/").replace(/[^A-Za-z0-9+/=]/g,"").replace(/=+$/,"");
+  while(code.length%4)code+="=";
+  const j=JSON.parse(decodeURIComponent(escape(atob(code))));
+  if(!j||!Array.isArray(j.d))return null;
+  return {id:"s"+now(),name:(j.n||"Shared Split").slice(0,40),
+    days:j.d.map(day=>({name:(day.n||"Day").slice(0,30),rest:!!day.r,exercises:Array.isArray(day.e)?day.e.slice(0,40):[]}))};
+}catch(e){return null;}}
+function shareSplit(id){
+  const sp=state.data.splits.find(x=>x.id===id);if(!sp){toast("Split not found.");return;}
+  const code=encodeSplit(sp);if(!code){toast("Couldn't build the Split Card.");return;}
+  const done=()=>{toast("Split Card copied — send it to anyone. They paste, they train.");haptic("done");};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(done).catch(()=>openSplitShareSheet(sp,code));}
+  else openSplitShareSheet(sp,code);
+}
+function openSplitShareSheet(sp,code){
+  const exCount=(sp.days||[]).reduce((a,d)=>a+(d.exercises||[]).length,0);
+  openSheet(`<div class="ttl">📤 Share "${esc(sp.name)}"</div>
+    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">${sp.days.length} days · ${exCount} exercises. Send this code — your friend pastes it under <b>Import a split</b> and the whole routine drops into their app. No account needed.</div>
+    <textarea id="split-code" readonly onclick="this.select()" style="width:100%;height:88px;font-size:10px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none">${code}</textarea>
+    <button class="btn gold" style="margin-top:9px" onclick="(function(){var t=document.getElementById('split-code');if(t){t.select();}if(navigator.clipboard){navigator.clipboard.writeText('${code}').then(()=>toast('Copied — send it over.'));}else toast('Select the code and copy it.');})()">📋 Copy code</button>
+    <button class="btn ghost" style="margin-top:7px" onclick="closeSheet()">Close</button>`);
+}
+function openShareSplitPicker(){
+  const sps=state.data.splits||[];
+  if(!sps.length){toast("No splits to share yet.");return;}
+  if(sps.length===1){shareSplit(sps[0].id);return;}
+  openSheet(`<div class="ttl">📤 Share which split?</div>
+    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Pick the routine to send. Your friend pastes the code and trains it instantly.</div>
+    ${sps.map(sp=>{const ex=(sp.days||[]).reduce((a,d)=>a+(d.exercises||[]).length,0);
+      return `<button class="row sp" onclick="shareSplit('${sp.id}')" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:11px;margin-bottom:7px;cursor:pointer;text-align:left"><div style="min-width:0"><b style="font-size:14px;color:var(--gold2)">${esc(sp.name)}</b><div class="mini" style="color:var(--text3)">${sp.days.length} days · ${ex} exercises</div></div><span style="color:var(--gold2);flex:none">📤</span></button>`;}).join("")}
+    <button class="btn ghost" style="margin-top:4px" onclick="openJusticeLeague()">‹ Back</button>`);
+}
+function openImportSplit(){
+  openSheet(`<div class="ttl">📥 Import a split</div>
+    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Paste a Split Card code a friend sent you. Their whole routine — days and every exercise — lands in your splits, ready to train.</div>
+    <textarea id="import-split-code" placeholder="Paste the GTSPL1:… code here…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:88px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none"></textarea>
+    <div class="row" style="gap:6px;margin-top:8px"><button class="btn gold sm g" onclick="pasteImportSplit()">📥 Paste &amp; Import</button><button class="btn sm" style="width:auto" onclick="doImportSplit()">Import</button></div>
+    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
+}
+function pasteImportSplit(){
+  if(navigator.clipboard&&navigator.clipboard.readText){
+    navigator.clipboard.readText().then(t=>{const inp=$("import-split-code");if(inp)inp.value=t;doImportSplit();})
+      .catch(()=>toast("Couldn't read clipboard — long-press the box, Paste, then Import."));
+  }else toast("Long-press the box, Paste, then Import.");
+}
+function doImportSplit(){
+  const inp=$("import-split-code");if(!inp)return;const sp=decodeSplit(inp.value);
+  if(!sp){toast((inp.value||"").trim()?"That code didn't read — copy the whole thing again.":"Paste a Split Card code first.");return;}
+  state.data.splits.push(sp);if(!state.data.activeSplitId)state.data.activeSplitId=sp.id;
+  save();haptic("done");closeSheet();render();
+  toast(`"${sp.name}" imported — ${sp.days.length} days ready to train.`);
+}
 function addDay(id){const s=state.data.splits.find(x=>x.id===id);s.days.push({name:"Day "+(s.days.length+1),exercises:[]});save();render();}
 function renameDay(id,i,v){const s=state.data.splits.find(x=>x.id===id);s.days[i].name=v;save();}
-function rmDayEx(id,i,j){const s=state.data.splits.find(x=>x.id===id);s.days[i].exercises.splice(j,1);save();render();}
+// Removing an exercise only edits the split list. Your logged sets, PRs and history stay in
+// state.data.workouts / state.data.prs forever — re-add it later and seedSets() pulls your last
+// weights straight back. So removal is always lossless; we just confirm it so the user trusts it.
+function rmDayEx(id,i,j){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const nm=s.days[i].exercises[j];s.days[i].exercises.splice(j,1);save();render();
+  if(nm&&lastSetFor(nm))toast("Removed from split — your "+nm+" history & weights are kept.");}
+// Compact "last time" hint for the split editor so retained memory is visible at a glance.
+function splitExHint(name){
+  const intel=(typeof liftIntel==="function")?liftIntel(name):null;
+  if(!intel||!intel.last||!intel.last.bset)return "";
+  const b=intel.last.bset,ex=exFor(name),da=intel.daysAgo;
+  const ago=da<=0?"today":da===1?"yesterday":da<7?da+"d ago":da<30?Math.round(da/7)+"w ago":Math.round(da/30)+"mo ago";
+  return `<span class="mini" style="color:var(--text3);display:block;margin-top:1px">last: <b style="color:var(--gold2)">${b.w}${ex&&ex.bw?"+":""}kg × ${b.r}</b> · ${ago}</span>`;
+}
 function moveDayEx(id,i,j,dir){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const arr=s.days[i].exercises;const k=j+dir;if(k<0||k>=arr.length)return;const t=arr[j];arr[j]=arr[k];arr[k]=t;save();render();}
 function addDayExercise(id,i){
   state._addTo={id,i};openPicker({id,i});   // multi-add: pick several at once, list stays open
