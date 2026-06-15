@@ -5982,6 +5982,21 @@ let ALFRED_VOICE="";
 /* ---- Alfred LOCAL coaching (works with NO API key) — pre-session briefing,
    post-session debrief, and ask-about-a-muscle. Pure local science. ---- */
 function fmtHrs(h){h=Math.max(0,Math.round(h));if(h<1)return "ready now";if(h<24)return h+"h";const dd=Math.floor(h/24),hh=h%24;return dd+"d"+(hh?" "+hh+"h":"");}
+// Alfred's memory — a personalised "welcome back" that proves he remembers the last patrol, your
+// streak and anything that's stalling. Kept tight so it informs without rambling.
+function alfredMemoryOpener(){
+  const d=state.data,u=d.u;const w=(d.workouts||[])[0];
+  if(!w)return "";
+  const da=Math.floor((Date.now()-new Date(w.date).getTime())/864e5);
+  const ago=da<=0?"earlier today":da===1?"yesterday":da<7?da+" days ago":da<14?"last week":Math.round(da/7)+" weeks ago";
+  let stalled=null;try{const names=loggedExerciseNamesByRecency();for(const n of names){const it=liftIntel(n);if(it&&it.stalled){stalled=n;break;}}}catch(e){}
+  const streak=u.streakDays||0;
+  let bits=[`Welcome back, Master. Your last patrol — <b>${esc(w.name)}</b> — was ${ago}`];
+  bits.push(da>=4?`, and the cave's been quiet since. Gotham notices, sir.`:`.`);
+  if(streak>=3)bits.push(` ${streak} nights on the trot — discipline I respect, sir.`);
+  if(stalled)bits.push(` One thing, Master: your <b>${esc(stalled)}</b> has stalled — change the stimulus before it sets like concrete.`);
+  return `<div class="banner" style="margin-bottom:7px;border-color:var(--gold-dim)"><span>🎩</span><div class="mini">${bits.join("")}</div></div>`;
+}
 function alfredBriefing(){
   const d=state.data,u=d.u;
   const trained=M12.filter(m=>(d.muscleVol[m]||0)>0);
@@ -5998,7 +6013,7 @@ function alfredBriefing(){
   const under=[],over=[];
   M12.forEach(m=>{const ws=weeklySets(m),vl=VL[m],eMrv=effectiveMRV(m);if(ws>0&&ws<vl.mev)under.push({m,ws,mev:vl.mev});if(ws>eMrv)over.push({m,ws,mrv:eMrv});});
   const gaps=[];trained.forEach(m=>coverageTips(m).slice(0,1).forEach(t=>gaps.push({m,text:t.text})));
-  let rows="";
+  let rows=alfredMemoryOpener();
   // opener
   if(!isTrainDay){
     rows+=`<div class="banner" style="margin-bottom:7px"><span style="line-height:1">${restIcon(16)}</span><div class="mini">Today is a scheduled rest day, sir. Recovery is where the adaptation actually happens — don't mistake it for idleness. ${recovering.length?`Your ${MNAME[recovering[0].m].toLowerCase()} are still ${recovering[0].r}% recovered — good timing.`:"Everything's fresh by tomorrow."}</div></div>`;
@@ -6021,7 +6036,7 @@ function alfredBriefing(){
   if(gaps.length)rows+=`<div class="mini" style="margin-bottom:5px">🎯 <b>${MNAME[gaps[0].m]}:</b> ${esc(gaps[0].text)}</div>`;
   if(!under.length&&!over.length&&!gaps.length)rows+=`<div class="mini" style="color:var(--green);margin-bottom:4px">✓ Volume and coverage look balanced this week. Maintain the standard.</div>`;
   ALFRED_VOICE=("Briefing, sir. "+rows).replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
-  return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center;justify-content:space-between">🎩 Alfred's briefing<button class="chip" style="padding:3px 9px" title="Read aloud" onclick="alfredSpeak(ALFRED_VOICE)">🔊 Voice</button></div>${rows}</div>`;
+  return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center;justify-content:space-between">🎩 Alfred's briefing<button class="chip" style="padding:3px 9px" title="Read aloud" onclick="alfredSpeak(ALFRED_VOICE)">🔊 Voice</button></div>${rows}<button class="btn gold sm" style="margin-top:9px;width:100%" onclick="openAlfredConsole()">🎩 Ask Alfred / give a command</button></div>`;
 }
 function alfredDebrief(){
   const w=state.data.workouts[0];if(!w)return "";
@@ -6041,6 +6056,93 @@ function alfredMusclePicker(){
     <div class="mini" style="margin-bottom:9px;color:var(--text2)">Tap any group for a full dossier — anatomy, your recovery, weekly volume vs landmarks, and what to train next.</div>
     <div class="row" style="flex-wrap:wrap;gap:7px">${M12.map(m=>`<button class="chip g" onclick="muscleDrill('${m}')">${MNAME[m]}</button>`).join("")}</div></div>`;
 }
+/* ===== ALFRED CONSOLE — he sees the whole training picture and can act on your word.
+   Reads (status, weakest, stalled, PRs, volume) need no permission; edits to your split are
+   ALWAYS gated behind an explicit confirm. Offline keyword-intent parser, no server. ===== */
+function alfredConsoleExamples(){return ["What should I train today?","What's my weakest muscle?","Which lifts have stalled?","How strong am I?","PR for bench press","Last time squat","Volume for chest","Add face pull to push","Remove leg press"];}
+function _alfredFindEx(q){
+  q=(q||"").toLowerCase().trim();if(!q)return null;
+  const names=(typeof EXDB!=="undefined"?EXDB:CORE_EX).map(e=>e.n);
+  let hit=names.find(n=>n.toLowerCase()===q);if(hit)return hit;
+  hit=names.find(n=>n.toLowerCase().includes(q));if(hit)return hit;
+  const toks=q.split(/\s+/);
+  const scored=names.map(n=>{const ln=n.toLowerCase();return {n,s:toks.filter(t=>ln.includes(t)).length};}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+  return scored.length?scored[0].n:null;
+}
+function _alfredActiveSplit(){return state.data.splits.find(s=>s.id===state.data.activeSplitId)||state.data.splits[0]||null;}
+function _alfredFindDay(sp,q){if(!sp)return -1;q=(q||"").toLowerCase().trim();let i=sp.days.findIndex(d=>(d.name||"").toLowerCase()===q);if(i<0)i=sp.days.findIndex(d=>(d.name||"").toLowerCase().includes(q));return i;}
+function alfredAsk(q){
+  const raw=(q||"").trim(),s=raw.toLowerCase();const d=state.data;
+  // EDIT: add X to [day]
+  let m=s.match(/^(?:add|put)\s+(.+?)\s+(?:to|in|on)\s+(.+)$/);
+  if(m){const exName=_alfredFindEx(m[1]),sp=_alfredActiveSplit(),di=_alfredFindDay(sp,m[2]);
+    if(!exName)return `I can't find a lift matching "${esc(m[1])}", Master. Try the exact name.`;
+    if(!sp)return "You have no split to edit, sir.";
+    if(di<0)return `No day called "${esc(m[2])}" in <b>${esc(sp.name)}</b>. Days: ${sp.days.map(x=>esc(x.name)).join(", ")}.`;
+    state._alfredPending={label:`Add <b>${esc(exName)}</b> to <b>${esc(sp.days[di].name)}</b> in ${esc(sp.name)}?`,done:`Added ${esc(exName)} to ${esc(sp.days[di].name)}, Master.`,fn:()=>{sp.days[di].exercises.push(exName);}};
+    return `On your word, sir: add <b>${esc(exName)}</b> to <b>${esc(sp.days[di].name)}</b>. Confirm below.`;}
+  // EDIT: remove X
+  m=s.match(/^(?:remove|delete|drop)\s+(.+)$/);
+  if(m){const exq=m[1],sp=_alfredActiveSplit();if(!sp)return "No split to edit, sir.";
+    let found=null;sp.days.forEach((day,di)=>{(day.exercises||[]).forEach((n,j)=>{if(!found&&n.toLowerCase().includes(exq))found={di,j,n};});});
+    if(!found)return `I don't see anything matching "${esc(exq)}" in <b>${esc(sp.name)}</b>, Master.`;
+    state._alfredPending={label:`Remove <b>${esc(found.n)}</b> from <b>${esc(sp.days[found.di].name)}</b>? Your history & weights stay safe.`,done:`Removed ${esc(found.n)} — history kept, sir.`,fn:()=>{sp.days[found.di].exercises.splice(found.j,1);}};
+    return `Remove <b>${esc(found.n)}</b> from <b>${esc(sp.days[found.di].name)}</b>? Confirm below — nothing is lost, you can re-add it anytime.`;}
+  // EDIT: add rest/training day
+  m=s.match(/^add\s+(?:a\s+)?(rest|training|train)\s+day$/);
+  if(m){const sp=_alfredActiveSplit();if(!sp)return "No split, sir.";const rest=m[1]==="rest";
+    state._alfredPending={label:`Add a ${rest?"rest":"training"} day to <b>${esc(sp.name)}</b>?`,done:`${rest?"Rest":"Training"} day added, Master.`,fn:()=>{sp.days.push(rest?{name:"Rest & Recover",rest:true,exercises:[]}:{name:"Day "+(sp.days.length+1),exercises:[]});}};
+    return `Add a ${rest?"rest":"training"} day to <b>${esc(sp.name)}</b>? Confirm below.`;}
+  // READ: weakest
+  if(/weak/.test(s)){const tr=M12.filter(x=>(d.muscleVol[x]||0)>0);if(!tr.length)return "No data yet, sir — train something first.";
+    const wk=tr.map(x=>({x,l:muscleLevel(x),sets:weeklySets(x)})).sort((a,b)=>a.l-b.l)[0];
+    return `Your weakest link is <b>${MNAME[wk.x]}</b> — level ${wk.l}, ${wk.sets} hard sets this week. Give it priority, Master.`;}
+  // READ: stalled
+  if(/stall|plateau|stuck/.test(s)){const out=[];loggedExerciseNamesByRecency().forEach(n=>{const it=liftIntel(n);if(it&&it.stalled)out.push(n);});
+    return out.length?`Stalled, sir: <b>${out.slice(0,5).map(esc).join(", ")}</b>. Change the angle, rep range or deload.`:"Nothing's stalled right now, Master. Keep the pressure on.";}
+  // READ: how strong / standing
+  if(/how strong|standing|percentile|how good|world/.test(s)){const c=myPatrolCard();if(!c.opt)return "Log your big lifts and I'll place you against the world, sir.";return `Across your big lifts you're in roughly the <b>top ${Math.max(1,100-c.opt)}%</b> of trained lifters, Master. Strength level ${c.sl}.`;}
+  // READ: what to train today
+  if(/train|today|what should|workout|session/.test(s)){const tr=M12.filter(x=>(d.muscleVol[x]||0)>0);
+    const prime=tr.filter(x=>getRecovery(x)>=70&&weeklySets(x)<VL[x].mav).sort((a,b)=>getRecovery(b)-getRecovery(a)).slice(0,3);
+    if(prime.length)return `Tonight, Master: <b>${prime.map(x=>MNAME[x]).join(", ")}</b> — recovered and below your weekly MAV. Productive volume waiting.`;
+    return "Everything you've trained is still recovering, sir. Hit an untrained group or take the rest.";}
+  // READ: PR for X
+  m=s.match(/(?:pr|record|best|1rm|max)\s+(?:for\s+)?(.+)$/)||s.match(/(.+?)\s+(?:pr|record|max|1rm)$/);
+  if(m){const exName=_alfredFindEx(m[1]);if(!exName)return "Can't find that lift, sir.";const p=d.prs[exName];
+    if(!p||!p.orm)return `No record logged for <b>${esc(exName)}</b> yet, Master.`;
+    return `<b>${esc(exName)}</b> — best e1RM <b class="gold">${Math.round(p.orm)}kg</b>${p.maxW?`, top weight ${Math.round(p.maxW)}kg`:""}. Go and beat it, sir.`;}
+  // READ: last time X
+  m=s.match(/^(?:last|previous)\s+(?:time\s+)?(.+)$/);
+  if(m){const exName=_alfredFindEx(m[1]);if(!exName)return "Can't find that lift, sir.";const it=liftIntel(exName);
+    if(!it||!it.last||!it.last.bset)return `No logged sets for <b>${esc(exName)}</b> yet, Master.`;
+    const b=it.last.bset;return `Last <b>${esc(exName)}</b> (${it.daysAgo<=0?"today":it.daysAgo+"d ago"}): top set <b>${b.w}kg × ${b.r}</b>.${it.tgt?" Next: "+esc(it.tgt.txt):""}`;}
+  // READ: volume for muscle
+  m=s.match(/(?:volume|sets)\s+(?:for\s+)?(.+)$/)||s.match(/(.+?)\s+(?:volume|sets)$/);
+  if(m){const mq=m[1].toLowerCase();const mm=M12.find(x=>MNAME[x].toLowerCase().includes(mq)||x.includes(mq));
+    if(!mm)return "Which muscle, sir? Name one of the twelve.";const ws=weeklySets(mm),vl=VL[mm],eMrv=effectiveMRV(mm);
+    const zone=ws<vl.mev?"below MEV — it won't grow":ws<=vl.mav?"in the growth zone":ws<=eMrv?"high but recoverable":"past MRV — back off";
+    return `<b>${MNAME[mm]}</b>: ${ws} hard sets this week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). You're ${zone}, Master.`;}
+  return `I can answer or act, Master. Try: <b>what should I train</b>, <b>weakest muscle</b>, <b>which lifts stalled</b>, <b>how strong am I</b>, <b>PR for bench</b>, <b>last time squat</b>, <b>volume for chest</b> — or <b>add face pull to push</b>, <b>remove leg press</b>.`;
+}
+function openAlfredConsole(){
+  state._alfredLog=state._alfredLog||[];
+  const log=state._alfredLog.slice(-6).map(t=>`<div style="margin-bottom:9px"><div class="mini" style="color:var(--text3)">You: ${esc(t.q)}</div><div class="banner" style="margin-top:3px"><span>🎩</span><div class="mini">${t.a}</div></div></div>`).join("");
+  const pend=state._alfredPending?`<div class="card" style="border-color:var(--gold-dim);margin-top:6px"><div class="mini" style="margin-bottom:7px">${state._alfredPending.label}</div><div class="row" style="gap:6px"><button class="btn gold sm g" onclick="alfredConfirm()">✓ Do it</button><button class="btn ghost sm" style="width:auto" onclick="alfredCancelPending()">Cancel</button></div></div>`:"";
+  const ex=alfredConsoleExamples().map((e,i)=>`<button class="chip g" style="margin:0 4px 5px 0" onclick="alfredAskExample(${i})">${esc(e)}</button>`).join("");
+  openSheet(`<div class="ttl">🎩 Ask Alfred</div>
+    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">I see your whole training picture, Master — recovery, volume, every lift and record. Ask me anything, or tell me to change your split and I'll do it on your word.</div>
+    <div class="row" style="gap:6px"><input id="alfred-q" placeholder="Ask or command…" autocomplete="off" autocapitalize="off" onkeydown="if(event.key==='Enter')alfredAskGo()" style="flex:1"/><button class="btn gold sm" style="width:auto" onclick="alfredAskGo()">Ask</button></div>
+    <div class="row wrap" style="margin-top:9px">${ex}</div>
+    ${pend}
+    <div style="margin-top:11px">${log}</div>
+    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
+  setTimeout(()=>{const i=$("alfred-q");if(i)i.focus();},60);
+}
+function alfredAskGo(){const i=$("alfred-q");if(!i)return;const q=i.value.trim();if(!q)return;const a=alfredAsk(q);state._alfredLog=state._alfredLog||[];state._alfredLog.push({q,a});openAlfredConsole();}
+function alfredAskExample(i){const q=alfredConsoleExamples()[i];if(!q)return;const a=alfredAsk(q);state._alfredLog=state._alfredLog||[];state._alfredLog.push({q,a});openAlfredConsole();}
+function alfredConfirm(){const p=state._alfredPending;if(!p)return;try{p.fn();}catch(e){}state._alfredPending=null;save();state._alfredLog.push({q:"✓ confirmed",a:p.done||"Done, Master."});openAlfredConsole();}
+function alfredCancelPending(){state._alfredPending=null;state._alfredLog.push({q:"✕ cancelled",a:"As you wish, sir. Nothing changed."});openAlfredConsole();}
 function caveStat(v,l){return `<div style="flex:1;min-width:64px;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:8px 4px;background:var(--bg2)"><div style="font-family:var(--disp);font-size:22px;color:var(--gold2);line-height:1.05">${v}</div><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">${l}</div></div>`;}
 /* Alfred's weekly "Cave review" — fight-camp recap of the last 7 days with proactive flags. */
 function alfredCaveReview(){
