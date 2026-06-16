@@ -1711,8 +1711,11 @@ function lastSetFor(name){
    Fatigue is NOT "trained = red". It accumulates from WORKING sets weighted by proximity to
    failure (RIR) and decays exponentially with a muscle-specific recovery constant. So 1 warmup
    + 1 normal set barely tints a muscle, while 4-6 sets to failure turn it deep red for days.
-   Bigger/slower muscles (back, quads, hams, glutes) recover slower than fast ones (delts, arms). */
-const MREC={back:66,quads:66,hamstrings:60,glutes:60,chest:48,shoulders:44,traps:40,biceps:38,triceps:38,forearms:34,calves:34,abs:34};
+   Bigger/slower muscles (back, quads, hams, glutes) recover slower than fast ones (delts, arms).
+   MREC[m] = the REAL full-recovery window in hours: time from a hard session to 100% recovered.
+   Realistic, evidence-based per group — back/legs ~72h, chest/delts/arms ~48h, calves/abs ~24-36h.
+   Recovery is bounded by this window, so a muscle is NEVER shown as needing >MREC[m] hours. */
+const MREC={back:72,quads:72,hamstrings:72,glutes:72,chest:48,shoulders:48,traps:48,biceps:48,triceps:48,forearms:36,calves:36,abs:24};
 const FATIGUE_REF=6;   // effective hard sets of recent stimulus = fully fatigued (deep red)
 const FRESH_PCT=12;    // at/below this fatigue% a muscle is considered fresh/ready
 // per-set fatigue contribution: warmups ~0, working sets scaled by how close to failure
@@ -1727,10 +1730,14 @@ function setStim(s){
   else{const rpe=+s.rpe; if(rpe>=5&&rpe<=10)prox=0.6+(rpe-5)*0.18;} // RPE5→.6 … RPE10→1.5
   return prox;
 }
-// live fatigue for a muscle: sum of recent session stimulus, each decayed by exp(-Δt/τ)
+// live fatigue for a muscle. Each recent session owes a fatigue debt that recovers LINEARLY over
+// that muscle's window (MREC[m]), scaled by how hard the session hit it. A session at/above HARD
+// effective sets uses the full window; a light session clears far sooner. The muscle's recovery is
+// gated by its most-demanding recent session — so "hours to ready" is ALWAYS bounded by MREC[m].
 function muscleFatigue(m){
   if(!(state.data.muscleVol[m]||0))return{units:0,pct:0,hrs:0};
-  const tau=MREC[m]||48, cutoff=now()-7*864e5; let units=0;
+  const W=MREC[m]||48, HARD=4, cutoff=now()-7*864e5;
+  let pct=0, hrs=0, units=0;
   (state.data.workouts||[]).forEach(w=>{
     const t=new Date(w.date).getTime(); if(!t||t<cutoff)return;
     const dt=Math.max(0,(now()-t)/36e5); // hours since this session
@@ -1741,12 +1748,15 @@ function muscleFatigue(m){
       if(ex.p&&ex.p.includes(m))sStim+=raw;
       else if(ex.s&&ex.s.includes(m))sStim+=raw*0.4;
     });
-    if(sStim>0)units+=sStim*Math.exp(-dt/tau);
+    if(sStim<=0)return;
+    units+=sStim;
+    const win=W*Math.min(1,sStim/HARD);   // this session's recovery window (≤ W)
+    const remain=Math.max(0,win-dt);        // fatigue hours still owed
+    const frac=win>0?remain/win:0;          // 0..1 remaining fatigue from this session
+    if(frac*100>pct)pct=frac*100;           // current fatigue = worst recent session
+    if(remain>hrs)hrs=remain;               // hours until fully recovered (bounded by W)
   });
-  const pct=clamp(Math.round(units/FATIGUE_REF*100),0,100);
-  let hrs=0; const fl=FATIGUE_REF*FRESH_PCT/100;
-  if(units>fl)hrs=Math.max(0,Math.round(tau*Math.log(units/fl)));
-  return{units,pct,hrs};
+  return{units:Math.round(units*10)/10,pct:clamp(Math.round(pct),0,100),hrs:Math.round(hrs)};
 }
 // recovery% = inverse of fatigue (kept so existing call sites read high=recovered=green)
 function getRecovery(m){
@@ -2597,7 +2607,7 @@ function discardSession(){appConfirm({title:"Discard session",body:"End this ses
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
 const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","📈","CASE"],["allies","🤝","ALLIES"],["history","📜","HISTORY"]];
-const MORE_TABS=[["fuel","🍽️","FUEL","Calories, macros, water, meal templates & weigh-ins"],["alfred","🤖","ALFRED","Your evidence-based AI coach — chat & physique photo critiques"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
+const MORE_TABS=[["alfred","🤖","ALFRED","Your evidence-based AI coach — chat & physique photo critiques"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.step==="summary"||state.showOnboarding){$("nav").classList.add("hide");return;}
   $("nav").classList.remove("hide");
@@ -2610,7 +2620,6 @@ function topBar(){
   return `<div class="topbar">
     <button class="tbtn wide" onclick="openMenu()"><span style="font-size:16px;line-height:1">☰</span><span class="tbl">COMMAND CENTER</span></button>
     <div style="display:flex;gap:6px">
-      <button class="tbtn${a('fuel')}" title="Fuel" onclick="go('fuel')">🍽️</button>
       <button class="tbtn${a('alfred')}" title="Alfred" onclick="go('alfred')">🤖</button>
       <button class="tbtn${a('tech')}" title="Wayne Tech" onclick="go('tech')">🦾</button>
       <button class="tbtn" title="Search everything" onclick="openIndex()">🧭</button>
@@ -2644,7 +2653,6 @@ function openMenu(){
     ["openDistricts","🗺️","District Control","Secure Gotham's sectors"],
     ["openArkham","🃏","Arkham Gallery","Capture the rogues"],
     ["openSkins","💠","Wardrobe & Belts","Suit skins & titles"],
-    ["openOrders","🎯","Wayne's Orders","Today's directives"],
     ["openRankLadder","🎖️","Rank Ladder","Your climb to Legend"],
     ["openRecordsHall","🧊","Records Hall","Every all-time best"],
     ["openReportCard","🏅","Report Card","Grade your week"],
@@ -2658,7 +2666,6 @@ function openMenu(){
     ["openGarage","🏍️","Garage","Milestone ride unlocks"],
     ["openInfirmary","🏥","Infirmary","Recovery, sleep & injuries"],
     ["openBatcomputer","🧠","Batcomputer","Deep analytics"],
-    ["openMessHall","🍽️","Mess Hall","Meals & nutrition"],
     ["openSettings","⚙️","Settings","Preferences & data"]
   ];
   const tHtml=tools.map(t=>tile(t[0],t[1],t[2],t[3])).join("");
@@ -4246,6 +4253,16 @@ function patrolReadiness(){
   let b=bands[bands.length-1];for(const x of bands)if(score>=x[0]){b=x;break;}
   return {score,label:b[1],color:b[2],line:b[3],rec:Math.round(rec),sleep,fresh,sleepKnown};
 }
+// Tiny recovery strip that lives UNDER the readiness card — the most-fatigued sectors at a glance,
+// each with its realistic hours-to-ready (bounded by the muscle's own recovery window).
+function recoveryStripMini(){
+  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
+  if(!trained.length)return "";
+  const sorted=trained.slice().sort((a,b)=>getRecovery(a)-getRecovery(b)).slice(0,4);
+  const chip=m=>{const rec=getRecovery(m),col=recoveryColor(rec),hrs=hoursToReady(m);
+    return `<span class="mini" onclick="muscleDrill('${m}')" style="display:inline-flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px 7px;cursor:pointer"><b style="color:${col}">${rec}%</b><span style="color:var(--text2)">${MNAME[m]}</span><span style="color:var(--text3);font-size:9px">${hrs>0?hrs+"h":"ready"}</span></span>`;};
+  return `<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:9px"><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Recovering now</div><div class="row" style="gap:5px;flex-wrap:wrap">${sorted.map(chip).join("")}</div></div>`;
+}
 function readinessCard(){
   const r=patrolReadiness(),C=326.7,off=(C*(1-r.score/100)).toFixed(1);
   const fac=(l,v)=>`<div style="flex:1;text-align:center"><div class="mini" style="font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)">${l}</div><div style="font-family:var(--disp);font-size:16px;color:var(--text2)">${v}</div></div>`;
@@ -4259,7 +4276,7 @@ function readinessCard(){
       <div style="font-family:var(--disp);font-size:22px;color:${r.color};line-height:1.1;margin:1px 0 4px">${r.label}</div>
       <div class="mini" style="color:var(--text2);line-height:1.45">${esc(r.line)}</div>
     </div></div>
-    <div class="row" style="gap:6px;margin-top:11px;border-top:1px solid var(--border);padding-top:9px">${fac("Recovery",r.rec+"%")}${fac("Sleep",r.sleepKnown?r.sleep+"%":"—")}${fac("Freshness",r.fresh+"%")}</div></div>`;
+    <div class="row" style="gap:6px;margin-top:11px;border-top:1px solid var(--border);padding-top:9px">${fac("Recovery",r.rec+"%")}${fac("Sleep",r.sleepKnown?r.sleep+"%":"—")}${fac("Freshness",r.fresh+"%")}</div>${recoveryStripMini()}</div>`;
 }
 // Training Age Clock
 const TA_MILES=[[7,"First Week","🌑"],[30,"One Month","🌘"],[90,"90 Nights","🌗"],[180,"Half a Year","🌖"],[365,"One Year","🌕"],[730,"Two Years","⭐"],[1825,"Five Years","🦇"],[3650,"A Decade in the Cave","🔱"]];
@@ -4691,7 +4708,6 @@ function renderInfirmary(){
 const INDEX_ITEMS=[
   ["🦇","Gotham home","Tonight's mission, readiness, daily challenges","go('gotham')"],
   ["⚔️","Mission / log a workout","Start or log tonight's session","go('mission')"],
-  ["🍽️","FUEL — nutrition","Calories, macros, food log, water, supplements, weigh-ins","go('fuel')"],
   ["📈","Case File","Records, defeats, history & analytics","go('case')"],
   ["📋","Plan & schedule","Splits, training days, volume map","goPlan()"],
   ["🤖","Alfred","AI coach, physique scan, the Chronicle","go('alfred')"],
@@ -4713,7 +4729,6 @@ const INDEX_ITEMS=[
   ["🚑","THE INFIRMARY","Sleep, soreness, cardio, supplements, injuries","openInfirmary()"],
   ["📡","Batcomputer","Full analytics dashboard","openBatcomputer()"],
   ["📂","Batcomputer report","30-day · 90-day · yearly review","periodReport(30)"],
-  ["🍽️","The Mess Hall","Deep food log, macro rings & carb cycling","openMessHall()"],
   ["🤝","Justice League","Compare with allies' Patrol Cards","openJusticeLeague()"],
   ["🏆","Leaderboard","Rank yourself vs allies by Vigilante Score","openLeaderboard()"],
   ["⚔️","Co-op Raid","Team up on a boss; pool your tonnage","openRaid()"],
@@ -4841,7 +4856,6 @@ function renderGotham(){
   html+=readinessCard();
   html+=batRankCard();
   html+=`<div class="grid2" style="margin-bottom:13px">${threatCard()}${fatigueMini()}</div>`;
-  html+=ordersCard();
   html+=wisdomCard();
 
   // rest day warning (4+ consecutive)
@@ -4879,15 +4893,12 @@ function renderGotham(){
   }else html+=`<p class="muted">No split selected. <a onclick="goPlan()" style="color:var(--gold2);cursor:pointer;text-decoration:underline">Build one in Mission → Plan</a>, or start a free session.</p><button class="btn gold sm" style="margin-top:8px" onclick="freeWorkout()">FREE SESSION ▶</button>`;
   html+=`</div>`;
 
-  // The Gauntlet — daily finisher challenge
-  html+=gauntletCard();
   // Two-Face's daily call — heavy vs volume directive
   html+=twoFaceCard();
   // Weekly Most Wanted bounty — weakest sector
   html+=mostWantedCard();
 
-  // glanceable recovery rings (heartbeat dials)
-  html+=recoveryRings();
+  // (Recovery now shows compactly under Patrol Readiness; full per-sector map lives in THE SUIT.)
 
   html+=`<div class="grid3" style="margin-bottom:13px">
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.streakDays}</div><div class="mini">day streak ›</div></div>
@@ -5890,9 +5901,22 @@ function renderAllies(){
     <div class="row sp" style="margin:2px 0 9px"><span class="mini">Vigilante Score</span><b class="gold" style="font-size:18px">${fmtNum(score)}</b></div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px">${lifts}</div>
     <button class="btn gold sm" onclick="shareMyCard()">🔗 Share my Patrol Card</button></div>`;
-  // Justice League
-  html+=`<div class="card" style="cursor:pointer" onclick="openJusticeLeague()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🦸 Justice League</div><span class="chip">${allies.length} all${allies.length===1?'y':'ies'}</span></div>
-    <div class="mini" style="color:var(--text2);margin-top:5px">Paste a friend's Patrol Card to add them, then compare strength head-to-head. ›</div></div>`;
+  // Inline League — every ally sits right here on the tab, each with ONE-TAP access to their lifts,
+  // split and a head-to-head compare. No more opening a sheet and digging through buttons first.
+  if(allies.length){
+    html+=`<div class="ttl" style="margin:17px 0 8px;font-size:15px;display:flex;align-items:center;gap:7px">🦸 Your League <span class="chip">${allies.length}</span></div>`;
+    html+=allies.map((a,i)=>{
+      const top=(a.lifts||[]).slice(0,3).map(l=>`<span class="chip" style="font-size:10.5px">${esc(l.n)} ${l.o}kg</span>`).join(" ")||'<span class="mini" style="color:var(--text3)">No lifts on their card yet</span>';
+      const days=(a.spl&&a.spl.d)?a.spl.d.length:0;
+      return `<div class="card" style="padding:12px 13px;margin-bottom:9px"><div class="row sp"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${a.re||"🦸"} ${esc(a.n)}</b><span class="chip">${esc(a.rk||"")}</span></div>
+      <div class="row" style="gap:6px;margin:9px 0">${caveStat("STR "+(a.sl||0),"strength")}${caveStat(fmtNum(a.vol||0)+"kg","moved")}${caveStat(a.w||0,"sessions")}${caveStat(a.boss||0,"villains")}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">${top}</div>
+      <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div></div>`;
+    }).join("");
+  }
+  // Justice League — add allies, share your card, open the leaderboard
+  html+=`<div class="card" style="cursor:pointer" onclick="openJusticeLeague()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">➕ Add an ally</div><span class="chip">${allies.length} all${allies.length===1?'y':'ies'}</span></div>
+    <div class="mini" style="color:var(--text2);margin-top:5px">Paste a friend's Patrol Card to add them to your League. ›</div></div>`;
   // Leaderboard
   html+=`<div class="card" style="cursor:pointer" onclick="openLeaderboard()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🏆 Leaderboard</div><span class="chip ${myRank===1&&board.length>1?'on':''}">${board.length>1?'#'+myRank+' of '+board.length:'just you'}</span></div>
     <div class="mini" style="color:var(--text2);margin-top:5px">Everyone ranked by Vigilante Score — strength, tonnage, sessions & villains fused into one number. ›</div></div>`;
@@ -6757,35 +6781,43 @@ function cycleMusclePrio(m){const order=PRIORITIES.map(p=>p.k);const cur=order.i
 
 /* ---- District Control ---- */
 const MUSCLE_DISTRICT={chest:"The Narrows",back:"Bristol Docks",shoulders:"Burnley Heights",biceps:"Otisburg",triceps:"Coventry",forearms:"The Cauldron",quads:"Robinson Park",hamstrings:"Park Row",glutes:"Amusement Mile",calves:"Tricorner Yards",abs:"Old Gotham",traps:"Diamond District"};
-function daysSinceMuscle(m){const t=state.data.muscleLastTrained&&state.data.muscleLastTrained[m];if(!t)return null;return (now()-t)/864e5;}
+function daysSinceMuscle(m){const t=state.data.muscleLastTrained&&state.data.muscleLastTrained[m];if(!t)return null;const d=(now()-t)/864e5;return isNaN(d)?null:d;}
+// "crime" = how overdue a muscle is for training, 0 (just trained) → 100 (badly neglected).
+// Guarded at every step so an untrained / unknown sector can NEVER produce NaN.
 function districtCrime(m){
   const trained=(state.data.muscleVol[m]||0)>0;const ds=daysSinceMuscle(m);
   if(!trained||ds==null)return {crime:85,ds:null,untrained:true};
-  const tg=prioDef(musclePrio(m)).target;
-  return {crime:clamp(Math.round((ds/tg)*60),0,100),ds,untrained:false};
+  const tg=prioDef(musclePrio(m)).target||6;
+  let crime=Math.round((ds/tg)*60);
+  if(isNaN(crime))crime=85;
+  return {crime:clamp(crime,0,100),ds,untrained:false};
 }
 function districtBand(c){return c<20?["SECURED","var(--green)"]:c<45?["PATROLLED","var(--gold2)"]:c<70?["RISING","var(--orange)"]:c<90?["CONTESTED","var(--red)"]:["OVERRUN","#ff3b30"];}
-function cityCrime(){let s=0;M12.forEach(m=>s+=districtCrime(m).crime);return Math.round(s/M12.length);}
+function cityCrime(){let s=0,n=0;M12.forEach(m=>{const c=districtCrime(m).crime;if(!isNaN(c)){s+=c;n++;}});return n?Math.round(s/n):0;}
+// Plain-language "last trained" label for any sector — no jargon, no percentages, no NaN.
+function districtAge(dc){return dc.untrained?"never trained":dc.ds<1?"trained today":Math.round(dc.ds)===1?"1 day ago":Math.round(dc.ds)+" days ago";}
 function districtSummary(){
   const cc=cityCrime();const band=districtBand(cc);
-  const worst=M12.map(m=>({m,...districtCrime(m)})).sort((a,b)=>b.crime-a.crime).slice(0,3);
-  return `<div class="card" style="padding:14px"><div class="row sp"><div class="ttl" style="margin:0">🗺️ District Control</div><b style="color:${band[1]}">${band[0]} · ${cc}%</b></div>
-    <div class="mini" style="color:var(--text2);margin:3px 0 8px">Gotham's worst hotspots tonight — secure them under iron.</div>
-    ${worst.map(w=>{const b=districtBand(w.crime);return `<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${mIcon(w.m,15)} ${esc(MUSCLE_DISTRICT[w.m])} <span class="mini" style="color:var(--text3)">(${MNAME[w.m]})</span></span><span class="mini" style="color:${b[1]}">${b[0]} ${w.crime}%</span></div>`;}).join("")}
+  const list=M12.map(m=>({m,...districtCrime(m)})).sort((a,b)=>b.crime-a.crime);
+  const worst=list.slice(0,3);const overdue=list.filter(w=>w.crime>=70).length;
+  return `<div class="card" style="padding:14px"><div class="row sp"><div class="ttl" style="margin:0">🗺️ District Control</div><b style="color:${band[1]}">${band[0]}</b></div>
+    <div class="mini" style="color:var(--text2);margin:3px 0 8px">${overdue?`${overdue} sector${overdue>1?"s":""} need work — these muscles are overdue for training.`:"Every sector trained recently — Gotham's locked down."}</div>
+    ${worst.map(w=>{const b=districtBand(w.crime);return `<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${mIcon(w.m,15)} ${esc(MUSCLE_DISTRICT[w.m])} <span class="mini" style="color:var(--text3)">(${MNAME[w.m]})</span></span><span class="mini" style="color:${b[1]}">${esc(districtAge(w))}</span></div>`;}).join("")}
     <button class="btn ghost sm" style="margin-top:9px" onclick="openDistricts()">Open the map & set priorities ›</button></div>`;
 }
 function openDistricts(){
   const cc=cityCrime();const band=districtBand(cc);
   const rows=M12.slice().map(m=>({m,dc:districtCrime(m)})).sort((a,b)=>b.dc.crime-a.dc.crime).map(({m,dc})=>{
     const b=districtBand(dc.crime);const p=prioDef(musclePrio(m));
-    const sub=dc.untrained?"Never secured — unclaimed territory":`Last patrol ${dc.ds<1?"today":Math.round(dc.ds)+"d ago"}`;
+    const sub=dc.untrained?"Never trained — unclaimed territory":`Trained ${districtAge(dc)}`;
     return `<div class="rl-row" style="align-items:flex-start"><div style="font-size:20px;padding-top:2px">${mIcon(m,20)}</div><div class="g"><div class="row sp"><b style="font-size:14px">${esc(MUSCLE_DISTRICT[m])}</b><button class="chip g" style="padding:2px 8px;margin:0" onclick="cycleMusclePrio('${m}')">${p.e} ${p.n}</button></div>
       <div class="mini" style="color:var(--text3)">${MNAME[m]} · ${esc(sub)}</div>
       <div style="height:6px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${dc.crime}%;background:${b[1]};transition:.3s"></div></div>
-      <div class="mini" style="margin-top:3px;color:${b[1]}">${b[0]} · crime ${dc.crime}%</div></div></div>`;
+      <div class="mini" style="margin-top:3px;color:${b[1]}">${b[0]} · ${esc(districtAge(dc))}</div></div></div>`;
   }).join("");
+  const overdue=M12.map(m=>districtCrime(m)).filter(dc=>dc.crime>=70).length;
   openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🗺️ District Control</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
-    <div class="card" style="text-align:center;padding:16px"><div style="font-size:30px;font-family:var(--disp);font-weight:700;color:${band[1]}">${band[0]}</div><div class="mini" style="color:var(--text2)">city-wide crime ${cc}%</div></div>
+    <div class="card" style="text-align:center;padding:16px"><div style="font-size:30px;font-family:var(--disp);font-weight:700;color:${band[1]}">${band[0]}</div><div class="mini" style="color:var(--text2)">${overdue?`${overdue} sector${overdue>1?"s":""} overdue for training`:"every sector trained recently"}</div></div>
     <div class="mini" style="color:var(--text2);margin:12px 0 8px">Tap a district's priority chip to set how often it needs patrol. Low-priority districts breed crime slower — but neglect one entirely and the rogues still move in.</div>
     ${rows}
     <button class="btn" style="margin-top:12px" onclick="closeOverlay()">Close</button>`;
