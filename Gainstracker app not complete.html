@@ -548,9 +548,10 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
   <div class="resthint" id="resthint">Breathe in…</div>
   <div class="restbtns">
     <button class="restbtn" onclick="addRest(-15)">−15s</button>
-    <button class="restbtn go" onclick="skipRest()">SKIP REST</button>
+    <button class="restbtn go" onclick="minimizeRest()">▾ MINIMISE</button>
     <button class="restbtn" onclick="addRest(30)">+30s</button>
   </div>
+  <button class="restbtn" onclick="skipRest()" style="margin-top:10px;opacity:.8">Skip rest entirely</button>
 </div>
 <div id="mmaov">
   <div class="mma-round" id="mma-round">ROUND 1 / 5</div>
@@ -578,7 +579,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Plate-Loaded Chest Press","id":"plateloadedc","eq":"machine","p":["chest"],"s":["triceps","shoulders"],"c":["Drive the handles together at the top for a hard squeeze","Big stretch at the bottom without bouncing off the chest","Keep your shoulder blades pinned to the pad"],"tgt":"Chest — sternal (mid) & lower · front delts and triceps","sub":{"chest":["mid","lo"]}},
 {"n":"Smith Machine Bench Press","id":"smithmachine","eq":"smith","p":["chest"],"s":["triceps","shoulders"],"c":["Lower to your lower chest, drive straight up the fixed bar path","Elbows ~45°, don't flare them flat","The fixed bar lets you push close to failure safely"],"tgt":"Chest — sternal (mid) head · front delts and triceps","sub":{"chest":["mid"]}},
 {"n":"Cable Chest Press","id":"cablechestpr","eq":"cable","p":["chest"],"s":["triceps","shoulders"],"c":["Press forward and squeeze your hands toward each other","Keep one foot staggered for a stable base","Constant cable tension — feel the chest the whole rep"],"tgt":"Chest — sternal (mid) head, constant tension · front delts and triceps","sub":{"chest":["mid"]}},
-{"n":"Push-Up","id":"pushup","eq":"bodyweight","p":["chest"],"s":["triceps","shoulders","abs"],"c":["Full body line, lower until your chest nearly touches","Elbows ~45°, drive the floor away and squeeze at the top","Add a weight plate on your back once bodyweight is easy"],"tgt":"Chest — sternal (mid) head · front delts, triceps and core","sub":{"chest":["mid"]}},
 {"n":"Dumbbell Floor Press","id":"dumbbellfloo","eq":"dumbbell","p":["chest"],"s":["triceps"],"c":["Lower until your upper arms touch the floor, then press","The floor limits the stretch and saves the shoulders","Pause on the floor, then drive hard to lockout"],"tgt":"Chest & triceps — mid chest with a strong lockout, shorter range","sub":{"chest":["mid"]}},
 {"n":"Barbell Incline Bench Press","id":"barbellincli","eq":"barbell","p":["chest"],"s":["shoulders","triceps"],"c":["Bench at ~30°, bar to your upper chest just below the collarbone","Drive up and slightly back over your shoulders","Don't over-incline past 45° or it becomes a shoulder press"],"tgt":"Chest — upper (clavicular) head · front delts and triceps","sub":{"chest":["up"]}},
 {"n":"Dumbbell Incline Bench Press","id":"dumbbellincl","eq":"dumbbell","p":["chest"],"s":["shoulders","triceps"],"c":["Bench ~30°, deep stretch at the bottom, press up and together","Keep the dumbbells over your elbows on the way up","Slow negative — the stretch is where upper chest grows"],"tgt":"Chest — upper (clavicular) head · front delts and triceps","sub":{"chest":["up"]}},
@@ -600,7 +600,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Low-to-High Cable Fly","id":"lowtohighcab","eq":"cable","p":["chest"],"s":["shoulders"],"c":["Pulleys low, sweep your hands up and together toward your chin","Soft fixed elbows, squeeze the upper chest at the top","This angle nails the upper chest fibers"],"tgt":"Chest — upper (clavicular) head, constant tension · a little front delt","sub":{"chest":["up"]}},
 {"n":"High-to-Low Cable Fly","id":"hightolowcab","eq":"cable","p":["chest"],"s":["shoulders"],"c":["Pulleys high, sweep your hands down and together at your hips","Soft fixed elbows, squeeze the lower chest at the bottom","This downward angle targets the lower chest"],"tgt":"Chest — lower (costal) head, constant tension · a little front delt","sub":{"chest":["lo"]}},
 {"n":"Cable Squeeze Fly","id":"cablesqueeze","eq":"cable","p":["chest"],"s":["shoulders"],"c":["Cross your hands past the midline and squeeze hard","Press your palms together to fire the inner chest","Hold the contracted squeeze for a full second"],"tgt":"Chest — inner sternal (mid) head · a little front delt","sub":{"chest":["mid"]}},
-{"n":"Dumbbell Squeeze Press","id":"dumbbellsque","eq":"dumbbell","p":["chest"],"s":["triceps","shoulders"],"c":["Press two dumbbells mashed together the whole rep","The constant inward pressure lights up the inner chest","Squeeze even harder at the top"],"tgt":"Chest — inner sternal (mid) head · triceps and front delts","sub":{"chest":["mid"]}},
 {"n":"Machine Inner Chest Press","id":"machineinner","eq":"machine","p":["chest"],"s":["triceps","shoulders"],"c":["Press the handles in and together, squeeze the inner chest","Set the seat to your mid-chest","Controlled return with constant tension"],"tgt":"Chest — inner sternal (mid) head · front delts and triceps","sub":{"chest":["mid"]}},
 {"n":"Dumbbell Pullover","id":"dumbbellpull","eq":"dumbbell","p":["chest"],"s":["back","triceps"],"c":["Big overhead stretch, pull the dumbbell over with the chest","Slight elbow bend, feel the stretch across the chest and ribs","Keep your hips down to maximize the stretch"],"tgt":"Chest — lower & ribcage · also lats","sub":{"chest":["lo"]}},
 {"n":"Decline Barbell Bench Press","id":"declinebarbe","eq":"barbell","p":["chest"],"s":["triceps","shoulders"],"c":["Lower to your lower chest, press up and in","Squeeze the lower chest at the top","Controlled descent, no bouncing"],"tgt":"Chest — lower (costal) head · front delts and triceps","sub":{"chest":["lo"]}},
@@ -609,10 +608,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Wide-Grip Bench Press","id":"widegripbenc","eq":"barbell","p":["chest"],"s":["shoulders","triceps"],"c":["Bar to your chest, drive it straight up to lockout","Elbows tucked ~45°, shoulder blades pinned back","Brace hard, feet planted"],"tgt":"Chest — sternal (mid) head, outer stretch · front delts","sub":{"chest":["mid"]}},
 {"n":"Barbell Floor Press","id":"barbellfloor","eq":"barbell","p":["chest"],"s":["triceps"],"c":["Bar to your chest, drive it straight up to lockout","Elbows tucked ~45°, shoulder blades pinned back","Brace hard, feet planted"],"tgt":"Chest & triceps — mid chest with a strong lockout","sub":{"chest":["mid"]}},
 {"n":"Low-Incline Dumbbell Press","id":"lowinclinedu","eq":"dumbbell","p":["chest"],"s":["shoulders","triceps"],"c":["Bar to your upper chest, drive up and slightly back","Bench ~30°, elbows tucked ~45°","Don't over-incline into a shoulder press"],"tgt":"Chest — upper-to-mid, shallow 15° incline · triceps","sub":{"chest":["up","mid"]}},
-{"n":"Deficit Push-Up","id":"deficitpushu","eq":"bodyweight","p":["chest"],"s":["triceps","shoulders"],"c":["Full body line, lower until your chest nearly touches","Elbows ~45°, drive the floor away","Squeeze hard at the top"],"tgt":"Chest — sternal (mid) head, extra stretch","sub":{"chest":["mid"]}},
-{"n":"Decline Push-Up","id":"declinepushu","eq":"bodyweight","p":["chest"],"s":["triceps","shoulders"],"c":["Full body line, lower until your chest nearly touches","Elbows ~45°, drive the floor away","Squeeze hard at the top"],"tgt":"Chest — upper (clavicular) head (feet elevated)","sub":{"chest":["up"]}},
-{"n":"Incline Push-Up","id":"inclinepushu","eq":"bodyweight","p":["chest"],"s":["triceps","shoulders"],"c":["Full body line, lower until your chest nearly touches","Elbows ~45°, drive the floor away","Squeeze hard at the top"],"tgt":"Chest — lower (costal) head (hands elevated)","sub":{"chest":["lo"]}},
-{"n":"Plate Squeeze Press","id":"platesqueeze","eq":"other","p":["chest"],"s":["triceps"],"c":["Full body line, lower until your chest nearly touches","Elbows ~45°, drive the floor away","Squeeze hard at the top"],"tgt":"Chest — inner sternal head, isometric squeeze","sub":{"chest":["mid"]}},
 {"n":"Machine Decline Fly","id":"machinedecli","eq":"machine","p":["chest"],"s":["shoulders"],"c":["Soft fixed elbows, big stretch then squeeze","Hug the weight together at the top","Slow and controlled"],"tgt":"Chest — lower (costal) head, isolation","sub":{"chest":["lo"]}},
 {"n":"Cable Fly (Flat Bench)","id":"cableflyflat","eq":"cable","p":["chest"],"s":["shoulders"],"c":["Soft fixed elbows, big stretch then squeeze","Hug the weight together at the top","Slow and controlled"],"tgt":"Chest — sternal (mid) head, constant tension","sub":{"chest":["mid"]}},
 {"n":"Hammer Strength Incline Press","id":"hammerstreng","eq":"machine","p":["chest"],"s":["shoulders","triceps"],"c":["Bar to your upper chest, drive up and slightly back","Bench ~30°, elbows tucked ~45°","Don't over-incline into a shoulder press"],"tgt":"Chest — upper (clavicular) head, plate-loaded · triceps","sub":{"chest":["up"]}},
@@ -777,7 +772,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Triceps Dip","id":"tricepsdip","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Stay upright to bias the triceps over the chest","Lower to ~90° at the elbow, drive to lockout","Add weight from a belt once bodyweight is easy"],"tgt":"Triceps — lateral & medial heads · chest","sub":{"triceps":["lat","med"]}},
 {"n":"Bench Dip","id":"benchdip","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Hands on a bench behind you, lower your hips down","Drive through the heels of your hands to lockout","Stack plates on your lap to add resistance"],"tgt":"Triceps — lateral & medial heads","sub":{"triceps":["lat","med"]}},
 {"n":"Machine Dip","id":"machinedip","eq":"machine","p":["triceps"],"s":["chest","shoulders"],"c":["Stay upright, press the handles down to lockout","The machine assists or loads a clean dip path","Squeeze the triceps hard at the bottom"],"tgt":"Triceps — lateral & medial heads · chest","sub":{"triceps":["lat","med"]}},
-{"n":"Diamond Push-Up","id":"diamondpushu","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Hands close in a diamond under your chest","Elbows tucked, lower until your chest touches your hands","Drive to a full lockout, squeeze the triceps"],"tgt":"Triceps — lateral & medial heads · chest","sub":{"triceps":["lat","med"]}},
 {"n":"Cable Triceps Kickback","id":"cabletriceps","eq":"cable","p":["triceps"],"s":["shoulders"],"c":["Hinge forward, upper arm fixed, extend back to lockout","Squeeze hard at full extension, hold a beat","Constant cable tension — slow and strict"],"tgt":"Triceps — lateral & long heads, constant tension","sub":{"triceps":["lat","long"]}},
 {"n":"Dumbbell Kickback","id":"dumbbellkick","eq":"dumbbell","p":["triceps"],"s":["shoulders"],"c":["Hinge over, pin the upper arm to your side, extend back","Squeeze at full lockout — don't swing","Keep the upper arm fixed and parallel to the floor"],"tgt":"Triceps — lateral & long heads","sub":{"triceps":["lat","long"]}},
 {"n":"Dumbbell Tate Press","id":"dumbbelltate","eq":"dumbbell","p":["triceps"],"s":["chest"],"c":["Lower the dumbbells to your chest with elbows flared out","Press up by extending the elbows, squeeze at the top","Keep the movement controlled and deliberate"],"tgt":"Triceps — medial & lateral heads","sub":{"triceps":["med","lat"]}},
@@ -786,7 +780,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Incline Skullcrusher","id":"inclineskull","eq":"ez bar","p":["triceps"],"s":["shoulders"],"c":["Elbows fixed, only the forearm moves","Full stretch, then a hard lockout","Control the negative"],"tgt":"Triceps — long & lateral heads, incline angle","sub":{"triceps":["long","lat"]}},
 {"n":"Reverse-Grip Single-Arm Pushdown","id":"reversegrips","eq":"cable","p":["triceps"],"s":["forearms"],"c":["Elbows fixed, only the forearm moves","Full stretch, then a hard lockout","Control the negative"],"tgt":"Triceps — medial head, underhand one-arm","sub":{"triceps":["med"]}},
 {"n":"Weighted Bench Dip","id":"weightedbenc","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Elbows fixed, only the forearm moves","Full stretch, then a hard lockout","Control the negative"],"tgt":"Triceps — lateral & medial heads, loaded","sub":{"triceps":["lat","med"]}},
-{"n":"Close-Grip Push-Up","id":"closegrippus","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Full body line, lower until your chest nearly touches","Elbows ~45°, drive the floor away","Squeeze hard at the top"],"tgt":"Triceps — lateral & medial heads","sub":{"triceps":["lat","med"]}},
 {"n":"EZ Bar Tate Press","id":"ezbartatepre","eq":"ez bar","p":["triceps"],"s":["chest"],"c":["Elbows fixed, only the forearm moves","Full stretch, then a hard lockout","Control the negative"],"tgt":"Triceps — medial & lateral heads","sub":{"triceps":["med","lat"]}},
 {"n":"California Press","id":"californiapr","eq":"barbell","p":["triceps"],"s":["chest","shoulders"],"c":["Elbows fixed, only the forearm moves","Full stretch, then a hard lockout","Control the negative"],"tgt":"Triceps — lateral & medial heads, press-skull hybrid","sub":{"triceps":["lat","med"]}},
 {"n":"Seated Dumbbell Overhead Extension","id":"seateddumbb4","eq":"dumbbell","p":["triceps"],"s":["shoulders"],"c":["Elbows fixed, only the forearm moves","Full stretch, then a hard lockout","Control the negative"],"tgt":"Triceps — long head, seated overhead","sub":{"triceps":["long"]}},
@@ -804,7 +797,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Plate Pinch Hold","id":"platepinchho","eq":"other","p":["forearms"],"s":[],"c":["Pinch the plates between your fingers and thumb, hold","Builds crushing pinch grip strength","Time your holds and try to beat them"],"tgt":"Forearms — pinch grip & finger strength","sub":{"forearms":["flex"]}},
 {"n":"Farmer's Hold","id":"farmershold","eq":"dumbbell","p":["forearms"],"s":["traps"],"c":["Grab heavy dumbbells and hold, tall and braced","Builds grip, forearms and traps","Time the hold — beat it next session"],"tgt":"Forearms — grip & crush strength · traps","sub":{"forearms":["flex"]}},
 {"n":"Hammer Wrist Curl","id":"hammerwristc","eq":"dumbbell","p":["forearms"],"s":["biceps"],"c":["Full stretch at the bottom, hard squeeze at the top","Elbows pinned to your sides, no swinging","Lower under control"],"tgt":"Forearms — brachioradialis, neutral grip · biceps","sub":{"forearms":["brad"]}},
-{"n":"Towel Pull-Up Hold","id":"towelpulluph","eq":"bodyweight","p":["forearms"],"s":["back"],"c":["Stand tall, brace the core, walk with control","Grip hard the whole way","Time or distance — beat it next time"],"tgt":"Forearms — grip & crush strength","sub":{"forearms":["flex"]}},
 {"n":"Reverse Wrist Curl (Machine)","id":"reversewrist","eq":"machine","p":["forearms"],"s":[],"c":["Full stretch at the bottom, hard squeeze at the top","Elbows pinned to your sides, no swinging","Lower under control"],"tgt":"Forearms — wrist extensors","sub":{"forearms":["ext"]}},
 {"n":"Suitcase Carry","id":"suitcasecarr","eq":"dumbbell","p":["forearms"],"s":["traps","abs"],"c":["Stand tall, brace the core, walk with control","Grip hard the whole way","Time or distance — beat it next time"],"tgt":"Forearms — grip · core and traps","sub":{"forearms":["flex"]}},
 {"n":"Barbell Back Squat","id":"barbellbacks","eq":"barbell","p":["quads"],"s":["glutes","hamstrings","abs"],"c":["Brace hard, sit down between your hips, drive the floor away","Knees track over your toes, chest up, depth to parallel or below","Don't go past 12 reps on a working set — load the bar instead"],"tgt":"Quads — vastus & rectus (the whole thigh) · glutes and core","sub":{"quads":["vas","rec"]}},
@@ -2006,6 +1998,9 @@ function showRestOverlay(dur){const ov=$("restov");if(!ov)return;state._restTota
 function updateRestOverlay(rem){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;const n=$("restnum");if(n)n.textContent=fmtTime(Math.max(0,rem));const tot=state._restTotal||1,C=728.8,frac=Math.max(0,Math.min(1,rem/tot)),prog=$("restprog");if(prog)prog.style.strokeDashoffset=(C*(1-frac)).toFixed(1);const hint=$("resthint");if(hint&&!ov.classList.contains("done"))hint.textContent=(Math.floor(Date.now()/4000)%2)?"Breathe out…":"Breathe in…";}
 function restDone(){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;ov.classList.add("done");const lb=$("restlabel");if(lb)lb.textContent="Recovered";const n=$("restnum");if(n)n.textContent="GO";const h=$("resthint");if(h)h.textContent="Back to work, sir.";const p=$("restprog");if(p)p.style.strokeDashoffset=0;clearTimeout(state._restCloseT);state._restCloseT=setTimeout(closeRestOverlay,1700);}
 function closeRestOverlay(){const ov=$("restov");if(ov)ov.classList.remove("on","done");}
+// Minimise — hide the big overlay but KEEP the clock running; it keeps counting in the workout header's REST box. Tap that box to bring the overlay back.
+function minimizeRest(){haptic("tap");closeRestOverlay();if(state.restRunning)toast("Rest still running — tap the REST timer to reopen.");}
+function reopenRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0)return;haptic("tap");showRestOverlay(state._restTotal||state._restOrigTotal||rem);updateRestOverlay(rem);}
 function addRest(delta){if(!state.restRunning){closeRestOverlay();return;}state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);let rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();return;}haptic("tap");updateRestOverlay(rem);const el=$("rest-display");if(el)el.textContent=fmtTime(Math.max(0,rem));}
 function skipRest(){state.restRunning=false;state.restTimer=0;haptic("tap");closeRestOverlay();const el=$("rest-display");if(el){el.textContent="REST";el.parentElement.style.borderColor="";}}
 /* ===== MMA Round Timer — combat-conditioning interval timer ===== */
@@ -2812,19 +2807,28 @@ function dismissWarm(ei){
 /* Exercise-swap: replace a lift mid-session with one that trains the same primary muscle. Sets carry over. */
 function openSwap(ei){
   const e=state.session.exercises[ei];if(!e)return;const cur=exFor(e.name);const prim=(cur.p&&cur.p[0])||null;
+  state._swapEi=ei;state._swapPrim=prim;state._swapQ="";
+  const total=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim).length;
+  openSheet(`<div class="ttl">⇄ Swap ${esc(e.name)}</div>
+    <div class="mini" style="color:var(--text2);margin:-2px 0 8px">Same primary muscle (${prim?MNAME[prim]:"—"}) — ${total} option${total===1?'':'s'}. Your logged sets stay put.</div>
+    <input id="swap-search" placeholder="🔍 Search ${prim?MNAME[prim].toLowerCase():''} movements…" autocomplete="off" oninput="drawSwapList()"/>
+    <div id="swap-list" style="max-height:54vh;overflow:auto;margin-top:8px"></div>
+    <button class="btn" style="margin-top:10px" onclick="closeSheet()">Cancel</button>`);
+  drawSwapList();
+}
+function drawSwapList(){
+  const ei=state._swapEi,prim=state._swapPrim;const e=state.session&&state.session.exercises[ei];if(!e)return;
+  const cur=exFor(e.name);const q=($("swap-search")?$("swap-search").value:"").toLowerCase().trim();
   const inSession=new Set(state.session.exercises.map(x=>x.name));
   let alts=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim&&!inSession.has(x.n));
   const gymOn=state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip;
   if(gymOn)alts=alts.filter(x=>gymAllows(x.eq));
+  if(q)alts=alts.filter(x=>x.n.toLowerCase().includes(q));
   alts.sort((a,b)=>{const sa=a.eq===cur.eq?0:1,sb=b.eq===cur.eq?0:1;return sa-sb||a.n.localeCompare(b.n);});
-  alts=alts.slice(0,40);
-  const rows=alts.length?alts.map(x=>`<div class="exrow" onclick="swapExercise(${ei},'${x.n.replace(/'/g,"\\'")}')">
+  const el=$("swap-list");if(!el)return;
+  el.innerHTML=alts.length?alts.map(x=>`<div class="exrow" onclick="swapExercise(${ei},'${x.n.replace(/'/g,"\\'")}')">
     ${thumb(x)}<div class="g"><div class="exname">${esc(x.n)}</div><div class="exmeta">${exTarget(x)} · ${esc(x.eq)}</div></div>
-    <span class="gold" style="font-size:20px">⇄</span></div>`).join(""):`<p class="muted center" style="padding:20px">No alternatives${gymOn?" in your gym — turn off the 🏠 filter for more":""}.</p>`;
-  openSheet(`<div class="ttl">⇄ Swap ${esc(e.name)}</div>
-    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">Same primary muscle (${prim?MNAME[prim]:"—"}) — your logged sets stay put.</div>
-    <div style="max-height:60vh;overflow:auto">${rows}</div>
-    <button class="btn" style="margin-top:10px" onclick="closeSheet()">Cancel</button>`);
+    <span class="gold" style="font-size:20px">⇄</span></div>`).join(""):`<p class="muted center" style="padding:20px">No ${q?`matches for "${esc(q)}"`:`alternatives${gymOn?" in your gym — turn off the 🏠 filter":""}`}.</p>`;
 }
 function swapExercise(ei,name){
   const e=state.session.exercises[ei];if(!e)return;e.name=name;
@@ -2956,7 +2960,7 @@ function renderLogging(){
   let html=`<button class="minbar" onclick="minimizeWorkout()" title="Minimise — keep the workout running and browse your tabs"><span style="font-size:15px">▾</span> Minimise workout · browse tabs</button>
   <div class="timers">
     <div class="tbox"><span class="num" id="wt-display">${fmtTime(state.session?Math.floor((Date.now()-state.session.startedAt)/1000):0)}</span><small>Mission time</small></div>
-    <div class="tbox rest"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>Recovery</small></div>
+    <div class="tbox rest" onclick="reopenRest()" style="cursor:pointer"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>${state.restRunning?"tap to open":"Recovery"}</small></div>
   </div>
   <div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
@@ -4210,9 +4214,24 @@ function gothamThreat(){
   return {score:s,level:b[1],color:b[2],desc:b[3]};
 }
 function threatCard(){const t=gothamThreat();
-  return `<div class="card" style="padding:14px"><div class="row sp"><div class="ttl" style="margin:0">⚠️ Gotham Threat Level</div><b class="num" style="font-size:19px;color:${t.color}">${t.level}</b></div>
+  return `<div class="card" style="padding:14px;cursor:pointer" onclick="openThreatInfo()"><div class="row sp"><div class="ttl" style="margin:0">⚠️ Gotham Threat Level</div><b class="num" style="font-size:19px;color:${t.color}">${t.level}</b></div>
   <div class="threat"><span class="threat-mk" style="left:${t.score}%"></span></div>
   <div class="mini" style="margin-top:7px;font-style:italic;color:var(--text2)">${esc(t.desc)}</div></div>`;
+}
+function openThreatInfo(){const t=gothamThreat();const d=state.data;
+  const dsl=d.u.lastTrainedDate?Math.round(daysSince(d.u.lastTrainedDate)):"—";const wc=weekCount(),goal=d.u.weeklyGoal||4,streak=d.u.streakDays||0;
+  const bands=[["SECURE","var(--green)","0–24","Gotham sleeps safe."],["UNEASY","var(--gold2)","25–49","Whispers in the alleys."],["RISING","var(--orange)","50–71","Crime is ticking up."],["DANGER","var(--red)","72–89","The rogues grow bold."],["CRITICAL","#ff3b30","90–100","The city is burning."]];
+  const row=(l,v,good)=>`<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><span class="mini" style="color:var(--text2)">${l}</span><b style="color:${good}">${v}</b></div>`;
+  openSheet(`<div class="row sp"><div class="ttl" style="margin:0">⚠️ Gotham Threat Level</div><b class="num" style="font-size:22px;color:${t.color}">${t.score}</b></div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 6px">Gotham's danger rises every night you're off patrol and falls when you hit your weekly goal and keep a streak. It's your consistency, dramatised.</div>
+    <div class="threat" style="margin:8px 0"><span class="threat-mk" style="left:${t.score}%"></span></div>
+    <div class="mini" style="font-style:italic;color:${t.color};margin-bottom:6px">${esc(t.desc)}</div>
+    ${row("Days since last patrol",dsl,dsl==="—"||dsl<=2?"var(--green)":dsl>=5?"var(--red)":"var(--gold2)")}
+    ${row("This week",wc+" / "+goal+" sessions",wc>=goal?"var(--green)":"var(--orange)")}
+    ${row("Current streak",streak+" day"+(streak===1?"":"s"),streak?"var(--gold2)":"var(--text2)")}
+    <div class="ttl" style="font-size:13px;margin:14px 0 2px">Threat bands</div>
+    ${bands.map(b=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px"><i style="width:9px;height:9px;border-radius:50%;background:${b[1]};display:inline-block"></i><b style="color:${b[1]};font-size:13px">${b[0]}</b> <span class="mini" style="color:var(--text3)">${b[2]}</span></span><span class="mini" style="color:var(--text2)">${b[3]}</span></div>`).join("")}
+    <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 // Fatigue Debt — accumulated fatigue vs recovery across trained muscles
 function fatigueDebt(){
@@ -4226,9 +4245,22 @@ function fatigueDebt(){
   return {pct,status,color};
 }
 function fatigueMini(){const f=fatigueDebt();
-  return `<div class="card" style="padding:12px 14px"><div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="color:${f.color}">${f.pct}%</b></div>
+  return `<div class="card" style="padding:12px 14px;cursor:pointer" onclick="openFatigueInfo()"><div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="color:${f.color}">${f.pct}%</b></div>
   <div class="bar" style="margin-top:8px"><i style="width:${f.pct}%;background:${f.color}"></i></div>
   <div class="mini" style="margin-top:6px;color:var(--text2)">${esc(f.status)}</div></div>`;
+}
+function openFatigueInfo(){const f=fatigueDebt();
+  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0).sort((a,b)=>getRecovery(a)-getRecovery(b));
+  const rows=trained.length?trained.map(m=>{const rec=getRecovery(m),col=recoveryColor(rec),hrs=hoursToReady(m),debt=Math.max(0,100-rec);
+    return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px">${mIcon(m,17,col)}<b style="font-size:13px;color:var(--text2)">${MNAME[m]}</b></span><div class="row g" style="gap:10px;align-items:center"><span class="mini" style="color:var(--text3)">${hrs>0?hrs+"h to ready":"ready"}</span><div class="bar" style="width:64px;margin:0"><i style="width:${debt}%;background:${col}"></i></div><b style="color:${col};min-width:34px;text-align:right">${debt}%</b></div></div>`;
+  }).join(""):`<p class="mini" style="color:var(--text3);padding:10px 0">No muscles trained yet — log a session and your fatigue map fills in here.</p>`;
+  openSheet(`<div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="font-size:22px;color:${f.color}">${f.pct}%</b></div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 6px">Your average fatigue across every trained muscle — the running tab between how hard you've hit them and how much they've recovered. Higher = more accumulated fatigue to clear.</div>
+    <div class="bar" style="margin:8px 0"><i style="width:${f.pct}%;background:${f.color}"></i></div>
+    <div class="mini" style="font-style:italic;color:${f.color};margin-bottom:6px">${esc(f.status)}</div>
+    <div class="ttl" style="font-size:13px;margin:12px 0 0">Per-muscle debt <span class="mini" style="font-weight:400;color:var(--text3)">— most fatigued first</span></div>
+    ${rows}
+    <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 // Patrol Readiness — one daily score fusing recovery, sleep and accumulated fatigue.
 function patrolReadiness(){
@@ -4260,23 +4292,24 @@ function recoveryStripMini(){
   if(!trained.length)return "";
   const sorted=trained.slice().sort((a,b)=>getRecovery(a)-getRecovery(b)).slice(0,4);
   const chip=m=>{const rec=getRecovery(m),col=recoveryColor(rec),hrs=hoursToReady(m);
-    return `<span class="mini" onclick="muscleDrill('${m}')" style="display:inline-flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px 7px;cursor:pointer"><b style="color:${col}">${rec}%</b><span style="color:var(--text2)">${MNAME[m]}</span><span style="color:var(--text3);font-size:9px">${hrs>0?hrs+"h":"ready"}</span></span>`;};
-  return `<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:9px"><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Recovering now</div><div class="row" style="gap:5px;flex-wrap:wrap">${sorted.map(chip).join("")}</div></div>`;
+    return `<span class="mini" onclick="event.stopPropagation();muscleDrill('${m}')" style="display:inline-flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px 7px;cursor:pointer"><b style="color:${col}">${rec}%</b><span style="color:var(--text2)">${MNAME[m]}</span><span style="color:var(--text3);font-size:9px">${hrs>0?hrs+"h":"ready"}</span></span>`;};
+  return `<div style="margin-top:9px;border-top:1px solid var(--border);padding-top:8px"><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Recovering now</div><div class="row" style="gap:5px;flex-wrap:wrap">${sorted.map(chip).join("")}</div></div>`;
 }
 function readinessCard(){
   const r=patrolReadiness(),C=326.7,off=(C*(1-r.score/100)).toFixed(1);
-  const fac=(l,v)=>`<div style="flex:1;text-align:center"><div class="mini" style="font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)">${l}</div><div style="font-family:var(--disp);font-size:16px;color:var(--text2)">${v}</div></div>`;
-  return `<div class="card glow" style="margin-bottom:13px"><div class="row" style="gap:16px;align-items:center">
-    <div style="position:relative;width:104px;height:104px;flex:none">
+  const fac=(l,v)=>`<div style="flex:1;text-align:center"><div class="mini" style="font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)">${l}</div><div style="font-family:var(--disp);font-size:15px;color:var(--text2)">${v}</div></div>`;
+  return `<div class="card glow" style="margin-bottom:12px;padding:13px;cursor:pointer" onclick="openInfirmary()"><div class="row" style="gap:13px;align-items:center">
+    <div style="position:relative;width:84px;height:84px;flex:none">
       <svg viewBox="0 0 120 120" style="transform:rotate(-90deg)"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/><circle cx="60" cy="60" r="52" fill="none" stroke="${r.color}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" style="transition:stroke-dashoffset .9s ease"/></svg>
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--disp);font-size:30px;color:${r.color};line-height:1">${r.score}</div><div class="mini" style="font-size:8.5px;letter-spacing:.1em;color:var(--text3)">/ 100</div></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--disp);font-size:26px;color:${r.color};line-height:1">${r.score}</div><div class="mini" style="font-size:8px;letter-spacing:.1em;color:var(--text3)">/ 100</div></div>
     </div>
     <div style="flex:1;min-width:0">
       <div class="mini" style="letter-spacing:.16em;text-transform:uppercase;color:var(--text3)">Patrol readiness</div>
-      <div style="font-family:var(--disp);font-size:22px;color:${r.color};line-height:1.1;margin:1px 0 4px">${r.label}</div>
-      <div class="mini" style="color:var(--text2);line-height:1.45">${esc(r.line)}</div>
+      <div style="font-family:var(--disp);font-size:20px;color:${r.color};line-height:1.1;margin:1px 0 3px">${r.label}</div>
+      <div class="mini" style="color:var(--text2);line-height:1.4">${esc(r.line)}</div>
+      <div class="mini" style="color:var(--gold2);margin-top:4px;font-weight:600">😴 Tap to log sleep &amp; recovery ›</div>
     </div></div>
-    <div class="row" style="gap:6px;margin-top:11px;border-top:1px solid var(--border);padding-top:9px">${fac("Recovery",r.rec+"%")}${fac("Sleep",r.sleepKnown?r.sleep+"%":"—")}${fac("Freshness",r.fresh+"%")}</div>${recoveryStripMini()}</div>`;
+    <div class="row" style="gap:6px;margin-top:9px;border-top:1px solid var(--border);padding-top:8px">${fac("Recovery",r.rec+"%")}${fac("Sleep",r.sleepKnown?r.sleep+"%":"—")}${fac("Freshness",r.fresh+"%")}</div>${recoveryStripMini()}</div>`;
 }
 // Training Age Clock
 const TA_MILES=[[7,"First Week","🌑"],[30,"One Month","🌘"],[90,"90 Nights","🌗"],[180,"Half a Year","🌖"],[365,"One Year","🌕"],[730,"Two Years","⭐"],[1825,"Five Years","🦇"],[3650,"A Decade in the Cave","🔱"]];
@@ -4671,20 +4704,7 @@ function renderInfirmary(){
   // WORKLOAD WATCH (ACWR — injury-risk ratio)
   html+=workloadCard();
 
-  // CARDIO / PATROL MILEAGE
-  const cPct=clamp(wkC/cGoal*100,0,100);const C2=326.7,off2=(C2*(1-cPct/100)).toFixed(1);
-  html+=`<div class="card"><div class="ttl">🏃 Patrol Mileage <span class="mini" style="font-weight:400">— conditioning this week</span></div>
-    <div class="row" style="gap:16px;align-items:center;margin-top:4px">
-      <div style="position:relative;width:92px;height:92px;flex:none"><svg viewBox="0 0 120 120" style="transform:rotate(-90deg)"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/><circle cx="60" cy="60" r="52" fill="none" stroke="#7FC8FF" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C2}" stroke-dashoffset="${off2}"/></svg>
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--disp);font-size:22px;color:#7FC8FF">${wkC}</div><div class="mini" style="font-size:8px">/ ${cGoal} min</div></div></div>
-      <div style="flex:1"><div class="mini" style="color:var(--text2);margin-bottom:7px">Heart & lungs are Batman's real engine. Quick log:</div>
-        <div class="row wrap" style="gap:6px">${[["🥊 Bag",15],["🏃 Run",20],["🚴 Bike",30],["🚶 Walk",30]].map(([t,mn])=>`<button class="btn ghost sm" style="width:auto;padding:6px 10px" onclick="addCardio(${mn},'${t.split(' ')[1]}')">${t} +${mn}</button>`).join("")}</div></div></div></div>`;
-
-  // SUPPLEMENTS
-  const items=[["creatine","Creatine 5g","💊"],["protein","Protein target","🥩"],["omega","Omega-3","🐟"],["vitd","Vitamin D","☀️"],["water","Hydration","💧"]];
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">💊 Daily stack</div>${cStreak?`<span class="chip on" style="color:var(--gold2)">🔥 ${cStreak}d creatine</span>`:""}</div>
-    <div style="margin-top:6px">${items.map(([k,l,e])=>{const on=!!supp[k];return `<button class="row sp" onclick="toggleSupp('${k}')" style="width:100%;background:none;border:none;padding:9px 0;border-top:1px solid var(--border);cursor:pointer"><span style="font-size:13.5px;color:${on?'var(--text)':'var(--text2)'}">${e} ${l}</span><span style="font-size:18px">${on?'✅':'⬜️'}</span></button>`;}).join("")}</div>
-    <div class="mini" style="margin-top:7px;color:var(--text3);font-style:italic">Creatine monohydrate 3–5g daily is the most evidence-backed legal supplement — consistency is the whole game.</div></div>`;
+  // (Patrol Mileage / cardio and the Daily Stack / supplements cards were removed to streamline the Infirmary — sleep, soreness, workload & injuries remain.)
 
   // INJURY BOARD
   html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🚑 Injury board</div><button class="btn ghost sm" style="width:auto" onclick="openInjuryPicker()">+ Flag</button></div>`;
@@ -4765,6 +4785,17 @@ const GARAGE=[
 ];
 function openGarage(){state.subpage="garage";render();window.scrollTo(0,0);}
 function closeGarage(){state.subpage=null;go("gotham");}
+// Garage box for the Gotham home — shows your best ride big, taps through to the full fleet.
+function garageCard(){
+  const s=gothamStats();const owned=GARAGE.filter(v=>v.req(s));const top=owned[owned.length-1]||GARAGE[0];const next=GARAGE.find(v=>!v.req(s));
+  return `<div class="card" style="margin-bottom:12px;cursor:pointer;display:flex;gap:15px;align-items:center;border-color:var(--gold-dim)" onclick="openGarage()">
+    <div style="font-size:62px;line-height:1;flex:none;filter:drop-shadow(0 0 14px rgba(232,197,106,.45))">${top.e}</div>
+    <div style="flex:1;min-width:0">
+      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">The Garage · ${owned.length}/${GARAGE.length} unlocked <span style="color:var(--gold2)">›</span></div>
+      <h2 style="font-size:22px;margin:1px 0 3px;color:var(--gold2)">${esc(top.n)}</h2>
+      <div class="mini" style="color:var(--text2);line-height:1.4">${next?`Next ride: ${next.e} <b>${esc(next.n)}</b> — ${esc(next.how)}`:"Full fleet earned. A legend of the cave."}</div>
+    </div></div>`;
+}
 function renderGarage(){
   const s=gothamStats();const unlocked=GARAGE.filter(v=>v.req(s)).length;
   let html=`<div class="fade">
@@ -4813,10 +4844,10 @@ function batRankCard(){
   const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
   const cur=RANKS[ri],next=RANKS[ri+1];
   const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
-  return `<div class="card" style="display:flex;gap:14px;align-items:center">
+  return `<div class="card" style="display:flex;gap:14px;align-items:center;cursor:pointer" onclick="openRankLadder()">
     ${batEmblem(ri,76)}
     <div style="flex:1;min-width:0">
-      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">Rank ${ri+1}/${RANKS.length} · Strength Lv ${sl}</div>
+      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">Rank ${ri+1}/${RANKS.length} · Strength Lv ${sl} <span style="color:var(--gold2)">· all ranks ›</span></div>
       <h2 style="font-size:24px;margin:1px 0 2px;color:var(--gold2)">${esc(cur[1])} ${cur[2]}</h2>
       ${next?`<div class="bar" style="height:8px;background:var(--bg4)"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
         <div class="mini" style="margin-top:3px;color:var(--text2)">${Math.max(0,hi-sl)} strength level${(hi-sl)===1?'':'s'} to <b>${esc(next[1])}</b> ${next[2]}</div>`
@@ -4904,9 +4935,7 @@ function renderGotham(){
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.streakDays}</div><div class="mini">day streak ›</div></div>
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.totalWorkouts}</div><div class="mini">missions ›</div></div>
     <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="goPlan()"><div class="big" style="font-size:30px">${weekCount()}/${u.weeklyGoal}</div><div class="mini">this week ›</div></div></div>`;
-  html+=`<div class="grid2" style="margin-bottom:13px">
-    <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openGarage()">🚗 Garage ${GARAGE.filter(v=>v.req(gothamStats())).length}/${GARAGE.length} ›</button>
-    <button class="btn" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;border-color:var(--gold-dim)" onclick="openInfirmary()">🚑 Infirmary ›</button></div>`;
+  html+=garageCard();
 
   // training age clock
   html+=trainingAgeCard();
