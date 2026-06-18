@@ -2686,7 +2686,7 @@ function cineNext(){
     ${it.eye?`<div class="ceye" style="color:${accent}">${esc(it.eye)}</div>`:""}
     ${it.title?`<div class="ctitle">${it.titleHtml||esc(it.title)}</div>`:""}
     <div class="cline"></div>
-    ${it.body?`<div class="cbody${it.big?' big':''}">${it.bodyHtml||('"'+esc(it.body)+'"')}</div>`:""}
+    ${(it.body||it.bodyHtml)?`<div class="cbody${it.big?' big':''}">${it.bodyHtml||('"'+esc(it.body)+'"')}</div>`:""}
     ${it.attr?`<div class="cattr">— ${esc(it.attr)}</div>`:""}
     <button class="cbtn" onclick="cineDismiss()">${esc(it.btn||"YESSIR")}</button>`;
   const el=$("cine");el.classList.remove("out");el.classList.add("on");
