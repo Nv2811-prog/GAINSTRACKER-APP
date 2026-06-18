@@ -1718,6 +1718,14 @@ function setVolume(ex,s){
   if(t==="L"||t==="R")v*=0.5;
   return v;
 }
+// Like setVolume but ALSO counts warm-up sets — used only for the head-line "total weight
+// moved" the user sees at the end of a workout. Fatigue, PRs & muscle volume still ignore warm-ups.
+function setVolumeRaw(ex,s){
+  if(!s.done)return 0;
+  const load=setLoad(ex,s.w), reps=+s.r||0; let v=load*reps;
+  if(s.type==="L"||s.type==="R")v*=0.5;
+  return v;
+}
 function setE1RM(ex,s){const load=setLoad(ex,s.w),reps=+s.r||0;if(!reps)return 0;return epley(load,reps);}
 function exVolume(exObj){let v=0;(exObj.sets||[]).forEach(s=>v+=setVolume(exFor(exObj.name),s));return v;}
 
@@ -2209,8 +2217,8 @@ function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;} // no r
 function setSessionNotes(v){if(state.session)state.session.notes=v;} // no render — keep textarea focus
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
-function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}}render();}
+function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}}render();}
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
 function liveCheckPR(ei,si){
@@ -2295,12 +2303,12 @@ function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.s
 function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();}
 function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;render();}
 function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
-function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;e._open=true;closeSheet();render();}
+function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;e._open=true;state.session._focusEi=ei;closeSheet();render();}
 function moveExercise(ei,dir){const arr=state.session.exercises;const j=ei+dir;if(j<0||j>=arr.length)return;const t=arr[ei];arr[ei]=arr[j];arr[j]=t;render();}
 // ---- Collapsible exercises: only the one you're actively on stays expanded; others fold like a list. ----
-function activeExIdx(){const o=findOpenSet();return o?o.ei:-1;}
+function activeExIdx(){const ses=state.session;if(ses&&ses._focusEi!=null&&ses.exercises[ses._focusEi])return ses._focusEi;const o=findOpenSet();return o?o.ei:-1;}
 function isExOpen(ei){const e=state.session.exercises[ei];if(!e)return false;const active=activeExIdx();if(ei===active)return e._open!==false;return e._open===true;}
-function toggleExCollapse(ei){const e=state.session.exercises[ei];if(!e)return;e._open=!isExOpen(ei);haptic("tap");render();}
+function toggleExCollapse(ei){const e=state.session.exercises[ei];if(!e)return;const open=isExOpen(ei);e._open=!open;state.session._focusEi=null;haptic("tap");render();}
 function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>s.done||parseFloat(s.r)>0).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
 // ---- Hold-to-drag exercise reordering (touch + mouse). Reorders DOM live, commits to the array once on drop — no re-render mid-drag, so it stays smooth. ----
 function initDragReorder(){
@@ -2444,7 +2452,7 @@ function finishWorkout(){
   let totalVol=0,fails=0,sessFails={},sessVol={},musclesHit={};const prsThis=[];
   done.forEach(e=>{
     const ex=exFor(e.name);let bestORM=0,bestW=0,bestReps=0,bestVol=0;
-    e.sets.forEach(s=>{const v=setVolume(ex,s);totalVol+=v;
+    e.sets.forEach(s=>{const v=setVolume(ex,s);totalVol+=setVolumeRaw(ex,s);
       if(s.type==="F"){fails++;}
       const orm=setE1RM(ex,s);if(orm>bestORM)bestORM=orm;
       const sw=setLoad(ex,s.w),sr=+s.r||0;
@@ -6190,15 +6198,30 @@ function renderAllies(){
   const board=[Object.assign({_you:true},me)].concat(allies.map(a=>Object.assign({},a)));
   board.forEach(c=>c._score=vigilanteScore(c));board.sort((a,b)=>b._score-a._score);
   const myRank=board.findIndex(c=>c._you)+1;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">ALLIES</h1>
-    <div class="tag" style="margin-bottom:13px">Your League · leaderboard · co-op raids · sparring</div>`;
+  const fc=myFriendCode();
+  const cloudOn=(typeof cloud!=="undefined"&&cloud.ready);
+  let html=`<div class="row sp" style="align-items:flex-end;margin-bottom:4px"><h1 style="font-size:34px;color:var(--gold2);margin:0">ALLIES</h1>
+    <span class="chip" style="${cloudOn?'color:var(--green);border-color:var(--green)':'color:var(--text3)'}">${cloudOn?'● LIVE':'○ connecting…'}</span></div>
+    <div class="tag" style="margin-bottom:13px">Train online with friends · share once, sync forever</div>`;
   // My Patrol Card hero
   const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
   html+=`<div class="card glow"><div class="row sp"><div class="ttl" style="margin:0">${me.re} ${esc(me.n)} <span class="mini" style="color:var(--text3)">(you)</span></div><span class="chip on">${esc(me.rk)}</span></div>
     <div class="row" style="gap:6px;margin:11px 0">${caveStat("STR "+me.sl,"strength")}${caveStat(fmtNum(me.vol)+"kg","moved")}${caveStat(me.w,"sessions")}${caveStat(me.boss,"villains")}</div>
     <div class="row sp" style="margin:2px 0 9px"><span class="mini">Vigilante Score</span><b class="gold" style="font-size:18px">${fmtNum(score)}</b></div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px">${lifts}</div>
-    <button class="btn gold sm" onclick="shareMyCard()">🔗 Share my Patrol Card</button></div>`;
+    <button class="btn ghost sm" onclick="shareMyCard()">📋 Copy a one-time snapshot instead</button></div>`;
+  // Friend code — the easy way to connect: share once, then everything syncs live
+  html+=`<div class="card" style="margin-top:12px;background:linear-gradient(160deg,var(--gold-bg),var(--bg2));border-color:var(--gold-dim)">
+    <div class="ttl" style="margin:0 0 3px;font-size:15px;display:flex;align-items:center;gap:7px">🔗 Your friend code</div>
+    <div class="mini" style="color:var(--text2);margin-bottom:8px">Send this once. A friend adds it and your Patrol Card streams to them <b style="color:var(--gold2)">live</b> after every workout — no re-pasting.</div>
+    <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="width:100%;font-size:12.5px;font-weight:700;color:var(--gold2);background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;letter-spacing:.5px"/>
+    <button class="btn gold sm" style="margin-top:8px" onclick="shareFriendCode()">📋 Copy my friend code</button></div>`;
+  // Add an ally — inline, right on the tab (no digging through a sheet)
+  html+=`<div class="card" style="margin-top:11px">
+    <div class="ttl" style="margin:0 0 5px;font-size:15px;display:flex;align-items:center;gap:7px">➕ Add an ally</div>
+    <div class="mini" style="color:var(--text2);margin-bottom:7px">Paste a friend's code (<b style="color:var(--gold2)">GTUID:…</b>) or a one-time Patrol Card snapshot.</div>
+    <textarea id="ally-code" placeholder="Paste a friend code or Patrol Card…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none"></textarea>
+    <div class="row" style="gap:6px;margin-top:7px"><button class="btn gold sm g" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div></div>`;
   // Inline League — every ally sits right here on the tab, each with ONE-TAP access to their lifts,
   // split and a head-to-head compare. No more opening a sheet and digging through buttons first.
   if(allies.length){
@@ -6212,9 +6235,9 @@ function renderAllies(){
       <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div></div>`;
     }).join("");
   }
-  // Justice League — add allies, share your card, open the leaderboard
-  html+=`<div class="card" style="cursor:pointer" onclick="openJusticeLeague()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">➕ Add an ally</div><span class="chip">${allies.length} all${allies.length===1?'y':'ies'}</span></div>
-    <div class="mini" style="color:var(--text2);margin-top:5px">Paste a friend's Patrol Card to add them to your League. ›</div></div>`;
+  // Advanced — full Justice League sheet (share/import a split, offline snapshot backup)
+  html+=`<div class="card" style="cursor:pointer" onclick="openJusticeLeague()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🛠️ More — splits &amp; backups</div><span class="chip">${allies.length} all${allies.length===1?'y':'ies'}</span></div>
+    <div class="mini" style="color:var(--text2);margin-top:5px">Open the full Justice League — share or import a split, copy an offline snapshot. ›</div></div>`;
   // Leaderboard
   html+=`<div class="card" style="cursor:pointer" onclick="openLeaderboard()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🏆 Leaderboard</div><span class="chip ${myRank===1&&board.length>1?'on':''}">${board.length>1?'#'+myRank+' of '+board.length:'just you'}</span></div>
     <div class="mini" style="color:var(--text2);margin-top:5px">Everyone ranked by Vigilante Score — strength, tonnage, sessions & villains fused into one number. ›</div></div>`;
