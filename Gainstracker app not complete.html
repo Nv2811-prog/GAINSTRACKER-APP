@@ -6325,20 +6325,26 @@ function _alfredFindDay(sp,q){if(!sp)return -1;q=(q||"").toLowerCase().trim();le
 function alfredAsk(q){
   const raw=(q||"").trim(),s=raw.toLowerCase();const d=state.data;
   // EDIT: copy [the exercises from] DAY-A to/into DAY-B  — a perfectly reasonable admin request, just do it.
+  // Searches across ALL splits (the user may keep "Legs" in one split and "Lower" in another), preferring the active split for ties.
   let m=s.match(/^(?:copy|duplicate|mirror)\s+(?:(?:the\s+)?(?:exercises|lifts|workout)\s+)?(?:from\s+)?(.+?)\s+(?:in)?to\s+(?:my\s+)?(.+?)(?:\s+day)?$/);
-  if(m){const sp=_alfredActiveSplit();if(!sp)return "You have no split to edit, sir.";
+  if(m){const splits=d.splits||[];if(!splits.length)return "You have no splits to edit, sir.";
     const srcQ=m[1].replace(/\bday\b/g,"").trim(),dstQ=m[2].replace(/\bday\b/g,"").trim();
-    const si=_alfredFindDay(sp,srcQ),dii=_alfredFindDay(sp,dstQ);
-    if(si<0)return `No day matching "${esc(srcQ)}" in <b>${esc(sp.name)}</b>. Days: ${sp.days.map(x=>esc(x.name)).join(", ")}.`;
-    if(dii<0)return `No day matching "${esc(dstQ)}" in <b>${esc(sp.name)}</b>. Days: ${sp.days.map(x=>esc(x.name)).join(", ")}.`;
-    if(si===dii)return "That's the same day, sir — nothing to copy.";
-    const srcEx=(sp.days[si].exercises||[]).slice();
-    if(!srcEx.length)return `<b>${esc(sp.days[si].name)}</b> has no exercises to copy, Master.`;
-    const dstEx=sp.days[dii].exercises||(sp.days[dii].exercises=[]);
+    const active=_alfredActiveSplit();
+    const ordered=active?[active].concat(splits.filter(x=>x!==active)):splits;
+    const findAnywhere=(q)=>{let r=null;ordered.forEach(sp=>{if(r)return;const di=_alfredFindDay(sp,q);if(di>=0)r={sp,di};});return r;};
+    const src=findAnywhere(srcQ),dst=findAnywhere(dstQ);
+    const allDays=()=>ordered.map(sp=>sp.days.map(x=>esc(x.name)+" <span style='color:var(--text3)'>("+esc(sp.name)+")</span>").join(", ")).join(" · ");
+    if(!src)return `No day matching "${esc(srcQ)}" anywhere, sir. Your days: ${allDays()}.`;
+    if(!dst)return `No day matching "${esc(dstQ)}" anywhere, sir. Your days: ${allDays()}.`;
+    if(src.sp===dst.sp&&src.di===dst.di)return "That's the same day, sir — nothing to copy.";
+    const srcEx=(src.sp.days[src.di].exercises||[]).slice();
+    if(!srcEx.length)return `<b>${esc(src.sp.days[src.di].name)}</b> has no exercises to copy, Master.`;
+    const dstEx=dst.sp.days[dst.di].exercises||(dst.sp.days[dst.di].exercises=[]);
     const toAdd=srcEx.filter(n=>!dstEx.some(x=>x.toLowerCase()===n.toLowerCase()));
-    if(!toAdd.length)return `<b>${esc(sp.days[dii].name)}</b> already has all of those, sir — nothing to add.`;
-    state._alfredPending={label:`Copy <b>${toAdd.length}</b> exercise${toAdd.length>1?"s":""} from <b>${esc(sp.days[si].name)}</b> into <b>${esc(sp.days[dii].name)}</b>?<div class="mini" style="margin-top:4px;color:var(--text2)">${toAdd.map(esc).join(", ")}</div>`,done:`Done, Master — ${toAdd.length} lift${toAdd.length>1?"s":""} copied into ${esc(sp.days[dii].name)}.`,fn:()=>{toAdd.forEach(n=>dstEx.push(n));}};
-    return `Right away, sir: copy ${toAdd.length} lift${toAdd.length>1?"s":""} from <b>${esc(sp.days[si].name)}</b> into <b>${esc(sp.days[dii].name)}</b>. Confirm below.`;}
+    if(!toAdd.length)return `<b>${esc(dst.sp.days[dst.di].name)}</b> already has all of those, sir — nothing to add.`;
+    const srcLbl=esc(src.sp.days[src.di].name)+(src.sp!==dst.sp?` <span style='color:var(--text3)'>(${esc(src.sp.name)})</span>`:""),dstLbl=esc(dst.sp.days[dst.di].name)+(src.sp!==dst.sp?` <span style='color:var(--text3)'>(${esc(dst.sp.name)})</span>`:"");
+    state._alfredPending={label:`Copy <b>${toAdd.length}</b> exercise${toAdd.length>1?"s":""} from <b>${srcLbl}</b> into <b>${dstLbl}</b>?<div class="mini" style="margin-top:4px;color:var(--text2)">${toAdd.map(esc).join(", ")}</div>`,done:`Done, Master — ${toAdd.length} lift${toAdd.length>1?"s":""} copied into ${esc(dst.sp.days[dst.di].name)}.`,fn:()=>{toAdd.forEach(n=>dstEx.push(n));}};
+    return `Right away, sir: copy ${toAdd.length} lift${toAdd.length>1?"s":""} from <b>${srcLbl}</b> into <b>${dstLbl}</b>. Confirm below.`;}
   // EDIT: add X to [day]
   m=s.match(/^(?:add|put)\s+(.+?)\s+(?:to|in|on)\s+(.+)$/);
   if(m){const exName=_alfredFindEx(m[1]),sp=_alfredActiveSplit(),di=_alfredFindDay(sp,m[2]);
