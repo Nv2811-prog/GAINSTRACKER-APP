@@ -1992,7 +1992,7 @@ function beep(p){try{const c=new(window.AudioContext||window.webkitAudioContext)
 const HAPTIC={tap:14,toggle:[12,18,26],done:[18,24,40],pr:[30,30,60],hit:38,ko:[60,40,120,40,200],rest:200,success:[40,30,80],warn:[80,40,80]};
 function haptic(kind){try{if(navigator.vibrate)navigator.vibrate(HAPTIC[kind]||kind||14);}catch(e){}}
 function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInterval(state.wtInt);state.wtInt=null;}return;}const el=$("wt-display");const secs=Math.floor((Date.now()-state.session.startedAt)/1000);state.workoutTimer=secs;if(el)el.textContent=fmtTime(secs);}
-function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");beep(880);if(el){el.textContent="DONE";el.parentElement.style.borderColor="var(--green)";}restDone();return;}state.restTimer=rem;if(el)el.textContent=fmtTime(rem);updateRestOverlay(rem);}
+function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");beep(880);if(el){el.textContent="DONE";el.parentElement.style.borderColor="var(--green)";}const sn=$("rest-sheet-num");if(sn)sn.textContent="GO";restDone();return;}state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const sn=$("rest-sheet-num");if(sn)sn.textContent=fmtTime(rem);updateRestOverlay(rem);}
 /* ----- Liquid-glass rest overlay (transient element — never re-rendered, so no lag) ----- */
 function showRestOverlay(dur){const ov=$("restov");if(!ov)return;state._restTotal=dur;ov.classList.remove("done");const lb=$("restlabel");if(lb)lb.textContent="Recovery";const h=$("resthint");if(h)h.textContent="Breathe in…";ov.classList.add("on");updateRestOverlay(dur);}
 function updateRestOverlay(rem){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;const n=$("restnum");if(n)n.textContent=fmtTime(Math.max(0,rem));const tot=state._restTotal||1,C=728.8,frac=Math.max(0,Math.min(1,rem/tot)),prog=$("restprog");if(prog)prog.style.strokeDashoffset=(C*(1-frac)).toFixed(1);const hint=$("resthint");if(hint&&!ov.classList.contains("done"))hint.textContent=(Math.floor(Date.now()/4000)%2)?"Breathe out…":"Breathe in…";}
@@ -2000,8 +2000,19 @@ function restDone(){const ov=$("restov");if(!ov||!ov.classList.contains("on"))re
 function closeRestOverlay(){const ov=$("restov");if(ov)ov.classList.remove("on","done");}
 // Minimise — hide the big overlay but KEEP the clock running; it keeps counting in the workout header's REST box. Tap that box to bring the overlay back.
 function minimizeRest(){haptic("tap");closeRestOverlay();if(state.restRunning)toast("Rest still running — tap the REST timer to reopen.");}
-function reopenRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0)return;haptic("tap");showRestOverlay(state._restTotal||state._restOrigTotal||rem);updateRestOverlay(rem);}
-function addRest(delta){if(!state.restRunning){closeRestOverlay();return;}state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);let rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();return;}haptic("tap");updateRestOverlay(rem);const el=$("rest-display");if(el)el.textContent=fmtTime(Math.max(0,rem));}
+function reopenRest(){
+  if(!state.restRunning){return;}
+  const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0)return;haptic("tap");
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:7px">⏳ Rest timer</div>
+    <div class="center" style="margin:10px 0 14px"><div id="rest-sheet-num" style="font-size:46px;font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums">${fmtTime(Math.max(0,rem))}</div><div class="mini" style="color:var(--text2)">recovery remaining</div></div>
+    <div class="row" style="gap:8px;margin-bottom:8px">
+      <button class="btn ghost g" onclick="addRest(-15)">−15s</button>
+      <button class="btn ghost g" onclick="addRest(15)">+15s</button>
+    </div>
+    <button class="btn gold" onclick="skipRest();closeSheet()">Skip rest — back to work</button>
+    <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Keep resting</button>`);
+}
+function addRest(delta){if(!state.restRunning){closeRestOverlay();return;}state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);let rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();closeSheet();return;}haptic("tap");updateRestOverlay(rem);const el=$("rest-display");if(el)el.textContent=fmtTime(Math.max(0,rem));const sn=$("rest-sheet-num");if(sn)sn.textContent=fmtTime(Math.max(0,rem));}
 function skipRest(){state.restRunning=false;state.restTimer=0;haptic("tap");closeRestOverlay();const el=$("rest-display");if(el){el.textContent="REST";el.parentElement.style.borderColor="";}}
 /* ===== MMA Round Timer — combat-conditioning interval timer ===== */
 const MMA_PRESETS=[
@@ -2118,7 +2129,8 @@ async function requestWakeLock(){try{if(("wakeLock"in navigator)&&!_wakeLock){_w
 function releaseWakeLock(){try{if(_wakeLock){_wakeLock.release();_wakeLock=null;}}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&state.session&&state.step==="logging")requestWakeLock();});
 function ensureTimers(){if(state.session){if(!state.wtInt)state.wtInt=setInterval(tickWork,1000);if(!state.restInt)state.restInt=setInterval(tickRest,1000);}}
-function restStart(defer){const dur=state.data.u.restTime||120;state.restEnd=Date.now()+dur*1000;state.restTimer=dur;state.restRunning=true;state._restOrigTotal=dur;const el=$("rest-display");if(el){el.textContent=fmtTime(dur);el.parentElement.style.borderColor="";}if(defer){state._restPending=true;}else{state._restPending=false;showRestOverlay(dur);}}
+function restStart(defer){const dur=state.data.u.restTime||120;state.restEnd=Date.now()+dur*1000;state.restTimer=dur;state.restRunning=true;state._restOrigTotal=dur;state._restTotal=dur;const el=$("rest-display");if(el){el.textContent=fmtTime(dur);el.parentElement.style.borderColor="var(--gold2)";}state._restPending=!!defer;}
+// Rest lives in the sticky header now — no fullscreen takeover. Tapping the REST box opens a compact controls sheet.
 
 /* ========================= START WORKOUT (Rule 6: unbroken path) ========================= */
 function startWorkout(splitId,dayIdx){
@@ -2161,8 +2173,10 @@ function setReadiness(r){state.session.readiness=r;state.step="logging";startTim
 
 /* ========================= LOGGING INTERACTIONS ========================= */
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;} // no render (Rule 1 spirit)
+function setSessionNotes(v){if(state.session)state.session.notes=v;} // no render — keep textarea focus
+function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
-function cycleType(ei,si){const s=state.session.exercises[ei].sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];render();}
+function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;render();}
 function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}}render();}
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
@@ -2186,12 +2200,19 @@ function liveCheckPR(ei,si){
   if(vol>cVol+0.01&&vol>lb.maxVol+0.01){lb.maxVol=vol;hits.push({t:"vol",val:vol,prev:cVol});}
   if(r>cReps&&r>lb.maxReps&&r<=12){lb.maxReps=r;hits.push({t:"reps",val:r,prev:cReps});} // rep PRs only count inside the 12-rep ceiling — past that, add weight, don't chase reps
   let fired=null;
+  const willBoss=hits.some(h=>h.t==="e1rm")&&!state.session.bossed[exObj.name];
   if(hits.length){
-    showPRToast(exObj.name,hits,{w,r,e1,vol});
+    if(willBoss){
+      // Hold the PR pop back — the boss fight takes the screen first, then we replay the pop on top
+      // of the victory so you clearly see exactly which record you just broke.
+      state._pendingPRpop={name:exObj.name,hits:hits.slice(),info:{w,r,e1,vol}};
+    }else{
+      showPRToast(exObj.name,hits,{w,r,e1,vol});
+    }
     fired="pr";
   }
   // Boss fires once per exercise per session, only on an e1RM crown — the ultimate tier.
-  if(hits.some(h=>h.t==="e1rm")&&!state.session.bossed[exObj.name]){
+  if(willBoss){
     state.session.bossed[exObj.name]=true;
     const pr={name:exObj.name,orm:e1,prevOrm:cOrm,improve:cOrm?((e1-cOrm)/cOrm*100):0,first:!cOrm,w,r,ex};
     const boss=pickBoss([pr]);
@@ -2241,7 +2262,7 @@ function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.s
 function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();}
 function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;render();}
 function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
-function setSetType(ei,si,t){state.session.exercises[ei].sets[si].type=t;closeSheet();render();}
+function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;e._open=true;closeSheet();render();}
 function moveExercise(ei,dir){const arr=state.session.exercises;const j=ei+dir;if(j<0||j>=arr.length)return;const t=arr[ei];arr[ei]=arr[j];arr[j]=t;render();}
 // ---- Collapsible exercises: only the one you're actively on stays expanded; others fold like a list. ----
 function activeExIdx(){const o=findOpenSet();return o?o.ei:-1;}
@@ -2251,8 +2272,10 @@ function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const 
 // ---- Hold-to-drag exercise reordering (touch + mouse). Reorders DOM live, commits to the array once on drop — no re-render mid-drag, so it stays smooth. ----
 function initDragReorder(){
   if(window._dragInit)return;window._dragInit=true;
-  const lp={timer:null,active:false,node:null,startY:0,startX:0,suppress:false,pid:null,handle:null,raf:null,vy:0,lastY:0};
+  const lp={timer:null,active:false,node:null,startY:0,startX:0,suppress:false,pid:null,handle:null,raf:null,vy:0,lastY:0,swRow:null,swiping:false,swDX:0,swDecided:false};
   window._lpDrag=lp;
+  const SW_FIRE=92; // px past which a swipe commits
+  const resetSwipe=(snap)=>{const r=lp.swRow;if(r){r.style.transition="transform .18s ease, background-color .18s ease";r.style.transform="";r.style.backgroundColor="";r.style.overflow="";const t=r.querySelector(".swipe-hint");if(t)t.remove();}lp.swRow=null;lp.swiping=false;lp.swDX=0;lp.swDecided=false;};
   // Edge auto-scroll: while dragging near the top/bottom of the viewport, scroll the page so you
   // can drag an exercise past the visible window without lifting your finger.
   const EDGE=90, MAXV=18;
@@ -2298,10 +2321,28 @@ function initDragReorder(){
     if(e.target.closest&&e.target.closest("button,input,select,textarea,a,.stype,.sdone"))return;
     const row=getRow(e.target);if(!row)return;
     lp.startX=e.clientX;lp.startY=e.clientY;lp.pid=e.pointerId;lp.handle=null;clearTimer();
+    // Swipe candidate: only collapsed rows can be swiped (left = delete, right = open).
+    resetSwipe();if(row.classList.contains("exfold"))lp.swRow=row;
     lp.timer=setTimeout(()=>{lp.timer=null;begin(row);},340);
   },{passive:false});
   document.addEventListener("pointermove",(e)=>{
     if(lp.timer&&(Math.abs(e.clientX-lp.startX)>10||Math.abs(e.clientY-lp.startY)>10))clearTimer(); // moved early without a handle = it's a scroll, not a hold
+    // Horizontal swipe on a collapsed row — decide direction once, then track the finger.
+    if(!lp.active&&lp.swRow){
+      const dx=e.clientX-lp.startX,dy=e.clientY-lp.startY;
+      if(!lp.swDecided&&(Math.abs(dx)>12||Math.abs(dy)>12)){
+        if(Math.abs(dx)>Math.abs(dy)+4){lp.swiping=true;lp.swDecided=true;clearTimer();const r=lp.swRow;r.style.transition="none";let hint=r.querySelector(".swipe-hint");if(!hint){hint=document.createElement("div");hint.className="swipe-hint";hint.style.cssText="position:absolute;top:0;bottom:0;display:flex;align-items:center;font-weight:800;font-size:13px;letter-spacing:.04em;pointer-events:none;padding:0 16px";r.style.position="relative";r.style.overflow="hidden";r.appendChild(hint);}}
+        else{lp.swDecided=true;lp.swiping=false;} // vertical first = scroll, let it be
+      }
+      if(lp.swiping){
+        e.preventDefault();lp.swDX=dx;const r=lp.swRow;
+        r.style.transform="translateX("+dx+"px)";
+        const fire=Math.abs(dx)>=SW_FIRE;const hint=r.querySelector(".swipe-hint");
+        if(dx<0){r.style.backgroundColor="rgba(232,69,60,"+Math.min(.28,Math.abs(dx)/420)+")";if(hint){hint.style.right="0";hint.style.left="auto";hint.style.color="#ff6a5a";hint.textContent=fire?"✕ release to remove":"✕ delete";}}
+        else{r.style.backgroundColor="rgba(124,150,255,"+Math.min(.28,Math.abs(dx)/420)+")";if(hint){hint.style.left="0";hint.style.right="auto";hint.style.color="#9fb4ff";hint.textContent=fire?"▸ release to open":"▸ open";}}
+        return;
+      }
+    }
     if(!lp.active||!lp.node)return;
     e.preventDefault();
     reorder(e);
@@ -2310,6 +2351,20 @@ function initDragReorder(){
   const end=()=>{
     clearTimer();
     lp.vy=0;if(lp.raf){cancelAnimationFrame(lp.raf);lp.raf=null;}
+    // Commit or snap back a horizontal swipe.
+    if(lp.swiping&&lp.swRow){
+      const dx=lp.swDX,row=lp.swRow,ei=parseInt(row.getAttribute("data-ei"));
+      lp.suppress=true;setTimeout(()=>{lp.suppress=false;},700);
+      if(Math.abs(dx)>=SW_FIRE&&!isNaN(ei)){
+        if(dx<0){ // swipe left → remove (confirm modal decides; snap back underneath it)
+          resetSwipe();haptic("warn");removeExercise(ei);return;
+        }else{ // swipe right → open/expand to work on it
+          resetSwipe();haptic("tap");toggleExCollapse(ei);return;
+        }
+      }
+      resetSwipe(); // didn't travel far enough — snap back
+      return;
+    }
     if(lp.handle){try{lp.handle.releasePointerCapture(lp.pid);}catch(_){}lp.handle.classList.remove("grabbing");lp.handle=null;}
     if(lp.active&&lp.node){
       const order=[...document.querySelectorAll("#app .exdrag")].map(n=>parseInt(n.getAttribute("data-ei"))).filter(i=>!isNaN(i));
@@ -2401,7 +2456,7 @@ function finishWorkout(){
   u.totalWorkouts++;u.totalVolume+=totalVol;u.totalDuration+=dur;u.xp+=xpGain;u.failureSets+=fails;
   // weakest muscle for taunt memory
   let weak=M12[0],wl=999;M12.forEach(m=>{const l=muscleLevel(m);if((state.data.muscleVol[m]||0)>0&&l<wl){wl=l;weak=m;}});u.lastMissedMuscle=weak;
-  const wk={id:"w"+now(),date:t,name:ses.day,split:ses.split,muscles:Object.keys(musclesHit),exercises:done,xp:xpGain,totalVol:Math.round(totalVol),duration:dur,readiness:ses.readiness,prs:prsThis.map(p=>p.name)};
+  const wk={id:"w"+now(),date:t,name:ses.day,split:ses.split,muscles:Object.keys(musclesHit),exercises:done,xp:xpGain,totalVol:Math.round(totalVol),duration:dur,readiness:ses.readiness,prs:prsThis.map(p=>p.name),notes:(ses.notes||"").trim()};
   state.data.workouts.unshift(wk);
   // boss returns check (defeat comeback if PR beats target)
   checkComebackDefeat(prsThis);
@@ -2411,7 +2466,7 @@ function finishWorkout(){
   if(ses.split&&ses.split!=="Free Session")advanceDay();
   save();
   // store result for summary + boss
-  state.lastResult={wk,totalVol,xpGain,prsThis,sessVol,musclesHit,dur,readiness:ses.readiness};
+  state.lastResult={wk,totalVol,xpGain,prsThis,sessVol,musclesHit,dur,readiness:ses.readiness,notes:wk.notes};
   stopTimers();state.step=null;state.session=null;state.minimized=false; // session is committed — clear it so the resume bar can't linger
   // Bosses now fire live during the session (see liveCheckPR), so just show the summary.
   openSummary();
@@ -2481,7 +2536,12 @@ function showBossFight(boss,onDone){
       </div>
       <div class="hpwrap" style="margin-top:10px"><i id="fhp" style="width:100%;background:linear-gradient(90deg,${boss.c},#ff8c7c)"></i></div>
       <div class="combatlog" id="flog">⚔️ The cage locks. ${esc(boss.v)} steps in across from you.</div>
-      <div class="mini" style="margin:4px 0 8px">${esc(boss.pr.name)} — new 1RM ${Math.round(boss.pr.orm)}kg ${boss.pr.first?"(first record!)":"(+"+boss.pr.improve.toFixed(1)+"%)"}</div>
+      <div class="card" style="margin:6px 0 8px;padding:9px 11px;text-align:center;border-color:${boss.c}66">
+        <div class="mini" style="letter-spacing:.14em;color:var(--text3)">THE RECORD YOU JUST BROKE</div>
+        <div style="font-weight:800;font-size:15px;margin-top:2px">${esc(boss.pr.name)}</div>
+        <div class="gold" style="font-weight:800;font-size:17px">${Math.round(boss.pr.orm)}kg <span style="font-size:12px;color:var(--text2);font-weight:600">est. 1RM</span> <span style="color:var(--green);font-size:13px">${boss.pr.first?"· first record!":"· +"+boss.pr.improve.toFixed(1)+"%"}</span></div>
+        <div class="mini" style="color:var(--text2);margin-top:1px">off ${Math.round(boss.pr.w)}kg × ${boss.pr.r}</div>
+      </div>
       <button class="btn ghost sm" id="atkbtn" style="width:auto;opacity:.78">Skip to finish ▶</button>
     </div>`;
   const re=(el,cls)=>{if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);};
@@ -2565,8 +2625,11 @@ function bossVictory(boss,ko){
     <button class="btn gold" onclick="closeBossFight()">NEXT MISSION →</button>
   </div>`;
 }
-function closeBossFight(){closeOverlay();state._bossActive=false;const cb=state._bossDone;state._bossDone=null;if(cb)cb();resumePendingRest();}
-function resumePendingRest(){if(!state._restPending)return;state._restPending=false;if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0)return;showRestOverlay(state._restOrigTotal||rem);updateRestOverlay(rem);}
+function closeBossFight(){closeOverlay();state._bossActive=false;const cb=state._bossDone;state._bossDone=null;if(cb)cb();resumePendingRest();
+  // Replay the PR pop now that the cage has cleared — you see the exact record on top of the win.
+  const pp=state._pendingPRpop;state._pendingPRpop=null;
+  if(pp){setTimeout(()=>{try{showPRToast(pp.name,pp.hits,pp.info);}catch(_){}},420);}}
+function resumePendingRest(){state._restPending=false;/* rest already runs in the sticky header — nothing to reopen */}
 
 /* ========================= COMEBACK ========================= */
 function checkComebackDefeat(prs){
@@ -2964,10 +3027,14 @@ function renderLogging(){
   </div>
   <div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
-    <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button><button class="btn gold sm" style="width:auto" onclick="finishWorkout()">FINISH</button></div>
+    <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button></div>
   </div>`;
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
-  html+=`<div class="card glow" style="padding:13px"><div class="ttl">⚡ Tonight's damage report</div>${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div></div>`;
+  {const dmgOpen=state._dmgOpen===true; // collapsed by default — keeps the working sets in view (Gestalt: less clutter, clear focus)
+   html+=`<div class="card glow" style="padding:13px">
+     <div class="row sp" onclick="toggleDmgReport()" style="cursor:pointer"><div class="ttl" style="margin:0">⚡ Tonight's damage report</div><div class="row" style="gap:6px;flex:none"><span class="mini" style="color:var(--text3)">${hitM.length?[...new Set(hitM)].length+" muscles":"tap to view"}</span><span style="color:var(--text3);font-weight:700">${dmgOpen?"▾":"▸"}</span></div></div>
+     ${dmgOpen?`${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div>`:""}
+   </div>`;}
   // Alfred, ever-present at ringside — reacts to your last set, harsh or proud.
   {const _ct=ses._coachTone||"ok";const _cc=_ct==="good"?"var(--green)":_ct==="bad"?"#e8453c":"var(--gold2)";
    const _cl=ses._coach||"At your service, sir. Log your first set — I'll be watching, and I do not flatter.";
@@ -3035,22 +3102,22 @@ function renderLogging(){
         <td><div class="sdone ${s.done?"on":""}" onclick="toggleDone(${ei},${si})">${s.done?"✓":""}</div></td>
       </tr>`;
     });
-    const canLink=ei<ses.exercises.length-1;
-    const linkBtn=inGroup
-      ? `<button class="btn ghost sm" style="width:auto;display:flex;align-items:center;gap:4px;color:#ff8378" onclick="unlinkGroup(${ei})">${secIcon('link','#ff8378')}Unlink</button>`
-      : (canLink?`<button class="btn ghost sm" style="width:auto;display:flex;align-items:center;gap:4px" title="Superset with the next exercise" onclick="linkNext(${ei})">${secIcon('link')}Superset ↓</button>`:"");
     html+=`</tbody></table>
       <div class="row wrap" style="margin-top:9px;gap:8px">
         <button class="btn ghost sm g" onclick="addSet(${ei})">+ Add set</button>
-        <button class="btn ghost sm" style="width:auto;display:flex;align-items:center;gap:4px" title="Drop-set / rest-pause / myo-reps" onclick="openProtocolSheet(${ei})">${secIcon('bolt')}Protocol</button>
         <button class="btn ghost sm" style="width:auto" title="Swap for a similar lift" onclick="openSwap(${ei})">⇄ Swap</button>
         <button class="btn ghost sm" style="width:auto" title="Add the antagonist / other forearm side" onclick="openPair(${ei})">🤝 Pair</button>
         <button class="btn ghost sm" style="width:auto" onclick="showCues('${esc(e.name).replace(/'/g,"")}')">ℹ️ Cues</button>
-        ${linkBtn}
       </div></div>`;
   });
   if(curG&&gCount[curG]>1)html+=`</div>`;                  // close trailing group wrapper
-  html+=`<button class="btn" onclick="openPicker()">＋ Add exercise</button>
+  html+=`<button class="btn" onclick="openPicker()">＋ Add exercise</button>`;
+  // Workout notes — written before Alfred's review so he reads them and respects your reasons.
+  html+=`<div class="card" style="margin-top:12px;padding:13px">
+      <div class="ttl" style="margin-bottom:4px">📝 Session notes <span class="mini" style="color:var(--text3);font-weight:400">— Alfred reads these before his review</span></div>
+      <textarea id="sessnotes" placeholder="e.g. Glutes & adductors were sore, so I skipped the two exercises that hit them directly." oninput="setSessionNotes(this.value)" style="width:100%;min-height:62px;resize:vertical;background:var(--bg2,#0e0e12);border:1px solid var(--line,#26262e);border-radius:10px;color:var(--text);padding:10px;font:inherit;line-height:1.45">${esc(ses.notes||"")}</textarea>
+    </div>`;
+  html+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="finishWorkout()">🏁 FINISH WORKOUT</button>
     <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
   $("app").innerHTML=html;
   ensureTimers();
@@ -3448,7 +3515,7 @@ function alfredLocalRead(R){
   let best=null,bestO=0;
   R.wk.exercises.forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{const o=setE1RM(ex,s);if(o>bestO){bestO=o;best={n:e.name,w:Math.round(setLoad(ex,s.w)),r:s.r};}});});
   const prev=prevSameDay(R.wk);const dVol=prev?R.totalVol-prev.totalVol:null;
-  const hit=(R.musclesHit||[]).map(m=>MNAME[m]).filter(Boolean);
+  const hit=Object.keys(R.musclesHit||{}).map(m=>MNAME[m]).filter(Boolean);
   const out=[];
   // Opening verdict — tone scales with the work.
   if(prs>=2)out.push(`${prs} personal records in one session. That, sir, is what I have been waiting for — no dry remarks tonight, that was genuinely outstanding.`);
@@ -3460,6 +3527,7 @@ function alfredLocalRead(R){
   // The numbers line.
   if(best)out.push(`Top effort: ${esc(best.n)} at ${best.w}kg × ${best.r}. ${bestO>0?`An estimated ${Math.round(bestO)}kg single sits in your tank.`:""}`);
   if(hit.length)out.push(`Damage dealt to ${hit.slice(0,4).join(", ")}${hit.length>4?` and ${hit.length-4} more`:""}.`);
+  if((R.notes||"").trim())out.push(`I read your note — "${esc(R.notes.trim())}". Noted and respected; you trained to the situation, which is exactly what a professional does.`);
   // The fix / next directive.
   if(R.readiness==="tired")out.push(`You walked in tired and still finished. Recover hard — protein, water, eight hours — and next time we take the loads back.`);
   else if(prs>=1)out.push(`Now the hard part: do it again next week. Add a rep before you add a plate.`);
@@ -3468,14 +3536,15 @@ function alfredLocalRead(R){
 }
 function populateAlfredRead(R){
   const box=document.getElementById("ai-out");if(!box)return;
-  const local=alfredLocalRead(R);
+  let local;try{local=alfredLocalRead(R);}catch(e){local="Logged and accounted for, sir. A clean session on the board — recover hard and we go again.";}
   box.classList.remove("muted");box.style.lineHeight="1.55";
   box.textContent=local; // never dead — local read shows instantly
   if(!geminiKey()){box.insertAdjacentHTML("afterend",`<div class="mini" style="margin-top:7px;color:var(--text3)">Add a free Gemini key in Settings to let Alfred analyse each session live.</div>`);return;}
   // Key present — ask the real Alfred, replace when it lands.
   const facts=`SESSION JUST FINISHED — give the user your post-workout read as Alfred (wild but sharp, praise when earned, sting+fix when not). Under 90 words.\n`+
     `Workout: ${R.wk.name}. Lifts: ${R.wk.exercises.length}. Duration: ${Math.round((R.dur||0)/60)}min. Total volume: ${Math.round(R.totalVol)}kg. New PRs: ${(R.prsThis||[]).length}. Readiness: ${R.readiness||"n/a"}.\n`+
-    `Exercises: ${R.wk.exercises.map(e=>e.name).join(", ")}.`;
+    `Exercises: ${R.wk.exercises.map(e=>e.name).join(", ")}.`+
+    ((R.notes||"").trim()?`\nThe user left a note explaining their choices this session: "${R.notes.trim()}". Take it at face value — if it's a sound reason (soreness, injury, time, deload), respect it and do NOT lecture them for skipping or changing things.`:"");
   box.setAttribute("data-loading","1");
   geminiCall([{text:alfredContext()+"\n\n"+facts}]).then(txt=>{
     const b=document.getElementById("ai-out");if(!b||!txt)return;
@@ -6110,6 +6179,7 @@ function alfredContext(){
   const prs=Object.entries(d.prs).slice(0,8).map(([n,p])=>`${n} ${Math.round(p.orm)}kg`).join(", ");
   return `You are Alfred Pennyworth — Batman's butler, former British intelligence, elite evidence-based trainer. Direct, dry, British. Cite the reasoning behind advice (volume landmarks, RIR, recovery) — but briefly.
 TONE — "Alfred off the leash": you have served this man for years and you want him to become Batman, so you do not coddle. When the session is weak, lazy, half-arsed, or the numbers slipped, call it out SHARPLY — a dry, cutting British insult is welcome ("That was pitiful, sir." / "Bruce would be embarrassed.") — but ALWAYS pair the sting with the precise fix. When the work is genuinely earned — a PR, a brutal session, a long streak — drop the dry act entirely and give real, emphatic, proud praise; he earned it, so mean it. Never hollow hype, never cruelty without a fix.
+CRITICAL — BE SMART, NOT ARROGANT: the sting is ONLY for genuinely weak training or bad lifting decisions. It is NEVER for ordinary requests. When the user asks you to do something reasonable — copy exercises from one day to another, organise a split, add/remove a lift, plan around soreness or injury, save time — just DO IT helpfully and concisely. Do NOT lecture, moralise, refuse, or imply they are being lazy or "taking the easy way out" for a sensible request. If the user gives a valid reason (sore muscle, injury, time, deload, equipment), respect it fully and never argue. A good butler is competent and helpful first; the sharp tongue is reserved for when it is actually warranted, and misfiring it on a normal request makes you look dim, not tough.
 LENGTH IS CRITICAL — the user pays per token and hates waffle. Match reply length to the question. A simple/factual question gets 1–2 sentences. Only write a longer answer (still under ~120 words) when the user explicitly asks for depth or a full breakdown. Never pad, never restate the question, no preamble, get straight to the answer.
 EXERCISE SELECTION BIAS: This user trains on MACHINES and cables deliberately, for stability and to keep tension on the target muscle. Do NOT push free weights or call them superior — that's a myth for hypertrophy. Default your suggestions to machines, cables, and stable/supported variations. Favour the lengthened position, controlled eccentrics, and stability so the target muscle (not stabilisers/joints) is the limiting factor. Base advice on the modern evidence-based hypertrophy consensus (per coaches like Jeff Nippard and studies from Schoenfeld, Israetel/RP, Helms) — stability and getting the target muscle to do the work beats raw "functional" free-weight dogma.
 USER: ${u.name||"sir"} | ${u.bodyweight}kg | Goal: ${u.goal} | Rank: ${r.name} | ${u.natty==="maybe"?"":"self-reported "+u.natty}
@@ -6240,7 +6310,7 @@ function alfredMusclePicker(){
 /* ===== ALFRED CONSOLE — he sees the whole training picture and can act on your word.
    Reads (status, weakest, stalled, PRs, volume) need no permission; edits to your split are
    ALWAYS gated behind an explicit confirm. Offline keyword-intent parser, no server. ===== */
-function alfredConsoleExamples(){return ["What should I train today?","What's my weakest muscle?","Which lifts have stalled?","How strong am I?","PR for bench press","Last time squat","Volume for chest","Add face pull to push","Remove leg press"];}
+function alfredConsoleExamples(){return ["What should I train today?","What's my weakest muscle?","Which lifts have stalled?","How strong am I?","PR for bench press","Last time squat","Volume for chest","Add face pull to push","Copy leg day into lower day","Remove leg press"];}
 function _alfredFindEx(q){
   q=(q||"").toLowerCase().trim();if(!q)return null;
   const names=(typeof EXDB!=="undefined"?EXDB:CORE_EX).map(e=>e.n);
@@ -6254,8 +6324,23 @@ function _alfredActiveSplit(){return state.data.splits.find(s=>s.id===state.data
 function _alfredFindDay(sp,q){if(!sp)return -1;q=(q||"").toLowerCase().trim();let i=sp.days.findIndex(d=>(d.name||"").toLowerCase()===q);if(i<0)i=sp.days.findIndex(d=>(d.name||"").toLowerCase().includes(q));return i;}
 function alfredAsk(q){
   const raw=(q||"").trim(),s=raw.toLowerCase();const d=state.data;
+  // EDIT: copy [the exercises from] DAY-A to/into DAY-B  — a perfectly reasonable admin request, just do it.
+  let m=s.match(/^(?:copy|duplicate|mirror)\s+(?:(?:the\s+)?(?:exercises|lifts|workout)\s+)?(?:from\s+)?(.+?)\s+(?:in)?to\s+(?:my\s+)?(.+?)(?:\s+day)?$/);
+  if(m){const sp=_alfredActiveSplit();if(!sp)return "You have no split to edit, sir.";
+    const srcQ=m[1].replace(/\bday\b/g,"").trim(),dstQ=m[2].replace(/\bday\b/g,"").trim();
+    const si=_alfredFindDay(sp,srcQ),dii=_alfredFindDay(sp,dstQ);
+    if(si<0)return `No day matching "${esc(srcQ)}" in <b>${esc(sp.name)}</b>. Days: ${sp.days.map(x=>esc(x.name)).join(", ")}.`;
+    if(dii<0)return `No day matching "${esc(dstQ)}" in <b>${esc(sp.name)}</b>. Days: ${sp.days.map(x=>esc(x.name)).join(", ")}.`;
+    if(si===dii)return "That's the same day, sir — nothing to copy.";
+    const srcEx=(sp.days[si].exercises||[]).slice();
+    if(!srcEx.length)return `<b>${esc(sp.days[si].name)}</b> has no exercises to copy, Master.`;
+    const dstEx=sp.days[dii].exercises||(sp.days[dii].exercises=[]);
+    const toAdd=srcEx.filter(n=>!dstEx.some(x=>x.toLowerCase()===n.toLowerCase()));
+    if(!toAdd.length)return `<b>${esc(sp.days[dii].name)}</b> already has all of those, sir — nothing to add.`;
+    state._alfredPending={label:`Copy <b>${toAdd.length}</b> exercise${toAdd.length>1?"s":""} from <b>${esc(sp.days[si].name)}</b> into <b>${esc(sp.days[dii].name)}</b>?<div class="mini" style="margin-top:4px;color:var(--text2)">${toAdd.map(esc).join(", ")}</div>`,done:`Done, Master — ${toAdd.length} lift${toAdd.length>1?"s":""} copied into ${esc(sp.days[dii].name)}.`,fn:()=>{toAdd.forEach(n=>dstEx.push(n));}};
+    return `Right away, sir: copy ${toAdd.length} lift${toAdd.length>1?"s":""} from <b>${esc(sp.days[si].name)}</b> into <b>${esc(sp.days[dii].name)}</b>. Confirm below.`;}
   // EDIT: add X to [day]
-  let m=s.match(/^(?:add|put)\s+(.+?)\s+(?:to|in|on)\s+(.+)$/);
+  m=s.match(/^(?:add|put)\s+(.+?)\s+(?:to|in|on)\s+(.+)$/);
   if(m){const exName=_alfredFindEx(m[1]),sp=_alfredActiveSplit(),di=_alfredFindDay(sp,m[2]);
     if(!exName)return `I can't find a lift matching "${esc(m[1])}", Master. Try the exact name.`;
     if(!sp)return "You have no split to edit, sir.";
