@@ -1221,7 +1221,9 @@ confessions:[],        // {date, text} Alfred's Confessions unlocks
 experiments:[],        // {id, exercise, mode, startW, startDate, done, result} Two-Face coin
 exNotes:{},            // exerciseName -> [{date, note}] coaching notes
 photos:[],             // {id, date, img(dataURL), bw, note} progress photos
-allies:[],             // {n,sl,rk,re,vol,w,boss,days,lifts} imported Patrol Cards (Justice League)
+allies:[],             // {n,sl,rk,re,vol,w,boss,days,lifts,_uid} Patrol Cards (Justice League) — offline pastes + live cloud cards
+allyIds:[],            // friend codes (Firebase uids) we subscribe to for LIVE auto-updating ally cards
+myUid:null,            // this device's anonymous Firebase uid = our shareable friend code
 foodLog:{},            // "YYYY-MM-DD" -> {items:[{n,k,p,c,f}], water:Number} Mess Hall daily intake
 gauntlet:{done:{},streak:0,best:0,last:null}, // The Gauntlet: daily finisher challenge -> done["YYYY-MM-DD"]=true
 soreness:{},           // "YYYY-MM-DD" -> {muscleKey:1-3} soreness tap-map
@@ -1233,7 +1235,7 @@ prefs:{weather:true,boot:true,particles:true}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
 
-function save(){try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){}}
+function save(){try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){}try{if(typeof cloud!=="undefined"&&cloud.ready)cloudPublish(false);}catch(e){}}
 function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.parse(r);const d=Object.assign(blankData(),p);if(p&&p.u)d.u=Object.assign(blankData().u,p.u);
   // Migration: older builds seeded muscleVol from experience at onboarding, inflating the level.
   // Real volume only ever comes from logged workouts, so volume with zero workouts = seeded -> clear.
@@ -5116,6 +5118,97 @@ function missionSubTabs(){
 }
 function toggleBelt(){$("belt").classList.toggle("hide");}
 /* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
+/* ══════════ CLOUD SYNC ══════════ Firebase Realtime DB + Anonymous Auth.
+   Makes the Justice League fully ONLINE: your Patrol Card auto-publishes, and
+   allies' cards stream in live (no re-pasting). Offline-first: if Firebase can't
+   load (no signal, PWA offline) the whole app keeps working on local data alone.
+   The config below is public-by-design — Firebase web apiKeys ship in client code
+   and are NOT secrets; access is governed by database security rules. */
+const FB_CONFIG={
+  apiKey:"AIzaSyB0WJOQXUJTPIo8BN_te-BkhKrU8ktAFWI",
+  authDomain:"gainstracker-e71f2.firebaseapp.com",
+  databaseURL:"https://gainstracker-e71f2-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"gainstracker-e71f2",
+  storageBucket:"gainstracker-e71f2.firebasestorage.app",
+  messagingSenderId:"686255558735",
+  appId:"1:686255558735:web:138517f231ec134e6cda3a"
+};
+const FB_SDK="10.12.5";
+const cloud={ready:false,uid:null,db:null,subs:{},_pubT:null};
+function _loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.async=true;s.onload=res;s.onerror=()=>rej(new Error("load "+src));document.head.appendChild(s);});}
+async function cloudLoadSDK(){
+  if(typeof firebase!=="undefined"&&firebase.database)return true;
+  const base="https://www.gstatic.com/firebasejs/"+FB_SDK+"/";
+  await _loadScript(base+"firebase-app-compat.js");
+  await _loadScript(base+"firebase-auth-compat.js");
+  await _loadScript(base+"firebase-database-compat.js");
+  return typeof firebase!=="undefined"&&!!firebase.database;
+}
+async function cloudInit(){
+  if(cloud.ready||cloud._initing)return;
+  if(typeof navigator!=="undefined"&&navigator.onLine===false){window.addEventListener("online",()=>cloudInit(),{once:true});return;}
+  cloud._initing=true;
+  try{
+    const ok=await cloudLoadSDK();if(!ok){cloud._initing=false;return;}
+    if(!firebase.apps.length)firebase.initializeApp(FB_CONFIG);
+    cloud.db=firebase.database();
+    const cred=await firebase.auth().signInAnonymously();
+    cloud.uid=(cred&&cred.user&&cred.user.uid)||(firebase.auth().currentUser&&firebase.auth().currentUser.uid);
+    if(!cloud.uid){cloud._initing=false;return;}
+    state.data.myUid=cloud.uid;save();
+    cloud.ready=true;cloud._initing=false;
+    cloudPublish(true);
+    cloudSubscribeAll();
+    if(state.tab==="allies")render();
+  }catch(e){cloud._initing=false;/* stay offline-only */}
+}
+// Publish our Patrol Card so allies see us update live. Debounced to coalesce rapid saves.
+function cloudPublish(now){
+  if(!cloud.ready||!cloud.db||!cloud.uid)return;
+  clearTimeout(cloud._pubT);
+  const go=()=>{try{const card=myPatrolCard();card._uid=cloud.uid;card._t=Date.now();cloud.db.ref("cards/"+cloud.uid).set(card);}catch(e){}};
+  if(now)go();else cloud._pubT=setTimeout(go,1500);
+}
+function cloudSubscribeAll(){(state.data.allyIds||[]).forEach(id=>cloudSubscribe(id));}
+function cloudSubscribe(id){
+  if(!cloud.ready||!cloud.db||!id||cloud.subs[id])return;
+  const ref=cloud.db.ref("cards/"+id);
+  const cb=snap=>{const c=snap.val();if(c)cloudMergeAlly(id,c);};
+  ref.on("value",cb,()=>{});cloud.subs[id]={ref,cb};
+}
+function cloudUnsubscribe(id){const s=cloud.subs[id];if(s){try{s.ref.off("value",s.cb);}catch(e){}delete cloud.subs[id];}}
+// Fold a live card into state.data.allies, matched by uid (fall back to name for legacy pastes).
+function cloudMergeAlly(id,c){
+  state.data.allies=state.data.allies||[];
+  c._uid=id;
+  let ix=state.data.allies.findIndex(a=>a&&a._uid===id);
+  if(ix<0)ix=state.data.allies.findIndex(a=>a&&!a._uid&&a.n===c.n);
+  if(ix>=0)state.data.allies[ix]=c;else state.data.allies.push(c);
+  save();
+  if(state.tab==="allies")render();
+}
+// Add an ally by friend code (their uid). Persists + subscribes for live updates.
+function cloudAddAlly(code){
+  let id=(code||"").trim();
+  const m=id.lastIndexOf("GTUID:");if(m>=0)id=id.slice(m+6);
+  id=id.replace(/[^A-Za-z0-9_-]/g,"");
+  if(!id||id.length<16){toast("That friend code doesn't look right, sir.");return false;}
+  if(id===cloud.uid||id===state.data.myUid){toast("That's your own code, Master.");return false;}
+  state.data.allyIds=state.data.allyIds||[];
+  if(state.data.allyIds.indexOf(id)<0)state.data.allyIds.push(id);
+  save();haptic("done");
+  if(cloud.ready){cloudSubscribe(id);toast("Linked — their card now updates live.");}
+  else{toast("Saved — they'll sync the moment you're back online.");cloudInit();}
+  return true;
+}
+function myFriendCode(){return cloud.uid||state.data.myUid||"";}
+function shareFriendCode(){
+  const fc=myFriendCode();if(!fc){toast("Connecting… try again in a second, sir.");cloudInit();return;}
+  const code="GTUID:"+fc;
+  const done=()=>{toast("Friend code copied — send it to your ally.");haptic("done");};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done).catch(()=>{const t=$("my-fc");if(t)t.select();toast("Select the code and copy it.");});
+  else{const t=$("my-fc");if(t)t.select();toast("Select the code and copy it.");}
+}
 function myPatrolCard(){
   const d=state.data,u=d.u,sl=strengthLevel(),r=rankFor(sl),a=(typeof trainingAge==="function"?trainingAge():null);
   const allLifts=Object.entries(d.prs||{}).map(([n,p])=>({n,o:Math.round((p&&p.orm)||0),w:Math.round((p&&p.maxW)||0),r:(p&&p.maxReps)||0})).filter(x=>x.o>0).sort((a,b)=>b.o-a.o);
@@ -5167,14 +5260,21 @@ function pasteAlly(){
   }else toast("Long-press the box, Paste, then tap Add.");
 }
 function addAlly(){
-  const inp=$("ally-code");if(!inp)return;const c=decodeCard(inp.value);
-  if(!c){toast((inp.value||"").trim()?"That code didn't read — copy the whole thing again (it's long).":"Paste a friend's Patrol Card code first.");return;}
+  const inp=$("ally-code");if(!inp)return;
+  const raw=(inp.value||"").trim();
+  // LIVE friend code (their Firebase uid) → subscribe for auto-updating card
+  if(/GTUID:/.test(raw)||(!/GTJL1:/.test(raw)&&/^[A-Za-z0-9_-]{16,}$/.test(raw))){
+    if(cloudAddAlly(raw)){inp.value="";openJusticeLeague();}
+    return;
+  }
+  const c=decodeCard(raw);
+  if(!c){toast(raw?"That code didn't read — copy the whole thing again (it's long).":"Paste a friend's Patrol Card code or friend code first.");return;}
   state.data.allies=state.data.allies||[];
   const ex=state.data.allies.findIndex(a=>a.n===c.n);
   if(ex>=0)state.data.allies[ex]=c;else state.data.allies.push(c);
   save();checkAchievements();haptic("done");toast(`${c.n} added to the League`);openJusticeLeague();
 }
-function delAlly(i){(state.data.allies||[]).splice(i,1);save();openJusticeLeague();}
+function delAlly(i){const a=(state.data.allies||[])[i];if(a&&a._uid){state.data.allyIds=(state.data.allyIds||[]).filter(x=>x!==a._uid);cloudUnsubscribe(a._uid);}(state.data.allies||[]).splice(i,1);save();openJusticeLeague();}
 function compareAlly(i){
   const me=myPatrolCard(),a=(state.data.allies||[])[i];if(!a)return;
   const row=(lab,m,t,unit,disp)=>{const win=m===t?0:(m>t?1:-1);
@@ -5279,17 +5379,29 @@ function openJusticeLeague(){
     ${c.opt?`<div class="mini" style="margin-top:7px;color:var(--text2);text-align:center">🌍 World optimality — <b class="gold">Top ${Math.max(1,100-c.opt)}%</b> of lifters on their big lifts</div>`:""}</div>`;
   const allyHtml=allies.length?allies.map((a,i)=>`<div style="margin-top:9px">${cardMini(a,false)}
     <div class="row" style="gap:6px;margin-top:5px"><button class="btn ghost sm" onclick="compareAlly(${i})">Compare</button><button class="btn ghost sm" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm" onclick="allySplit(${i})">🗂️ Split</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delAlly(${i})">✕</button></div></div>`).join(""):'<div class="mini" style="margin-top:8px;color:var(--text3)">No allies yet. Paste a friend\u2019s Patrol Card below to start your League.</div>';
-  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('link')}Justice League</div>
-    <div class="mini" style="margin:-2px 0 11px;color:var(--text2)">Train with friends — no account, no server. Share your Patrol Card as a code, add theirs to compare strength, world optimality, big-3 and recent patrols. Everything stays on your devices.</div>
+  const fc=myFriendCode();
+  const cloudOn=(typeof cloud!=="undefined"&&cloud.ready);
+  const statusPill=cloudOn
+    ?`<span class="chip" style="color:var(--green);border-color:var(--green)">● LIVE</span>`
+    :`<span class="chip" style="color:var(--text3)">○ connecting…</span>`;
+  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('link')}Justice League ${statusPill}</div>
+    <div class="mini" style="margin:-2px 0 11px;color:var(--text2)">Train with friends, fully online. Share your <b style="color:var(--gold2)">friend code</b> once — after that your cards update each other <b>live</b>, no re-pasting. Add an ally and their stats stream in automatically.</div>
     ${cardMini(me,true)}
     <div class="row wrap" style="gap:5px;margin-top:8px">${lifts}</div>
     <button class="btn sm" style="margin-top:11px" onclick="openLeaderboard()">🏆 League Leaderboard — rank everyone</button>
-    <button class="btn gold sm" style="margin-top:7px" onclick="shareMyCard()">📋 Copy my Patrol Card</button>
+    <div class="card" style="margin-top:9px;background:var(--gold-bg);border-color:var(--gold-dim)">
+      <div class="ttl" style="margin:0 0 4px;font-size:14px">🔗 Your friend code</div>
+      <div class="mini" style="color:var(--text2);margin-bottom:6px">Send this once. Anyone who adds it sees your card auto-update forever.</div>
+      <input id="my-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="width:100%;font-size:12px;color:var(--gold2);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:9px;text-align:center"/>
+      <button class="btn gold sm" style="margin-top:7px" onclick="shareFriendCode()">📋 Copy my friend code</button>
+    </div>
     <div class="row" style="gap:6px;margin-top:7px"><button class="btn ghost sm g" onclick="openShareSplitPicker()">📤 Share a split</button><button class="btn ghost sm" style="width:auto" onclick="openImportSplit()">📥 Import</button></div>
-    <textarea id="my-code" readonly onclick="this.select()" style="width:100%;margin-top:7px;height:50px;font-size:10px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none">${code}</textarea>
+    <details style="margin-top:7px"><summary class="mini" style="color:var(--text3);cursor:pointer">Offline backup — copy a one-time Patrol Card snapshot</summary>
+      <button class="btn sm" style="margin-top:7px" onclick="shareMyCard()">📋 Copy snapshot code</button>
+      <textarea id="my-code" readonly onclick="this.select()" style="width:100%;margin-top:7px;height:46px;font-size:10px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none">${code}</textarea></details>
     <div class="hr"></div>
     <div class="ttl" style="margin:0 0 6px">Add an ally</div>
-    <textarea id="ally-code" placeholder="Paste a friend's Patrol Card code…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:50px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none"></textarea>
+    <textarea id="ally-code" placeholder="Paste a friend code (GTUID:…) or a Patrol Card snapshot…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:50px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none"></textarea>
     <div class="row" style="gap:6px;margin-top:7px"><button class="btn gold sm g" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div>
     <div style="margin-top:4px">${allyHtml}</div>
     <button class="btn ghost" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
@@ -7778,6 +7890,8 @@ function boot(){
   if(state.data.onboardingDone){checkVillainTaunt();checkUnlocks();/* silent baseline on first run so only NEW unlocks notify later */}
   // service worker
   if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+  // cloud sync — go online for live Allies (deferred so it never blocks first paint)
+  try{if(state.data.onboardingDone)setTimeout(()=>{try{cloudInit();}catch(e){}},800);}catch(e){}
   // offline indicator: reflects real connectivity, reassures data is local
   const offUI=()=>{const p=$("offline-pill");if(p)p.classList.toggle("on",!navigator.onLine);};
   window.addEventListener("online",offUI);window.addEventListener("offline",offUI);offUI();
