@@ -241,6 +241,14 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 #cine .cline{height:2px;width:0;margin:17px auto 0;background:linear-gradient(90deg,transparent,var(--gold2),transparent);animation:cLine .9s ease .6s forwards}
 #cine .cbtn{margin-top:24px;font-family:var(--disp);letter-spacing:.22em;font-size:18px;padding:14px 0;width:100%;border-radius:13px;border:1px solid var(--gold-dim);color:#0a0a0a;background:linear-gradient(180deg,var(--gold3),var(--gold));cursor:pointer;opacity:0;animation:cRise .6s ease .92s both,cBreathe 2.6s ease-in-out 1.7s infinite}
 #cine .cbtn:active{transform:scale(.97)}
+/* PR Kill-Cam — slow-mo cinematic sting fired when a record falls mid-workout */
+#cine.killcam .cbg{background:radial-gradient(circle at 50% 38%,rgba(74,12,12,.93),rgba(3,1,1,.99));animation:cFade .3s ease forwards}
+#cine.killcam .cstage{animation:cIn .48s cubic-bezier(.16,1.1,.3,1) 0s forwards}
+#cine.killcam .cbody{font-style:normal;margin-top:6px}
+#cine .kcnum{font-family:var(--disp);font-size:76px;line-height:.95;font-weight:800;letter-spacing:-.01em;text-shadow:0 0 28px currentColor;animation:kcSmash .62s cubic-bezier(.2,1.4,.35,1) .16s both}
+#cine .kcnum .kcunit{display:block;font-size:13px;font-weight:600;letter-spacing:.22em;color:var(--text3);text-shadow:none;margin-top:9px}
+#cine .kcdelta{font-family:var(--disp);font-size:22px;letter-spacing:.05em;margin-top:14px;opacity:0;animation:cRise .6s ease .5s both}
+@keyframes kcSmash{0%{transform:scale(1.85);filter:blur(8px);opacity:0}55%{filter:blur(0);opacity:1}72%{transform:scale(.95)}100%{transform:scale(1)}}
 @keyframes cFade{to{opacity:1}}
 @keyframes cFadeOut{to{opacity:0}}
 @keyframes cSpin{to{transform:rotate(360deg)}}
@@ -2248,7 +2256,7 @@ function liveCheckPR(ei,si){
       // of the victory so you clearly see exactly which record you just broke.
       state._pendingPRpop={name:exObj.name,hits:hits.slice(),info:{w,r,e1,vol}};
     }else{
-      showPRToast(exObj.name,hits,{w,r,e1,vol});
+      prKillCam(exObj.name,hits,{w,r,e1,vol});
     }
     fired="pr";
   }
@@ -2298,6 +2306,28 @@ function showPRToast(name,hits,info){
   p.classList.remove("on");void p.offsetWidth;p.classList.add("on");
   clearTimeout(p._t);p._t=setTimeout(()=>{p.classList.remove("on");},5200);
   haptic("pr");
+}
+// PR KILL-CAM — full-screen slow-mo cinematic when a record falls. Reuses the #cine overlay
+// with a kill-cam skin: the exercise, a smashing big number, the delta over your old best.
+// Auto-dismisses so it never blocks logging; tap anywhere (or ONWARD) to skip.
+function prKillCam(name,hits,info){
+  try{
+    hits=hits.slice().sort((a,b)=>PR_TIER[b.t].rank-PR_TIER[a.t].rank);
+    const top=hits[0],cfg=PR_TIER[top.t];
+    const round1=v=>Math.round(v*10)/10;
+    const big=top.t==="reps"?top.val:Math.round(top.val);
+    const dval=top.prev?(top.val-top.prev):0;
+    const pct=top.prev?((top.val-top.prev)/top.prev*100):0;
+    const deltaStr=top.prev
+      ? `+${top.t==="reps"?dval:round1(dval)}${top.t==="reps"?" reps":"kg"} · ▲ ${pct>=10?Math.round(pct):round1(pct)}% over your old best`
+      : `FIRST RECORD — nothing to beat but yourself`;
+    const liftStr=(info&&info.w!=null&&info.r)?`${round1(info.w)}kg × ${info.r}`:"";
+    const extra=hits.length>1?` · +${hits.length-1} more record${hits.length>2?"s":""} this set`:"";
+    const bodyHtml=`<div class="kcnum" style="color:${cfg.accent}">${big}<span class="kcunit">${esc(cfg.unit)}</span></div>
+      <div class="kcdelta" style="color:${cfg.accent}">${deltaStr}</div>
+      ${(liftStr||extra)?`<div class="mini" style="margin-top:11px;color:var(--text3);letter-spacing:.1em">${liftStr}${extra}</div>`:""}`;
+    cinePush({killcam:true,auto:3000,icon:cfg.badge,eye:"RECORD SHATTERED",titleHtml:esc(name),title:name,bodyHtml,btn:"ONWARD",accent:cfg.accent});
+  }catch(e){try{showPRToast(name,hits,info);}catch(_){}}
 }
 function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();}
 function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();}
@@ -2499,6 +2529,11 @@ function finishWorkout(){
   let weak=M12[0],wl=999;M12.forEach(m=>{const l=muscleLevel(m);if((state.data.muscleVol[m]||0)>0&&l<wl){wl=l;weak=m;}});u.lastMissedMuscle=weak;
   const wk={id:"w"+now(),date:t,name:ses.day,split:ses.split,muscles:Object.keys(musclesHit),exercises:done,xp:xpGain,totalVol:Math.round(totalVol),duration:dur,readiness:ses.readiness,prs:prsThis.map(p=>p.name),notes:(ses.notes||"").trim()};
   state.data.workouts.unshift(wk);
+  // log your own session + records into the Patrol Feed (your League timeline)
+  try{
+    pushPatrolFeed({icon:"🦇",accent:"var(--gold2)",name:"You",you:true,kind:"train",html:`<b>You</b> finished ${esc(ses.day||"a session")} — ${fmtNum(Math.round(totalVol))}kg moved`});
+    prsThis.forEach(p=>pushPatrolFeed({icon:"👑",accent:"var(--gold2)",name:"You",you:true,kind:"pr",html:`<b>You</b> set a record — ${esc(p.name)} <span style="color:var(--gold2)">${Math.round(p.orm)}kg</span> est 1RM`}));
+  }catch(e){}
   // boss returns check (defeat comeback if PR beats target)
   checkComebackDefeat(prsThis);
   checkAchievements();
@@ -2697,11 +2732,14 @@ function cineNext(){
     ${(it.body||it.bodyHtml)?`<div class="cbody${it.big?' big':''}">${it.bodyHtml||('"'+esc(it.body)+'"')}</div>`:""}
     ${it.attr?`<div class="cattr">— ${esc(it.attr)}</div>`:""}
     <button class="cbtn" onclick="cineDismiss()">${esc(it.btn||"YESSIR")}</button>`;
-  const el=$("cine");el.classList.remove("out");el.classList.add("on");
-  try{haptic("done");}catch(e){}
+  const el=$("cine");el.classList.remove("out");el.classList.toggle("killcam",!!it.killcam);el.classList.add("on");
+  try{haptic(it.killcam?"pr":"done");}catch(e){}
+  clearTimeout(state._cineAutoT);
+  if(it.auto)state._cineAutoT=setTimeout(()=>{try{cineDismiss();}catch(e){}},it.auto);
 }
 function cineDismiss(){
   const el=$("cine");if(!el||!state._cineOn)return;
+  clearTimeout(state._cineAutoT);
   el.classList.add("out");
   try{haptic("tap");}catch(e){}
   setTimeout(()=>{el.classList.remove("on","out");state._cineOn=false;if((state._cineQ||[]).length)cineNext();},330);
@@ -2716,24 +2754,40 @@ function maybeShowDailyWisdom(){
     cinePush({eye:"Wayne Wisdom",icon:"🦇",big:true,body:w[0],attr:w[1],btn:"YESSIR"});
   }catch(e){}
 }
+// Live Patrol Feed — a running log of League activity so you never miss an ally's session,
+// even if you weren't on the app when the live pop fired. Capped, newest first, persisted.
+function pushPatrolFeed(entry){
+  try{
+    state.data.patrolFeed=state.data.patrolFeed||[];
+    state.data.patrolFeed.unshift(Object.assign({t:Date.now()},entry));
+    if(state.data.patrolFeed.length>40)state.data.patrolFeed.length=40;
+    save();
+  }catch(e){}
+}
+function feedAgo(t){const s=Math.max(0,(Date.now()-t)/1000);if(s<60)return"just now";const m=s/60;if(m<60)return Math.floor(m)+"m ago";const h=m/60;if(h<24)return Math.floor(h)+"h ago";const d=h/24;return Math.floor(d)+"d ago";}
 // Detect when a linked ally has logged new workouts since we last saw them, and pop a cinematic bulletin.
 function cloudDetectAllyWorkout(id,c){
   try{
     state.data.allySeen=state.data.allySeen||{};
     const prev=state.data.allySeen[id];
-    const w=(c&&c.w)||0;
-    if(!prev){state.data.allySeen[id]={w};save();return;}      // first sighting → baseline, no pop
-    if(w>prev.w){
+    const w=(c&&c.w)||0, boss=(c&&c.boss)||0;
+    if(!prev){state.data.allySeen[id]={w,boss};save();return;}      // first sighting → baseline, no pop
+    const nm=(c.n||"An ally"), re=(c.re||"🦇");
+    if(w>(prev.w||0)){
       const sess=(c.recent&&c.recent[0])||null;
-      const nm=(c.n||"An ally");
       const bits=[];
       if(sess){bits.push(esc(sess.n||"a session"));if(sess.v)bits.push(fmtNum(sess.v)+"kg moved");if(sess.top)bits.push("top lift "+esc(sess.top));}
       else bits.push("logged a new patrol");
-      cinePush({eye:"Justice League · Live",icon:(c.re||"🦇"),accent:"var(--green)",
+      cinePush({eye:"Justice League · Live",icon:re,accent:"var(--green)",
         title:nm,titleHtml:`${esc(nm)} <span style="color:var(--green)">just trained</span>`,
         bodyHtml:bits.join(" · "),btn:"RESPECT"});
+      pushPatrolFeed({icon:re,accent:"var(--green)",name:nm,kind:"train",html:`<b>${esc(nm)}</b> trained — ${bits.join(" · ")}`});
     }
-    state.data.allySeen[id]={w};save();
+    if(boss>(prev.boss||0)){
+      const n=boss-(prev.boss||0);
+      pushPatrolFeed({icon:"🥊",accent:"var(--gold2)",name:nm,kind:"ko",html:`<b>${esc(nm)}</b> scored a <span style="color:var(--gold2)">KO</span> — ${boss} villain${boss===1?"":"s"} down`});
+    }
+    state.data.allySeen[id]={w,boss};save();
   }catch(e){}
 }
 function openSheet(html){$("sheet").innerHTML=html;$("sheet").classList.add("on");$("sheetbg").classList.add("on");state.pickerOpen=false;}
@@ -6191,6 +6245,17 @@ function openBatcomputer(){
 }
 /* ===== ALLIES TAB — one social hub: your Patrol Card, the Justice League,
    the Leaderboard, Co-op Raids & 1-v-1 Sparring, grouped in one place. ===== */
+function patrolFeedCard(){
+  const feed=(state.data.patrolFeed||[]);
+  if(!feed.length)return"";
+  const rows=feed.slice(0,12).map(f=>`<div class="row" style="gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)">
+    <div style="font-size:19px;flex:none;width:26px;text-align:center">${f.icon||"🦇"}</div>
+    <div class="g" style="min-width:0"><div class="mini" style="color:var(--text);font-size:13px;line-height:1.45">${f.html||""}</div>
+    <div class="mini" style="color:var(--text3);font-size:11px;margin-top:2px">${feedAgo(f.t)}</div></div></div>`).join("");
+  return `<div class="card" style="margin-top:11px"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">📡 Patrol Feed</div><span class="chip" style="color:var(--green);border-color:var(--green)">live</span></div>
+    <div class="mini" style="color:var(--text2);margin:4px 0 2px">Every session, KO and record across your League — newest first.</div>
+    <div style="margin-top:4px">${rows}</div></div>`;
+}
 function renderAllies(){
   const d=state.data;
   const me=myPatrolCard();const score=vigilanteScore(me);
@@ -6235,6 +6300,8 @@ function renderAllies(){
       <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div></div>`;
     }).join("");
   }
+  // Live Patrol Feed — your League's activity timeline
+  html+=patrolFeedCard();
   // Advanced — full Justice League sheet (share/import a split, offline snapshot backup)
   html+=`<div class="card" style="cursor:pointer" onclick="openJusticeLeague()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🛠️ More — splits &amp; backups</div><span class="chip">${allies.length} all${allies.length===1?'y':'ies'}</span></div>
     <div class="mini" style="color:var(--text2);margin-top:5px">Open the full Justice League — share or import a split, copy an offline snapshot. ›</div></div>`;
