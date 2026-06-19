@@ -446,6 +446,11 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .fighter .vface{width:1em;height:1em;object-fit:cover;border-radius:18px;display:block}
 .vcam{flex:none;align-self:center;margin-left:auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#0c0f15;color:var(--text3);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
 .vcam:active{transform:scale(.92);color:var(--text)}
+.fnboard{display:flex;flex-direction:column;gap:9px}
+.fnrow{display:flex;gap:10px;align-items:center}
+.fnrow.you .fnav{box-shadow:0 0 0 2px var(--gold2)}
+.fnpos{flex:none;width:24px;text-align:center;font-family:var(--disp);font-size:14px;color:var(--text2)}
+.fnav{flex:none;width:32px;height:32px;border-radius:50%;background:#0c0f15;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:17px}
 @keyframes vpulse{0%,100%{box-shadow:0 0 0 3px rgba(232,197,106,.16),0 0 14px -3px var(--bc)}50%{box-shadow:0 0 0 4px rgba(232,197,106,.28),0 0 22px 0 var(--bc)}}
 .heat{display:grid;grid-template-columns:repeat(26,1fr);gap:2px}
 .heat i{aspect-ratio:1;border-radius:2px;background:var(--bg4)}
@@ -6268,6 +6273,88 @@ function openBatcomputer(){
 }
 /* ===== ALLIES TAB — one social hub: your Patrol Card, the Justice League,
    the Leaderboard, Co-op Raids & 1-v-1 Sparring, grouped in one place. ===== */
+/* ========================= FIGHT NIGHT — weekly KO scorecard ========================= */
+// Monday-00:00 local as the week key. Each fighter's score = lifetime tonnage added since week start.
+function fnWeekStart(t){const d=new Date(t||now());d.setHours(0,0,0,0);const dow=(d.getDay()+6)%7;d.setDate(d.getDate()-dow);return d.getTime();}
+function fnKey(a){return a&&a._uid?a._uid:(a?"n:"+a.n:null);}
+function fightNightBoard(base){
+  base=base||{};
+  const myVol=Math.round((state.data.u.totalVolume)||0),me=myPatrolCard();
+  const rows=[{uid:"me",name:(me.n||"You")+" (you)",re:me.re||"🦇",you:true,vol:Math.max(0,myVol-(("me"in base)?base.me:myVol))}];
+  (state.data.allies||[]).forEach(a=>{const k=fnKey(a);const b=(k in base)?base[k]:Math.round(a.vol||0);
+    rows.push({uid:k,name:a.n||"Ally",re:a.re||"🦇",vol:Math.max(0,Math.round(a.vol||0)-b)});});
+  return rows.sort((x,y)=>y.vol-x.vol);
+}
+function fightNightSync(){
+  const fn=state.data.fightNight=state.data.fightNight||{wk:0,base:{},history:[]};
+  const wkNow=fnWeekStart(),myVol=Math.round((state.data.u.totalVolume)||0),allies=state.data.allies||[];
+  if(fn.wk!==wkNow){
+    // week rolled over → settle the previous bout (if there was a real contest)
+    if(fn.wk&&fn.base){
+      const board=fightNightBoard(fn.base);
+      if(board.length>=2&&board.some(b=>b.vol>0)){
+        const res={wk:fn.wk,end:fn.wk+7*864e5,board,winner:board[0]};
+        fn.history=fn.history||[];fn.history.unshift(res);if(fn.history.length>12)fn.history.length=12;
+        try{showFightNightResult(res);}catch(e){}
+        try{const w=res.winner;pushPatrolFeed({icon:"🏆",accent:"var(--gold2)",name:w.name,kind:"fightnight",html:`<b>Fight Night</b> — ${esc(w.name)} took the belt with <b style="color:var(--gold2)">${fmtNum(w.vol)}kg</b> moved this week`});}catch(e){}
+      }
+    }
+    const base={me:myVol};allies.forEach(a=>{const k=fnKey(a);if(k)base[k]=Math.round(a.vol||0);});
+    fn.wk=wkNow;fn.base=base;save();
+  }else{
+    // mid-week: give newly-added fighters a fair baseline so they don't show inflated tonnage
+    let changed=false;if(!("me"in fn.base)){fn.base.me=myVol;changed=true;}
+    allies.forEach(a=>{const k=fnKey(a);if(k&&!(k in fn.base)){fn.base[k]=Math.round(a.vol||0);changed=true;}});
+    if(changed)save();
+  }
+}
+function fnCountdown(end){const ms=end-now();if(ms<=0)return"settling…";
+  const h=Math.floor(ms/36e5),dd=Math.floor(h/24);
+  if(dd>=1)return dd+"d "+(h-dd*24)+"h left";
+  const m=Math.floor((ms-h*36e5)/6e4);return h+"h "+m+"m left";}
+function fightNightHistoryRow(){
+  const h=(state.data.fightNight&&state.data.fightNight.history)||[];if(!h.length)return"";
+  const w=h[0].winner;
+  return `<div class="hr" style="margin:11px 0 9px"></div><div class="row sp"><span class="mini" style="color:var(--text3)">Last week's belt</span><span class="mini" style="color:var(--gold2);font-weight:700">${w?esc(w.re||"🏆")+" "+esc(w.name)+" · "+fmtNum(w.vol)+"kg":"—"}</span></div>`;
+}
+function fightNightCard(){
+  fightNightSync();
+  const fn=state.data.fightNight;if(!fn)return"";
+  const board=fightNightBoard(fn.base),end=fn.wk+7*864e5;
+  const max=Math.max(1,...board.map(b=>b.vol));
+  const allies=state.data.allies||[];
+  const rows=board.map((b,i)=>{
+    const lead=i===0&&b.vol>0,pct=Math.round(b.vol/max*100);
+    return `<div class="fnrow ${b.you?"you":""}">
+      <div class="fnpos">${lead?"🏆":"#"+(i+1)}</div>
+      <div class="fnav">${b.re||"🦇"}</div>
+      <div class="g" style="min-width:0">
+        <div class="row sp"><b style="font-size:13.5px;color:${lead?"var(--gold2)":"var(--text)"}">${esc(b.name)}</b><span class="mini" style="font-weight:700;color:${lead?"var(--gold2)":"var(--text2)"}">${fmtNum(b.vol)}kg</span></div>
+        <div class="bar" style="height:6px;margin-top:5px;background:var(--bg4)"><i style="width:${pct}%;background:${lead?"linear-gradient(90deg,var(--gold),var(--gold2))":"var(--gold-dim)"}"></i></div>
+      </div></div>`;
+  }).join("");
+  const sub=allies.length
+    ? `Most kg moved by Sunday midnight takes the belt. Live standings:`
+    : `Add an ally and the weekly tonnage bout goes live. For now you're shadow-boxing — keep stacking weight.`;
+  return `<div class="card" style="margin-top:11px;border-color:var(--gold-dim);background:linear-gradient(165deg,var(--gold-bg),var(--bg2))">
+    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🥊 Fight Night</div><span class="chip" style="color:var(--gold2);border-color:var(--gold-dim)">${fnCountdown(end)}</span></div>
+    <div class="mini" style="color:var(--text2);margin:4px 0 9px">${sub}</div>
+    <div class="fnboard">${rows}</div>
+    ${fightNightHistoryRow()}
+  </div>`;
+}
+function showFightNightResult(res){
+  const w=res.winner,others=res.board.slice(1,4);
+  const youWon=w&&w.you;
+  const bodyHtml=`<div style="font-family:var(--disp);font-size:46px;line-height:1">${esc(w.re||"🏆")}</div>
+    <div style="font-family:var(--disp);font-size:22px;color:var(--gold2);margin-top:6px">${esc(w.name)}</div>
+    <div class="kcdelta" style="color:var(--gold2)">${fmtNum(w.vol)}kg moved</div>
+    ${others.length?`<div class="mini" style="color:var(--text3);margin-top:12px;line-height:1.6">${others.map((o,i)=>`#${i+2} ${esc(o.re||"🦇")} ${esc(o.name)} · ${fmtNum(o.vol)}kg`).join("<br>")}</div>`:""}`;
+  cinePush({killcam:true,auto:0,icon:youWon?"👑":"🥊",eye:"FIGHT NIGHT · RESULTS",
+    titleHtml:youWon?'<span style="color:var(--gold2)">THE BELT IS YOURS</span>':esc(w.name)+" takes the belt",
+    title:youWon?"The belt is yours":w.name+" takes the belt",
+    bodyHtml,btn:"NEXT ROUND",accent:"var(--gold2)"});
+}
 function patrolFeedCard(){
   const feed=(state.data.patrolFeed||[]);
   if(!feed.length)return"";
@@ -6323,6 +6410,8 @@ function renderAllies(){
       <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div></div>`;
     }).join("");
   }
+  // Fight Night — weekly tonnage bout with a belt on the line
+  html+=fightNightCard();
   // Live Patrol Feed — your League's activity timeline
   html+=patrolFeedCard();
   // Advanced — full Justice League sheet (share/import a split, offline snapshot backup)
