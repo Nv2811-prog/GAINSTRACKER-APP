@@ -442,6 +442,10 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .vmed.cur{box-shadow:0 0 0 3px rgba(232,197,106,.18),0 0 18px -2px var(--bc);animation:vpulse 1.8s ease-in-out infinite}
 .vmed.lock{filter:grayscale(1) brightness(.55);opacity:.5}
 .vmed .vchk{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:50%;background:var(--green);color:#04180a;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid #0c0f15}
+.vmed .vface{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.fighter .vface{width:1em;height:1em;object-fit:cover;border-radius:18px;display:block}
+.vcam{flex:none;align-self:center;margin-left:auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#0c0f15;color:var(--text3);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.vcam:active{transform:scale(.92);color:var(--text)}
 @keyframes vpulse{0%,100%{box-shadow:0 0 0 3px rgba(232,197,106,.16),0 0 14px -3px var(--bc)}50%{box-shadow:0 0 0 4px rgba(232,197,106,.28),0 0 22px 0 var(--bc)}}
 .heat{display:grid;grid-template-columns:repeat(26,1fr);gap:2px}
 .heat i{aspect-ratio:1;border-radius:2px;background:var(--bg4)}
@@ -2563,6 +2567,24 @@ function resumeBar(){
     <span class="rb-go">RESUME ▸</span></div>`;
 }
 
+/* ========================= VILLAIN FACES (user-sourced images) ========================= */
+function villainImgUrl(v){const m=state.data.villainImg||{};return m[v]||"";}
+function villainFace(b){
+  const u=villainImgUrl(b.v);
+  if(u)return '<img class="vface" src="'+esc(u)+'" alt="'+esc(b.v)+'" onerror="this.remove()">'+(b.e?'<span class="vfallback" style="opacity:0">'+esc(b.e)+'</span>':'');
+  return esc(b.e||"");
+}
+async function setVillainImg(v){
+  const cur=villainImgUrl(v);
+  const url=await appPrompt({title:"VILLAIN MUGSHOT",body:"Paste an image URL (https://…) or a data:image/… string for "+esc(v)+". Leave blank to clear.",placeholder:"https://…",ok:"Save",value:cur});
+  if(url===null)return;
+  const t=(url||"").trim();
+  if(!t){const m=state.data.villainImg||{};delete m[v];state.data.villainImg=m;save();render();toast("Mugshot cleared");return;}
+  if(!/^https?:\/\//i.test(t)&&!/^data:image\//i.test(t)){toast("Need an http(s):// or data:image/ link");return;}
+  state.data.villainImg=Object.assign({},state.data.villainImg||{},{[v]:t});
+  save();render();toast("Mugshot saved");
+}
+
 /* ========================= BOSS SELECTION ========================= */
 function pickBoss(prs){
   if(!prs.length)return null;
@@ -2607,7 +2629,7 @@ function showBossFight(boss,onDone){
       <div class="fightstage" id="fstage">
         <div class="flash" id="fflash"></div>
         <div class="fighter hero" id="fhero">🦇</div>
-        <div class="fighter boss" id="fboss">${boss.e}</div>
+        <div class="fighter boss" id="fboss">${villainFace(boss)}</div>
         <div class="strikemoji" id="fstrike"></div>
       </div>
       <div class="hpwrap" style="margin-top:10px"><i id="fhp" style="width:100%;background:linear-gradient(90deg,${boss.c},#ff8c7c)"></i></div>
@@ -6206,8 +6228,9 @@ function villainCampaignCard(){
     else if(unlocked)right=`<div class="mini" style="color:var(--text3)">Ready — land a PR to engage</div>`;
     else right=`<div class="mini" style="color:var(--text3)">🔒 Locked · reach Lv ${b.min}</div>`;
     return `<div class="vrow">
-      <div class="vmed ${cls}" style="--bc:${b.c}">${b.e}${done?'<span class="vchk">✓</span>':''}</div>
+      <div class="vmed ${cls}" style="--bc:${b.c}">${villainFace(b)}${done?'<span class="vchk">✓</span>':''}</div>
       <div class="g" style="padding-top:3px"><b style="font-size:14px;color:${done?'var(--text)':cur?'var(--gold2)':unlocked?'var(--text)':'var(--text3)'}">${esc(b.v)}</b>${right}</div>
+      <button class="vcam" data-v="${esc(b.v)}" onclick="setVillainImg(this.dataset.v)" title="Set mugshot">${villainImgUrl(b.v)?'🖼':'📷'}</button>
     </div>`;
   }).join("");
   return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('radar')}Villain campaign</div><span class="chip">${defeated}/${list.length} down</span></div>
