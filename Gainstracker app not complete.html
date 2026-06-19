@@ -5462,6 +5462,8 @@ function cloudMergeAlly(id,c){
   if(ix>=0)state.data.allies[ix]=c;else state.data.allies.push(c);
   save();
   cloudDetectAllyWorkout(id,c);
+  // Live co-op raid: if this ally is our raid partner and their sheet is open, refresh it so the bar climbs in real time.
+  try{const r=state.data.raid;if(r&&r.allyUid===id&&document.getElementById("raid-live-tag"))openRaid();}catch(e){}
   if(state.tab==="allies")render();
 }
 // Add an ally by friend code (their uid). Persists + subscribes for live updates.
@@ -5760,9 +5762,25 @@ const RAID_BOSSES=[
   {n:"Doomsday — Unleashed",e:"☠️",c:"#d0463a",target:200000,q:"The endgame raid. Two vigilantes, a quarter-million kilos of fury."}
 ];
 function raidMine(){const r=state.data.raid;if(!r)return 0;const t0=new Date(r.start).getTime();return state.data.workouts.filter(w=>new Date(w.date).getTime()>=t0).reduce((a,w)=>a+(w.totalVol||0),0);}
-function raidProgress(){const r=state.data.raid;if(!r)return null;const mine=raidMine(),ally=+r.ally||0,combined=mine+ally;return {mine,ally,combined,pct:clamp(combined/r.target*100,0,100),done:combined>=r.target};}
-function startRaid(idx){const b=RAID_BOSSES[idx];if(!b)return;const nm=(($("raid-ally")||{}).value||"").trim();
-  if(!nm){toast("Give your ally a name first, sir.");return;}
+// Live ally contribution: for a uid-bound raid, read the friend's lifetime vol straight off their
+// live-synced card and subtract the snapshot taken at raid start — so it climbs on its own as they train.
+function raidAllyLive(){const r=state.data.raid;if(!r||!r.allyUid)return null;return (state.data.allies||[]).find(a=>a&&a._uid===r.allyUid)||null;}
+function raidAllyVol(){const r=state.data.raid;if(!r)return 0;
+  if(r.allyUid){const a=raidAllyLive();const live=a?(+a.vol||0):null;if(live==null)return +r.ally||0;return Math.max(0,live-(+r.allyStartVol||0));}
+  return +r.ally||0;}
+function raidProgress(){const r=state.data.raid;if(!r)return null;const mine=raidMine(),ally=raidAllyVol(),combined=mine+ally;return {mine,ally,combined,pct:clamp(combined/r.target*100,0,100),done:combined>=r.target,live:!!r.allyUid};}
+function pickRaidAlly(uid){state._raidPickUid=(state._raidPickUid===uid)?null:uid;haptic("tap");openRaid();}
+function startRaid(idx){const b=RAID_BOSSES[idx];if(!b)return;
+  // Live path: an ally was picked from the friend list — bind to their uid and snapshot their tonnage now.
+  if(state._raidPickUid){
+    const a=(state.data.allies||[]).find(x=>x&&x._uid===state._raidPickUid);
+    if(!a){toast("That ally isn't syncing right now, sir.");return;}
+    state.data.raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:(a.n||"Ally").slice(0,20),allyUid:a._uid,allyStartVol:+a.vol||0,ally:0};
+    state._raidPickUid=null;save();haptic("done");toast("Live raid begun vs "+b.n);openRaid();return;
+  }
+  // Manual path: typed name + optional pasted card (legacy / snapshot allies).
+  const nm=(($("raid-ally")||{}).value||"").trim();
+  if(!nm){toast("Pick a live ally above, or type an ally's name first, sir.");return;}
   let allyStart=null;const code=($("raid-code")||{}).value||"";if(code.trim()){const c=decodeCard(code);if(c)allyStart=c.vol||0;}
   state.data.raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:nm.slice(0,20),allyStartVol:allyStart,ally:0};
   save();haptic("done");toast("Raid begun vs "+b.n);openRaid();}
@@ -5781,25 +5799,33 @@ function claimRaid(){const r=state.data.raid,p=raidProgress();if(!r||!p||!p.done
 function openRaid(){
   const r=state.data.raid;
   if(!r){
+    const live=(state.data.allies||[]).filter(a=>a&&a._uid);
+    const pick=state._raidPickUid;
+    const liveBlock=live.length?`<label class="mini">Pick a live ally <span style="color:var(--text3)">— their tonnage pools in real time, no pasting</span></label>
+      <div style="margin:6px 0 4px">${live.map(a=>{const on=a._uid===pick;return `<button class="row sp" onclick="pickRaidAlly('${esc(a._uid)}')" style="width:100%;background:${on?'rgba(232,197,106,.14)':'var(--bg2)'};border:1px solid ${on?'var(--gold2)':'var(--border2)'};border-radius:11px;padding:9px 11px;margin-bottom:6px;cursor:pointer;text-align:left"><div class="row g" style="gap:9px;min-width:0"><span style="font-size:20px;flex:none">${a.re||"🦇"}</span><div style="min-width:0"><b style="font-size:13px">${esc(a.n||"Ally")}</b> <span class="mini" style="color:#7cc4ff">🔴 live</span><div class="mini" style="color:var(--text3)">${fmtNum(a.vol||0)}kg lifetime</div></div></div><span style="color:${on?'var(--gold2)':'var(--text3)'};flex:none">${on?"✓":"○"}</span></button>`;}).join("")}</div>
+      <div class="mini center" style="color:var(--text3);margin:2px 0 12px">— or sync a one-time ally below —</div>`:`<div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Add an ally by friend code on the Allies tab to pool tonnage <b>in real time</b>. Or team with a one-time ally by pasting their Patrol Card below.</div>`;
     openSheet(`<div class="ttl">⚔️ Co-op Raid</div>
-      <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Team up with an ally against a colossal boss. Your tonnage and theirs pool toward one target — no server; you sync their total from their Patrol Card.</div>
-      <label class="mini">Ally's name</label><input id="raid-ally" placeholder="e.g. Dick" style="margin-bottom:8px"/>
+      <div class="mini" style="margin:-2px 0 12px;color:var(--text2)">Team up against a colossal boss — your tonnage and your ally's pool toward one shared target.</div>
+      ${liveBlock}
+      <label class="mini">Ally's name ${pick?'<span style="color:var(--text3)">(using live ally above)</span>':""}</label><input id="raid-ally" placeholder="e.g. Dick" ${pick?"disabled":""} style="margin-bottom:8px;${pick?'opacity:.4':''}"/>
       <label class="mini">Ally's Patrol Card <span style="color:var(--text3)">(optional — to sync their tonnage)</span></label>
-      <textarea id="raid-code" placeholder="Paste their card to track their contribution…" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none;margin-bottom:9px"></textarea>
-      <label class="mini">Choose your raid boss</label>
+      <textarea id="raid-code" placeholder="Paste their card to track their contribution…" ${pick?"disabled":""} style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none;margin-bottom:9px;${pick?'opacity:.4':''}"></textarea>
+      <label class="mini">Choose your raid boss${pick?` <span style="color:var(--gold2)">— vs ${esc((live.find(a=>a._uid===pick)||{}).n||"ally")}</span>`:""}</label>
       <div style="margin-top:6px">${RAID_BOSSES.map((b,i)=>`<button class="row sp" onclick="startRaid(${i})" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:10px;margin-bottom:7px;cursor:pointer;text-align:left"><div class="row g" style="gap:10px;min-width:0"><span style="font-size:26px;flex:none">${b.e}</span><div style="min-width:0"><b style="font-size:14px;color:var(--gold2)">${esc(b.n)}</b><div class="mini" style="color:var(--text3)">Pooled target ${fmtNum(b.target)}kg</div></div></div><span style="color:var(--gold2);flex:none">▶</span></button>`).join("")}</div>
       <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
     return;
   }
-  const p=raidProgress();const barCol=p.done?"#2ECC71":r.c;
-  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:6px">${r.e} ${esc(r.boss)}</div>
-    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Co-op raid with <b class="gold">${esc(r.allyName)}</b> · pooled target ${fmtNum(r.target)}kg</div>
+  const p=raidProgress();const barCol=p.done?"#2ECC71":r.c;const liveAlly=p.live?raidAllyLive():null;
+  openSheet(`<span id="raid-live-tag" hidden></span><div class="ttl" style="display:flex;align-items:center;gap:6px">${r.e} ${esc(r.boss)}</div>
+    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Co-op raid with <b class="gold">${esc(r.allyName)}</b>${p.live?' <span style="color:#7cc4ff">🔴 live</span>':''} · pooled target ${fmtNum(r.target)}kg</div>
     <div class="card glow center" style="padding:14px">
       <div class="big" style="font-size:34px;color:${p.done?'var(--green)':'var(--gold2)'}">${fmtNum(p.combined)}<span style="font-size:16px">/${fmtNum(r.target)}kg</span></div>
       <div style="height:12px;border-radius:7px;background:var(--bg2);overflow:hidden;margin:10px 0 6px"><div style="height:100%;width:${p.pct}%;background:${barCol};transition:width .4s"></div></div>
       <div class="row sp"><span class="mini">You: <b class="gold">${fmtNum(p.mine)}kg</b></span><span class="mini">${esc(r.allyName)}: <b style="color:#7cc4ff">${fmtNum(p.ally)}kg</b></span></div>
     </div>
-    ${p.done?`<button class="btn gold" style="margin-top:11px" onclick="claimRaid()">⚔️ Claim the kill</button>`:`<div class="mini" style="margin:11px 0 5px;color:var(--text2)">Your tonnage tracks automatically from every session logged since the raid began. Sync ${esc(r.allyName)}'s total from their latest Patrol Card:</div>
+    ${p.done?`<button class="btn gold" style="margin-top:11px" onclick="claimRaid()">⚔️ Claim the kill</button>`
+      :p.live?`<div class="banner" style="margin-top:11px;border-color:rgba(124,196,255,.4);background:rgba(124,196,255,.08)"><span>🔴</span><div class="mini" style="line-height:1.5">Both totals pool <b>automatically</b>. Your tonnage counts every session since the raid began; ${esc(r.allyName)}'s climbs live the moment they log a workout${liveAlly?"":' — <span style="color:var(--text3)">(waiting for their first sync since you linked)</span>'}.</div></div>`
+      :`<div class="mini" style="margin:11px 0 5px;color:var(--text2)">Your tonnage tracks automatically from every session logged since the raid began. Sync ${esc(r.allyName)}'s total from their latest Patrol Card:</div>
       <textarea id="raid-sync" placeholder="Paste ${esc(r.allyName)}'s latest Patrol Card…" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none"></textarea>
       <button class="btn sm" style="margin-top:6px" onclick="syncRaidAlly()">Sync ${esc(r.allyName)}'s tonnage</button>
       <div class="row g" style="gap:7px;margin-top:6px"><button class="btn ghost sm" onclick="addRaidAlly(1000)">+1t manual</button><button class="btn ghost sm" onclick="addRaidAlly(5000)">+5t manual</button></div>`}
