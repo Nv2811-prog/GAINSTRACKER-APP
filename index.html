@@ -451,6 +451,8 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .fnrow.you .fnav{box-shadow:0 0 0 2px var(--gold2)}
 .fnpos{flex:none;width:24px;text-align:center;font-family:var(--disp);font-size:14px;color:var(--text2)}
 .fnav{flex:none;width:32px;height:32px;border-radius:50%;background:#0c0f15;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:17px}
+.vintro-face{width:86px;height:86px;border-radius:50%;margin:2px auto 0;position:relative;border:2px solid var(--bc,#555);background:#0c0f15;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden;box-shadow:0 0 28px -4px var(--bc,#555);animation:kcSmash .55s cubic-bezier(.2,1.4,.35,1) .12s both}
+.vintro-face .vface{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
 @keyframes vpulse{0%,100%{box-shadow:0 0 0 3px rgba(232,197,106,.16),0 0 14px -3px var(--bc)}50%{box-shadow:0 0 0 4px rgba(232,197,106,.28),0 0 22px 0 var(--bc)}}
 .heat{display:grid;grid-template-columns:repeat(26,1fr);gap:2px}
 .heat i{aspect-ratio:1;border-radius:2px;background:var(--bg4)}
@@ -2197,7 +2199,7 @@ function startWorkout(splitId,dayIdx){
   state.session={split:sp?sp.name:"Free Session",day:day?day.name:"Workout",readiness:null,startedAt:now(),
     exercises:(day?day.exercises:[]).map(n=>({name:n,sets:seedSets(n)}))};
   state.workoutTimer=0;state.restTimer=0;state.restRunning=false;
-  state.step="readiness";render();playEntrance(state.session.day);
+  state.step="readiness";render();playEntrance(state.session.day);villainIntroForDay();
 }
 function freeWorkout(){state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
@@ -2588,6 +2590,55 @@ async function setVillainImg(v){
   if(!/^https?:\/\//i.test(t)&&!/^data:image\//i.test(t)){toast("Need an http(s):// or data:image/ link");return;}
   state.data.villainImg=Object.assign({},state.data.villainImg||{},{[v]:t});
   save();render();toast("Mugshot saved");
+}
+
+/* ========================= VILLAIN INTRO — taunt cutscene on a weak-point day ========================= */
+const VILLAIN_TAUNTS={
+  chest:"Your chest folds under pressure. Prove me wrong.",
+  back:"That back of yours? Weak as wet paper.",
+  shoulders:"Those shoulders can't carry the weight of Gotham.",
+  biceps:"Cute arms. Try lifting something real.",
+  triceps:"Your lockout crumbles. I've watched it happen.",
+  forearms:"Your grip fails long before mine ever would.",
+  quads:"Skipping legs again? How predictable.",
+  hamstrings:"Your hamstrings are an afterthought. Fix that.",
+  glutes:"No power off the floor. No power at all.",
+  calves:"Chicken legs win no fights in this city.",
+  abs:"No core, no control. You'll break first.",
+  traps:"Your frame is hollow. Build it or fall."
+};
+function pickNemesis(muscle){
+  const sl=strengthLevel();
+  const pool=BOSSES.filter(b=>b.min<=Math.max(5,sl+10));
+  const arr=pool.length?pool:BOSSES;
+  let h=0;for(let i=0;i<muscle.length;i++)h=(h*31+muscle.charCodeAt(i))>>>0;
+  return arr[h%arr.length];
+}
+function villainIntroForDay(){
+  try{
+    const ses=state.session;if(!ses||!ses.exercises||!ses.exercises.length)return;
+    if((state.data.workouts||[]).length<3)return;            // don't pester brand-new users
+    const today=new Date().toDateString();
+    if(state.data.u._lastVillainIntro===today)return;        // at most once a day
+    const prim={};ses.exercises.forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>{prim[m]=(prim[m]||0)+1;});});
+    const targets=Object.keys(prim);if(!targets.length)return;
+    const avg=M12.reduce((s,m)=>s+muscleLevel(m),0)/M12.length;
+    let weak=null,wl=999;targets.forEach(m=>{const l=muscleLevel(m);if(l<wl){wl=l;weak=m;}});
+    if(!weak)return;
+    if(avg>0&&wl>=avg)return;                                 // only fire when it's genuinely a soft spot
+    const nem=pickNemesis(weak);
+    const mn=(typeof MNAME!=="undefined"&&MNAME[weak])||weak;
+    const taunt=VILLAIN_TAUNTS[weak]||("Your "+mn.toLowerCase()+" is a weak point. Today you fix it.");
+    state.data.u._lastVillainIntro=today;save();
+    setTimeout(()=>{try{cinePush({
+      eye:"WEAK POINT · INTERCEPT",icon:nem.e,accent:nem.c,
+      title:nem.v+" blocks your path",
+      titleHtml:`<span style="color:${nem.c||'var(--gold2)'}">${esc(nem.v)}</span> blocks your path`,
+      bodyHtml:`<div class="vintro-face" style="--bc:${nem.c}">${villainFace({v:nem.v,e:nem.e})}</div>
+        <div class="mini" style="margin-top:11px;font-style:italic;color:var(--text);font-size:14px">"${esc(taunt)}"</div>
+        <div class="mini" style="margin-top:9px;color:var(--text2)">Today hits your <b style="color:${nem.c}">${esc(mn)}</b> — your softest point. Bury him.</div>`,
+      btn:"FACE HIM"});}catch(e){}},1500);
+  }catch(e){}
 }
 
 /* ========================= BOSS SELECTION ========================= */
