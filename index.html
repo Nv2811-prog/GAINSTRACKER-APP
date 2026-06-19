@@ -6910,7 +6910,8 @@ function alfredAsk(q){
   if(m){const n=clamp(parseInt(m[1],10),1,7);d.u.weeklyGoal=n;save();return `Weekly goal set to <b>${n}</b> session${n>1?"s":""}, Master. I'll hold you to it.`;}
   // ACTION: switch / activate <split>
   m=s.match(/^(?:switch to|activate|use|change to)\s+(?:the\s+)?(.+?)(?:\s+split)?$/);
-  if(m){const sp=(d.splits||[]).find(x=>(x.name||"").toLowerCase().includes(m[1].trim()));
+  if(m){const qn=m[1].trim().toLowerCase().replace(/[^a-z0-9]+/g," ").trim(),qtok=qn.split(/\s+/).filter(Boolean),norm=x=>(x.name||"").toLowerCase().replace(/[^a-z0-9]+/g," ");
+    let sp=(d.splits||[]).find(x=>norm(x).includes(qn));if(!sp&&qtok.length)sp=(d.splits||[]).find(x=>qtok.every(t=>norm(x).includes(t)));
     if(sp){if(d.activeSplitId===sp.id)return `<b>${esc(sp.name)}</b> is already your active split, sir.`;
       d.activeSplitId=sp.id;save();return `Active split is now <b>${esc(sp.name)}</b>, Master.`;}
     if((d.splits||[]).length)return `No split called "${esc(m[1])}", sir. You have: ${(d.splits||[]).map(x=>esc(x.name)).join(", ")}.`;}
