@@ -3289,7 +3289,7 @@ function stretchRedundancyNotes(){
     const miss=subs.find(s=>!touched[s[0]] && (((SUBBIAS[m]||{})[s[0]]||[])[0]!=="low"));  // an untouched, genuinely biasable region
     if(!miss)return;
     const subNm=id=>{const s=subs.find(x=>x[0]===id);return s?s[1].toLowerCase():"that region";};
-    notes.push({kind:"redundant",text:`📡 <b>Redundant coverage — ${MNAME[m].toLowerCase()}.</b> ${heavyEx} moves are stacked on the <b>${subNm(heavyId)}</b>, while the <b>${subNm(miss[0])}</b> got nothing. Swap one for a ${subNm(miss[0])} movement and you cover the whole muscle instead of doubling up on the same fibres.`});
+    notes.push({kind:"redundant",text:`📡 <b>Redundant coverage — ${MNAME[m].toLowerCase()}.</b> ${heavyEx} moves are stacked on the <b>${subNm(heavyId)}</b>, while the <b>${subNm(miss[0])}</b> got nothing. Swap one for ${subNm(miss[0])} work instead and you cover the whole muscle rather than doubling up on the same fibres.`});
   });
   return notes.slice(0,2);
 }
