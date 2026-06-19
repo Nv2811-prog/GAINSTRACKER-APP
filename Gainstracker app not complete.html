@@ -3247,6 +3247,52 @@ function sessionVolNotes(){
   });
   return notes.slice(0,2);
 }
+// ===== Live mid-session radar: lengthened-position "stretch debt" + redundant-coverage warnings =====
+// Pure read of the current session — never writes. Coaches coverage, complementing sessionVolNotes (which coaches total volume).
+function isLengthened(ex){
+  if(!ex)return false;
+  const n=(ex.n||"").toLowerCase();
+  // Unambiguous long-length movers by name.
+  if(/\b(romanian|rdl|stiff[- ]?leg|good ?morning|pullover|sissy|deficit)\b/.test(n))return true;
+  // Otherwise trust the curated cue/target text — flyes, deep presses, dips, overhead work all describe a loaded stretch.
+  const t=((ex.c||[]).join(" ")+" "+(ex.tgt||"")).toLowerCase();
+  return /(deep stretch|big stretch|huge stretch|overhead stretch|deep for a|stretch is where|loaded stretch|long stretch|maximal stretch|deep chest stretch)/.test(t);
+}
+function stretchRedundancyNotes(){
+  if(!state.session)return [];
+  const list=[];
+  state.session.exercises.forEach(e=>{
+    const ex=exFor(e.name);const working=countSets(e.sets,true);
+    if(working>0)list.push({name:e.name,ex,working});
+  });
+  if(!list.length)return [];
+  const notes=[],usedM={};
+  // ---- Stretch debt: a primary muscle carrying real volume but with zero lengthened-position work ----
+  const volByM={},lenByM={};
+  list.forEach(it=>{const len=isLengthened(it.ex);(it.ex.p||[]).forEach(m=>{volByM[m]=(volByM[m]||0)+it.working;if(len)lenByM[m]=true;});});
+  const STRETCH_EG={chest:"a deep dumbbell fly or pullover",back:"a lat pullover or straight-arm pulldown",hamstrings:"Romanian deadlifts or seated leg curls",quads:"a deep hack squat, leg press or sissy squat",glutes:"deep walking lunges or RDLs",biceps:"incline dumbbell curls",triceps:"an overhead extension",shoulders:"a behind-the-body cable lateral",calves:"a full-stretch standing calf raise",traps:"a heavy dead-hang shrug",forearms:"a full-stretch wrist curl"};
+  Object.keys(volByM).forEach(m=>{
+    if(volByM[m]>=3 && !lenByM[m] && STRETCH_EG[m]){
+      usedM[m]=1;
+      notes.push({kind:"stretch",text:`🧲 <b>Stretch debt — ${MNAME[m].toLowerCase()}.</b> ~${Math.round(volByM[m])} hard sets tonight, all worked in the short/mid range. Loading a muscle at long length is some of the most productive stimulus there is — bank one lengthened-position move (${STRETCH_EG[m]}) and you've paid it off.`});
+    }
+  });
+  // ---- Redundancy radar: 2+ moves stacked on one sub-region while a separately-trainable sub-region of the same muscle sits untouched ----
+  const subHits={};
+  list.forEach(it=>{(it.ex.p||[]).forEach(m=>{const subs=exSub(it.ex,m)||[];subs.forEach(id=>{subHits[m]=subHits[m]||{};subHits[m][id]=subHits[m][id]||{n:0,ex:new Set()};subHits[m][id].n+=it.working/subs.length;subHits[m][id].ex.add(it.name);});});});
+  Object.keys(subHits).forEach(m=>{
+    if(usedM[m])return;                                    // don't pile two notes on the same muscle
+    const subs=SUBG[m]||[],touched=subHits[m];
+    let heavyId=null,heavyN=0,heavyEx=0;
+    Object.entries(touched).forEach(([id,o])=>{if(o.ex.size>=2 && o.n>heavyN){heavyN=o.n;heavyId=id;heavyEx=o.ex.size;}});
+    if(!heavyId)return;
+    const miss=subs.find(s=>!touched[s[0]] && (((SUBBIAS[m]||{})[s[0]]||[])[0]!=="low"));  // an untouched, genuinely biasable region
+    if(!miss)return;
+    const subNm=id=>{const s=subs.find(x=>x[0]===id);return s?s[1].toLowerCase():"that region";};
+    notes.push({kind:"redundant",text:`📡 <b>Redundant coverage — ${MNAME[m].toLowerCase()}.</b> ${heavyEx} moves are stacked on the <b>${subNm(heavyId)}</b>, while the <b>${subNm(miss[0])}</b> got nothing. Swap one for a ${subNm(miss[0])} movement and you cover the whole muscle instead of doubling up on the same fibres.`});
+  });
+  return notes.slice(0,2);
+}
 function renderLogging(){
   const ses=state.session;const metric=state.data.u.metric;
   let html=`<button class="minbar" onclick="minimizeWorkout()" title="Minimise — keep the workout running and browse your tabs"><span style="font-size:15px">▾</span> Minimise workout · browse tabs</button>
@@ -3269,6 +3315,8 @@ function renderLogging(){
    const _cl=ses._coach||"At your service, sir. Log your first set — I'll be watching, and I do not flatter.";
    html+=`<div class="banner" style="margin-bottom:8px;border-color:${_cc}55"><span>🎩</span><div style="min-width:0"><b style="font-size:11px;letter-spacing:.08em;color:${_cc}">ALFRED${_ct==="bad"?" — UNIMPRESSED":_ct==="good"?" — IMPRESSED":""}</b><div class="mini" style="font-style:italic;color:var(--text2);line-height:1.45">"${esc(_cl)}"</div></div></div>`;}
   sessionVolNotes().forEach(nt=>{html+=`<div class="banner" style="background:rgba(232,197,106,.10);border-color:rgba(232,197,106,.4);margin-bottom:8px"><span>🧠</span><div class="mini" style="line-height:1.5">${nt.text}</div></div>`;});
+  // Coverage radar — stretch-debt (teal) & redundant-coverage (cyan), distinct from the gold volume notes above.
+  stretchRedundancyNotes().forEach(nt=>{const ac=nt.kind==="stretch"?"86,204,182":"96,165,250";html+=`<div class="banner" style="background:rgba(${ac},.10);border-color:rgba(${ac},.42);margin-bottom:8px"><span>${nt.kind==="stretch"?"🧲":"📡"}</span><div class="mini" style="line-height:1.5">${nt.text.replace(/^🧲 |^📡 /,"")}</div></div>`;});
   // Supersets & circuits: consecutive exercises sharing e.group render inside a linked wrapper.
   const gCount={};ses.exercises.forEach(e=>{if(e.group)gCount[e.group]=(gCount[e.group]||0)+1;});
   let curG=null,gLetters={},gSeq=0;
