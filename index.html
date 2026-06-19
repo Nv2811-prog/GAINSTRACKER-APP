@@ -5335,6 +5335,7 @@ async function cloudInit(){
     cloud.ready=true;cloud._initing=false;
     cloudPublish(true);
     cloudSubscribeAll();
+    cloudListenNudges();
     if(state.tab==="allies")render();
   }catch(e){cloud._initing=false;/* stay offline-only */}
 }
@@ -5377,6 +5378,51 @@ function cloudAddAlly(code){
   if(cloud.ready){cloudSubscribe(id);toast("Linked — their card now updates live.");}
   else{toast("Saved — they'll sync the moment you're back online.");cloudInit();}
   return true;
+}
+/* ========================= BAT-SIGNAL — nudge an ally ========================= */
+// Inbound: listen on our own inbox; each nudge pops a cinematic then is consumed (removed).
+function cloudListenNudges(){
+  if(!cloud.ready||!cloud.db||!cloud.uid||cloud._nudgeRef)return;
+  const ref=cloud.db.ref("nudges/"+cloud.uid);cloud._nudgeRef=ref;
+  ref.on("child_added",snap=>{
+    const n=snap.val()||{};
+    try{if(n.t&&Date.now()-n.t<3*864e5)showBatSignal(n);}catch(e){}
+    try{snap.ref.remove();}catch(e){}   // consume so it never replays
+  },()=>{});
+}
+function showBatSignal(n){
+  const nm=n.name||"An ally",msg=n.msg||"The signal's lit. Get to the gym.";
+  cinePush({eye:"BAT-SIGNAL · INCOMING",icon:"🦇",accent:"var(--gold2)",
+    title:nm+" lit the signal",titleHtml:`${esc(nm)} <span style="color:var(--gold2)">lit the signal</span>`,
+    bodyHtml:`<div style="font-size:42px;line-height:1">🦇</div><div class="mini" style="margin-top:9px;font-style:italic;color:var(--text);font-size:14px">"${esc(msg)}"</div>`,
+    btn:"ON MY WAY"});
+  try{pushPatrolFeed({icon:"🦇",accent:"var(--gold2)",name:nm,kind:"nudge",html:`<b>${esc(nm)}</b> lit the <span style="color:var(--gold2)">Bat-Signal</span> for you — "${esc(msg)}"`});}catch(e){}
+  try{haptic("pr");}catch(e){}
+}
+// Outbound: only to live (friend-code) allies — snapshots have no inbox to reach.
+function nudgeAlly(i){
+  const a=(state.data.allies||[])[i];if(!a)return;
+  if(!a._uid){toast("Live signals need a friend-code ally, not a one-time snapshot.");return;}
+  if(!cloud.ready){toast("Connecting… try the signal again in a second.");cloudInit();return;}
+  const presets=["The signal's lit. Get to the gym. 🦇","Gotham needs reps — move some weight.","I'm training tonight. Match me.","You've gone quiet. The city noticed.","Leg day waits for no one."];
+  state._nudgePresets=presets;
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:7px">🦇 Light the Bat-Signal</div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 11px">Send <b>${esc(a.n)}</b> an accountability nudge — it pops on their screen instantly.</div>
+    ${presets.map((p,k)=>`<button class="btn ghost" style="width:100%;text-align:left;margin-bottom:7px" onclick="sendNudge(${i},${k})">${esc(p)}</button>`).join("")}
+    <button class="btn" style="width:100%;margin-top:3px" onclick="closeSheet()">Cancel</button>`);
+}
+function sendNudge(i,k){
+  const a=(state.data.allies||[])[i],presets=state._nudgePresets||[];
+  closeSheet();cloudSendNudge(a,presets[k]||"The signal's lit.");
+}
+function cloudSendNudge(a,msg){
+  if(!a||!a._uid||!cloud.ready||!cloud.db){toast("Can't reach them right now, sir.");return;}
+  try{
+    const re=(rankFor(strengthLevel())||{}).emoji||"🦇";
+    cloud.db.ref("nudges/"+a._uid).push({from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),re,msg:String(msg).slice(0,80),t:Date.now()});
+    toast("🦇 Signal sent to "+a.n);haptic("done");
+    try{pushPatrolFeed({icon:"🦇",accent:"var(--text2)",name:a.n,kind:"nudge-sent",html:`You lit the <span style="color:var(--gold2)">Bat-Signal</span> for <b>${esc(a.n)}</b>`});}catch(e){}
+  }catch(e){toast("Couldn't send the signal.");}
 }
 function myFriendCode(){return cloud.uid||state.data.myUid||"";}
 function shareFriendCode(){
@@ -6407,7 +6453,8 @@ function renderAllies(){
       return `<div class="card" style="padding:12px 13px;margin-bottom:9px"><div class="row sp"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${a.re||"🦸"} ${esc(a.n)}</b><span class="chip">${esc(a.rk||"")}</span></div>
       <div class="row" style="gap:6px;margin:9px 0">${caveStat("STR "+(a.sl||0),"strength")}${caveStat(fmtNum(a.vol||0)+"kg","moved")}${caveStat(a.w||0,"sessions")}${caveStat(a.boss||0,"villains")}</div>
       <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">${top}</div>
-      <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div></div>`;
+      <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div>
+      <button class="btn ghost sm" style="width:100%;margin-top:6px;color:var(--gold2);border-color:var(--gold-dim)" onclick="nudgeAlly(${i})">🦇 Light the Bat-Signal</button></div>`;
     }).join("");
   }
   // Fight Night — weekly tonnage bout with a belt on the line
