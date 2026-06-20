@@ -1303,6 +1303,29 @@ function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.p
   }
   state.data=d;}}catch(e){}}
 
+/* --- Live-session crash/kill recovery -------------------------------------
+   The active workout lives in state.session (memory only). When iOS kills a
+   backgrounded PWA (~15 min idle) the page reloads and that session is lost.
+   We mirror it to localStorage on every checkpoint + whenever the app is
+   hidden, then offer to restore it on next boot. */
+function saveSession(){try{
+  if(state.session){localStorage.setItem("gt_session",JSON.stringify({s:state.session,step:state.step,min:!!state.minimized,t:Date.now()}));}
+  else localStorage.removeItem("gt_session");
+}catch(e){}}
+function saveSessionSoon(){try{clearTimeout(state._sessT);state._sessT=setTimeout(saveSession,700);}catch(e){}}
+function clearSavedSession(){try{clearTimeout(state._sessT);localStorage.removeItem("gt_session");}catch(e){}}
+function restoreSession(){try{
+  const r=localStorage.getItem("gt_session");if(!r)return false;
+  const o=JSON.parse(r);
+  if(!o||!o.s||!Array.isArray(o.s.exercises)){localStorage.removeItem("gt_session");return false;}
+  // Expire anything older than 18h so a forgotten session never resurrects days later.
+  if(!o.t||Date.now()-o.t>18*36e5){localStorage.removeItem("gt_session");return false;}
+  // Only restore if real work was logged — don't revive an empty just-opened shell.
+  const hasData=o.s.exercises.some(ex=>(ex.sets||[]).some(s=>s.done||String(s.w==null?"":s.w).trim()||String(s.r==null?"":s.r).trim()));
+  if(!hasData){localStorage.removeItem("gt_session");return false;}
+  state.session=o.s;state.minimized=true;state.step=null;state._restored=true;return true;
+}catch(e){return false;}}
+
 /* ========================= UTILS ========================= */
 const $=id=>document.getElementById(id);
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -2233,15 +2256,15 @@ function seedSets(name){
   if(last&&last.length)return last.map(s=>({w:"",r:"",type:s.type||"NRM",done:false,rpe:"",prevW:s.w,prevR:s.r,prevType:s.type||"NRM"}));
   return [0,1,2].map(()=>({w:"",r:"",type:"NRM",done:false,rpe:""}));
 }
-function setReadiness(r){state.session.readiness=r;state.step="logging";startTimers();render();}
+function setReadiness(r){state.session.readiness=r;state.step="logging";startTimers();render();saveSession();}
 
 /* ========================= LOGGING INTERACTIONS ========================= */
-function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;} // no render (Rule 1 spirit)
+function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;saveSessionSoon();} // no render (Rule 1 spirit); debounced backup
 function setSessionNotes(v){if(state.session)state.session.notes=v;} // no render — keep textarea focus
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}}render();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}}render();saveSession();}
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
 function liveCheckPR(ei,si){
@@ -2344,8 +2367,8 @@ function prKillCam(name,hits,info){
     cinePush({killcam:true,hold:true,icon:cfg.badge,eye:"RECORD SHATTERED",titleHtml:esc(name),title:name,bodyHtml,btn:"ONWARD",accent:cfg.accent});
   }catch(e){try{showPRToast(name,hits,info);}catch(_){}}
 }
-function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();}
-function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();}
+function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();saveSession();}
+function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();saveSession();}
 function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;render();}
 function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
 function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;e._open=true;state.session._focusEi=ei;closeSheet();render();}
@@ -2482,11 +2505,11 @@ function openSetSheet(ei,si){
     <button class="btn ghost sm" style="width:100%;color:var(--red);border-color:rgba(232,69,60,.4)" onclick="delSet(${ei},${si});closeSheet()">✕ Delete set</button>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
 }
-function removeExercise(ei){appConfirm({title:"Remove exercise",body:"Remove this exercise from the session?",ok:"Remove",danger:true}).then(ok=>{if(ok){state.session.exercises.splice(ei,1);render();}});}
+function removeExercise(ei){appConfirm({title:"Remove exercise",body:"Remove this exercise from the session?",ok:"Remove",danger:true}).then(ok=>{if(ok){state.session.exercises.splice(ei,1);render();saveSession();}});}
 // Supersets/circuits: link this exercise with the next into one back-to-back group.
 function linkNext(ei){const ex=state.session.exercises;if(ei>=ex.length-1)return;const g=ex[ei].group||ex[ei+1].group||("ss"+now());ex[ei].group=g;ex[ei+1].group=g;haptic&&haptic("tap");render();}
 function unlinkGroup(ei){const ex=state.session.exercises;const g=ex[ei].group;if(!g)return;ex.forEach(e=>{if(e.group===g)delete e.group;});render();}
-function addExerciseToSession(name){if(!state.session.exercises.some(e=>e.name===name))state.session.exercises.push({name,sets:seedSets(name)});closeSheet();render();}
+function addExerciseToSession(name){if(!state.session.exercises.some(e=>e.name===name))state.session.exercises.push({name,sets:seedSets(name)});closeSheet();render();saveSession();}
 
 /* ========================= COMMIT WORKOUT ========================= */
 function finishWorkout(){
@@ -2558,15 +2581,15 @@ function finishWorkout(){
   save();
   // store result for summary + boss
   state.lastResult={wk,totalVol,xpGain,prsThis,sessVol,musclesHit,dur,readiness:ses.readiness,notes:wk.notes};
-  stopTimers();state.step=null;state.session=null;state.minimized=false; // session is committed — clear it so the resume bar can't linger
+  stopTimers();state.step=null;state.session=null;state.minimized=false;clearSavedSession(); // session is committed — clear it so the resume bar can't linger
   // Bosses now fire live during the session (see liveCheckPR), so just show the summary.
   openSummary();
 }
-function endSession(){stopTimers();state.session=null;state.step=null;state.minimized=false;state.tab="gotham";render();}
+function endSession(){stopTimers();state.session=null;state.step=null;state.minimized=false;clearSavedSession();state.tab="gotham";render();}
 // Minimise the live workout: keep the session + timers running, drop back to the tabs so you can
 // check history, fuel, etc. A floating resume bar lets you jump straight back into logging.
-function minimizeWorkout(){if(!state.session)return;state.minimized=true;state.step=null;haptic("tap");if(!state.tab)state.tab="gotham";render();window.scrollTo(0,0);}
-function resumeWorkout(){if(!state.session)return;state.minimized=false;state.step="logging";haptic("tap");render();window.scrollTo(0,0);}
+function minimizeWorkout(){if(!state.session)return;state.minimized=true;state.step=null;haptic("tap");if(!state.tab)state.tab="gotham";render();window.scrollTo(0,0);saveSession();}
+function resumeWorkout(){if(!state.session)return;state.minimized=false;state.step="logging";haptic("tap");render();window.scrollTo(0,0);saveSession();}
 function resumeBar(){
   if(!state.session||state.step||state.showOnboarding)return"";
   const t=fmtTime(Math.floor((Date.now()-state.session.startedAt)/1000));
@@ -3174,7 +3197,7 @@ function addPair(ei,name){
   const ses=state.session;const e=ses.exercises[ei];if(!e)return;
   const grp=e.group||("pair"+now());e.group=grp;
   ses.exercises.splice(ei+1,0,{name,group:grp,sets:seedSets(name)});
-  haptic("done");closeSheet();toast("Paired with "+name);render();
+  haptic("done");closeSheet();toast("Paired with "+name);render();saveSession();
 }
 /* 1RM Test Day — a guided warm-up-to-max ramp built from your current estimated max. */
 function testRamp(name){
@@ -3478,7 +3501,7 @@ function handleVoice(t){
   const s=state.session.exercises[open.ei].sets[open.si];
   s.w=String(w);s.r=String(r);s.done=true;haptic("done");const ev2=liveCheckPR(open.ei,open.si);restStart(ev2==="boss");
   toast("✓ "+w+"kg × "+r+" — "+esc(state.session.exercises[open.ei].name));
-  render();
+  render();saveSession();
 }
 function regionTip(ex){
   const p=(ex.p&&ex.p[0])||"",n=(ex.n||"").toLowerCase();
@@ -8681,7 +8704,11 @@ function boot(){
   loadExDB();
   if(!state.data.onboardingDone){state.showOnboarding=true;state.obStep=0;state.obTmp={};}
   else{state.tab="gotham";}  // The Cave auto-home: always land on the glanceable Cowl dashboard, never the last-used tab
+  // Crash/kill recovery: if a live workout was interrupted (app killed while backgrounded),
+  // bring it back as a minimized resume bar instead of losing the logged sets.
+  if(state.data.onboardingDone&&!state.showOnboarding){try{if(restoreSession()){startTimers();}}catch(e){}}
   render();
+  if(state._restored){state._restored=false;try{toast("🦇 Workout recovered — your logged sets are safe. Tap the bar to resume.");}catch(e){}}
   if(state.data.onboardingDone){checkVillainTaunt();checkUnlocks();maybeShowDailyWisdom();/* silent baseline on first run so only NEW unlocks notify later */}
   // service worker
   if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
@@ -8690,6 +8717,10 @@ function boot(){
   // offline indicator: reflects real connectivity, reassures data is local
   const offUI=()=>{const p=$("offline-pill");if(p)p.classList.toggle("on",!navigator.onLine);};
   window.addEventListener("online",offUI);window.addEventListener("offline",offUI);offUI();
+  // Persist the live workout the instant the app is hidden/backgrounded — this is the moment
+  // right before iOS may kill the PWA, so it captures even the set you were mid-typing.
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){try{saveSession();}catch(e){}}});
+  window.addEventListener("pagehide",()=>{try{saveSession();}catch(e){}});
   // Glass press ripple — adds a tactile light burst on every tappable surface
   document.addEventListener("pointerdown",e=>{
     const t=e.target.closest(".btn,.chip,.sdone,.exrow,#nav button,.stype");
