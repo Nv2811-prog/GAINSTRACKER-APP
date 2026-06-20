@@ -2287,6 +2287,17 @@ function liveCheckPR(ei,si){
   if(vol>cVol+0.01&&vol>lb.maxVol+0.01){lb.maxVol=vol;hits.push({t:"vol",val:vol,prev:cVol});}
   if(r>cReps&&r>lb.maxReps&&r<=12){lb.maxReps=r;hits.push({t:"reps",val:r,prev:cReps});} // rep PRs only count inside the 12-rep ceiling — past that, add weight, don't chase reps
   let fired=null;
+  // Smart profile capture: an e1RM crown that LEAPS >30% over a real standing record usually isn't a
+  // sudden superhuman jump — it's a different machine / easier cam / resistance setting. Flag it so
+  // Alfred can proactively offer to file it under its own profile (keeping the true record clean).
+  try{const e1hit=hits.find(h=>h.t==="e1rm");
+    if(e1hit&&cOrm>0&&e1>cOrm*1.3){
+      state.session._profileFlags=state.session._profileFlags||{};
+      if(!state.session._profileFlags[exObj.name])
+        state.session._profileFlags[exObj.name]={name:exObj.name,prevRec:JSON.parse(JSON.stringify(rec)),prevOrm:cOrm,newOrm:e1,newW:w,newR:r,jump:Math.round((e1-cOrm)/cOrm*100)};
+    }}catch(e){}
+  // Co-op raid: an e1RM crown is a "record landed" — pool it toward the shared boss.
+  if(hits.some(h=>h.t==="e1rm")){try{raidNotePR(1);}catch(e){}try{resolveCallouts(exObj.name);}catch(e){}}
   const willBoss=hits.some(h=>h.t==="e1rm")&&!state.session.bossed[exObj.name];
   if(hits.length){
     if(willBoss){
@@ -2581,9 +2592,13 @@ function finishWorkout(){
   save();
   // store result for summary + boss
   state.lastResult={wk,totalVol,xpGain,prsThis,sessVol,musclesHit,dur,readiness:ses.readiness,notes:wk.notes};
+  // Smart profile capture: carry any "suspicious leap" flags out of the session so Alfred can offer
+  // to file them once the summary is up (the session object is about to be cleared).
+  try{const pf=ses._profileFlags;state._profileOffers=pf?Object.keys(pf).map(k=>pf[k]):null;}catch(e){state._profileOffers=null;}
   stopTimers();state.step=null;state.session=null;state.minimized=false;clearSavedSession(); // session is committed — clear it so the resume bar can't linger
   // Bosses now fire live during the session (see liveCheckPR), so just show the summary.
   openSummary();
+  try{setTimeout(maybeOfferProfile,900);}catch(e){}
 }
 function endSession(){stopTimers();state.session=null;state.step=null;state.minimized=false;clearSavedSession();state.tab="gotham";render();}
 // Minimise the live workout: keep the session + timers running, drop back to the tabs so you can
@@ -2906,6 +2921,9 @@ function cloudDetectAllyWorkout(id,c){
       pushPatrolFeed({icon:"👑",accent:"var(--gold2)",name:nm,kind:"ally-pr",
         html:`<b>${esc(nm)}</b> set a record — ${esc(u.n)} <span style="color:var(--gold2)">${u.o}kg</span> est 1RM`});
     });
+    // Co-op raid: if this ally is our raid partner, their records pool toward the shared boss too.
+    try{const rd=state.data.raid;if(rd&&rd.allyUid===id&&ups.length){rd.allyPRs=(+rd.allyPRs||0)+ups.length;
+      if(state.tab==="allies"||($("sheet")&&$("sheet").classList.contains("on")))pushPatrolFeed({icon:"⚔️",accent:"#7cc4ff",name:nm,kind:"raid-hit",html:`<b>${esc(nm)}</b> landed a hit on the raid boss — ${ups.length} record${ups.length===1?"":"s"} pooled`});}}catch(e){}
     state.data.allySeen[id]={w,boss,lifts:liftMap};save();
   }catch(e){}
 }
@@ -3821,7 +3839,7 @@ function summaryCard4(R){
     ${rec.length?rec.map(m=>`<div class="row sp" style="margin-bottom:6px"><span>${mIcon(m,16)} ${MNAME[m]}</span><span class="muted">~${hoursToReady(m)}h</span></div>`).join(""):'<p class="muted">All sectors green.</p>'}
   </div>
   ${sessionNoteBlock(R)}
-  <button class="btn gold" onclick="shareWorkout()">📤 SHARE MISSION</button>`;
+  <button class="btn gold" onclick="shareWorkout()">📤 SHARE WITH ALLIES</button>`;
 }
 // ===== Alfred's read (post-workout) — ALWAYS works, with or without a Gemini key. =====
 // Builds a real, data-driven verdict from the session, in Alfred's "on roids — wild but good" voice.
@@ -3869,8 +3887,26 @@ function populateAlfredRead(R){
     b.textContent=txt.trim();
   }).catch(_=>{/* keep the local read on any failure */});
 }
-function shareWorkout(){const R=state.lastResult;state.data.u.shares++;save();const txt=`🦇 ${R.wk.name} complete\n${fmtNum(R.totalVol)}kg moved · ${R.wk.exercises.length} exercises · ${fmtTime(R.dur)}\n${R.prsThis.length?R.prsThis.length+" new PR(s)! ":""}#GainsTracker #Gotham`;
-  if(navigator.share)navigator.share({text:txt}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(txt);toast("Mission report copied.");}}
+// SHARE = push this session's recap straight into your allies' in-app Patrol Feeds. No link, no
+// external share sheet — it lands inside the app, the same recap they'd see auto-detected, but sent
+// the instant you finish. Falls back to clipboard only if you have no live allies yet.
+function shareWorkout(){
+  const R=state.lastResult;if(!R){toast("No session to share, sir.");return;}
+  state.data.u.shares=(state.data.u.shares||0)+1;save();
+  const live=(state.data.allies||[]).filter(a=>a&&a._uid);
+  if(!live.length){
+    const txt=`🦇 ${R.wk.name} complete\n${fmtNum(R.totalVol)}kg moved · ${R.wk.exercises.length} exercises · ${fmtTime(R.dur)}\n${R.prsThis.length?R.prsThis.length+" new PR(s)! ":""}#GainsTracker #Gotham`;
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt);toast("No allies yet — recap copied. Add a friend code to share in-app.");}
+    else toast("Add a friend-code ally to share missions in-app.");
+    return;
+  }
+  if(!cloud.ready||!cloud.db){toast("Connecting… tap share again in a second.");cloudInit();return;}
+  let top="";try{let bo=0;R.wk.exercises.forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{const o=setE1RM(ex,s);if(o>bo){bo=o;top=e.name+" "+Math.round(setLoad(ex,s.w))+"kg×"+(s.r||0);}});});}catch(e){}
+  const payload={type:"recap",from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),re:(rankFor(strengthLevel())||{}).emoji||"🦇",wk:(R.wk.name||"Session").slice(0,28),vol:Math.round(R.totalVol||0),lifts:R.wk.exercises.length,prs:(R.prsThis||[]).length,top:top.slice(0,40),t:Date.now()};
+  let sent=0;live.forEach(a=>{try{cloud.db.ref("nudges/"+a._uid).push(payload);sent++;}catch(e){}});
+  toast(sent?`📤 Mission shared to ${sent} all${sent===1?"y":"ies"}`:"Couldn't reach your allies.");haptic("done");
+  try{pushPatrolFeed({icon:"📋",accent:"var(--text2)",name:"You",kind:"recap-sent",html:`You shared <b>${esc(R.wk.name||"a session")}</b> with your ${sent} all${sent===1?"y":"ies"}`});}catch(e){}
+}
 
 /* ========================= BATSUIT SVG (front + back, anatomical) ========================= */
 function dim(lvl,base,max){return base+clamp(lvl/15,0,1)*(max-base);}
@@ -5532,7 +5568,12 @@ function cloudListenNudges(){
   const ref=cloud.db.ref("nudges/"+cloud.uid);cloud._nudgeRef=ref;
   ref.on("child_added",snap=>{
     const n=snap.val()||{};
-    try{if(n.t&&Date.now()-n.t<3*864e5)showBatSignal(n);}catch(e){}
+    try{if(n.t&&Date.now()-n.t<3*864e5){
+      if(n.type==="callout")showCallout(n);
+      else if(n.type==="callout-won")showCalloutWon(n);
+      else if(n.type==="recap")showRecap(n);
+      else showBatSignal(n);
+    }}catch(e){}
     try{snap.ref.remove();}catch(e){}   // consume so it never replays
   },()=>{});
 }
@@ -5545,6 +5586,17 @@ function showBatSignal(n){
   try{pushPatrolFeed({icon:"🦇",accent:"var(--gold2)",name:nm,kind:"nudge",html:`<b>${esc(nm)}</b> lit the <span style="color:var(--gold2)">Bat-Signal</span> for you — "${esc(msg)}"`});}catch(e){}
   try{haptic("pr");}catch(e){}
 }
+// Inbound mission recap — an ally tapped "Share with allies" after finishing. Lands quietly in the
+// Patrol Feed (no full-screen cinematic — it's a feed item, not an alarm), plus a soft toast.
+function showRecap(n){
+  const nm=n.name||"An ally";
+  const bits=[];
+  if(n.prs)bits.push(`<b style="color:var(--gold2)">${n.prs} new PR${n.prs===1?"":"s"}</b>`);
+  if(n.vol)bits.push(`${fmtNum(n.vol)}kg moved`);
+  if(n.lifts)bits.push(`${n.lifts} lift${n.lifts===1?"":"s"}`);
+  try{pushPatrolFeed({icon:"📋",accent:"var(--gold2)",name:nm,kind:"recap",html:`<b>${esc(nm)}</b> shared a mission — <b>${esc(n.wk||"a session")}</b>${bits.length?" · "+bits.join(" · "):""}${n.top?`<br><span class="mini" style="color:var(--text3)">Top: ${esc(n.top)}</span>`:""}`});}catch(e){}
+  try{if(state.tab==="allies")toast((n.re||"📋")+" "+nm+" shared a mission");}catch(e){}
+}
 // Outbound: only to live (friend-code) allies — snapshots have no inbox to reach.
 function nudgeAlly(i){
   const a=(state.data.allies||[])[i];if(!a)return;
@@ -5555,6 +5607,7 @@ function nudgeAlly(i){
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:7px">🦇 Light the Bat-Signal</div>
     <div class="mini" style="color:var(--text2);margin:2px 0 11px">Send <b>${esc(a.n)}</b> an accountability nudge — it pops on their screen instantly.</div>
     ${presets.map((p,k)=>`<button class="btn ghost" style="width:100%;text-align:left;margin-bottom:7px" onclick="sendNudge(${i},${k})">${esc(p)}</button>`).join("")}
+    <button class="btn" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1206;font-weight:800;margin:6px 0 3px" onclick="openCallout(${i})">🥊 Call them out instead — beat their own PR</button>
     <button class="btn" style="width:100%;margin-top:3px" onclick="closeSheet()">Cancel</button>`);
 }
 function sendNudge(i,k){
@@ -5569,6 +5622,119 @@ function cloudSendNudge(a,msg){
     toast("🦇 Signal sent to "+a.n);haptic("done");
     try{pushPatrolFeed({icon:"🦇",accent:"var(--text2)",name:a.n,kind:"nudge-sent",html:`You lit the <span style="color:var(--gold2)">Bat-Signal</span> for <b>${esc(a.n)}</b>`});}catch(e){}
   }catch(e){toast("Couldn't send the signal.");}
+}
+/* ========================= CALLOUT — self-relative PR duel =========================
+   Evolved bat-signal. Instead of "beat MY number" (unfair when the gap is big), a callout dares an
+   ally to beat THEIR OWN record on a lift (or any lift) before a deadline. When they land an e1RM
+   crown that matches, it auto-resolves and pings the challenger back. Stored in state.data.callouts:
+   {id,dir:"in"|"out",who,uid,lift,due,status:"open"|"won"|"lost",t}. */
+function calloutLeft(ts){
+  const ms=(+ts||0)-Date.now();
+  if(ms<=0)return "time's up";
+  const h=ms/36e5;
+  if(h<24)return Math.max(1,Math.round(h))+"h left";
+  return Math.round(h/24)+"d left";
+}
+// Expire open callouts whose clock ran out; prune the log. Returns true if anything changed.
+function sweepCallouts(){
+  try{const cs=state.data.callouts;if(!cs||!cs.length)return false;
+    const now=Date.now();let ch=false;
+    cs.forEach(c=>{if(c.status==="open"&&c.due&&now>c.due){c.status="lost";ch=true;
+      if(c.dir==="in"){try{pushPatrolFeed({icon:"🥊",accent:"var(--text3)",name:c.who,kind:"callout-lost",html:`<b>${esc(c.who)}</b>'s callout expired — the record stood. The city remembers.`});}catch(e){}}
+    }});
+    if(cs.length>30)state.data.callouts=cs.slice(0,30);
+    if(ch)save();return ch;
+  }catch(e){return false;}
+}
+function openCallout(i){
+  const a=(state.data.allies||[])[i];if(!a)return;
+  if(!a._uid){toast("Callouts need a friend-code ally, not a one-time snapshot.");return;}
+  if(!cloud.ready){toast("Connecting… try the callout again in a second.");cloudInit();return;}
+  const lifts=[{n:"Any lift",o:0}].concat(((a.liftsAll||a.lifts||[]).filter(l=>l&&l.n)).slice(0,4));
+  state._coLifts=lifts;state._coAlly=i;const days=state._coDays||7;
+  const liftBtns=lifts.map((l,k)=>`<button class="btn ghost" style="width:100%;text-align:left;margin-bottom:6px" onclick="sendCallout(${k})">${k===0?'🎯 <b>Any lift</b> — top any one of their own crowns':'🏋️ <b>'+esc(l.n)+'</b>'+(l.o?` <span class="mini" style="color:var(--text3)">— past ${l.o}</span>`:'')}</button>`).join("");
+  openSheet(`<div class="ttl">🥊 Call out ${esc(a.n)}</div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 11px">A callout dares them to beat <b>their own</b> personal record before the clock runs out — fair no matter who's stronger. The moment they land it, you both get the alert.</div>
+    <div class="mini" style="color:var(--text3);margin-bottom:5px">Deadline</div>
+    <div style="display:flex;gap:7px;margin-bottom:13px">
+      ${[3,7,14].map(d=>`<button class="btn ${days===d?'':'ghost'} sm" style="flex:1" onclick="setCalloutDays(${i},${d})">${d} days</button>`).join("")}
+    </div>
+    <div class="mini" style="color:var(--text3);margin-bottom:5px">Pick the challenge</div>
+    ${liftBtns}
+    <button class="btn" style="width:100%;margin-top:4px" onclick="closeSheet()">Cancel</button>`);
+}
+function setCalloutDays(i,d){state._coDays=d;openCallout(i);}
+function sendCallout(k){
+  const i=state._coAlly,lifts=state._coLifts||[],l=lifts[k];if(!l)return;
+  const a=(state.data.allies||[])[i];if(!a)return;
+  closeSheet();cloudSendCallout(a,l.n,state._coDays||7);
+}
+function cloudSendCallout(a,lift,days){
+  if(!a||!a._uid||!cloud.ready||!cloud.db){toast("Can't reach them right now, sir.");return;}
+  try{
+    const cid="co"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    const due=Date.now()+(+days||7)*864e5;
+    const re=(rankFor(strengthLevel())||{}).emoji||"🥊";
+    cloud.db.ref("nudges/"+a._uid).push({type:"callout",from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),re,cid,lift:String(lift||"Any lift").slice(0,30),due,t:Date.now()});
+    state.data.callouts=state.data.callouts||[];
+    state.data.callouts.unshift({id:cid,dir:"out",who:a.n,uid:a._uid,lift:String(lift||"Any lift"),due,status:"open",t:Date.now()});
+    save();haptic("done");
+    const ll=lift==="Any lift"?"any of their crowns":lift;
+    toast("🥊 Callout sent to "+a.n);
+    try{pushPatrolFeed({icon:"🥊",accent:"var(--gold2)",name:a.n,kind:"callout-sent",html:`You called out <b>${esc(a.n)}</b> — beat <b>${esc(ll)}</b> in ${days} days`});}catch(e){}
+  }catch(e){toast("Couldn't send the callout.");}
+}
+// Inbound callout: store it, pop a cinematic, drop it in the feed.
+function showCallout(n){
+  const nm=n.name||"An ally",lift=n.lift||"Any lift",due=+n.due||Date.now()+7*864e5;
+  state.data.callouts=state.data.callouts||[];
+  if(n.cid&&state.data.callouts.some(c=>c.id===n.cid))return; // dedupe replays
+  state.data.callouts.unshift({id:n.cid||("co"+Date.now()),dir:"in",who:nm,uid:n.from,lift,due,status:"open",t:Date.now()});
+  save();
+  const ll=lift==="Any lift"?"beat any one of your own records":`beat your <b>${esc(lift)}</b> record`;
+  cinePush({eye:"CALLOUT · INCOMING",icon:"🥊",accent:"var(--gold2)",
+    title:nm+" called you out",titleHtml:`${esc(nm)} <span style="color:var(--gold2)">called you out</span>`,
+    bodyHtml:`<div style="font-size:42px;line-height:1">🥊</div><div class="mini" style="margin-top:9px;color:var(--text);font-size:14px">Dares you to ${ll} before <b>${calloutLeft(due)}</b>.</div><div class="mini" style="margin-top:7px;color:var(--text3)">Land it and they'll know the instant you do.</div>`,
+    btn:"CHALLENGE ACCEPTED"});
+  try{pushPatrolFeed({icon:"🥊",accent:"var(--gold2)",name:nm,kind:"callout-in",html:`<b>${esc(nm)}</b> called you out — ${ll} by ${calloutLeft(due)}`});}catch(e){}
+  try{haptic("pr");}catch(e){}
+}
+// On my own e1RM crown: answer any matching open incoming callout, ping the challenger back.
+function resolveCallouts(exName){
+  try{
+    const cs=state.data.callouts;if(!cs||!cs.length)return;
+    const now=Date.now();let any=false;
+    cs.forEach(c=>{
+      if(c.dir!=="in"||c.status!=="open")return;
+      if(c.due&&now>c.due)return;
+      if(c.lift!=="Any lift"&&c.lift!==exName)return;
+      c.status="won";c.wonAt=now;any=true;
+      cloudCalloutWon(c,exName);
+      cinePush({eye:"CALLOUT · ANSWERED",icon:"🥊",accent:"var(--gold2)",
+        title:"Callout answered",titleHtml:`<span style="color:var(--gold2)">Callout answered</span>`,
+        bodyHtml:`<div style="font-size:40px">🥊</div><div class="mini" style="margin-top:8px;color:var(--text)">You beat your <b>${esc(exName)}</b> record — <b>${esc(c.who)}</b>'s callout is answered.</div>`,
+        btn:"GOTHAM SLEPT EASY"});
+      try{pushPatrolFeed({icon:"🥊",accent:"var(--gold2)",name:c.who,kind:"callout-won",html:`You answered <b>${esc(c.who)}</b>'s callout — new <b>${esc(exName)}</b> crown`});}catch(e){}
+    });
+    if(any)save();
+  }catch(e){}
+}
+function cloudCalloutWon(c,exName){
+  if(!c||!c.uid||!cloud.ready||!cloud.db)return;
+  try{cloud.db.ref("nudges/"+c.uid).push({type:"callout-won",from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),cid:c.id,lift:exName||c.lift,t:Date.now()});}catch(e){}
+}
+// The challenger's side: their outgoing callout got answered.
+function showCalloutWon(n){
+  const nm=n.name||"Your rival",lift=n.lift||"a lift";
+  let c=null;
+  if(n.cid)c=(state.data.callouts||[]).find(x=>x.id===n.cid&&x.dir==="out");
+  if(c){c.status="won";c.wonAt=Date.now();save();}
+  cinePush({eye:"CALLOUT · ANSWERED",icon:"🥊",accent:"var(--gold2)",
+    title:nm+" answered your callout",titleHtml:`${esc(nm)} <span style="color:var(--gold2)">answered your callout</span>`,
+    bodyHtml:`<div style="font-size:42px">🥊</div><div class="mini" style="margin-top:9px;color:var(--text)"><b>${esc(nm)}</b> beat their <b>${esc(lift)}</b> record before the clock ran out. Respect earned.</div>`,
+    btn:"RESPECT"});
+  try{pushPatrolFeed({icon:"🥊",accent:"var(--gold2)",name:nm,kind:"callout-answered",html:`<b>${esc(nm)}</b> answered your callout — beat their <b>${esc(lift)}</b>`});}catch(e){}
+  try{haptic("pr");}catch(e){}
 }
 /* ===================== CO-OP RAID — request / accept handshake =====================
    Starting a raid against a live ally no longer just flips it on locally. It fires an invite
@@ -5603,7 +5769,7 @@ function showRaidInvite(inv){
   }
   try{haptic("pr");}catch(e){}
   appConfirm({title:(inv.e||"⚔️")+" Raid invite",
-    html:`<b>${esc(nm)}</b> wants to raid <b class="gold">${esc((inv.boss||"a boss").split(" — ")[0])}</b> with you — pooled target <b>${fmtNum(inv.target||0)}kg</b>. Accept and both of you fight it together, tonnage pooling live.`,
+    html:`<b>${esc(nm)}</b> wants to raid <b class="gold">${esc((inv.boss||"a boss").split(" — ")[0])}</b> with you — break <b>${inv.target||0} records</b> together. Accept and both of you fight it, every PR pooling live.`,
     ok:"⚔️ Accept raid",cancel:"Decline"}).then(ok=>{
       if(!ok){try{pushPatrolFeed({icon:"⚔️",accent:"var(--text3)",name:nm,kind:"raid-dec",html:`You declined <b>${esc(nm)}</b>'s raid invite.`});}catch(e){}return;}
       acceptRaidInvite(inv);
@@ -5616,7 +5782,7 @@ function acceptRaidInvite(inv){
   if(state.data.allyIds&&state.data.allyIds.indexOf(uid)<0){state.data.allyIds.push(uid);if(cloud.ready)cloudSubscribe(uid);}
   state.data.raid={boss:inv.boss,e:inv.e,c:inv.c,target:inv.target,
     start:inv.start||new Date().toISOString(),
-    allyName:(inv.name||"Ally").slice(0,20),allyUid:uid,allyStartVol:(a?(+a.vol||0):0),ally:0};
+    allyName:(inv.name||"Ally").slice(0,20),allyUid:uid,minePRs:0,allyPRs:0};
   save();haptic("done");toast("Raid joined vs "+(inv.boss||"the boss").split(" — ")[0]);
   try{pushPatrolFeed({icon:"⚔️",accent:"var(--gold2)",name:inv.name||"Ally",kind:"raid-join",html:`You joined <b>${esc(inv.name||"an ally")}</b>'s raid on <b>${esc((inv.boss||"a boss").split(" — ")[0])}</b>.`});}catch(e){}
   if(state.tab==="allies")render();
@@ -5652,7 +5818,7 @@ function myPatrolCard(){
     let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{const o=epley(+s.w||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
     return {n:(w.name||"Session").slice(0,16),v:Math.round(w.totalVol||0),t:(w.date||"").slice(0,10),top:top.slice(0,18)};
   });
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,lifts,liftsAll,spl,bw,opt,big,recent};
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,lifts,liftsAll,spl,bw,opt,big,recent};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
@@ -5828,7 +5994,27 @@ function openJusticeLeague(){
     <button class="btn ghost" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
 }
 // Composite "Vigilante Score" — one number to rank yourself against your League.
-function vigilanteScore(c){if(!c)return 0;return Math.round((c.sl||0)*10+(c.opt||0)*0.9+(c.vol||0)/1000+(c.w||0)*2+(c.boss||0)*8+(c.days||0)*0.5);}
+// Vigilante Score — rewards QUALITY, not raw grinding. Strength level and world optimality (how good
+// your lifts actually are vs everyone) dominate; boss wins add skill credit; sessions count only a
+// little and are capped so nobody climbs the board by simply logging more, lower-quality sets than
+// you. Lifetime tonnage was REMOVED as a driver (it just rewarded volume for volume's sake).
+function vigilanteScore(c){if(!c)return 0;
+  const opt=c.opt||0, sl=c.sl||0, boss=c.boss||0, sessions=Math.min(c.w||0,50);
+  return Math.round(sl*9 + opt*2.4 + boss*7 + sessions*0.6);}
+// Ally status light from their last logged session: trained today / recovering / fresh.
+function allyStatus(a){
+  let last=null;try{if(a&&a.recent&&a.recent[0]&&a.recent[0].t)last=a.recent[0].t;}catch(e){}
+  if(!last)return null;
+  let days;try{const t0=new Date(new Date().toDateString()),t1=new Date(new Date(last+"T12:00:00").toDateString());days=Math.round((t0-t1)/864e5);}catch(e){return null;}
+  if(isNaN(days))return null;
+  if(days<=0)return {c:"var(--gold2)",t:"Trained today",pulse:true};
+  if(days<=2)return {c:"#E8C53C",t:"Recovering"};
+  return {c:"var(--green)",t:"Fresh"};
+}
+function allyStatusPill(a){
+  const st=allyStatus(a);if(!st)return "";
+  return `<span class="chip" style="color:${st.c};border-color:${st.c};font-size:10px;display:inline-flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:${st.c};display:inline-block${st.pulse?';animation:voicepulse 1.4s ease-in-out infinite':''}"></span>${st.t}</span>`;
+}
 // Rivalry score — the head-to-head number, weighted toward general STRENGTH and OPTIMALITY (how good
 // your lifts are vs the world), with some villain fun. Less about who simply moved more tonnage.
 function rivalryScore(c){if(!c)return 0;return Math.round((c.sl||0)*12+(c.opt||0)*1.6+(c.vol||0)/2500+(c.boss||0)*10+(c.w||0)*1.5);}
@@ -5843,39 +6029,40 @@ function openLeaderboard(){
     return `<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:10px 11px;margin-top:8px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
       <div class="row sp"><div class="row g" style="gap:9px;min-width:0"><span style="font-size:20px;flex:none;width:26px;text-align:center">${medal(i)}</span><b style="font-family:var(--disp);font-size:15px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b></div><b style="color:${you?'var(--gold2)':'var(--text)'}">${fmtNum(c._score)}</b></div>
       <div style="height:7px;border-radius:5px;background:var(--bg);overflow:hidden;margin-top:7px"><div style="height:100%;width:${pct}%;background:${you?'linear-gradient(90deg,var(--gold3),var(--gold))':'#3a4252'};border-radius:5px"></div></div>
-      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl}${c.opt?` · Top ${Math.max(1,100-c.opt)}%`:""} · ${fmtNum(c.vol)}kg · ${c.w} sessions · ${c.boss} villains</div></div>`;}).join("");
+      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl}${c.opt?` · <b style="color:var(--gold2)">Top ${Math.max(1,100-c.opt)}%</b> quality`:""} · ${c.boss} villains · ${c.w} sessions</div></div>`;}).join("");
   const myRank=board.findIndex(c=>c._you)+1;
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:6px">🏆 League Leaderboard</div>
-    <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — strength level, world optimality, tonnage, sessions, villains and nights on patrol, fused into one number.</div>
+    <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — driven by <b>strength</b> and <b>world optimality</b> (how good your lifts truly are), plus villains beaten. Quality over quantity: grinding more, sloppier sets won't out-rank a cleaner, stronger lifter.</div>
     <div class="banner" style="margin-bottom:4px"><span>🦇</span><div class="mini">${board.length<2?"Add allies in the Justice League to fill the board — for now the cave is yours alone.":myRank===1?"You sit at the top of the League. Defend the cowl.":`You're ranked #${myRank} of ${board.length}. ${fmtNum((board[myRank-2]._score-me._score))} points behind the vigilante above you.`}</div></div>
     ${rows}
     <button class="btn" style="margin-top:13px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
 }
-/* ===== CO-OP RAIDS (#26): team with an ally against a colossal boss; tonnage pools ===== */
-// Pooled tonnage accumulates across EVERY session both of you log while the raid is live (not one
-// session). Calibrated to real training: ~8t per person per session ⇒ ~16t combined per joint round.
-// Bane ≈ one strong joint session; the ladder roughly doubles up to a true multi-week endgame.
+/* ===== CO-OP RAIDS (#26): team with an ally against a boss; combined PRs pool =====
+   The boss falls when the two of you LAND a set number of records together (not tonnage —
+   tonnage punished whoever trained legs and rewarded sheer volume). A "record" = an e1RM
+   crown (you got genuinely stronger on a lift). Realistic ladder: a good session lands 1–3,
+   so Bane is a round or two and the final boss is a sustained campaign. */
 const RAID_BOSSES=[
-  {n:"Bane — Breaking the Bat",e:"💪",c:"#b07a3a",target:16000,q:"One shared session of fury. Together you'll move what no single Bat could."},
-  {n:"Ra's al Ghul — The Demon's Head",e:"🗡️",c:"#2e8b57",target:35000,q:"The League of Shadows tests your alliance over a few sessions. Pool your iron."},
-  {n:"Darkseid — Apokolips",e:"🌑",c:"#9b6fce",target:70000,q:"A god-tier raid spanning a week or more. Only a true partnership moves this much."},
-  {n:"Doomsday — Unleashed",e:"☠️",c:"#d0463a",target:120000,q:"The endgame raid. Two vigilantes, the heaviest campaign in Gotham."}
+  {n:"Bane — Breaking the Bat",e:"💪",c:"#b07a3a",target:3,q:"Three records, shared. One or two strong sessions between you and the mask cracks."},
+  {n:"Ra's al Ghul — The Demon's Head",e:"🗡️",c:"#2e8b57",target:6,q:"Six records over a few sessions. The League of Shadows tests your alliance."},
+  {n:"Darkseid — Apokolips",e:"🌑",c:"#9b6fce",target:9,q:"Nine records. A god-tier raid — keep stacking new ground over a week."},
+  {n:"Doomsday — Unleashed",e:"☠️",c:"#d0463a",target:12,q:"Twelve records. Only a relentless partnership grinds out this much new strength."},
+  {n:"The Batman Who Laughs — Dark Multiverse",e:"🃏",c:"#7b46d0",target:15,q:"Fifteen records. The endgame raid — the heaviest campaign Gotham has ever seen."}
 ];
-function raidMine(){const r=state.data.raid;if(!r)return 0;const t0=new Date(r.start).getTime();return state.data.workouts.filter(w=>new Date(w.date).getTime()>=t0).reduce((a,w)=>a+(w.totalVol||0),0);}
-// Live ally contribution: for a uid-bound raid, read the friend's lifetime vol straight off their
-// live-synced card and subtract the snapshot taken at raid start — so it climbs on its own as they train.
+// PR-based raid: each side keeps a live count of records LANDED since the raid began.
+// raidNotePR() bumps mine on every e1RM crown; the ally's count climbs from their card syncs.
+function raidNotePR(n){try{const r=state.data.raid;if(!r)return;r.minePRs=(+r.minePRs||0)+(n||1);save();}catch(e){}}
 function raidAllyLive(){const r=state.data.raid;if(!r||!r.allyUid)return null;return (state.data.allies||[]).find(a=>a&&a._uid===r.allyUid)||null;}
-function raidAllyVol(){const r=state.data.raid;if(!r)return 0;
-  if(r.allyUid){const a=raidAllyLive();const live=a?(+a.vol||0):null;if(live==null)return +r.ally||0;return Math.max(0,live-(+r.allyStartVol||0));}
-  return +r.ally||0;}
-function raidProgress(){const r=state.data.raid;if(!r)return null;const mine=raidMine(),ally=raidAllyVol(),combined=mine+ally;return {mine,ally,combined,pct:clamp(combined/r.target*100,0,100),done:combined>=r.target,live:!!r.allyUid};}
+function raidProgress(){const r=state.data.raid;if(!r)return null;
+  const mine=+r.minePRs||0, ally=+r.allyPRs||0, combined=mine+ally;
+  return {mine,ally,combined,pct:clamp(combined/r.target*100,0,100),done:combined>=r.target,live:!!r.allyUid};}
 function pickRaidAlly(uid){state._raidPickUid=(state._raidPickUid===uid)?null:uid;haptic("tap");openRaid();}
 function startRaid(idx){const b=RAID_BOSSES[idx];if(!b)return;
   // Live path: an ally was picked from the friend list — bind to their uid and snapshot their tonnage now.
   if(state._raidPickUid){
     const a=(state.data.allies||[]).find(x=>x&&x._uid===state._raidPickUid);
     if(!a){toast("That ally isn't syncing right now, sir.");return;}
-    const raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:(a.n||"Ally").slice(0,20),allyUid:a._uid,allyStartVol:+a.vol||0,ally:0,invited:true};
+    const raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:(a.n||"Ally").slice(0,20),allyUid:a._uid,minePRs:0,allyPRs:0,invited:true};
     state.data.raid=raid;
     state._raidPickUid=null;save();haptic("done");
     const sent=cloudSendRaidInvite(a._uid,raid);
@@ -5886,63 +6073,55 @@ function startRaid(idx){const b=RAID_BOSSES[idx];if(!b)return;
   // Manual path: typed name + optional pasted card (legacy / snapshot allies).
   const nm=(($("raid-ally")||{}).value||"").trim();
   if(!nm){toast("Pick a live ally above, or type an ally's name first, sir.");return;}
-  let allyStart=null;const code=($("raid-code")||{}).value||"";if(code.trim()){const c=decodeCard(code);if(c)allyStart=c.vol||0;}
-  state.data.raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:nm.slice(0,20),allyStartVol:allyStart,ally:0};
+  state.data.raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:nm.slice(0,20),minePRs:0,allyPRs:0};
   save();haptic("done");toast("Raid begun vs "+b.n);openRaid();}
-function syncRaidAlly(){const r=state.data.raid;if(!r)return;const c=decodeCard(($("raid-sync")||{}).value||"");
-  if(!c){toast("That Patrol Card didn't read.");return;}
-  if(r.allyStartVol==null)r.allyStartVol=c.vol||0;
-  r.ally=Math.max(0,(c.vol||0)-(r.allyStartVol||0));save();haptic("done");toast(r.allyName+" synced — "+fmtNum(r.ally)+"kg in");openRaid();}
-function addRaidAlly(kg){const r=state.data.raid;if(!r)return;r.ally=Math.max(0,(+r.ally||0)+kg);if(r.allyStartVol==null)r.allyStartVol=0;save();haptic("light");openRaid();}
+function addRaidAllyPR(n){const r=state.data.raid;if(!r)return;r.allyPRs=Math.max(0,(+r.allyPRs||0)+n);save();haptic("light");openRaid();}
 function endRaid(){appConfirm({title:"Abandon raid",body:"Your shared progress will be lost. Sure?",ok:"Abandon",cancel:"Keep raiding",danger:true}).then(ok=>{if(!ok)return;state.data.raid=null;save();haptic("warn");closeSheet();render();});}
 function claimRaid(){const r=state.data.raid,p=raidProgress();if(!r||!p||!p.done)return;
   state.data.bossWins=state.data.bossWins||[];
   state.data.bossWins.unshift({villain:r.boss+" — co-op w/ "+r.allyName,ex:"Co-op Raid",w:0,r:0,orm:0,prevOrm:0,date:new Date().toISOString()});
   state.data.raid=null;save();haptic("done");closeSheet();
-  appAlert({title:"RAID COMPLETE",ok:"For Gotham",html:`${r.e} <b>${esc(r.boss)}</b> has fallen to you and ${esc(r.allyName)}. <b>${fmtNum(p.combined)}kg</b> moved together — logged to your Hall of Defeats.`});
+  appAlert({title:"RAID COMPLETE",ok:"For Gotham",html:`${r.e} <b>${esc(r.boss)}</b> has fallen to you and ${esc(r.allyName)}. <b>${p.combined} records</b> broken together — logged to your Hall of Defeats.`});
   render();}
 function openRaid(){
   const r=state.data.raid;
   if(!r){
     const live=(state.data.allies||[]).filter(a=>a&&a._uid);
     const pick=state._raidPickUid;
-    const liveBlock=live.length?`<label class="mini">Pick a live ally <span style="color:var(--text3)">— their tonnage pools in real time, no pasting</span></label>
+    const liveBlock=live.length?`<label class="mini">Pick a live ally <span style="color:var(--text3)">— their records pool in real time, no pasting</span></label>
       <div style="margin:6px 0 4px">${live.map(a=>{const on=a._uid===pick;return `<button class="row sp" onclick="pickRaidAlly('${esc(a._uid)}')" style="width:100%;background:${on?'rgba(232,197,106,.14)':'var(--bg2)'};border:1px solid ${on?'var(--gold2)':'var(--border2)'};border-radius:11px;padding:9px 11px;margin-bottom:6px;cursor:pointer;text-align:left"><div class="row g" style="gap:9px;min-width:0"><span style="font-size:20px;flex:none">${a.re||"🦇"}</span><div style="min-width:0"><b style="font-size:13px">${esc(a.n||"Ally")}</b> <span class="mini" style="color:#7cc4ff">🔴 live</span><div class="mini" style="color:var(--text3)">${fmtNum(a.vol||0)}kg lifetime</div></div></div><span style="color:${on?'var(--gold2)':'var(--text3)'};flex:none">${on?"✓":"○"}</span></button>`;}).join("")}</div>
-      <div class="mini center" style="color:var(--text3);margin:2px 0 12px">— or sync a one-time ally below —</div>`:`<div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Add an ally by friend code on the Allies tab to pool tonnage <b>in real time</b>. Or team with a one-time ally by pasting their Patrol Card below.</div>`;
+      <div class="mini center" style="color:var(--text3);margin:2px 0 12px">— or team with a one-time ally below —</div>`:`<div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Add an ally by friend code on the Allies tab to pool records <b>in real time</b>. Or team with a one-time ally by typing their name below.</div>`;
     openSheet(`<div class="ttl">⚔️ Co-op Raid</div>
-      <div class="mini" style="margin:-2px 0 12px;color:var(--text2)">Team up against a colossal boss — your tonnage and your ally's pool toward one shared target.</div>
+      <div class="mini" style="margin:-2px 0 12px;color:var(--text2)">Team up against a boss — your records and your ally's pool toward one shared target.</div>
       ${liveBlock}
-      <label class="mini">Ally's name ${pick?'<span style="color:var(--text3)">(using live ally above)</span>':""}</label><input id="raid-ally" placeholder="e.g. Dick" ${pick?"disabled":""} style="margin-bottom:8px;${pick?'opacity:.4':''}"/>
-      <label class="mini">Ally's Patrol Card <span style="color:var(--text3)">(optional — to sync their tonnage)</span></label>
-      <textarea id="raid-code" placeholder="Paste their card to track their contribution…" ${pick?"disabled":""} style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none;margin-bottom:9px;${pick?'opacity:.4':''}"></textarea>
+      <label class="mini">Ally's name ${pick?'<span style="color:var(--text3)">(using live ally above)</span>':""}</label><input id="raid-ally" placeholder="e.g. Dick" ${pick?"disabled":""} style="margin-bottom:9px;${pick?'opacity:.4':''}"/>
       <label class="mini">Choose your raid boss${pick?` <span style="color:var(--gold2)">— vs ${esc((live.find(a=>a._uid===pick)||{}).n||"ally")}</span>`:""}</label>
-      <div style="margin-top:6px">${RAID_BOSSES.map((b,i)=>`<button class="row sp" onclick="startRaid(${i})" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:10px;margin-bottom:7px;cursor:pointer;text-align:left"><div class="row g" style="gap:10px;min-width:0"><span style="font-size:26px;flex:none">${b.e}</span><div style="min-width:0"><b style="font-size:14px;color:var(--gold2)">${esc(b.n)}</b><div class="mini" style="color:var(--text3)">Pooled target ${fmtNum(b.target)}kg</div></div></div><span style="color:var(--gold2);flex:none">▶</span></button>`).join("")}</div>
+      <div style="margin-top:6px">${RAID_BOSSES.map((b,i)=>`<button class="row sp" onclick="startRaid(${i})" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:10px;margin-bottom:7px;cursor:pointer;text-align:left"><div class="row g" style="gap:10px;min-width:0"><span style="font-size:26px;flex:none">${b.e}</span><div style="min-width:0"><b style="font-size:14px;color:var(--gold2)">${esc(b.n)}</b><div class="mini" style="color:var(--text3)">${b.target} records to break together</div></div></div><span style="color:var(--gold2);flex:none">▶</span></button>`).join("")}</div>
       <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
     return;
   }
   const p=raidProgress();const barCol=p.done?"#2ECC71":r.c;const liveAlly=p.live?raidAllyLive():null;
+  const prWord=n=>n+" PR"+(n===1?"":"s");
   openSheet(`<span id="raid-live-tag" hidden></span><div class="ttl" style="display:flex;align-items:center;gap:6px">${r.e} ${esc(r.boss)}</div>
-    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Co-op raid with <b class="gold">${esc(r.allyName)}</b>${p.live?' <span style="color:#7cc4ff">🔴 live</span>':''} · pooled target ${fmtNum(r.target)}kg</div>
+    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Co-op raid with <b class="gold">${esc(r.allyName)}</b>${p.live?' <span style="color:#7cc4ff">🔴 live</span>':''} · break <b>${r.target}</b> records together</div>
     <div class="card glow center" style="padding:14px">
-      <div class="big" style="font-size:34px;color:${p.done?'var(--green)':'var(--gold2)'}">${fmtNum(p.combined)}<span style="font-size:16px">/${fmtNum(r.target)}kg</span></div>
+      <div class="big" style="font-size:34px;color:${p.done?'var(--green)':'var(--gold2)'}">${p.combined}<span style="font-size:16px">/${r.target} records</span></div>
       <div style="height:12px;border-radius:7px;background:var(--bg2);overflow:hidden;margin:10px 0 6px"><div style="height:100%;width:${p.pct}%;background:${barCol};transition:width .4s"></div></div>
-      <div class="row sp"><span class="mini">You: <b class="gold">${fmtNum(p.mine)}kg</b></span><span class="mini">${esc(r.allyName)}: <b style="color:#7cc4ff">${fmtNum(p.ally)}kg</b></span></div>
+      <div class="row sp"><span class="mini">You: <b class="gold">${prWord(p.mine)}</b></span><span class="mini">${esc(r.allyName)}: <b style="color:#7cc4ff">${prWord(p.ally)}</b></span></div>
     </div>
     ${p.done?`<button class="btn gold" style="margin-top:11px" onclick="claimRaid()">⚔️ Claim the kill</button>`
-      :p.live?`<div class="banner" style="margin-top:11px;border-color:rgba(124,196,255,.4);background:rgba(124,196,255,.08)"><span>🔴</span><div class="mini" style="line-height:1.5">Both totals pool <b>automatically</b>. Your tonnage counts every session since the raid began; ${esc(r.allyName)}'s climbs live the moment they log a workout${liveAlly?"":(r.invited?' — <span style="color:var(--text3)">(invite sent — waiting for them to accept &amp; log)</span>':' — <span style="color:var(--text3)">(waiting for their first sync since you linked)</span>')}.</div></div>`
-      :`<div class="mini" style="margin:11px 0 5px;color:var(--text2)">Your tonnage tracks automatically from every session logged since the raid began. Sync ${esc(r.allyName)}'s total from their latest Patrol Card:</div>
-      <textarea id="raid-sync" placeholder="Paste ${esc(r.allyName)}'s latest Patrol Card…" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none"></textarea>
-      <button class="btn sm" style="margin-top:6px" onclick="syncRaidAlly()">Sync ${esc(r.allyName)}'s tonnage</button>
-      <div class="row g" style="gap:7px;margin-top:6px"><button class="btn ghost sm" onclick="addRaidAlly(1000)">+1t manual</button><button class="btn ghost sm" onclick="addRaidAlly(5000)">+5t manual</button></div>`}
+      :p.live?`<div class="banner" style="margin-top:11px;border-color:rgba(124,196,255,.4);background:rgba(124,196,255,.08)"><span>🔴</span><div class="mini" style="line-height:1.5">Every record counts <b>automatically</b>. Each new est-1RM you crown adds to the pool; ${esc(r.allyName)}'s records climb live the moment they log one${liveAlly?"":(r.invited?' — <span style="color:var(--text3)">(invite sent — waiting for them to accept &amp; log)</span>':' — <span style="color:var(--text3)">(waiting for their first sync since you linked)</span>')}.</div></div>`
+      :`<div class="mini" style="margin:11px 0 5px;color:var(--text2)">Your records count automatically as you crown new est-1RMs. For a one-time ally, tap below each time ${esc(r.allyName)} lands a record:</div>
+      <div class="row g" style="gap:7px;margin-top:6px"><button class="btn ghost sm" onclick="addRaidAllyPR(1)">+1 their record</button><button class="btn ghost sm" onclick="addRaidAllyPR(-1)">− undo</button></div>`}
     <button class="btn ghost sm" style="margin-top:12px;color:var(--text3)" onclick="endRaid()">Abandon raid</button>
     <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
 }
 function raidCard(){const r=state.data.raid;
-  if(!r)return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim)" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0">⚔️ Co-op Raid</div><span class="mini" style="color:var(--gold2)">start ›</span></div><div class="mini" style="color:var(--text2)">Team up with an ally against a colossal boss — pool your tonnage toward one shared target.</div></div>`;
+  if(!r)return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim)" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0">⚔️ Co-op Raid</div><span class="mini" style="color:var(--gold2)">start ›</span></div><div class="mini" style="color:var(--text2)">Team up with an ally against a boss — pool your records toward one shared target.</div></div>`;
   const p=raidProgress();
   return `<div class="card glow" style="cursor:pointer" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0">${r.e} Raid: ${esc(r.boss.split(" — ")[0])}</div><span class="chip ${p.done?'on':''}">${Math.round(p.pct)}%</span></div>
     <div style="height:10px;border-radius:6px;background:var(--bg2);overflow:hidden;margin:8px 0 5px"><div style="height:100%;width:${p.pct}%;background:${p.done?'#2ECC71':r.c}"></div></div>
-    <div class="mini" style="color:var(--text2)">${p.done?`Target smashed — tap to claim the kill with ${esc(r.allyName)}.`:`${fmtNum(p.combined)}/${fmtNum(r.target)}kg with ${esc(r.allyName)} · tap to sync & view`}</div></div>`;
+    <div class="mini" style="color:var(--text2)">${p.done?`Boss broken — tap to claim the kill with ${esc(r.allyName)}.`:`${p.combined}/${r.target} records with ${esc(r.allyName)} · tap to view`}</div></div>`;
 }
 function setActiveSplit(id){state.data.activeSplitId=id;state.data._nextDay=0;save();render();}
 function open1RM(){openSheet(`<div class="ttl">1RM calculator (Epley)</div>
@@ -6671,6 +6850,50 @@ function fightNightHistoryRow(){
   const w=h[0].winner;
   return `<div class="hr" style="margin:11px 0 9px"></div><div class="row sp"><span class="mini" style="color:var(--text3)">Last week's belt</span><span class="mini" style="color:var(--gold2);font-weight:700">${w?esc(w.re||"🏆")+" "+esc(w.name)+" · "+fmtNum(w.vol)+"kg":"—"}</span></div>`;
 }
+/* ===== WEEKLY FIGHT CARD — your own week, scored like a bout vs last week's self. ===== */
+function weeklyFightCard(){
+  const d=state.data,ws=d.workouts||[];if(!ws.length)return "";
+  const nowT=now();
+  const inRange=(w,a,b)=>{const t=new Date(w.date).getTime();return t>=nowT-b*864e5&&t<nowT-a*864e5;};
+  const thisW=ws.filter(w=>inRange(w,0,7)),lastW=ws.filter(w=>inRange(w,7,14));
+  const agg=arr=>{let vol=0,prs=0,sets=0;arr.forEach(w=>{vol+=w.totalVol||0;prs+=(w.prs||[]).length;(w.exercises||[]).forEach(e=>sets+=(e.sets||[]).filter(s=>s.type!=="W").length);});return {sessions:arr.length,vol:Math.round(vol),prs,sets};};
+  const T=agg(thisW),L=agg(lastW);
+  if(!T.sessions&&!L.sessions)return "";
+  let best=null,bestO=0;thisW.forEach(w=>{(w.exercises||[]).forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{const o=setE1RM(ex,s);if(o>bestO){bestO=o;best={n:e.name,o:Math.round(o)};}});});});
+  const sc=x=>x.sessions*3+x.prs*4+x.vol/2000;
+  const mine=sc(T),theirs=sc(L);
+  const verdict=!L.sessions?{t:"OPENING BOUT",c:"var(--gold2)",d:"First week on the card — set the bar to beat."}
+    :mine>theirs*1.03?{t:"WIN",c:"var(--green)",d:"You beat last week's self. The needle moved — keep it moving."}
+    :mine<theirs*0.97?{t:"LOSS",c:"#E8453C",d:"Last week's you edged it. Answer back this week."}
+    :{t:"DRAW",c:"var(--gold2)",d:"Dead even with last week. Break the tie."};
+  const tale=(lab,t,l,unit,disp)=>{const win=t===l?0:(t>l?1:-1);const dt=disp?disp(t):t,dl=disp?disp(l):l;
+    return `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><b style="min-width:60px;text-align:left;color:${win>0?'var(--green)':win<0?'var(--text2)':'var(--gold2)'}">${dt}${unit||""}</b><span class="mini" style="flex:1;text-align:center;color:var(--text3)">${lab}</span><span style="min-width:60px;text-align:right;color:var(--text3)">${dl}${unit||""}</span></div>`;};
+  return `<div class="card" style="margin-top:11px;border-color:var(--gold-dim);background:linear-gradient(170deg,#15110a,var(--bg2))">
+    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🥊 This Week's Fight Card</div><span class="chip" style="color:${verdict.c};border-color:${verdict.c};font-weight:800">${verdict.t}</span></div>
+    <div class="mini" style="color:var(--text2);margin:5px 0 8px">${verdict.d}</div>
+    <div class="row" style="gap:6px;margin-bottom:6px">${caveStat(T.sessions,"sessions")}${caveStat(fmtNum(T.vol)+"kg","moved")}${caveStat(T.prs,"records")}${caveStat(d.u.streakDays||0,"🔥 streak")}</div>
+    <div class="row sp" style="margin:4px 0 1px"><b class="mini" style="color:var(--gold2)">THIS WEEK</b><b class="mini" style="color:var(--text3)">LAST WEEK</b></div>
+    ${tale("Sessions",T.sessions,L.sessions)}
+    ${tale("Tonnage",T.vol,L.vol," kg",v=>fmtNum(v))}
+    ${tale("Working sets",T.sets,L.sets)}
+    ${tale("New records",T.prs,L.prs)}
+    ${best?`<div class="mini" style="color:var(--text3);margin-top:8px;text-align:center">🏆 Knockout lift of the week — <b style="color:var(--gold2)">${esc(best.n)}</b> at ${best.o}kg est. 1RM</div>`:""}
+  </div>`;
+}
+// Ally streak in the danger window: trained yesterday, hasn't trained today, real streak going.
+function allyStreakRisk(a){
+  if(!a||!a.streak||a.streak<3)return null;
+  let last=null;try{if(a.recent&&a.recent[0]&&a.recent[0].t)last=a.recent[0].t;}catch(e){}
+  if(!last)return null;
+  let days;try{const t0=new Date(new Date().toDateString()),t1=new Date(new Date(last+"T12:00:00").toDateString());days=Math.round((t0-t1)/864e5);}catch(e){return null;}
+  return days===1?{streak:a.streak}:null;
+}
+function streakRescue(i){
+  const a=(state.data.allies||[])[i];if(!a)return;
+  if(!a._uid){toast("Streak rescue needs a friend-code ally, sir.");return;}
+  if(!cloud.ready){toast("Connecting… try again in a second.");cloudInit();return;}
+  cloudSendNudge(a,`🔥 Don't let your ${a.streak}-day streak die — get a session in before midnight.`);
+}
 function fightNightCard(){
   fightNightSync();
   const fn=state.data.fightNight;if(!fn)return"";
@@ -6756,13 +6979,16 @@ function renderAllies(){
     html+=allies.map((a,i)=>{
       const top=(a.lifts||[]).slice(0,3).map(l=>`<span class="chip" style="font-size:10.5px">${esc(l.n)} ${l.o}kg</span>`).join(" ")||'<span class="mini" style="color:var(--text3)">No lifts on their card yet</span>';
       const days=(a.spl&&a.spl.d)?a.spl.d.length:0;
-      return `<div class="card" style="padding:12px 13px;margin-bottom:9px"><div class="row sp"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${a.re||"🦸"} ${esc(a.n)}</b><span class="chip">${esc(a.rk||"")}</span></div>
+      return `<div class="card" style="padding:12px 13px;margin-bottom:9px"><div class="row sp" style="align-items:flex-start"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${a.re||"🦸"} ${esc(a.n)}</b><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="chip">${esc(a.rk||"")}</span>${allyStatusPill(a)}</div></div>
       <div class="row" style="gap:6px;margin:9px 0">${caveStat("STR "+(a.sl||0),"strength")}${caveStat(fmtNum(a.vol||0)+"kg","moved")}${caveStat(a.w||0,"sessions")}${caveStat(a.boss||0,"villains")}</div>
       <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">${top}</div>
       <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div>
+      ${(()=>{const risk=allyStreakRisk(a);return risk?`<button class="btn sm" style="width:100%;margin-top:6px;background:linear-gradient(135deg,#ff7a3a,#E8453C);color:#fff;font-weight:800" onclick="streakRescue(${i})">🔥 Rescue their ${risk.streak}-day streak — about to break</button>`:"";})()}
       <button class="btn ghost sm" style="width:100%;margin-top:6px;color:var(--gold2);border-color:var(--gold-dim)" onclick="nudgeAlly(${i})">🦇 Light the Bat-Signal</button></div>`;
     }).join("");
   }
+  // Weekly Fight Card — your own week scored like a bout vs last week's self
+  html+=weeklyFightCard();
   // Fight Night — weekly tonnage bout with a belt on the line
   html+=fightNightCard();
   // Tools — compact 2-col grid of tap tiles (Leaderboard · Raid · Sparring · More).
@@ -7145,6 +7371,53 @@ function prProfileTag(name){
   const cur=prCurrentProfile(name),vault=(state.data.prVault&&state.data.prVault[name])||{};
   if(cur==="Standard"&&!Object.keys(vault).length)return "";
   return ` <span class="chip" style="font-size:9.5px;padding:1px 6px;color:var(--gold2);border-color:var(--gold-dim)">${esc(cur)}</span>`;
+}
+/* ===== SMART PROFILE CAPTURE — Alfred proactively offers to file a freak record under its own profile.
+   When a crown leaps >30% over a real standing record (flagged in liveCheckPR), it's almost always a
+   different machine / easier cam, not a sudden superhuman jump. After the summary, Alfred asks: keep it
+   as a genuine PR, or file it as a separate resistance profile so your true record stays clean. */
+function maybeOfferProfile(){
+  try{
+    const offers=state._profileOffers;if(!offers||!offers.length)return;
+    if(state.step==="summary"&&document.getElementById("cine")&&document.getElementById("cine").classList.contains("on")){
+      setTimeout(maybeOfferProfile,1200);return; // wait for any kill-cam/boss cine to clear first
+    }
+    const o=offers.shift();state._profileOffers=offers.length?offers:null;
+    if(!o||!o.name){if(state._profileOffers)maybeOfferProfile();return;}
+    appConfirm({title:"🤖 Alfred — that was a big jump",
+      html:`Your <b>${esc(o.name)}</b> est. 1RM just leapt <b class="gold">+${o.jump}%</b> (${Math.round(o.prevOrm)} → <b>${Math.round(o.newOrm)}kg</b>) in one session, sir. A clean ${o.jump}% gain is rare — was that the <b>same machine and setting</b> as your record, or a <b>different one</b> (easier cam, another machine)?<div class="mini" style="margin-top:6px;color:var(--text2)">If it was a different setup, I'll file these numbers under their own resistance profile so your true <b>${esc(o.name)}</b> record stays honest. If it was a genuine PR, we keep it — and well done.</div>`,
+      ok:"Different setup — file it",cancel:"Genuine PR — keep it"}).then(diff=>{
+        if(diff)openProfileLabelSheet(o);
+        else{try{toast("Logged as a real PR. Outstanding, Master.");}catch(e){}}
+        if(state._profileOffers)setTimeout(maybeOfferProfile,500);
+      });
+  }catch(e){}
+}
+function openProfileLabelSheet(o){
+  state._profileFileFor=o;
+  const presets=["Different machine","Easier cam","Assisted","Other gym"];
+  openSheet(`<div class="ttl">🗂️ File ${esc(o.name)} profile</div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 11px">These <b>${Math.round(o.newOrm)}kg</b> numbers move to their own profile. Your standing <b>${Math.round(o.prevOrm)}kg</b> record comes back as the live one — switch between them anytime from The Forge or by asking Alfred.</div>
+    ${presets.map(p=>`<button class="btn ghost" style="width:100%;text-align:left;margin-bottom:7px" onclick="fileLiftProfilePick('${esc(p).replace(/'/g,"\\'")}')">${esc(p)}</button>`).join("")}
+    <div class="mini" style="color:var(--text3);margin:4px 0 5px">Or name it yourself</div>
+    <input id="profLabel" placeholder="e.g. Hammer Strength" autocapitalize="words" autocomplete="off" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:10px;font-size:13px"/>
+    <div class="row" style="gap:6px;margin-top:8px"><button class="btn gold sm g" onclick="fileLiftProfilePick(($('profLabel').value||'Variant'))">File it</button><button class="btn sm" style="width:auto" onclick="closeSheet()">Cancel</button></div>`);
+}
+function fileLiftProfilePick(label){const o=state._profileFileFor;if(!o)return;closeSheet();fileLiftProfile(o,label);}
+// Move the inflated live record into a vault profile; restore the previous (true) record as live.
+function fileLiftProfile(o,label){
+  try{
+    const d=state.data,name=o.name;label=_prCleanLabel(label);
+    d.prVault=d.prVault||{};d.prVault[name]=d.prVault[name]||{};
+    const liveNow=d.prs[name];                       // the new, inflated record just committed
+    if(liveNow&&(liveNow.orm>0||liveNow.maxW>0))d.prVault[name][label]=liveNow;
+    if(o.prevRec&&(o.prevRec.orm>0||o.prevRec.maxW>0))d.prs[name]=o.prevRec; // bring the true record back live
+    else delete d.prs[name];
+    d.prProfile=d.prProfile||{};d.prProfile[name]="Standard";
+    save();haptic("done");
+    try{toast(`Filed under "${label}". Your ${name} record stands at ${Math.round((o.prevRec&&o.prevRec.orm)||0)}kg.`);}catch(e){}
+    try{render();}catch(e){}
+  }catch(e){try{toast("Couldn't file that profile.");}catch(_){}}
 }
 // Sub-line listing the OTHER profiles' bests for a lift, so two PR versions show side by side.
 function prVaultLine(name){
@@ -8701,6 +8974,9 @@ function boot(){
   if(!state.data.splits||!state.data.splits.length){state.data.splits=defaultSplits();state.data.activeSplitId="ppl";}
   // migrate plates
   if(!state.data.plates||!state.data.plates.length)state.data.plates=DEF_PLATES.slice();
+  // Migrate any in-progress raid from the old tonnage targets to the new combined-PR ladder.
+  try{const r=state.data.raid;if(r&&(r.minePRs==null||r.target>50)){const nb=RAID_BOSSES.find(b=>b.n===r.boss)||RAID_BOSSES.find(b=>b.n.split(" — ")[0]===String(r.boss).split(" — ")[0]);r.target=nb?nb.target:3;r.minePRs=0;r.allyPRs=0;delete r.ally;delete r.allyStartVol;save();}}catch(e){}
+  try{sweepCallouts();}catch(e){}
   loadExDB();
   if(!state.data.onboardingDone){state.showOnboarding=true;state.obStep=0;state.obTmp={};}
   else{state.tab="gotham";}  // The Cave auto-home: always land on the glanceable Cowl dashboard, never the last-used tab
