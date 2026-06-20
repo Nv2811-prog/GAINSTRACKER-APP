@@ -24,7 +24,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.45;
-overflow-x:hidden;-webkit-font-smoothing:antialiased;
+-webkit-font-smoothing:antialiased;
 background-image:radial-gradient(circle at 50% -8%,rgba(235,199,107,.17),transparent 46%),radial-gradient(circle at 50% 2%,rgba(91,124,166,.15),transparent 58%),radial-gradient(circle at 86% 112%,rgba(124,92,232,.09),transparent 50%),radial-gradient(circle at 10% 120%,rgba(91,124,166,.08),transparent 48%);background-attachment:fixed;}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 background-image:linear-gradient(rgba(91,124,166,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(91,124,166,.045) 1px,transparent 1px);background-size:36px 36px;
@@ -32,7 +32,7 @@ background-image:linear-gradient(rgba(91,124,166,.045) 1px,transparent 1px),line
 #app{max-width:560px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 14px 96px;min-height:100%}
 /* ===== motion system — smooth, 60fps view transitions ===== */
 :root{--ease-out:cubic-bezier(.22,.61,.36,1);--ease-spring:cubic-bezier(.34,1.4,.5,1)}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 body{overscroll-behavior-y:none}
 @keyframes viewEnter{0%{opacity:0;transform:translate3d(0,11px,0)}100%{opacity:1;transform:translate3d(0,0,0)}}
 #app.view-enter{animation:viewEnter .34s var(--ease-out) both;will-change:transform,opacity}
@@ -2403,7 +2403,7 @@ function initDragReorder(){
     if(!lp.active){lp.raf=null;return;}
     if(lp.vy!==0){
       window.scrollBy(0,lp.vy);
-      if(lp.node){const fake={clientX:lp.startX,clientY:lp.lastY};reorder(fake);}
+      if(lp.node){const fake={clientX:lp.startX,clientY:lp.lastY};reorder(fake);lp.baseY=lp.lastY;lp.node.style.transform="scale(1.04)";}
     }
     lp.raf=requestAnimationFrame(autoScroll);
   };
@@ -2417,14 +2417,18 @@ function initDragReorder(){
   const getRow=(t)=>{while(t&&t!==document.body){if(t.classList&&t.classList.contains("exdrag"))return t;t=t.parentElement;}return null;};
   const getHandle=(t)=>{while(t&&t!==document.body){if(t.classList&&t.classList.contains("draghandle"))return t;t=t.parentElement;}return null;};
   const clearTimer=()=>{if(lp.timer){clearTimeout(lp.timer);lp.timer=null;}};
-  const lift=(row)=>{row.style.transition="transform .12s ease,box-shadow .12s ease,opacity .12s ease";row.style.transform="scale(1.025)";row.style.boxShadow="0 14px 34px rgba(0,0,0,.6)";row.style.opacity="0.97";row.style.position="relative";row.style.zIndex="30";};
-  const begin=(row)=>{lp.active=true;lp.node=row;lift(row);document.body.style.userSelect="none";if(lp.handle)lp.handle.classList.add("grabbing");haptic("done");};
+  // pointer-events:none lets elementFromPoint see the row UNDER the finger (no dead-zone over the dragged card);
+  // transform is left out of the transition so the card tracks the finger 1:1 instead of lagging behind it.
+  const lift=(row)=>{row.style.transition="box-shadow .12s ease,opacity .12s ease";row.style.transform="translateY(0) scale(1.04)";row.style.boxShadow="0 16px 40px rgba(0,0,0,.62)";row.style.opacity="0.96";row.style.position="relative";row.style.zIndex="30";row.style.pointerEvents="none";row.style.willChange="transform";};
+  const begin=(row)=>{lp.active=true;lp.node=row;lp.baseY=lp.startY;lift(row);document.body.style.userSelect="none";if(lp.handle)lp.handle.classList.add("grabbing");haptic("done");};
   const reorder=(e)=>{
     const row=getRow(document.elementFromPoint(e.clientX,e.clientY));
     if(!row||row===lp.node||!row.classList.contains("exdrag"))return;
     const rect=row.getBoundingClientRect();const before=e.clientY<rect.top+rect.height/2;const parent=row.parentElement;
-    if(before){if(row.previousElementSibling!==lp.node)parent.insertBefore(lp.node,row);}
-    else{if(row.nextElementSibling!==lp.node)parent.insertBefore(lp.node,row.nextElementSibling);}
+    let moved=false;
+    if(before){if(row.previousElementSibling!==lp.node){parent.insertBefore(lp.node,row);moved=true;}}
+    else{if(row.nextElementSibling!==lp.node){parent.insertBefore(lp.node,row.nextElementSibling);moved=true;}}
+    if(moved){lp.baseY=e.clientY;lp.node.style.transform="scale(1.04)";} // landed in a new slot — re-anchor the finger-follow so it keeps tracking cleanly
   };
   document.addEventListener("pointerdown",(e)=>{
     if(state.step!=="logging"||lp.active)return;
@@ -2466,6 +2470,7 @@ function initDragReorder(){
     if(!lp.active||!lp.node)return;
     e.preventDefault();
     reorder(e);
+    lp.node.style.transform="translateY("+(e.clientY-lp.baseY)+"px) scale(1.04)"; // card follows the finger
     updateEdge(e.clientY);
   },{passive:false});
   const end=()=>{
@@ -5818,7 +5823,8 @@ function myPatrolCard(){
     let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{const o=epley(+s.w||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
     return {n:(w.name||"Session").slice(0,16),v:Math.round(w.totalVol||0),t:(w.date||"").slice(0,10),top:top.slice(0,18)};
   });
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,lifts,liftsAll,spl,bw,opt,big,recent};
+  const prTot=(d.workouts||[]).reduce((n,w)=>n+((w.prs||[]).length),0); // cumulative PR events ever — lets Fight Night score progress, not tonnage
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
@@ -6807,37 +6813,41 @@ function openBatcomputer(){
 /* ===== ALLIES TAB — one social hub: your Patrol Card, the Justice League,
    the Leaderboard, Co-op Raids & 1-v-1 Sparring, grouped in one place. ===== */
 /* ========================= FIGHT NIGHT — weekly KO scorecard ========================= */
-// Monday-00:00 local as the week key. Each fighter's score = lifetime tonnage added since week start.
+// Monday-00:00 local as the week key. Each fighter's score = personal records set since week start.
 function fnWeekStart(t){const d=new Date(t||now());d.setHours(0,0,0,0);const dow=(d.getDay()+6)%7;d.setDate(d.getDate()-dow);return d.getTime();}
 function fnKey(a){return a&&a._uid?a._uid:(a?"n:"+a.n:null);}
+// Cumulative PR events ever logged — the running tally Fight Night diffs week-to-week.
+function myPRTotal(){return (state.data.workouts||[]).reduce((n,w)=>n+((w.prs||[]).length),0);}
 function fightNightBoard(base){
   base=base||{};
-  const myVol=Math.round((state.data.u.totalVolume)||0),me=myPatrolCard();
-  const rows=[{uid:"me",name:(me.n||"You")+" (you)",re:me.re||"🦇",you:true,vol:Math.max(0,myVol-(("me"in base)?base.me:myVol))}];
-  (state.data.allies||[]).forEach(a=>{const k=fnKey(a);const b=(k in base)?base[k]:Math.round(a.vol||0);
-    rows.push({uid:k,name:a.n||"Ally",re:a.re||"🦇",vol:Math.max(0,Math.round(a.vol||0)-b)});});
-  return rows.sort((x,y)=>y.vol-x.vol);
+  const myPR=myPRTotal(),me=myPatrolCard();
+  const rows=[{uid:"me",name:(me.n||"You")+" (you)",re:me.re||"🦇",you:true,pr:Math.max(0,myPR-(("me"in base)?base.me:myPR))}];
+  (state.data.allies||[]).forEach(a=>{const k=fnKey(a);const tot=Math.round(a.prTot||0);const b=(k in base)?base[k]:tot;
+    rows.push({uid:k,name:a.n||"Ally",re:a.re||"🦇",pr:Math.max(0,tot-b)});});
+  return rows.sort((x,y)=>y.pr-x.pr);
 }
 function fightNightSync(){
-  const fn=state.data.fightNight=state.data.fightNight||{wk:0,base:{},history:[]};
-  const wkNow=fnWeekStart(),myVol=Math.round((state.data.u.totalVolume)||0),allies=state.data.allies||[];
+  const fn=state.data.fightNight=state.data.fightNight||{wk:0,base:{},history:[],metric:"pr"};
+  const wkNow=fnWeekStart(),myPR=myPRTotal(),allies=state.data.allies||[];
+  const freshBase=()=>{const base={me:myPR};allies.forEach(a=>{const k=fnKey(a);if(k)base[k]=Math.round(a.prTot||0);});return base;};
+  // Migrating off the old tonnage bout: re-baseline on PRs and DON'T settle a phantom (volume) result.
+  if(fn.metric!=="pr"){fn.metric="pr";fn.wk=wkNow;fn.base=freshBase();fn.history=fn.history||[];save();return;}
   if(fn.wk!==wkNow){
-    // week rolled over → settle the previous bout (if there was a real contest)
+    // week rolled over → settle the previous bout (if anyone actually set a record)
     if(fn.wk&&fn.base){
       const board=fightNightBoard(fn.base);
-      if(board.length>=2&&board.some(b=>b.vol>0)){
+      if(board.length>=2&&board.some(b=>b.pr>0)){
         const res={wk:fn.wk,end:fn.wk+7*864e5,board,winner:board[0]};
         fn.history=fn.history||[];fn.history.unshift(res);if(fn.history.length>12)fn.history.length=12;
         try{showFightNightResult(res);}catch(e){}
-        try{const w=res.winner;pushPatrolFeed({icon:"🏆",accent:"var(--gold2)",name:w.name,kind:"fightnight",html:`<b>Fight Night</b> — ${esc(w.name)} took the belt with <b style="color:var(--gold2)">${fmtNum(w.vol)}kg</b> moved this week`});}catch(e){}
+        try{const w=res.winner;pushPatrolFeed({icon:"🏆",accent:"var(--gold2)",name:w.name,kind:"fightnight",html:`<b>Fight Night</b> — ${esc(w.name)} took the belt with <b style="color:var(--gold2)">${w.pr} record${w.pr===1?"":"s"}</b> set this week`});}catch(e){}
       }
     }
-    const base={me:myVol};allies.forEach(a=>{const k=fnKey(a);if(k)base[k]=Math.round(a.vol||0);});
-    fn.wk=wkNow;fn.base=base;save();
+    fn.wk=wkNow;fn.base=freshBase();save();
   }else{
-    // mid-week: give newly-added fighters a fair baseline so they don't show inflated tonnage
-    let changed=false;if(!("me"in fn.base)){fn.base.me=myVol;changed=true;}
-    allies.forEach(a=>{const k=fnKey(a);if(k&&!(k in fn.base)){fn.base[k]=Math.round(a.vol||0);changed=true;}});
+    // mid-week: give newly-added fighters a fair baseline so they don't show phantom records
+    let changed=false;if(!("me"in fn.base)){fn.base.me=myPR;changed=true;}
+    allies.forEach(a=>{const k=fnKey(a);if(k&&!(k in fn.base)){fn.base[k]=Math.round(a.prTot||0);changed=true;}});
     if(changed)save();
   }
 }
@@ -6848,7 +6858,7 @@ function fnCountdown(end){const ms=end-now();if(ms<=0)return"settling…";
 function fightNightHistoryRow(){
   const h=(state.data.fightNight&&state.data.fightNight.history)||[];if(!h.length)return"";
   const w=h[0].winner;
-  return `<div class="hr" style="margin:11px 0 9px"></div><div class="row sp"><span class="mini" style="color:var(--text3)">Last week's belt</span><span class="mini" style="color:var(--gold2);font-weight:700">${w?esc(w.re||"🏆")+" "+esc(w.name)+" · "+fmtNum(w.vol)+"kg":"—"}</span></div>`;
+  return `<div class="hr" style="margin:11px 0 9px"></div><div class="row sp"><span class="mini" style="color:var(--text3)">Last week's belt</span><span class="mini" style="color:var(--gold2);font-weight:700">${w?esc(w.re||"🏆")+" "+esc(w.name)+" · "+(w.pr||0)+" PR"+((w.pr||0)===1?"":"s"):"—"}</span></div>`;
 }
 /* ===== WEEKLY FIGHT CARD — your own week, scored like a bout vs last week's self. ===== */
 function weeklyFightCard(){
@@ -6898,21 +6908,21 @@ function fightNightCard(){
   fightNightSync();
   const fn=state.data.fightNight;if(!fn)return"";
   const board=fightNightBoard(fn.base),end=fn.wk+7*864e5;
-  const max=Math.max(1,...board.map(b=>b.vol));
+  const max=Math.max(1,...board.map(b=>b.pr));
   const allies=state.data.allies||[];
   const rows=board.map((b,i)=>{
-    const lead=i===0&&b.vol>0,pct=Math.round(b.vol/max*100);
+    const lead=i===0&&b.pr>0,pct=Math.round(b.pr/max*100);
     return `<div class="fnrow ${b.you?"you":""}">
       <div class="fnpos">${lead?"🏆":"#"+(i+1)}</div>
       <div class="fnav">${b.re||"🦇"}</div>
       <div class="g" style="min-width:0">
-        <div class="row sp"><b style="font-size:13.5px;color:${lead?"var(--gold2)":"var(--text)"}">${esc(b.name)}</b><span class="mini" style="font-weight:700;color:${lead?"var(--gold2)":"var(--text2)"}">${fmtNum(b.vol)}kg</span></div>
+        <div class="row sp"><b style="font-size:13.5px;color:${lead?"var(--gold2)":"var(--text)"}">${esc(b.name)}</b><span class="mini" style="font-weight:700;color:${lead?"var(--gold2)":"var(--text2)"}">${b.pr} PR${b.pr===1?"":"s"}</span></div>
         <div class="bar" style="height:6px;margin-top:5px;background:var(--bg4)"><i style="width:${pct}%;background:${lead?"linear-gradient(90deg,var(--gold),var(--gold2))":"var(--gold-dim)"}"></i></div>
       </div></div>`;
   }).join("");
   const sub=allies.length
-    ? `Most kg moved by Sunday midnight takes the belt. Live standings:`
-    : `Add an ally and the weekly tonnage bout goes live. For now you're shadow-boxing — keep stacking weight.`;
+    ? `Most personal records set by Sunday midnight takes the belt — progress, not just tonnage. Live standings:`
+    : `Add an ally and the weekly records bout goes live. For now you're shadow-boxing — chase new PRs.`;
   return `<div class="card" style="margin-top:11px;border-color:var(--gold-dim);background:linear-gradient(165deg,var(--gold-bg),var(--bg2))">
     <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🥊 Fight Night</div><span class="chip" style="color:var(--gold2);border-color:var(--gold-dim)">${fnCountdown(end)}</span></div>
     <div class="mini" style="color:var(--text2);margin:4px 0 9px">${sub}</div>
@@ -6925,8 +6935,8 @@ function showFightNightResult(res){
   const youWon=w&&w.you;
   const bodyHtml=`<div style="font-family:var(--disp);font-size:46px;line-height:1">${esc(w.re||"🏆")}</div>
     <div style="font-family:var(--disp);font-size:22px;color:var(--gold2);margin-top:6px">${esc(w.name)}</div>
-    <div class="kcdelta" style="color:var(--gold2)">${fmtNum(w.vol)}kg moved</div>
-    ${others.length?`<div class="mini" style="color:var(--text3);margin-top:12px;line-height:1.6">${others.map((o,i)=>`#${i+2} ${esc(o.re||"🦇")} ${esc(o.name)} · ${fmtNum(o.vol)}kg`).join("<br>")}</div>`:""}`;
+    <div class="kcdelta" style="color:var(--gold2)">${w.pr} record${w.pr===1?"":"s"} set</div>
+    ${others.length?`<div class="mini" style="color:var(--text3);margin-top:12px;line-height:1.6">${others.map((o,i)=>`#${i+2} ${esc(o.re||"🦇")} ${esc(o.name)} · ${o.pr} PR${o.pr===1?"":"s"}`).join("<br>")}</div>`:""}`;
   cinePush({killcam:true,auto:0,icon:youWon?"👑":"🥊",eye:"FIGHT NIGHT · RESULTS",
     titleHtml:youWon?'<span style="color:var(--gold2)">THE BELT IS YOURS</span>':esc(w.name)+" takes the belt",
     title:youWon?"The belt is yours":w.name+" takes the belt",
@@ -6989,7 +6999,7 @@ function renderAllies(){
   }
   // Weekly Fight Card — your own week scored like a bout vs last week's self
   html+=weeklyFightCard();
-  // Fight Night — weekly tonnage bout with a belt on the line
+  // Fight Night — weekly personal-records bout with a belt on the line
   html+=fightNightCard();
   // Tools — compact 2-col grid of tap tiles (Leaderboard · Raid · Sparring · More).
   // Replaces four stacked cards so the tab reads clean; each opens its own sheet.
