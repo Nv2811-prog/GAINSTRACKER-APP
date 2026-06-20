@@ -2197,6 +2197,7 @@ function restStart(defer){const dur=state.data.u.restTime||120;state.restEnd=Dat
 
 /* ========================= START WORKOUT (Rule 6: unbroken path) ========================= */
 function startWorkout(splitId,dayIdx){
+  try{closeSheet();}catch(e){}   // dismiss any open sheet (e.g. raid) so it can't linger over the session
   const sp=state.data.splits.find(s=>s.id===splitId);
   const day=sp?sp.days[dayIdx]:null;
   state.session={split:sp?sp.name:"Free Session",day:day?day.name:"Workout",readiness:null,startedAt:now(),
@@ -2204,7 +2205,7 @@ function startWorkout(splitId,dayIdx){
   state.workoutTimer=0;state.restTimer=0;state.restRunning=false;
   state.step="readiness";render();playEntrance(state.session.day);villainIntroForDay();
 }
-function freeWorkout(){state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
+function freeWorkout(){try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
 const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
 function playEntrance(name){
@@ -2340,7 +2341,7 @@ function prKillCam(name,hits,info){
     const bodyHtml=`<div class="kcnum" style="color:${cfg.accent}">${big}<span class="kcunit">${esc(cfg.unit)}</span></div>
       <div class="kcdelta" style="color:${cfg.accent}">${deltaStr}</div>
       ${(liftStr||extra)?`<div class="mini" style="margin-top:11px;color:var(--text3);letter-spacing:.1em">${liftStr}${extra}</div>`:""}`;
-    cinePush({killcam:true,auto:3000,icon:cfg.badge,eye:"RECORD SHATTERED",titleHtml:esc(name),title:name,bodyHtml,btn:"ONWARD",accent:cfg.accent});
+    cinePush({killcam:true,hold:true,icon:cfg.badge,eye:"RECORD SHATTERED",titleHtml:esc(name),title:name,bodyHtml,btn:"ONWARD",accent:cfg.accent});
   }catch(e){try{showPRToast(name,hits,info);}catch(_){}}
 }
 function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();}
@@ -2814,9 +2815,12 @@ function cineNext(){
     ${it.attr?`<div class="cattr">— ${esc(it.attr)}</div>`:""}
     <button class="cbtn" onclick="cineDismiss()">${esc(it.btn||"YESSIR")}</button>`;
   const el=$("cine");el.classList.remove("out");el.classList.toggle("killcam",!!it.killcam);el.classList.add("on");
+  // hold:true → this cinematic stays until the user taps the button. No auto-timer, and a tap on the
+  // backdrop won't dismiss it either (so a mid-set screen tap can't skip a PR celebration by accident).
+  const bg=el.querySelector(".cbg");if(bg)bg.onclick=it.hold?null:cineDismiss;
   try{haptic(it.killcam?"pr":"done");}catch(e){}
   clearTimeout(state._cineAutoT);
-  if(it.auto)state._cineAutoT=setTimeout(()=>{try{cineDismiss();}catch(e){}},it.auto);
+  if(it.auto&&!it.hold)state._cineAutoT=setTimeout(()=>{try{cineDismiss();}catch(e){}},it.auto);
 }
 function cineDismiss(){
   const el=$("cine");if(!el||!state._cineOn)return;
@@ -2852,7 +2856,9 @@ function cloudDetectAllyWorkout(id,c){
     state.data.allySeen=state.data.allySeen||{};
     const prev=state.data.allySeen[id];
     const w=(c&&c.w)||0, boss=(c&&c.boss)||0;
-    if(!prev){state.data.allySeen[id]={w,boss};save();return;}      // first sighting → baseline, no pop
+    // Snapshot every lift on their card by name→best e1RM, so we can spot records between syncs.
+    const liftMap={};((c&&(c.liftsAll||c.lifts))||[]).forEach(l=>{if(l&&l.n)liftMap[l.n]=Math.round(+l.o||0);});
+    if(!prev){state.data.allySeen[id]={w,boss,lifts:liftMap};save();return;}   // first sighting → baseline, no pop
     const nm=(c.n||"An ally"), re=(c.re||"🦇");
     if(w>(prev.w||0)){
       const sess=(c.recent&&c.recent[0])||null;
@@ -2865,10 +2871,19 @@ function cloudDetectAllyWorkout(id,c){
       pushPatrolFeed({icon:re,accent:"var(--green)",name:nm,kind:"train",html:`<b>${esc(nm)}</b> trained — ${bits.join(" · ")}`});
     }
     if(boss>(prev.boss||0)){
-      const n=boss-(prev.boss||0);
       pushPatrolFeed({icon:"🥊",accent:"var(--gold2)",name:nm,kind:"ko",html:`<b>${esc(nm)}</b> scored a <span style="color:var(--gold2)">KO</span> — ${boss} villain${boss===1?"":"s"} down`});
     }
-    state.data.allySeen[id]={w,boss};save();
+    // Records: any lift whose e1RM climbed (or a brand-new lift on their card) → live feed entry, so
+    // an ally's PRs surface to you the same way yours do. Caps the noise at the 3 biggest jumps.
+    const pl=prev.lifts||{};
+    const ups=Object.keys(liftMap).filter(n=>liftMap[n]>0&&liftMap[n]>(pl[n]||0)+0.5)
+      .map(n=>({n,o:liftMap[n],d:liftMap[n]-(pl[n]||0),fresh:!(n in pl)}))
+      .sort((a,b)=>b.d-a.d).slice(0,3);
+    ups.forEach(u=>{
+      pushPatrolFeed({icon:"👑",accent:"var(--gold2)",name:nm,kind:"ally-pr",
+        html:`<b>${esc(nm)}</b> set a record — ${esc(u.n)} <span style="color:var(--gold2)">${u.o}kg</span> est 1RM`});
+    });
+    state.data.allySeen[id]={w,boss,lifts:liftMap};save();
   }catch(e){}
 }
 function openSheet(html){$("sheet").innerHTML=html;$("sheet").classList.add("on");$("sheetbg").classList.add("on");state.pickerOpen=false;}
@@ -5438,6 +5453,7 @@ async function cloudInit(){
     cloudPublish(true);
     cloudSubscribeAll();
     cloudListenNudges();
+    cloudListenRaidInvites();
     if(state.tab==="allies")render();
   }catch(e){cloud._initing=false;/* stay offline-only */}
 }
@@ -5465,8 +5481,11 @@ function cloudMergeAlly(id,c){
   if(ix>=0)state.data.allies[ix]=c;else state.data.allies.push(c);
   save();
   cloudDetectAllyWorkout(id,c);
-  // Live co-op raid: if this ally is our raid partner and their sheet is open, refresh it so the bar climbs in real time.
-  try{const r=state.data.raid;if(r&&r.allyUid===id&&document.getElementById("raid-live-tag"))openRaid();}catch(e){}
+  // Live co-op raid: if this ally is our raid partner AND the raid sheet is genuinely on screen
+  // (not mid-workout, sheet actually open), refresh it so the bar climbs in real time. The extra
+  // guards stop a stray ally sync from re-popping the raid sheet over a live workout (the old glitch).
+  try{const r=state.data.raid,sh=$("sheet");
+    if(r&&r.allyUid===id&&!state.session&&sh&&sh.classList.contains("on")&&document.getElementById("raid-live-tag"))openRaid();}catch(e){}
   if(state.tab==="allies")render();
 }
 // Add an ally by friend code (their uid). Persists + subscribes for live updates.
@@ -5527,6 +5546,58 @@ function cloudSendNudge(a,msg){
     toast("🦇 Signal sent to "+a.n);haptic("done");
     try{pushPatrolFeed({icon:"🦇",accent:"var(--text2)",name:a.n,kind:"nudge-sent",html:`You lit the <span style="color:var(--gold2)">Bat-Signal</span> for <b>${esc(a.n)}</b>`});}catch(e){}
   }catch(e){toast("Couldn't send the signal.");}
+}
+/* ===================== CO-OP RAID — request / accept handshake =====================
+   Starting a raid against a live ally no longer just flips it on locally. It fires an invite
+   to their inbox; they get a pop with Accept / Decline. On Accept BOTH sides hold the same raid
+   (same boss, same start instant) and each one's tonnage pools live off the other's synced card. */
+function cloudSendRaidInvite(allyUid,raid){
+  if(!allyUid||!cloud.ready||!cloud.db||!cloud.uid)return false;
+  try{
+    cloud.db.ref("raidinv/"+allyUid).push({
+      from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),
+      boss:raid.boss,e:raid.e,c:raid.c,target:raid.target,start:raid.start,t:Date.now()
+    });
+    return true;
+  }catch(e){return false;}
+}
+// Inbound invites: pop an Accept / Decline. Consume the node either way so it can't replay.
+function cloudListenRaidInvites(){
+  if(!cloud.ready||!cloud.db||!cloud.uid||cloud._raidInvRef)return;
+  const ref=cloud.db.ref("raidinv/"+cloud.uid);cloud._raidInvRef=ref;
+  ref.on("child_added",snap=>{
+    const inv=snap.val()||{};
+    try{if(inv.from&&inv.t&&Date.now()-inv.t<3*864e5)showRaidInvite(inv);}catch(e){}
+    try{snap.ref.remove();}catch(e){}
+  },()=>{});
+}
+function showRaidInvite(inv){
+  const nm=inv.name||"An ally";
+  // If we're already mid-raid, don't hijack it — just log that they called.
+  if(state.data.raid){
+    try{pushPatrolFeed({icon:"⚔️",accent:"var(--gold2)",name:nm,kind:"raid-inv",html:`<b>${esc(nm)}</b> invited you to raid <b>${esc((inv.boss||"a boss").split(" — ")[0])}</b> — finish your current raid first.`});}catch(e){}
+    return;
+  }
+  try{haptic("pr");}catch(e){}
+  appConfirm({title:(inv.e||"⚔️")+" Raid invite",
+    html:`<b>${esc(nm)}</b> wants to raid <b class="gold">${esc((inv.boss||"a boss").split(" — ")[0])}</b> with you — pooled target <b>${fmtNum(inv.target||0)}kg</b>. Accept and both of you fight it together, tonnage pooling live.`,
+    ok:"⚔️ Accept raid",cancel:"Decline"}).then(ok=>{
+      if(!ok){try{pushPatrolFeed({icon:"⚔️",accent:"var(--text3)",name:nm,kind:"raid-dec",html:`You declined <b>${esc(nm)}</b>'s raid invite.`});}catch(e){}return;}
+      acceptRaidInvite(inv);
+    });
+}
+function acceptRaidInvite(inv){
+  const uid=inv.from;
+  const a=(state.data.allies||[]).find(x=>x&&x._uid===uid);
+  // Make sure we're linked to them so their card (and tonnage) keeps streaming in.
+  if(state.data.allyIds&&state.data.allyIds.indexOf(uid)<0){state.data.allyIds.push(uid);if(cloud.ready)cloudSubscribe(uid);}
+  state.data.raid={boss:inv.boss,e:inv.e,c:inv.c,target:inv.target,
+    start:inv.start||new Date().toISOString(),
+    allyName:(inv.name||"Ally").slice(0,20),allyUid:uid,allyStartVol:(a?(+a.vol||0):0),ally:0};
+  save();haptic("done");toast("Raid joined vs "+(inv.boss||"the boss").split(" — ")[0]);
+  try{pushPatrolFeed({icon:"⚔️",accent:"var(--gold2)",name:inv.name||"Ally",kind:"raid-join",html:`You joined <b>${esc(inv.name||"an ally")}</b>'s raid on <b>${esc((inv.boss||"a boss").split(" — ")[0])}</b>.`});}catch(e){}
+  if(state.tab==="allies")render();
+  openRaid();
 }
 function myFriendCode(){return cloud.uid||state.data.myUid||"";}
 function shareFriendCode(){
@@ -5758,11 +5829,14 @@ function openLeaderboard(){
     <button class="btn" style="margin-top:13px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
 }
 /* ===== CO-OP RAIDS (#26): team with an ally against a colossal boss; tonnage pools ===== */
+// Pooled tonnage accumulates across EVERY session both of you log while the raid is live (not one
+// session). Calibrated to real training: ~8t per person per session ⇒ ~16t combined per joint round.
+// Bane ≈ one strong joint session; the ladder roughly doubles up to a true multi-week endgame.
 const RAID_BOSSES=[
-  {n:"Bane — Breaking the Bat",e:"💪",c:"#b07a3a",target:40000,q:"Together you'll move what no single Bat could."},
-  {n:"Ra's al Ghul — The Demon's Head",e:"🗡️",c:"#2e8b57",target:75000,q:"The League of Shadows tests your alliance. Pool your iron."},
-  {n:"Darkseid — Apokolips",e:"🌑",c:"#9b6fce",target:120000,q:"A god-tier raid. Only a true partnership moves this much."},
-  {n:"Doomsday — Unleashed",e:"☠️",c:"#d0463a",target:200000,q:"The endgame raid. Two vigilantes, a quarter-million kilos of fury."}
+  {n:"Bane — Breaking the Bat",e:"💪",c:"#b07a3a",target:16000,q:"One shared session of fury. Together you'll move what no single Bat could."},
+  {n:"Ra's al Ghul — The Demon's Head",e:"🗡️",c:"#2e8b57",target:35000,q:"The League of Shadows tests your alliance over a few sessions. Pool your iron."},
+  {n:"Darkseid — Apokolips",e:"🌑",c:"#9b6fce",target:70000,q:"A god-tier raid spanning a week or more. Only a true partnership moves this much."},
+  {n:"Doomsday — Unleashed",e:"☠️",c:"#d0463a",target:120000,q:"The endgame raid. Two vigilantes, the heaviest campaign in Gotham."}
 ];
 function raidMine(){const r=state.data.raid;if(!r)return 0;const t0=new Date(r.start).getTime();return state.data.workouts.filter(w=>new Date(w.date).getTime()>=t0).reduce((a,w)=>a+(w.totalVol||0),0);}
 // Live ally contribution: for a uid-bound raid, read the friend's lifetime vol straight off their
@@ -5778,8 +5852,13 @@ function startRaid(idx){const b=RAID_BOSSES[idx];if(!b)return;
   if(state._raidPickUid){
     const a=(state.data.allies||[]).find(x=>x&&x._uid===state._raidPickUid);
     if(!a){toast("That ally isn't syncing right now, sir.");return;}
-    state.data.raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:(a.n||"Ally").slice(0,20),allyUid:a._uid,allyStartVol:+a.vol||0,ally:0};
-    state._raidPickUid=null;save();haptic("done");toast("Live raid begun vs "+b.n);openRaid();return;
+    const raid={boss:b.n,e:b.e,c:b.c,target:b.target,start:new Date().toISOString(),allyName:(a.n||"Ally").slice(0,20),allyUid:a._uid,allyStartVol:+a.vol||0,ally:0,invited:true};
+    state.data.raid=raid;
+    state._raidPickUid=null;save();haptic("done");
+    const sent=cloudSendRaidInvite(a._uid,raid);
+    toast(sent?("⚔️ Raid invite sent to "+(a.n||"your ally")):("Raid begun vs "+b.n));
+    try{pushPatrolFeed({icon:"⚔️",accent:"var(--gold2)",name:a.n,kind:"raid-sent",html:`You called <b>${esc(a.n||"an ally")}</b> to raid <b>${esc(b.n.split(" — ")[0])}</b> — waiting for them to accept.`});}catch(e){}
+    openRaid();return;
   }
   // Manual path: typed name + optional pasted card (legacy / snapshot allies).
   const nm=(($("raid-ally")||{}).value||"").trim();
@@ -5827,7 +5906,7 @@ function openRaid(){
       <div class="row sp"><span class="mini">You: <b class="gold">${fmtNum(p.mine)}kg</b></span><span class="mini">${esc(r.allyName)}: <b style="color:#7cc4ff">${fmtNum(p.ally)}kg</b></span></div>
     </div>
     ${p.done?`<button class="btn gold" style="margin-top:11px" onclick="claimRaid()">⚔️ Claim the kill</button>`
-      :p.live?`<div class="banner" style="margin-top:11px;border-color:rgba(124,196,255,.4);background:rgba(124,196,255,.08)"><span>🔴</span><div class="mini" style="line-height:1.5">Both totals pool <b>automatically</b>. Your tonnage counts every session since the raid began; ${esc(r.allyName)}'s climbs live the moment they log a workout${liveAlly?"":' — <span style="color:var(--text3)">(waiting for their first sync since you linked)</span>'}.</div></div>`
+      :p.live?`<div class="banner" style="margin-top:11px;border-color:rgba(124,196,255,.4);background:rgba(124,196,255,.08)"><span>🔴</span><div class="mini" style="line-height:1.5">Both totals pool <b>automatically</b>. Your tonnage counts every session since the raid began; ${esc(r.allyName)}'s climbs live the moment they log a workout${liveAlly?"":(r.invited?' — <span style="color:var(--text3)">(invite sent — waiting for them to accept &amp; log)</span>':' — <span style="color:var(--text3)">(waiting for their first sync since you linked)</span>')}.</div></div>`
       :`<div class="mini" style="margin:11px 0 5px;color:var(--text2)">Your tonnage tracks automatically from every session logged since the raid began. Sync ${esc(r.allyName)}'s total from their latest Patrol Card:</div>
       <textarea id="raid-sync" placeholder="Paste ${esc(r.allyName)}'s latest Patrol Card…" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px;resize:none"></textarea>
       <button class="btn sm" style="margin-top:6px" onclick="syncRaidAlly()">Sync ${esc(r.allyName)}'s tonnage</button>
@@ -6637,17 +6716,15 @@ function renderAllies(){
     <div class="row sp" style="margin:2px 0 9px"><span class="mini">Vigilante Score</span><b class="gold" style="font-size:18px">${fmtNum(score)}</b></div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px">${lifts}</div>
     <button class="btn ghost sm" onclick="shareMyCard()">📋 Copy a one-time snapshot instead</button></div>`;
-  // Friend code — the easy way to connect: share once, then everything syncs live
+  // Connect — friend code + add-ally fused into one tidy card (share once, sync forever)
   html+=`<div class="card" style="margin-top:12px;background:linear-gradient(160deg,var(--gold-bg),var(--bg2));border-color:var(--gold-dim)">
-    <div class="ttl" style="margin:0 0 3px;font-size:15px;display:flex;align-items:center;gap:7px">🔗 Your friend code</div>
-    <div class="mini" style="color:var(--text2);margin-bottom:8px">Send this once. A friend adds it and your Patrol Card streams to them <b style="color:var(--gold2)">live</b> after every workout — no re-pasting.</div>
+    <div class="ttl" style="margin:0 0 3px;font-size:15px;display:flex;align-items:center;gap:7px">🔗 Connect</div>
+    <div class="mini" style="color:var(--text2);margin-bottom:8px">Share your code once — a friend adds it and your Patrol Card streams to them <b style="color:var(--gold2)">live</b> after every workout.</div>
     <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="width:100%;font-size:12.5px;font-weight:700;color:var(--gold2);background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;letter-spacing:.5px"/>
-    <button class="btn gold sm" style="margin-top:8px" onclick="shareFriendCode()">📋 Copy my friend code</button></div>`;
-  // Add an ally — inline, right on the tab (no digging through a sheet)
-  html+=`<div class="card" style="margin-top:11px">
-    <div class="ttl" style="margin:0 0 5px;font-size:15px;display:flex;align-items:center;gap:7px">➕ Add an ally</div>
-    <div class="mini" style="color:var(--text2);margin-bottom:7px">Paste a friend's code (<b style="color:var(--gold2)">GTUID:…</b>) or a one-time Patrol Card snapshot.</div>
-    <textarea id="ally-code" placeholder="Paste a friend code or Patrol Card…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:46px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none"></textarea>
+    <button class="btn gold sm" style="margin-top:8px" onclick="shareFriendCode()">📋 Copy my friend code</button>
+    <div style="border-top:1px solid var(--border);margin:11px 0 9px"></div>
+    <div class="mini" style="color:var(--text2);margin-bottom:7px"><b style="color:var(--gold2)">Add an ally</b> — paste their code (GTUID:…) or a one-time snapshot.</div>
+    <textarea id="ally-code" placeholder="Paste a friend code or Patrol Card…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:44px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none"></textarea>
     <div class="row" style="gap:6px;margin-top:7px"><button class="btn gold sm g" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div></div>`;
   // Inline League — every ally sits right here on the tab, each with ONE-TAP access to their lifts,
   // split and a head-to-head compare. No more opening a sheet and digging through buttons first.
@@ -6665,34 +6742,41 @@ function renderAllies(){
   }
   // Fight Night — weekly tonnage bout with a belt on the line
   html+=fightNightCard();
-  // Live Patrol Feed — your League's activity timeline
-  html+=patrolFeedCard();
-  // Advanced — full Justice League sheet (share/import a split, offline snapshot backup)
-  html+=`<div class="card" style="cursor:pointer" onclick="openJusticeLeague()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🛠️ More — splits &amp; backups</div><span class="chip">${allies.length} all${allies.length===1?'y':'ies'}</span></div>
-    <div class="mini" style="color:var(--text2);margin-top:5px">Open the full Justice League — share or import a split, copy an offline snapshot. ›</div></div>`;
-  // Leaderboard
-  html+=`<div class="card" style="cursor:pointer" onclick="openLeaderboard()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🏆 Leaderboard</div><span class="chip ${myRank===1&&board.length>1?'on':''}">${board.length>1?'#'+myRank+' of '+board.length:'just you'}</span></div>
-    <div class="mini" style="color:var(--text2);margin-top:5px">Everyone ranked by Vigilante Score — strength, tonnage, sessions & villains fused into one number. ›</div></div>`;
-  // Co-op Raid
+  // Tools — compact 2-col grid of tap tiles (Leaderboard · Raid · Sparring · More).
+  // Replaces four stacked cards so the tab reads clean; each opens its own sheet.
   const r=d.raid;const rp=r?raidProgress():null;
-  html+=`<div class="card" style="cursor:pointer" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">⚔️ Co-op Raid</div>${r?`<span class="chip on">${Math.round(rp.pct)}%</span>`:`<span class="chip">team boss</span>`}</div>
-    ${r?`<div class="mini" style="color:var(--text2);margin-top:6px">${r.e} <b>${esc(r.boss)}</b> with ${esc(r.allyName)} — ${fmtNum(rp.combined)}/${fmtNum(r.target)}kg pooled.</div>
-      <div class="bar" style="height:7px;margin-top:7px;background:var(--bg4)"><i style="width:${rp.pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>`
-    :`<div class="mini" style="color:var(--text2);margin-top:5px">Team up with an ally against a colossal boss — your tonnage and theirs pool toward one target. ›</div>`}</div>`;
-  // Sparring (1-v-1 rival) — head-to-head inline
   const rv=d.rival;
-  if(rv){const myAvg=avgWeekVol();const theirAvg=rv.totalVol/Math.max(1,rv.totalWorkouts);const ahead=myAvg>=theirAvg;
-    html+=`<div class="card"><div class="ttl" style="display:flex;align-items:center;gap:7px">🥊 Sparring with ${esc(rv.name||'rival')}</div>
-      <div class="row sp" style="margin-top:4px"><span class="muted">Their avg session</span><b>${fmtNum(theirAvg)}kg</b></div>
-      <div class="row sp"><span class="muted">Your avg this week</span><b>${fmtNum(myAvg)}kg</b></div>
-      <div class="center" style="margin:9px 0 4px"><span class="chip ${ahead?'on':''}" style="color:${ahead?'var(--green)':'var(--red)'}">${ahead?'⬆️ You lead':'⬇️ They lead'} by ${fmtNum(Math.abs(myAvg-theirAvg))}kg</span></div>
-      <div class="row" style="gap:8px;margin-top:8px"><button class="btn ghost sm g" onclick="exportRival()">Share my code</button><button class="btn ghost sm g" onclick="importRival()">Change rival</button></div></div>`;
-  }else{
-    html+=`<div class="card"><div class="ttl" style="display:flex;align-items:center;gap:7px">🥊 Sparring <span class="chip" style="font-weight:400">1-v-1</span></div>
-      <div class="mini" style="color:var(--text2);margin:5px 0 9px">Import a rival's sparring code for a direct head-to-head rivalry — their average session vs yours.</div>
-      <div class="row" style="gap:8px"><button class="btn ghost sm g" onclick="exportRival()">Share my code</button><button class="btn ghost sm g" onclick="importRival()">Import a rival</button></div></div>`;
-  }
+  const lbSub=board.length>1?('#'+myRank+' of '+board.length):'just you';
+  const raidSub=r?(Math.round(rp.pct)+'% vs '+esc(r.boss)):'team boss';
+  const sparSub=rv?('vs '+esc(rv.name||'rival')):'1-v-1';
+  const tile=(onclick,icon,label,sub,hot)=>`<div class="card" style="cursor:pointer;margin:0;padding:13px 12px;text-align:center" onclick="${onclick}">
+    <div style="font-size:22px;line-height:1">${icon}</div>
+    <div class="ttl" style="margin:6px 0 2px;font-size:14px">${label}</div>
+    <span class="chip ${hot?'on':''}" style="font-size:10px">${sub}</span></div>`;
+  html+=`<div class="ttl" style="margin:17px 0 8px;font-size:15px;display:flex;align-items:center;gap:7px">🧰 League tools</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      ${tile('openLeaderboard()','🏆','Leaderboard',lbSub,myRank===1&&board.length>1)}
+      ${tile('openRaid()','⚔️','Co-op Raid',raidSub,!!r)}
+      ${tile('openSparring()','🥊','Sparring',sparSub,!!rv)}
+      ${tile('openJusticeLeague()','🛠️','Splits & backups',allies.length+' all'+(allies.length===1?'y':'ies'))}
+    </div>`;
+  // Live Patrol Feed — your League's activity timeline, at the very bottom as the log
+  html+=patrolFeedCard();
   $("app").innerHTML=html;
+}
+function openSparring(){
+  const d=state.data;const rv=d.rival;
+  let body;
+  if(rv){const myAvg=avgWeekVol();const theirAvg=rv.totalVol/Math.max(1,rv.totalWorkouts);const ahead=myAvg>=theirAvg;
+    body=`<div class="row sp" style="margin-top:4px"><span class="muted">Their avg session</span><b>${fmtNum(theirAvg)}kg</b></div>
+      <div class="row sp"><span class="muted">Your avg this week</span><b>${fmtNum(myAvg)}kg</b></div>
+      <div class="center" style="margin:11px 0 6px"><span class="chip ${ahead?'on':''}" style="color:${ahead?'var(--green)':'var(--red)'}">${ahead?'⬆️ You lead':'⬇️ They lead'} by ${fmtNum(Math.abs(myAvg-theirAvg))}kg</span></div>
+      <div class="row" style="gap:8px;margin-top:10px"><button class="btn ghost sm g" onclick="exportRival()">Share my code</button><button class="btn ghost sm g" onclick="importRival()">Change rival</button></div>`;
+  }else{
+    body=`<div class="mini" style="color:var(--text2);margin:5px 0 11px">Import a rival's sparring code for a direct head-to-head rivalry — their average session vs yours.</div>
+      <div class="row" style="gap:8px"><button class="btn ghost sm g" onclick="exportRival()">Share my code</button><button class="btn ghost sm g" onclick="importRival()">Import a rival</button></div>`;
+  }
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:7px">🥊 Sparring ${rv?'with '+esc(rv.name||'rival'):'<span class="chip" style="font-weight:400">1-v-1</span>'}</div>${body}`);
 }
 function renderCase(){
   const d=state.data;
@@ -6704,7 +6788,7 @@ function renderCase(){
     html+=`<button class="btn" style="margin-bottom:13px" onclick="periodReport(30)">📂 Batcomputer report — 30d · 90d · yearly</button>`;
   // PRs
   const prs=Object.entries(d.prs).sort((a,b)=>b[1].orm-a[1].orm).slice(0,10);
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🎯 Records (est. 1RM) <span class="mini" style="font-weight:400">— tap for full history</span></div><button class="btn ghost sm" style="width:auto" onclick="openForge()">🛠️ Forge</button></div>${prs.length?prs.map(([n,p])=>`<div class="row sp" style="margin-bottom:6px;cursor:pointer" onclick="openForge(${p.w},${p.r})"><span style="font-size:13px">${esc(n)} ›</span><b class="gold">${Math.round(p.orm)}kg <span class="mini">${p.w}×${p.r}</span></b></div>`).join(""):'<p class="muted">No PRs yet. Go set one.</p>'}<div class="mini" style="color:var(--text3);margin-top:4px">Tap a record to open it in The Forge · plan every working set by percentage.</div></div>`;
+  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🎯 Records (est. 1RM) <span class="mini" style="font-weight:400">— tap for full history</span></div><button class="btn ghost sm" style="width:auto" onclick="openForge()">🛠️ Forge</button></div>${prs.length?prs.map(([n,p])=>`<div style="margin-bottom:6px"><div class="row sp" style="cursor:pointer" onclick="openForge(${p.w},${p.r})"><span style="font-size:13px">${esc(n)}${prProfileTag(n)} ›</span><b class="gold">${Math.round(p.orm)}kg <span class="mini">${p.w}×${p.r}</span></b></div>${prVaultLine(n)}</div>`).join(""):'<p class="muted">No PRs yet. Go set one.</p>'}<div class="mini" style="color:var(--text3);margin-top:4px">Tap a record to open it in The Forge · plan every working set by percentage.</div></div>`;
   // MMA title belts (bodyweight-ratio championships)
   html+=titleBeltsCard();
   // combat rating — per-exercise rank tuned by movement (replaces freeweight-only standards)
@@ -6965,7 +7049,7 @@ function alfredMusclePicker(){
 /* ===== ALFRED CONSOLE — he sees the whole training picture and can act on your word.
    Reads (status, weakest, stalled, PRs, volume) need no permission; edits to your split are
    ALWAYS gated behind an explicit confirm. Offline keyword-intent parser, no server. ===== */
-function alfredConsoleExamples(){return ["What should I train today?","Am I recovered?","What's my weakest muscle?","How strong am I?","PR for bench press","Volume for chest","Open leaderboard","Start push day","Set weekly goal to 5","Add face pull to push","Switch to PPL split","How's my streak?"];}
+function alfredConsoleExamples(){return ["What should I train today?","Am I recovered?","What's my weakest muscle?","How strong am I?","PR for bench press","Set leg press to a hard resistance profile","Volume for chest","Open leaderboard","Start push day","Set weekly goal to 5","Add face pull to push","Switch to PPL split","How's my streak?"];}
 function _alfredFindEx(q){
   q=(q||"").toLowerCase().trim();if(!q)return null;
   const names=(typeof EXDB!=="undefined"?EXDB:CORE_EX).map(e=>e.n);
@@ -7004,8 +7088,81 @@ function _alfredNav(q){
   return (best&&bs>0)?{title:best[1],action:best[3]}:null;
 }
 function _alfredFindDay(sp,q){if(!sp)return -1;q=(q||"").toLowerCase().trim();let i=sp.days.findIndex(d=>(d.name||"").toLowerCase()===q);if(i<0)i=sp.days.findIndex(d=>(d.name||"").toLowerCase().includes(q));return i;}
+/* ===== Resistance-profile PR variants =====================================================
+   A lift's "records" live in d.prs[name] exactly as before — every existing readout keeps working.
+   When you tell Alfred a lift is now on a different resistance profile (e.g. a harder cam, an easier
+   machine, a band setting), we FILE the current record in a vault under its old profile label and
+   swap in that profile's own record (or a blank one) as the live d.prs[name]. Switch back any time and
+   the old numbers return. So each profile keeps its own PRs on the same exercise, with nothing lost. */
+function prCurrentProfile(name){return (state.data.prProfile&&state.data.prProfile[name])||"Standard";}
+function _prCleanLabel(x){
+  let l=String(x||"").replace(/\b(resistance|profile|cam|setting|mode|the|a|an|to|on|onto|now|is|of|for)\b/gi," ")
+    .replace(/[^a-z0-9 +/.\-]/gi," ").replace(/\s+/g," ").trim();
+  if(!l)l="Variant";
+  l=l.split(" ").slice(0,3).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+  return l.slice(0,18);
+}
+function switchPRProfile(name,label){
+  const d=state.data;d.prVault=d.prVault||{};d.prProfile=d.prProfile||{};
+  label=_prCleanLabel(label);
+  const old=prCurrentProfile(name);
+  if(old.toLowerCase()===label.toLowerCase()){d.prProfile[name]=label;save();return {same:true,label};}
+  d.prVault[name]=d.prVault[name]||{};
+  if(d.prs[name]&&(d.prs[name].orm>0||d.prs[name].maxW>0))d.prVault[name][old]=d.prs[name]; // file current under old label
+  d.prProfile[name]=label;
+  let restored=false;
+  const key=Object.keys(d.prVault[name]).find(k=>k.toLowerCase()===label.toLowerCase());
+  if(key){d.prs[name]=d.prVault[name][key];delete d.prVault[name][key];restored=true;} // bring that profile's PRs live
+  else delete d.prs[name];                                                              // else start fresh
+  if(!Object.keys(d.prVault[name]).length)delete d.prVault[name];
+  save();return {label,old,restored};
+}
+// Small gold chip showing a lift's active profile (only when it isn't plain "Standard" or has variants).
+function prProfileTag(name){
+  const cur=prCurrentProfile(name),vault=(state.data.prVault&&state.data.prVault[name])||{};
+  if(cur==="Standard"&&!Object.keys(vault).length)return "";
+  return ` <span class="chip" style="font-size:9.5px;padding:1px 6px;color:var(--gold2);border-color:var(--gold-dim)">${esc(cur)}</span>`;
+}
+// Sub-line listing the OTHER profiles' bests for a lift, so two PR versions show side by side.
+function prVaultLine(name){
+  const vault=(state.data.prVault&&state.data.prVault[name])||{};
+  const ks=Object.keys(vault).filter(k=>vault[k]&&(vault[k].orm>0||vault[k].maxW>0));
+  if(!ks.length)return "";
+  return `<div class="mini" style="color:var(--text3);margin-top:1px">Other profiles: ${ks.map(k=>`${esc(k)} <b style="color:var(--text2)">${Math.round(vault[k].orm||0)}kg</b>`).join(" · ")}</div>`;
+}
 function alfredAsk(q){
   const raw=(q||"").trim(),s=raw.toLowerCase();const d=state.data;
+  // EDIT: resistance-profile PR variants — "set leg press to hard resistance profile", "switch leg
+  // extension to an easier profile", "new heavy cam for hack squat". Files records per profile.
+  if(/\b(?:profile|cam)\b/.test(s)){
+    let exName=null,label=null;
+    const tries=[
+      {re:/(?:resistance\s+)?(?:profile|cam|setting)\s+(?:for|on)\s+(.+?)\s+(?:to|=|:|called|named|as|is|now)\s+(.+)$/,swap:false},
+      {re:/(?:set|switch|change|put|use|move)\s+(.+?)\s+(?:to|on|onto)\s+(?:an?\s+|the\s+)?(.+?)\s+(?:resistance\s+)?(?:profile|cam|setting)\b.*$/,swap:false},
+      {re:/(?:new|create|add|log|start)\s+(?:an?\s+|the\s+)?(.+?)\s+(?:resistance\s+)?(?:profile|cam|setting)\s+(?:for|on)\s+(.+)$/,swap:true},
+      {re:/(.+?)\s+(?:resistance\s+)?(?:profile|cam|setting)\s*(?:to|=|:|is|now)?\s*(.+)$/,swap:false}
+    ];
+    for(let ti=0;ti<tries.length&&!exName;ti++){
+      const mm=s.match(tries[ti].re);if(!mm)continue;
+      const a=(mm[1]||"").trim(),b=(mm[2]||"").trim();
+      const exq=tries[ti].swap?b:a, labq=tries[ti].swap?a:b;
+      const ex=_alfredFindEx(exq);
+      if(ex){exName=ex;label=labq;}
+    }
+    if(!exName)return `Tell me which lift, Master — try <b>set leg press to a hard resistance profile</b> or <b>switch leg extension to an easier profile</b>.`;
+    label=_prCleanLabel(label);
+    const cur=prCurrentProfile(exName);
+    if(cur.toLowerCase()===label.toLowerCase())return `<b>${esc(exName)}</b> is already on the <b>${esc(label)}</b> profile, sir.`;
+    const vault=(d.prVault&&d.prVault[exName])||{};
+    const hasNew=Object.keys(vault).some(k=>k.toLowerCase()===label.toLowerCase());
+    const curHasPR=d.prs[exName]&&(d.prs[exName].orm>0||d.prs[exName].maxW>0);
+    state._alfredPending={
+      label:`Switch <b>${esc(exName)}</b> to the <b>${esc(label)}</b> resistance profile?<div class="mini" style="margin-top:4px;color:var(--text2)">${curHasPR?`Its current records file safely under <b>${esc(cur)}</b>. `:""}${hasNew?`Your saved <b>${esc(label)}</b> records come back as the live ones.`:`A fresh <b>${esc(label)}</b> record starts building — nothing is lost, switch back anytime.`}</div>`,
+      done:`Done, Master — <b>${esc(exName)}</b> now tracks records on the <b>${esc(label)}</b> profile.`,
+      fn:()=>switchPRProfile(exName,label)
+    };
+    return `On your word, sir: move <b>${esc(exName)}</b> onto the <b>${esc(label)}</b> resistance profile. Confirm below.`;
+  }
   // EDIT: copy [the exercises from] DAY-A to/into DAY-B  — a perfectly reasonable admin request, just do it.
   // Searches across ALL splits (the user may keep "Legs" in one split and "Lower" in another), preferring the active split for ties.
   let m=s.match(/^(?:copy|duplicate|mirror)\s+(?:(?:the\s+)?(?:exercises|lifts|workout)\s+)?(?:from\s+)?(.+?)\s+(?:in)?to\s+(?:my\s+)?(.+?)(?:\s+day)?$/);
@@ -7105,8 +7262,11 @@ function alfredAsk(q){
   // READ: PR for X
   m=s.match(/(?:pr|record|best|1rm|max)\s+(?:for\s+)?(.+)$/)||s.match(/(.+?)\s+(?:pr|record|max|1rm)$/);
   if(m){const exName=_alfredFindEx(m[1]);if(!exName)return "Can't find that lift, sir.";const p=d.prs[exName];
-    if(!p||!p.orm)return `No record logged for <b>${esc(exName)}</b> yet, Master.`;
-    return `<b>${esc(exName)}</b> — best e1RM <b class="gold">${Math.round(p.orm)}kg</b>${p.maxW?`, top weight ${Math.round(p.maxW)}kg`:""}. Go and beat it, sir.`;}
+    const cur=prCurrentProfile(exName),vault=(d.prVault&&d.prVault[exName])||{};
+    const others=Object.keys(vault).filter(k=>vault[k]&&vault[k].orm>0).map(k=>`${esc(k)} ${Math.round(vault[k].orm)}kg`);
+    const tag=cur!=="Standard"?` <span class="mini">[${esc(cur)} profile]</span>`:"";
+    if(!p||!p.orm)return `No record logged for <b>${esc(exName)}</b>${cur!=="Standard"?` on the <b>${esc(cur)}</b> profile`:""} yet, Master.${others.length?` Other profiles: ${others.join(", ")}.`:""}`;
+    return `<b>${esc(exName)}</b>${tag} — best e1RM <b class="gold">${Math.round(p.orm)}kg</b>${p.maxW?`, top weight ${Math.round(p.maxW)}kg`:""}.${others.length?` Other profiles: ${others.join(", ")}.`:""} Go and beat it, sir.`;}
   // READ: last time X
   m=s.match(/^(?:last|previous)\s+(?:time\s+)?(.+)$/);
   if(m){const exName=_alfredFindEx(m[1]);if(!exName)return "Can't find that lift, sir.";const it=liftIntel(exName);
