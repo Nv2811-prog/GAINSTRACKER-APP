@@ -201,11 +201,16 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .resumebar .rb-ttl{font-size:13.5px;font-weight:800;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .resumebar .rb-sub{font-size:11.5px;color:var(--text2)}
 .resumebar .rb-go{font-size:12px;font-weight:800;letter-spacing:.05em;color:#0b0a06;background:var(--gold2);border-radius:8px;padding:6px 9px;flex:none}
-.timers{position:sticky;top:0;z-index:20;display:flex;gap:8px;background:rgba(6,6,8,.92);backdrop-filter:blur(14px);padding:10px 2px;margin:-4px -2px 12px}
+/* Always-on top bar: position:fixed (not sticky — iOS Safari/PWA refuses to pin sticky here),
+   so the timers stay glued to the top of the screen no matter how far you scroll. */
+.timers{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;z-index:30;display:flex;align-items:stretch;gap:8px;background:rgba(6,6,8,.94);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);padding:calc(8px + env(safe-area-inset-top)) 14px 9px;box-shadow:0 6px 20px -9px rgba(0,0,0,.65)}
 .tbox{flex:1;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:7px;background:var(--bg2)}
 .tbox .num{font-size:26px;color:var(--gold2);display:block}
 .tbox.rest .num{color:var(--blue)}
 .tbox small{font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
+/* Minimalist minimise control — just a down-arrow. */
+.minbtn{flex:none;width:36px;border:1px solid var(--border2);border-radius:11px;background:var(--bg2);color:var(--text3);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s,color .12s,background .12s}
+.minbtn:active{transform:scale(.94);color:var(--gold2);background:rgba(232,197,106,.12)}
 
 /* recovery bars / mev */
 .bar{height:7px;border-radius:4px;background:var(--bg4);overflow:hidden;border:1px solid var(--border)}
@@ -3359,12 +3364,13 @@ function stretchRedundancyNotes(){
 }
 function renderLogging(){
   const ses=state.session;const metric=state.data.u.metric;
-  let html=`<button class="minbar" onclick="minimizeWorkout()" title="Minimise — keep the workout running and browse your tabs"><span style="font-size:15px">▾</span> Minimise workout · browse tabs</button>
-  <div class="timers">
+  let html=`<div class="timers" id="timerbar">
     <div class="tbox"><span class="num" id="wt-display">${fmtTime(state.session?Math.floor((Date.now()-state.session.startedAt)/1000):0)}</span><small>Mission time</small></div>
     <div class="tbox rest" onclick="reopenRest()" style="cursor:pointer"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>${state.restRunning?"tap to open":"Recovery"}</small></div>
+    <button class="minbtn" onclick="minimizeWorkout()" title="Minimise — keep the workout running and browse tabs" aria-label="Minimise workout">▾</button>
   </div>
-  <div class="row sp" style="margin-bottom:8px">
+  <div id="timerspace" aria-hidden="true"></div>`;
+  html+=`<div class="row sp" style="margin-bottom:8px">
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
     <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button></div>
   </div>`;
@@ -3461,6 +3467,8 @@ function renderLogging(){
   html+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="finishWorkout()">🏁 FINISH WORKOUT</button>
     <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
   $("app").innerHTML=html;
+  // Reserve exactly the fixed timer-bar's height so the content below it isn't hidden underneath.
+  {const _tb=$("timerbar"),_sp=$("timerspace");if(_tb&&_sp)_sp.style.height=_tb.offsetHeight+"px";}
   ensureTimers();
   if(!state.wtInt)startTimers();
   initDragReorder();
