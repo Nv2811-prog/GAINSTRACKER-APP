@@ -2022,9 +2022,18 @@ function suggestForSub(m,id,n){
   return CORE_EX.filter(ex=>ex.p&&ex.p.includes(m)&&exSub(ex,m).includes(id)).slice(0,n||3).map(e=>e.n);
 }
 
-/* ========================= XP / LEVEL (account) ========================= */
-function accountLevel(){return Math.floor(Math.sqrt(state.data.u.xp/120));}
-function xpForLevel(l){return l*l*120;}
+/* ========================= XP / LEVEL (account) =========================
+   Banded curve: each level costs a flat block of XP, and the block grows by
+   one nominal-session every 10 levels. A nominal session ≈ 100 XP, so:
+     • Lv 1–10  → 300 XP/level  ≈ 2–4 sessions each
+     • Lv 11–20 → 400 XP/level  ≈ 3–5 sessions each
+     • Lv 21–30 → 500 XP/level  ≈ 4–6 sessions each
+     • …and on up, getting steeper, capped at MAXLVL for now.
+   (Old curve was 120·l² — a quadratic that ballooned to ~20 sessions/level by Lv10.) */
+const MAXLVL=50;
+function lvlBlock(l){return (3+Math.floor((l-1)/10))*100;}   // XP cost of the l-th level
+function xpForLevel(l){if(l<=0)return 0;let t=0;for(let k=1;k<=l;k++)t+=lvlBlock(k);return t;}
+function accountLevel(){const xp=(state.data.u&&state.data.u.xp)||0;let l=0;while(l<MAXLVL&&xpForLevel(l+1)<=xp)l++;return l;}
 
 /* ========================= ACHIEVEMENTS ========================= */
 function achStats(){
@@ -3842,8 +3851,8 @@ function sessionRoguesGallery(R){
     <div class="vmini-row">${tiles.join("")}</div>`;
 }
 function summaryCard1(R){
-  const lvl=accountLevel(),need=xpForLevel(lvl+1),cur=state.data.u.xp;
-  const prevNeed=xpForLevel(lvl);const pct=clamp((cur-prevNeed)/(need-prevNeed)*100,0,100);
+  const lvl=accountLevel(),atMax=lvl>=MAXLVL,need=xpForLevel(lvl+1),cur=state.data.u.xp;
+  const prevNeed=xpForLevel(lvl);const pct=atMax?100:clamp((cur-prevNeed)/(need-prevNeed)*100,0,100);
   const sets=R.wk.exercises.reduce((a,e)=>a+e.sets.length,0);
   const prN=R.prsThis.length;
   const vsPrev=(()=>{const p=prevSameDay(R.wk);if(!p)return"";const dp=R.totalVol-p.totalVol;const pc=p.totalVol?Math.round(dp/p.totalVol*100):0;const up=dp>0,dn=dp<0;return `<div class="mini" style="margin-top:5px;font-weight:600;color:${up?'var(--green)':dn?'#e8453c':'var(--text3)'}">${up?'▲':dn?'▼':'='} ${dp>0?'+':''}${fmtNum(Math.round(dp))}kg (${pc>0?'+':''}${pc}%) vs last ${esc(R.wk.name)}</div>`;})();
@@ -3859,7 +3868,7 @@ function summaryCard1(R){
       <div class="muted" style="font-size:13px">≈ ${batCompare(R.totalVol)}</div>${vsPrev}</div>
     ${prN?`<div class="prribbon"><div class="row" style="gap:10px;align-items:center"><div style="font-size:26px;filter:drop-shadow(0 0 8px rgba(46,204,113,.5))">🏆</div><div style="flex:1"><div class="prr-t">${prN} NEW PERSONAL RECORD${prN>1?"S":""}</div><div class="prr-s">${R.prsThis.map(p=>esc(p.name)).join(" · ")}</div></div></div></div>`:""}
     <div class="hr"></div>
-    <div class="row sp" style="margin-bottom:6px"><b class="gold">+${R.xpGain} XP</b><span class="mini">Level ${lvl} → ${fmtNum(need-cur)} XP to next</span></div>
+    <div class="row sp" style="margin-bottom:6px"><b class="gold">+${R.xpGain} XP</b><span class="mini">${atMax?`Level ${lvl} · MAX — legend status`:`Level ${lvl} → ${fmtNum(need-cur)} XP to next`}</span></div>
     <div class="bar xpbar"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
     <div class="center" style="margin-top:11px"><span class="chip on">🔥 ${state.data.u.streakDays} day streak</span></div>
     ${sessionRoguesGallery(R)}
