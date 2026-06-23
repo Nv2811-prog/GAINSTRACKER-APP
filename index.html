@@ -5344,6 +5344,9 @@ function batRankCard(){
   const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
   const cur=RANKS[ri],next=RANKS[ri+1];
   const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
+  // Account XP level — the per-session track (separate from strength rank). Shown here so it's glanceable.
+  const xlvl=accountLevel(),xMax=xlvl>=MAXLVL,xCur=(state.data.u&&state.data.u.xp)||0;
+  const xPrev=xpForLevel(xlvl),xNeed=xpForLevel(xlvl+1),xPct=xMax?100:clamp((xCur-xPrev)/Math.max(1,(xNeed-xPrev))*100,0,100);
   return `<div class="card" style="display:flex;gap:14px;align-items:center;cursor:pointer" onclick="openRankLadder()">
     ${batEmblem(ri,76)}
     <div style="flex:1;min-width:0">
@@ -5352,6 +5355,8 @@ function batRankCard(){
       ${next?`<div class="bar" style="height:8px;background:var(--bg4)"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
         <div class="mini" style="margin-top:3px;color:var(--text2)">${Math.max(0,hi-sl)} strength level${(hi-sl)===1?'':'s'} to <b>${esc(next[1])}</b> ${next[2]}</div>`
       :`<div class="mini" style="color:var(--gold2)">⭑ Maximum rank reached — you are the Legend of Gotham.</div>`}
+      <div class="mini" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;color:var(--text3)"><span>⚡ Level ${xlvl}${xMax?" · MAX":""}</span><span>${xMax?"legend":fmtNum(xNeed-xCur)+" XP to next"}</span></div>
+      <div class="bar" style="height:6px;background:var(--bg4)"><i style="width:${xPct}%;background:linear-gradient(90deg,#7FC8FF,#5b8def)"></i></div>
     </div></div>`;
 }
 
