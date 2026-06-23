@@ -1869,7 +1869,15 @@ function muscleLevel(m){
 function muscleXP(m){const v=state.data.muscleVol[m]||0;const l=muscleLevel(m);
   const lo=MLV_BASE*Math.pow(l,MLV_INV),hi=MLV_BASE*Math.pow(l+1,MLV_INV);
   return{lvl:l,cur:Math.max(0,v-lo),need:Math.max(1,hi-lo),pct:clamp((v-lo)/(hi-lo)*100,0,100)};}
-function strengthLevel(){let s=0;M12.forEach(m=>s+=muscleLevel(m));return Math.max(1,Math.round(s/M12.length*1.3));}
+/* Gotham rank progression (Street Thug → The Legend). A career curve driven by real training —
+   total volume + sessions — with sqrt diminishing returns: early ranks come in a handful of sessions,
+   elite ranks take years. (Old formula averaged coarse per-muscle levels and sat at Lv1 for ~15+
+   sessions, so the rank felt frozen for beginners.) Per-muscle strength still lives in muscleLevel(). */
+function strengthLevel(){
+  const u=state.data.u||{};
+  const pts=(u.totalVolume||0)/1000 + (u.totalWorkouts||0)*8;   // ~1pt/1000kg + 8pts/session
+  return Math.max(1,Math.min(45,Math.round(0.34*Math.sqrt(pts))));
+}
 
 /* ========================= WEEKLY SETS PER MUSCLE ========================= */
 function weeklySets(m){
