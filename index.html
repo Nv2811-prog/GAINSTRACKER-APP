@@ -3133,6 +3133,41 @@ function nextTarget(name){
   if(r<hi)return `<b>${lb.w}kg × ${r+1}+</b> — beat last week's reps (aim ${lo}–${hi})`;
   return `maxed ${hi} reps → <b>+${inc}kg to ${fmtNum(lb.w+inc)}kg × ${lo}</b>`;
 }
+// Stale-lift radar: established lifts (have a record) that haven't set a PR in 3+ weeks but are
+// still in active rotation — surfaced as revival targets. Pairs with PR Fight Night.
+function staleLifts(maxDays){
+  const d=state.data,nowMs=Date.now(),DAY=86400000;
+  const lastTrain={};                                          // newest training touch per lift
+  (d.workouts||[]).forEach(w=>{const t=Date.parse(w.date)||0;(w.exercises||[]).forEach(e=>{if(lastTrain[e.name]==null||t>lastTrain[e.name])lastTrain[e.name]=t;});});
+  const out=[];
+  Object.entries(d.prs||{}).forEach(([name,p])=>{
+    if(!p||!(p.orm>0)||!p.date)return;                         // need an established record + a date
+    const sincePR=Math.floor((nowMs-Date.parse(p.date))/DAY);
+    if(!(sincePR>=21))return;                                  // fresh record — not stale
+    const lt=lastTrain[name];if(lt==null)return;
+    const sinceTrain=Math.floor((nowMs-lt)/DAY);
+    if(sinceTrain>(maxDays||45))return;                        // abandoned, not "stale in rotation"
+    out.push({name,sincePR,sinceTrain,orm:Math.round(p.orm)});
+  });
+  return out.sort((a,b)=>b.sincePR-a.sincePR).slice(0,5);
+}
+// Tonight's game plan: Alfred's pre-session briefing — 1-2 concrete, winnable targets drawn from the
+// lifts queued this session (revive the stalest, then a clean progression on the heaviest established lift).
+function tonightGamePlan(){
+  const ses=state.session;if(!ses||!ses.exercises||!ses.exercises.length)return null;
+  const names=ses.exercises.map(e=>e.name);const items=[];
+  const stale=staleLifts(60).filter(s=>names.includes(s.name));
+  let used=null;
+  if(stale.length){const s=stale[0];const wks=Math.floor(s.sincePR/7);used=s.name;
+    items.push(`<b>Break the slump on ${esc(s.name)}</b> — no record in <b>${wks} week${wks===1?"":"s"}</b>. ${nextTarget(s.name)||"One clean rep past your best ends it."}`);}
+  let pick=null,pickO=-1;
+  names.forEach(n=>{if(n===used)return;const p=state.data.prs[n];const o=(p&&p.orm)||0;if(o>pickO&&nextTarget(n)){pickO=o;pick=n;}});
+  if(pick)items.push(`<b>${esc(pick)}:</b> ${nextTarget(pick)}`);
+  if(!items.length){const firstWithSug=names.find(n=>nextTarget(n));
+    items.push(firstWithSug?`<b>${esc(firstWithSug)}:</b> ${nextTarget(firstWithSug)}`:`First run through these lifts — log honest sets tonight and I'll have targets ready next time, sir.`);}
+  return items.slice(0,2);
+}
+function dismissGamePlan(){if(state.session)state.session._planDismiss=true;if(typeof saveSession==="function")saveSession();render();}
 // Warm-up: only suggested the first time a session touches a given primary muscle.
 // Light and short — "feel the movement", not an exhausting ramp. Body is warm after the first lift.
 function warmupSuggest(ei){
@@ -3376,6 +3411,16 @@ function renderLogging(){
     <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
     <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button></div>
   </div>`;
+  // Tonight's game plan — Alfred's pre-session briefing with 1-2 concrete targets (dismissible per session).
+  if(!ses._planDismiss){const _gp=tonightGamePlan();
+    if(_gp&&_gp.length){
+      html+=`<div class="card glow" style="padding:13px;margin-bottom:8px;border-color:rgba(232,197,106,.42);background:rgba(232,197,106,.06)">
+        <div class="row sp" style="margin-bottom:7px"><div class="ttl" style="margin:0">🗺️ Tonight's game plan</div><span onclick="dismissGamePlan()" title="Dismiss" style="cursor:pointer;color:var(--text3);font-weight:700;padding:0 4px;flex:none">✕</span></div>
+        ${_gp.map(t=>`<div class="mini" style="line-height:1.5;margin-bottom:5px;color:var(--text2)">🎯 ${t}</div>`).join("")}
+        <div class="mini" style="color:var(--text3);margin-top:3px">Hit one of these and tonight counts as a win, sir.</div>
+      </div>`;
+    }
+  }
   const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
   {const dmgOpen=state._dmgOpen===true; // collapsed by default — keeps the working sets in view (Gestalt: less clutter, clear focus)
    html+=`<div class="card glow" style="padding:13px">
