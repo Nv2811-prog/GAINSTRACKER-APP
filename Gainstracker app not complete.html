@@ -3079,9 +3079,11 @@ function render(){
   // One-shot view-enter animation — fires only when actually moving to a different view,
   // never on in-place re-renders (set toggles, card flips), so logging stays jank-free.
   if(!same){const _a=$("app");if(_a){
-    // If the fixed resume bar is on screen, a transform on #app would reparent it (it lives
-    // inside #app) and make it jump — use the opacity-only variant in that case.
-    const soft=!!(state.session&&!state.step&&!state.showOnboarding);
+    // If a position:fixed element lives inside #app, a transform/will-change on #app turns #app
+    // into its containing block — the fixed element then scrolls away with the page and never
+    // returns. The logging view's pinned timer bar AND the floating resume bar both hit this, so
+    // those views use the opacity-only entry (no transform, no will-change) instead of the slide.
+    const soft=state.step==="logging"||!!(state.session&&!state.step&&!state.showOnboarding);
     _a.classList.remove("view-enter","view-enter-soft");void _a.offsetWidth;_a.classList.add(soft?"view-enter-soft":"view-enter");}}
 }
 
