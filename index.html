@@ -1306,6 +1306,13 @@ function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.p
     d.u.streakDays=0;d.u.lastTrainedDate=null;d.u.earnedBadges=[];
     d.u._dbV3=true;
   }
+  // Migration: the account-XP economy was rebalanced (cheaper early levels + a more generous,
+  // heavy-friendly per-session payout). Recompute lifetime XP from real workout history under the
+  // new formula so work already logged counts. One-time, and only ever RAISES — never strips progress.
+  if(!d.u._xpV2){
+    let xp=0;(d.workouts||[]).forEach(w=>{const v=+w.totalVol||0,pr=(w.prs||[]).length;xp+=Math.min(Math.round(v/140),65)+pr*22+30;});
+    d.u.xp=Math.max(d.u.xp||0,xp);d.u._xpV2=true;
+  }
   state.data=d;}}catch(e){}}
 
 /* --- Live-session crash/kill recovery -------------------------------------
@@ -2024,14 +2031,14 @@ function suggestForSub(m,id,n){
 
 /* ========================= XP / LEVEL (account) =========================
    Banded curve: each level costs a flat block of XP, and the block grows by
-   one nominal-session every 10 levels. A nominal session ≈ 100 XP, so:
-     • Lv 1–10  → 300 XP/level  ≈ 2–4 sessions each
-     • Lv 11–20 → 400 XP/level  ≈ 3–5 sessions each
-     • Lv 21–30 → 500 XP/level  ≈ 4–6 sessions each
+   one nominal-session every 10 levels. A nominal session ≈ 80 XP, so:
+     • Lv 1–10  → 200 XP/level  ≈ 2–4 sessions each
+     • Lv 11–20 → 300 XP/level  ≈ 3–5 sessions each
+     • Lv 21–30 → 400 XP/level  ≈ 4–6 sessions each
      • …and on up, getting steeper, capped at MAXLVL for now.
    (Old curve was 120·l² — a quadratic that ballooned to ~20 sessions/level by Lv10.) */
 const MAXLVL=50;
-function lvlBlock(l){return (3+Math.floor((l-1)/10))*100;}   // XP cost of the l-th level
+function lvlBlock(l){return 200+Math.floor((l-1)/10)*100;}   // XP cost of the l-th level
 function xpForLevel(l){if(l<=0)return 0;let t=0;for(let k=1;k<=l;k++)t+=lvlBlock(k);return t;}
 function accountLevel(){const xp=(state.data.u&&state.data.u.xp)||0;let l=0;while(l<MAXLVL&&xpForLevel(l+1)<=xp)l++;return l;}
 
@@ -2590,8 +2597,9 @@ function finishWorkout(){
     if(ld===today){}else if(d<=1.5){u.streakDays++;}else{u.streakDays=1;}}else u.streakDays=1;
   u.lastTrainedDate=t;
   // totals + xp — paced so levels mean something: capped volume bonus + flat base + PR reward.
-  // (Volume is kg×reps and balloons fast, so it's divided hard and capped; PRs and showing up carry the weight.)
-  const xpGain=Math.min(Math.round(totalVol/160),55)+prsThis.length*25+20;
+  // Generous flat base (30) so a heavy, low-tonnage session still pays; volume divided & capped so
+  // high-rep marathons don't dominate; PRs carry real weight. ~60–115 XP/session → ~2-4 sessions/level early.
+  const xpGain=Math.min(Math.round(totalVol/140),65)+prsThis.length*22+30;
   u.totalWorkouts++;u.totalVolume+=totalVol;u.totalDuration+=dur;u.xp+=xpGain;u.failureSets+=fails;
   // weakest muscle for taunt memory
   let weak=M12[0],wl=999;M12.forEach(m=>{const l=muscleLevel(m);if((state.data.muscleVol[m]||0)>0&&l<wl){wl=l;weak=m;}});u.lastMissedMuscle=weak;
