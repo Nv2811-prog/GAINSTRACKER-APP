@@ -2670,9 +2670,20 @@ function resumeBar(){
 // Built-in mugshots for user-dropped villain image files (relative paths — ship with the app, work offline).
 const VILLAIN_IMG_DEFAULT={
   "Two-Face":"300px-TwoFace2.jpg",
+  "Bane":"Bane.jpg",
   "The Penguin":"penguin-1-cover-b-brian-bolland-card-stock-variant-449117.jpg",
+  "Penguin":"penguin-1-cover-b-brian-bolland-card-stock-variant-449117.jpg",
   "Poison Ivy":"poison-ivy-batman-vol.jpg",
-  "Hugo Strange":"ModernHugoStrange.jpg"
+  "Hugo Strange":"Hugo%20strange.jpg",
+  "Scarecrow":"Scarecrow.webp",
+  "The Joker":"Joker.jpg",
+  "Joker":"Joker.jpg",
+  "Harley Quinn":"Harley%20quinn.jpg",
+  "The Riddler":"riddler.jpg",
+  "Riddler":"riddler.jpg",
+  "Ra's al Ghul":"Ras%20a%20gul.jpg",
+  "Catwoman":"Catwoman.jpg",
+  "Man-Bat":"man%20bat.jpg"
 };
 function villainImgUrl(v){const m=state.data.villainImg||{};return m[v]||VILLAIN_IMG_DEFAULT[v]||"";}
 function villainFace(b){
