@@ -1204,7 +1204,8 @@ const SCIENCE_LIBRARY=[
 ];
 
 // boss roster keyed by improvement %
-const BOSSES=[{v:"Street Henchman",e:"👊",c:"#7a7a7a",q:"You're just a man in a gym. For now.",min:0},{v:"Ventriloquist",e:"🎭",c:"#8a6a4a",q:"Scarface said you'd fail. Scarface was wrong.",min:5},{v:"Killer Moth",e:"🦋",c:"#6a8a4a",q:"Even the lamest villain falls eventually.",min:10},{v:"Scarecrow",e:"🎃",c:"#c97a2a",q:"He weaponizes fear. You weaponized iron.",min:15},{v:"Catwoman",e:"🐱",c:"#9c5ce8",q:"She steals everything. You just stole a PR from your past self.",min:20},{v:"Harley Quinn",e:"🃏",c:"#e84c8c",q:"Mistah J would be proud. You absolutely wrecked it.",min:25},{v:"Penguin",e:"🐧",c:"#4a6a8a",q:"Waddled into the wrong gym, Cobblepot.",min:30},{v:"Riddler",e:"❓",c:"#3ca84c",q:"Riddle me this: how much can you lift? More than last time.",min:35},{v:"Mr. Freeze",e:"❄️",c:"#3c8ce8",q:"ICE COLD. Your PRs are cryogenically preserved forever.",min:40},{v:"Carmine Falcone",e:"🕴️",c:"#8a7a5a",q:"The Roman ran Gotham's underworld. You just ran a new record.",min:45},{v:"Two-Face",e:"🪙",c:"#c9a84c",q:"Heads you win. Tails you win. There was never a loss.",min:50},{v:"Ra's al Ghul",e:"⚔️",c:"#2eae5c",q:"The League trained for centuries. You trained for this moment.",min:60},{v:"Bane",e:"💉",c:"#e8453c",q:"He broke the Bat's back. You just broke your own record.",min:75},{v:"Joker",e:"🃏",c:"#5cae3c",q:"Why so serious? Because no one's laughing at this PR.",min:100}];
+/* Roster trimmed to rogues you have real mugshots for (Mr. Freeze kept — famous, add a pic and it lights up). */
+const BOSSES=[{v:"Penguin",e:"🐧",c:"#4a6a8a",q:"Waddled into the wrong gym, Cobblepot.",min:0},{v:"Catwoman",e:"🐱",c:"#9c5ce8",q:"She steals everything. You just stole a PR from your past self.",min:8},{v:"Scarecrow",e:"🎃",c:"#c97a2a",q:"He weaponizes fear. You weaponized iron.",min:15},{v:"Riddler",e:"❓",c:"#3ca84c",q:"Riddle me this: how much can you lift? More than last time.",min:22},{v:"Harley Quinn",e:"🃏",c:"#e84c8c",q:"Mistah J would be proud. You absolutely wrecked it.",min:28},{v:"Poison Ivy",e:"🌿",c:"#2eae5c",q:"Her thorns spread fast — but not faster than your gains.",min:35},{v:"Man-Bat",e:"🦇",c:"#6a5a8a",q:"Half man, half bat, all defeated by your discipline.",min:42},{v:"Hugo Strange",e:"🧠",c:"#8a6a4a",q:"He profiled the Bat. He never profiled this work ethic.",min:48},{v:"Carmine Falcone",e:"🕴️",c:"#8a7a5a",q:"The Roman ran Gotham's underworld. You just ran a new record.",min:54},{v:"Mr. Freeze",e:"❄️",c:"#3c8ce8",q:"ICE COLD. Your PRs are cryogenically preserved forever.",min:62},{v:"Two-Face",e:"🪙",c:"#c9a84c",q:"Heads you win. Tails you win. There was never a loss.",min:70},{v:"Ra's al Ghul",e:"⚔️",c:"#2eae5c",q:"The League trained for centuries. You trained for this moment.",min:82},{v:"Bane",e:"💉",c:"#e8453c",q:"He broke the Bat's back. You just broke your own record.",min:95},{v:"Joker",e:"🃏",c:"#5cae3c",q:"Why so serious? Because no one's laughing at this PR.",min:115}];
 const NEMESIS_MAP={chest:{villain:"Bane",quote:"The chest is the shield of Gotham's hero. Yours is paper."},back:{villain:"Riddler",quote:"Strong in front. Empty behind. I wonder what that says about you."},quads:{villain:"Penguin",quote:"You look impressive until you stand up. Train the legs."},shoulders:{villain:"Scarecrow",quote:"Wide shoulders inspire fear. Narrow ones inspire pity."},biceps:{villain:"Joker",quote:"Big chest, tiny arms. The joke writes itself."},triceps:{villain:"Joker",quote:"Arms that press but can't extend. Half a weapon."},abs:{villain:"Two-Face",quote:"Half the work done. Half neglected. Which side are you?"},hamstrings:{villain:"Bane",quote:"Your quads push. Your hamstrings surrender. Fix it."},glutes:{villain:"Penguin",quote:"Power comes from the posterior chain. Yours has gone missing."},calves:{villain:"Killer Croc",quote:"Even Croc has better calf development. Sort it out."},traps:{villain:"Deathstroke",quote:"A warrior's traps carry the weight of battle. Yours carry nothing."},forearms:{villain:"Catwoman",quote:"Grip is everything in Gotham. You'd drop the grappling hook."}};
 
 const EXP_FILL={RECRUIT:{chest:800,back:700,shoulders:600,biceps:400,triceps:400,forearms:200,quads:1200,hamstrings:600,glutes:500,calves:300,abs:400,traps:250},VIGILANTE:{chest:30000,back:26000,shoulders:22000,biceps:14000,triceps:14000,forearms:6000,quads:45000,hamstrings:22000,glutes:18000,calves:11000,abs:15000,traps:9000},DARK_KNIGHT:{chest:75000,back:65000,shoulders:55000,biceps:35000,triceps:35000,forearms:15000,quads:110000,hamstrings:55000,glutes:45000,calves:27000,abs:38000,traps:22000}};
@@ -4460,12 +4461,19 @@ function exerciseHistory(name){
   const verdict=intel?liftVerdict(intel):"";
   const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
   const tgtBlock=intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"";
+  // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
+  const recordE1=Math.max(...e1s);
+  const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
+  const fcLift=(typeof strengthForecast==="function")?strengthForecast().find(o=>o.n===name):null;
+  const fcBlock=fcLift?`<div class="banner" style="margin:0 0 10px;background:rgba(127,200,255,.08);border-color:rgba(127,200,255,.32)"><span>🔮</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">FORECAST — AT YOUR CURRENT PACE</div><b style="font-size:14px;color:#9fd0ff">${fcLift.cur}kg → ${fcLift.target}kg in ~${fcLift.days}d</b></div></div>`:"";
   openSheet(`<div class="row sp"><div class="ttl">${esc(name)}</div><span class="chip">${rows.length} sessions</span></div>
     ${verdict?`<div class="banner" style="margin:2px 0 10px"><span>🎩</span><div class="mini" style="color:${vcol}">${esc(verdict)}</div></div>`:""}
     ${tgtBlock}
-    <div class="row" style="gap:16px;margin:4px 0 12px">
-      <div><div class="mini">Best e1RM</div><b class="gold" style="font-size:20px">${Math.max(...e1s)}kg</b></div>
+    ${fcBlock}
+    <div class="row" style="gap:16px;margin:4px 0 12px;flex-wrap:wrap">
+      <div><div class="mini">Record e1RM</div><b class="gold" style="font-size:20px">${recordE1}kg</b></div>
       <div><div class="mini">Top weight</div><b style="font-size:20px">${Math.max(...tws)}kg</b></div>
+      <div><div class="mini">Gains/session</div><b style="font-size:18px;color:${effPS>=0?'var(--green)':'var(--red)'}">${effPS>=0?'+':''}${effPS.toFixed(1)}kg</b></div>
       <div><div class="mini">Since start</div><b style="font-size:14px">${trend}</b></div>
     </div>
     <div class="row" style="gap:6px;margin-bottom:8px">
@@ -4631,9 +4639,6 @@ function archExerciseList(){
 function archiveCardsHtml(){
   const d=state.data;
   const si=strengthIndexSeries();
-  const wins=(d.bossWins||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const fc=strengthForecast();
-  const eff=ironEfficiency();
   const totalPRs=Object.values(d.prs).reduce((a,p)=>a+(p.count||1),0);
   let html="";
   // Strength Index hero
@@ -4645,24 +4650,8 @@ function archiveCardsHtml(){
   }else html+=`<p class="muted" style="padding:10px 0">Log a few sessions across your main lifts and your Strength Index curve will rise here.</p>`;
   html+=`</div>`;
 
-  // Strength forecast
-  if(fc.length){
-    html+=`<div class="card"><div class="ttl">🔮 Strength Forecast <span class="mini" style="font-weight:400">— at your current pace</span></div>`;
-    fc.forEach(o=>{const dt=new Date(Date.now()+o.days*864e5);
-      html+=`<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><div style="min-width:0;flex:1"><b style="font-size:13px">${esc(o.n)}</b><div class="mini">${o.cur}kg → <b class="gold">${o.target}kg</b></div></div>
-        <div style="text-align:right"><b style="font-size:14px">~${o.days}d</b><div class="mini" style="color:var(--text3)">by ${dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div></div></div>`;});
-    html+=`<div class="mini" style="color:var(--text3);margin-top:7px;font-style:italic">Projections from your recent rate of progress. Keep showing up and these dates move closer.</div></div>`;
-  }
-
-  // Iron efficiency
-  if(eff.length){
-    const mx=Math.max(...eff.map(e=>Math.abs(e.perSession)),0.1);
-    html+=`<div class="card"><div class="ttl">⚙️ Iron Efficiency <span class="mini" style="font-weight:400">— est-1RM gained per session</span></div>`;
-    eff.slice(0,8).forEach((e,i)=>{const w=clamp(Math.abs(e.perSession)/mx*100,3,100);const pos=e.perSession>=0;
-      html+=`<div style="padding:7px 0;border-top:1px solid var(--border)"><div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px"><b style="color:var(--text3)">#${i+1}</b> ${esc(e.n)}</span><b class="${pos?'gold':'red'}">${pos?'+':''}${e.perSession.toFixed(1)}kg/session</b></div>
-        <div class="bar" style="height:6px;background:var(--bg4)"><i style="width:${w}%;background:${pos?'linear-gradient(90deg,var(--gold),var(--gold2))':'var(--red)'}"></i></div></div>`;});
-    html+=`<div class="mini" style="color:var(--text3);margin-top:7px;font-style:italic">Your highest-return lifts. The leaders are where progressive overload is working hardest.</div></div>`;
-  }
+  // Strength Forecast, record est-1RM and gains/session now live INSIDE each lift's own curve
+  // (tap any lift below) — where the data actually is, instead of as separate stacked cards.
 
   // EVERY LIFT — the hero of this page: a big, prominent, searchable vault.
   // (Hall of Defeats removed per request — its content lives in the Arkham gallery / boss wins already.)
