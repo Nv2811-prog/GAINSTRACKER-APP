@@ -387,6 +387,12 @@ border-top:1px solid var(--border);display:flex;max-width:560px;margin:0 auto;pa
 .vpanel::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.10) 2px 3px);mix-blend-mode:overlay;opacity:.7}
 .vplabel{position:absolute;top:5px;left:0;right:0;z-index:3;font-family:var(--mono,monospace);font-size:8px;letter-spacing:.22em;color:rgba(255,255,255,.5)}
 .vface{position:relative;z-index:2;font-size:74px;line-height:1;filter:drop-shadow(0 7px 18px rgba(0,0,0,.8)) contrast(1.08) saturate(.92);animation:vfaceIn .85s cubic-bezier(.2,.8,.2,1) .08s both}
+/* User-dropped villain photos render as a clean circular GCPD mugshot — face-biased crop,
+   feathered edge so the original background fades to nothing, gold ring. No bg-removal needed. */
+img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-position:center 30%;font-size:0;
+  border:2px solid rgba(242,208,121,.55);box-shadow:0 9px 24px rgba(0,0,0,.72),inset 0 0 0 4px rgba(0,0,0,.4);
+  -webkit-mask-image:radial-gradient(circle at 50% 46%,#000 58%,rgba(0,0,0,.9) 76%,transparent 99%);
+  mask-image:radial-gradient(circle at 50% 46%,#000 58%,rgba(0,0,0,.9) 76%,transparent 99%)}
 .vface.side{font-size:66px;transform:scaleX(.82);filter:drop-shadow(-6px 7px 16px rgba(0,0,0,.85)) brightness(.62) grayscale(.25) contrast(1.1)}
 @keyframes vfaceIn{0%{opacity:0;transform:scale(.55) translateY(22px)}70%{transform:scale(1.05)}100%{opacity:1;transform:none}}
 .vface.side{animation:vfaceInS .9s cubic-bezier(.2,.8,.2,1) .14s both}
@@ -2661,7 +2667,14 @@ function resumeBar(){
 }
 
 /* ========================= VILLAIN FACES (user-sourced images) ========================= */
-function villainImgUrl(v){const m=state.data.villainImg||{};return m[v]||"";}
+// Built-in mugshots for user-dropped villain image files (relative paths — ship with the app, work offline).
+const VILLAIN_IMG_DEFAULT={
+  "Two-Face":"300px-TwoFace2.jpg",
+  "The Penguin":"penguin-1-cover-b-brian-bolland-card-stock-variant-449117.jpg",
+  "Poison Ivy":"poison-ivy-batman-vol.jpg",
+  "Hugo Strange":"ModernHugoStrange.jpg"
+};
+function villainImgUrl(v){const m=state.data.villainImg||{};return m[v]||VILLAIN_IMG_DEFAULT[v]||"";}
 function villainFace(b){
   const u=villainImgUrl(b.v);
   if(u)return '<img class="vface" src="'+esc(u)+'" alt="'+esc(b.v)+'" onerror="this.remove()">'+(b.e?'<span class="vfallback" style="opacity:0">'+esc(b.e)+'</span>':'');
