@@ -4031,8 +4031,8 @@ function reg(m,d,extra){
 function suitProps(){
   const sl=clamp(M12.reduce((a,m)=>a+muscleLevel(m),0)/M12.length,0,15);
   return {sl,cx:120,
-    neck:dim(sl,9.5,12.5), sh:dim(sl,43,60), pec:dim(sl,30,42), waist:dim(sl,18,23.5), hip:dim(sl,23,29),
-    ua:dim(sl,11,16.5), fa:dim(sl,8.5,12), th:dim(sl,17,24), cf:dim(sl,11.5,17)};
+    neck:dim(sl,9.5,12.5), sh:dim(sl,46,66), pec:dim(sl,32,45), waist:dim(sl,17,21), hip:dim(sl,23,29),
+    ua:dim(sl,12,18), fa:dim(sl,9,12.5), th:dim(sl,18,25), cf:dim(sl,12,17.5)};
 }
 function setSuitView(v){state.suitView=v;render();}
 function headShape(cx){
