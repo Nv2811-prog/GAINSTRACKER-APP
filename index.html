@@ -4635,10 +4635,10 @@ function archiveCardsHtml(){
     html+=`<div class="mini" style="color:var(--text3);margin-top:7px;font-style:italic">Your highest-return lifts. The leaders are where progressive overload is working hardest.</div></div>`;
   }
 
-  // Hall of Defeats — PR/villain timeline
-  html+=`<div class="card"><div class="ttl">⚔️ Hall of Defeats <span class="mini" style="font-weight:400">— ${totalPRs} PRs · ${wins.length} bosses felled</span></div>`;
+  // Hall of Defeats — PR/villain timeline (collapsed by default; it can run very long)
+  let hallInner;
   if(wins.length){
-    html+=`<div style="position:relative;padding-left:6px">`+wins.slice(0,40).map(b=>{
+    hallInner=`<div style="position:relative;padding-left:6px">`+wins.slice(0,40).map(b=>{
       const bo=BOSSES.find(x=>x.v===b.villain)||{e:"🦇",c:"#E8C56A"};
       const jump=b.prevOrm?`<span class="green">${b.prevOrm}→${b.orm}kg</span>`:`<b class="gold">${b.orm}kg</b>`;
       return `<div class="row" style="gap:11px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--border)">
@@ -4646,13 +4646,13 @@ function archiveCardsHtml(){
         <div style="flex:1;min-width:0"><div class="row sp"><b style="font-size:14px;color:${bo.c}">${esc(b.villain)} down</b><span class="mini">${new Date(b.date).toLocaleDateString()}</span></div>
           <div class="mini" style="color:var(--text2)">${esc(b.ex)} · ${b.w}kg × ${b.r} · ${jump} est-1RM</div></div></div>`;
     }).join("")+`</div>`;
-  }else html+=`<p class="muted" style="padding:10px 0">No bosses felled yet. Set a PR on any lift and a villain falls — the moment lands here forever.</p>`;
-  html+=`</div>`;
+  }else hallInner=`<p class="muted" style="padding:10px 0">No bosses felled yet. Set a PR on any lift and a villain falls — the moment lands here forever.</p>`;
+  html+=acc('hallDefeats','⚔️','Hall of Defeats',hallInner,false,`${totalPRs} PRs · ${wins.length} felled`);
 
-  // Full exercise list with search + curves
-  html+=`<div class="card"><div class="ttl">📚 Every lift <span class="mini" style="font-weight:400">— tap any for full charts</span></div>
-    <input placeholder="🔍 Search lifts…" value="${esc(state._archQ||"")}" oninput="setArchQ(this.value)" style="margin:6px 0 2px"/>
-    <div id="arch-list">${archExerciseList()}</div></div>`;
+  // Full exercise list with search + curves (collapsed; expand to browse every lift)
+  html+=acc('everyLift','📚','Every lift',
+    `<input placeholder="🔍 Search lifts…" value="${esc(state._archQ||"")}" oninput="setArchQ(this.value)" style="margin:2px 0"/>
+    <div id="arch-list">${archExerciseList()}</div>`, false, 'tap any for full charts');
   return html;
 }
 function renderArchive(){
@@ -6758,7 +6758,7 @@ function combatStd(ex){
   const eq=(ex.eq||"").toLowerCase();
   dk*=(CR_EQUIP[eq]!=null?CR_EQUIP[eq]:1.0);
   if(ex.bw)dk+=1.0;                              // bodyweight is baked into the e1RM
-  return {vig:dk*0.62,dk:dk,legend:dk*1.34};
+  return {vig:dk*0.62,dk:dk,legend:dk*1.62};     // Legend = elite ceiling (raised so it's earned, not handed out)
 }
 function combatRank(ratio,std){return ratio>=std.legend?3:ratio>=std.dk?2:ratio>=std.vig?1:0;}
 function combatRatingCard(){
@@ -6790,10 +6790,9 @@ function combatRatingCard(){
   return `<div class="card">${head}
     <div class="stage" style="border-radius:13px;padding:11px 13px;margin:4px 0 8px;display:flex;align-items:center;justify-content:space-between">
       <div><div class="mini" style="color:var(--text3);letter-spacing:.1em">FIGHTER RANK</div><b style="font-size:18px;color:var(--gold2)">${fr.emoji} ${fr.name}</b></div>
-      <div style="text-align:right"><div class="mini" style="color:var(--text3)">overall</div><b class="gold" style="font-size:22px">Lv ${sl}</b></div>
+      <div style="text-align:right"><div class="mini" style="color:var(--text3)">total tonnage moved</div><b class="gold" style="font-size:22px">Lv ${sl}</b></div>
     </div>
-    ${body}
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Each lift is judged against a standard tuned to its movement and equipment, so a cable or machine lift can rank Legend on its own terms. e1RM is estimated — treat ranks as a guide.</div></div>`;
+    ${acc('combatLifts','🥊','Per-lift combat ranks',body+`<div class="mini" style="margin-top:8px;color:var(--text3)">Each lift is judged against a standard tuned to its movement and equipment. Legend is an elite ceiling now — earned, not handed out. Your Fighter Rank above climbs with the <b>total weight you've moved since day one</b>, not any single lift.</div>`,false,`${rows.length} lifts ranked`)}</div>`;
 }
 // ---- staleness detector + muscle balance analyzer ----
 function stalenessReport(){
