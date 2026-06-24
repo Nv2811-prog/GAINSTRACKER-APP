@@ -2683,7 +2683,8 @@ const VILLAIN_IMG_DEFAULT={
   "Riddler":"riddler.jpg",
   "Ra's al Ghul":"Ras%20a%20gul.jpg",
   "Catwoman":"Catwoman.jpg",
-  "Man-Bat":"man%20bat.jpg"
+  "Man-Bat":"man%20bat.jpg",
+  "Carmine Falcone":"Carmine_Falcone_%28circa_2014%29.png"
 };
 function villainImgUrl(v){const m=state.data.villainImg||{};return m[v]||VILLAIN_IMG_DEFAULT[v]||"";}
 function villainFace(b){
@@ -5425,7 +5426,7 @@ function renderGotham(){
   // ===== HERO — TONIGHT'S MISSION: the reason you opened the app. Big, first, ONE clear action. =====
   const sp=d.splits.find(s=>s.id===d.activeSplitId)||d.splits[0];
   html+=`<div class="card glow" style="padding:21px"><div class="ttl" style="font-size:14px;margin-bottom:9px">⚔️ Tonight's Mission</div>`;
-  if(sp){const ni=d._nextDay||0;const nextDay=sp.days[ni]||sp.days[0];
+  if(sp){const ni=computeNextDay(sp);d._nextDay=ni;const nextDay=sp.days[ni]||sp.days[0];
     if(isRest(nextDay)){
       html+=`<div><h2 style="font-size:38px;display:flex;align-items:center;gap:11px;line-height:.92">${restIcon(30)} ${esc(nextDay.name)}</h2><div class="mini" style="margin-top:3px">${esc(sp.name)} · recovery is part of the plan</div></div>
         <div class="mini" style="margin:9px 0 15px;color:var(--text2);font-style:italic;line-height:1.5">${esc(restLine())}</div>
@@ -6636,6 +6637,25 @@ function toggleRestDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s)
   save();render();}
 function delDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s||s.days.length<=1)return;s.days.splice(i,1);if((state.data._nextDay||0)>=s.days.length)state.data._nextDay=0;save();render();}
 function advanceDay(){const sp=state.data.splits.find(s=>s.id===state.data.activeSplitId)||state.data.splits[0];if(sp&&sp.days.length)state.data._nextDay=((state.data._nextDay||0)+1)%sp.days.length;}
+// Tonight's day follows your SPLIT PROGRESSION (self-healing from real history), never the calendar
+// weekday: it's the day right after the most recent split-day you actually completed — Upper→Lower→Rest→…
+// Falls back to the stored pointer for rest days / no history.
+function computeNextDay(sp){
+  if(!sp||!sp.days||!sp.days.length)return 0;
+  const len=sp.days.length;
+  const idxByName={};
+  sp.days.forEach((dy,i)=>{const k=((dy&&dy.name)||"").toLowerCase().trim();if(k&&idxByName[k]==null)idxByName[k]=i;});
+  let lastWoTime=-1,lastWoIdx=null;
+  for(const w of (state.data.workouts||[])){            // newest-first (unshift order)
+    const k=((w&&w.name)||"").toLowerCase().trim();
+    if(idxByName[k]!=null){lastWoTime=new Date(w.date).getTime();lastWoIdx=idxByName[k];break;}
+  }
+  const rest=state.data.restLog||[];
+  const lastRestTime=rest.length?new Date(rest[0]).getTime():-1;
+  if(lastWoIdx==null&&lastRestTime<0)return (state.data._nextDay||0)%len;   // brand new — start at the pointer
+  if(lastRestTime>lastWoTime)return (state.data._nextDay||0)%len;           // last thing was a rest → pointer already moved past it
+  return (lastWoIdx+1)%len;                                                 // the day after the last split-day you trained
+}
 function logRestDay(){state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();toast(restLine());render();}
 
 /* ========================= CASE FILE TAB ========================= */
