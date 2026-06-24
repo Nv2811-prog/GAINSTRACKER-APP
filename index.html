@@ -5391,87 +5391,55 @@ function patrolReport(idx){
 }
 
 function renderGotham(){
-  const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
-  const ironT=fmtNum(u.totalVolume);
-  const ledger=u.totalVolume<10000?"New to the vault.":u.totalVolume<50000?"A respectable deposit.":u.totalVolume<100000?"Wayne would notice.":u.totalVolume<500000?"The cave is full.":"Beyond the cave. Into legend.";
-  let html=`<div class="row sp"><div class="row g" style="gap:11px"><img class="brandlogo sm" src="logo_t.png" alt=""><div><div class="tag">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}</div>
-    <h1 style="font-size:34px;color:var(--gold2)">${u.name?esc(u.name.toUpperCase()):"GOTHAM"}</h1>${earnedTitle()?`<div class="mini" style="color:var(--gold-dim);letter-spacing:.08em;margin-top:-2px">🎖️ ${esc(earnedTitle())}</div>`:""}</div></div>
+  const d=state.data,u=d.u;const sl=strengthLevel();
+  // ===== COMMAND HEADER — bigger, more commanding =====
+  let html=`<div class="row sp" style="margin-bottom:5px"><div class="row g" style="gap:11px"><img class="brandlogo sm" src="logo_t.png" alt=""><div><div class="tag">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}</div>
+    <h1 style="font-size:44px;color:var(--gold2);line-height:.88">${u.name?esc(u.name.toUpperCase()):"GOTHAM"}</h1>${earnedTitle()?`<div class="mini" style="color:var(--gold-dim);letter-spacing:.08em;margin-top:2px">🎖️ ${esc(earnedTitle())}</div>`:""}</div></div>
     <div class="row g" style="gap:7px"><button class="btn ghost sm" style="width:auto" onclick="openIndex()" title="Find anything">🧭</button><button class="btn ghost sm" style="width:auto" onclick="openSettings()">⚙︎</button></div></div>
-    <div class="muted" style="font-style:italic;font-size:13px;margin:-2px 0 12px">${gothamWeather()}</div>`;
-  html+=readinessCard();
-  html+=batRankCard();
-  html+=`<div class="grid2" style="margin-bottom:13px">${threatCard()}${fatigueMini()}</div>`;
-  // Wayne Wisdom now arrives as a cinematic launch bulletin (maybeShowDailyWisdom), keeping the dashboard short.
+    <div class="muted" style="font-style:italic;font-size:13px;margin:-2px 0 15px">${gothamWeather()}</div>`;
 
-  // rest day warning (4+ consecutive)
-  const cons=consecutiveDays();
-  if(cons>=4&&!d.dismissed.restWarn)html+=`<div class="banner"><span>🦇</span><div><b>Alfred:</b> <span class="mini">Sir, you've been on patrol for ${cons} consecutive days. Even Batman rests. A recovery day is advised — not weakness, just strategy.</span></div><span class="x" onclick="d_dismiss('restWarn')">×</span></div>`;
-  // multi-muscle recovery
-  const comp=M12.filter(m=>(d.muscleVol[m]||0)&&getRecovery(m)<50);
-  if(comp.length>=3&&!d.dismissed.multiRec)html+=`<div class="banner alert"><span>🛠️</span><div><b>Multiple sectors compromised.</b> <span class="mini">The Batsuit needs repair. See THE SUIT.</span></div><span class="x" onclick="d_dismiss('multiRec')">×</span></div>`;
-
-  // comeback
-  const cb=d.bossReturns.find(b=>!b.defeated);
-  if(cb)html+=`<div class="banner"><span>👁️</span><div><b>${esc(cb.villain)} has returned.</b><div class="mini">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-defeat.</div></div></div>`;
-
-  // stalled-lift detector — proactive Alfred nudge when lifts plateau
-  const stalled=stalledLifts();
-  if(stalled.length>=2&&!d.dismissed.stall){
-    const nm=stalled.slice(0,3).map(s=>esc(s.n)).join(", ");
-    html+=`<div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩺</span><div><b>Alfred:</b> <span class="mini">${stalled.length} lifts have stalled — no new est-1RM in 3 sessions (${nm}). Change one variable: a feeler heavy single, a close variation, or a light week to let strength rebound.</span></div><span class="x" onclick="d_dismiss('stall')">NOTED</span></div>`;
-  }
-
-  // today's mission
+  // ===== HERO — TONIGHT'S MISSION: the reason you opened the app. Big, first, ONE clear action. =====
   const sp=d.splits.find(s=>s.id===d.activeSplitId)||d.splits[0];
-  const todayIdx=(new Date().getDay()+6)%7;
-  html+=`<div class="card glow"><div class="ttl">Tonight's mission</div>`;
+  html+=`<div class="card glow" style="padding:21px"><div class="ttl" style="font-size:14px;margin-bottom:9px">⚔️ Tonight's Mission</div>`;
   if(sp){const ni=d._nextDay||0;const nextDay=sp.days[ni]||sp.days[0];
     if(isRest(nextDay)){
-      html+=`<div class="row sp"><div><h2 style="font-size:26px;display:flex;align-items:center;gap:8px">${restIcon(24)} ${esc(nextDay.name)}</h2><div class="mini">${esc(sp.name)} · recovery is part of the plan</div></div>
-        <button class="btn gold sm" onclick="logRestDay()">REST ✓</button></div>
-        <div class="mini" style="margin-top:9px;color:var(--text2);font-style:italic;line-height:1.5">${esc(restLine())}</div>
+      html+=`<div><h2 style="font-size:38px;display:flex;align-items:center;gap:11px;line-height:.92">${restIcon(30)} ${esc(nextDay.name)}</h2><div class="mini" style="margin-top:3px">${esc(sp.name)} · recovery is part of the plan</div></div>
+        <div class="mini" style="margin:9px 0 15px;color:var(--text2);font-style:italic;line-height:1.5">${esc(restLine())}</div>
+        <button class="btn gold" style="font-size:16px;padding:15px" onclick="logRestDay()">REST LOGGED ✓</button>
         <button class="btn ghost sm" style="margin-top:9px" onclick="freeWorkout()">Feeling fresh? Train anyway ▶</button>`;
     }else{
-      html+=`<div class="row sp"><div class="row g" style="gap:11px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${ni})">${dayThumb(nextDay)}<div><h2 style="font-size:26px">${esc(nextDay.name)} <span class="mini" style="color:var(--gold2)">›</span></h2><div class="mini">${esc(sp.name)} · ${nextDay.exercises.length} exercises · tap to preview</div></div></div>
-        <button class="btn gold sm" onclick="startWorkout('${sp.id}',${ni})">START ▶</button></div>`;
+      html+=`<div class="row" style="gap:15px;cursor:pointer;margin-bottom:16px" onclick="openDayBriefing('${sp.id}',${ni})">${dayThumb(nextDay)}<div style="flex:1;min-width:0"><h2 style="font-size:38px;line-height:.9">${esc(nextDay.name)}</h2><div class="mini" style="margin-top:4px">${esc(sp.name)} · ${nextDay.exercises.length} exercises · tap to preview ›</div></div></div>
+        <button class="btn gold" style="font-size:18px;padding:18px;letter-spacing:.05em" onclick="startWorkout('${sp.id}',${ni})">START PATROL ▶</button>`;
     }
-  }else html+=`<p class="muted">No split selected. <a onclick="goPlan()" style="color:var(--gold2);cursor:pointer;text-decoration:underline">Build one in Mission → Plan</a>, or start a free session.</p><button class="btn gold sm" style="margin-top:8px" onclick="freeWorkout()">FREE SESSION ▶</button>`;
+  }else html+=`<p class="muted">No split selected. <a onclick="goPlan()" style="color:var(--gold2);cursor:pointer;text-decoration:underline">Build one in Mission → Plan</a>, or start a free session.</p><button class="btn gold" style="margin-top:11px;font-size:16px;padding:15px" onclick="freeWorkout()">FREE SESSION ▶</button>`;
   html+=`</div>`;
 
-  // Two-Face's daily call — heavy vs volume directive
-  html+=twoFaceCard();
-  // Weekly Most Wanted bounty — weakest sector
+  // ===== STATUS — your overall rank + readiness, the two glance metrics =====
+  html+=batRankCard();
+  html+=readinessCard();
+  html+=`<div class="grid2" style="margin-bottom:16px">${threatCard()}${fatigueMini()}</div>`;
+
+  // ===== THE WEEK'S ONE FOCUS =====
   html+=mostWantedCard();
 
-  // (Recovery now shows compactly under Patrol Readiness; full per-sector map lives in THE SUIT.)
+  // ===== ALFRED'S ALERTS — only surface when they actually matter =====
+  const cons=consecutiveDays();
+  if(cons>=4&&!d.dismissed.restWarn)html+=`<div class="banner"><span>🦇</span><div><b>Alfred:</b> <span class="mini">Sir, you've been on patrol for ${cons} consecutive days. Even Batman rests. A recovery day is advised — not weakness, just strategy.</span></div><span class="x" onclick="d_dismiss('restWarn')">×</span></div>`;
+  const comp=M12.filter(m=>(d.muscleVol[m]||0)&&getRecovery(m)<50);
+  if(comp.length>=3&&!d.dismissed.multiRec)html+=`<div class="banner alert"><span>🛠️</span><div><b>Multiple sectors compromised.</b> <span class="mini">The Batsuit needs repair. See THE SUIT.</span></div><span class="x" onclick="d_dismiss('multiRec')">×</span></div>`;
+  const cb=d.bossReturns.find(b=>!b.defeated);
+  if(cb)html+=`<div class="banner"><span>👁️</span><div><b>${esc(cb.villain)} has returned.</b><div class="mini">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-defeat.</div></div></div>`;
+  const stalled=stalledLifts();
+  if(stalled.length>=2&&!d.dismissed.stall){const nm=stalled.slice(0,3).map(s=>esc(s.n)).join(", ");
+    html+=`<div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩺</span><div><b>Alfred:</b> <span class="mini">${stalled.length} lifts have stalled — no new est-1RM in 3 sessions (${nm}). Change one variable: a feeler heavy single, a close variation, or a light week to let strength rebound.</span></div><span class="x" onclick="d_dismiss('stall')">NOTED</span></div>`;}
 
-  html+=`<div class="grid3" style="margin-bottom:13px">
-    <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.streakDays}</div><div class="mini">day streak ›</div></div>
-    <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:30px">${u.totalWorkouts}</div><div class="mini">missions ›</div></div>
-    <div class="card center" style="margin:0;padding:13px;cursor:pointer" onclick="goPlan()"><div class="big" style="font-size:30px">${weekCount()}/${u.weeklyGoal}</div><div class="mini">this week ›</div></div></div>`;
+  // ===== CHARACTER + QUICK STATS (demoted below the fold) =====
+  html+=twoFaceCard();
+  html+=`<div class="grid3" style="margin-bottom:16px">
+    <div class="card center" style="margin:0;padding:15px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:34px">${u.streakDays}</div><div class="mini">day streak ›</div></div>
+    <div class="card center" style="margin:0;padding:15px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:34px">${u.totalWorkouts}</div><div class="mini">missions ›</div></div>
+    <div class="card center" style="margin:0;padding:15px;cursor:pointer" onclick="goPlan()"><div class="big" style="font-size:34px">${weekCount()}/${u.weeklyGoal}</div><div class="mini">this week ›</div></div></div>`;
   html+=garageCard();
-
-  // training age clock
-  html+=trainingAgeCard();
-  // iron ledger (tap for full lifetime page) + cityscape skyline + PR velocity
-  const vel=prVelocity();
-  html+=`<div class="card" style="cursor:pointer" onclick="openIronLedger()"><div class="row sp"><div class="ttl" style="margin:0">🏛️ Wayne Iron Ledger</div><span class="mini" style="color:var(--gold2)">full ledger ›</span></div>
-    <div class="row sp" style="align-items:flex-end"><div class="big">${ironT}<span style="font-size:18px"> kg</span></div><span class="chip" style="color:${vel.color}">${vel.dir} ${vel.label}</span></div>
-    ${cityscapeBar()}
-    <div class="muted" style="font-style:italic;font-size:13px;margin-top:8px">${ledger}</div></div>`;
-
-  // nemesis (weekly)
-  const nem=weakestMuscle();
-  if(nem&&NEMESIS_MAP[nem]&&!d.dismissed["nem_"+nem]){const nm=NEMESIS_MAP[nem];
-    html+=`<div class="banner"><span>😈</span><div><b>${esc(nm.villain)} taunts you:</b><div class="mini" style="font-style:italic">"${esc(nm.quote)}"</div></div><span class="x" onclick="d_dismiss('nem_${nem}')">NOTED</span></div>`;}
-
-  // next mission intel (overload)
-  const intel=overloadIntel();
-  if(intel.length)html+=`<div class="card"><div class="ttl">Next mission intel</div>${intel.map(i=>`<div class="row sp" style="margin-bottom:6px"><span style="font-size:13px">${esc(i.name)}</span><b class="gold">${i.text}</b></div>`).join("")}</div>`;
-
-  // Feature 15: bottom note alternates 50/50 between Batman flavour and real training science — tappable for the full library
-  const note=gothamNote();
-  html+=`<div class="card" style="cursor:pointer" onclick="openTips()"><div class="row sp"><div class="ttl">${note.kind==="science"?"🧪 TRAINING INTEL":"🦇 GOTHAM"}</div><span class="mini" style="color:var(--gold2)">all tips ›</span></div><div style="font-style:italic;font-size:14px;line-height:1.5;color:${note.kind==="science"?"var(--text)":"var(--text2)"}">${esc(note.text)}</div></div>`;
 
   $("app").innerHTML=html;
 }
