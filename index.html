@@ -5505,11 +5505,16 @@ function renderMission(){
       <button class="btn gold" onclick="newSplit();setMSub('plan')">＋ Build a split</button></div>`;
   }
   d.splits.forEach(sp=>{
-    html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${d.activeSplitId===sp.id?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
-      <div style="margin-top:8px">${sp.days.map((day,i)=>isRest(day)
-        ? `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px;display:inline-flex;align-items:center;gap:6px">${restIcon(15)} ${esc(day.name)}</b><div class="mini">Planned recovery — not counted against your streak</div></div></div><button class="btn ghost sm" style="width:auto" onclick="logRestDay()">REST ✓</button></div>`
-        : `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px">${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span></b><div class="mini">${day.exercises.length} exercises · tap to preview</div></div></div><button class="btn gold sm" style="width:auto" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`
-      ).join("")}</div></div>`;
+    const isActive=d.activeSplitId===sp.id;
+    const ni=isActive?computeNextDay(sp):-1;       // highlight the day you're actually up for next
+    html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${isActive?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
+      <div style="margin-top:8px">${sp.days.map((day,i)=>{
+        const tn=i===ni?`<span class="chip on" style="font-size:9px;padding:1px 7px;margin-left:7px;vertical-align:middle">TONIGHT</span>`:"";
+        const hl=i===ni?"box-shadow:inset 0 0 0 1px rgba(242,208,121,.32);background:rgba(242,208,121,.06);border-radius:12px;":"";
+        return isRest(day)
+        ? `<div class="row sp" style="padding:8px 10px;margin:3px 0;border-top:1px solid var(--border);${hl}"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px;display:inline-flex;align-items:center;gap:6px">${restIcon(15)} ${esc(day.name)}${tn}</b><div class="mini">Planned recovery — not counted against your streak</div></div></div><button class="btn ghost sm" style="width:auto" onclick="logRestDay()">REST ✓</button></div>`
+        : `<div class="row sp" style="padding:8px 10px;margin:3px 0;border-top:1px solid var(--border);${hl}"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px">${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><div class="mini">${day.exercises.length} exercises · tap to preview</div></div></div><button class="btn gold sm" style="width:auto" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`;
+      }).join("")}</div></div>`;
   });
   html+=`<button class="btn" onclick="freeWorkout()">⚡ Free session</button>`;
   // ===== 3) FEATURE SUB-TABS — two clean homes for everything else =====
