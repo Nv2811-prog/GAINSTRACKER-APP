@@ -65,8 +65,8 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 .pop-red{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(240,82,74,.22),0 10px 30px -10px rgba(240,82,74,.3)!important}
 .pop-green{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(52,210,123,.22),0 10px 30px -10px rgba(52,210,123,.28)!important}
 /* figure stage: a lit pedestal so the Batsuit pops off the black */
-.stage{position:relative;background:radial-gradient(ellipse 70% 60% at 50% 34%,#2a2f3c 0%,#13161f 55%,#070809 100%)!important;border:1px solid rgba(201,168,76,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 60px -20px rgba(124,150,255,.18),0 0 0 1px rgba(201,168,76,.1),0 18px 50px -24px rgba(0,0,0,.9)!important}
-.stage::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse 60% 42% at 50% 96%,rgba(201,168,76,.12),transparent 70%)}
+.stage{position:relative;background:radial-gradient(ellipse 56% 46% at 50% 18%,rgba(150,170,212,.2),transparent 60%),radial-gradient(ellipse 72% 62% at 50% 36%,#2c323f 0%,#13161f 56%,#060708 100%)!important;border:1px solid rgba(201,168,76,.24)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 72px -22px rgba(124,150,255,.2),inset 0 -34px 54px -30px rgba(0,0,0,.72),0 0 0 1px rgba(201,168,76,.1),0 22px 56px -26px rgba(0,0,0,.92)!important}
+.stage::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse 64% 40% at 50% 98%,rgba(232,197,106,.2),transparent 72%),radial-gradient(ellipse 130% 72% at 50% -4%,rgba(0,0,0,.28),transparent 46%)}
 .card h2,.card h3{color:var(--gold2)}
 .ttl{font-family:var(--disp);font-size:13px;letter-spacing:.17em;text-transform:uppercase;color:var(--gold2);opacity:.82;margin-bottom:10px}
 .big{font-family:var(--disp);font-size:46px;color:var(--gold2);line-height:.9;text-shadow:0 0 22px rgba(235,199,107,.2)}
@@ -4006,9 +4006,15 @@ function rcHex(r){return r>=80?"#2ECC71":r>=50?"#E8C53C":"#E8453C";}
 function suitColor(m){if(!(state.data.muscleVol[m]||0))return null;return rcHex(getRecovery(m));}
 // Shared suit defs: 3D shading gradients + a soft bloom for worked muscles. Injected into every suit body.
 const SUIT_DEFS=`<defs>`
-  +`<linearGradient id="sOcc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".34"/></linearGradient>`
-  +`<radialGradient id="sGloss" cx="34%" cy="22%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>`
-  +`<filter id="suitGlow" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="3.2" result="b"/><feComponentTransfer in="b" result="bd"><feFuncA type="linear" slope="0.7"/></feComponentTransfer><feMerge><feMergeNode in="bd"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`
+  // Ambient occlusion — bellies dark at the bottom edge, sculpting depth into each muscle.
+  +`<linearGradient id="sOcc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset=".82" stop-color="#000" stop-opacity=".2"/><stop offset="1" stop-color="#000" stop-opacity=".48"/></linearGradient>`
+  // Warm stage bounce — gold light kicking up from the pedestal floor onto the lower body.
+  +`<linearGradient id="sBounce" x1="0" y1="0" x2="0" y2="1"><stop offset=".62" stop-color="#E8C56A" stop-opacity="0"/><stop offset="1" stop-color="#F0D27A" stop-opacity=".14"/></linearGradient>`
+  // Cool rim/sky light — a faint blue catch along the top of each muscle for separation.
+  +`<linearGradient id="sRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C2D6FF" stop-opacity=".18"/><stop offset=".34" stop-color="#C2D6FF" stop-opacity="0"/></linearGradient>`
+  // Tight specular key light from upper-left — gives muscle bellies a sculpted sheen.
+  +`<radialGradient id="sGloss" cx="38%" cy="15%" r="66%"><stop offset="0" stop-color="#fff" stop-opacity=".32"/><stop offset=".38" stop-color="#fff" stop-opacity=".07"/><stop offset=".72" stop-color="#fff" stop-opacity="0"/></radialGradient>`
+  +`<filter id="suitGlow" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="3.6" result="b"/><feComponentTransfer in="b" result="bd"><feFuncA type="linear" slope="0.92"/></feComponentTransfer><feMerge><feMergeNode in="bd"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`
   +`</defs>`;
 function reg(m,d,extra){
   // _figColor override lets the same anatomy be recoloured for non-recovery views (e.g. a day's target map)
@@ -4016,7 +4022,7 @@ function reg(m,d,extra){
   const c=fc?null:suitColor(m);
   const lit=fc?fc.op>=0.4:!!c;
   const fAttr=(state._figGlow&&lit)?' filter="url(#suitGlow)"':'';
-  const shade=state._figShade?`<path d="${d}" fill="url(#sOcc)" style="pointer-events:none"/><path d="${d}" fill="url(#sGloss)" style="pointer-events:none"/>`:'';
+  const shade=state._figShade?`<path d="${d}" fill="url(#sOcc)" style="pointer-events:none"/><path d="${d}" fill="url(#sBounce)" style="pointer-events:none"/><path d="${d}" fill="url(#sRim)" style="pointer-events:none"/><path d="${d}" fill="url(#sGloss)" style="pointer-events:none"/>`:'';
   if(fc){
     return `<path d="${d}" fill="${fc.fill}" fill-opacity="${fc.op}" stroke="#05080c" stroke-opacity=".5" stroke-width="1.1" stroke-linejoin="round"${fAttr} style="pointer-events:none"/>${shade}`;}
   const fill=c||"#E8C56A";const op=c?".92":".08";
