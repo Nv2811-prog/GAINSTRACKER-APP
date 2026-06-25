@@ -393,6 +393,11 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
   border:2px solid rgba(242,208,121,.55);box-shadow:0 9px 24px rgba(0,0,0,.72),inset 0 0 0 4px rgba(0,0,0,.4);
   -webkit-mask-image:radial-gradient(circle at 50% 46%,#000 58%,rgba(0,0,0,.9) 76%,transparent 99%);
   mask-image:radial-gradient(circle at 50% 46%,#000 58%,rgba(0,0,0,.9) 76%,transparent 99%)}
+/* In the GCPD booking panels & "BOOKED" tiles the mugshot fills as a rectangular booking PHOTO, not the circle. */
+.vpanel img.vface{width:100%;height:100%;border-radius:6px;object-fit:cover;object-position:center 24%;border:none;box-shadow:none;-webkit-mask-image:none;mask-image:none;transform:none}
+.vpanel img.vface.side{filter:grayscale(.35) brightness(.66) contrast(1.12);transform:none}
+.vmini-face{min-height:58px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:0!important}
+.vmini-face img.vface{width:100%;height:58px;border-radius:0;object-fit:cover;object-position:center 24%;border:none;box-shadow:none;-webkit-mask-image:none;mask-image:none;transform:none}
 .vface.side{font-size:66px;transform:scaleX(.82);filter:drop-shadow(-6px 7px 16px rgba(0,0,0,.85)) brightness(.62) grayscale(.25) contrast(1.1)}
 @keyframes vfaceIn{0%{opacity:0;transform:scale(.55) translateY(22px)}70%{transform:scale(1.05)}100%{opacity:1;transform:none}}
 .vface.side{animation:vfaceInS .9s cubic-bezier(.2,.8,.2,1) .14s both}
@@ -2872,8 +2877,8 @@ function bossVictory(boss,ko){
       <div class="vrule"></div>
       <div class="vflash"></div>
       <div class="vpanels">
-        <div class="vpanel"><div class="vplabel">FRONT</div><div class="vface">${boss.e}</div></div>
-        <div class="vpanel"><div class="vplabel">PROFILE</div><div class="vface side">${boss.e}</div></div>
+        <div class="vpanel"><div class="vplabel">FRONT</div>${villainImgUrl(boss.v)?`<img class="vface" src="${esc(villainImgUrl(boss.v))}" alt="${esc(boss.v)}">`:`<div class="vface">${boss.e}</div>`}</div>
+        <div class="vpanel"><div class="vplabel">PROFILE</div>${villainImgUrl(boss.v)?`<img class="vface side" src="${esc(villainImgUrl(boss.v))}" alt="">`:`<div class="vface side">${boss.e}</div>`}</div>
       </div>
       <div class="vslate"><b>GCPD</b><span>${esc((boss.pr.name||"").toUpperCase()).slice(0,18)}</span><span class="vcase">${caseNo}</span></div>
       <div class="vstamp">DEFEATED</div>
@@ -2945,6 +2950,20 @@ function maybeShowDailyWisdom(){
     state.data.lastWisdomDay=today;save();
     const w=wisdomToday();
     cinePush({eye:"Wayne Wisdom",icon:"🦇",big:true,body:w[0],attr:w[1],btn:"YESSIR"});
+  }catch(e){}
+}
+// Two-Face's daily coin — fires ONCE per day as a cinematic bulletin (not an inline Gotham card you scroll past).
+function maybeShowTwoFaceCall(){
+  try{const today=new Date().toDateString();
+    if(state.data.lastTwoFaceDay===today)return;
+    state.data.lastTwoFaceDay=today;save();
+    const heads=twoFaceSide()===0;
+    const col=heads?"var(--gold2)":"#E8453C";
+    const title=heads?"HEADS — Go Heavy":"TAILS — Chase Volume";
+    const dir=heads
+      ? "Tonight is about <b style='color:var(--gold2)'>top-end strength</b>. Work up to a heavy top single or triple on your first compound, then back off. Move real iron."
+      : "Tonight is about <b style='color:#ff6a5e'>accumulation</b>. Keep 1–2 reps in reserve, add a back-off set, chase 2 extra reps on everything. Bury the muscle in volume.";
+    cinePush({eye:"Two-Face's Call",icon:heads?"🪙":"🩸",accent:col,title:title,titleHtml:`<span style="color:${col}">${esc(title)}</span>`,bodyHtml:dir,btn:"NO CHOOSING"});
   }catch(e){}
 }
 // Live Patrol Feed — a running log of League activity so you never miss an ally's session,
@@ -3895,7 +3914,7 @@ function sessionRoguesGallery(R){
   const seen={};const tiles=[];
   R.prsThis.forEach(p=>{const b=(typeof pickBoss==="function")?pickBoss([p]):null;if(!b)return;
     if(seen[b.v])return;seen[b.v]=1;
-    tiles.push(`<div class="vmini" style="--vc:${b.c}"><div class="vmini-face">${b.e}</div><div class="vmini-stamp">BOOKED</div><div class="vmini-name">${esc(b.v)}</div></div>`);});
+    tiles.push(`<div class="vmini" style="--vc:${b.c}"><div class="vmini-face">${villainImgUrl(b.v)?`<img class="vface" src="${esc(villainImgUrl(b.v))}" alt="">`:b.e}</div><div class="vmini-stamp">BOOKED</div><div class="vmini-name">${esc(b.v)}</div></div>`);});
   if(!tiles.length)return"";
   return `<div class="hr"></div>
     <div class="mini" style="letter-spacing:.16em;color:var(--text3);font-family:var(--mono,monospace);margin-bottom:8px">GCPD · ROGUES BOOKED TONIGHT</div>
@@ -4299,7 +4318,7 @@ function renderSuit(){
     const rec=getRecovery(m),lvl=muscleLevel(m),trained=(state.data.muscleVol[m]||0)>0;
     return `<div onclick="muscleDrill('${m}')" style="cursor:pointer;margin-bottom:9px">
       <div class="row sp" style="margin-bottom:3px"><span>${mIcon(m,16)} ${MNAME[m]} <span class="mini">Lv ${lvl}</span></span>
-      <span class="mini" style="color:${trained?recoveryColor(rec):'var(--text3)'}">${trained?rec+"%":"—"}</span></div>
+      <span class="mini" style="color:${trained?recoveryColor(rec):'var(--text3)'}">${trained?rec+"% · "+(hoursToReady(m)>0?hoursToReady(m)+"h to go":"ready"):"untrained"}</span></div>
       <div class="bar"><i style="width:${trained?rec:0}%;background:${trained?recoveryColor(rec):'var(--bg4)'}"></i></div></div>`;
   }).join("")}</div>`;
   // weekly coverage radar
@@ -5404,6 +5423,17 @@ function patrolReport(idx){
     <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close the file</button>`);
 }
 
+/* Wayne Towers Lifted — lifetime tonnage as a growing Gotham skyline (each tower = 20,000kg moved). */
+const WAYNE_TOWER_KG=20000;
+function wayneTowersCard(){
+  const vol=(typeof ironLedger==="function"?ironLedger().vol:(state.data.u.totalVolume||0))||0;
+  if(vol<=0)return "";
+  const towers=vol/WAYNE_TOWER_KG, whole=Math.floor(towers), pct=Math.round((towers-whole)*100);
+  return `<div class="card" style="cursor:pointer" onclick="openIronLedger()"><div class="row sp"><div class="ttl" style="margin:0">🏙️ Wayne Towers Lifted</div><span class="mini" style="color:var(--gold2)">iron ledger ›</span></div>
+    <div class="row sp" style="align-items:flex-end;margin-top:2px"><div class="big">${whole}<span style="font-size:18px;color:var(--text2)"> ${whole===1?"tower":"towers"}</span></div><div class="mini" style="color:var(--text3);text-align:right">${fmtNum(Math.round(vol))} kg moved<br>${pct}% to tower ${whole+1}</div></div>
+    <div class="bar" style="height:7px;margin-top:8px"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
+    <div class="mini" style="color:var(--text2);margin-top:7px;font-style:italic">Each tower = ${fmtNum(WAYNE_TOWER_KG)}kg of iron. You're raising Gotham's skyline one rep at a time.</div></div>`;
+}
 function renderGotham(){
   const d=state.data,u=d.u;const sl=strengthLevel();
   // ===== COMMAND HEADER — bigger, more commanding =====
@@ -5447,13 +5477,13 @@ function renderGotham(){
   if(stalled.length>=2&&!d.dismissed.stall){const nm=stalled.slice(0,3).map(s=>esc(s.n)).join(", ");
     html+=`<div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩺</span><div><b>Alfred:</b> <span class="mini">${stalled.length} lifts have stalled — no new est-1RM in 3 sessions (${nm}). Change one variable: a feeler heavy single, a close variation, or a light week to let strength rebound.</span></div><span class="x" onclick="d_dismiss('stall')">NOTED</span></div>`;}
 
-  // ===== CHARACTER + QUICK STATS (demoted below the fold) =====
-  html+=twoFaceCard();
+  // ===== QUICK STATS (demoted) — Two-Face's Call now fires as a daily cinematic popup, not an inline card =====
   html+=`<div class="grid3" style="margin-bottom:16px">
     <div class="card center" style="margin:0;padding:15px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:34px">${u.streakDays}</div><div class="mini">day streak ›</div></div>
     <div class="card center" style="margin:0;padding:15px;cursor:pointer" onclick="go('case')"><div class="big" style="font-size:34px">${u.totalWorkouts}</div><div class="mini">missions ›</div></div>
     <div class="card center" style="margin:0;padding:15px;cursor:pointer" onclick="goPlan()"><div class="big" style="font-size:34px">${weekCount()}/${u.weeklyGoal}</div><div class="mini">this week ›</div></div></div>`;
   html+=garageCard();
+  html+=wayneTowersCard();
 
   $("app").innerHTML=html;
 }
@@ -9085,7 +9115,7 @@ function boot(){
   if(state.data.onboardingDone&&!state.showOnboarding){try{if(restoreSession()){startTimers();}}catch(e){}}
   render();
   if(state._restored){state._restored=false;try{toast("🦇 Workout recovered — your logged sets are safe. Tap the bar to resume.");}catch(e){}}
-  if(state.data.onboardingDone){checkVillainTaunt();checkUnlocks();maybeShowDailyWisdom();/* silent baseline on first run so only NEW unlocks notify later */}
+  if(state.data.onboardingDone){checkVillainTaunt();checkUnlocks();maybeShowDailyWisdom();maybeShowTwoFaceCall();/* silent baseline on first run so only NEW unlocks notify later */}
   // service worker
   if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
   // cloud sync — go online for live Allies (deferred so it never blocks first paint)
