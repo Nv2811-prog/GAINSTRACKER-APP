@@ -597,6 +597,60 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .badgepill{font-family:var(--disp);font-size:13px;letter-spacing:.06em;color:var(--gold2);background:var(--gold-bg);border:1px solid var(--gold-dim);padding:3px 10px;border-radius:20px;white-space:nowrap}
 .cityscape{width:100%;height:84px;display:block;border-radius:10px;border:1px solid var(--border);margin-top:4px}
 @keyframes flicker{0%,100%{opacity:.85}50%{opacity:1}}
+/* ===== Gotham Iron Protocol v2: command-deck visual layer ===== */
+.gtv2-shell{position:relative;margin:-2px -2px 0}
+.gtv2-hero{position:relative;overflow:hidden;border:1px solid rgba(242,208,121,.25);border-radius:18px;margin-bottom:14px;min-height:254px;background:#07090d;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 22px 60px -30px #000}
+.gtv2-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,5,8,.2),rgba(4,5,8,.76) 54%,#07090d),linear-gradient(90deg,rgba(7,9,13,.96),rgba(7,9,13,.52) 52%,rgba(7,9,13,.86));z-index:1}
+.gtv2-hero::after{content:"";position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(242,208,121,.2),transparent 30%,rgba(85,155,232,.14) 78%,rgba(240,82,74,.12));mix-blend-mode:screen;z-index:2;pointer-events:none}
+.gtv2-hero-img{position:absolute;right:-28px;top:-18px;width:66%;height:112%;object-fit:cover;object-position:center;opacity:.72;filter:saturate(.9) contrast(1.08)}
+.gtv2-hero-body{position:relative;z-index:3;padding:18px 16px 16px;display:flex;flex-direction:column;min-height:254px}
+.gtv2-kicker{font-family:var(--disp);letter-spacing:.22em;text-transform:uppercase;font-size:12px;color:var(--gold-dim)}
+.gtv2-title{font-family:var(--disp);font-size:46px;line-height:.86;color:var(--gold2);letter-spacing:.02em;margin:6px 0 8px;max-width:78%}
+.gtv2-sub{font-size:13px;line-height:1.45;color:#c7cbd3;max-width:78%}
+.gtv2-hero-actions{margin-top:auto;display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}
+.gtv2-mission-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.gtv2-rotlabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8a909c;margin:14px 0 6px}
+.gtv2-rotation{display:flex;flex-wrap:wrap;gap:5px}
+.gtv2-rot{font-family:var(--disp);font-size:12px;letter-spacing:.05em;padding:5px 11px;border-radius:9px;white-space:nowrap;cursor:pointer;background:rgba(255,255,255,.06);color:#c7cbd3;border:1px solid rgba(255,255,255,.12);transition:transform .12s ease}
+.gtv2-rot:active{transform:scale(.95)}
+.gtv2-rot.on{background:linear-gradient(180deg,var(--gold3),var(--gold));color:#150f02;border-color:transparent;box-shadow:0 0 15px -3px rgba(242,208,121,.6)}
+.gtv2-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.055);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:700;color:var(--text2);backdrop-filter:blur(8px)}
+.gtv2-pill.gold{color:var(--gold2);border-color:rgba(242,208,121,.32);background:rgba(242,208,121,.1)}
+.gtv2-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.gtv2-panel{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.11);background:linear-gradient(180deg,rgba(31,37,50,.9),rgba(13,16,23,.9));border-radius:14px;padding:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px -25px #000}
+.gtv2-panel::before{content:"";position:absolute;left:11px;right:11px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.28),transparent)}
+.gtv2-panel.wide{grid-column:1/-1}
+.gtv2-label{font-family:var(--disp);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.gtv2-value{font-family:var(--disp);font-size:28px;line-height:1;color:var(--text)}
+.gtv2-note{font-size:12px;line-height:1.38;color:var(--text2);margin-top:5px}
+.gtv2-meter{height:8px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:9px}
+.gtv2-meter i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 12px rgba(242,208,121,.24)}
+.gtv2-action{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
+.gtv2-action:first-child{border-top:0;padding-top:0}
+.gtv2-action-ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(242,208,121,.1);border:1px solid rgba(242,208,121,.24);font-size:18px}
+.gtv2-action-title{font-weight:800;font-size:13.5px;color:var(--text)}
+.gtv2-action-copy{font-size:12px;line-height:1.38;color:var(--text2);margin-top:1px}
+.gtv2-chipline{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.gtv2-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;border-radius:999px;padding:4px 8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.045);color:var(--text2)}
+.gtv2-chip.red{color:#ff887f;border-color:rgba(240,82,74,.38);background:rgba(240,82,74,.1)}
+.gtv2-chip.green{color:#75e5a5;border-color:rgba(52,210,123,.34);background:rgba(52,210,123,.1)}
+.gtv2-chip.gold{color:var(--gold2);border-color:rgba(242,208,121,.33);background:rgba(242,208,121,.09)}
+.gtv2-protocol{border-color:rgba(85,155,232,.28);background:linear-gradient(180deg,rgba(25,34,50,.94),rgba(10,13,19,.94))}
+.gtv2-protocol .gtv2-action-ic{background:rgba(85,155,232,.12);border-color:rgba(85,155,232,.32)}
+.gtv2-map{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
+.gtv2-muscle{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);border-radius:11px;padding:8px 6px;text-align:center;min-width:0}
+.gtv2-muscle b{display:block;font-family:var(--disp);font-size:14px;line-height:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gtv2-muscle span{display:block;font-size:10px;color:var(--text3);margin-top:2px}
+.gtv2-audit-row{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-top:1px solid rgba(255,255,255,.08)}
+.gtv2-audit-row:first-child{border-top:0}
+.gtv2-audit-row strong{font-size:13px}
+.gtv2-audit-row p{font-size:12px;line-height:1.45;color:var(--text2);margin:1px 0 0}
+@media(max-width:380px){
+  .gtv2-title{font-size:40px;max-width:86%}
+  .gtv2-sub{max-width:86%}
+  .gtv2-hero-img{width:74%;opacity:.56}
+  .gtv2-map{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 </head>
 <body>
@@ -8995,6 +9049,191 @@ async function sendAlfred(){
     ALFRED_MSGS[ALFRED_MSGS.length-1].text=txt||"I have nothing to add, sir.";state.data.u.aiUses++;checkAchievements();save();}
   catch(e){ALFRED_MSGS[ALFRED_MSGS.length-1].text="I'm afraid the line to the Batcomputer is down, sir. ("+e.message+")";}
   renderAlfred();
+}
+
+/* ========================= GOTHAM IRON PROTOCOL v2 =========================
+   A read-only command deck over the existing data model. It deliberately avoids save()
+   and only derives guidance from logged workouts, split structure, PRs, recovery and
+   weekly set landmarks. */
+function gtv2Clr(kind){
+  return kind==="red"?"#ff887f":kind==="green"?"#75e5a5":kind==="blue"?"#9fd0ff":kind==="gold"?"var(--gold2)":"var(--text2)";
+}
+function gtv2Pct(v){return clamp(Math.round(v||0),0,100);}
+function gtv2Stimulus(m){
+  const ws=weeklySets(m),vl=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m);
+  if(ws<=0)return {zone:"Silent",kind:"",text:"no sets this week"};
+  if(ws<vl.mev)return {zone:"Below MEV",kind:"red",text:`${ws}/${vl.mev} sets - not enough to grow`};
+  if(ws<=vl.mav)return {zone:"Growth",kind:"green",text:`${ws} sets - productive range`};
+  if(ws<=mrv)return {zone:"High",kind:"gold",text:`${ws} sets - high but recoverable`};
+  return {zone:"Past MRV",kind:"red",text:`${ws}/${mrv} sets - junk-volume risk`};
+}
+function gtv2Pattern(ex){
+  const p=((ex&&ex.p&&ex.p[0])||"other");
+  const n=((ex&&ex.n)||"").toLowerCase();
+  if(p==="chest")return n.includes("incline")||n.includes("upper")?"upper chest":n.includes("fly")||n.includes("pec")?"chest fly":"pressing";
+  if(p==="back")return n.includes("pulldown")||n.includes("pull-up")||n.includes("chin")?"vertical pull":n.includes("deadlift")||n.includes("good morning")?"hinge/back":"row";
+  if(p==="shoulders")return n.includes("rear")?"rear delt":n.includes("lateral")?"side delt":n.includes("press")?"overhead press":"delt raise";
+  if(p==="triceps")return n.includes("overhead")||n.includes("skull")?"long-head triceps":"triceps extension";
+  if(p==="biceps")return n.includes("hammer")||n.includes("reverse")?"brachialis/grip curl":"elbow flexion";
+  if(["quads","hamstrings","glutes"].includes(p))return n.includes("curl")?"knee flexion":n.includes("extension")?"knee extension":n.includes("thrust")||n.includes("bridge")?"hip extension":n.includes("squat")||n.includes("press")?"squat/press":"single-leg/lower";
+  return p;
+}
+function gtv2CurrentPlanDay(){
+  const d=state.data,sp=(d.splits||[]).find(s=>s.id===d.activeSplitId)||(d.splits||[])[0];
+  if(!sp)return null;
+  const i=computeNextDay(sp),day=sp.days[i]||sp.days[0];
+  return {sp,i,day};
+}
+function gtv2RedundancyAudit(){
+  const cur=gtv2CurrentPlanDay();if(!cur||isRest(cur.day))return null;
+  const buckets={};
+  (cur.day.exercises||[]).forEach(n=>{const ex=exFor(n),key=gtv2Pattern(ex);(buckets[key]=buckets[key]||[]).push(n);});
+  const dup=Object.keys(buckets).filter(k=>buckets[k].length>=3).sort((a,b)=>buckets[b].length-buckets[a].length)[0];
+  if(!dup)return null;
+  return {kind:"gold",icon:"🧭",title:"Redundancy check",copy:`${cur.day.name} has ${buckets[dup].length} ${dup} movements. Keep the best 2, then add a missing angle instead of more of the same.`};
+}
+function gtv2BalanceAudit(){
+  const push=["chest","shoulders","triceps"].reduce((a,m)=>a+weeklySets(m),0);
+  const pull=["back","biceps","forearms","traps"].reduce((a,m)=>a+weeklySets(m),0);
+  const quad=weeklySets("quads"),post=weeklySets("hamstrings")+weeklySets("glutes");
+  if(push>=10&&push>pull*1.35)return {kind:"gold",icon:"⚖️",title:"Push is outrunning pull",copy:`Push work is ${push} sets vs ${pull} pull sets. Add rows/rear delts before more pressing to keep shoulders honest.`};
+  if(pull>=10&&pull>push*1.5)return {kind:"gold",icon:"⚖️",title:"Pull dominates the week",copy:`Pull work is ${pull} sets vs ${push} push sets. Add pressing only if recovery is green and joints feel good.`};
+  if(quad>=8&&quad>post*1.6)return {kind:"gold",icon:"🦵",title:"Posterior chain lag",copy:`Quads have ${quad} sets while hamstrings + glutes have ${post}. Add curls, RDLs, hip thrusts or back extensions.`};
+  return null;
+}
+function gtv2ProgressionFor(name){
+  const rows=exerciseRows(name);if(!rows.length)return null;
+  const last=rows[rows.length-1],set=last.bset;if(!set)return null;
+  const ex=exFor(name),w=+set.w||0,r=+set.r||0,load=setLoad(ex,w),profile=typeof prProfileTag==="function"?prProfileTag(name):"";
+  if(r>=9){
+    const step=ex.bw?"small added load":"2.5kg";
+    return {kind:"green",icon:"📈",title:"Progression order",copy:`${name}${profile}: last top set was ${load}kg x ${r}. Since it cleared 9+ reps, add ${step} next time and keep reps clean.`};
+  }
+  if(r>=6)return {kind:"blue",icon:"🎯",title:"Progression order",copy:`${name}${profile}: hold ${load}kg and beat ${r} reps first. No weight jump until the last set reaches 9+ reps.`};
+  return {kind:"gold",icon:"🛠️",title:"Progression order",copy:`${name}${profile}: ${load}kg x ${r} is still heavy. Repeat the load, own technique, and build reps before adding weight.`};
+}
+function gtv2ActionIntel(){
+  const items=[];
+  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
+  M12.forEach(m=>{
+    const ws=weeklySets(m),vl=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m),rec=getRecovery(m);
+    if(ws>mrv)items.push({kind:"red",icon:"🔥",title:`${MNAME[m]} past MRV`,copy:`${ws} sets this week vs recoverable ceiling around ${mrv}. Stop adding sets; recover or train a different sector.`});
+    else if(ws>0&&ws<vl.mev)items.push({kind:"gold",icon:"📉",title:`${MNAME[m]} below MEV`,copy:`Only ${ws}/${vl.mev} hard sets this week. Add ${vl.mev-ws} focused set${vl.mev-ws===1?"":"s"} if you want growth.`});
+    else if(ws===0&&(state.data.muscleVol[m]||0)>0&&daysSince(muscleLastTrained(m))>8)items.push({kind:"gold",icon:"🕯️",title:`${MNAME[m]} has gone quiet`,copy:`No useful weekly stimulus and last trained ${Math.round(daysSince(muscleLastTrained(m)))} days ago. Put it back on patrol.`});
+    else if(rec>=75&&ws<vl.mav&&(state.data.muscleVol[m]||0)>0)items.push({kind:"green",icon:"✅",title:`${MNAME[m]} ready`,copy:`${rec}% recovered with ${ws}/${vl.mav} sets. Good target if tonight's split allows it.`});
+    const fr=typeof freqInfo==="function"?freqInfo(m):null;
+    if(fr&&ws>=10&&fr.sessions<2)items.push({kind:"blue",icon:"🔁",title:`Split ${MNAME[m]} volume`,copy:`${ws} sets are crammed into ${fr.sessions} session. Consider 2 exposures so set quality stays high. Optional, not a nag.`});
+  });
+  const bal=gtv2BalanceAudit();if(bal)items.unshift(bal);
+  const red=gtv2RedundancyAudit();if(red)items.unshift(red);
+  const names=(typeof loggedExerciseNamesByRecency==="function"?loggedExerciseNamesByRecency():loggedExerciseNames()).slice(0,4);
+  const prog=names.map(gtv2ProgressionFor).find(Boolean);if(prog)items.unshift(prog);
+  if(!items.length&&trained.length)items.push({kind:"green",icon:"🦇",title:"Protocol clean",copy:"Volume, recovery and balance look orderly. Execute tonight's mission and chase quality reps."});
+  if(!items.length)items.push({kind:"blue",icon:"🎩",title:"Alfred needs evidence",copy:"Log a workout and the protocol will start reading recovery, weekly sets, balance and progression."});
+  const weight={red:0,gold:1,blue:2,green:3};
+  return items.sort((a,b)=>(weight[a.kind]??2)-(weight[b.kind]??2)).slice(0,5);
+}
+function gtv2ProtocolDeck(){
+  const rows=gtv2ActionIntel().map(a=>`<div class="gtv2-action">
+    <div class="gtv2-action-ic" style="color:${gtv2Clr(a.kind)}">${a.icon}</div>
+    <div><div class="gtv2-action-title">${esc(a.title)}</div><div class="gtv2-action-copy">${a.copy}</div></div>
+    <span class="gtv2-chip ${a.kind}">${a.kind==="red"?"urgent":a.kind==="green"?"green":a.kind==="blue"?"option":"watch"}</span>
+  </div>`).join("");
+  return `<div class="gtv2-panel gtv2-protocol wide"><div class="row sp"><div><div class="gtv2-label">Alfred Protocol</div><div class="gtv2-value" style="font-size:24px;color:var(--gold2)">What matters tonight</div></div><button class="btn ghost sm" style="width:auto" onclick="gtv2OpenProtocolBriefing()">Briefing</button></div><div style="margin-top:10px">${rows}</div></div>`;
+}
+function gtv2MissionHero(){
+  const d=state.data,u=d.u,cur=gtv2CurrentPlanDay(),title=u.name?u.name.toUpperCase():"GOTHAM";
+  let body="",btn="",meta="",rot="";
+  if(cur&&cur.day){
+    const day=cur.day,rest=isRest(day);
+    meta=`<span class="gtv2-pill gold">${esc(cur.sp.name)}</span><span class="gtv2-pill">${rest?"Recovery protocol":(day.exercises||[]).length+" exercises"}</span><span class="gtv2-pill">Strength Lv ${strengthLevel()}</span>`;
+    rot=`<div class="gtv2-rotlabel">Where you are in ${esc(cur.sp.name)}</div><div class="gtv2-rotation">${cur.sp.days.map((dy,i)=>`<span class="gtv2-rot${i===cur.i?' on':''}" onclick="openDayBriefing('${cur.sp.id}',${i})">${isRest(dy)?'😴 ':''}${esc((dy.name||'').toUpperCase())}</span>`).join('')}</div>`;
+    if(rest){
+      body=`${esc(day.name)} is on the board. Recovery is not retreat; it is where the adaptation gets paid.`;
+      btn=`<button class="btn gold" onclick="logRestDay()">REST LOGGED</button><button class="btn ghost sm" style="width:auto" onclick="freeWorkout()">Train</button>`;
+    }else{
+      const prime=(day.exercises||[]).slice(0,3).map(n=>exFor(n).p&&exFor(n).p[0]).filter(Boolean).map(m=>MNAME[m]).filter((v,i,a)=>a.indexOf(v)===i).join(" / ");
+      body=`Tonight's patrol is ${esc(day.name)}${prime?` - ${esc(prime)}`:""}. Open the cage, log clean sets, and let Alfred judge the evidence.`;
+      btn=`<button class="btn gold" onclick="startWorkout('${cur.sp.id}',${cur.i})">START PATROL</button><button class="btn ghost sm" style="width:auto" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Intel</button>`;
+    }
+  }else{
+    body="No active split is selected. Start a free session or build the plan in Mission.";
+    btn=`<button class="btn gold" onclick="freeWorkout()">FREE SESSION</button><button class="btn ghost sm" style="width:auto" onclick="goPlan()">Plan</button>`;
+    meta=`<span class="gtv2-pill gold">No active split</span><span class="gtv2-pill">Strength Lv ${strengthLevel()}</span>`;
+  }
+  return `<section class="gtv2-hero">
+    <img class="gtv2-hero-img" src="Batman.jpg" alt="">
+    <div class="gtv2-hero-body">
+      <div class="gtv2-kicker">${new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})} - Gotham Iron Protocol v2</div>
+      <div class="gtv2-title">${esc(title)}</div>
+      <div class="gtv2-sub">${body}</div>
+      <div class="gtv2-mission-meta">${meta}</div>
+      ${rot}
+      <div class="gtv2-hero-actions">${btn}</div>
+    </div>
+  </section>`;
+}
+function gtv2ScorePanel(){
+  const r=patrolReadiness(),t=gothamThreat(),f=fatigueDebt(),w=weekCount(),goal=state.data.u.weeklyGoal||4;
+  return `<div class="gtv2-grid">
+    <div class="gtv2-panel" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color}">${r.score}</div><div class="gtv2-note">${esc(r.label)} - ${esc(r.line)}</div><div class="gtv2-meter"><i style="width:${r.score}%;background:${r.color}"></i></div></div>
+    <div class="gtv2-panel" onclick="openThreatInfo()"><div class="gtv2-label">Threat</div><div class="gtv2-value" style="color:${t.color}">${t.level}</div><div class="gtv2-note">${esc(t.desc)}</div><div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color}"></i></div></div>
+    <div class="gtv2-panel" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color}">${f.pct}%</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color}"></i></div></div>
+    <div class="gtv2-panel" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"}">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
+    ${gtv2ProtocolDeck()}
+  </div>`;
+}
+function gtv2MuscleGrid(){
+  const rows=M12.map(m=>{
+    const s=gtv2Stimulus(m),rec=(state.data.muscleVol[m]||0)?getRecovery(m):0,col=s.kind==="red"?"#ff887f":s.kind==="green"?"#75e5a5":s.kind==="gold"?"var(--gold2)":"var(--text3)";
+    return `<button class="gtv2-muscle" onclick="muscleDrill('${m}')">${mIcon(m,18,col)}<b>${MNAME[m]}</b><span style="color:${col}">${s.zone} · ${rec?rec+"% rec":"no data"}</span></button>`;
+  }).join("");
+  return `<div class="gtv2-panel wide"><div class="row sp"><div><div class="gtv2-label">Batsuit Map</div><div class="gtv2-value" style="font-size:22px;color:var(--gold2)">Volume x recovery by muscle</div></div><button class="btn ghost sm" style="width:auto" onclick="go('suit')">Suit</button></div><div class="gtv2-map">${rows}</div></div>`;
+}
+function gtv2OpenProtocolBriefing(){
+  const audit=gtv2ActionIntel();
+  const muscleRows=M12.map(m=>{const s=gtv2Stimulus(m),fr=typeof freqInfo==="function"?freqInfo(m):null;
+    return `<div class="gtv2-audit-row"><span>${mIcon(m,18,gtv2Clr(s.kind||""))}</span><div><strong>${MNAME[m]}</strong><p>${esc(s.text)} · recovery ${state.data.muscleVol[m]?getRecovery(m)+"%":"unknown"}${fr?` · ${fr.sessions} session${fr.sessions===1?"":"s"} this week`:""}</p></div></div>`;
+  }).join("");
+  openSheet(`<div class="ttl">🎩 Alfred Protocol Briefing</div>
+    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">Read-only audit of weekly sets, recovery, frequency, redundancy and progression. No data is changed here.</div>
+    <div class="gtv2-panel gtv2-protocol" style="margin-bottom:10px">${audit.map(a=>`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:${gtv2Clr(a.kind)}">${a.icon}</div><div><div class="gtv2-action-title">${esc(a.title)}</div><div class="gtv2-action-copy">${a.copy}</div></div><span class="gtv2-chip ${a.kind}">${a.kind}</span></div>`).join("")}</div>
+    <div class="ttl" style="font-size:14px;margin:12px 0 4px">All sectors</div>
+    ${muscleRows}
+    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
+}
+function renderGotham(){
+  const d=state.data,u=d.u;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  const stalled=typeof stalledLifts==="function"?stalledLifts():[];
+  const cb=(d.bossReturns||[]).find(b=>!b.defeated);
+  if(stalled.length||cb){
+    html+=`<div class="gtv2-panel wide" style="margin-bottom:14px"><div class="gtv2-label">Active case files</div>`;
+    if(stalled.length)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ffb15c">🩺</div><div><div class="gtv2-action-title">${stalled.length} stalled lift${stalled.length===1?"":"s"}</div><div class="gtv2-action-copy">${stalled.slice(0,3).map(s=>esc(s.n)).join(", ")} - change one variable or deload the movement.</div></div><button class="btn ghost sm" style="width:auto" onclick="openBatcomputer()">Open</button></div>`;
+    if(cb)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ff887f">👁️</div><div><div class="gtv2-action-title">${esc(cb.villain)} has returned</div><div class="gtv2-action-copy">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-book the case.</div></div><span class="gtv2-chip red">boss</span></div>`;
+    html+=`</div>`;
+  }
+  html+=batRankCard();
+  html+=mostWantedCard();
+  html+=`<div class="gtv2-grid"><div class="gtv2-panel" onclick="go('case')"><div class="gtv2-label">Streak</div><div class="gtv2-value" style="color:var(--gold2)">${u.streakDays||0}</div><div class="gtv2-note">day${(u.streakDays||0)===1?"":"s"} under the signal</div></div>
+    <div class="gtv2-panel" onclick="openIronLedger()"><div class="gtv2-label">Iron Ledger</div><div class="gtv2-value" style="color:var(--gold2)">${fmtNum(Math.round((typeof ironLedger==="function"?ironLedger().vol:u.totalVolume)||0))}</div><div class="gtv2-note">kg lifetime volume</div></div></div>`;
+  html+=garageCard()+wayneTowersCard()+`</div>`;
+  $("app").innerHTML=html;
+}
+function overloadSuggestions(wk){
+  const out=[];
+  (wk.exercises||[]).forEach(e=>{
+    const working=(e.sets||[]).filter(s=>s.done&&s.type!=="W"&&+s.r>0);
+    if(!working.length)return;
+    const last=working[working.length-1],top=working.reduce((a,s)=>(+s.w||0)>(+a.w||0)?s:a,working[0]);
+    const reps=+last.r||0,ex=exFor(e.name),load=setLoad(ex,top.w);
+    let text,tone;
+    if(reps>=9){text=`Last working set hit ${reps} reps, so weight may rise next time: ${ex.bw?"add the smallest load you can":"try +2.5kg"} and keep form strict.`;tone="up";}
+    else if(reps>=6){text=`Do not add weight yet. Hold ${load}kg and push the last set from ${reps} toward 9+ clean reps first.`;tone="ok";}
+    else{text=`Hold or reduce the load. Last set was only ${reps} reps; earn 6-8 clean reps before chasing load.`;tone="hold";}
+    out.push({name:e.name,text,tone});
+  });
+  return out;
 }
 
 /* ========================= SETTINGS ========================= */
