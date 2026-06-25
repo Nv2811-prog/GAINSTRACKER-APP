@@ -442,6 +442,8 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .brandlogo{width:132px;height:132px;object-fit:contain;display:block;margin:0 auto;animation:pulseLogo 2.6s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(201,168,76,.32))}
 .brandlogo.sm{width:34px;height:34px;margin:0;animation:none;filter:drop-shadow(0 2px 8px rgba(201,168,76,.45))}
 .brandlogo.splash{width:172px;height:172px}
+.profavatar{width:78px;height:78px;border-radius:50%;flex:none;overflow:hidden;border:2.5px solid var(--gold2);box-shadow:0 0 24px -4px rgba(242,208,121,.55),inset 0 0 0 3px rgba(0,0,0,.4)}
+.profavatar img{width:100%;height:100%;object-fit:cover;object-position:center 22%}
 .ob-dots{display:flex;gap:7px;justify-content:center;margin:0 0 14px}
 .ob-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16);transition:.25s}
 .ob-dots i.on{background:var(--gold2);width:22px;border-radius:4px;box-shadow:0 0 10px rgba(201,168,76,.55)}
@@ -3041,7 +3043,7 @@ function discardSession(){appConfirm({title:"Discard session",body:"End this ses
 
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
-const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","📈","CASE"],["allies","🤝","ALLIES"],["history","📜","HISTORY"]];
+const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","👤","PROFILE"],["allies","🤝","ALLIES"]];
 const MORE_TABS=[["alfred","🤖","ALFRED","Your evidence-based AI coach — chat & physique photo critiques"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.step==="summary"||state.showOnboarding){$("nav").classList.add("hide");return;}
@@ -3148,7 +3150,7 @@ function render(){
   else if(state.subpage==="garage"){renderGarage();renderNav();}
   else if(state.subpage==="infirmary"){renderInfirmary();renderNav();}
   else{
-    const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderCase,allies:renderAllies,history:renderHistory,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
+    const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderProfile,allies:renderAllies,history:renderProfile,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
     fn();
     const app=$("app");if(app){app.insertAdjacentHTML("afterbegin",topBar());const rb=resumeBar();if(rb)app.insertAdjacentHTML("beforeend",rb);}
     renderNav();
@@ -5433,6 +5435,32 @@ function wayneTowersCard(){
     <div class="row sp" style="align-items:flex-end;margin-top:2px"><div class="big">${whole}<span style="font-size:18px;color:var(--text2)"> ${whole===1?"tower":"towers"}</span></div><div class="mini" style="color:var(--text3);text-align:right">${fmtNum(Math.round(vol))} kg moved<br>${pct}% to tower ${whole+1}</div></div>
     <div class="bar" style="height:7px;margin-top:8px"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
     <div class="mini" style="color:var(--text2);margin-top:7px;font-style:italic">Each tower = ${fmtNum(WAYNE_TOWER_KG)}kg of iron. You're raising Gotham's skyline one rep at a time.</div></div>`;
+}
+/* ========================= PROFILE TAB (Case + History merged) =========================
+   One identity page: avatar + rank, the big Strength Index curve, title belts, combat ranks,
+   and Every Lift as the door into per-lift detail. Records/forecasts live inside each lift's curve. */
+function renderProfile(){
+  const d=state.data,u=d.u;const sl=strengthLevel(),r=rankFor(sl);
+  let html=`<div class="row" style="gap:14px;align-items:center;margin-bottom:15px">
+    <div class="profavatar"><img src="Batman.jpg" alt="" onerror="this.parentNode.style.display='none'"></div>
+    <div style="flex:1;min-width:0">
+      <h1 style="font-size:33px;color:var(--gold2);line-height:.9">${u.name?esc(u.name.toUpperCase()):"VIGILANTE"}</h1>
+      <div class="mini" style="color:var(--gold-dim);letter-spacing:.06em;margin-top:3px">${r.emoji} ${esc(r.name)} · STRENGTH LV ${sl}</div>
+      ${earnedTitle()?`<div class="mini" style="color:var(--text3);margin-top:1px">🎖️ ${esc(earnedTitle())}</div>`:""}
+    </div></div>`;
+  if(!d.workouts.length){
+    html+=`<div class="card"><p class="muted" style="margin:0">Your profile fills in as you train — strength curve, records, belts and every lift. Log your first session, sir.</p><button class="btn gold sm" style="margin-top:11px" onclick="go('mission')">Go to Mission ▶</button></div>`;
+    $("app").innerHTML=html;return;
+  }
+  html+=batRankCard();
+  html+=archiveCardsHtml();                 // Strength Index hero + Every Lift hero
+  html+=titleBeltsCard();
+  html+=combatRatingCard();
+  html+=`<div class="grid2" style="margin-bottom:13px"><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:24px">🖥️</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Batcomputer</div><div class="mini" style="color:var(--text3)">Deep analytics & reports</div></button><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:24px">🃏</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Every villain you've felled</div></button></div>`;
+  html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div><div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
+  html+=`<div class="card"><div class="ttl">📜 Patrol log <span class="mini" style="font-weight:400">— tap a mission for the full report</span></div>${d.workouts.slice(0,12).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><div class="row g" style="gap:9px;align-items:center"><b class="gold">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 9px" onclick="patrolReport(${i})">📜</button></div></div>`).join("")}</div>`;
+  html+=`<button class="btn" style="margin:4px 0 18px;border-color:var(--gold-dim)" onclick="openMeasure()">📐 Body measurements & trends</button>`;
+  $("app").innerHTML=html;
 }
 function renderGotham(){
   const d=state.data,u=d.u;const sl=strengthLevel();
