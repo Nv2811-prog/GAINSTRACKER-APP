@@ -9384,7 +9384,12 @@ function boot(){
   if(state._restored){state._restored=false;try{toast("🦇 Workout recovered — your logged sets are safe. Tap the bar to resume.");}catch(e){}}
   if(state.data.onboardingDone){checkVillainTaunt();checkUnlocks();maybeShowDailyWisdom();maybeShowTwoFaceCall();/* silent baseline on first run so only NEW unlocks notify later */}
   // service worker
-  if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+  if("serviceWorker"in navigator){
+    navigator.serviceWorker.register("sw.js").then(r=>{try{r.update();}catch(_){}}).catch(()=>{});
+    // When a fresh worker takes control, reload ONCE so the newest build shows immediately. Never wipes data.
+    let _swReloaded=false;
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(_swReloaded)return;_swReloaded=true;location.reload();});
+  }
   // cloud sync — go online for live Allies (deferred so it never blocks first paint)
   try{if(state.data.onboardingDone)setTimeout(()=>{try{cloudInit();}catch(e){}},800);}catch(e){}
   // offline indicator: reflects real connectivity, reassures data is local
