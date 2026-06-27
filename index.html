@@ -3552,6 +3552,11 @@ function stretchRedundancyNotes(){
   });
   return notes.slice(0,2);
 }
+/* "Fill last" — copy last session's weight×reps into tonight's sets so you only nudge what changes. */
+function fillLast(ei){const ses=state.session;if(!ses)return;const e=ses.exercises[ei];if(!e)return;let n=0;(e.sets||[]).forEach(s=>{if(s.type==="W")return;if(s.prevW!=null&&s.prevW!==""){s.w=s.prevW;n++;}if(s.prevR!=null&&s.prevR!=="")s.r=s.prevR;});if(typeof saveSession==="function")saveSession();try{haptic("tap");}catch(_){}render();toast(n?`Filled ${n} set${n===1?"":"s"} from last time — now beat it.`:"No previous numbers for this lift yet.");}
+/* Per-gym machine settings — remember seat height / pin / pad for this machine AT THIS GYM. */
+function machineSetting(name){const d=state.data;return ((d.machineSettings||{})[d.u.activeGym]||{})[name]||"";}
+function setMachineSetting(name){const d=state.data;appPrompt({title:"Machine setup · "+(d.u.activeGym||"gym"),body:"Save your settings for this machine (seat height, pin, pad position…). Stored per gym.",ok:"Save",value:machineSetting(name)}).then(v=>{if(v===null)return;d.machineSettings=d.machineSettings||{};d.machineSettings[d.u.activeGym]=d.machineSettings[d.u.activeGym]||{};v=(v||"").trim();if(v)d.machineSettings[d.u.activeGym][name]=v;else delete d.machineSettings[d.u.activeGym][name];save();render();});}
 function renderLogging(){
   const ses=state.session;const metric=state.data.u.metric;
   let html=`<div class="timers" id="timerbar">
@@ -3635,6 +3640,7 @@ function renderLogging(){
         <div class="mini" style="color:var(--gold2);margin-bottom:4px;display:flex;align-items:center">${secIcon('flame')}Warm-up — ${esc(w.muscles)} still cold</div>
         <div class="mini" style="margin-bottom:6px">${w.sets.map(s=>s.w+"kg × "+s.r).join("  ·  ")} <span style="color:var(--text3)">— primes the pattern, doesn't count as working volume</span></div>
         <div class="row" style="gap:8px"><button class="btn gold sm g" onclick="addWarmups(${ei})">Add warm-up</button><button class="btn ghost sm" style="width:auto" onclick="dismissWarm(${ei})">Skip</button></div></div>`:"";})()}
+      ${["machine","cable","smith","lever","plate-loaded"].includes((ex.eq||"").toLowerCase())?`<div class="mini" onclick="setMachineSetting('${esc(e.name).replace(/'/g,"")}')" style="margin-bottom:7px;cursor:pointer">⚙️ <b style="color:var(--gold2)">${esc(state.data.u.activeGym||"Gym")}</b> setup: ${(()=>{const ms=machineSetting(e.name);return ms?`<b>${esc(ms)}</b> <span style="color:var(--text3)">· edit</span>`:`<span style="color:var(--text3)">tap to save seat / pin / pad ›</span>`;})()}</div>`:""}
       <table class="settbl"><thead><tr><th>SET</th><th>PREVIOUS</th><th>${ex.bw?"+KG":"KG"}</th><th>REPS</th><th></th><th>${metric==="rir"?"RIR":"RPE"}</th><th>✓</th></tr></thead><tbody>`;
     e.sets.forEach((s,si)=>{
       const prev=(s.prevW!=null||s.prevR!=null)?`${s.prevType&&s.prevType!=="NRM"?s.prevType+" ":""}${s.prevW||0}×${s.prevR||0}`:"—";
@@ -3652,6 +3658,7 @@ function renderLogging(){
     html+=`</tbody></table>
       <div class="row wrap" style="margin-top:9px;gap:8px">
         <button class="btn ghost sm g" onclick="addSet(${ei})">+ Add set</button>
+        <button class="btn ghost sm" style="width:auto" title="Fill these sets with last session's numbers" onclick="fillLast(${ei})">↻ Fill last</button>
         <button class="btn ghost sm" style="width:auto" title="Swap for a similar lift" onclick="openSwap(${ei})">⇄ Swap</button>
         <button class="btn ghost sm" style="width:auto" title="Add the antagonist / other forearm side" onclick="openPair(${ei})">🤝 Pair</button>
         <button class="btn ghost sm" style="width:auto" onclick="showCues('${esc(e.name).replace(/'/g,"")}')">ℹ️ Cues</button>
