@@ -4540,6 +4540,12 @@ function exerciseRows(name){
   });
   return rows;
 }
+/* Rep-max PRs — heaviest load lifted for at least N reps (5/8/10) from the active gym's history. */
+function repMaxes(name){
+  const ex=exFor(name),best={5:0,8:0,10:0};
+  (state.data.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{if((e.name||"").toLowerCase().trim()!==(name||"").toLowerCase().trim())return;(e.sets||[]).forEach(s=>{if(s.type==="W"||!s.done)return;const reps=+s.r||0,load=setLoad(ex,s.w);if(!load||!reps)return;[5,8,10].forEach(rm=>{if(reps>=rm&&load>best[rm])best[rm]=load;});});});});
+  return best;
+}
 function exerciseHistory(name){
   const ex=exFor(name),rows=exerciseRows(name);
   if(!rows.length){openSheet(`<div class="ttl">${esc(name)}</div><p class="muted">No completed sets logged for this lift yet.</p><button class="btn" onclick="closeSheet()">Close</button>`);return;}
@@ -4569,6 +4575,7 @@ function exerciseHistory(name){
       <div><div class="mini">Gains/session</div><b style="font-size:18px;color:${effPS>=0?'var(--green)':'var(--red)'}">${effPS>=0?'+':''}${effPS.toFixed(1)}kg</b></div>
       <div><div class="mini">Since start</div><b style="font-size:14px">${trend}</b></div>
     </div>
+    ${(()=>{const rmx=repMaxes(name);return (rmx[5]||rmx[8]||rmx[10])?`<div class="row" style="gap:7px;margin:0 0 12px;flex-wrap:wrap"><span class="mini" style="color:var(--text3);align-self:center">Rep maxes:</span>${[[5,"5RM"],[8,"8RM"],[10,"10RM"]].map(a=>rmx[a[0]]?`<span class="chip" style="width:auto">${a[1]} <b class="gold">${Math.round(rmx[a[0]])}kg</b></span>`:"").join("")}</div>`:"";})()}
     <div class="row" style="gap:6px;margin-bottom:8px">
       <button class="chip ${mode==='e1rm'?'on':''}" onclick="setExHist('${safe}','e1rm')">Est. 1RM</button>
       <button class="chip ${mode==='weight'?'on':''}" onclick="setExHist('${safe}','weight')">Top weight</button>
