@@ -5511,6 +5511,42 @@ function wayneTowersCard(){
 /* ========================= PROFILE TAB (Case + History merged) =========================
    One identity page: avatar + rank, the big Strength Index curve, title belts, combat ranks,
    and Every Lift as the door into per-lift detail. Records/forecasts live inside each lift's curve. */
+/* MMA Fight Record — week-vs-week W-L plus knockouts (rogues felled). */
+function mmaRecord(){
+  const ws=(state.data.workouts||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!ws.length)return null;
+  const byWeek={};
+  ws.forEach(w=>{const dd=new Date(w.date);dd.setHours(0,0,0,0);const dow=(dd.getDay()+6)%7;dd.setDate(dd.getDate()-dow);const k=dd.getTime();byWeek[k]=(byWeek[k]||0)+(+w.totalVol||0);});
+  const weeks=Object.keys(byWeek).map(Number).sort((a,b)=>a-b);
+  let wins=0,losses=0,draws=0;
+  for(let i=1;i<weeks.length;i++){const cur=byWeek[weeks[i]],prev=byWeek[weeks[i-1]];if(cur>prev*1.02)wins++;else if(cur<prev*0.98)losses++;else draws++;}
+  return {wins,losses,draws,kos:(state.data.bossWins||[]).length,weeks:weeks.length};
+}
+function mmaRecordCard(){
+  const r=mmaRecord();if(!r||r.weeks<2)return "";
+  return `<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🥊 Fight Record</div><span class="mini" style="color:var(--text3)">week vs week · ${r.weeks} weeks</span></div>
+    <div class="row" style="align-items:flex-end;margin:6px 0 4px"><div class="big" style="font-size:46px;color:var(--gold2)">${r.wins}<span style="font-size:22px;color:var(--text3)"> - ${r.losses}${r.draws?" - "+r.draws:""}</span></div>
+      <div style="margin-left:auto;text-align:right"><div class="big" style="font-size:30px;color:#ff6a5e">${r.kos}</div><div class="mini">KO · rogues felled</div></div></div>
+    <div class="mini" style="color:var(--text2);font-style:italic">Out-train last week and it's a win. Every record that fells a villain is a knockout.</div></div>`;
+}
+/* Best-ever Highlight Reel — top lifts by est-1RM at the active gym; tap to open the curve. */
+function highlightReelCard(){
+  const prs=Object.entries(state.data.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm).slice(0,5);
+  if(!prs.length)return "";
+  return `<div class="card"><div class="ttl">🏆 Best-ever reel <span class="mini" style="font-weight:400">— heaviest iron${state.data.u.activeGym?" · "+esc(state.data.u.activeGym):""}</span></div>
+    ${prs.map(([n,p],i)=>`<div class="row sp" style="padding:8px 0;border-top:${i?"1px solid var(--border)":"none"};cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')"><div class="row" style="gap:9px;min-width:0"><span class="num" style="color:var(--text3);width:18px">#${i+1}</span><b style="font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)} ›</b></div><b class="gold" style="white-space:nowrap">${Math.round(p.orm)}kg</b></div>`).join("")}</div>`;
+}
+/* Cross-gym comparison — lifts set at 2+ gyms, side by side (machines differ). */
+function crossGymCard(){
+  const byGym=state.data.prsByGym||{};const gyms=Object.keys(byGym);
+  if(gyms.length<2)return "";
+  const lifts={};
+  gyms.forEach(g=>Object.entries(byGym[g]||{}).forEach(([n,p])=>{if(p&&p.orm>0){lifts[n]=lifts[n]||{};lifts[n][g]=Math.round(p.orm);}}));
+  const multi=Object.entries(lifts).filter(([n,m])=>Object.keys(m).length>=2).slice(0,8);
+  if(!multi.length)return "";
+  return `<div class="card"><div class="ttl">🏟️ Same lift, different gyms <span class="mini" style="font-weight:400">— machines vary</span></div>
+    ${multi.map(([n,m])=>`<div style="padding:8px 0;border-top:1px solid var(--border)"><b style="font-size:13px">${esc(n)}</b><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">${Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([g,o])=>`<span class="chip" style="width:auto">${esc(g)} <b class="gold">${o}kg</b></span>`).join("")}</div></div>`).join("")}</div>`;
+}
 function renderProfile(){
   const d=state.data,u=d.u;const sl=strengthLevel(),r=rankFor(sl);
   let html=`<div class="row" style="gap:14px;align-items:center;margin-bottom:15px;cursor:pointer" onclick="openSettings()">
@@ -5527,6 +5563,9 @@ function renderProfile(){
   html+=batRankCard();
   html+=archiveCardsHtml();                 // Strength Index hero + Every Lift hero
   html+=titleBeltsCard();
+  html+=mmaRecordCard();
+  html+=highlightReelCard();
+  html+=crossGymCard();
   html+=combatRatingCard();
   html+=`<div class="grid2" style="margin-bottom:13px"><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:24px">🖥️</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Batcomputer</div><div class="mini" style="color:var(--text3)">Deep analytics & reports</div></button><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:24px">🃏</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Every villain you've felled</div></button></div>`;
   html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div><div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
