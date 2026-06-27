@@ -1385,6 +1385,14 @@ function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.p
     let xp=0;(d.workouts||[]).forEach(w=>{const v=+w.totalVol||0,pr=(w.prs||[]).length;xp+=Math.min(Math.round(v/140),65)+pr*22+30;});
     d.u.xp=Math.max(d.u.xp||0,xp);d.u._xpV2=true;
   }
+  // Per-GYM records: different gyms = different machines, so PRs live in a per-gym book.
+  // d.prs is re-pointed to the ACTIVE gym's book each load (JSON can't preserve the in-memory reference).
+  if(!d.u.gyms||!d.u.gyms.length)d.u.gyms=["Fitness X","Powerhouse","PureGym","Copenhagen Gym"];
+  if(!d.u.activeGym)d.u.activeGym=d.u.gyms[0];
+  d.prsByGym=d.prsByGym||{};
+  if(!d.u._gymV1){d.prsByGym[d.u.activeGym]=d.prsByGym[d.u.activeGym]||d.prs||{};d.u._gymV1=true;}
+  d.prsByGym[d.u.activeGym]=d.prsByGym[d.u.activeGym]||{};
+  d.prs=d.prsByGym[d.u.activeGym];
   state.data=d;}}catch(e){}}
 
 /* --- Live-session crash/kill recovery -------------------------------------
@@ -2363,6 +2371,11 @@ function seedSets(name){
   return [0,1,2].map(()=>({w:"",r:"",type:"NRM",done:false,rpe:""}));
 }
 function setReadiness(r){state.session.readiness=r;state.step="logging";startTimers();render();saveSession();}
+/* Per-gym records: switching the active gym re-points d.prs to that gym's record book, so every PR
+   read/write (targets, boss fights, records) automatically reflects the gym you're standing in. */
+function switchGym(gym){const d=state.data;gym=(gym||"").trim();if(!gym)return;d.u.gyms=d.u.gyms||["Fitness X"];if(!d.u.gyms.includes(gym))d.u.gyms.push(gym);d.u.activeGym=gym;d.prsByGym=d.prsByGym||{};d.prsByGym[gym]=d.prsByGym[gym]||{};d.prs=d.prsByGym[gym];save();}
+function setSessionGym(gym){if(state.session)state.session.gym=gym;switchGym(gym);haptic("tap");render();}
+function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Different machines mean different PRs. Name the gym:",ok:"Add"}).then(n=>{n=(n||"").trim();if(!n)return;switchGym(n);if(state.session)state.session.gym=n;if(fromSettings)openSettings();else render();});}
 
 /* ========================= LOGGING INTERACTIONS ========================= */
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;saveSessionSoon();} // no render (Rule 1 spirit); debounced backup
@@ -2688,7 +2701,7 @@ function finishWorkout(){
   u.totalWorkouts++;u.totalVolume+=totalVol;u.totalDuration+=dur;u.xp+=xpGain;u.failureSets+=fails;
   // weakest muscle for taunt memory
   let weak=M12[0],wl=999;M12.forEach(m=>{const l=muscleLevel(m);if((state.data.muscleVol[m]||0)>0&&l<wl){wl=l;weak=m;}});u.lastMissedMuscle=weak;
-  const wk={id:"w"+now(),date:t,name:ses.day,split:ses.split,muscles:Object.keys(musclesHit),exercises:done,xp:xpGain,totalVol:Math.round(totalVol),duration:dur,readiness:ses.readiness,prs:prsThis.map(p=>p.name),notes:(ses.notes||"").trim()};
+  const wk={id:"w"+now(),date:t,name:ses.day,split:ses.split,muscles:Object.keys(musclesHit),exercises:done,xp:xpGain,totalVol:Math.round(totalVol),duration:dur,readiness:ses.readiness,gym:(ses.gym||state.data.u.activeGym||""),prs:prsThis.map(p=>p.name),notes:(ses.notes||"").trim()};
   state.data.workouts.unshift(wk);
   // log your own session + records into the Patrol Feed (your League timeline)
   try{
@@ -3226,7 +3239,12 @@ function render(){
 function renderReadiness(){
   $("app").innerHTML=`<div class="fade" style="padding-top:24px">
     <div class="tag center">${esc(state.session.split)}</div>
-    <h1 style="font-size:40px;text-align:center;color:var(--gold2);margin:4px 0 22px">${esc(state.session.day)}</h1>
+    <h1 style="font-size:40px;text-align:center;color:var(--gold2);margin:4px 0 18px">${esc(state.session.day)}</h1>
+    <div class="card"><div class="ttl">🏋️ Which gym tonight?</div>
+      <p class="muted" style="margin-bottom:11px;font-size:13px">Different machines, different records — your PRs are tracked separately per gym.</p>
+      <div class="row" style="gap:7px;flex-wrap:wrap">${(state.data.u.gyms||[]).map(g=>{const on=(state.session.gym||state.data.u.activeGym)===g;return `<button class="chip ${on?"on":""}" style="width:auto" onclick="setSessionGym('${esc(g).replace(/'/g,"\\'")}')">${esc(g)}</button>`;}).join("")}
+        <button class="chip" style="width:auto" onclick="promptAddGym(false)">＋ Add gym</button></div>
+    </div>
     <div class="card"><div class="ttl">Mission readiness check</div>
       <p class="muted" style="margin-bottom:14px;font-size:13.5px">How's the body tonight? Alfred adjusts the overload intel accordingly.</p>
       <button class="btn" style="margin-bottom:9px" onclick="setReadiness('fresh')">🟢 &nbsp;FRESH — full send</button>
@@ -9245,6 +9263,8 @@ function openSettings(){
     <label class="mini">Weekly goal</label><input inputmode="numeric" value="${u.weeklyGoal}" oninput="u_set('weeklyGoal',parseInt(this.value)||4)" style="margin-bottom:8px"/>
     <label class="mini">Rest timer (sec)</label><input inputmode="numeric" value="${u.restTime}" oninput="u_set('restTime',parseInt(this.value)||120)" style="margin-bottom:8px"/>
     <label class="mini">Bar weight (kg)</label><input inputmode="decimal" value="${u.barWeight}" oninput="u_set('barWeight',parseFloat(this.value)||20)" style="margin-bottom:12px"/>
+    <label class="mini">Current gym — records are tracked separately per gym</label>
+    <div class="row" style="gap:7px;flex-wrap:wrap;margin-bottom:12px">${(u.gyms||[]).map(g=>`<button class="chip ${u.activeGym===g?'on':''} g" style="width:auto" onclick="switchGym('${esc(g).replace(/'/g,"\\'")}');openSettings()">${esc(g)}</button>`).join("")}<button class="chip g" style="width:auto" onclick="promptAddGym(true)">＋ Add</button></div>
     <label class="mini">Autoregulation metric</label>
     <div class="row" style="gap:8px;margin-bottom:12px"><button class="chip ${u.metric==='rpe'?'on':''} g" onclick="u_set('metric','rpe');openSettings()">RPE</button><button class="chip ${u.metric==='rir'?'on':''} g" onclick="u_set('metric','rir');openSettings()">RIR</button></div>
     <label class="mini">Alfred's voice (speaks after each set)</label>
