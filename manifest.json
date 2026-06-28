@@ -1,0 +1,16 @@
+{
+  "name": "GainsTracker — Gotham Iron Protocol",
+  "short_name": "GainsTracker",
+  "description": "Train like Gotham's protector — per-gym PRs, fatigue maps, rank progression, MMA fight record and a tactile dark-gold protocol tracker.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070809",
+  "theme_color": "#070809",
+  "categories": ["health", "fitness", "sports"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
