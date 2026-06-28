@@ -691,6 +691,15 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .freq2-row{display:flex;flex-wrap:wrap;gap:6px}
 .freq2-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer;transition:transform .12s ease}
 .freq2-chip:active{transform:scale(.94)}
+.splitday{display:flex;align-items:center;gap:10px;padding:9px 10px;margin:5px 0;border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008));border:1px solid var(--border)}
+.splitday.tonight{border-color:rgba(242,208,121,.42);background:linear-gradient(180deg,rgba(242,208,121,.1),rgba(12,15,21,.3));box-shadow:inset 0 0 22px -12px rgba(242,208,121,.5)}
+.splitday-main{display:flex;align-items:center;gap:10px;flex:1;min-width:0;cursor:pointer}
+.splitday-tx{min-width:0}
+.splitday-tx b{display:flex;align-items:center;gap:6px;font-size:14.5px;color:var(--text)}
+.splitday-tx span{display:block;font-size:11px;color:var(--text3);margin-top:2px}
+.splitday-start{flex:0 0 auto;font-family:var(--disp);font-size:13px;letter-spacing:.06em;padding:11px 16px;border-radius:11px;cursor:pointer;color:#150f02;border:1px solid transparent;background:linear-gradient(180deg,var(--gold3),var(--gold));box-shadow:0 4px 14px -5px rgba(242,208,121,.6),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .12s ease}
+.splitday-start:active{transform:scale(.93)}
+.splitday-start.rest{color:var(--text2);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border-color:var(--border);box-shadow:none}
 @media(max-width:380px){
   .gtv2-tonight-day{font-size:29px}
   .gtv2-idname{font-size:20px}
@@ -5715,10 +5724,9 @@ function renderMission(){
     html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${isActive?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
       <div style="margin-top:8px">${sp.days.map((day,i)=>{
         const tn=i===ni?`<span class="chip on" style="font-size:9px;padding:1px 7px;margin-left:7px;vertical-align:middle">TONIGHT</span>`:"";
-        const hl=i===ni?"box-shadow:inset 0 0 0 1px rgba(242,208,121,.32);background:rgba(242,208,121,.06);border-radius:12px;":"";
         return isRest(day)
-        ? `<div class="row sp" style="padding:8px 10px;margin:3px 0;border-top:1px solid var(--border);${hl}"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px;display:inline-flex;align-items:center;gap:6px">${restIcon(15)} ${esc(day.name)}${tn}</b><div class="mini">Planned recovery — not counted against your streak</div></div></div><button class="btn ghost sm" style="width:auto" onclick="logRestDay()">REST ✓</button></div>`
-        : `<div class="row sp" style="padding:8px 10px;margin:3px 0;border-top:1px solid var(--border);${hl}"><div class="row g" style="gap:9px;cursor:pointer" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div><b style="font-size:14px">${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><div class="mini">${day.exercises.length} exercises · tap to preview</div></div></div><button class="btn gold sm" style="width:auto" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`;
+        ? `<div class="splitday rest${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${restIcon(15)} ${esc(day.name)}${tn}</b><span>Planned recovery — protects your streak</span></div></div><button class="splitday-start rest" onclick="logRestDay()">REST ✓</button></div>`
+        : `<div class="splitday${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><span>${day.exercises.length} exercises · tap to preview</span></div></div><button class="splitday-start" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`;
       }).join("")}</div></div>`;
   });
   html+=`<button class="btn" onclick="freeWorkout()">⚡ Free session</button>`;
