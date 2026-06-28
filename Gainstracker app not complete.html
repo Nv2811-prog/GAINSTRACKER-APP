@@ -604,18 +604,31 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .gtv2-hero::after{content:"";position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(242,208,121,.2),transparent 30%,rgba(85,155,232,.14) 78%,rgba(240,82,74,.12));mix-blend-mode:screen;z-index:2;pointer-events:none}
 .gtv2-hero-img{position:absolute;right:-28px;top:-18px;width:66%;height:112%;object-fit:cover;object-position:center;opacity:.72;filter:saturate(.9) contrast(1.08)}
 .gtv2-hero-body{position:relative;z-index:3;padding:18px 16px 16px;display:flex;flex-direction:column;min-height:254px}
-.gtv2-kicker{font-family:var(--disp);letter-spacing:.22em;text-transform:uppercase;font-size:12px;color:var(--gold-dim)}
-.gtv2-title{font-family:var(--disp);font-size:46px;line-height:.86;color:var(--gold2);letter-spacing:.02em;margin:6px 0 8px;max-width:78%}
-.gtv2-sub{font-size:13px;line-height:1.45;color:#c7cbd3;max-width:78%}
+.gtv2-idrow{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.gtv2-idlogo{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.65))}
+.gtv2-idtext{display:flex;flex-direction:column;line-height:1.05;min-width:0}
+.gtv2-idname{font-family:var(--disp);font-size:22px;letter-spacing:.04em;color:var(--gold2);text-shadow:0 2px 12px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gtv2-iddate{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);margin-top:2px}
+.gtv2-tonight{position:relative;border-radius:15px;padding:14px 15px 13px;margin-bottom:12px;background:linear-gradient(180deg,rgba(242,208,121,.14),rgba(12,15,21,.46));border:1px solid rgba(242,208,121,.36);box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 0 28px -12px rgba(242,208,121,.5),0 16px 42px -26px #000}
+.gtv2-tonight.rest{background:linear-gradient(180deg,rgba(85,155,232,.14),rgba(12,15,21,.46));border-color:rgba(85,155,232,.36);box-shadow:inset 0 1px 0 rgba(255,255,255,.11),inset 0 0 28px -12px rgba(85,155,232,.45),0 16px 42px -26px #000}
+.gtv2-tonight.empty{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(12,15,21,.46));border-color:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 42px -26px #000}
+.gtv2-tonight-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--disp);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold2)}
+.gtv2-tonight.rest .gtv2-tonight-tag{color:#9fc1f2}
+.gtv2-tonight.empty .gtv2-tonight-tag{color:var(--text2)}
+.gtv2-tonight-tag i{width:7px;height:7px;border-radius:50%;background:var(--gold2);animation:gtv2pulse 2.1s infinite}
+.gtv2-tonight.rest .gtv2-tonight-tag i{background:#9fc1f2}
+.gtv2-tonight.empty .gtv2-tonight-tag i{background:var(--text3);animation:none}
+@keyframes gtv2pulse{0%{box-shadow:0 0 0 0 rgba(242,208,121,.55)}70%{box-shadow:0 0 0 8px rgba(242,208,121,0)}100%{box-shadow:0 0 0 0 rgba(242,208,121,0)}}
+.gtv2-tonight-day{font-family:var(--disp);font-size:34px;line-height:.92;color:var(--text);margin:5px 0 3px;letter-spacing:.01em}
+.gtv2-tonight-meta{font-size:12px;line-height:1.4;color:var(--text2)}
 .gtv2-hero-actions{margin-top:auto;display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}
-.gtv2-mission-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.gtv2-rotlabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8a909c;margin:14px 0 6px}
-.gtv2-rotation{display:flex;flex-wrap:wrap;gap:5px}
-.gtv2-rot{font-family:var(--disp);font-size:12px;letter-spacing:.05em;padding:5px 11px;border-radius:9px;white-space:nowrap;cursor:pointer;background:rgba(255,255,255,.06);color:#c7cbd3;border:1px solid rgba(255,255,255,.12);transition:transform .12s ease}
-.gtv2-rot:active{transform:scale(.95)}
-.gtv2-rot.on{background:linear-gradient(180deg,var(--gold3),var(--gold));color:#150f02;border-color:transparent;box-shadow:0 0 15px -3px rgba(242,208,121,.6)}
-.gtv2-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.055);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:700;color:var(--text2);backdrop-filter:blur(8px)}
-.gtv2-pill.gold{color:var(--gold2);border-color:rgba(242,208,121,.32);background:rgba(242,208,121,.1)}
+.gtv2-track{display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.gtv2-track::-webkit-scrollbar{display:none}
+.gtv2-step{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9px;cursor:pointer;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#aab0bc;font-family:var(--disp);font-size:11.5px;letter-spacing:.04em;white-space:nowrap;transition:transform .12s ease}
+.gtv2-step:active{transform:scale(.95)}
+.gtv2-step-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);flex:0 0 auto}
+.gtv2-step.on{background:linear-gradient(180deg,var(--gold3),var(--gold));color:#150f02;border-color:transparent;box-shadow:0 0 16px -3px rgba(242,208,121,.6)}
+.gtv2-step.on .gtv2-step-dot{background:#150f02}
 .gtv2-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .gtv2-panel{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.11);background:linear-gradient(180deg,rgba(31,37,50,.9),rgba(13,16,23,.9));border-radius:14px;padding:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px -25px #000}
 .gtv2-panel::before{content:"";position:absolute;left:11px;right:11px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.28),transparent)}
@@ -646,9 +659,9 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .gtv2-audit-row strong{font-size:13px}
 .gtv2-audit-row p{font-size:12px;line-height:1.45;color:var(--text2);margin:1px 0 0}
 @media(max-width:380px){
-  .gtv2-title{font-size:40px;max-width:86%}
-  .gtv2-sub{max-width:86%}
-  .gtv2-hero-img{width:74%;opacity:.56}
+  .gtv2-tonight-day{font-size:29px}
+  .gtv2-idname{font-size:20px}
+  .gtv2-hero-img{width:74%;opacity:.5}
   .gtv2-map{grid-template-columns:repeat(3,1fr)}
 }
 </style>
@@ -9191,32 +9204,29 @@ function gtv2ProtocolDeck(){
 }
 function gtv2MissionHero(){
   const d=state.data,u=d.u,cur=gtv2CurrentPlanDay(),title=u.name?u.name.toUpperCase():"GOTHAM";
-  let body="",btn="",meta="",rot="";
+  const dateStr=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+  let focal="",btn="",track="";
   if(cur&&cur.day){
     const day=cur.day,rest=isRest(day);
-    meta=`<span class="gtv2-pill gold">${esc(cur.sp.name)}</span><span class="gtv2-pill">${rest?"Recovery protocol":(day.exercises||[]).length+" exercises"}</span><span class="gtv2-pill">Strength Lv ${strengthLevel()}</span>`;
-    rot=`<div class="gtv2-rotlabel">Where you are in ${esc(cur.sp.name)}</div><div class="gtv2-rotation">${cur.sp.days.map((dy,i)=>`<span class="gtv2-rot${i===cur.i?' on':''}" onclick="openDayBriefing('${cur.sp.id}',${i})">${isRest(dy)?'😴 ':''}${esc((dy.name||'').toUpperCase())}</span>`).join('')}</div>`;
+    track=`<div class="gtv2-track">${cur.sp.days.map((dy,i)=>`<button class="gtv2-step${i===cur.i?' on':''}" onclick="openDayBriefing('${cur.sp.id}',${i})"><span class="gtv2-step-dot"></span>${isRest(dy)?'😴 ':''}${esc((dy.name||'').toUpperCase())}</button>`).join('')}</div>`;
     if(rest){
-      body=`${esc(day.name)} is on the board. Recovery is not retreat; it is where the adaptation gets paid.`;
+      focal=`<div class="gtv2-tonight rest"><div class="gtv2-tonight-tag"><i></i>Tonight · recovery</div><div class="gtv2-tonight-day">${esc(day.name)}</div><div class="gtv2-tonight-meta">Recovery is where the adaptation gets paid · ${esc(cur.sp.name)}</div></div>`;
       btn=`<button class="btn gold" onclick="logRestDay()">REST LOGGED</button><button class="btn ghost sm" style="width:auto" onclick="freeWorkout()">Train</button>`;
     }else{
       const prime=(day.exercises||[]).slice(0,3).map(n=>exFor(n).p&&exFor(n).p[0]).filter(Boolean).map(m=>MNAME[m]).filter((v,i,a)=>a.indexOf(v)===i).join(" / ");
-      body=`Tonight's patrol is ${esc(day.name)}${prime?` - ${esc(prime)}`:""}. Open the cage, log clean sets, and let Alfred judge the evidence.`;
+      focal=`<div class="gtv2-tonight"><div class="gtv2-tonight-tag"><i></i>Tonight's patrol · selected</div><div class="gtv2-tonight-day">${esc(day.name)}</div><div class="gtv2-tonight-meta">${prime?esc(prime)+" · ":""}${(day.exercises||[]).length} exercises · ${esc(cur.sp.name)}</div></div>`;
       btn=`<button class="btn gold" onclick="startWorkout('${cur.sp.id}',${cur.i})">START PATROL</button><button class="btn ghost sm" style="width:auto" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Intel</button>`;
     }
   }else{
-    body="No active split is selected. Start a free session or build the plan in Mission.";
+    focal=`<div class="gtv2-tonight empty"><div class="gtv2-tonight-tag"><i></i>No active split</div><div class="gtv2-tonight-day">FREE SESSION</div><div class="gtv2-tonight-meta">Start a session now, or build your plan in Mission.</div></div>`;
     btn=`<button class="btn gold" onclick="freeWorkout()">FREE SESSION</button><button class="btn ghost sm" style="width:auto" onclick="goPlan()">Plan</button>`;
-    meta=`<span class="gtv2-pill gold">No active split</span><span class="gtv2-pill">Strength Lv ${strengthLevel()}</span>`;
   }
   return `<section class="gtv2-hero">
     <img class="gtv2-hero-img" src="Batman.jpg" alt="">
     <div class="gtv2-hero-body">
-      <div class="gtv2-kicker">${new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})} - Gotham Iron Protocol v2</div>
-      <div class="gtv2-title">${esc(title)}</div>
-      <div class="gtv2-sub">${body}</div>
-      <div class="gtv2-mission-meta">${meta}</div>
-      ${rot}
+      <div class="gtv2-idrow"><img class="gtv2-idlogo" src="logo_t.png" alt=""><div class="gtv2-idtext"><span class="gtv2-idname">${esc(title)}</span><span class="gtv2-iddate">${dateStr} · Strength Lv ${strengthLevel()}</span></div></div>
+      ${focal}
+      ${track}
       <div class="gtv2-hero-actions">${btn}</div>
     </div>
   </section>`;
