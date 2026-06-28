@@ -684,6 +684,13 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .gtv2-audit-row:first-child{border-top:0}
 .gtv2-audit-row strong{font-size:13px}
 .gtv2-audit-row p{font-size:12px;line-height:1.45;color:var(--text2);margin:1px 0 0}
+.freq2-dial{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.freq2-stat{text-align:center;padding:10px 6px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.012));border:1px solid var(--border);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.freq2-num{font-family:var(--disp);font-size:30px;line-height:1}
+.freq2-lab{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:3px}
+.freq2-row{display:flex;flex-wrap:wrap;gap:6px}
+.freq2-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer;transition:transform .12s ease}
+.freq2-chip:active{transform:scale(.94)}
 @media(max-width:380px){
   .gtv2-tonight-day{font-size:29px}
   .gtv2-idname{font-size:20px}
@@ -2082,17 +2089,16 @@ function freqGuideCard(){
   const train=items.filter(i=>i.stat==="train");
   const soon=items.filter(i=>i.stat==="soon");
   const ok=items.filter(i=>i.stat==="ok");
-  const row=i=>`<div class="row sp" onclick="muscleDrill('${i.m}')" style="cursor:pointer;padding:7px 0;border-top:1px solid var(--border)">
-    <span class="row g" style="gap:8px">${mIcon(i.m,16)} <b style="font-size:13.5px">${MNAME[i.m]}</b></span>
-    <span class="mini" style="color:${i.col};text-align:right">${i.note}</span></div>`;
-  const block=(ic,lab,arr,emptyTxt)=>`<div style="margin-bottom:11px"><div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:1px">${ic} ${lab} · ${arr.length}</div>${arr.length?arr.map(row).join(""):`<div class="mini" style="color:var(--text3);padding:7px 0;border-top:1px solid var(--border)">${emptyTxt}</div>`}</div>`;
-  const lead=train.length?`<b class="gold">${train.length} muscle${train.length===1?"":"s"}</b> need work — train one tonight.`:soon.length?`Solid frequency. ${soon.length} coming due — keep the rotation tight.`:`Every sector is on a 2×/week rhythm. Textbook frequency, sir.`;
-  return `<div class="card"><div class="ttl" style="display:flex;align-items:center;gap:7px">🎯 Frequency coach</div>
-    <div class="mini" style="margin:-2px 0 10px;color:var(--text2);line-height:1.5">${lead} <span style="color:var(--text3)">Each muscle grows best trained ~2×/week.</span></div>
-    ${block("🔴","TRAIN NEXT",train,"Nothing overdue — nice.")}
-    ${block("🟡","DUE SOON",soon,"None coming due.")}
-    ${block("🟢","WELL COVERED",ok,"Train something to start a streak.")}
-    <button class="btn ghost sm" style="margin-top:2px" onclick="go('suit')">Open full Batsuit ›</button></div>`;
+  const stat=(n,lab,col)=>`<div class="freq2-stat"><div class="freq2-num" style="color:${col}">${n}</div><div class="freq2-lab">${lab}</div></div>`;
+  const chip=i=>`<button class="freq2-chip" style="border-color:${i.col}" onclick="muscleDrill('${i.m}')">${mIcon(i.m,15,i.col)}<span>${MNAME[i.m]}</span><em style="font-style:normal;color:var(--text3);font-weight:400;font-size:11px">${esc(i.note.split("·")[0].trim())}</em></button>`;
+  const lead=train.length?`<b class="gold">${train.length} muscle${train.length===1?"":"s"}</b> need work tonight.`:soon.length?`Solid frequency — ${soon.length} coming due. Keep the rotation tight.`:`Every sector on a 2×/week rhythm. Textbook, sir.`;
+  const focusArr=train.length?train:soon;
+  const focusLab=train.length?"Train one of these next":soon.length?"Coming due — rotate these in":"";
+  return `<div class="card"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🎯 Frequency coach</div><span class="chip" onclick="go('suit')">Batsuit ›</span></div>
+    <div class="mini" style="margin:5px 0 11px;color:var(--text2);line-height:1.5">${lead} <span style="color:var(--text3)">Each muscle grows best trained ~2×/week.</span></div>
+    <div class="freq2-dial">${stat(train.length,"Train next","var(--red)")}${stat(soon.length,"Due soon","var(--yellow)")}${stat(ok.length,"Covered","var(--green)")}</div>
+    ${focusLab?`<div class="mini" style="color:var(--text3);letter-spacing:.08em;margin:12px 0 7px">${focusLab.toUpperCase()}</div><div class="freq2-row">${focusArr.map(chip).join("")}</div>`:""}
+  </div>`;
 }
 // Compact suit figure + sector readiness, surfaced inside MISSION (mirrors THE BATSUIT tab).
 function missionBodyHtml(){
