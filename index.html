@@ -8653,7 +8653,7 @@ function alfredContext(){
   // Last workout
   const lastW=(d.workouts||[])[0];const lastStr=lastW?`\nLAST SESSION: ${new Date(lastW.date).toLocaleDateString()} — ${lastW.name}, ${Math.round(lastW.totalVol||0)}kg total`:'';
   // Injuries
-  const inj=(d.injuries||[]).filter(x=>!x.cleared).map(x=>MNAME[x.muscle]||x.muscle).join(', ');
+  const inj=Object.keys(d.injuries||{}).map(m=>MNAME[m]||m).join(', ');
   // Physique
   const pa=u.physiqueAnalysis||{};
   return `You are Alfred Pennyworth — former MI6 field officer, battlefield medic, and Batman's personal handler for 20 years. You are also a certified strength coach who has studied under Israetel, Schoenfeld, and Helms personally. You are the Batcomputer made human: you have complete access to every data point about this man's training history, recovery, PRs, and physique.
