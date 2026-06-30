@@ -1639,7 +1639,8 @@ suppLog:{},            // "YYYY-MM-DD" -> {creatine,protein,omega,vitd,water:boo
 suppStreak:{creatine:0,best:0,last:null}, // creatine daily streak
 raid:null,             // {boss,e,target,mine,ally,allyName,start} co-op raid
 prefs:{weather:true,boot:true,particles:true},
-gymEquipment:{}
+gymEquipment:{},
+activeGymSplits:{}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
 
@@ -1675,6 +1676,8 @@ function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.p
   d.prsByGym[d.u.activeGym]=d.prsByGym[d.u.activeGym]||{};
   d.prs=d.prsByGym[d.u.activeGym];
   d.gymEquipment=d.gymEquipment||{};
+  d.activeGymSplits=d.activeGymSplits||{};
+  if(d.activeSplitId&&d.u.activeGym&&!d.activeGymSplits[d.u.activeGym])d.activeGymSplits[d.u.activeGym]=d.activeSplitId;
   state.data=d;}}catch(e){}}
 
 /* --- Live-session crash/kill recovery -------------------------------------
@@ -2799,7 +2802,13 @@ function seedSets(name){
 function setReadiness(r){state.session.readiness=r;state.step="patrol-intro";render();saveSession();}
 /* Per-gym records: switching the active gym re-points d.prs to that gym's record book, so every PR
    read/write (targets, boss fights, records) automatically reflects the gym you're standing in. */
-function switchGym(gym){const d=state.data;gym=(gym||"").trim();if(!gym)return;d.u.gyms=d.u.gyms||["Fitness X"];if(!d.u.gyms.includes(gym))d.u.gyms.push(gym);d.u.activeGym=gym;d.prsByGym=d.prsByGym||{};d.prsByGym[gym]=d.prsByGym[gym]||{};d.prs=d.prsByGym[gym];save();}
+function switchGym(gym){const d=state.data;gym=(gym||"").trim();if(!gym)return;
+  d.activeGymSplits=d.activeGymSplits||{};
+  if(d.u.activeGym&&d.activeSplitId)d.activeGymSplits[d.u.activeGym]=d.activeSplitId;
+  d.u.gyms=d.u.gyms||["Fitness X"];if(!d.u.gyms.includes(gym))d.u.gyms.push(gym);d.u.activeGym=gym;
+  d.prsByGym=d.prsByGym||{};d.prsByGym[gym]=d.prsByGym[gym]||{};d.prs=d.prsByGym[gym];
+  if(d.activeGymSplits[gym])d.activeSplitId=d.activeGymSplits[gym];
+  save();}
 function setSessionGym(gym){if(state.session)state.session.gym=gym;switchGym(gym);haptic("tap");render();}
 function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Different machines mean different PRs. Name the gym:",ok:"Add"}).then(n=>{n=(n||"").trim();if(!n)return;switchGym(n);if(state.session)state.session.gym=n;if(fromSettings)openSettings();else render();});}
 
@@ -6154,6 +6163,8 @@ function gymCampaignsCard(){
     const hasEquip=d.gymEquipment&&d.gymEquipment[g]&&Object.keys(d.gymEquipment[g].equip||{}).length>0;
     const fmt=dt=>dt?new Date(dt).toLocaleDateString('en-GB',{month:'short',year:'2-digit'}):"";
     const range=st.first&&st.last?fmt(st.first)+(st.first===st.last?"":" → "+(isAct?"now":fmt(st.last))):"";
+    const boundSplitId=(d.activeGymSplits||{})[g];
+    const boundSplit=boundSplitId&&(d.splits||[]).find(s=>s.id===boundSplitId);
     if(isAct){
       html+=`<div style="border:1.5px solid var(--gold-dim);border-radius:14px;padding:13px;margin-bottom:10px;background:linear-gradient(135deg,rgba(232,197,106,.1),rgba(180,140,60,.04))">
         <div class="row sp" style="margin-bottom:8px">
@@ -6167,6 +6178,7 @@ function gymCampaignsCard(){
           ${[['🎯',st.sessions,'sessions'],['🏋️',fmtNum(st.vol)+'kg','volume'],['🏆',prCount,'PRs set']].map(([ic,v,l],i)=>`<div class="center" style="flex:1;padding:9px 4px;border-left:${i?'1px solid rgba(232,197,106,.15)':'none'}"><div style="font-family:var(--disp);font-size:20px;color:var(--gold2)">${v}</div><div class="mini" style="color:var(--text3)">${l}</div></div>`).join("")}
         </div>
         ${range?`<div class="mini" style="color:var(--text3)">📅 ${range}</div>`:""}
+        ${boundSplit?`<div class="mini" style="color:var(--gold2);margin-top:4px">🗂️ <b>${esc(boundSplit.name)}</b> · ${boundSplit.days.length}d split</div>`:`<div class="mini" style="color:var(--text3);margin-top:4px">🗂️ No split bound — set one active on the Mission tab</div>`}
         ${hasEquip?`<div class="mini" style="color:var(--gold-dim);margin-top:3px">⚙️ Equipment profile saved</div>`:`<div class="mini" style="color:var(--text3);margin-top:3px">⚙️ No equipment profile — tap to add one</div>`}
       </div>`;
     }else{
@@ -6178,10 +6190,11 @@ function gymCampaignsCard(){
           </div>
           <button class="chip" style="width:auto;font-size:11px" onclick="switchGym('${esc(g).replace(/'/g,"\\'")}');render()">Switch here</button>
         </div>
-        ${st.vol?`<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:7px">
-          <span class="mini" style="color:var(--text3)">📦 <b style="color:var(--text)">${fmtNum(st.vol)}kg</b> lifetime</span>
+        <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:7px">
+          ${st.vol?`<span class="mini" style="color:var(--text3)">📦 <b style="color:var(--text)">${fmtNum(st.vol)}kg</b> lifetime</span>`:""}
           ${range?`<span class="mini" style="color:var(--text3)">📅 ${range}</span>`:""}
-        </div>`:""}
+          ${boundSplit?`<span class="mini" style="color:var(--text3)">🗂️ <b style="color:var(--text)">${esc(boundSplit.name)}</b></span>`:""}
+        </div>
       </div>`;
     }
   });
@@ -6926,7 +6939,7 @@ function raidCard(){const r=state.data.raid;
     <div style="height:10px;border-radius:6px;background:var(--bg2);overflow:hidden;margin:8px 0 5px"><div style="height:100%;width:${p.pct}%;background:${p.done?'#2ECC71':r.c}"></div></div>
     <div class="mini" style="color:var(--text2)">${p.done?`Boss broken — tap to claim the kill with ${esc(r.allyName)}.`:`${p.combined}/${r.target} records with ${esc(r.allyName)} · tap to view`}</div></div>`;
 }
-function setActiveSplit(id){state.data.activeSplitId=id;state.data._nextDay=0;save();render();}
+function setActiveSplit(id){const d=state.data;d.activeSplitId=id;d._nextDay=0;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;save();render();}
 function open1RM(){openSheet(`<div class="ttl">1RM calculator (Epley)</div>
   <label class="mini">Weight (kg)</label><input id="o-w" inputmode="decimal" oninput="calc1rm()" style="margin-bottom:8px"/>
   <label class="mini">Reps</label><input id="o-r" inputmode="numeric" oninput="calc1rm()" style="margin-bottom:8px"/>
@@ -7252,7 +7265,7 @@ function setDaysPerWeek(n){
   const on=patterns[n]||[0,2,4];const ws={};for(let i=0;i<7;i++)ws[i]=on.includes(i);
   state.data.u.weekSchedule=ws;syncWeeklyGoal();save();render();}
 function toggleDay(i){const ws=state.data.u.weekSchedule;ws[i]=ws[i]===false?true:false;syncWeeklyGoal();save();render();}
-function newSplit(){const id="s"+now();state.data.splits.push({id,name:"New Split",days:[{name:"Day 1",exercises:[]}]});if(!state.data.activeSplitId)state.data.activeSplitId=id;save();render();}
+function newSplit(){const d=state.data;const id="s"+now();d.splits.push({id,name:"New Split",days:[{name:"Day 1",exercises:[]}]});if(!d.activeSplitId){d.activeSplitId=id;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;}save();render();}
 function renameSplit(id,v){const s=state.data.splits.find(x=>x.id===id);if(s)s.name=v;save();}
 function delSplit(id){appConfirm({title:"Delete split",body:"Delete this split permanently?",ok:"Delete",danger:true}).then(ok=>{if(!ok)return;state.data.splits=state.data.splits.filter(x=>x.id!==id);if(state.data.activeSplitId===id)state.data.activeSplitId=state.data.splits[0]?.id||null;save();render();});}
 /* ===== SHAREABLE SPLITS — "Split Card" codes (cousin-proof: one tap to copy, one paste to import) ===== */
