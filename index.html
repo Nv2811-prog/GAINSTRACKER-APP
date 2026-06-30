@@ -6380,7 +6380,7 @@ function profileEveryLiftTile(d){
   const siLast=siVals.length?siVals[siVals.length-1]:0;
   const siUp=siVals.length>=2&&siVals[siVals.length-1]>=siVals[0];
   const siPct=siVals.length>=2&&siVals[0]?Math.round((siVals[siVals.length-1]-siVals[0])/siVals[0]*100):0;
-  return `<button onclick="openArchive()" style="display:block;width:100%;text-align:left;cursor:pointer;background:linear-gradient(135deg,rgba(232,197,106,.12) 0%,rgba(60,40,10,.08) 50%,rgba(232,197,106,.06) 100%);border:1.5px solid rgba(232,197,106,.5);border-radius:18px;padding:18px 18px 16px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:0 0 40px -10px rgba(232,197,106,.35),inset 0 1px 0 rgba(255,255,255,.08)">
+  return `<button onclick="renderArchive()" style="display:block;width:100%;text-align:left;cursor:pointer;background:linear-gradient(135deg,rgba(232,197,106,.12) 0%,rgba(60,40,10,.08) 50%,rgba(232,197,106,.06) 100%);border:1.5px solid rgba(232,197,106,.5);border-radius:18px;padding:18px 18px 16px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:0 0 40px -10px rgba(232,197,106,.35),inset 0 1px 0 rgba(255,255,255,.08)">
     <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(232,197,106,.15),transparent 70%);pointer-events:none"></div>
     <div class="row sp" style="align-items:flex-start;margin-bottom:10px">
       <div>
