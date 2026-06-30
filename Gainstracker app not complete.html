@@ -650,44 +650,103 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .gtv2-step-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);flex:0 0 auto}
 .gtv2-step.on{background:linear-gradient(180deg,var(--gold3),var(--gold));color:#150f02;border-color:transparent;box-shadow:0 0 16px -3px rgba(242,208,121,.6)}
 .gtv2-step.on .gtv2-step-dot{background:#150f02}
-.gtv2-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.gtv2-panel{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.11);background:linear-gradient(180deg,rgba(31,37,50,.9),rgba(13,16,23,.9));border-radius:14px;padding:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px -25px #000}
-.gtv2-panel::before{content:"";position:absolute;left:11px;right:11px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.28),transparent)}
+/* ── Gotham panel grid ── */
+.gtv2-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+
+/* ── Base panel: compact + cinematic lighting ── */
+.gtv2-panel{
+ position:relative;overflow:hidden;
+ border:1px solid rgba(255,255,255,.09);
+ background:
+   radial-gradient(ellipse 80% 58% at 0% 0%, rgba(255,255,255,.042), transparent 60%),
+   radial-gradient(ellipse 60% 48% at 100% 100%, rgba(0,0,0,.32), transparent 62%),
+   linear-gradient(158deg, rgba(18,25,40,.98), rgba(7,10,17,.98));
+ border-radius:16px;padding:11px;
+ box-shadow:
+   inset 0 1px 0 rgba(255,255,255,.09),
+   inset 0 0 0 1px rgba(255,255,255,.025),
+   0 18px 44px -20px rgba(0,0,0,.94),
+   0 3px 10px -5px rgba(0,0,0,.7);
+ transition:border-color .2s,box-shadow .2s}
+/* gold top shimmer */
+.gtv2-panel::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+ background:linear-gradient(90deg,transparent 8%,rgba(255,208,72,.44) 50%,transparent 92%);pointer-events:none}
+/* inner diagonal highlight — simulates a studio key-light from top-left */
+.gtv2-panel::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ background:linear-gradient(135deg,rgba(255,255,255,.055) 0%,transparent 38%,rgba(0,0,0,.14) 100%)}
 .gtv2-panel.wide{grid-column:1/-1}
-.gtv2-label{font-family:var(--disp);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
-.gtv2-value{font-family:var(--disp);font-size:28px;line-height:1;color:var(--text)}
-.gtv2-note{font-size:12px;line-height:1.38;color:var(--text2);margin-top:5px}
-.gtv2-meter{height:8px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:9px}
-.gtv2-meter i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 12px rgba(242,208,121,.24)}
-.gtv2-action{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
+
+/* ── Compact data typography ── */
+.gtv2-label{font-family:var(--disp);font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.gtv2-value{font-family:var(--disp);font-size:25px;line-height:1;color:var(--text)}
+.gtv2-note{font-size:11px;line-height:1.38;color:var(--text2);margin-top:3px}
+.gtv2-meter{height:5px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:7px}
+.gtv2-meter i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 10px rgba(255,208,72,.5)}
+
+/* ── Action rows inside panels ── */
+.gtv2-action{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.07)}
 .gtv2-action:first-child{border-top:0;padding-top:0}
-.gtv2-action-ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(242,208,121,.1);border:1px solid rgba(242,208,121,.24);font-size:18px}
-.gtv2-action-title{font-weight:800;font-size:13.5px;color:var(--text)}
-.gtv2-action-copy{font-size:12px;line-height:1.38;color:var(--text2);margin-top:1px}
-.gtv2-chipline{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-.gtv2-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;border-radius:999px;padding:4px 8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.045);color:var(--text2)}
-.gtv2-chip.red{color:#ff887f;border-color:rgba(240,82,74,.38);background:rgba(240,82,74,.1)}
-.gtv2-chip.green{color:#75e5a5;border-color:rgba(52,210,123,.34);background:rgba(52,210,123,.1)}
-.gtv2-chip.gold{color:var(--gold2);border-color:rgba(242,208,121,.33);background:rgba(242,208,121,.09)}
-.gtv2-protocol{border-color:rgba(85,155,232,.28);background:linear-gradient(180deg,rgba(25,34,50,.94),rgba(10,13,19,.94))}
-.gtv2-protocol .gtv2-action-ic{background:rgba(85,155,232,.12);border-color:rgba(85,155,232,.32)}
-.gtv2-chip.blue{color:#9fc1f2;border-color:rgba(85,155,232,.36);background:rgba(85,155,232,.1)}
-.gtv2-alfred-top{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;margin-top:11px;padding:11px;border-radius:12px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);transition:transform .12s ease}
-.gtv2-alfred-top:active{transform:scale(.99)}
-.gtv2-alfred-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);flex:0 0 auto}
-.gtv2-alfred-ic.red{background:rgba(240,82,74,.13);border-color:rgba(240,82,74,.38)}
-.gtv2-alfred-ic.gold{background:rgba(242,208,121,.13);border-color:rgba(242,208,121,.38)}
-.gtv2-alfred-ic.green{background:rgba(52,210,123,.13);border-color:rgba(52,210,123,.36)}
-.gtv2-alfred-ic.blue{background:rgba(85,155,232,.13);border-color:rgba(85,155,232,.36)}
+.gtv2-action-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,208,72,.09);border:1px solid rgba(255,208,72,.22);font-size:15px;flex:none}
+.gtv2-action-title{font-weight:800;font-size:13px;color:var(--text)}
+.gtv2-action-copy{font-size:11.5px;line-height:1.4;color:var(--text2);margin-top:1px}
+
+.gtv2-chipline{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.gtv2-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;border-radius:999px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text2)}
+.gtv2-chip.red{color:#ff887f;border-color:rgba(255,54,34,.4);background:rgba(255,54,34,.1)}
+.gtv2-chip.green{color:#6ef5a8;border-color:rgba(34,232,122,.36);background:rgba(34,232,122,.1)}
+.gtv2-chip.gold{color:var(--gold2);border-color:rgba(255,208,72,.36);background:rgba(255,208,72,.09)}
+.gtv2-chip.blue{color:#9fc1f2;border-color:rgba(60,150,255,.38);background:rgba(60,150,255,.1)}
+
+/* ── Alfred Protocol: command-terminal treatment ── */
+.gtv2-protocol{
+ border-color:rgba(60,150,255,.3);
+ background:
+   radial-gradient(ellipse 80% 55% at 0% 0%, rgba(60,150,255,.06), transparent 58%),
+   radial-gradient(ellipse 50% 40% at 100% 100%, rgba(0,0,0,.35), transparent 62%),
+   linear-gradient(158deg, rgba(8,16,32,.99), rgba(4,8,16,.99));
+ box-shadow:
+   inset 0 1px 0 rgba(60,150,255,.14),
+   inset 0 0 0 1px rgba(60,150,255,.06),
+   0 0 0 1px rgba(60,150,255,.08),
+   0 20px 48px -22px rgba(0,0,0,.98)}
+.gtv2-protocol::before{background:linear-gradient(90deg,transparent 5%,rgba(60,150,255,.5) 50%,transparent 95%)}
+.gtv2-protocol .gtv2-action-ic{background:rgba(60,150,255,.12);border-color:rgba(60,150,255,.32)}
+
+/* ── Alfred intel card ── */
+.gtv2-alfred-top{
+ display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;
+ margin-top:9px;padding:10px;border-radius:13px;cursor:pointer;
+ background:linear-gradient(158deg,rgba(14,22,38,.95),rgba(6,10,18,.85));
+ border:1px solid rgba(60,150,255,.2);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 18px -10px rgba(0,0,0,.7);
+ transition:transform .12s ease,border-color .15s}
+.gtv2-alfred-top:active{transform:scale(.99);border-color:rgba(60,150,255,.4)}
+.gtv2-alfred-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);flex:none}
+.gtv2-alfred-ic.red{background:rgba(255,54,34,.14);border-color:rgba(255,54,34,.4)}
+.gtv2-alfred-ic.gold{background:rgba(255,208,72,.14);border-color:rgba(255,208,72,.42)}
+.gtv2-alfred-ic.green{background:rgba(34,232,122,.14);border-color:rgba(34,232,122,.38)}
+.gtv2-alfred-ic.blue{background:rgba(60,150,255,.14);border-color:rgba(60,150,255,.38)}
 .gtv2-alfred-title{font-family:var(--disp);font-size:15px;letter-spacing:.01em;color:var(--text)}
 .gtv2-alfred-copy{font-size:12px;line-height:1.4;color:var(--text2);margin-top:2px}
-.gtv2-alfred-more{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px;cursor:pointer}
-.gtv2-alfred-link{font-size:11px;color:var(--gold2);font-weight:700;margin-left:auto;white-space:nowrap}
-.gtv2-map{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
-.gtv2-muscle{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);border-radius:11px;padding:8px 6px;text-align:center;min-width:0}
-.gtv2-muscle b{display:block;font-family:var(--disp);font-size:14px;line-height:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gtv2-muscle span{display:block;font-size:10px;color:var(--text3);margin-top:2px}
-.gtv2-audit-row{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-top:1px solid rgba(255,255,255,.08)}
+.gtv2-alfred-more{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;cursor:pointer}
+.gtv2-alfred-link{font-size:11px;color:var(--gold2);font-weight:700;margin-left:auto;white-space:nowrap;text-shadow:0 0 10px rgba(255,208,72,.4)}
+
+/* ── Muscle grid ── */
+.gtv2-map{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}
+.gtv2-muscle{
+ position:relative;overflow:hidden;
+ border:1px solid rgba(255,255,255,.09);
+ background:linear-gradient(155deg,rgba(16,22,34,.96),rgba(8,11,17,.96));
+ border-radius:12px;padding:7px 5px;text-align:center;min-width:0;cursor:pointer;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 12px -8px rgba(0,0,0,.7);
+ transition:border-color .15s,box-shadow .15s}
+.gtv2-muscle::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)}
+.gtv2-muscle:active{border-color:rgba(255,208,72,.4);box-shadow:0 0 0 1px rgba(255,208,72,.14)}
+.gtv2-muscle b{display:block;font-family:var(--disp);font-size:13px;line-height:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gtv2-muscle span{display:block;font-size:9.5px;color:var(--text3);margin-top:2px;line-height:1.2}
+
+.gtv2-audit-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-top:1px solid rgba(255,255,255,.07)}
 .gtv2-audit-row:first-child{border-top:0}
 .gtv2-audit-row strong{font-size:13px}
 .gtv2-audit-row p{font-size:12px;line-height:1.45;color:var(--text2);margin:1px 0 0}
@@ -5669,11 +5728,11 @@ function closeGarage(){state.subpage=null;go("gotham");}
 // Garage box for the Gotham home — shows your best ride big, taps through to the full fleet.
 function garageCard(){
   const s=gothamStats();const owned=GARAGE.filter(v=>v.req(s));const top=owned[owned.length-1]||GARAGE[0];const next=GARAGE.find(v=>!v.req(s));
-  return `<div class="card" style="margin-bottom:12px;cursor:pointer;display:flex;gap:15px;align-items:center;border-color:var(--gold-dim)" onclick="openGarage()">
-    <div style="font-size:62px;line-height:1;flex:none;filter:drop-shadow(0 0 14px rgba(232,197,106,.45))">${top.e}</div>
+  return `<div class="card" style="margin-bottom:12px;cursor:pointer;display:flex;gap:15px;align-items:center;border-color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px var(--gold)" onclick="openGarage()">
+    <div style="font-size:66px;line-height:1;flex:none;filter:drop-shadow(0 0 20px rgba(232,197,106,.75))">${top.e}</div>
     <div style="flex:1;min-width:0">
       <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">The Garage · ${owned.length}/${GARAGE.length} unlocked <span style="color:var(--gold2)">›</span></div>
-      <h2 style="font-size:22px;margin:1px 0 3px;color:var(--gold2)">${esc(top.n)}</h2>
+      <h2 style="font-size:22px;margin:1px 0 3px;color:var(--gold2);text-shadow:0 0 16px currentColor">${esc(top.n)}</h2>
       <div class="mini" style="color:var(--text2);line-height:1.4">${next?`Next ride: ${next.e} <b>${esc(next.n)}</b> — ${esc(next.how)}`:"Full fleet earned. A legend of the cave."}</div>
     </div></div>`;
 }
@@ -5700,13 +5759,14 @@ function mostWantedCard(){
   const lm=VL[m]||{mev:8,mav:14};const target=lm.mev;const cur=weeklySets(m);
   const done=cur>=target;const pct=clamp(cur/Math.max(1,target)*100,0,100);
   const nm=NEMESIS_MAP[m];const villain=nm?nm.villain:"The Rogues";
-  return `<div class="card" style="border-color:${done?'var(--green)':'#E8453C66'}">
-    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🎯 MOST WANTED</div><span class="chip" style="color:${done?'var(--green)':'#E8453C'}">${done?'CLAIMED':'BOUNTY OPEN'}</span></div>
+  const bc=done?"var(--green)":"#E8453C";
+  return `<div class="card" style="border-color:${bc};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px ${bc}">
+    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🎯 MOST WANTED</div><span class="chip" style="color:${bc};border-color:${bc}">${done?'CLAIMED':'BOUNTY OPEN'}</span></div>
     <div class="row g" style="gap:12px;margin-top:8px;align-items:center">
-      <div style="flex:none">${mIcon(m,38,done?'#2ECC71':'#E8453C')}</div>
-      <div style="flex:1;min-width:0"><h2 style="font-size:20px;margin:0;color:${done?'var(--green)':'var(--gold2)'}">${MNAME[m]}</h2>
+      <div style="flex:none">${mIcon(m,42,done?'#2ECC71':'#E8453C')}</div>
+      <div style="flex:1;min-width:0"><h2 style="font-size:20px;margin:0;color:${done?'var(--green)':'var(--gold2)'};text-shadow:0 0 18px currentColor">${MNAME[m]}</h2>
         <div class="mini" style="color:var(--text2);line-height:1.45">Your weakest sector this week — ${esc(villain)} is exploiting it. Bounty: hit <b>${target} sets</b> to bring ${MNAME[m].toLowerCase()} back to the growth zone.</div></div></div>
-    <div class="bar" style="height:9px;background:var(--bg4);margin-top:10px"><i style="width:${pct}%;background:${done?'var(--green)':'linear-gradient(90deg,#E8453C,#E8A52A)'}"></i></div>
+    <div class="bar" style="height:8px;background:var(--bg4);margin-top:10px"><i style="width:${pct}%;background:${done?'var(--green)':'linear-gradient(90deg,#E8453C,#E8A52A)'};box-shadow:0 0 10px ${bc}"></i></div>
     <div class="row sp" style="margin-top:4px"><span class="mini" style="color:var(--text3)">${cur}/${target} sets this week</span>${done?`<span class="mini green">✓ Bounty collected — sector secured</span>`:`<span class="mini" style="color:#E8A52A">${target-cur} set${target-cur===1?'':'s'} to go</span>`}</div></div>`;
 }
 
@@ -5725,14 +5785,15 @@ function batRankCard(){
   const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
   const cur=RANKS[ri],next=RANKS[ri+1];
   const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
-  return `<div class="card" style="display:flex;gap:14px;align-items:center;cursor:pointer" onclick="openRankLadder()">
+  const tc=["#8a8a8a","#9aa0ab","#7FC8FF","#cd7f32","#c0c0c0","#E8C56A","#E8C56A","#F0524A","#FFD36E"][clamp(ri,0,8)];
+  return `<div class="card" style="display:flex;gap:14px;align-items:center;cursor:pointer;border-color:${tc};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px ${tc}" onclick="openRankLadder()">
     ${batEmblem(ri,76)}
     <div style="flex:1;min-width:0">
-      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">Rank ${ri+1}/${RANKS.length} · Strength Lv ${sl} <span style="color:var(--gold2)">· all ranks ›</span></div>
-      <h2 style="font-size:24px;margin:1px 0 2px;color:var(--gold2)">${esc(cur[1])} ${cur[2]}</h2>
-      ${next?`<div class="bar" style="height:8px;background:var(--bg4)"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
+      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">Rank ${ri+1}/${RANKS.length} · Strength Lv ${sl} <span style="color:${tc}">· all ranks ›</span></div>
+      <h2 style="font-size:24px;margin:1px 0 2px;color:${tc};text-shadow:0 0 18px currentColor">${esc(cur[1])} ${cur[2]}</h2>
+      ${next?`<div class="bar" style="height:7px;background:var(--bg4)"><i style="width:${pct}%;background:linear-gradient(90deg,${tc},var(--gold2));box-shadow:0 0 10px ${tc}"></i></div>
         <div class="mini" style="margin-top:3px;color:var(--text2)">${Math.max(0,hi-sl)} strength level${(hi-sl)===1?'':'s'} to <b>${esc(next[1])}</b> ${next[2]}</div>`
-      :`<div class="mini" style="color:var(--gold2)">⭑ Maximum rank reached — you are the Legend of Gotham.</div>`}
+      :`<div class="mini" style="color:${tc};text-shadow:0 0 12px currentColor">⭑ Maximum rank reached — you are the Legend of Gotham.</div>`}
     </div></div>`;
 }
 
@@ -5763,9 +5824,9 @@ function wayneTowersCard(){
   const vol=(typeof ironLedger==="function"?ironLedger().vol:(state.data.u.totalVolume||0))||0;
   if(vol<=0)return "";
   const towers=vol/WAYNE_TOWER_KG, whole=Math.floor(towers), pct=Math.round((towers-whole)*100);
-  return `<div class="card" style="cursor:pointer" onclick="openIronLedger()"><div class="row sp"><div class="ttl" style="margin:0">🏙️ Wayne Towers Lifted</div><span class="mini" style="color:var(--gold2)">iron ledger ›</span></div>
-    <div class="row sp" style="align-items:flex-end;margin-top:2px"><div class="big">${whole}<span style="font-size:18px;color:var(--text2)"> ${whole===1?"tower":"towers"}</span></div><div class="mini" style="color:var(--text3);text-align:right">${fmtNum(Math.round(vol))} kg moved<br>${pct}% to tower ${whole+1}</div></div>
-    <div class="bar" style="height:7px;margin-top:8px"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
+  return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px var(--gold)" onclick="openIronLedger()"><div class="row sp"><div class="ttl" style="margin:0">🏙️ Wayne Towers Lifted</div><span class="mini" style="color:var(--gold2)">iron ledger ›</span></div>
+    <div class="row sp" style="align-items:flex-end;margin-top:2px"><div class="big" style="text-shadow:0 0 24px rgba(232,168,32,.65)">${whole}<span style="font-size:18px;color:var(--text2)"> ${whole===1?"tower":"towers"}</span></div><div class="mini" style="color:var(--text3);text-align:right">${fmtNum(Math.round(vol))} kg moved<br>${pct}% to tower ${whole+1}</div></div>
+    <div class="bar" style="height:7px;margin-top:8px"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 10px rgba(255,208,72,.5)"></i></div>
     <div class="mini" style="color:var(--text2);margin-top:7px;font-style:italic">Each tower = ${fmtNum(WAYNE_TOWER_KG)}kg of iron. You're raising Gotham's skyline one rep at a time.</div></div>`;
 }
 /* ========================= PROFILE TAB (Case + History merged) =========================
@@ -9471,11 +9532,12 @@ function gtv2MissionHero(){
 }
 function gtv2ScorePanel(){
   const r=patrolReadiness(),t=gothamThreat(),f=fatigueDebt(),w=weekCount(),goal=state.data.u.weeklyGoal||4;
+  const patrolClr=w>=goal?"var(--green)":"var(--gold)";
   return `<div class="gtv2-grid">
-    <div class="gtv2-panel" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color}">${r.score}</div><div class="gtv2-note">${esc(r.label)} - ${esc(r.line)}</div><div class="gtv2-meter"><i style="width:${r.score}%;background:${r.color}"></i></div></div>
-    <div class="gtv2-panel" onclick="openThreatInfo()"><div class="gtv2-label">Threat</div><div class="gtv2-value" style="color:${t.color}">${t.level}</div><div class="gtv2-note">${esc(t.desc)}</div><div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color}"></i></div></div>
-    <div class="gtv2-panel" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color}">${f.pct}%</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color}"></i></div></div>
-    <div class="gtv2-panel" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"}">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score}</div><div class="gtv2-note">${esc(r.label)} — ${esc(r.line)}</div><div class="gtv2-meter"><i style="width:${r.score}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${t.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${t.color}" onclick="openThreatInfo()"><div class="gtv2-label">Threat</div><div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div><div class="gtv2-note">${esc(t.desc)}</div><div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.pct}%</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${patrolClr};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${patrolClr}" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"};text-shadow:0 0 18px currentColor">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
     ${gtv2ProtocolDeck()}
   </div>`;
 }
