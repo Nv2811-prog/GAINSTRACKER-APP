@@ -1031,8 +1031,8 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 <div id="alf-voice-ov">
   <div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:54px 20px 0;flex:none">
     <div style="font-family:var(--disp);font-size:11px;color:var(--gold2);letter-spacing:.22em;opacity:.75">ALFRED · BATCOMPUTER</div>
-    <div style="display:flex;gap:8px">
-      <button onclick="_avOpenTextChat()" title="Text chat" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--text3);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer">⌨</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="ALFRED_MSGS=[];ALFRED_PIC=null;_avRenderTranscript();_avRenderChips();_avRenderPicPreview();" title="Clear conversation" style="background:none;border:none;color:var(--text3);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:6px">Clear</button>
       <button onclick="closeAlfredVoice()" title="Close" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--text3);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
     </div>
   </div>
@@ -1047,6 +1047,9 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
   <div style="width:100%;padding:2px 16px 44px;flex:none">
     <div id="av-chips" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px"></div>
     <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="document.getElementById('av-pic-in').click()" title="Attach physique photo" style="flex:none;width:38px;height:38px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">📎</button>
+      <input type="file" accept="image/*" id="av-pic-in" style="display:none" onchange="_alfredAttachPic(this)"/>
+      <div id="av-pic-preview"></div>
       <input id="av-in" placeholder="Or type here…" style="flex:1;padding:11px 14px;border-radius:14px;font-size:15px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)" onkeydown="if(event.key==='Enter'){event.preventDefault();_avSendText();}" autocomplete="off" autocapitalize="sentences"/>
       <button class="btn gold sm" style="width:auto;padding:11px 16px;border-radius:14px;flex:none" onclick="_avSendText()">→</button>
     </div>
@@ -2297,13 +2300,10 @@ function openTips(cat){
 }
 function askAlfredAbout(topic){
   closeSheet();
-  if(!geminiKey()){go("alfred");return;}                 // no key -> Alfred tab shows activation card
-  go("alfred");
+  if(!geminiKey()){openSettings();return;}
+  openAlfredVoice();
   const q="Give me a deeper, evidence-based breakdown of "+topic+" for my training specifically — cite the reasoning.";
-  ALFRED_MSGS.push({role:"user",text:q});ALFRED_MSGS.push({role:"alfred",text:"…thinking…"});renderAlfred();
-  geminiCall([{text:alfredContext()+"\n\nUser asks: "+q}])
-    .then(txt=>{ALFRED_MSGS[ALFRED_MSGS.length-1].text=txt||"I have nothing to add, sir.";state.data.u.aiUses++;checkAchievements();save();renderAlfred();})
-    .catch(e=>{ALFRED_MSGS[ALFRED_MSGS.length-1].text="The line to the Batcomputer is down, sir. ("+e.message+")";renderAlfred();});
+  _alfSend(q,null);
 }
 
 /* ========================= EXERCISE DB LOADING ========================= */
@@ -8740,11 +8740,6 @@ async function geminiConvCall(contents){
 let ALFRED_MSGS=[];
 let ALFRED_PIC=null;
 function fileB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});}
-async function attachAlfredPic(input){const f=input.files[0];if(!f)return;
-  if(f.size>6e6){toast("That photo's a bit large — try a smaller one.");return;}
-  try{const b64=await fileB64(f);ALFRED_PIC={b64,mime:f.type,url:"data:"+f.type+";base64,"+b64};renderAlfred();const i=$("alfred-in");if(i)i.focus();}
-  catch(e){toast("Couldn't read that photo.");}
-}
 let ALFRED_VOICE="";
 
 /* ========================= ALFRED EVERYWHERE — FAB + bottom sheet chat ========================= */
@@ -8754,20 +8749,38 @@ function openAlfredChat(){haptic("tap");openAlfredVoice();}
 let _AV_STATE='idle'; // idle | listen | think | speak
 let _AV_CONTINUOUS=false; // true once the user taps to start talking — keeps listening after each reply
 
+let _AV_SPEECH_UNLOCKED=false;
+function _avUnlockSpeech(){
+  // iOS Safari only allows speechSynthesis.speak() to start audio if the very first call
+  // happens inside a user-gesture call stack. Our real replies are spoken after an async
+  // Gemini fetch, by which point the gesture has expired and speak() silently no-ops.
+  // Priming with a throwaway utterance here (synchronously, inside the tap handler) unlocks
+  // audio for the rest of the page session.
+  if(_AV_SPEECH_UNLOCKED)return;
+  try{
+    if(!window.speechSynthesis)return;
+    window.speechSynthesis.speak(new SpeechSynthesisUtterance(' '));
+    _AV_SPEECH_UNLOCKED=true;
+  }catch(e){}
+}
 function openAlfredVoice(){
   const ov=document.getElementById('alf-voice-ov');if(!ov)return;
   ov.classList.add('on');haptic('tap');
+  _avUnlockSpeech();
   _AV_CONTINUOUS=false;
-  _avRenderTranscript();_avRenderChips();_avSetState('idle');
+  _avRenderTranscript();_avRenderChips();_avRenderPicPreview();_avSetState('idle');
 }
 function closeAlfredVoice(){
   const ov=document.getElementById('alf-voice-ov');if(ov)ov.classList.remove('on');
   if(_alfRec){try{_alfRec.stop();}catch(e){}}
-  _alfListening=false;_AV_CONTINUOUS=false;
+  _alfListening=false;_AV_CONTINUOUS=false;ALFRED_PIC=null;
   try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
   _avSetState('idle');
 }
-function _avOpenTextChat(){closeAlfredVoice();_renderAlfredSheet();}
+function _avRenderPicPreview(){
+  const c=document.getElementById('av-pic-preview');if(!c)return;
+  c.innerHTML=ALFRED_PIC?`<div style="position:relative;flex:none"><img src="${esc(ALFRED_PIC.url)}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;border:1px solid var(--gold2)"/><button onclick="ALFRED_PIC=null;_avRenderPicPreview()" style="position:absolute;top:-5px;right:-5px;background:#333;border-radius:50%;width:15px;height:15px;font-size:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;border:none">✕</button></div>`:'';
+}
 function _avSetState(s){
   _AV_STATE=s;
   const ov=document.getElementById('alf-voice-ov');if(!ov)return;
@@ -8803,12 +8816,15 @@ function _avRenderChips(){
 function _avQuickAsk(q){const i=document.getElementById('av-in');if(i)i.value=q;_avSendText();}
 async function _avSendText(){
   const i=document.getElementById('av-in');if(!i)return;
-  const q=i.value.trim();if(!q)return;
-  i.value='';const c=document.getElementById('av-chips');if(c)c.innerHTML='';
+  const q=i.value.trim();const pic=ALFRED_PIC;
+  if(!q&&!pic)return;
+  i.value='';ALFRED_PIC=null;_avRenderPicPreview();
+  const c=document.getElementById('av-chips');if(c)c.innerHTML='';
   _avSetState('think');
-  await _alfSend(q,null);
+  await _alfSend(q,pic);
 }
 function _alfOrbTap(){
+  _avUnlockSpeech();
   if(_AV_STATE==='listen'){_AV_CONTINUOUS=false;if(_alfRec){try{_alfRec.stop();}catch(e){}}_avSetState('idle');return;}
   if(_AV_STATE==='speak'){_AV_CONTINUOUS=false;try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}_avSetState('idle');return;}
   if(_AV_STATE==='think')return;
@@ -8827,7 +8843,7 @@ function _avStartListen(){
     for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}
     const st=document.getElementById('av-status');
     if(st&&(interim||final))st.textContent='"'+(final||interim)+'"';
-    if(final){gotFinal=true;_alfListening=false;const c=document.getElementById('av-chips');if(c)c.innerHTML='';_avSetState('think');_alfSend(final.trim(),null);}
+    if(final){gotFinal=true;_alfListening=false;const pic=ALFRED_PIC;ALFRED_PIC=null;_avRenderPicPreview();const c=document.getElementById('av-chips');if(c)c.innerHTML='';_avSetState('think');_alfSend(final.trim(),pic);}
   };
   _alfRec.onerror=e=>{_alfListening=false;if(e.error==='not-allowed'){_AV_CONTINUOUS=false;toast('Mic permission blocked — enable it in browser settings.');}_avSetState('idle');};
   _alfRec.onend=()=>{_alfListening=false;if(!gotFinal&&_AV_STATE==='listen'){_AV_CONTINUOUS=false;_avSetState('idle');}};
@@ -9053,8 +9069,11 @@ async function _alfSend(q,pic){
 async function _alfredAttachPic(input){
   const f=input.files[0];if(!f)return;
   if(f.size>6e6){toast("Photo's too large — try a smaller one.");return;}
-  try{const b64=await fileB64(f);ALFRED_PIC={b64,mime:f.type,url:"data:"+f.type+";base64,"+b64};_renderAlfredSheet();}
-  catch(e){toast("Couldn't read that photo.");}
+  try{
+    const b64=await fileB64(f);ALFRED_PIC={b64,mime:f.type,url:"data:"+f.type+";base64,"+b64};
+    const ov=document.getElementById('alf-voice-ov');
+    if(ov&&ov.classList.contains('on'))_avRenderPicPreview();else _alfUiSync();
+  }catch(e){toast("Couldn't read that photo.");}
 }
 
 /* ---- Alfred LOCAL coaching (works with NO API key) — pre-session briefing,
@@ -10637,24 +10656,13 @@ function openStoryChapter(id){
 function renderAlfred(){
   try{maybeContextualDailyWisdom();}catch(e){}
   const has=!!geminiKey();state.data.u.aiKeySet=has;
-  // Chat card — uses same ALFRED_MSGS / _renderAlfredSheet engine so FAB and tab share history
-  const tabMicBtn=`<button id="alf-mic-btn" style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:${_alfListening?'rgba(255,54,34,.35)':_ALF_VOICE?'rgba(255,208,72,.18)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer" onclick="_alfMicStart()" title="Tap to speak">${_alfListening?'⏹':'🎙'}</button>`;
-  const tabVoiceBtn=`<button style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid ${_ALF_VOICE?'rgba(255,208,72,.5)':'var(--border2)'};background:${_ALF_VOICE?'rgba(255,208,72,.12)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer" onclick="_alfVoiceToggle()" title="${_ALF_VOICE?'Voice on':'Voice off'}">${_ALF_VOICE?'🔊':'🔇'}</button>`;
-  const chatCard=has
-    ?`<div class="card" style="padding:14px;margin-bottom:14px">
-        <div class="row sp" style="margin-bottom:10px">
-          <div class="row" style="gap:8px"><div style="font-size:20px">🦇</div><div style="font-family:var(--disp);font-size:17px;color:var(--gold2)">ALFRED</div><div class="mini" style="color:var(--text3)">Batcomputer · full data access</div></div>
-          <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="ALFRED_MSGS=[];ALFRED_PIC=null;renderAlfred()">Clear</button>
-        </div>
-        <div id="alfred-tab-chat" style="max-height:40vh;overflow-y:auto;margin-bottom:10px">${_alfredMsgsHtml()}</div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <button style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer" onclick="document.getElementById('alfred-pic-tab').click()">📎</button>
-          <input type="file" accept="image/*" id="alfred-pic-tab" style="display:none" onchange="_alfredAttachPic(this)"/>
-          ${ALFRED_PIC?`<img src="${esc(ALFRED_PIC.url)}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;border:1px solid var(--gold2);flex:none"/>`:''}
-          ${tabMicBtn}${tabVoiceBtn}
-          <input id="alf-tab-in" placeholder="${_alfListening?'Listening…':'Ask or command Alfred…'}" style="flex:1;padding:10px 12px;border-radius:11px;font-size:15px" onkeydown="if(event.key==='Enter'){event.preventDefault();_alfTabSend();}" autocomplete="off" autocapitalize="sentences"/>
-          <button class="btn gold sm" style="width:auto;padding:10px 14px;flex:none;border-radius:11px" onclick="_alfTabSend()">→</button>
-        </div>
+  // Single launcher — actual chat/voice/photo-attach all lives in the floating-circle overlay now.
+  const launchCard=has
+    ?`<div class="card" style="padding:18px;margin-bottom:14px;text-align:center">
+        <div style="font-size:36px;margin-bottom:8px">🦇</div>
+        <div style="font-family:var(--disp);font-size:17px;color:var(--gold2);margin-bottom:4px">TALK TO ALFRED</div>
+        <div class="mini" style="color:var(--text3);margin-bottom:14px">Voice or text · full data access · attach physique photos</div>
+        <button class="btn gold" style="width:auto;padding:11px 24px" onclick="openAlfredVoice()">Open Alfred →</button>
       </div>`
     :`<div class="card" style="margin-bottom:14px;padding:16px">
         <div class="row" style="gap:12px;margin-bottom:12px"><div style="font-size:30px">🦇</div><div><div style="font-family:var(--disp);font-size:18px;color:var(--gold2)">ACTIVATE ALFRED</div><div class="mini" style="color:var(--text2);margin-top:2px">Add a free Gemini key for live chat, programming advice, and physique analysis.</div></div></div>
@@ -10662,7 +10670,7 @@ function renderAlfred(){
         <div class="mini" style="color:var(--text3)">Free key at aistudio.google.com/apikey · takes 30 seconds</div>
       </div>`;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach · tap 🦇 anywhere to chat</div>`;
-  html+=chatCard;
+  html+=launchCard;
   html+=alfredBriefing();
   html+=storyCampaignCard();
   html+=alfredCaveReview();
@@ -10670,30 +10678,7 @@ function renderAlfred(){
   html+=fightRecordCard();
   html+=alfredMusclePicker();
   $("app").innerHTML=html;
-  requestAnimationFrame(()=>{const c=document.getElementById('alfred-tab-chat');if(c)c.scrollTop=c.scrollHeight;});
 }
-function _alfTabSend(){const i=document.getElementById('alf-tab-in');if(!i)return;const q=i.value.trim();if(!q&&!ALFRED_PIC)return;i.value='';const pic=ALFRED_PIC;ALFRED_PIC=null;_alfSend(q,pic).then(()=>{const c=document.getElementById('alfred-tab-chat');if(c)c.scrollTop=c.scrollHeight;}).catch(()=>{});const c=document.getElementById('alfred-tab-chat');if(c)c.scrollTop=c.scrollHeight;}
-function alfredQuick(){const i=$("alfred-in");if(i)i.focus();}
-async function sendAlfred(){
-  const inp=$("alfred-in");const pic=ALFRED_PIC;const q=inp.value.trim();
-  if(!q&&!pic)return;
-  inp.value="";ALFRED_PIC=null;
-  ALFRED_MSGS.push({role:"user",text:q||(pic?"What do you make of this physique, Alfred?":""),img:pic?pic.url:null});
-  ALFRED_MSGS.push({role:"alfred",text:"…thinking…"});renderAlfred();
-  try{
-    const parts=[];
-    if(pic){
-      parts.push({text:alfredContext()+"\n\nThe user has attached a physique photo. As Alfred — a sharp, witty British butler and elite sports scientist — give an honest, encouraging critique: standout strong points, the 2-3 weakest areas to bring up, symmetry/proportion notes, and one concrete training focus. Be specific and motivating, never clinical or robotic. "+(q?("User's question: "+q):"")});
-      parts.push({inline_data:{mime_type:pic.mime,data:pic.b64}});
-    }else{
-      parts.push({text:alfredContext()+"\n\nUser asks: "+q});
-    }
-    const txt=await geminiCall(parts);
-    ALFRED_MSGS[ALFRED_MSGS.length-1].text=txt||"I have nothing to add, sir.";state.data.u.aiUses++;checkAchievements();save();}
-  catch(e){ALFRED_MSGS[ALFRED_MSGS.length-1].text="I'm afraid the line to the Batcomputer is down, sir. ("+e.message+")";}
-  renderAlfred();
-}
-
 /* ========================= GOTHAM IRON PROTOCOL v2 =========================
    A read-only command deck over the existing data model. It deliberately avoids save()
    and only derives guidance from logged workouts, split structure, PRs, recovery and
