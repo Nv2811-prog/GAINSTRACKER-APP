@@ -6254,8 +6254,8 @@ function profileHeroHtml(d,u,sl,r,ri){
 }
 
 function profileCalendarHtml(d){
-  const MC_COL={chest:'#7FC8FF',back:'#E8C56A',shoulders:'#A78BFA',biceps:'#34D399',triceps:'#F87171',forearms:'#FB923C',quads:'#FBBF24',hamstrings:'#60A5FA',glutes:'#F472B6',calves:'#A3E635',abs:'#38BDF8',traps:'#C084FC'};
-  const MC_ABR={chest:'CH',back:'BK',shoulders:'SH',biceps:'BI',triceps:'TR',forearms:'FA',quads:'QD',hamstrings:'HS',glutes:'GL',calves:'CA',abs:'AB',traps:'TP'};
+  // Cohesive palette: warm push / cool pull / earthy legs — no neon rainbow
+  const MC_COL={chest:'#E07D50',back:'#E8C56A',shoulders:'#7BAFD4',biceps:'#4DC898',triceps:'#D96060',forearms:'#C48A50',quads:'#D4A030',hamstrings:'#5890CC',glutes:'#A86898',calves:'#5EAA6E',abs:'#38AABC',traps:'#8870C8'};
   const vols={},dayMuscles={};
   (d.workouts||[]).forEach(w=>{
     const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toISOString().slice(0,10);
@@ -6271,7 +6271,8 @@ function profileCalendarHtml(d){
   const firstDow=(new Date(yr,mo,1).getDay()+6)%7;
   const DAYS=['M','T','W','T','F','S','S'];
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  let cells=DAYS.map(dv=>`<div style="text-align:center;font-size:9px;color:var(--text3);padding-bottom:4px;font-weight:700;letter-spacing:.05em">${dv}</div>`).join('');
+  // Day-header row
+  let cells=DAYS.map(dv=>`<div style="text-align:center;font-size:9px;color:rgba(232,197,106,.5);padding-bottom:6px;font-weight:700;letter-spacing:.08em">${dv}</div>`).join('');
   for(let i=0;i<firstDow;i++)cells+=`<div></div>`;
   for(let day=1;day<=dim;day++){
     const dd=new Date(yr,mo,day);const k=dd.toISOString().slice(0,10);const v=vols[k]||0;
@@ -6279,26 +6280,30 @@ function profileCalendarHtml(d){
     const t=v?Math.min(1,v/mx):0;
     const muscles=(dayMuscles[k]||[]).slice(0,4);
     if(v&&!future){
-      const badges=muscles.map(m=>`<span style="background:${MC_COL[m]||'#888'};border-radius:3px;padding:2px 3px;font-size:7px;font-weight:900;color:#000;line-height:1;letter-spacing:-.02em;display:block">${MC_ABR[m]||'?'}</span>`).join('');
-      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="border-radius:9px;background:linear-gradient(175deg,rgba(235,199,107,${(0.1+t*0.15).toFixed(2)}) 0%,rgba(12,15,22,.95) 100%);border:1.5px solid rgba(235,199,107,${(0.3+t*0.5).toFixed(2)});box-shadow:0 0 ${Math.round(4+t*10)}px rgba(235,199,107,${(t*.4).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 2px 6px;min-height:64px">
-        <span style="font-size:8px;color:rgba(255,255,255,.38);font-weight:500;line-height:1">${day}</span>
-        <div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;align-items:center;padding:0 1px">${badges}</div>
+      // Muscle icons in a centered flex-wrap (max 2 per row, auto-centers odd count)
+      const icons=muscles.map(m=>`<svg viewBox="0 0 24 24" width="14" height="14" style="color:${MC_COL[m]||'#aaa'};flex:none">${MICON[m]||MICON.chest}</svg>`).join('');
+      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.12+t*0.14).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1.5px solid rgba(235,199,107,${(0.28+t*0.52).toFixed(2)});box-shadow:0 0 ${Math.round(3+t*9)}px rgba(235,199,107,${(t*.38).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 2px 7px;min-height:72px">
+        <span style="font-size:8px;color:rgba(255,255,255,.32);font-weight:500;line-height:1">${day}</span>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;max-width:31px">${icons}</div>
       </div>`;
     } else {
-      cells+=`<div style="border-radius:9px;background:${future?'transparent':'rgba(255,255,255,.025)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;min-height:64px">
-        <span style="font-size:${isToday?13:11}px;color:${isToday?'var(--gold2)':'rgba(255,255,255,.2)'};font-weight:${isToday?'700':'400'};line-height:1">${future?'':day}</span>
+      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.022)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;min-height:72px">
+        <span style="font-size:${isToday?13:11}px;color:${isToday?'var(--gold2)':'rgba(255,255,255,.16)'};font-weight:${isToday?'700':'400'};line-height:1">${future?'':day}</span>
       </div>`;
     }
   }
   const active=Object.values(vols).filter(v=>v>0).length;
-  return `<div style="background:linear-gradient(180deg,rgba(232,197,106,.06) 0%,var(--bg2) 60%);border:1px solid rgba(232,197,106,.22);border-radius:18px;padding:16px;margin-bottom:10px">
-    <div class="row sp" style="margin-bottom:12px">
-      <div><div style="font-family:var(--disp);font-size:17px;color:var(--gold2);letter-spacing:.05em">📅 ${MON[mo].toUpperCase()} ${yr}</div><div class="mini" style="color:var(--text3);margin-top:2px">${active} session${active===1?'':'s'} this month · tap any day</div></div>
+  return `<div style="background:linear-gradient(160deg,rgba(232,197,106,.07) 0%,rgba(10,12,18,.98) 55%);border:1px solid rgba(232,197,106,.28);border-radius:20px;padding:18px;margin-bottom:10px">
+    <div class="row sp" style="margin-bottom:14px">
+      <div>
+        <div style="font-family:var(--disp);font-size:17px;color:var(--gold2);letter-spacing:.06em">📅 ${MON[mo].toUpperCase()} ${yr}</div>
+        <div class="mini" style="color:var(--text3);margin-top:2px">${active} session${active===1?'':'s'} this month · tap any day</div>
+      </div>
       <button class="btn ghost sm" style="width:auto;border-color:rgba(232,197,106,.3);color:var(--gold2);font-size:11px" onclick="exportICS()">Export</button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${cells}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)">
-      ${Object.entries(MC_ABR).map(([m,a])=>`<span style="display:inline-flex;align-items:center;gap:3px"><span style="background:${MC_COL[m]};border-radius:3px;padding:1px 4px;font-size:8px;font-weight:900;color:#000">${a}</span><span style="font-size:9px;color:var(--text3)">${MNAME[m]||m}</span></span>`).join('')}
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">${cells}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
+      ${Object.entries(MC_COL).map(([m,c])=>`<span style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" width="11" height="11" style="color:${c};flex:none">${MICON[m]||MICON.chest}</svg><span style="font-size:9px;color:var(--text3)">${MNAME[m]||m}</span></span>`).join('')}
     </div>
   </div>`;
 }
@@ -8345,7 +8350,7 @@ function heatmap(){
 }
 function dayDetail(key){
   const MUSCLE_IMG={chest:'assets/figures/figure-chest-front.png',back:'assets/figures/figure-back-back.png',shoulders:'assets/figures/figure-shoulders-front.png',biceps:'assets/figures/figure-biceps-front.png',triceps:'assets/figures/figure-triceps-back.png',forearms:'assets/figures/figure-forearms-front.png',quads:'assets/figures/figure-quads-front.png',hamstrings:'assets/figures/figure-hamstrings-back.png',glutes:'assets/figures/figure-glutes-back.png',calves:'assets/figures/figure-calves-back.png',abs:'assets/figures/figure-abs-front.png',traps:'assets/figures/figure-traps-back.png'};
-  const MC_COL={chest:'#7FC8FF',back:'#E8C56A',shoulders:'#A78BFA',biceps:'#34D399',triceps:'#F87171',forearms:'#FB923C',quads:'#FBBF24',hamstrings:'#60A5FA',glutes:'#F472B6',calves:'#A3E635',abs:'#38BDF8',traps:'#C084FC'};
+  const MC_COL={chest:'#E07D50',back:'#E8C56A',shoulders:'#7BAFD4',biceps:'#4DC898',triceps:'#D96060',forearms:'#C48A50',quads:'#D4A030',hamstrings:'#5890CC',glutes:'#A86898',calves:'#5EAA6E',abs:'#38AABC',traps:'#8870C8'};
   const ws=state.data.workouts.filter(w=>{const k=new Date(w.date);k.setHours(0,0,0,0);return k.toDateString()===key;});
   if(!ws.length)return;
   const dt=new Date(key);
