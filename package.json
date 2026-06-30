@@ -8,7 +8,8 @@
     "build": "vite build && node scripts/postbuild.js",
     "preview": "vite preview",
     "lint": "eslint src --ext ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "gemini": "bash scripts/gemini.sh"
   },
   "dependencies": {
     "firebase": "^10.12.5",

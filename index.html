@@ -17,11 +17,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet"/>
 <style>
 :root{
---bg:#06080d;--bg2:#121722;--bg3:#1a2233;--bg4:#27303f;
---gold:#D4B255;--gold2:#F2D079;--gold3:#FCE6A0;--gold-dim:#8B6B2A;--gold-bg:#1F1607;
---red:#F0524A;--green:#34D27B;--yellow:#E8C53C;--orange:#E8923C;--blue:#4F93E8;--purple:#9C5CE8;--steel:#5B7CA6;
---text:#F3EFE3;--text2:#97a0ad;--text3:#5b626e;
---border:#23262e;--border2:#363b46;
+--bg:#030508;--bg2:#0b1018;--bg3:#121826;--bg4:#1b2234;
+--gold:#E8A820;--gold2:#FFD048;--gold3:#FFF09A;--gold-dim:#A06E14;--gold-bg:#180F00;
+--red:#FF3622;--green:#22E87A;--yellow:#FFD200;--orange:#FF8C22;--blue:#3C96FF;--purple:#9840F8;--steel:#4878C0;
+--text:#F6F2E6;--text2:#98A4B4;--text3:#606872;
+--border:#181D28;--border2:#282F42;
 --disp:'Bebas Neue','Oswald','Arial Narrow',sans-serif;
 --body:'DM Sans','Segoe UI',system-ui,sans-serif;
 }
@@ -29,10 +29,10 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5;
 -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;
-background-image:radial-gradient(circle at 50% -8%,rgba(235,199,107,.17),transparent 46%),radial-gradient(circle at 50% 2%,rgba(91,124,166,.15),transparent 58%),radial-gradient(circle at 86% 112%,rgba(124,92,232,.09),transparent 50%),radial-gradient(circle at 10% 120%,rgba(91,124,166,.08),transparent 48%);background-attachment:fixed;}
+background-image:radial-gradient(circle at 50% -10%,rgba(232,168,32,.32),transparent 44%),radial-gradient(circle at 80% 0%,rgba(255,54,34,.18),transparent 36%),radial-gradient(circle at 20% 0%,rgba(60,150,255,.22),transparent 40%),radial-gradient(circle at 86% 115%,rgba(152,64,248,.18),transparent 48%),radial-gradient(circle at 10% 120%,rgba(60,150,255,.14),transparent 46%);background-attachment:fixed;}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-background-image:linear-gradient(rgba(91,124,166,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(91,124,166,.045) 1px,transparent 1px);background-size:36px 36px;
--webkit-mask-image:radial-gradient(circle at 50% 24%,#000,transparent 76%);mask-image:radial-gradient(circle at 50% 24%,#000,transparent 76%);}
+background-image:linear-gradient(rgba(60,150,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(60,150,255,.09) 1px,transparent 1px);background-size:32px 32px;
+-webkit-mask-image:radial-gradient(circle at 50% 20%,#000 10%,transparent 74%);mask-image:radial-gradient(circle at 50% 20%,#000 10%,transparent 74%);}
 #app{max-width:560px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 14px 96px;min-height:100%}
 /* ===== motion system — smooth, 60fps view transitions ===== */
 :root{--ease-out:cubic-bezier(.22,.61,.36,1);--ease-spring:cubic-bezier(.34,1.4,.5,1)}
@@ -60,10 +60,10 @@ img{display:block;max-width:100%}
 /* cards — frosted glass */
 .card{background:linear-gradient(180deg,rgba(37,43,58,.92),rgba(20,24,34,.82));backdrop-filter:blur(10px) saturate(1.3);-webkit-backdrop-filter:blur(10px) saturate(1.3);border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:19px;margin-bottom:16px;position:relative;overflow:hidden;
 box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.025),0 20px 46px -22px rgba(0,0,0,.9),0 2px 10px -4px rgba(0,0,0,.55)}
-.card::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(235,199,107,.24),transparent);pointer-events:none}
+.card::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,208,72,.44),transparent);pointer-events:none}
 .card::after{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent 38%)}
-.card.glow{border-color:rgba(201,168,76,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(201,168,76,.2),0 18px 48px -18px rgba(201,168,76,.36)}
-.card.glow::before{background:linear-gradient(90deg,transparent,rgba(247,221,147,.6),transparent);height:1px}
+.card.glow{border-color:rgba(255,208,72,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(255,208,72,.28),0 18px 48px -18px rgba(255,208,72,.55),0 0 80px -30px rgba(255,208,72,.2)}
+.card.glow::before{background:linear-gradient(90deg,transparent,rgba(255,208,72,.85),transparent);height:1px}
 /* glow-pop: lifts any element off the dark so you can see it's there */
 .pop{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(201,168,76,.16),0 8px 26px -10px rgba(201,168,76,.26),0 22px 52px -26px rgba(0,0,0,.9)!important}
 .pop-red{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(240,82,74,.22),0 10px 30px -10px rgba(240,82,74,.3)!important}
@@ -73,21 +73,21 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 .stage::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse 64% 40% at 50% 98%,rgba(232,197,106,.2),transparent 72%),radial-gradient(ellipse 130% 72% at 50% -4%,rgba(0,0,0,.28),transparent 46%)}
 .card h2,.card h3{color:var(--gold2)}
 .ttl{font-family:var(--disp);font-size:15px;letter-spacing:.17em;text-transform:uppercase;color:var(--gold2);opacity:.95;margin-bottom:12px}
-.big{font-family:var(--disp);font-size:58px;color:var(--gold2);line-height:.86;font-variant-numeric:tabular-nums;text-shadow:0 0 28px rgba(242,208,121,.28)}
+.big{font-family:var(--disp);font-size:58px;color:var(--gold2);line-height:.86;font-variant-numeric:tabular-nums;text-shadow:0 0 22px rgba(255,208,72,.55),0 0 48px rgba(255,208,72,.22)}
 .hr{height:1px;background:var(--border);margin:13px 0}
 
 /* buttons — frosted glass */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px;border-radius:13px;position:relative;overflow:hidden;
 background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdrop-filter:blur(12px) saturate(1.3);-webkit-backdrop-filter:blur(12px) saturate(1.3);border:1px solid rgba(255,255,255,.13);color:var(--text);font-weight:600;width:100%;transition:transform .12s,filter .12s,box-shadow .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 6px 16px -10px rgba(0,0,0,.7)}
 .btn:active{transform:scale(.97);filter:brightness(1.12)}
-.btn.gold{background:linear-gradient(180deg,var(--gold3),var(--gold));backdrop-filter:none;-webkit-backdrop-filter:none;color:#150f02;border:none;font-weight:700;letter-spacing:.03em;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 22px -10px rgba(235,199,107,.65)}
+.btn.gold{background:linear-gradient(180deg,var(--gold3),var(--gold));backdrop-filter:none;-webkit-backdrop-filter:none;color:#120900;border:none;font-weight:700;letter-spacing:.03em;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 0 0 1px rgba(255,208,72,.35),0 8px 28px -8px rgba(255,208,72,.8),0 2px 0 0 rgba(255,255,255,.12)}
 .btn.gold:active{filter:brightness(1.08)}
 .btn.ghost{background:rgba(255,255,255,.03);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:none;border-color:rgba(255,255,255,.08)}
 .btn.sm{padding:8px 12px;font-size:13px;width:auto}
 .btn.danger{color:var(--red);border-color:rgba(232,82,74,.32);background:linear-gradient(180deg,rgba(40,20,21,.55),rgba(20,12,13,.42))}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(38,42,54,.5),rgba(20,24,32,.4));backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:600;width:auto;flex:none;white-space:nowrap;transition:transform .12s,filter .12s}
 .chip:active{transform:scale(.95)}
-.chip.on{background:linear-gradient(180deg,rgba(36,26,6,.7),rgba(25,18,5,.6));border-color:rgba(201,168,76,.5);color:var(--gold2);box-shadow:0 0 16px -4px rgba(235,199,107,.45)}
+.chip.on{background:linear-gradient(180deg,rgba(50,32,4,.75),rgba(32,20,2,.65));border-color:rgba(255,208,72,.6);color:var(--gold2);box-shadow:0 0 18px -3px rgba(255,208,72,.6)}
 /* press ripple */
 .ripple{position:absolute;border-radius:50%;transform:scale(0);pointer-events:none;background:radial-gradient(circle,rgba(247,221,147,.55),rgba(247,221,147,0) 70%);animation:rippleAnim .6s ease-out forwards;mix-blend-mode:screen}
 @keyframes rippleAnim{to{transform:scale(2.6);opacity:0}}
@@ -171,8 +171,9 @@ padding:7px 9px calc(9px + env(safe-area-inset-bottom));background:linear-gradie
 #nav button:active .ic{transform:scale(.86)}
 
 /* exercise thumb */
-.exrow{display:flex;gap:13px;align-items:center;padding:13px 12px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(160deg,#0f0f13,#0c0c0f);margin-bottom:9px}
-.exrow.added{border-color:rgba(46,204,113,.55);background:linear-gradient(160deg,rgba(46,204,113,.12),rgba(12,12,15,.9))}
+.exrow{display:flex;gap:13px;align-items:center;padding:12px 12px;border:1px solid rgba(255,208,72,.16);border-radius:14px;background:linear-gradient(160deg,rgba(18,22,34,.97),rgba(9,11,17,.97));margin-bottom:9px;transition:border-color .15s,box-shadow .15s,background .15s}
+.exrow:active{border-color:rgba(255,208,72,.42);background:linear-gradient(160deg,rgba(28,32,48,.97),rgba(14,16,26,.97));box-shadow:0 0 0 1px rgba(255,208,72,.14),0 8px 24px -12px rgba(255,208,72,.3)}
+.exrow.added{border-color:rgba(34,232,122,.55);background:linear-gradient(160deg,rgba(22,80,44,.18),rgba(9,11,17,.97));box-shadow:0 0 0 1px rgba(34,232,122,.15),0 6px 20px -10px rgba(34,232,122,.25)}
 /* Workout exercise cards: never virtualize them (stops the screen jumping when you tap a set),
    and block text selection / the iOS copy-callout so holding to drag never grabs text. Inputs stay editable. */
 .exdrag{content-visibility:visible;contain-intrinsic-size:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -183,15 +184,21 @@ padding:7px 9px calc(9px + env(safe-area-inset-bottom));background:linear-gradie
 .draghandle:active,.draghandle.grabbing{cursor:grabbing;background:rgba(232,197,106,.16);color:var(--gold2)}
 .exthumb{display:none}
 .exthumb-ph{display:none}
-.exwrap{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:14px;background:radial-gradient(circle at 50% 32%,#1d1e25,#08080b 92%);border:1px solid rgba(232,69,60,.3);flex:none;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 3px 10px -5px #000}
+.exwrap{display:inline-flex;align-items:center;justify-content:center;width:86px;height:86px;border-radius:15px;position:relative;
+background:radial-gradient(ellipse 80% 70% at 50% 36%,#1a1c28,#06060b 90%);
+border:1px solid rgba(255,54,34,.32);flex:none;overflow:hidden;
+box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6px 20px -8px rgba(255,54,34,.35),0 2px 8px -4px #000}
+.exwrap::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 90% 50% at 50% 0%,rgba(255,255,255,.06),transparent 60%);pointer-events:none;z-index:1}
 .exwrap.sm{width:74px;height:74px;border-radius:12px}
-.exwrap svg{pointer-events:none;width:100%;height:100%}
+.exwrap svg{pointer-events:none;width:100%;height:100%;position:relative;z-index:2}
 .exwrap img.eximg{width:100%;height:100%;object-fit:contain;display:block;background:#f4f4f4;pointer-events:none}
 .exwrap .exfig{display:none;width:100%;height:100%}
 .exwrap.noimg img.eximg{display:none}
 .exwrap.noimg .exfig{display:block}
-.exname{font-weight:700;font-size:15px;line-height:1.2;letter-spacing:-.01em}
-.exmeta{font-size:12px;color:var(--text3);margin-top:3px;text-transform:capitalize;letter-spacing:.02em}
+.exwrap img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;z-index:2;pointer-events:none;background:transparent}
+.exwrap img.exfigimg.hidden{display:none}
+.exname{font-weight:700;font-size:15px;line-height:1.2;letter-spacing:-.01em;color:var(--text)}
+.exmeta{font-size:12px;color:var(--text3);margin-top:3px;text-transform:capitalize;letter-spacing:.04em;font-family:var(--disp)}
 
 /* set table */
 .settbl{width:100%;border-collapse:collapse;margin-top:10px}
@@ -782,7 +789,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Machine Inner Chest Press","id":"machineinner","eq":"machine","p":["chest"],"s":["triceps","shoulders"],"c":["Press the handles in and together, squeeze the inner chest","Set the seat to your mid-chest","Controlled return with constant tension"],"tgt":"Chest — inner sternal (mid) head · front delts and triceps","sub":{"chest":["mid"]}},
 {"n":"Dumbbell Pullover","id":"dumbbellpull","eq":"dumbbell","p":["chest"],"s":["back","triceps"],"c":["Big overhead stretch, pull the dumbbell over with the chest","Slight elbow bend, feel the stretch across the chest and ribs","Keep your hips down to maximize the stretch"],"tgt":"Chest — lower & ribcage · also lats","sub":{"chest":["lo"]}},
 {"n":"Decline Barbell Bench Press","id":"declinebarbe","eq":"barbell","p":["chest"],"s":["triceps","shoulders"],"c":["Lower to your lower chest, press up and in","Squeeze the lower chest at the top","Controlled descent, no bouncing"],"tgt":"Chest — lower (costal) head · front delts and triceps","sub":{"chest":["lo"]}},
-{"n":"Smith Machine Decline Press","id":"smithmachin7","eq":"smith","p":["chest"],"s":["triceps","shoulders"],"c":["Lower to your lower chest, press up and in","Squeeze the lower chest at the top","Controlled descent, no bouncing"],"tgt":"Chest — lower (costal) head · triceps","sub":{"chest":["lo"]}},
 {"n":"Reverse-Grip Bench Press","id":"reversegripb","eq":"barbell","p":["chest"],"s":["triceps","shoulders"],"c":["Bar to your upper chest, drive up and slightly back","Bench ~30°, elbows tucked ~45°","Don't over-incline into a shoulder press"],"tgt":"Chest — upper (clavicular) head, underhand bias · triceps","sub":{"chest":["up"]}},
 {"n":"Wide-Grip Bench Press","id":"widegripbenc","eq":"barbell","p":["chest"],"s":["shoulders","triceps"],"c":["Bar to your chest, drive it straight up to lockout","Elbows tucked ~45°, shoulder blades pinned back","Brace hard, feet planted"],"tgt":"Chest — sternal (mid) head, outer stretch · front delts","sub":{"chest":["mid"]}},
 {"n":"Barbell Floor Press","id":"barbellfloor","eq":"barbell","p":["chest"],"s":["triceps"],"c":["Bar to your chest, drive it straight up to lockout","Elbows tucked ~45°, shoulder blades pinned back","Brace hard, feet planted"],"tgt":"Chest & triceps — mid chest with a strong lockout","sub":{"chest":["mid"]}},
@@ -946,7 +952,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Cable Skullcrusher","id":"cableskullcr","eq":"cable","p":["triceps"],"s":[],"c":["Lying with the cable behind you, extend to lockout","Elbows fixed, the cable keeps constant tension","Big stretch behind your head each rep"],"tgt":"Triceps — long & lateral heads, constant tension","sub":{"triceps":["long","lat"]}},
 {"n":"Cable Cross-Body Extension","id":"cablecrossbo","eq":"cable","p":["triceps"],"s":["shoulders"],"c":["Extend the handle across and down with a fixed elbow","Keep the upper arm still — only the forearm moves","Squeeze the long head at full extension"],"tgt":"Triceps — long head, single-arm overhead bias","sub":{"triceps":["long"]}},
 {"n":"Close-Grip Bench Press","id":"closegripben","eq":"barbell","p":["triceps"],"s":["chest","shoulders"],"c":["Grip just inside shoulder width, elbows tucked","Lower to your lower chest, drive to a hard lockout","Keep the elbows close — don't let them flare"],"tgt":"Triceps — lateral & medial heads, mass builder · chest","sub":{"triceps":["lat","med"]}},
-{"n":"Smith Close-Grip Bench Press","id":"smithclosegr","eq":"smith","p":["triceps"],"s":["chest","shoulders"],"c":["Narrow grip on the fixed bar, elbows tucked tight","Lower to your lower chest, drive straight up","The fixed path lets you push hard on the triceps"],"tgt":"Triceps — lateral & medial heads, mass builder · chest","sub":{"triceps":["lat","med"]}},
 {"n":"JM Press","id":"jmpress","eq":"barbell","p":["triceps"],"s":["chest","shoulders"],"c":["A hybrid of close-grip press and skullcrusher","Lower the bar toward your chin/upper chest, elbows forward","Drive up powerfully — great for triceps strength"],"tgt":"Triceps — lateral & medial heads, heavy mass · chest","sub":{"triceps":["lat","med"]}},
 {"n":"Triceps Dip","id":"tricepsdip","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Stay upright to bias the triceps over the chest","Lower to ~90° at the elbow, drive to lockout","Add weight from a belt once bodyweight is easy"],"tgt":"Triceps — lateral & medial heads · chest","sub":{"triceps":["lat","med"]}},
 {"n":"Bench Dip","id":"benchdip","eq":"bodyweight","p":["triceps"],"s":["chest","shoulders"],"c":["Hands on a bench behind you, lower your hips down","Drive through the heels of your hands to lockout","Stack plates on your lap to add resistance"],"tgt":"Triceps — lateral & medial heads","sub":{"triceps":["lat","med"]}},
@@ -998,7 +1003,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Walking Lunge","id":"walkinglunge","eq":"dumbbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Step out and drop the back knee toward the floor","Stay tall, drive up through the front heel","Long strides hit more glute, short strides more quad"],"tgt":"Quads — vastus & rectus · glutes","sub":{"quads":["vas","rec"]}},
 {"n":"Reverse Lunge","id":"reverselunge","eq":"dumbbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Step back and drop the knee, drive up through the front foot","More stable and knee-friendly than forward lunges","Keep your torso upright"],"tgt":"Quads — vastus · glutes","sub":{"quads":["vas"]}},
 {"n":"Bulgarian Split Squat","id":"bulgarianspl","eq":"dumbbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Rear foot elevated, drop straight down on the front leg","Stay fairly upright for quads, lean forward for glutes","Drive up through the front heel"],"tgt":"Quads — vastus & rectus · glutes","sub":{"quads":["vas","rec"]}},
-{"n":"Smith Bulgarian Split Squat","id":"smithbulgari","eq":"smith","p":["quads"],"s":["glutes","hamstrings"],"c":["Rear foot up, sink straight down under the fixed bar","The Smith balance lets you push the quad hard","Drive up through the front foot"],"tgt":"Quads — vastus · glutes","sub":{"quads":["vas"]}},
 {"n":"Barbell Lunge","id":"barbelllunge","eq":"barbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Step out and drop the back knee, stay tall and braced","Drive up through the front heel","Control each rep — no falling forward"],"tgt":"Quads — vastus · glutes","sub":{"quads":["vas"]}},
 {"n":"Dumbbell Step-Up","id":"dumbbellstep","eq":"dumbbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Drive up through the foot on the box — minimal push-off below","Stand tall at the top, control the way down","Higher box hits more glute"],"tgt":"Quads — vastus · glutes","sub":{"quads":["vas"]}},
 {"n":"Split Squat","id":"splitsquat","eq":"bodyweight","p":["quads"],"s":["glutes","hamstrings"],"c":["Feet split, drop straight down on the front leg","Stay upright, drive through the front heel","Add dumbbells to load it once bodyweight is easy"],"tgt":"Quads — vastus · glutes","sub":{"quads":["vas"]}},
@@ -1013,8 +1017,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Single-Leg Press","id":"singlelegpre","eq":"machine","p":["quads"],"s":["glutes","hamstrings"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — vastus, one leg at a time · glutes","sub":{"quads":["vas"]}},
 {"n":"Walking Lunge (Barbell)","id":"walkinglung2","eq":"barbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — vastus & rectus · glutes","sub":{"quads":["vas","rec"]}},
 {"n":"Front-Foot-Elevated Split Squat","id":"frontfootele","eq":"dumbbell","p":["quads"],"s":["glutes","hamstrings"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — vastus & rectus, deeper range · glutes","sub":{"quads":["vas","rec"]}},
-{"n":"Smith Machine Lunge","id":"smithmachin8","eq":"smith","p":["quads"],"s":["glutes","hamstrings"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — vastus · glutes","sub":{"quads":["vas"]}},
-{"n":"Smith Front Squat","id":"smithfrontsq","eq":"smith","p":["quads"],"s":["glutes","abs"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — rectus & vastus, upright · core","sub":{"quads":["rec","vas"]}},
 {"n":"Weighted Sissy Squat","id":"weightedsiss","eq":"bodyweight","p":["quads"],"s":["quads"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — rectus femoris / teardrop, loaded","sub":{"quads":["rec"]}},
 {"n":"Spanish Squat","id":"spanishsquat","eq":"band","p":["quads"],"s":["glutes"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — rectus & vastus, knee-friendly band","sub":{"quads":["rec","vas"]}},
 {"n":"Paused Hack Squat","id":"pausedhacksq","eq":"machine","p":["quads"],"s":["glutes"],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — vastus, paused at the bottom · glutes","sub":{"quads":["vas"]}},
@@ -1022,7 +1024,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Reverse Nordic Curl","id":"reversenordi","eq":"bodyweight","p":["quads"],"s":[],"c":["Brace, sit down between your hips, drive the floor away","Knees track over your toes, chest up","Don't push past 12 reps — add load instead"],"tgt":"Quads — rectus femoris, eccentric stretch","sub":{"quads":["rec"]}},
 {"n":"Barbell Romanian Deadlift","id":"barbellroman","eq":"barbell","p":["hamstrings"],"s":["glutes","back"],"c":["Push your hips back, soft knees, feel the hamstring stretch","Bar stays close, neutral braced spine throughout","Stand tall by driving the hips forward"],"tgt":"Hamstrings — hip / hinge portion · glutes and lower back","sub":{"hamstrings":["hip"]}},
 {"n":"Dumbbell Romanian Deadlift","id":"dumbbellroma","eq":"dumbbell","p":["hamstrings"],"s":["glutes","back"],"c":["Hinge from the hips, let the dumbbells track down your legs","Soft knees, feel the stretch, neutral spine","Drive the hips forward to stand"],"tgt":"Hamstrings — hip / hinge portion · glutes","sub":{"hamstrings":["hip"]}},
-{"n":"Smith Romanian Deadlift","id":"smithromania","eq":"smith","p":["hamstrings"],"s":["glutes","back"],"c":["Push the hips back along the fixed bar path","Soft knees, big hamstring stretch, flat back","Drive the hips forward to lock out"],"tgt":"Hamstrings — hip / hinge portion · glutes","sub":{"hamstrings":["hip"]}},
 {"n":"Cable Romanian Deadlift","id":"cableromania","eq":"cable","p":["hamstrings"],"s":["glutes","back"],"c":["Hinge back against the cable for constant tension","Soft knees, feel the stretch, neutral spine","Stand tall by driving the hips forward"],"tgt":"Hamstrings — hip / hinge portion, constant tension · glutes","sub":{"hamstrings":["hip"]}},
 {"n":"Stiff-Leg Deadlift","id":"stifflegdead","eq":"barbell","p":["hamstrings"],"s":["glutes","back"],"c":["Keep the legs nearly straight, hinge for a deep stretch","Neutral spine — never round the lower back","Only go as low as your hamstrings allow"],"tgt":"Hamstrings — hip / hinge, deep stretch · glutes","sub":{"hamstrings":["hip"]}},
 {"n":"Dumbbell Stiff-Leg Deadlift","id":"dumbbellstif","eq":"dumbbell","p":["hamstrings"],"s":["glutes","back"],"c":["Near-straight legs, hinge the dumbbells down for a stretch","Flat braced back, hips travel back","Drive the hips forward to stand"],"tgt":"Hamstrings — hip / hinge, deep stretch · glutes","sub":{"hamstrings":["hip"]}},
@@ -1046,7 +1047,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Cable Pull-Through (Hamstring Focus)","id":"cablepullth2","eq":"cable","p":["hamstrings"],"s":["glutes","back"],"c":["Push your hips back, soft knees, feel the hamstring stretch","Neutral braced spine throughout","Drive the hips forward to stand"],"tgt":"Hamstrings — hip/hinge, constant tension · glutes","sub":{"hamstrings":["hip"]}},
 {"n":"Barbell Hip Thrust","id":"barbellhipth","eq":"barbell","p":["glutes"],"s":["hamstrings"],"c":["Drive through your heels, squeeze the glutes hard at the top","Chin tucked, ribs down — don't arch the lower back","Full lockout, control the way down"],"tgt":"Glutes — gluteus maximus · hamstrings","sub":{"glutes":["max"]}},
 {"n":"Machine Hip Thrust","id":"machinehipth","eq":"machine","p":["glutes"],"s":["hamstrings"],"c":["Drive the pad up by squeezing the glutes, full lockout","Keep your ribs down, chin tucked","Pause and squeeze at the top"],"tgt":"Glutes — gluteus maximus · hamstrings","sub":{"glutes":["max"]}},
-{"n":"Smith Hip Thrust","id":"smithhipthru","eq":"smith","p":["glutes"],"s":["hamstrings"],"c":["Drive the fixed bar up through your heels, squeeze at the top","Ribs down, chin tucked, full hip lockout","Control the descent"],"tgt":"Glutes — gluteus maximus · hamstrings","sub":{"glutes":["max"]}},
 {"n":"Plate-Loaded Hip Thrust","id":"plateloadedh","eq":"machine","p":["glutes"],"s":["hamstrings"],"c":["Drive the loaded pad up, squeeze hard at lockout","Keep your core braced, ribs down","Pause at the top each rep"],"tgt":"Glutes — gluteus maximus · hamstrings","sub":{"glutes":["max"]}},
 {"n":"Barbell Glute Bridge","id":"barbellglute","eq":"barbell","p":["glutes"],"s":["hamstrings"],"c":["From the floor, drive the hips up and squeeze","Shorter range than a thrust — focus on the squeeze","Ribs down, full lockout"],"tgt":"Glutes — gluteus maximus · hamstrings","sub":{"glutes":["max"]}},
 {"n":"Single-Leg Hip Thrust","id":"singleleghip","eq":"bodyweight","p":["glutes"],"s":["hamstrings"],"c":["Drive through one heel, squeeze the glute at the top","Keep your hips level — don't let one side drop","Add a dumbbell on the hip to progress"],"tgt":"Glutes — gluteus maximus, one leg at a time · hamstrings","sub":{"glutes":["max"]}},
@@ -1077,19 +1077,16 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Banded Glute Bridge","id":"bandedgluteb","eq":"band","p":["glutes"],"s":["hamstrings"],"c":["Drive through your heels, squeeze the glutes hard at the top","Ribs down, chin tucked, don't arch the low back","Full lockout, control the way down"],"tgt":"Glutes — gluteus maximus, band tension","sub":{"glutes":["max"]}},
 {"n":"Standing Calf Raise","id":"standingcalf","eq":"machine","p":["calves"],"s":[],"c":["Full stretch at the bottom, pause and squeeze at the top","Straight legs target the gastrocnemius","No bouncing — slow controlled reps"],"tgt":"Calves — gastrocnemius (straight-leg)","sub":{"calves":["gas"]}},
 {"n":"Barbell Standing Calf Raise","id":"barbellstand","eq":"barbell","p":["calves"],"s":[],"c":["Bar on your back, rise onto your toes and squeeze","Full stretch at the bottom, pause at the top","Stay balanced, no bouncing"],"tgt":"Calves — gastrocnemius (straight-leg)","sub":{"calves":["gas"]}},
-{"n":"Smith Standing Calf Raise","id":"smithstandin","eq":"smith","p":["calves"],"s":[],"c":["Toes on a block under the fixed bar, full range each rep","Deep stretch, hard squeeze at the top","Slow controlled tempo"],"tgt":"Calves — gastrocnemius (straight-leg)","sub":{"calves":["gas"]}},
 {"n":"Dumbbell Standing Calf Raise","id":"dumbbellstan","eq":"dumbbell","p":["calves"],"s":[],"c":["Hold dumbbells, rise onto your toes and squeeze","Full stretch at the bottom","One leg at a time for more range"],"tgt":"Calves — gastrocnemius (straight-leg)","sub":{"calves":["gas"]}},
 {"n":"Leg Press Calf Raise","id":"legpresscalf","eq":"machine","p":["calves"],"s":[],"c":["Push the sled with your toes, full stretch then squeeze","Keep the legs nearly straight","Pause at the top, slow negative"],"tgt":"Calves — gastrocnemius (straight-leg)","sub":{"calves":["gas"]}},
 {"n":"Donkey Calf Raise","id":"donkeycalfra","eq":"machine","p":["calves"],"s":[],"c":["Hinged-over position gives a huge stretch at the bottom","Rise onto the toes and squeeze hard","Slow controlled reps"],"tgt":"Calves — gastrocnemius (straight-leg), deep stretch","sub":{"calves":["gas"]}},
 {"n":"Hack Squat Calf Raise","id":"hacksquatcal","eq":"machine","p":["calves"],"s":[],"c":["Toes on the platform, press up onto the balls of your feet","Full stretch at the bottom, squeeze at the top","Controlled tempo"],"tgt":"Calves — gastrocnemius (straight-leg)","sub":{"calves":["gas"]}},
 {"n":"Single-Leg Standing Calf Raise","id":"singlelegsta","eq":"bodyweight","p":["calves"],"s":[],"c":["Balance on one foot on a step, full stretch then squeeze","Hold a dumbbell to add load","Slow and controlled, no bouncing"],"tgt":"Calves — gastrocnemius (straight-leg), one leg","sub":{"calves":["gas"]}},
 {"n":"Seated Calf Raise","id":"seatedcalfra","eq":"machine","p":["calves"],"s":[],"c":["Bent knees target the soleus — full stretch then squeeze","Pause at the top of every rep","Slow controlled negative, no bouncing"],"tgt":"Calves — soleus (bent-knee)","sub":{"calves":["sol"]}},
-{"n":"Smith Seated Calf Raise","id":"smithseatedc","eq":"smith","p":["calves"],"s":[],"c":["Bar across your knees, raise onto your toes and squeeze","Full stretch at the bottom","Controlled tempo"],"tgt":"Calves — soleus (bent-knee)","sub":{"calves":["sol"]}},
 {"n":"Dumbbell Seated Calf Raise","id":"dumbbellseat","eq":"dumbbell","p":["calves"],"s":[],"c":["Dumbbell on your knees, push onto your toes and squeeze","Deep stretch at the bottom","Slow and strict"],"tgt":"Calves — soleus (bent-knee)","sub":{"calves":["sol"]}},
 {"n":"Bent-Knee Calf Raise","id":"bentkneecalf","eq":"machine","p":["calves"],"s":[],"c":["Knees bent against the pad, raise onto your toes","Full stretch, hard squeeze at the top","No bouncing — controlled reps"],"tgt":"Calves — soleus (bent-knee)","sub":{"calves":["sol"]}},
 {"n":"Tibialis Raise","id":"tibialisrais","eq":"bodyweight","p":["calves"],"s":[],"c":["Heels down, pull your toes up toward your shins","Builds the front shin for knee and ankle health","Squeeze at the top, control the lower"],"tgt":"Tibialis (front of the shin)"},
 {"n":"Tibialis Machine","id":"tibialismach","eq":"machine","p":["calves"],"s":[],"c":["Pull your toes up against the loaded pad","Squeeze the shin muscle at the top","Slow controlled reps"],"tgt":"Tibialis (front of the shin)"},
-{"n":"Smith Machine Calf Raise","id":"smithmachin9","eq":"smith","p":["calves"],"s":[],"c":["Full stretch at the bottom, pause and squeeze at the top","No bouncing — slow controlled reps","Full range every rep"],"tgt":"Calves — gastrocnemius (straight-leg)","sub":{"calves":["gas"]}},
 {"n":"Single-Leg Dumbbell Calf Raise","id":"singlelegdum","eq":"dumbbell","p":["calves"],"s":[],"c":["Full stretch at the bottom, pause and squeeze at the top","No bouncing — slow controlled reps","Full range every rep"],"tgt":"Calves — gastrocnemius, one leg","sub":{"calves":["gas"]}},
 {"n":"Barbell Seated Calf Raise","id":"barbellseate","eq":"barbell","p":["calves"],"s":[],"c":["Full stretch at the bottom, pause and squeeze at the top","No bouncing — slow controlled reps","Full range every rep"],"tgt":"Calves — soleus (bent-knee)","sub":{"calves":["sol"]}},
 {"n":"Banded Tibialis Raise","id":"bandedtibial","eq":"band","p":["calves"],"s":[],"c":["Full stretch at the bottom, pause and squeeze at the top","No bouncing — slow controlled reps","Full range every rep"],"tgt":"Tibialis (front of the shin)"},
@@ -1134,7 +1131,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Barbell Shrug","id":"barbellshrug","eq":"barbell","p":["traps"],"s":[],"c":["Shrug straight up toward your ears, squeeze at the top","Don't roll the shoulders — straight up and down","Hold the squeeze a beat, lower under control"],"tgt":"Traps — upper traps","sub":{"traps":["up"]}},
 {"n":"Dumbbell Shrug","id":"dumbbellshru","eq":"dumbbell","p":["traps"],"s":[],"c":["Shrug the dumbbells straight up, squeeze hard","Let them hang for a full stretch at the bottom","No rolling — straight up and down"],"tgt":"Traps — upper traps","sub":{"traps":["up"]}},
 {"n":"Trap Bar Shrug","id":"trapbarshrug","eq":"trap bar","p":["traps"],"s":[],"c":["Stand inside the bar and shrug straight up","The neutral handles let you load heavy","Squeeze at the top, full stretch at the bottom"],"tgt":"Traps — upper traps, heavy","sub":{"traps":["up"]}},
-{"n":"Smith Machine Shrug","id":"smithmachin6","eq":"smith","p":["traps"],"s":[],"c":["Shrug the fixed bar straight up, squeeze at the top","Full stretch at the bottom each rep","Controlled tempo, no bouncing"],"tgt":"Traps — upper traps","sub":{"traps":["up"]}},
 {"n":"Machine Shrug","id":"machineshrug","eq":"machine","p":["traps"],"s":[],"c":["Shrug the handles straight up, squeeze hard","Pause at the top, control the descent","Full range every rep"],"tgt":"Traps — upper traps","sub":{"traps":["up"]}},
 {"n":"Cable Shrug","id":"cableshrug","eq":"cable","p":["traps"],"s":[],"c":["Shrug straight up against the cable, squeeze at the top","Constant tension keeps the traps loaded","Full stretch at the bottom"],"tgt":"Traps — upper traps, constant tension","sub":{"traps":["up"]}},
 {"n":"Behind-the-Back Shrug","id":"behindtheba3","eq":"barbell","p":["traps"],"s":[],"c":["Hold the bar behind your glutes, shrug straight up","This angle pulls the shoulders back into the mid traps","Squeeze and control the lower"],"tgt":"Traps — upper & mid traps","sub":{"traps":["up","mid"]}},
@@ -1791,8 +1787,153 @@ function figureSVG(ex){
   const ap=anchor(prim);if(ap)gl+=glow(ap,5.4,R);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="display:block">${imp}${body}${gl}</svg>`;
 }
+/* ===== MOVEMENT-FIGURE MAP ===== */
+/* ~35 figure keys; hundreds of exercises map to one image via ID then fallback */
+const FIGMAP={
+ barbellbench:'flat-press',dumbbellbenc:'flat-press',machinechest:'flat-press',
+ plateloadedc:'flat-press',smithmachine:'flat-press',cablechestpr:'flat-press',
+ dumbbellfloo:'flat-press',widegripbenc:'flat-press',barbellfloor:'flat-press',
+ cableflyflat:'chest-fly',
+ barbellincli:'incline-press',dumbbellincl:'incline-press',inclinemachi:'incline-press',
+ smithmachin2:'incline-press',inclinecable:'incline-press',landminepres:'incline-press',
+ lowinclinedu:'incline-press',hammerstreng:'incline-press',reversegripb:'incline-press',
+ reversegripd:'incline-press',
+ dumbbelldecl:'decline-press',declinemachi:'decline-press',cabledecline:'decline-press',
+ declinebarbe:'decline-press',smithmachin7:'decline-press',
+ pecdeckfly:'chest-fly',flatdumbbell:'chest-fly',inclinedumbb:'chest-fly',
+ cablecrossov:'chest-fly',seatedcablec:'chest-fly',lowtohighcab:'chest-fly',
+ hightolowcab:'chest-fly',cablesqueeze:'chest-fly',machineinner:'chest-fly',
+ machinedecli:'chest-fly',
+ chestdip:'chest-dip',weightedches:'chest-dip',assisteddipm:'chest-dip',
+ dumbbellpull:'pullover',dumbbellpul3:'pullover',machinepullo:'pullover',dumbbellpul2:'pullover',
+ latpulldownw:'pulldown',closegriplat:'pulldown',neutralgripl:'pulldown',
+ reversegripl:'pulldown',vbarlatpulld:'pulldown',behindthenec:'pulldown',
+ plateloadedl:'pulldown',cablestraigh:'pulldown',cablelatpray:'pulldown',
+ ropelatpulld:'pulldown',girondalatpu:'pulldown',bandedlatpul:'pulldown',
+ pullup:'pull-up',chinup:'pull-up',weightedpull:'pull-up',
+ widegrippull:'pull-up',assistedpull:'pull-up',neutralgripp:'pull-up',
+ barbellbento:'barbell-row',pendlayrow:'barbell-row',yatesrow:'barbell-row',
+ underhandbar:'barbell-row',meadowsrow:'barbell-row',smithmachin3:'barbell-row',
+ dumbbellrow:'db-row',chestsupport:'db-row',sealrow:'db-row',krocrow:'db-row',
+ seatedcabler:'cable-row',widegripseat:'cable-row',cableroperow:'cable-row',
+ standingcabl:'cable-row',chestsuppor3:'cable-row',chestsuppor4:'cable-row',
+ machineseate:'cable-row',machinehighr:'cable-row',machinelowro:'cable-row',
+ plateloadedr:'cable-row',neutralgripm:'cable-row',machinerever:'cable-row',
+ tbarrow:'cable-row',chestsuppor2:'cable-row',hightolowca3:'cable-row',
+ lowtohighca3:'cable-row',widegripcabl:'cable-row',trapbarrow:'cable-row',
+ chestsuppor5:'cable-row',neutralwidec:'cable-row',invertedrow:'cable-row',
+ feetelevated:'cable-row',
+ barbelldeadl:'deadlift',rackpull:'deadlift',snatchgripde:'deadlift',
+ deficitdeadl:'deadlift',mixedgripdea:'deadlift',pauseddeadli:'deadlift',
+ seatedbarbel:'overhead-press',standingbarb:'overhead-press',dumbbellshou:'overhead-press',
+ arnoldpress:'overhead-press',machineshoul:'overhead-press',plateloadeds:'overhead-press',
+ smithmachin4:'overhead-press',zpress:'overhead-press',vikingpress:'overhead-press',
+ dumbbelllate:'lateral-raise',seateddumbbe:'lateral-raise',cablelateral:'lateral-raise',
+ leaningcable:'lateral-raise',behindthebac:'lateral-raise',machinelater:'lateral-raise',
+ luraise:'lateral-raise',
+ dumbbellfron:'front-raise',
+ barbell_rear:'rear-delt-fly',reversedeckf:'rear-delt-fly',
+ barbellshrug:'shrug',dumbbellshru:'shrug',cableshrug:'shrug',machineShrug:'shrug',
+ facepull:'face-pull',
+ barbellcurl:'biceps-curl-bb',ezbarcurl:'biceps-curl-bb',widegripcurl:'biceps-curl-bb',
+ dumbbellcurl:'biceps-curl-db',alternatingd:'biceps-curl-db',concentratio:'biceps-curl-db',
+ spidercurl:'biceps-curl-db',inclinecurl:'biceps-curl-db',
+ hammercurl:'hammer-curl',crossbodyhca:'hammer-curl',ropehammercl:'hammer-curl',
+ cablebicepsc:'biceps-curl-cable',ropebiccurl:'biceps-curl-cable',highcablecur:'biceps-curl-cable',
+ preachercurl:'preacher-curl',ezpreacherc:'preacher-curl',machineprea:'preacher-curl',
+ cablepreache:'preacher-curl',spidercurle:'preacher-curl',
+ tricepspushd:'triceps-pushdown',ropetricepsp:'triceps-pushdown',reversetrice:'triceps-pushdown',
+ singlearmpu:'triceps-pushdown',vbarpushdow:'triceps-pushdown',straightbart:'triceps-pushdown',
+ skullcrusher:'triceps-overhead',overheadtric:'triceps-overhead',cabletriceps:'triceps-overhead',
+ dumbbellovet:'triceps-overhead',ezbarskulld:'triceps-overhead',
+ tricepsdip:'triceps-dip',benchdip:'triceps-dip',assistedtri:'triceps-dip',
+ barbellsquat:'squat',lowbarsquat:'squat',frontsquat:'squat',gobletSquat:'squat',
+ smithmachin5:'squat',hackSquat:'squat',zerocherSqu:'squat',boxsquat:'squat',
+ parabsquat:'squat',splitSquat:'squat',
+ legpress:'leg-press',legtpress:'leg-press',singlelegpr:'leg-press',hacklegpres:'leg-press',
+ barbelllunge:'lunge',dumbelllunge:'lunge',reverselunge:'lunge',walkinglunge:'lunge',
+ bulgarianspl:'lunge',laterallunge:'lunge',cablelunge:'lunge',
+ romanianddl:'hinge',stifflegddl:'hinge',singlelegrd:'hinge',cableRDL:'hinge',
+ goodmorning:'hinge',hipHinge:'hinge',
+ lyinglegcur:'leg-curl',seatedlegcur:'leg-curl',standingleg:'leg-curl',
+ singlelegcu:'leg-curl',cablelegcur:'leg-curl',
+ legextensio:'leg-extension',singlelegex:'leg-extension',cablelegext:'leg-extension',
+ standingcal:'calf-raise',seatedcalft:'calf-raise',donkeycalfr:'calf-raise',
+ singlelegca:'calf-raise',machinecalf:'calf-raise',calfpress:'calf-raise',
+ hipthrust:'hip-thrust',barbellhipt:'hip-thrust',singleleght:'hip-thrust',
+ cablehipthr:'hip-thrust',machineHipt:'hip-thrust',glutebridge:'hip-thrust',
+ machineabdu:'hip-abduction',cableabduct:'hip-abduction',bandabducti:'hip-abduction',
+ machineaddu:'hip-abduction',
+ cablecrunch:'ab-crunch',crunch:'ab-crunch',declinecrunc:'ab-crunch',
+ bicyclecrun:'ab-crunch',reversecrun:'ab-crunch',legRaise:'ab-crunch',
+ plank:'ab-plank',sideplank:'ab-plank',hollowbody:'ab-plank',
+ facepull2:'face-pull',reardeltcab:'face-pull',reardeltfly:'rear-delt-fly',
+ bentoverflyb:'rear-delt-fly',inclinereard:'rear-delt-fly',machinerear:'rear-delt-fly',
+ backextensio:'back-extension',romanianext:'back-extension',hyperextens:'back-extension'
+};
+function exFigKey(ex){
+ if(!ex)return null;
+ const k=FIGMAP[ex.id];
+ if(k)return k;
+ const p=(ex.p||[])[0],eq=ex.eq||'',n=(ex.n||'').toLowerCase();
+ if(n.includes('rear delt')||n.includes('reverse fly')||n.includes('reverse pec'))return 'rear-delt-fly';
+ if(n.includes('face pull'))return 'face-pull';
+ if(n.includes('shrug'))return 'shrug';
+ if(n.includes('hip thrust')||n.includes('glute bridge'))return 'hip-thrust';
+ if(n.includes('hip abduction')||n.includes('hip adduction'))return 'hip-abduction';
+ if(n.includes('back extension')||n.includes('hyperext'))return 'back-extension';
+ if(n.includes('plank'))return 'ab-plank';
+ if(n.includes('crunch')||n.includes('leg raise')||n.includes('sit-up'))return 'ab-crunch';
+ if(n.includes('calf'))return 'calf-raise';
+ if(n.includes('leg curl'))return 'leg-curl';
+ if(n.includes('leg extension'))return 'leg-extension';
+ if(n.includes('leg press')||n.includes('hack squat'))return 'leg-press';
+ if(n.includes('lunge')||n.includes('split squat')||n.includes('bulgarian'))return 'lunge';
+ if(n.includes('squat'))return 'squat';
+ if(n.includes('romanian')||n.includes('stiff-leg')||n.includes('rdl')||n.includes('good morning'))return 'hinge';
+ if(n.includes('deadlift'))return 'deadlift';
+ if(n.includes('pull-up')||n.includes('pullup')||n.includes('chin-up')||n.includes('chinup'))return 'pull-up';
+ if(n.includes('pulldown'))return 'pulldown';
+ if(n.includes('row'))return eq==='dumbbell'?'db-row':'cable-row';
+ if(n.includes('skull')||n.includes('overhead')||n.includes('extension')&&p==='triceps')return 'triceps-overhead';
+ if(n.includes('pushdown')||n.includes('push-down'))return 'triceps-pushdown';
+ if(n.includes('dip'))return p==='chest'?'chest-dip':'triceps-dip';
+ if(n.includes('preacher'))return 'preacher-curl';
+ if(n.includes('hammer'))return 'hammer-curl';
+ if(n.includes('curl'))return eq==='cable'?'biceps-curl-cable':eq==='barbell'||eq==='ez bar'?'biceps-curl-bb':'biceps-curl-db';
+ if(n.includes('lateral raise')||n.includes('side raise'))return 'lateral-raise';
+ if(n.includes('front raise'))return 'front-raise';
+ if(n.includes('incline')&&p==='chest')return 'incline-press';
+ if(n.includes('decline')&&p==='chest')return 'decline-press';
+ if(n.includes('fly')||n.includes('pec deck')||n.includes('crossover'))return 'chest-fly';
+ if(p==='chest')return 'flat-press';
+ if(p==='back')return eq==='barbell'?'barbell-row':'cable-row';
+ if(p==='shoulders')return n.includes('press')?'overhead-press':'lateral-raise';
+ if(p==='biceps')return 'biceps-curl-db';
+ if(p==='triceps')return 'triceps-pushdown';
+ if(p==='quads')return 'squat';
+ if(p==='hamstrings')return 'leg-curl';
+ if(p==='glutes')return 'hip-thrust';
+ if(p==='calves')return 'calf-raise';
+ if(p==='abs')return 'ab-crunch';
+ if(p==='traps')return 'shrug';
+ return null;
+}
+function exFigImg(ex){
+ const k=exFigKey(ex);
+ return k?`assets/exfig/${k}.png`:'';
+}
+
 function thumb(ex,small){
-  return `<span class="exwrap${small?' sm':''}">${figureSVG(ex)}</span>`;
+ const fi=exFigImg(ex);
+ const svgFallback=figureSVG(ex);
+ if(fi){
+   return `<span class="exwrap${small?' sm':''}">
+     <img class="exfigimg" src="${fi}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('hidden')" />
+     ${svgFallback}
+   </span>`;
+ }
+ return `<span class="exwrap${small?' sm':''}">${svgFallback}</span>`;
 }
 function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x[0])r=x;return{name:r[1],emoji:r[2]};}
 function quoteToday(){return QUOTES[new Date().getDate()%QUOTES.length];}
@@ -3852,16 +3993,60 @@ function openPicker(multi){
   state.pickerOpen=true;state.pickerQuery="";state.pickerMuscle="all";
   state.gymFilter=false;
   const mm=!!state.pickerMulti;
-  $("sheet").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">Add exercise${mm?'s':''} <span class="muted" style="font-weight:400">— ${EXDB.length} loaded</span></div>${mm?`<button class="btn gold sm" style="width:auto" onclick="finishMultiAdd()">Done <span id="picker-cnt"></span></button>`:''}</div>
-    ${mm?`<div class="mini" style="color:var(--text2);margin:2px 0 0">Tap to add several — they stay listed and checked. Tap again to remove. Hit <b>Done</b> when finished.</div>`:''}
-    <input id="ex-search" placeholder="Search e.g. bench, squat, curl…" autocomplete="off" oninput="updateExList()"/>
-    <div class="row sp" style="margin:9px 0 4px;align-items:center">
-      <div class="scroll-x" id="ex-musc" style="flex:1">${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')">${m==='all'?'All':MNAME[m]}</button>`).join("")}</div>
+  $("sheet").innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="flex:1">
+        <div style="font-family:var(--disp);font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold2);line-height:1;text-shadow:0 0 16px rgba(255,208,72,.45)">
+          ${mm?'Build split':'Add exercise'}
+        </div>
+        <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:2px">${EXDB.length} movements · tap to add</div>
+      </div>
+      ${mm?`<button class="btn gold sm" style="width:auto;min-width:80px" onclick="finishMultiAdd()">Done <span id="picker-cnt"></span></button>`:''}
     </div>
-    <button class="btn" style="margin:6px 0 2px;border-style:dashed;width:100%" onclick="openCustomCreator()">🛠️ Create custom exercise</button>
-    <div id="ex-list" style="max-height:48vh;overflow:auto;margin-top:6px"></div>`;
+    <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,208,72,.4),transparent);margin:-4px 0 12px"></div>
+    <div style="position:relative;margin-bottom:10px">
+      <input id="ex-search" placeholder="Search — bench, squat, curl, row…" autocomplete="off" oninput="updateExList()"
+        style="padding-left:36px;background:linear-gradient(180deg,rgba(20,26,40,.9),rgba(12,15,22,.9));border-color:rgba(255,208,72,.22)"/>
+      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5">🔍</span>
+    </div>
+    <div class="scroll-x" id="ex-musc" style="margin-bottom:10px;gap:6px">${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')" style="font-family:var(--disp);letter-spacing:.06em">${m==='all'?'ALL':MNAME[m].toUpperCase()}</button>`).join("")}</div>
+    <button class="btn" style="margin:0 0 10px;border:1px dashed rgba(255,208,72,.22);background:rgba(255,208,72,.04);color:var(--gold2);font-family:var(--disp);letter-spacing:.06em" onclick="openCustomCreator()">⚙ CREATE CUSTOM LIFT</button>
+    <div id="ex-list" style="max-height:50vh;overflow-y:auto;overflow-x:hidden;margin:0 -2px;padding:0 2px"></div>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
-  updateExList();setTimeout(()=>{const s=$("ex-search");},50);
+  updateExList();
+}
+/* Exercise detail sheet — shows big figure + cues, lets you add from there */
+function openExDetail(exName){
+  const ex=exFor(exName);
+  const fi=exFigImg(ex);
+  const priCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',
+    quads:'#FFD200',hamstrings:'#FF3622',glutes:'#9840F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
+  const col=priCols[(ex.p||[])[0]]||'var(--gold2)';
+  const tgt=exTarget(ex);
+  openSheet(`
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">
+      <span class="exwrap" style="width:100px;height:100px;border-radius:18px;border-color:${col}40;box-shadow:0 0 0 1px ${col}20,0 8px 28px -8px ${col}50,0 0 40px -12px ${col}30">
+        ${fi?`<img class="exfigimg" src="${fi}" alt="" onerror="this.classList.add('hidden')"/>`:''}
+        ${figureSVG(ex)}
+      </span>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--disp);font-size:22px;line-height:1.1;color:var(--text);margin-bottom:4px">${esc(ex.n)}</div>
+        <div style="font-size:12px;letter-spacing:.05em;color:${col};text-transform:uppercase;font-weight:700;margin-bottom:4px">${esc(tgt.split('·')[0].trim())}</div>
+        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">${esc(ex.eq)}</div>
+      </div>
+    </div>
+    ${(ex.c&&ex.c.length)?`
+    <div style="margin-bottom:14px">
+      <div style="font-family:var(--disp);font-size:11px;letter-spacing:.14em;color:var(--gold2);margin-bottom:7px">FORM CUES</div>
+      ${ex.c.map(cue=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)">
+        <span style="color:${col};font-size:14px;margin-top:1px;flex:none">▸</span>
+        <span style="font-size:14px;line-height:1.5;color:var(--text2)">${esc(cue)}</span>
+      </div>`).join('')}
+    </div>`:''}
+    ${ex.s&&ex.s.length?`<div style="font-size:12px;color:var(--text3);margin-bottom:14px">Also trains: ${ex.s.map(m=>`<span style="color:var(--text2)">${MNAME[m]||m}</span>`).join(', ')}</div>`:''}
+    <button class="btn gold" style="margin-bottom:8px" onclick="pickAdd('${ex.n.replace(/'/g,"\\'")}');closeSheet()">＋ Add to session</button>
+    <button class="btn ghost" onclick="closeSheet()">Close</button>
+  `);
 }
 
 /* ===== CUSTOM EXERCISE CREATOR ===== */
@@ -3935,10 +4120,17 @@ function updateExList(){
   const el=$("ex-list");if(!el)return;
   const st=el.scrollTop;                       // preserve scroll so the list doesn't jump on each add
   const added=pickerAddedList();
-  el.innerHTML=list.length?list.map(e=>{const on=added&&added.includes(e.n);return `<div class="exrow${on?' added':''}" onclick="pickAdd('${e.n.replace(/'/g,"\\'")}')">
-    ${thumb(e)}
-    <div class="g"><div class="exname">${esc(e.n)}</div><div class="exmeta">${exTarget(e)} · ${esc(e.eq)}</div></div>
-    <span style="font-size:22px;color:${on?'var(--green)':'var(--gold2)'}">${on?'✓':'＋'}</span></div>`;}).join(""):`<p class="muted center" style="padding:24px">No exercises match "${esc(q)}".</p>`;
+  el.innerHTML=list.length?list.map(e=>{const on=added&&added.includes(e.n);const safe=e.n.replace(/'/g,"\\'");return `<div class="exrow${on?' added':''}">
+    <div style="display:contents" onclick="openExDetail('${safe}')">
+      ${thumb(e)}
+      <div class="g" style="min-width:0">
+        <div class="exname">${esc(e.n)}</div>
+        <div class="exmeta">${exTarget(e).split('·')[0].trim()}</div>
+        <div style="font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-top:1px">${esc(e.eq)}</div>
+      </div>
+    </div>
+    <button onclick="pickAdd('${safe}')" style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;border:1px solid ${on?'rgba(34,232,122,.5)':'rgba(255,208,72,.35)'};background:${on?'rgba(34,232,122,.12)':'rgba(255,208,72,.1)'};color:${on?'var(--green)':'var(--gold2)'};transition:all .12s">${on?'✓':'＋'}</button>
+    </div>`;}).join(""):`<p class="muted center" style="padding:24px 0">No exercises match "${esc(q)}".</p>`;
   el.scrollTop=st;
   const cnt=$("picker-cnt");if(cnt&&added)cnt.textContent=added.length?`· ${added.length}`:"";
 }
