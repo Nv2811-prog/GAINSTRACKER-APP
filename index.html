@@ -6254,7 +6254,8 @@ function profileHeroHtml(d,u,sl,r,ri){
 }
 
 function profileCalendarHtml(d){
-  const MC_DOT={chest:'#7FC8FF',back:'#E8C56A',shoulders:'#A78BFA',biceps:'#34D399',triceps:'#F87171',forearms:'#FB923C',quads:'#FBBF24',hamstrings:'#60A5FA',glutes:'#F472B6',calves:'#A3E635',abs:'#38BDF8',traps:'#C084FC'};
+  const MC_COL={chest:'#7FC8FF',back:'#E8C56A',shoulders:'#A78BFA',biceps:'#34D399',triceps:'#F87171',forearms:'#FB923C',quads:'#FBBF24',hamstrings:'#60A5FA',glutes:'#F472B6',calves:'#A3E635',abs:'#38BDF8',traps:'#C084FC'};
+  const MC_ABR={chest:'CH',back:'BK',shoulders:'SH',biceps:'BI',triceps:'TR',forearms:'FA',quads:'QD',hamstrings:'HS',glutes:'GL',calves:'CA',abs:'AB',traps:'TP'};
   const vols={},dayMuscles={};
   (d.workouts||[]).forEach(w=>{
     const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toISOString().slice(0,10);
@@ -6270,19 +6271,21 @@ function profileCalendarHtml(d){
   const firstDow=(new Date(yr,mo,1).getDay()+6)%7;
   const DAYS=['M','T','W','T','F','S','S'];
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  let cells=DAYS.map(dv=>`<div style="text-align:center;font-size:9px;color:var(--text3);padding-bottom:3px;font-weight:600;letter-spacing:.06em">${dv}</div>`).join('');
+  let cells=DAYS.map(dv=>`<div style="text-align:center;font-size:9px;color:var(--text3);padding-bottom:4px;font-weight:600;letter-spacing:.04em">${dv}</div>`).join('');
   for(let i=0;i<firstDow;i++)cells+=`<div></div>`;
   for(let day=1;day<=dim;day++){
     const dd=new Date(yr,mo,day);const k=dd.toISOString().slice(0,10);const v=vols[k]||0;
     const future=dd>today;const isToday=dd.getTime()===today.getTime();
     const t=v?Math.min(1,v/mx):0;
-    const bg=future?'transparent':v?`rgba(235,199,107,${(0.22+t*0.78).toFixed(2)})`:'rgba(255,255,255,.04)';
-    const glow=v&&!future?`;box-shadow:0 0 ${Math.round(3+t*9)}px rgba(235,199,107,${(t*.55).toFixed(2)})`:'';
-    const muscles=(dayMuscles[k]||[]).slice(0,4);
-    const dots=muscles.length?`<div style="display:flex;gap:2px;justify-content:center;margin-top:2px">${muscles.map(m=>`<div style="width:4px;height:4px;border-radius:50%;background:${MC_DOT[m]||'#888'};box-shadow:0 0 3px ${MC_DOT[m]||'#888'}"></div>`).join('')}</div>`:'';
-    cells+=`<div onclick="${v&&!future?`dayDetail('${dd.toDateString()}')`:''}" style="border-radius:5px;background:${bg}${glow};border:${isToday?'1.5px solid var(--gold2)':'1px solid transparent'};${v&&!future?'cursor:pointer;':''}display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 0">
-      <span style="font-size:8px;color:${v&&!future?'rgba(0,0,0,.8)':isToday?'var(--gold2)':'rgba(255,255,255,.25)'};font-weight:${isToday?'700':'400'};line-height:1">${day}</span>
-      ${dots}
+    const bg=future?'transparent':v?`rgba(235,199,107,${(0.18+t*0.72).toFixed(2)})`:'rgba(255,255,255,.04)';
+    const glow=v&&!future?`;box-shadow:0 0 ${Math.round(4+t*10)}px rgba(235,199,107,${(t*.5).toFixed(2)})`:'';
+    const muscles=(dayMuscles[k]||[]).slice(0,3);
+    const abbrRow=muscles.length
+      ?`<div style="display:flex;gap:1px;justify-content:center;flex-wrap:nowrap;margin-top:2px">${muscles.map(m=>`<span style="font-size:7px;font-weight:800;color:${MC_COL[m]||'#aaa'};line-height:1;letter-spacing:-.02em;text-shadow:0 0 4px ${MC_COL[m]||'#aaa'}">${MC_ABR[m]||'?'}</span>`).join('<span style="font-size:6px;color:rgba(255,255,255,.2)"> </span>')}</div>`
+      :'';
+    cells+=`<div onclick="${v&&!future?`dayDetail('${dd.toDateString()}')`:''}" style="border-radius:6px;background:${bg}${glow};border:${isToday?'1.5px solid var(--gold2)':'1px solid transparent'};${v&&!future?'cursor:pointer;':''}display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 1px;min-height:36px">
+      <span style="font-size:10px;color:${v&&!future?'rgba(0,0,0,.85)':isToday?'var(--gold2)':'rgba(255,255,255,.3)'};font-weight:${v||isToday?'700':'400'};line-height:1">${day}</span>
+      ${abbrRow}
     </div>`;
   }
   const active=Object.values(vols).filter(v=>v>0).length;
@@ -6292,6 +6295,9 @@ function profileCalendarHtml(d){
       <button class="btn ghost sm" style="width:auto;border-color:rgba(232,197,106,.3);color:var(--gold2);font-size:11px" onclick="exportICS()">Export</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${cells}</div>
+    <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">
+      ${Object.entries(MC_ABR).map(([m,a])=>`<span style="font-size:9px;font-weight:700;color:${MC_COL[m]};text-shadow:0 0 4px ${MC_COL[m]}">${a} <span style="color:var(--text3);font-weight:400">${MNAME[m]||m}</span></span>`).join('')}
+    </div>
   </div>`;
 }
 
