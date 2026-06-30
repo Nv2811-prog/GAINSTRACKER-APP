@@ -8233,6 +8233,7 @@ function patrolFeedCard(){
     <div class="mini" style="color:var(--text2);margin:4px 0 2px">Every session, KO and record across your League — newest first.</div>
     <div style="margin-top:4px">${rows}</div></div>`;
 }
+function retryCloud(){cloud._initing=false;cloudInit();setTimeout(()=>{if(state.tab==="allies")render();},2500);}
 function renderAllies(){
   const d=state.data;
   const me=myPatrolCard();const score=vigilanteScore(me);
@@ -8242,6 +8243,9 @@ function renderAllies(){
   const myRank=board.findIndex(c=>c._you)+1;
   const fc=myFriendCode();
   const cloudOn=(typeof cloud!=="undefined"&&cloud.ready);
+  const initing=(typeof cloud!=="undefined"&&cloud._initing);
+  // kick cloud init if it never started or silently failed
+  if(!cloudOn&&!initing){try{cloudInit();setTimeout(()=>{if(state.tab==="allies")render();},3000);}catch(e){}}
 
   // ── Hero header + my card ──
   let html=`<div style="background:linear-gradient(180deg,rgba(60,150,255,.14),rgba(7,9,13,.0));border:1px solid rgba(60,150,255,.28);border-radius:18px;padding:15px 14px 14px;margin-bottom:13px;position:relative;overflow:hidden">
@@ -8251,7 +8255,7 @@ function renderAllies(){
         <div style="font-family:var(--disp);font-size:26px;color:#9fc1f2;letter-spacing:.04em;line-height:1">ALLIES</div>
         <div style="font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-top:2px">Gotham Patrol Network · live sync</div>
       </div>
-      <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid ${cloudOn?'rgba(46,204,122,.4)':'rgba(255,255,255,.12)'};color:${cloudOn?'#6ef5a8':'var(--text3)'}"><i style="width:6px;height:6px;border-radius:50%;background:${cloudOn?'#6ef5a8':'rgba(255,255,255,.2)'};${cloudOn?'animation:gtv2pulse 2s infinite':''}"></i>${cloudOn?'LIVE':'CONNECTING'}</span>
+      <button onclick="retryCloud()" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid ${cloudOn?'rgba(46,204,122,.4)':'rgba(255,100,80,.35)'};color:${cloudOn?'#6ef5a8':'#ff9080'};background:none;cursor:pointer"><i style="width:6px;height:6px;border-radius:50%;background:${cloudOn?'#6ef5a8':'#ff6a50'};${cloudOn?'animation:gtv2pulse 2s infinite':''}"></i>${cloudOn?'LIVE':initing?'CONNECTING…':'TAP TO CONNECT'}</button>
     </div>
     <div style="background:rgba(0,0,0,.32);border:1px solid rgba(60,150,255,.18);border-radius:12px;padding:12px 13px">
       <div class="row sp" style="align-items:center;margin-bottom:8px">
