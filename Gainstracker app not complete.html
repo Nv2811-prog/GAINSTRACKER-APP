@@ -6213,7 +6213,11 @@ function profileHeroHtml(d,u,sl,r,ri){
   const lo=cur[0],hi=next?next[0]:cur[0];
   const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
   const tc=["#8a8a8a","#9aa0ab","#7FC8FF","#cd7f32","#c0c0c0","#E8C56A","#E8C56A","#F0524A","#FFD36E"][clamp(ri,0,8)];
-  const wks=weeklyStreak(),days=daysOnProtocol(),bw=bodyW();
+  const wks=weeklyStreak(),bw=bodyW();
+  // 8-week volume sparkline
+  const volBars=(()=>{const bars=[];for(let i=7;i>=0;i--){const s=now()-(i+1)*7*864e5,e=now()-i*7*864e5;bars.push(state.data.workouts.filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0));}return bars;})();
+  const volMx=Math.max(1,...volBars);const volUp=volBars[7]>=volBars[0];
+  const sparkHtml=`<div style="display:flex;align-items:flex-end;gap:2px;height:28px;padding:0 2px">${volBars.map(v=>`<div style="flex:1;border-radius:2px 2px 0 0;background:${volUp?'var(--gold2)':'#F0524A'};opacity:${v?1:.15};height:${clamp(Math.round(v/volMx*100),4,100)}%;box-shadow:${v&&volUp?'0 0 4px rgba(232,197,106,.5)':'none'}"></div>`).join('')}</div>`;
   return `<div style="background:linear-gradient(170deg,rgba(10,12,18,0),rgba(10,12,18,1)),linear-gradient(135deg,rgba(232,197,106,.1),rgba(120,100,40,.03));border:1px solid ${tc}44;border-radius:20px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 0 50px -14px ${tc}55">
     <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,${tc}1a 0%,transparent 70%);pointer-events:none"></div>
     <div class="row" style="gap:13px;align-items:center;margin-bottom:14px;cursor:pointer" onclick="openSettings()">
@@ -6231,18 +6235,34 @@ function profileHeroHtml(d,u,sl,r,ri){
       <div class="row sp" style="margin-top:4px"><span class="mini" style="color:var(--text3)">${esc(cur[1])}</span><span class="mini" style="color:${tc}">${Math.max(0,hi-sl)} lv → ${esc(next[1])} ${next[2]}</span></div>
     </div>`:`<div class="mini" style="color:${tc};margin-bottom:13px;text-shadow:0 0 12px currentColor">⭑ Maximum rank — Legend of Gotham.</div>`}
     <div class="row" style="gap:7px">
-      ${[[wks>0?wks:'—','wk streak','🔥'],[days>0?days:'—','days on','🗓️'],[bw?bw+'kg':'—','bodyweight','⚖️']].map(([v,l,ic])=>`<div style="flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
-        <div style="font-size:12px;margin-bottom:1px">${ic}</div>
-        <div style="font-family:var(--disp);font-size:18px;color:var(--gold2);line-height:1">${v}</div>
-        <div class="mini" style="color:var(--text3);line-height:1.2;margin-top:2px">${l}</div>
-      </div>`).join('')}
+      <div style="flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
+        <div style="font-size:12px;margin-bottom:1px">🔥</div>
+        <div style="font-family:var(--disp);font-size:18px;color:var(--gold2);line-height:1">${wks>0?wks:'—'}</div>
+        <div class="mini" style="color:var(--text3);line-height:1.2;margin-top:2px">wk streak</div>
+      </div>
+      <div style="flex:2;padding:8px 8px 6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
+        ${sparkHtml}
+        <div class="mini" style="color:var(--text3);text-align:center;margin-top:3px">8-wk volume ${volUp?'▲':'▼'}</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
+        <div style="font-size:12px;margin-bottom:1px">⚖️</div>
+        <div style="font-family:var(--disp);font-size:18px;color:var(--gold2);line-height:1">${bw?bw+'kg':'—'}</div>
+        <div class="mini" style="color:var(--text3);line-height:1.2;margin-top:2px">bodyweight</div>
+      </div>
     </div>
   </div>`;
 }
 
 function profileCalendarHtml(d){
-  const vols={};
-  (d.workouts||[]).forEach(w=>{const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toISOString().slice(0,10);vols[key]=(vols[key]||0)+(w.totalVol||0);});
+  const MC_DOT={chest:'#7FC8FF',back:'#E8C56A',shoulders:'#A78BFA',biceps:'#34D399',triceps:'#F87171',forearms:'#FB923C',quads:'#FBBF24',hamstrings:'#60A5FA',glutes:'#F472B6',calves:'#A3E635',abs:'#38BDF8',traps:'#C084FC'};
+  const vols={},dayMuscles={};
+  (d.workouts||[]).forEach(w=>{
+    const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toISOString().slice(0,10);
+    vols[key]=(vols[key]||0)+(w.totalVol||0);
+    const ms=[];(w.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).slice(0,1).forEach(m=>{if(!ms.includes(m))ms.push(m);});});
+    if(!dayMuscles[key])dayMuscles[key]=[];
+    ms.forEach(m=>{if(!dayMuscles[key].includes(m))dayMuscles[key].push(m);});
+  });
   const mx=Math.max(1,...Object.values(vols).filter(v=>v>0));
   const today=new Date();today.setHours(0,0,0,0);
   const yr=today.getFullYear(),mo=today.getMonth();
@@ -6258,14 +6278,17 @@ function profileCalendarHtml(d){
     const t=v?Math.min(1,v/mx):0;
     const bg=future?'transparent':v?`rgba(235,199,107,${(0.22+t*0.78).toFixed(2)})`:'rgba(255,255,255,.04)';
     const glow=v&&!future?`;box-shadow:0 0 ${Math.round(3+t*9)}px rgba(235,199,107,${(t*.55).toFixed(2)})`:'';
-    cells+=`<div onclick="${v&&!future?`dayDetail('${dd.toDateString()}')`:''}" style="aspect-ratio:1;border-radius:5px;background:${bg}${glow};border:${isToday?'1.5px solid var(--gold2)':'1px solid transparent'};${v&&!future?'cursor:pointer;':''}display:flex;align-items:center;justify-content:center">
-      <span style="font-size:8px;color:${v&&!future?'rgba(0,0,0,.75)':isToday?'var(--gold2)':'rgba(255,255,255,.25)'};font-weight:${isToday?'700':'400'}">${day}</span>
+    const muscles=(dayMuscles[k]||[]).slice(0,4);
+    const dots=muscles.length?`<div style="display:flex;gap:2px;justify-content:center;margin-top:2px">${muscles.map(m=>`<div style="width:4px;height:4px;border-radius:50%;background:${MC_DOT[m]||'#888'};box-shadow:0 0 3px ${MC_DOT[m]||'#888'}"></div>`).join('')}</div>`:'';
+    cells+=`<div onclick="${v&&!future?`dayDetail('${dd.toDateString()}')`:''}" style="border-radius:5px;background:${bg}${glow};border:${isToday?'1.5px solid var(--gold2)':'1px solid transparent'};${v&&!future?'cursor:pointer;':''}display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 0">
+      <span style="font-size:8px;color:${v&&!future?'rgba(0,0,0,.8)':isToday?'var(--gold2)':'rgba(255,255,255,.25)'};font-weight:${isToday?'700':'400'};line-height:1">${day}</span>
+      ${dots}
     </div>`;
   }
   const active=Object.values(vols).filter(v=>v>0).length;
   return `<div style="background:var(--bg2);border:1px solid rgba(232,197,106,.18);border-radius:16px;padding:14px;margin-bottom:10px">
     <div class="row sp" style="margin-bottom:10px">
-      <div><div style="font-family:var(--disp);font-size:16px;color:var(--gold2)">📅 ${MON[mo]} ${yr}</div><div class="mini" style="color:var(--text3);margin-top:1px">${active} training day${active===1?'':'s'} total</div></div>
+      <div><div style="font-family:var(--disp);font-size:16px;color:var(--gold2)">📅 ${MON[mo]} ${yr}</div><div class="mini" style="color:var(--text3);margin-top:1px">${active} training day${active===1?'':'s'} · tap to see session</div></div>
       <button class="btn ghost sm" style="width:auto;border-color:rgba(232,197,106,.3);color:var(--gold2);font-size:11px" onclick="exportICS()">Export</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${cells}</div>
@@ -6294,17 +6317,27 @@ function profileOnThisDay(d){
 function profileBossPreviewHtml(d,sl){
   const wins=new Set((d.bossWins||[]).map(b=>b.villain));
   const sorted=(typeof BOSSES!=='undefined'?BOSSES:[]).slice().sort((a,b)=>a.min-b.min);
-  const next=sorted.find(b=>sl>=b.min&&!wins.has(b.v));
+  const next=sorted.find(b=>!wins.has(b.v));
   const defeated=wins.size;
   if(!next)return '';
+  const locked=sl<next.min;
+  const pct=locked?clamp(Math.round(sl/next.min*100),2,98):100;
+  const barCol=locked?'#F0524A':'#2ECC71';
   return `<div style="background:linear-gradient(135deg,rgba(240,82,74,.07),rgba(10,12,18,.95));border:1px solid rgba(240,82,74,.3);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer" onclick="openArkham()">
-    <div class="row sp" style="align-items:center">
+    <div class="row sp" style="align-items:center;margin-bottom:9px">
       <div style="min-width:0">
         <div style="font-size:10px;letter-spacing:.14em;color:#F0524A;text-transform:uppercase;margin-bottom:3px">⚔️ Next target · ${defeated} felled</div>
         <div style="font-size:15px;font-weight:700;color:var(--gold2)">${esc(next.v)}</div>
         ${next.q?`<div class="mini" style="color:var(--text2);margin-top:2px;font-style:italic">"${esc((next.q||'').slice(0,55))}…"</div>`:''}
       </div>
       <div style="font-size:32px;flex:none;margin-left:10px">${(typeof villainFace==='function'?villainFace(next):next.e)||'👊'}</div>
+    </div>
+    <div style="height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden">
+      <div style="width:${pct}%;height:100%;border-radius:3px;background:${barCol};box-shadow:0 0 8px ${barCol}88;transition:width .5s"></div>
+    </div>
+    <div class="row sp" style="margin-top:4px">
+      <span class="mini" style="color:var(--text3)">Str Lv ${sl}</span>
+      ${locked?`<span class="mini" style="color:#F0524A">Lv ${next.min} to engage · ${next.min-sl} away</span>`:`<span class="mini" style="color:#2ECC71">⚡ Ready — tap to fight</span>`}
     </div>
   </div>`;
 }
