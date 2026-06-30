@@ -5067,7 +5067,56 @@ function renderSuit(){
 
   html+=symmetryCard();
   html+=progressPhotosCard();
+  html+=suitPhysiqueAlfredCard();
   $("app").innerHTML=html;
+}
+
+function suitPhysiqueAlfredCard(){
+  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const last=ph[0];
+  const stored=state.data.u.lastPhysiqueAnalysis;
+  const hasKey=!!geminiKey();
+  let inner='';
+  if(!last){
+    inner=`<div class="mini" style="color:var(--text3);line-height:1.6">Add a progress photo above. Alfred will assess your muscle development, symmetry, weak points, and what to prioritise in the next training block.</div>`;
+  } else if(!hasKey){
+    inner=`<div class="mini" style="color:var(--text3);line-height:1.6">Add a Gemini API key in Settings to let Alfred analyse your physique photos.</div>`;
+  } else if(stored){
+    inner=`<div style="font-size:13.5px;line-height:1.65;color:var(--text2)">${esc(stored.text).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>
+      <div class="mini" style="color:var(--text3);margin-top:8px">Analysed ${new Date(stored.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'2-digit'})}</div>`;
+  } else {
+    inner=`<div class="mini" style="color:var(--text3);line-height:1.6">Photo on file. Tap <b>Analyse</b> and Alfred will assess your physique against your training data — development, symmetry, weak points, and the single highest-leverage training priority.</div>`;
+  }
+  const analyseBtn=last&&hasKey?`<button class="btn ghost sm" style="width:auto" onclick="alfredPhysiqueReview()">Analyse →</button>`:'';
+  return `<div class="card" style="border-color:rgba(255,208,72,.22);padding:14px">
+    <div class="row sp" style="margin-bottom:10px">
+      <div class="row" style="gap:8px"><span style="font-size:20px">🦇</span><div><div style="font-family:var(--disp);font-size:15px;color:var(--gold2)">ALFRED PHYSIQUE REVIEW</div><div class="mini" style="color:var(--text3)">Cross-referenced with your training data</div></div></div>
+      ${analyseBtn}
+    </div>
+    ${inner}
+  </div>`;
+}
+
+async function alfredPhysiqueReview(){
+  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const last=ph[0];
+  if(!last){toast('Add a progress photo first.');return;}
+  if(!geminiKey()){toast('Add a Gemini API key in Settings.');return;}
+  toast('Alfred is assessing your physique…');
+  const match=last.img.match(/^data:([^;]+);base64,(.+)$/);
+  if(!match){toast('Could not read photo data.');return;}
+  const[,mime,b64]=match;
+  try{
+    const txt=await geminiCall([
+      {text:alfredContext()+`\n\nYou are conducting a formal physique assessment. Study this progress photo with clinical precision. Provide: (1) the 2 most developed muscle groups you can see and why they stand out, (2) the 2–3 visually lagging areas that need immediate attention — be specific about which head/region, (3) symmetry assessment — left vs right, upper vs lower, anterior vs posterior, (4) a single highest-leverage training intervention for the next 8 weeks based on what you see AND their actual training data above. Reference specific muscles from their data where relevant. Max 130 words. No padding.`},
+      {inline_data:{mime_type:mime,data:b64}}
+    ]);
+    state.data.u.lastPhysiqueAnalysis={text:txt||'No analysis returned.',date:new Date().toISOString()};
+    save();
+    ALFRED_MSGS.push({role:'user',text:'Analyse my current physique photo.',img:last.img});
+    ALFRED_MSGS.push({role:'alfred',text:txt||'No analysis returned.'});
+    render();
+  }catch(e){toast('Alfred: '+e.message);}
 }
 function progressPhotosCard(){
   const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -8553,11 +8602,16 @@ function alfredContext(){
   const inj=(d.injuries||[]).filter(x=>!x.cleared).map(x=>MNAME[x.muscle]||x.muscle).join(', ');
   // Physique
   const pa=u.physiqueAnalysis||{};
-  return `You are Alfred Pennyworth — Batman's butler, former British intelligence officer, elite evidence-based trainer. You have served this man for years. You are direct, dry, and unafraid to be sharp when warranted.
+  return `You are Alfred Pennyworth — former MI6 field officer, battlefield medic, and Batman's personal handler for 20 years. You are also a certified strength coach who has studied under Israetel, Schoenfeld, and Helms personally. You are the Batcomputer made human: you have complete access to every data point about this man's training history, recovery, PRs, and physique.
 
-TONE: Call out genuinely weak effort with a dry British sting + the precise fix. Give real, emphatic praise for earned achievements. For normal requests (organise splits, swap exercises, plan around injury) just DO IT helpfully — the sharp tongue is ONLY for bad training choices, never for sensible requests.
-LENGTH: Match reply to the question. Simple question = 1–2 sentences max. Longer only if the user asks for depth (cap ~150 words). No preamble. No restatement. No padding.
-EXERCISE BIAS: User trains machines/cables deliberately — do NOT push free weights as superior. Default to cable/machine/supported variations. Evidence-base: RP/Israetel, Schoenfeld, Helms, Nippard.
+PERSONA: Jarvis precision meets British blade. Calm, authoritative, zero fluff. You cite real peer-reviewed studies by author + year when making evidence claims (e.g. "Schoenfeld et al., 2017 demonstrated..." or "as Helms confirmed in the MASS series"). You are not a cheerleader. You will be harsh when the data or effort warrants it — but surgical, never emotional.
+LENGTH: Match reply to question. Simple = 1–3 sentences. Detailed request = max 120 words, bullet if listing. NO preamble. NO restatement. NO filler. Cut everything that doesn't add information.
+EXERCISE BIAS: User trains machines/cables deliberately. Never push free weights as superior. Honour the equipment he uses.
+ACTIONS: When the user asks you to DO something in the app (create a split, activate a split, add exercise), output ONE action tag at the end of your reply in this exact format — nothing else on that line:
+[ACTION:CREATE_SPLIT:SplitName:Day1Name:ex1,ex2,ex3|Day2Name:ex1,ex2]
+[ACTION:ACTIVATE_SPLIT:splitId]
+[ACTION:GO:tabname]
+Only emit an action when the user explicitly asks you to create/change something. Normal questions get no action tag.
 
 USER: ${u.name||'sir'} | BW: ${u.bodyweight}kg | Goal: ${u.goal} | ${u.natty&&u.natty!=='maybe'?u.natty+' | ':''}Rank: ${r.emoji} ${r.name} Lv${sl}
 EXPERIENCE: ${exp}
@@ -8644,25 +8698,37 @@ function _alfredMsgsHtml(){
   if(!ALFRED_MSGS.length)return `<div style="text-align:center;padding:28px 14px 16px">
     <div style="font-size:44px;margin-bottom:12px;filter:drop-shadow(0 0 16px rgba(255,208,72,.55))">🦇</div>
     <div style="font-family:var(--disp);font-size:22px;color:var(--gold2);letter-spacing:.04em;margin-bottom:6px">ALFRED ONLINE</div>
-    <div class="mini" style="color:var(--text2);max-width:260px;margin:0 auto;line-height:1.65">Evidence-based coach. Ask about your training, recovery, programming, nutrition — or anything else on your mind.</div>
+    <div class="mini" style="color:var(--text2);max-width:270px;margin:0 auto;line-height:1.65">Full access to your data. Ask anything — or tell him to do something.</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;justify-content:center">
-      ${["What should I train today?","How's my recovery?","Review my current split","What's stalling my progress?","Best next exercise for chest?"].map(q=>`<button class="chip" style="font-size:12px;width:auto" onclick="_alfredQuickAsk('${q.replace(/'/g,"\\'")}')">${q}</button>`).join("")}
+      ${["What should I train today?","Build me a Push Pull Legs split","How's my recovery looking?","What's my weakest muscle?","Am I overtraining?","What should I eat today?"].map(q=>`<button class="chip" style="font-size:12px;width:auto" onclick="_alfredQuickAsk('${q.replace(/'/g,"\\'")}')">${q}</button>`).join("")}
     </div>
   </div>`;
-  return ALFRED_MSGS.map(m=>`<div class="alf-msg ${m.role} ${m.text==='…thinking…'?'alf-thinking':''}">
-    <div class="alf-label">${m.role==='user'?'You':'Alfred'}</div>
-    <div class="alf-bubble">${m.img?`<img src="${esc(m.img)}" style="max-width:110px;border-radius:8px;margin-bottom:5px;display:block"/>`:''}${esc(m.text).replace(/\n/g,'<br>')}</div>
-  </div>`).join('');
+  return ALFRED_MSGS.map(m=>{
+    const isThinking=m.text==='…thinking…';
+    const actionBtns=(m.role==='alfred'&&m.actions&&m.actions.length&&!isThinking)
+      ?m.actions.map((a,i)=>{
+        const label=a.type==='CREATE_SPLIT'?`✅ Create "${(a.args[0]||'Split').trim()}"`:a.type==='ACTIVATE_SPLIT'?'✅ Activate Split':a.type==='GO'?'→ Go there':'Apply';
+        return `<button class="chip on" style="font-size:11px;width:auto;margin-top:7px" onclick="_alfExecAction('${a.type}',${JSON.stringify(a.args)})">${label}</button>`;
+      }).join('')
+      :'';
+    return `<div class="alf-msg ${m.role} ${isThinking?'alf-thinking':''}">
+      <div class="alf-label">${m.role==='user'?'You':'Alfred'}</div>
+      <div class="alf-bubble">${m.img?`<img src="${esc(m.img)}" style="max-width:110px;border-radius:8px;margin-bottom:5px;display:block"/>`:''}${esc(m.text).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}${actionBtns?`<div>${actionBtns}</div>`:''}</div>
+    </div>`;
+  }).join('');
 }
 
 function _renderAlfredSheet(){
   const has=!!geminiKey();
+  const micBtn=`<button id="alf-mic-btn" style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:${_alfListening?'rgba(255,54,34,.35)':_ALF_VOICE?'rgba(255,208,72,.18)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer" onclick="_alfMicStart()" title="${_alfListening?'Listening…':_ALF_VOICE?'Voice on — tap to speak':'Tap to speak'}">${_alfListening?'⏹':'🎙'}</button>`;
+  const voiceBtn=`<button style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid ${_ALF_VOICE?'rgba(255,208,72,.5)':'var(--border2)'};background:${_ALF_VOICE?'rgba(255,208,72,.12)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer" onclick="_alfVoiceToggle()" title="${_ALF_VOICE?'Voice on — tap to mute':'Tap to hear Alfred speak'}">${_ALF_VOICE?'🔊':'🔇'}</button>`;
   const inputArea=has
-    ?`<div style="display:flex;gap:7px;align-items:center;padding-top:10px;border-top:1px solid var(--border)">
+    ?`<div style="display:flex;gap:6px;align-items:center;padding-top:10px;border-top:1px solid var(--border)">
         <button style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer" onclick="document.getElementById('alf-pic-in').click()" title="Attach photo">📎</button>
         <input type="file" accept="image/*" id="alf-pic-in" style="display:none" onchange="_alfredAttachPic(this)"/>
         ${ALFRED_PIC?`<div style="position:relative;flex:none"><img src="${esc(ALFRED_PIC.url)}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid var(--gold2)"/><button onclick="ALFRED_PIC=null;_renderAlfredSheet()" style="position:absolute;top:-5px;right:-5px;background:#333;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button></div>`:''}
-        <input id="alf-in" placeholder="Ask Alfred anything…" style="flex:1;padding:10px 12px;border-radius:12px;font-size:15px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_sendAlfredSheet();}" autocomplete="off" autocapitalize="sentences"/>
+        ${micBtn}${voiceBtn}
+        <input id="alf-in" placeholder="${_alfListening?'Listening…':'Ask Alfred anything…'}" style="flex:1;padding:10px 12px;border-radius:12px;font-size:15px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_sendAlfredSheet();}" autocomplete="off" autocapitalize="sentences"/>
         <button class="btn gold sm" style="width:auto;padding:10px 14px;flex:none;border-radius:12px" onclick="_sendAlfredSheet()">→</button>
       </div>`
     :`<div style="padding-top:10px;border-top:1px solid var(--border);text-align:center">
@@ -8687,6 +8753,86 @@ async function _sendAlfredSheet(){
   if(!q&&!pic)return;
   i.value='';ALFRED_PIC=null;
   await _alfSend(q,pic);
+}
+
+/* ---- Alfred voice mode + mic input ---- */
+let _ALF_VOICE=false;
+let _alfRec=null;
+let _alfListening=false;
+
+function _alfVoiceToggle(){
+  _ALF_VOICE=!_ALF_VOICE;
+  if(!_ALF_VOICE){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+  haptic('tap');
+  toast(_ALF_VOICE?'🔊 Alfred will speak responses':'🔇 Alfred voice off');
+  _renderAlfredSheet();
+}
+
+function _alfMicStart(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voice input not supported on this browser.');return;}
+  if(_alfListening){try{if(_alfRec)_alfRec.stop();}catch(e){}return;}
+  if(_alfRec){try{_alfRec.stop();}catch(e){}}
+  _alfRec=new SR();
+  _alfRec.continuous=false;_alfRec.interimResults=false;_alfRec.lang='en-US';
+  _alfRec.onstart=()=>{_alfListening=true;const b=document.getElementById('alf-mic-btn');if(b){b.textContent='⏹';b.style.background='rgba(255,54,34,.35)';}};
+  _alfRec.onresult=e=>{
+    _alfListening=false;
+    const b=document.getElementById('alf-mic-btn');if(b){b.textContent='🎙';b.style.background='';}
+    const text=(e.results[0][0].transcript||'').trim();
+    if(!text)return;
+    const inp=document.getElementById('alf-in')||document.getElementById('alf-tab-in');
+    if(inp)inp.value=text;
+    _alfSend(text,null);
+  };
+  _alfRec.onerror=()=>{_alfListening=false;const b=document.getElementById('alf-mic-btn');if(b){b.textContent='🎙';b.style.background='';}};
+  _alfRec.onend=()=>{_alfListening=false;const b=document.getElementById('alf-mic-btn');if(b){b.textContent='🎙';b.style.background='';}};
+  try{_alfRec.start();haptic('tap');}catch(e){toast('Mic error: '+e.message);}
+}
+
+/* ---- Action parser — strips [ACTION:...] tags, returns clean text + actions array ---- */
+function _alfParseActions(text){
+  const actions=[];
+  const clean=(text||'').replace(/\[ACTION:([^\]]+)\]/g,(_,body)=>{
+    const parts=body.split(':');
+    if(parts[0])actions.push({type:parts[0].trim(),args:parts.slice(1)});
+    return '';
+  }).replace(/\n{3,}/g,'\n\n').trim();
+  return {clean,actions};
+}
+
+function _alfExecAction(type,argsRaw){
+  const args=argsRaw||[];
+  if(type==='CREATE_SPLIT'){
+    const name=(args[0]||'New Split').trim();
+    const dayStr=args.slice(1).join(':');
+    const dayParts=dayStr.split('|').filter(Boolean);
+    const days=dayParts.map(dp=>{
+      const [dn,...rest]=dp.split(':');
+      const exs=rest.join(':').split(',').map(x=>x.trim()).filter(Boolean);
+      return {name:(dn||'Day').trim(),exercises:exs};
+    });
+    if(!days.length)days.push({name:'Day 1',exercises:[]});
+    const sp={id:'sp'+Date.now(),name,days};
+    state.data.splits=state.data.splits||[];
+    state.data.splits.push(sp);
+    state.data.activeSplitId=sp.id;
+    const gym=state.data.u.activeGym;
+    if(gym){state.data.activeGymSplits=state.data.activeGymSplits||{};state.data.activeGymSplits[gym]=sp.id;}
+    save();haptic('done');
+    toast('✅ Split "'+name+'" created and activated');
+    go('mission');
+  } else if(type==='ACTIVATE_SPLIT'){
+    const id=(args[0]||'').trim();
+    const sp=(state.data.splits||[]).find(s=>s.id===id);
+    if(!sp){toast('Split not found.');return;}
+    state.data.activeSplitId=id;
+    const gym=state.data.u.activeGym;
+    if(gym){state.data.activeGymSplits=state.data.activeGymSplits||{};state.data.activeGymSplits[gym]=id;}
+    save();haptic('done');toast('✅ Split activated');render();
+  } else if(type==='GO'){
+    go((args[0]||'gotham').trim());
+  }
 }
 
 async function _alfSend(q,pic){
@@ -8716,9 +8862,18 @@ async function _alfSend(q,pic){
     const finalParts=[{text:displayQ}];
     if(pic){try{const[,mime,b64]=pic.url.match(/^data:([^;]+);base64,(.+)$/)||[];if(b64)finalParts.push({inline_data:{mime_type:mime,data:pic.b64}});}catch(e){}}
     contents.push({role:'user',parts:finalParts});
-    const txt=await geminiConvCall(contents);
-    ALFRED_MSGS[ALFRED_MSGS.length-1].text=txt||'I have nothing to add, sir.';
+    const raw=await geminiConvCall(contents);
+    const {clean,actions}=_alfParseActions(raw||'I have nothing to add, sir.');
+    const last=ALFRED_MSGS[ALFRED_MSGS.length-1];
+    last.text=clean||'I have nothing to add, sir.';
+    last.actions=actions;
     state.data.u.aiUses++;try{checkAchievements();}catch(e){}save();
+    // Auto-speak if voice mode on
+    if(_ALF_VOICE&&clean){
+      try{if(window.speechSynthesis){window.speechSynthesis.cancel();setTimeout(()=>{try{window.speechSynthesis.speak(_alfredUtter(clean.replace(/\*\*/g,'').replace(/\*/g,'').slice(0,280),0.92,0.95));}catch(e){}},120);}}catch(e){}
+    }
+    // Auto-execute any actions
+    if(actions.length){setTimeout(()=>{try{_alfExecAction(actions[0].type,actions[0].args);}catch(e){}},600);}
   }catch(e){
     ALFRED_MSGS[ALFRED_MSGS.length-1].text="The line to the Batcomputer is down, sir. ("+e.message+")";
   }
@@ -10313,18 +10468,21 @@ function renderAlfred(){
   try{maybeContextualDailyWisdom();}catch(e){}
   const has=!!geminiKey();state.data.u.aiKeySet=has;
   // Chat card — uses same ALFRED_MSGS / _renderAlfredSheet engine so FAB and tab share history
+  const tabMicBtn=`<button id="alf-mic-btn" style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:${_alfListening?'rgba(255,54,34,.35)':_ALF_VOICE?'rgba(255,208,72,.18)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer" onclick="_alfMicStart()" title="Tap to speak">${_alfListening?'⏹':'🎙'}</button>`;
+  const tabVoiceBtn=`<button style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid ${_ALF_VOICE?'rgba(255,208,72,.5)':'var(--border2)'};background:${_ALF_VOICE?'rgba(255,208,72,.12)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer" onclick="_alfVoiceToggle()" title="${_ALF_VOICE?'Voice on':'Voice off'}">${_ALF_VOICE?'🔊':'🔇'}</button>`;
   const chatCard=has
     ?`<div class="card" style="padding:14px;margin-bottom:14px">
         <div class="row sp" style="margin-bottom:10px">
-          <div class="row" style="gap:8px"><div style="font-size:20px">🦇</div><div style="font-family:var(--disp);font-size:17px;color:var(--gold2)">ALFRED CHAT</div></div>
+          <div class="row" style="gap:8px"><div style="font-size:20px">🦇</div><div style="font-family:var(--disp);font-size:17px;color:var(--gold2)">ALFRED</div><div class="mini" style="color:var(--text3)">Batcomputer · full data access</div></div>
           <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="ALFRED_MSGS=[];ALFRED_PIC=null;renderAlfred()">Clear</button>
         </div>
-        <div id="alfred-tab-chat" style="max-height:38vh;overflow-y:auto;margin-bottom:10px">${_alfredMsgsHtml()}</div>
-        <div style="display:flex;gap:7px;align-items:center">
+        <div id="alfred-tab-chat" style="max-height:40vh;overflow-y:auto;margin-bottom:10px">${_alfredMsgsHtml()}</div>
+        <div style="display:flex;gap:6px;align-items:center">
           <button style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer" onclick="document.getElementById('alfred-pic-tab').click()">📎</button>
           <input type="file" accept="image/*" id="alfred-pic-tab" style="display:none" onchange="_alfredAttachPic(this)"/>
           ${ALFRED_PIC?`<img src="${esc(ALFRED_PIC.url)}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;border:1px solid var(--gold2);flex:none"/>`:''}
-          <input id="alf-tab-in" placeholder="Message Alfred…" style="flex:1;padding:10px 12px;border-radius:11px;font-size:15px" onkeydown="if(event.key==='Enter'){event.preventDefault();_alfTabSend();}" autocomplete="off"/>
+          ${tabMicBtn}${tabVoiceBtn}
+          <input id="alf-tab-in" placeholder="${_alfListening?'Listening…':'Ask or command Alfred…'}" style="flex:1;padding:10px 12px;border-radius:11px;font-size:15px" onkeydown="if(event.key==='Enter'){event.preventDefault();_alfTabSend();}" autocomplete="off" autocapitalize="sentences"/>
           <button class="btn gold sm" style="width:auto;padding:10px 14px;flex:none;border-radius:11px" onclick="_alfTabSend()">→</button>
         </div>
       </div>`
