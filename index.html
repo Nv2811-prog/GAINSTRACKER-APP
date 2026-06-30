@@ -6206,31 +6206,199 @@ function crossGymCard(){
   return `<div class="card"><div class="ttl">🏟️ Same lift, different gyms <span class="mini" style="font-weight:400">— machines vary</span></div>
     ${multi.map(([n,m])=>`<div style="padding:8px 0;border-top:1px solid var(--border)"><b style="font-size:13px">${esc(n)}</b><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">${Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([g,o])=>`<span class="chip" style="width:auto">${esc(g)} <b class="gold">${o}kg</b></span>`).join("")}</div></div>`).join("")}</div>`;
 }
+
+/* ========================= PROFILE v2 — compact-by-default ========================= */
+function profileHeroHtml(d,u,sl,r,ri){
+  const cur=RANKS[ri],next=RANKS[ri+1];
+  const lo=cur[0],hi=next?next[0]:cur[0];
+  const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
+  const tc=["#8a8a8a","#9aa0ab","#7FC8FF","#cd7f32","#c0c0c0","#E8C56A","#E8C56A","#F0524A","#FFD36E"][clamp(ri,0,8)];
+  const wks=weeklyStreak(),days=daysOnProtocol(),bw=bodyW();
+  return `<div style="background:linear-gradient(170deg,rgba(10,12,18,0),rgba(10,12,18,1)),linear-gradient(135deg,rgba(232,197,106,.1),rgba(120,100,40,.03));border:1px solid ${tc}44;border-radius:20px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 0 50px -14px ${tc}55">
+    <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,${tc}1a 0%,transparent 70%);pointer-events:none"></div>
+    <div class="row" style="gap:13px;align-items:center;margin-bottom:14px;cursor:pointer" onclick="openSettings()">
+      <div class="profavatar" style="border:2px solid ${tc};box-shadow:0 0 20px ${tc}55;flex:none"><img src="Batman.jpg" alt="" onerror="this.parentNode.style.display='none'"></div>
+      <div style="flex:1;min-width:0">
+        <h1 style="font-size:28px;color:var(--gold2);line-height:.95;letter-spacing:-.01em">${u.name?esc(u.name.toUpperCase()):"VIGILANTE"}</h1>
+        <div style="font-size:11px;color:${tc};letter-spacing:.14em;text-transform:uppercase;margin-top:4px;text-shadow:0 0 10px currentColor">${cur[2]} ${esc(cur[1])} · LV ${sl}</div>
+        ${earnedTitle()?`<div class="mini" style="color:var(--text3);margin-top:2px">🎖️ ${esc(earnedTitle())}</div>`:`<div class="mini" style="color:var(--text3);margin-top:2px">tap to edit ›</div>`}
+      </div>
+    </div>
+    ${next?`<div style="margin-bottom:13px">
+      <div style="height:6px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden">
+        <div style="width:${pct}%;height:100%;border-radius:4px;background:linear-gradient(90deg,${tc}88,${tc});box-shadow:0 0 10px ${tc}77;transition:width .4s"></div>
+      </div>
+      <div class="row sp" style="margin-top:4px"><span class="mini" style="color:var(--text3)">${esc(cur[1])}</span><span class="mini" style="color:${tc}">${Math.max(0,hi-sl)} lv → ${esc(next[1])} ${next[2]}</span></div>
+    </div>`:`<div class="mini" style="color:${tc};margin-bottom:13px;text-shadow:0 0 12px currentColor">⭑ Maximum rank — Legend of Gotham.</div>`}
+    <div class="row" style="gap:7px">
+      ${[[wks>0?wks:'—','wk streak','🔥'],[days>0?days:'—','days on','🗓️'],[bw?bw+'kg':'—','bodyweight','⚖️']].map(([v,l,ic])=>`<div style="flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
+        <div style="font-size:12px;margin-bottom:1px">${ic}</div>
+        <div style="font-family:var(--disp);font-size:18px;color:var(--gold2);line-height:1">${v}</div>
+        <div class="mini" style="color:var(--text3);line-height:1.2;margin-top:2px">${l}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function profileCalendarHtml(d){
+  const vols={};
+  (d.workouts||[]).forEach(w=>{const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toISOString().slice(0,10);vols[key]=(vols[key]||0)+(w.totalVol||0);});
+  const mx=Math.max(1,...Object.values(vols).filter(v=>v>0));
+  const today=new Date();today.setHours(0,0,0,0);
+  const yr=today.getFullYear(),mo=today.getMonth();
+  const dim=new Date(yr,mo+1,0).getDate();
+  const firstDow=(new Date(yr,mo,1).getDay()+6)%7;
+  const DAYS=['M','T','W','T','F','S','S'];
+  const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  let cells=DAYS.map(dv=>`<div style="text-align:center;font-size:9px;color:var(--text3);padding-bottom:3px;font-weight:600;letter-spacing:.06em">${dv}</div>`).join('');
+  for(let i=0;i<firstDow;i++)cells+=`<div></div>`;
+  for(let day=1;day<=dim;day++){
+    const dd=new Date(yr,mo,day);const k=dd.toISOString().slice(0,10);const v=vols[k]||0;
+    const future=dd>today;const isToday=dd.getTime()===today.getTime();
+    const t=v?Math.min(1,v/mx):0;
+    const bg=future?'transparent':v?`rgba(235,199,107,${(0.22+t*0.78).toFixed(2)})`:'rgba(255,255,255,.04)';
+    const glow=v&&!future?`;box-shadow:0 0 ${Math.round(3+t*9)}px rgba(235,199,107,${(t*.55).toFixed(2)})`:'';
+    cells+=`<div onclick="${v&&!future?`dayDetail('${dd.toDateString()}')`:''}" style="aspect-ratio:1;border-radius:5px;background:${bg}${glow};border:${isToday?'1.5px solid var(--gold2)':'1px solid transparent'};${v&&!future?'cursor:pointer;':''}display:flex;align-items:center;justify-content:center">
+      <span style="font-size:8px;color:${v&&!future?'rgba(0,0,0,.75)':isToday?'var(--gold2)':'rgba(255,255,255,.25)'};font-weight:${isToday?'700':'400'}">${day}</span>
+    </div>`;
+  }
+  const active=Object.values(vols).filter(v=>v>0).length;
+  return `<div style="background:var(--bg2);border:1px solid rgba(232,197,106,.18);border-radius:16px;padding:14px;margin-bottom:10px">
+    <div class="row sp" style="margin-bottom:10px">
+      <div><div style="font-family:var(--disp);font-size:16px;color:var(--gold2)">📅 ${MON[mo]} ${yr}</div><div class="mini" style="color:var(--text3);margin-top:1px">${active} training day${active===1?'':'s'} total</div></div>
+      <button class="btn ghost sm" style="width:auto;border-color:rgba(232,197,106,.3);color:var(--gold2);font-size:11px" onclick="exportICS()">Export</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${cells}</div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)">
+      <div class="mini" style="color:var(--text3);margin-bottom:6px;letter-spacing:.06em">26-WEEK PATROL TRAIL</div>
+      ${patrolCalendar()}
+    </div>
+  </div>`;
+}
+
+function profileOnThisDay(d){
+  const today=new Date();const mo=today.getMonth(),day=today.getDate();
+  const past=(d.workouts||[]).filter(w=>{const dt=new Date(w.date);return dt.getMonth()===mo&&dt.getDate()===day&&dt.getFullYear()<today.getFullYear();});
+  if(!past.length)return '';
+  const w=past[past.length-1];
+  const yr=new Date(w.date).getFullYear();
+  const prs=w.prs&&w.prs.length?`<span class="chip on" style="font-size:10px;color:var(--green);padding:2px 8px">${w.prs.length} PR${w.prs.length>1?'s':''}</span>`:'';
+  return `<div style="background:linear-gradient(135deg,rgba(127,200,255,.06),rgba(10,12,18,.95));border:1px solid rgba(127,200,255,.2);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()">
+    <div class="row sp" style="align-items:flex-start">
+      <div style="min-width:0">
+        <div style="font-size:10px;letter-spacing:.14em;color:#7FC8FF;text-transform:uppercase;margin-bottom:3px">⏪ On this day · ${yr}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(w.name)}</div>
+        <div class="mini" style="color:var(--text2);margin-top:2px">${w.exercises.length} exercises · ${fmtNum(w.totalVol)}kg · ${w.prs&&w.prs.length?w.prs.slice(0,2).map(esc).join(', '):'no PRs'}</div>
+      </div>
+      <div style="text-align:right;flex:none;margin-left:10px">${prs}<div class="mini" style="color:var(--text3);margin-top:4px">tap ›</div></div>
+    </div>
+  </div>`;
+}
+
+function profileBossPreviewHtml(d,sl){
+  const wins=new Set((d.bossWins||[]).map(b=>b.villain));
+  const sorted=(typeof BOSSES!=='undefined'?BOSSES:[]).slice().sort((a,b)=>a.min-b.min);
+  const next=sorted.find(b=>sl>=b.min&&!wins.has(b.v));
+  const defeated=wins.size;
+  if(!next)return '';
+  return `<div style="background:linear-gradient(135deg,rgba(240,82,74,.07),rgba(10,12,18,.95));border:1px solid rgba(240,82,74,.3);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer" onclick="openArkham()">
+    <div class="row sp" style="align-items:center">
+      <div style="min-width:0">
+        <div style="font-size:10px;letter-spacing:.14em;color:#F0524A;text-transform:uppercase;margin-bottom:3px">⚔️ Next target · ${defeated} felled</div>
+        <div style="font-size:15px;font-weight:700;color:var(--gold2)">${esc(next.v)}</div>
+        ${next.q?`<div class="mini" style="color:var(--text2);margin-top:2px;font-style:italic">"${esc((next.q||'').slice(0,55))}…"</div>`:''}
+      </div>
+      <div style="font-size:32px;flex:none;margin-left:10px">${(typeof villainFace==='function'?villainFace(next):next.e)||'👊'}</div>
+    </div>
+  </div>`;
+}
+
+function profilePRFeedHtml(d){
+  const prs=Object.entries(d.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm);
+  if(!prs.length)return `<p class="muted" style="margin:0">No records yet. Log your first session and records appear here.</p>`;
+  const volPRs={};
+  (d.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{const v=(e.sets||[]).filter(s=>s.done&&s.type!=="W").reduce((a,s)=>a+((+s.w||0)*(+s.r||0)),0);if(v>(volPRs[e.name]||0))volPRs[e.name]=Math.round(v);});});
+  let html=`<div class="row sp" style="margin-bottom:8px"><span class="mini" style="color:var(--text3)">${prs.length} records${d.u.activeGym?' · '+esc(d.u.activeGym):''}</span><span class="mini" style="color:var(--text3)">e1RM · session vol</span></div>`;
+  html+=prs.slice(0,15).map(([n,p],i)=>{
+    const vol=volPRs[n];
+    return `<div style="padding:9px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
+      <div class="row sp">
+        <div class="row" style="gap:8px;min-width:0;align-items:center">
+          <span style="font-size:11px;color:var(--text3);min-width:20px;font-family:var(--disp)">#${i+1}</span>
+          <b style="font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n)} ›</b>
+        </div>
+        <b class="gold" style="font-size:15px;white-space:nowrap;flex:none">${Math.round(p.orm)}kg</b>
+      </div>
+      <div class="row" style="gap:10px;margin-top:3px;padding-left:28px">
+        ${p.w&&p.r?`<span class="mini" style="color:var(--text3)">${Math.round(p.w)}kg×${p.r}</span>`:''}
+        ${vol?`<span class="mini" style="color:var(--text2)">📦 ${fmtNum(vol)}kg vol</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  if(prs.length>15)html+=`<div class="mini" style="color:var(--text3);margin-top:8px;text-align:center">+${prs.length-15} more · open Every Lift ▼</div>`;
+  html+=`<button class="btn ghost sm" style="width:100%;margin-top:12px;border-color:rgba(232,197,106,.3);color:var(--gold2)" onclick="shareProfilePRCard()">📤 Share PR Card</button>`;
+  return html;
+}
+
+function shareProfilePRCard(){
+  const prs=Object.entries(state.data.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm).slice(0,5);
+  if(!prs.length){toast("Log some PRs first!");return;}
+  const sl=strengthLevel(),r=rankFor(sl),u=state.data.u;
+  const lines=prs.map(([n,p],i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid rgba(232,197,106,.15)"><span style="font-size:13px;color:#d8d8d8">#${i+1} ${esc(n)}</span><b style="color:#E8C56A;font-size:15px">${Math.round(p.orm)}kg</b></div>`).join('');
+  openSheet(`<div style="background:linear-gradient(135deg,#0a0c12,#12100a);border:2px solid rgba(232,197,106,.45);border-radius:18px;padding:22px;margin-bottom:16px">
+    <div style="font-size:10px;letter-spacing:.2em;color:rgba(232,197,106,.55);text-transform:uppercase;margin-bottom:6px;text-align:center">Gotham Iron Protocol</div>
+    <div style="font-size:24px;font-weight:900;color:#E8C56A;letter-spacing:.04em;margin-bottom:2px;text-align:center">${u.name?esc(u.name.toUpperCase()):"VIGILANTE"}</div>
+    <div style="font-size:12px;color:rgba(232,197,106,.65);margin-bottom:16px;text-align:center">${r.emoji} ${esc(r.name)} · Strength Lv ${sl}</div>
+    <div>${lines}</div>
+    <div style="margin-top:14px;font-size:10px;color:rgba(232,197,106,.35);text-align:center">Personal Records · ${new Date().toLocaleDateString()}</div>
+  </div>
+  <div class="mini" style="color:var(--text2);margin-bottom:14px;text-align:center">Screenshot this card to share 💪</div>
+  <button class="btn" onclick="closeSheet()">Done</button>`);
+}
+
+function profileLogHtml(d){
+  if(!d.workouts.length)return '<p class="muted" style="margin:0">No missions logged yet.</p>';
+  return d.workouts.slice(0,12).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)">
+    <div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()">
+      <b style="font-size:13.5px">${esc(w.name)} ›</b>
+      <div class="mini" style="margin-top:1px">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div>
+    </div>
+    <div class="row" style="gap:8px;align-items:center;flex:none"><b class="gold" style="font-size:14px">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 8px" onclick="patrolReport(${i})">📜</button></div>
+  </div>`).join('');
+}
+
+function profileToolsHtml(){
+  return `<div class="grid2" style="margin-bottom:10px">
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:22px">🖥️</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Batcomputer</div><div class="mini" style="color:var(--text3)">Deep analytics</div></button>
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:22px">🃏</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Villains felled</div></button>
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openMeasure()"><div style="font-size:22px">📐</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Measurements</div><div class="mini" style="color:var(--text3)">Body trends</div></button>
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openTrophyRoom()"><div style="font-size:22px">🏆</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Trophy Room</div><div class="mini" style="color:var(--text3)">26 honors</div></button>
+  </div>
+  <button class="btn ghost sm" style="width:100%;border-color:rgba(232,197,106,.3);color:var(--gold2);margin-top:2px" onclick="exportICS()">📅 Export calendar (.ics)</button>`;
+}
+
 function renderProfile(){
-  const d=state.data,u=d.u;const sl=strengthLevel(),r=rankFor(sl);
-  let html=`<div class="row" style="gap:14px;align-items:center;margin-bottom:15px;cursor:pointer" onclick="openSettings()">
-    <div class="profavatar"><img src="Batman.jpg" alt="" onerror="this.parentNode.style.display='none'"></div>
-    <div style="flex:1;min-width:0">
-      <h1 style="font-size:33px;color:var(--gold2);line-height:.9">${u.name?esc(u.name.toUpperCase()):"VIGILANTE"}</h1>
-      <div class="mini" style="color:var(--gold-dim);letter-spacing:.06em;margin-top:3px">${r.emoji} ${esc(r.name)} · STRENGTH LV ${sl}</div>
-      ${earnedTitle()?`<div class="mini" style="color:var(--text3);margin-top:1px">🎖️ ${esc(earnedTitle())} · tap to edit ›</div>`:`<div class="mini" style="color:var(--text3);margin-top:1px">tap to edit profile ›</div>`}
-    </div></div>`;
+  const d=state.data,u=d.u;
+  const sl=strengthLevel(),r=rankFor(sl);
+  const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
+  let html=profileHeroHtml(d,u,sl,r,ri);
   if(!d.workouts.length){
-    html+=`<div class="card"><p class="muted" style="margin:0">Your profile fills in as you train — strength curve, records, belts and every lift. Log your first session, sir.</p><button class="btn gold sm" style="margin-top:11px" onclick="go('mission')">Go to Mission ▶</button></div>`;
+    html+=`<div class="card"><p class="muted" style="margin:0">Your profile fills in as you train. Log your first session, sir.</p><button class="btn gold sm" style="margin-top:11px" onclick="go('mission')">Go to Mission ▶</button></div>`;
     $("app").innerHTML=html;return;
   }
-  html+=batRankCard();
-  html+=archiveCardsHtml();                 // Strength Index hero + Every Lift hero
-  html+=titleBeltsCard();
-  html+=mmaRecordCard();
-  html+=highlightReelCard();
-  html+=crossGymCard();
-  html+=gymCampaignsCard();
-  html+=combatRatingCard();
-  html+=`<div class="grid2" style="margin-bottom:13px"><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:24px">🖥️</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Batcomputer</div><div class="mini" style="color:var(--text3)">Deep analytics & reports</div></button><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:24px">🃏</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Every villain you've felled</div></button></div>`;
-  html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div><div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
-  html+=`<div class="card"><div class="ttl">📜 Patrol log <span class="mini" style="font-weight:400">— tap a mission for the full report</span></div>${d.workouts.slice(0,12).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><div class="row g" style="gap:9px;align-items:center"><b class="gold">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 9px" onclick="patrolReport(${i})">📜</button></div></div>`).join("")}</div>`;
-  html+=`<button class="btn" style="margin:4px 0 18px;border-color:var(--gold-dim)" onclick="openMeasure()">📐 Body measurements & trends</button>`;
+  html+=profileCalendarHtml(d);
+  const otd=profileOnThisDay(d);if(otd)html+=otd;
+  html+=profileBossPreviewHtml(d,sl);
+  const prCount=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
+  html+=acc('prf-pr','🏆','PR Record Book',profilePRFeedHtml(d),false,prCount+' records');
+  html+=acc('prf-std','📊','Strength Standards',strengthStandardsCard(),false,'vs bodyweight');
+  html+=acc('prf-fight','🥊','Fight Record',mmaRecordCard()||"<p class='muted' style='margin:0'>Log 2+ weeks to unlock.</p>",false,'week vs week');
+  html+=acc('prf-belts','🎖️','Title Belts',titleBeltsCard()||"<p class='muted' style='margin:0'>Log bodyweight + PRs to see belt ranks.</p>",false,'BW-ratio');
+  html+=acc('prf-combat','⚔️','Combat Rating',combatRatingCard()||"<p class='muted' style='margin:0'>Log sets to earn a rank.</p>",false,'per lift');
+  html+=acc('prf-lifts','📈','Every Lift',archiveCardsHtml(),false,'full archive');
+  html+=acc('prf-gyms','🏛️','Gym Campaigns',gymCampaignsCard(),false,(u.gyms||[]).length+' base'+((u.gyms||[]).length===1?'':'s'));
+  html+=acc('prf-log','📜','Patrol Log',profileLogHtml(d),false,'recent missions');
+  html+=acc('prf-tools','⚡','Quick Tools',profileToolsHtml(),false,'');
   $("app").innerHTML=html;
 }
 function d_dismiss(k){state.data.dismissed[k]=true;save();render();}
