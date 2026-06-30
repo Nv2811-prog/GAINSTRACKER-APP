@@ -1638,7 +1638,8 @@ cardioLog:[],          // {date, type, mins} conditioning / patrol mileage
 suppLog:{},            // "YYYY-MM-DD" -> {creatine,protein,omega,vitd,water:bool} supplement checklist
 suppStreak:{creatine:0,best:0,last:null}, // creatine daily streak
 raid:null,             // {boss,e,target,mine,ally,allyName,start} co-op raid
-prefs:{weather:true,boot:true,particles:true}
+prefs:{weather:true,boot:true,particles:true},
+gymEquipment:{}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
 
@@ -1673,6 +1674,7 @@ function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.p
   if(!d.u._gymV1){d.prsByGym[d.u.activeGym]=d.prsByGym[d.u.activeGym]||d.prs||{};d.u._gymV1=true;}
   d.prsByGym[d.u.activeGym]=d.prsByGym[d.u.activeGym]||{};
   d.prs=d.prsByGym[d.u.activeGym];
+  d.gymEquipment=d.gymEquipment||{};
   state.data=d;}}catch(e){}}
 
 /* --- Live-session crash/kill recovery -------------------------------------
@@ -3797,7 +3799,7 @@ function drawSwapList(){
   const cur=exFor(e.name);const q=($("swap-search")?$("swap-search").value:"").toLowerCase().trim();
   const inSession=new Set(state.session.exercises.map(x=>x.name));
   let alts=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim&&!inSession.has(x.n));
-  const gymOn=state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip;
+  const gymOn=state.gymFilter&&!!((state.data.gymEquipment||{})[state.data.u.activeGym||""]||{}).equip;
   if(gymOn)alts=alts.filter(x=>gymAllows(x.eq));
   if(q)alts=alts.filter(x=>x.n.toLowerCase().includes(q));
   alts.sort((a,b)=>{const sa=a.eq===cur.eq?0:1,sb=b.eq===cur.eq?0:1;return sa-sb||a.n.localeCompare(b.n);});
@@ -3824,7 +3826,7 @@ function openPair(ei){
   const inSession=new Set(state.session.exercises.map(x=>x.name));
   let alts=EXDB.filter(x=>(x.p&&x.p[0])===targetMuscle&&!inSession.has(x.n)&&x.n!==e.name);
   if(forearm){const isExt=/reverse|extensor|extension/i.test(e.name);const opp=x=>isExt?!/reverse|extensor|extension/i.test(x.n):/reverse|extensor|extension/i.test(x.n);alts.sort((a,b)=>(opp(a)?0:1)-(opp(b)?0:1));}
-  const gymOn=state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip;
+  const gymOn=state.gymFilter&&!!((state.data.gymEquipment||{})[state.data.u.activeGym||""]||{}).equip;
   if(gymOn)alts=alts.filter(x=>gymAllows(x.eq));
   const logged=new Set(loggedExerciseNames());
   alts.sort((a,b)=>(logged.has(b.n)?1:0)-(logged.has(a.n)?1:0));
@@ -4202,21 +4204,21 @@ function addExNote(name){const el=$("exnote-in");if(!el)return;const v=(el.value
 /* ========================= EXERCISE PICKER (Rule 1: oninput -> updateExList only) ========================= */
 /* ===== My Gym — equipment profile so suggestions match what's actually in front of you ===== */
 const GYM_EQUIP=[["barbell","Barbells"],["dumbbell","Dumbbells"],["machine","Machines"],["cable","Cables"],["smith","Smith machine"],["ez bar","EZ bar"],["trap bar","Trap bar"],["bodyweight","Bodyweight / bars"],["band","Bands"],["kettlebell","Kettlebells"],["other","Other"]];
-function gymAllows(eq){const g=state.data.u.gym;if(!g||!g.equip)return true;return g.equip[eq]!==false;}
-function openGym(){
-  const g=state.data.u.gym||{name:"",equip:{}};
+function gymAllows(eq){const g=(state.data.gymEquipment||{})[state.data.u.activeGym||""];if(!g||!g.equip||!Object.keys(g.equip).length)return true;return g.equip[eq]!==false;}
+function openGym(gymName){
+  const gn=gymName||state.data.u.activeGym||"";state._gymEditName=gn;
+  const g=(state.data.gymEquipment||{})[gn]||{equip:{}};
   const chips=GYM_EQUIP.map(([k,l])=>`<button class="chip g gymeq ${g.equip[k]!==false?'on':''}" data-k="${k}" onclick="toggleGymEq('${k}')">${l}</button>`).join("");
-  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}My gym</div>
-    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Tell the app what you've got and it only suggests exercises you can actually do.</div>
-    <label class="mini">Gym name</label><input id="gym-name" value="${esc(g.name||'')}" placeholder="e.g. Fitness X — Gym80" style="margin-bottom:10px"/>
-    <label class="mini" style="display:block;margin-bottom:5px">Equipment available</label>
+  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Equipment — ${esc(gn)}</div>
+    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Tell the app what's at <b>${esc(gn)}</b> and it only suggests exercises you can actually do there.</div>
+    <label class="mini" style="display:block;margin-bottom:5px">Equipment available <span style="color:var(--text3)">(all on = no filter)</span></label>
     <div class="row" style="flex-wrap:wrap;gap:7px">${chips}</div>
-    <button class="btn gold" style="margin-top:12px" onclick="saveGym()">Save gym</button>
+    <button class="btn gold" style="margin-top:12px" onclick="saveGym()">Save equipment</button>
     <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Cancel</button>`);
   state._gymTmp=Object.assign({},g.equip);
 }
 function toggleGymEq(k){state._gymTmp=state._gymTmp||{};state._gymTmp[k]=state._gymTmp[k]===false?true:false;document.querySelectorAll(".gymeq").forEach(b=>{const kk=b.getAttribute("data-k");b.classList.toggle("on",state._gymTmp[kk]!==false);});}
-function saveGym(){const name=($("gym-name")||{}).value||"";state.data.u.gym={name:name.trim(),equip:Object.assign({},state._gymTmp||{})};state.gymFilter=true;save();haptic("done");closeSheet();toast(name?("Gym set: "+name.trim()):"Gym saved");render();}
+function saveGym(){const gn=state._gymEditName||state.data.u.activeGym||"";state.data.gymEquipment=state.data.gymEquipment||{};const eqNew=Object.assign({},state._gymTmp||{});state.data.gymEquipment[gn]={equip:eqNew};state.gymFilter=true;save();haptic("done");closeSheet();toast("Equipment saved for "+gn);render();}
 function toggleGymFilter(){state.gymFilter=!state.gymFilter;const c=$("gymfilter-chip");if(c)c.classList.toggle("on",state.gymFilter);updateExList();}
 function openPicker(multi){
   state.pickerMulti=multi||null;
@@ -4343,7 +4345,7 @@ function updateExList(){
   state.pickerQuery=q;
   let list=EXDB;
   if(state.pickerMuscle!=="all")list=list.filter(e=>(e.p||[]).includes(state.pickerMuscle));
-  if(state.gymFilter&&state.data.u.gym&&state.data.u.gym.equip)list=list.filter(e=>gymAllows(e.eq));
+  if(state.gymFilter)list=list.filter(e=>gymAllows(e.eq));
   if(q)list=list.filter(e=>e.n.toLowerCase().includes(q));
   // Cap only the unfiltered "all" view (perf); when a muscle filter or search is active, show every match so new exercises at the end of the list are never hidden.
   if(state.pickerMuscle==="all"&&!q)list=list.slice(0,120);
@@ -6088,6 +6090,7 @@ function renderProfile(){
   html+=mmaRecordCard();
   html+=highlightReelCard();
   html+=crossGymCard();
+  html+=gymCampaignsCard();
   html+=combatRatingCard();
   html+=`<div class="grid2" style="margin-bottom:13px"><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:24px">🖥️</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Batcomputer</div><div class="mini" style="color:var(--text3)">Deep analytics & reports</div></button><button class="card" style="text-align:left;padding:14px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:24px">🃏</div><div class="ttl" style="margin:5px 0 1px;font-size:13px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Every villain you've felled</div></button></div>`;
   html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div><div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
@@ -6130,6 +6133,90 @@ function overloadIntel(){  const out=[];const seen=new Set();
   return out;
 }
 
+/* ========================= GYM CAMPAIGNS ========================= */
+function gymStats(gymName){
+  const ws=state.data.workouts||[];
+  let sessions=0,vol=0,first=null,last=null;
+  ws.forEach(w=>{if((w.gym||"")===(gymName||"")){sessions++;vol+=w.totalVol||0;const t=w.date;if(!first||t<first)first=t;if(!last||t>last)last=t;}});
+  return {sessions,vol:Math.round(vol),first,last};
+}
+function gymCampaignsCard(){
+  const d=state.data,u=d.u;
+  const gyms=u.gyms||[];if(!gyms.length)return "";
+  const active=u.activeGym||gyms[0];
+  let html=`<div class="card" style="border-color:rgba(232,197,106,.3)">
+    <div class="ttl" style="display:flex;align-items:center;gap:8px;margin-bottom:2px">🏛️ Gym Campaigns <span class="chip on" style="font-size:10px">${gyms.length} base${gyms.length===1?"":"s"}</span></div>
+    <div class="mini" style="margin:-2px 0 12px;color:var(--text2)">Each gym is its own record book — PRs, equipment and sessions stored separately.</div>`;
+  gyms.forEach(g=>{
+    const isAct=g===active;
+    const st=gymStats(g);
+    const prCount=Object.keys((d.prsByGym&&d.prsByGym[g])||{}).filter(n=>(d.prsByGym[g][n]||{}).orm>0).length;
+    const hasEquip=d.gymEquipment&&d.gymEquipment[g]&&Object.keys(d.gymEquipment[g].equip||{}).length>0;
+    const fmt=dt=>dt?new Date(dt).toLocaleDateString('en-GB',{month:'short',year:'2-digit'}):"";
+    const range=st.first&&st.last?fmt(st.first)+(st.first===st.last?"":" → "+(isAct?"now":fmt(st.last))):"";
+    if(isAct){
+      html+=`<div style="border:1.5px solid var(--gold-dim);border-radius:14px;padding:13px;margin-bottom:10px;background:linear-gradient(135deg,rgba(232,197,106,.1),rgba(180,140,60,.04))">
+        <div class="row sp" style="margin-bottom:8px">
+          <div>
+            <div style="font-family:var(--disp);font-size:17px;color:var(--gold2);letter-spacing:.04em">${esc(g)}</div>
+            <div class="mini" style="display:flex;align-items:center;gap:5px;margin-top:2px"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></span><b style="color:var(--green)">ACTIVE BASE</b></div>
+          </div>
+          <button class="btn ghost sm" style="width:auto;font-size:11px;border-color:var(--gold-dim);color:var(--gold2)" onclick="openGym('${esc(g).replace(/'/g,"\\'")}')">⚙️ Equipment</button>
+        </div>
+        <div class="row" style="gap:0;border:1px solid rgba(232,197,106,.2);border-radius:10px;overflow:hidden;margin-bottom:7px">
+          ${[['🎯',st.sessions,'sessions'],['🏋️',fmtNum(st.vol)+'kg','volume'],['🏆',prCount,'PRs set']].map(([ic,v,l],i)=>`<div class="center" style="flex:1;padding:9px 4px;border-left:${i?'1px solid rgba(232,197,106,.15)':'none'}"><div style="font-family:var(--disp);font-size:20px;color:var(--gold2)">${v}</div><div class="mini" style="color:var(--text3)">${l}</div></div>`).join("")}
+        </div>
+        ${range?`<div class="mini" style="color:var(--text3)">📅 ${range}</div>`:""}
+        ${hasEquip?`<div class="mini" style="color:var(--gold-dim);margin-top:3px">⚙️ Equipment profile saved</div>`:`<div class="mini" style="color:var(--text3);margin-top:3px">⚙️ No equipment profile — tap to add one</div>`}
+      </div>`;
+    }else{
+      html+=`<div style="border:1px solid var(--border2);border-radius:12px;padding:11px;margin-bottom:8px;background:var(--bg2)">
+        <div class="row sp">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(g)}</div>
+            <div class="mini" style="color:var(--text3);margin-top:2px">📦 Chapter closed · ${st.sessions} sessions · ${prCount} PRs frozen</div>
+          </div>
+          <button class="chip" style="width:auto;font-size:11px" onclick="switchGym('${esc(g).replace(/'/g,"\\'")}');render()">Switch here</button>
+        </div>
+        ${st.vol?`<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:7px">
+          <span class="mini" style="color:var(--text3)">📦 <b style="color:var(--text)">${fmtNum(st.vol)}kg</b> lifetime</span>
+          ${range?`<span class="mini" style="color:var(--text3)">📅 ${range}</span>`:""}
+        </div>`:""}
+      </div>`;
+    }
+  });
+  html+=`<button class="btn ghost sm" style="width:100%;margin-top:4px;border-color:rgba(232,197,106,.3);color:var(--gold2)" onclick="promptAddGym(false)">＋ Start a new gym campaign</button></div>`;
+  return html;
+}
+
+/* ========================= COMPACT SPLIT TILE ========================= */
+function splitCompactTileHtml(){
+  const d=state.data;const count=(d.splits||[]).length;
+  const activeSp=d.splits.find(s=>s.id===d.activeSplitId)||d.splits[0];
+  const exTotal=(d.splits||[]).reduce((a,sp)=>a+(sp.days||[]).reduce((b,dy)=>b+(dy.exercises||[]).length,0),0);
+  return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim);background:linear-gradient(135deg,rgba(232,197,106,.07),rgba(12,15,22,.9))" onclick="openSplitSheet()">
+    <div class="row sp">
+      <div class="row" style="gap:10px;min-width:0">
+        <span style="font-size:24px;flex:none">🗂️</span>
+        <div style="min-width:0">
+          <div class="ttl" style="margin:0;font-size:15px">Training splits <span class="chip on" style="font-size:10px;margin-left:6px;padding:2px 7px">${count}</span></div>
+          <div class="mini" style="color:var(--text2);margin-top:2px">${activeSp?`Active: <b style="color:var(--gold2)">${esc(activeSp.name)}</b> · ${activeSp.days.length}d`:"No splits yet"} · ${exTotal} ex total</div>
+        </div>
+      </div>
+      <span style="color:var(--gold2);flex:none;font-size:20px">›</span>
+    </div>
+    ${activeSp?`<div class="row" style="gap:5px;flex-wrap:wrap;margin-top:9px;pointer-events:none">${(activeSp.days||[]).slice(0,6).map(dy=>`<span class="chip" style="font-size:10px;padding:3px 8px;${isRest(dy)?'opacity:.5;border-color:var(--text3)':''}">${isRest(dy)?'🛌 ':''}${esc(dy.name)}</span>`).join("")}${activeSp.days.length>6?`<span class="chip" style="font-size:10px;padding:3px 8px;opacity:.5">+${activeSp.days.length-6} more</span>`:""}</div>`:""}
+  </div>`;
+}
+function openSplitSheet(){
+  $("sheet").innerHTML=`<div class="row sp" style="margin-bottom:12px">
+    <div class="ttl" style="margin:0;font-size:18px">🗂️ Splits &amp; schedule</div>
+    <button class="btn ghost sm" style="width:auto;border-color:var(--gold-dim);color:var(--gold2)" onclick="closeSheet();render()">Done ✓</button>
+  </div>
+  ${splitsEditorHtml()}`;
+  $("sheet").classList.add("on");$("sheetbg").classList.add("on");
+}
+
 /* ========================= MISSION TAB ========================= */
 function renderMission(){
   const d=state.data;
@@ -6168,7 +6255,7 @@ function missionSubTabs(){
   let body="";
   if(sub==="plan"){
     body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Build your splits and set which nights you patrol.</div>`
-      +scheduleEditorHtml()+splitsEditorHtml();
+      +scheduleEditorHtml()+splitCompactTileHtml();
   }else{
     body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, deload & every quick tool — all in one place.</div>`
       +scienceCardsHtml()
