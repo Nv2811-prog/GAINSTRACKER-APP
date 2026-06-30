@@ -6269,10 +6269,6 @@ function profileCalendarHtml(d){
       <button class="btn ghost sm" style="width:auto;border-color:rgba(232,197,106,.3);color:var(--gold2);font-size:11px" onclick="exportICS()">Export</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${cells}</div>
-    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05)">
-      <div class="mini" style="color:var(--text3);margin-bottom:6px;letter-spacing:.06em">26-WEEK PATROL TRAIL</div>
-      ${patrolCalendar()}
-    </div>
   </div>`;
 }
 
@@ -6492,7 +6488,6 @@ function renderProfile(){
   html+=acc('prf-rec','🏆','Records & Ranks',profileRecordsHtml(d),false,prCount+' PRs · belts · fight record');
   html+=acc('prf-str','📊','Strength Analysis',profileStrengthHtml(),false,'standards · combat rating');
   html+=acc('prf-bases','🏛️','Bases & Tools',profileBasesToolsHtml(d,u),false,(u.gyms||[]).length+' gym'+(((u.gyms||[]).length)===1?'':'s')+' · tools');
-  html+=acc('prf-log','📜','Mission Log',profileLogHtml(d),false,'recent patrols');
   $("app").innerHTML=html;
 }
 function d_dismiss(k){state.data.dismissed[k]=true;save();render();}
