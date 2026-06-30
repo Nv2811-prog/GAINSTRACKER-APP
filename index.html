@@ -8656,11 +8656,13 @@ function alfredContext(){
   const inj=Object.keys(d.injuries||{}).map(m=>MNAME[m]||m).join(', ');
   // Physique
   const pa=u.physiqueAnalysis||{};
+  const lpa=u.lastPhysiqueAnalysis;
   return `You are Alfred Pennyworth — former MI6 field officer, battlefield medic, and Batman's personal handler for 20 years. You are also a certified strength coach who has studied under Israetel, Schoenfeld, and Helms personally. You are the Batcomputer made human: you have complete access to every data point about this man's training history, recovery, PRs, and physique.
 
 PERSONA: Jarvis precision meets British blade. Calm, authoritative, zero fluff. You cite real peer-reviewed studies by author + year when making evidence claims (e.g. "Schoenfeld et al., 2017 demonstrated..." or "as Helms confirmed in the MASS series"). You are not a cheerleader. You will be harsh when the data or effort warrants it — but surgical, never emotional.
 LENGTH: Match reply to question. Simple = 1–3 sentences. Detailed request = max 120 words, bullet if listing. NO preamble. NO restatement. NO filler. Cut everything that doesn't add information.
 EXERCISE BIAS: User trains machines/cables deliberately. Never push free weights as superior. Honour the equipment he uses.
+PHYSIQUE PHOTOS: If an image is attached to the user's message, that IS his current physique — look at it directly and assess development, symmetry, weak points, and the single highest-leverage training priority. Never claim you cannot view or rate a photo that has been attached — you can see it.
 ACTIONS: When the user asks you to DO something in the app (create a split, activate a split, add exercise), output ONE action tag at the end of your reply in this exact format — nothing else on that line:
 [ACTION:CREATE_SPLIT:SplitName:Day1Name:ex1,ex2,ex3|Day2Name:ex1,ex2]
 [ACTION:ACTIVATE_SPLIT:splitId]
@@ -8670,7 +8672,7 @@ Only emit an action when the user explicitly asks you to create/change something
 USER: ${u.name||'sir'} | BW: ${u.bodyweight}kg | Goal: ${u.goal} | ${u.natty&&u.natty!=='maybe'?u.natty+' | ':''}Rank: ${r.emoji} ${r.name} Lv${sl}
 EXPERIENCE: ${exp}
 WEEK: ${weekCount()}/${u.weeklyGoal} sessions | Daily streak: ${u.streakDays}d | Weekly streak: ${weeklyStreak()} weeks
-PHYSIQUE NOTES: weak — ${(pa.weakPoints||[]).map(m=>MNAME[m]).join(',')||'n/a'}; strong — ${(pa.strongPoints||[]).map(m=>MNAME[m]).join(',')||'n/a'}; imbalance: ${pa.mainImbalance||'n/a'}
+PHYSIQUE NOTES: weak — ${(pa.weakPoints||[]).map(m=>MNAME[m]).join(',')||'n/a'}; strong — ${(pa.strongPoints||[]).map(m=>MNAME[m]).join(',')||'n/a'}; imbalance: ${pa.mainImbalance||'n/a'}${lpa&&lpa.text?`\nLAST PHOTO ANALYSIS (${new Date(lpa.date).toLocaleDateString()}): ${lpa.text}`:''}
 
 MUSCLE STATUS (level / recovery / weekly sets):
   ${muscleStr}
@@ -8750,16 +8752,18 @@ function openAlfredChat(){haptic("tap");openAlfredVoice();}
 
 /* ── Alfred Voice Conversation — Jarvis-style orb overlay ── */
 let _AV_STATE='idle'; // idle | listen | think | speak
+let _AV_CONTINUOUS=false; // true once the user taps to start talking — keeps listening after each reply
 
 function openAlfredVoice(){
   const ov=document.getElementById('alf-voice-ov');if(!ov)return;
   ov.classList.add('on');haptic('tap');
+  _AV_CONTINUOUS=false;
   _avRenderTranscript();_avRenderChips();_avSetState('idle');
 }
 function closeAlfredVoice(){
   const ov=document.getElementById('alf-voice-ov');if(ov)ov.classList.remove('on');
   if(_alfRec){try{_alfRec.stop();}catch(e){}}
-  _alfListening=false;
+  _alfListening=false;_AV_CONTINUOUS=false;
   try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
   _avSetState('idle');
 }
@@ -8773,6 +8777,13 @@ function _avSetState(s){
   else if(s==='speak')ov.classList.add('av-speak');
   const st=document.getElementById('av-status');
   if(st)st.textContent={idle:'Tap to speak',listen:'Listening…',think:'Thinking…',speak:'Speaking…'}[s]||'';
+}
+function _avEndTurn(){
+  _avSetState('idle');
+  if(!_AV_CONTINUOUS)return;
+  const ov=document.getElementById('alf-voice-ov');
+  if(!ov||!ov.classList.contains('on'))return;
+  setTimeout(()=>{if(_AV_CONTINUOUS&&_AV_STATE==='idle')_avStartListen();},450);
 }
 function _avRenderTranscript(){
   const t=document.getElementById('av-transcript');if(!t)return;
@@ -8798,9 +8809,10 @@ async function _avSendText(){
   await _alfSend(q,null);
 }
 function _alfOrbTap(){
-  if(_AV_STATE==='listen'){if(_alfRec){try{_alfRec.stop();}catch(e){}}_avSetState('idle');return;}
-  if(_AV_STATE==='speak'){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}_avSetState('idle');return;}
+  if(_AV_STATE==='listen'){_AV_CONTINUOUS=false;if(_alfRec){try{_alfRec.stop();}catch(e){}}_avSetState('idle');return;}
+  if(_AV_STATE==='speak'){_AV_CONTINUOUS=false;try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}_avSetState('idle');return;}
   if(_AV_STATE==='think')return;
+  _AV_CONTINUOUS=true;
   _avStartListen();
 }
 function _avStartListen(){
@@ -8809,15 +8821,16 @@ function _avStartListen(){
   if(_alfRec){try{_alfRec.stop();}catch(e){}}
   _alfRec=new SR();_alfRec.continuous=false;_alfRec.interimResults=true;_alfRec.lang='en-US';
   _avSetState('listen');_alfListening=true;
+  let gotFinal=false;
   _alfRec.onresult=e=>{
     let interim='',final='';
     for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}
     const st=document.getElementById('av-status');
     if(st&&(interim||final))st.textContent='"'+(final||interim)+'"';
-    if(final){_alfListening=false;const c=document.getElementById('av-chips');if(c)c.innerHTML='';_avSetState('think');_alfSend(final.trim(),null);}
+    if(final){gotFinal=true;_alfListening=false;const c=document.getElementById('av-chips');if(c)c.innerHTML='';_avSetState('think');_alfSend(final.trim(),null);}
   };
-  _alfRec.onerror=e=>{_alfListening=false;_avSetState('idle');if(e.error==='not-allowed')toast('Mic permission blocked — enable it in browser settings.');};
-  _alfRec.onend=()=>{_alfListening=false;if(_AV_STATE==='listen')_avSetState('idle');};
+  _alfRec.onerror=e=>{_alfListening=false;if(e.error==='not-allowed'){_AV_CONTINUOUS=false;toast('Mic permission blocked — enable it in browser settings.');}_avSetState('idle');};
+  _alfRec.onend=()=>{_alfListening=false;if(!gotFinal&&_AV_STATE==='listen'){_AV_CONTINUOUS=false;_avSetState('idle');}};
   try{_alfRec.start();haptic('tap');}catch(e){_avSetState('idle');}
 }
 
@@ -8970,6 +8983,10 @@ function _alfUiSync(){
   _renderAlfredSheet();
 }
 async function _alfSend(q,pic){
+  if(!pic&&q&&/\bphysique\b|\bphoto\b|\bpicture\b|\bpic\b|rate (my|me)|how.*(look|looking)|progress photo|my body\b/i.test(q)){
+    const lp=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    if(lp&&lp.img){const m=lp.img.match(/^data:([^;]+);base64,(.+)$/);if(m)pic={url:lp.img,b64:m[2],mime:m[1]};}
+  }
   const displayQ=q||(pic?'What do you make of this physique, Alfred?':'');
   ALFRED_MSGS.push({role:'user',text:displayQ,img:pic?pic.url:null});
   ALFRED_MSGS.push({role:'alfred',text:'…thinking…'});
@@ -9015,19 +9032,19 @@ async function _alfSend(q,pic){
               const utt=_alfredUtter(clean.replace(/\*\*/g,'').replace(/\*/g,'').slice(0,280),0.92,0.95);
               if(ovOn){
                 utt.onstart=()=>_avSetState('speak');
-                utt.onend=()=>_avSetState('idle');
-                utt.onerror=()=>_avSetState('idle');
+                utt.onend=()=>_avEndTurn();
+                utt.onerror=()=>_avEndTurn();
               }
               window.speechSynthesis.speak(utt);
-            }catch(e){if(ovOn)_avSetState('idle');}
+            }catch(e){if(ovOn)_avEndTurn();}
           },120);
-        }else if(ovOn){_avSetState('idle');}
-      }catch(e){if(ovOn)_avSetState('idle');}
-    }else if(ovOn){_avSetState('idle');}
+        }else if(ovOn){_avEndTurn();}
+      }catch(e){if(ovOn)_avEndTurn();}
+    }else if(ovOn){_avEndTurn();}
     // Auto-execute any actions
     if(actions.length){setTimeout(()=>{try{_alfExecAction(actions[0].type,actions[0].args);}catch(e){}},600);}
   }catch(e){
-    if(document.getElementById('alf-voice-ov')?.classList.contains('on'))_avSetState('idle');
+    if(document.getElementById('alf-voice-ov')?.classList.contains('on'))_avEndTurn();
     ALFRED_MSGS[ALFRED_MSGS.length-1].text="The line to the Batcomputer is down, sir. ("+e.message+")";
   }
   _alfUiSync();
