@@ -845,6 +845,41 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .g9-br{bottom:20px;right:20px;border-bottom-width:2px;border-right-width:2px;animation:g9cor .4s .19s ease both}
 @keyframes g9cor{from{opacity:0;transform:scale(2.2)}to{opacity:1;transform:scale(1)}}
 
+/* ===== Batcave garage-door entrance (replaces g9-entr) ===== */
+.g9-garage{position:fixed;inset:0;z-index:9000;overflow:hidden;background:#04060a}
+.g9-garage-bg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}
+.g9-garage-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(242,208,121,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.022) 1px,transparent 1px);background-size:46px 46px;pointer-events:none}
+.g9-garage-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:380px;height:380px;background:radial-gradient(ellipse,rgba(242,208,121,.26) 0%,transparent 65%);pointer-events:none;animation:garGlow 1.1s 1.1s ease both}
+@keyframes garGlow{from{opacity:0;transform:translate(-50%,-50%) scale(.2)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.g9-garage-bat{font-size:88px;line-height:1;animation:garBat .6s 1.08s cubic-bezier(.15,.85,.25,1.1) both;filter:drop-shadow(0 0 40px rgba(242,208,121,.75));position:relative;z-index:2}
+@keyframes garBat{from{opacity:0;transform:scale(5) rotate(-18deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
+.g9-garage-label{font-size:8px;letter-spacing:.7em;text-transform:uppercase;color:rgba(242,208,121,.38);margin-top:16px;animation:garTxt .8s 1.28s ease both;position:relative;z-index:2}
+.g9-garage-name{font-family:var(--disp);font-size:32px;letter-spacing:.06em;color:var(--gold2);text-shadow:0 0 50px rgba(242,208,121,.6);animation:garTxt .8s 1.44s ease both;text-align:center;padding:0 24px;max-width:340px;position:relative;z-index:2}
+@keyframes garTxt{from{opacity:0;letter-spacing:.9em}to{opacity:1}}
+.g9-garage-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.85) 50%,transparent);box-shadow:0 0 18px 5px rgba(242,208,121,.4);animation:garScan 1.1s 1.15s ease both;pointer-events:none;z-index:3}
+@keyframes garScan{from{top:-3px;opacity:0}8%{opacity:1}88%{opacity:.4}to{top:100%;opacity:0}}
+.g9-garage-c{position:absolute;width:30px;height:30px;border:0 solid rgba(242,208,121,.55);z-index:3}
+.g9-garage-c.tl{top:24px;left:24px;border-top-width:2px;border-left-width:2px;animation:garC .38s 1.05s ease both}
+.g9-garage-c.tr{top:24px;right:24px;border-top-width:2px;border-right-width:2px;animation:garC .38s 1.11s ease both}
+.g9-garage-c.bl{bottom:24px;left:24px;border-bottom-width:2px;border-left-width:2px;animation:garC .38s 1.17s ease both}
+.g9-garage-c.br{bottom:24px;right:24px;border-bottom-width:2px;border-right-width:2px;animation:garC .38s 1.23s ease both}
+@keyframes garC{from{opacity:0;transform:scale(2.8)}to{opacity:1;transform:scale(1)}}
+.g9-garage-crack{position:absolute;top:0;bottom:0;left:50%;width:4px;transform:translateX(-50%);background:linear-gradient(to bottom,transparent 0%,rgba(242,208,121,.9) 12%,rgba(255,224,80,1) 50%,rgba(242,208,121,.9) 88%,transparent);box-shadow:0 0 26px 10px rgba(242,208,121,.5),0 0 70px 20px rgba(242,208,121,.2);animation:garCrack .3s .02s ease both;z-index:4}
+@keyframes garCrack{from{opacity:0;transform:translateX(-50%) scaleX(0)}to{opacity:1;transform:translateX(-50%) scaleX(1)}}
+.g9-door-left,.g9-door-right{position:absolute;top:0;bottom:0;z-index:5;
+  background:repeating-linear-gradient(to bottom,transparent 0,transparent 64px,rgba(0,0,0,.72) 64px,rgba(0,0,0,.72) 67px),repeating-linear-gradient(to bottom,rgba(255,255,255,.052) 0,rgba(255,255,255,.022) 33px,rgba(255,255,255,.065) 67px),linear-gradient(160deg,#1e2130 0%,#0e1016 40%,#1a1d26 100%)}
+.g9-door-left{left:0;width:50.5%;border-right:2px solid #000;animation:garDoorL .72s .32s cubic-bezier(.22,1,.36,1) both}
+.g9-door-right{left:49.5%;right:0;border-left:2px solid #000;animation:garDoorR .72s .32s cubic-bezier(.22,1,.36,1) both}
+@keyframes garDoorL{from{transform:translateX(0)}to{transform:translateX(-102%)}}
+@keyframes garDoorR{from{transform:translateX(0)}to{transform:translateX(102%)}}
+.g9-garage.closing .g9-door-left{animation:garDoorLC .48s cubic-bezier(.6,0,.8,1) both}
+.g9-garage.closing .g9-door-right{animation:garDoorRC .48s cubic-bezier(.6,0,.8,1) both}
+.g9-garage.closing .g9-garage-bat,.g9-garage.closing .g9-garage-label,.g9-garage.closing .g9-garage-name,.g9-garage.closing .g9-garage-glow{animation:garOut .18s ease both}
+.g9-garage.closing .g9-garage-crack{animation:garOut .1s ease both}
+@keyframes garDoorLC{from{transform:translateX(-102%)}to{transform:translateX(0)}}
+@keyframes garDoorRC{from{transform:translateX(102%)}to{transform:translateX(0)}}
+@keyframes garOut{to{opacity:0}}
+
 /* ===== Wave 9 v2: Patrol intro v2 + swipe + input table ===== */
 /* Patrol intro */
 .patrol2-wrap{min-height:100svh;display:flex;flex-direction:column;background:#04060a;position:relative;overflow:hidden}
@@ -10176,25 +10211,40 @@ function renderLogging(){
   initDragReorder();
 }
 
-/* ===== Wave 9 v3: Cinematic entrance + figure fix ===== */
+/* ===== Wave 9 v4: Garage-door Batcave entrance + global thumb() fix ===== */
 
-/* Batcave interface entrance — slides in from left, sweeps out to right. */
+/* Two massive Batcave garage doors slide apart to reveal the workout */
 function playEntrance(name){
   if(state._entrLock)return;state._entrLock=true;
   try{haptic('light');}catch(e){}
-  try{document.querySelectorAll('.g9-entr').forEach(n=>n.remove());}catch(_){}
-  const ov=document.createElement('div');ov.className='g9-entr';
-  ov.innerHTML=`<div class="g9-grid"></div>
-    <div class="g9-corner g9-tl"></div><div class="g9-corner g9-tr"></div>
-    <div class="g9-corner g9-bl"></div><div class="g9-corner g9-br"></div>
-    <div class="g9-scan"></div>
-    <div class="g9-bat">🦇</div>
-    <div class="g9-proto">Gotham Iron Protocol</div>
-    <div class="g9-wkname">${(typeof esc==='function'?esc(name||'Workout'):name||'Workout')}</div>`;
+  try{document.querySelectorAll('.g9-entr,.g9-entr2,.g9-garage').forEach(n=>n.remove());}catch(_){}
+  const nm=typeof esc==='function'?esc(name||'Workout'):(name||'Workout');
+  const ov=document.createElement('div');ov.className='g9-garage';
+  ov.innerHTML=`<div class="g9-garage-bg">
+    <div class="g9-garage-grid"></div>
+    <div class="g9-garage-glow"></div>
+    <div class="g9-garage-c tl"></div><div class="g9-garage-c tr"></div>
+    <div class="g9-garage-c bl"></div><div class="g9-garage-c br"></div>
+    <div class="g9-garage-scan"></div>
+    <div class="g9-garage-bat">🦇</div>
+    <div class="g9-garage-label">GOTHAM IRON PROTOCOL</div>
+    <div class="g9-garage-name">${nm}</div>
+  </div>
+  <div class="g9-garage-crack"></div>
+  <div class="g9-door-left"></div>
+  <div class="g9-door-right"></div>`;
   document.body.appendChild(ov);
-  const fin=()=>{if(ov._done)return;ov._done=true;state._entrLock=false;ov.classList.add('g9-out');setTimeout(()=>{try{ov.remove();}catch(_){}},440);};
-  ov.addEventListener('click',fin);
-  setTimeout(fin,2500);
+  const close=()=>{if(ov._done)return;ov._done=true;state._entrLock=false;ov.classList.add('closing');setTimeout(()=>{try{ov.remove();}catch(_){}},520);};
+  ov.addEventListener('click',close);
+  setTimeout(close,3800);
+}
+
+/* Fix thumb() globally — one source only, never layer demo photo over SVG anatomy */
+function thumb(ex,small){
+  const fi=exFigImg(ex);
+  const cls='exwrap'+(small?' sm':'');
+  if(fi)return `<span class="${cls}"><img class="exfigimg" src="${fi}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'"/></span>`;
+  return `<span class="${cls}">${figureSVG(ex)}</span>`;
 }
 
 /* ===== Wave 9 v2: Dramatic patrol intro + proper logging redesign ===== */
