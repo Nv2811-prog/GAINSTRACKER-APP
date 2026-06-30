@@ -3597,15 +3597,11 @@ function renderNav(){
   const tabs=TABS.map(t=>`<button class="${state.tab===t[0]?"on":""}" onclick="go('${t[0]}')"><span class="ic">${t[1]}</span><span class="lb">${t[2]}</span></button>`).join("");
   $("nav").innerHTML=`<i class="nav-plate"></i><div class="nav-bar">${tabs}</div><i class="nav-plate"></i>`;
 }
-/* Slim utility bar injected at the top of every tab — quick reach to the moved sections + menu. */
+/* Slim utility bar injected at the top of every tab — settings left, command center right. */
 function topBar(){
-  const a=t=>state.tab===t?" on":"";
   return `<div class="topbar">
+    <button class="tbtn" onclick="openSettings()" style="gap:4px"><span style="font-size:15px;line-height:1">⚙️</span><span class="tbl">SETTINGS</span></button>
     <button class="tbtn wide" onclick="openMenu()"><span style="font-size:15px;line-height:1">☰</span><span class="tbl">COMMAND CENTER</span></button>
-    <div style="display:flex;gap:5px">
-      <button class="tbtn${a('alfred')}" onclick="go('alfred')" style="gap:4px"><span style="font-size:13px">🤖</span><span class="tbl">ALFRED</span></button>
-      <button class="tbtn" onclick="openIndex()" style="gap:5px;background:linear-gradient(160deg,rgba(242,208,121,.13),rgba(14,14,18,.92));border-color:rgba(242,208,121,.4);color:var(--gold2)"><span style="font-size:12px;font-weight:900">⌘</span><span class="tbl">SEARCH</span></button>
-    </div>
   </div>`;
 }
 /* ===================== ACCORDION (expand/collapse for dense sections) ===================== */
@@ -3628,25 +3624,22 @@ function toggleAcc(id){
 function goPlan(){state.mSub="plan";go("mission");}
 /* ===================== COMMAND CENTER (the ☰ MORE menu) ===================== */
 function openMenu(){
-  const big=MORE_TABS.map(t=>`<button class="card" style="text-align:left;padding:15px;display:flex;gap:13px;align-items:center;cursor:pointer" onclick="closeSheet();go('${t[0]}')">
-    <div style="font-size:30px">${t[1]}</div><div class="g"><div class="ttl" style="margin:0;font-size:16px">${t[2]}</div><div class="mini" style="color:var(--text3);line-height:1.4">${t[3]}</div></div>
-    <div style="color:var(--text3);font-size:20px">›</div></button>`).join("");
-  const features=[
-    ["openDistricts","🗺️","District Control","Secure Gotham's sectors"],
-    ["openArkham","🃏","Arkham Gallery","Capture the rogues"],
-    ["openSkins","💠","Wardrobe & Belts","Suit skins & titles"],
-    ["openRankLadder","🎖️","Rank Ladder","Your climb to Legend"],
-    ["openRecordsHall","🧊","Records Hall","Every all-time best"],
-    ["openReportCard","🏅","Report Card","Grade your week"],
-    ["openTestDay","🎯","1RM Test Day","Guided ramp to a true max"],
-    ["openTimeMachine","🗓️","This Day","Your training history"]
-  ];
   const tile=(fn,ic,nm,ds)=>`<button class="card cc-tile" onclick="closeSheet();${fn}()"><div class="cc-ic">${ic}</div><div class="cc-nm">${nm}</div>${ds?`<div class="cc-ds">${ds}</div>`:""}</button>`;
+  const features=[
+    ["()=>go('alfred')","🤖","Alfred","AI coach"],
+    ["()=>go('tech')","🦾","Wayne Tech","Gadgets & tools"],
+    ["openDistricts","🗺️","Districts","Gotham sectors"],
+    ["openRankLadder","🎖️","Rank Ladder","Climb to Legend"],
+    ["openRecordsHall","🧊","Records Hall","All-time bests"],
+    ["openReportCard","🏅","Report Card","Grade your week"],
+    ["openTestDay","🎯","1RM Test Day","True max ramp"],
+    ["openTimeMachine","🗓️","This Day","Training history"]
+  ];
   const fHtml=features.map(f=>tile(f[0],f[1],f[2],f[3])).join("");
   const tools=[
     ["openForge","⚒️","Forge","Plate-load calculator"],
     ["openGarage","🏍️","Garage","Milestone ride unlocks"],
-    ["openInfirmary","🏥","Infirmary","Recovery, sleep & injuries"],
+    ["openInfirmary","🏥","Infirmary","Recovery & injuries"],
     ["openBatcomputer","🧠","Batcomputer","Deep analytics"],
     ["openSettings","⚙️","Settings","Preferences & data"]
   ];
@@ -3654,8 +3647,6 @@ function openMenu(){
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:8px">☰ Command Center</div>
     <div class="mini" style="color:var(--text2);margin:-2px 0 11px">Everything that isn't a main tab — tap any tile.</div>
     <button class="btn ghost sm" style="width:100%;margin-bottom:14px;justify-content:center" onclick="closeSheet();openIndex()">🧭 &nbsp;Search every tool & exercise…</button>
-    <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">SECTIONS</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:15px">${big}</div>
     <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">GADGETS</div>
     <div class="grid3" style="margin-bottom:15px">${fHtml}</div>
     <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">TOOLS</div>
@@ -5069,8 +5060,6 @@ function renderSuit(){
   html+=coverageRadar();
   html+=districtSummary();
 
-  html+=`<div class="grid2"><button class="card" style="text-align:left;padding:14px;cursor:pointer" onclick="openArkham()"><div style="font-size:26px">🃏</div><div class="ttl" style="margin:4px 0 1px;font-size:14px">Arkham Gallery</div><div class="mini" style="color:var(--text3)">Capture the rogues' gallery</div></button>
-    <button class="card" style="text-align:left;padding:14px;cursor:pointer" onclick="openSkins()"><div style="font-size:26px">💠</div><div class="ttl" style="margin:4px 0 1px;font-size:14px">Wardrobe & Titles</div><div class="mini" style="color:var(--text3)">Suit skins & championship belts</div></button></div>`;
 
   const me=state.data.u.measurements;
   html+=`<div class="card"><div class="row sp"><div class="ttl">Body measurements</div><button class="btn ghost sm" style="width:auto" onclick="openMeasure()">Edit</button></div>
