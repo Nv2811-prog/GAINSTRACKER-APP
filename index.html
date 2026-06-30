@@ -195,7 +195,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .exwrap .exfig{display:none;width:100%;height:100%}
 .exwrap.noimg img.eximg{display:none}
 .exwrap.noimg .exfig{display:block}
-.exwrap img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;z-index:2;pointer-events:none;background:transparent}
+.exwrap img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;z-index:2;pointer-events:none;background:#07080e}
 .exwrap img.exfigimg.hidden{display:none}
 .exname{font-weight:700;font-size:15px;line-height:1.2;letter-spacing:-.01em;color:var(--text)}
 .exmeta{font-size:12px;color:var(--text3);margin-top:3px;text-transform:capitalize;letter-spacing:.04em;font-family:var(--disp)}
@@ -825,6 +825,26 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .log-ex-pill{flex:0 0 auto;padding:7px 12px;border-radius:10px;font-family:var(--disp);font-size:11.5px;letter-spacing:.05em;cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:var(--text3);transition:all .15s;-webkit-tap-highlight-color:transparent}
 .log-ex-pill.ex-active{background:rgba(242,208,121,.11);border-color:rgba(242,208,121,.38);color:var(--gold2)}
 .log-ex-pill.ex-done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.28);color:var(--green,#2ecc71)}
+/* ===== Wave 9 v3: Cinematic entrance (g9-entr) ===== */
+.g9-entr{position:fixed;inset:0;z-index:9000;background:#04060a;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;animation:g9in .38s cubic-bezier(.2,0,.1,1) both}
+.g9-entr.g9-out{animation:g9out .42s cubic-bezier(.9,0,.8,1) both}
+@keyframes g9in{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes g9out{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(0 0 0 100%)}}
+.g9-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(242,208,121,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.035) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.g9-bat{font-size:76px;animation:g9bat .55s .12s ease both;filter:drop-shadow(0 0 34px rgba(242,208,121,.55));line-height:1}
+@keyframes g9bat{from{opacity:0;transform:scale(3.5) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
+.g9-proto{font-family:var(--disp);font-size:9px;letter-spacing:.55em;text-transform:uppercase;color:rgba(242,208,121,.45);margin-top:18px;animation:g9txt .7s .28s ease both}
+.g9-wkname{font-family:var(--disp);font-size:26px;letter-spacing:.08em;color:var(--gold2);margin-top:5px;text-shadow:0 0 40px rgba(242,208,121,.55);animation:g9txt .7s .4s ease both;text-align:center;padding:0 28px;max-width:360px}
+@keyframes g9txt{from{opacity:0;letter-spacing:.8em}to{opacity:1}}
+.g9-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.7) 50%,transparent);box-shadow:0 0 14px 3px rgba(242,208,121,.3);animation:g9scan 1.3s .05s ease both;pointer-events:none}
+@keyframes g9scan{from{top:-3px;opacity:0}8%{opacity:1}90%{opacity:.5}to{top:100%;opacity:0}}
+.g9-corner{position:absolute;width:22px;height:22px;border:0 solid rgba(242,208,121,.5)}
+.g9-tl{top:20px;left:20px;border-top-width:2px;border-left-width:2px;animation:g9cor .4s .04s ease both}
+.g9-tr{top:20px;right:20px;border-top-width:2px;border-right-width:2px;animation:g9cor .4s .09s ease both}
+.g9-bl{bottom:20px;left:20px;border-bottom-width:2px;border-left-width:2px;animation:g9cor .4s .14s ease both}
+.g9-br{bottom:20px;right:20px;border-bottom-width:2px;border-right-width:2px;animation:g9cor .4s .19s ease both}
+@keyframes g9cor{from{opacity:0;transform:scale(2.2)}to{opacity:1;transform:scale(1)}}
+
 /* ===== Wave 9 v2: Patrol intro v2 + swipe + input table ===== */
 /* Patrol intro */
 .patrol2-wrap{min-height:100svh;display:flex;flex-direction:column;background:#04060a;position:relative;overflow:hidden}
@@ -10156,10 +10176,28 @@ function renderLogging(){
   initDragReorder();
 }
 
-/* ===== Wave 9 v2: Dramatic patrol intro + proper logging redesign ===== */
+/* ===== Wave 9 v3: Cinematic entrance + figure fix ===== */
 
-/* Kill the car entrance — the patrol intro is the new cinematic moment. */
-function playEntrance(name){try{haptic('light');}catch(e){}}
+/* Batcave interface entrance — slides in from left, sweeps out to right. */
+function playEntrance(name){
+  if(state._entrLock)return;state._entrLock=true;
+  try{haptic('light');}catch(e){}
+  try{document.querySelectorAll('.g9-entr').forEach(n=>n.remove());}catch(_){}
+  const ov=document.createElement('div');ov.className='g9-entr';
+  ov.innerHTML=`<div class="g9-grid"></div>
+    <div class="g9-corner g9-tl"></div><div class="g9-corner g9-tr"></div>
+    <div class="g9-corner g9-bl"></div><div class="g9-corner g9-br"></div>
+    <div class="g9-scan"></div>
+    <div class="g9-bat">🦇</div>
+    <div class="g9-proto">Gotham Iron Protocol</div>
+    <div class="g9-wkname">${(typeof esc==='function'?esc(name||'Workout'):name||'Workout')}</div>`;
+  document.body.appendChild(ov);
+  const fin=()=>{if(ov._done)return;ov._done=true;state._entrLock=false;ov.classList.add('g9-out');setTimeout(()=>{try{ov.remove();}catch(_){}},440);};
+  ov.addEventListener('click',fin);
+  setTimeout(fin,2500);
+}
+
+/* ===== Wave 9 v2: Dramatic patrol intro + proper logging redesign ===== */
 
 /* Dramatic mission-briefing patrol intro. */
 function renderPatrolIntro(){
@@ -10261,11 +10299,10 @@ function renderLogging(){
     const col=pCols[(ex.p||[])[0]]||'var(--gold2)';
     const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
 
-    // Figure — use the established exwrap pattern (always renders something)
+    // Figure — ONE source only: demo photo if exists, anatomy SVG otherwise. Never layer both.
     const fi=exFigImg(ex);
     const figHtml=`<span class="exwrap" style="width:88px;height:88px;flex:0 0 88px;border-radius:16px;border-color:${col}44;box-shadow:0 0 0 1px ${col}18,0 8px 28px -8px ${col}40">
-      ${fi?`<img class="exfigimg" src="${fi}" alt="" onerror="this.classList.add('hidden')"/>`:''}
-      ${figureSVG(ex)}
+      ${fi?`<img class="exfigimg" src="${fi}" alt="" onerror="this.style.display='none'"/>`:figureSVG(ex)}
     </span>`;
 
     h+=`<div class="log-focus">
