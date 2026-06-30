@@ -752,6 +752,8 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .gtv2-muscle:active{border-color:rgba(255,208,72,.4);box-shadow:0 0 0 1px rgba(255,208,72,.14)}
 .gtv2-muscle b{display:block;font-family:var(--disp);font-size:13px;line-height:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gtv2-muscle span{display:block;font-size:9.5px;color:var(--text3);margin-top:2px;line-height:1.2}
+.gtv2-minimusle{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent}
+.gtv2-minimusle:active{transform:scale(.94)}
 
 .gtv2-audit-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-top:1px solid rgba(255,255,255,.07)}
 .gtv2-audit-row:first-child{border-top:0}
@@ -3564,11 +3566,10 @@ function renderNav(){
 function topBar(){
   const a=t=>state.tab===t?" on":"";
   return `<div class="topbar">
-    <button class="tbtn wide" onclick="openMenu()"><span style="font-size:16px;line-height:1">☰</span><span class="tbl">COMMAND CENTER</span></button>
-    <div style="display:flex;gap:6px">
-      <button class="tbtn${a('alfred')}" title="Alfred" onclick="go('alfred')">🤖</button>
-      <button class="tbtn${a('tech')}" title="Wayne Tech" onclick="go('tech')">🦾</button>
-      <button class="tbtn" title="Search everything" onclick="openIndex()">🧭</button>
+    <button class="tbtn wide" onclick="openMenu()"><span style="font-size:15px;line-height:1">☰</span><span class="tbl">COMMAND CENTER</span></button>
+    <div style="display:flex;gap:5px">
+      <button class="tbtn${a('alfred')}" onclick="go('alfred')" style="gap:4px"><span style="font-size:13px">🤖</span><span class="tbl">ALFRED</span></button>
+      <button class="tbtn" onclick="openIndex()" style="gap:5px;background:linear-gradient(160deg,rgba(242,208,121,.13),rgba(14,14,18,.92));border-color:rgba(242,208,121,.4);color:var(--gold2)"><span style="font-size:12px;font-weight:900">⌘</span><span class="tbl">SEARCH</span></button>
     </div>
   </div>`;
 }
@@ -6033,16 +6034,18 @@ const GARAGE=[
 ];
 function openGarage(){state.subpage="garage";render();window.scrollTo(0,0);}
 function closeGarage(){state.subpage=null;go("gotham");}
-// Garage box for the Gotham home — shows your best ride big, taps through to the full fleet.
+// Garage box for the Gotham home — compact tactile tile, taps through to the full fleet.
 function garageCard(){
   const s=gothamStats();const owned=GARAGE.filter(v=>v.req(s));const top=owned[owned.length-1]||GARAGE[0];const next=GARAGE.find(v=>!v.req(s));
-  return `<div class="card" style="margin-bottom:12px;cursor:pointer;display:flex;gap:15px;align-items:center;border-color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px var(--gold)" onclick="openGarage()">
-    <div style="font-size:66px;line-height:1;flex:none;filter:drop-shadow(0 0 20px rgba(232,197,106,.75))">${top.e}</div>
+  return `<div class="gtv2-panel wide" style="margin-bottom:8px;display:flex;gap:12px;align-items:center;cursor:pointer;border-color:rgba(232,197,106,.32);padding:10px 12px" onclick="openGarage()">
+    <div style="font-size:36px;line-height:1;flex:none;filter:drop-shadow(0 0 14px rgba(232,197,106,.65))">${top.e}</div>
     <div style="flex:1;min-width:0">
-      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">The Garage · ${owned.length}/${GARAGE.length} unlocked <span style="color:var(--gold2)">›</span></div>
-      <h2 style="font-size:22px;margin:1px 0 3px;color:var(--gold2);text-shadow:0 0 16px currentColor">${esc(top.n)}</h2>
-      <div class="mini" style="color:var(--text2);line-height:1.4">${next?`Next ride: ${next.e} <b>${esc(next.n)}</b> — ${esc(next.how)}`:"Full fleet earned. A legend of the cave."}</div>
-    </div></div>`;
+      <div style="font-size:10px;letter-spacing:.14em;color:var(--text3);font-family:var(--disp);margin-bottom:2px">THE GARAGE · ${owned.length}/${GARAGE.length} UNLOCKED</div>
+      <div style="font-size:14px;color:var(--gold2);font-family:var(--disp);line-height:1.1">${esc(top.n)}</div>
+      ${next?`<div style="font-size:11px;color:var(--text2);margin-top:2px">Next: ${next.e} ${esc(next.n)} — ${esc(next.how)}</div>`:`<div style="font-size:11px;color:var(--green);margin-top:2px">Full fleet earned. Legend of the cave.</div>`}
+    </div>
+    <span style="color:var(--gold2);font-size:16px;flex:none">›</span>
+  </div>`;
 }
 function renderGarage(){
   const s=gothamStats();const unlocked=GARAGE.filter(v=>v.req(s)).length;
@@ -6067,15 +6070,23 @@ function mostWantedCard(){
   const lm=VL[m]||{mev:8,mav:14};const target=lm.mev;const cur=weeklySets(m);
   const done=cur>=target;const pct=clamp(cur/Math.max(1,target)*100,0,100);
   const nm=NEMESIS_MAP[m];const villain=nm?nm.villain:"The Rogues";
-  const bc=done?"var(--green)":"#E8453C";
-  return `<div class="card" style="border-color:${bc};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px ${bc}">
-    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🎯 MOST WANTED</div><span class="chip" style="color:${bc};border-color:${bc}">${done?'CLAIMED':'BOUNTY OPEN'}</span></div>
-    <div class="row g" style="gap:12px;margin-top:8px;align-items:center">
-      <div style="flex:none">${mIcon(m,42,done?'#2ECC71':'#E8453C')}</div>
-      <div style="flex:1;min-width:0"><h2 style="font-size:20px;margin:0;color:${done?'var(--green)':'var(--gold2)'};text-shadow:0 0 18px currentColor">${MNAME[m]}</h2>
-        <div class="mini" style="color:var(--text2);line-height:1.45">Your weakest sector this week — ${esc(villain)} is exploiting it. Bounty: hit <b>${target} sets</b> to bring ${MNAME[m].toLowerCase()} back to the growth zone.</div></div></div>
-    <div class="bar" style="height:8px;background:var(--bg4);margin-top:10px"><i style="width:${pct}%;background:${done?'var(--green)':'linear-gradient(90deg,#E8453C,#E8A52A)'};box-shadow:0 0 10px ${bc}"></i></div>
-    <div class="row sp" style="margin-top:4px"><span class="mini" style="color:var(--text3)">${cur}/${target} sets this week</span>${done?`<span class="mini green">✓ Bounty collected — sector secured</span>`:`<span class="mini" style="color:#E8A52A">${target-cur} set${target-cur===1?'':'s'} to go</span>`}</div></div>`;
+  const bc=done?"#2ECC71":"#E8453C";
+  return `<div class="gtv2-panel wide" style="border-color:${bc}55;margin-bottom:8px;padding:10px 12px">
+    <div class="row sp" style="align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+        ${mIcon(m,26,bc)}
+        <div style="min-width:0">
+          <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:var(--disp)">MOST WANTED · ${esc(villain)}</div>
+          <div style="font-size:15px;font-weight:800;color:${bc};font-family:var(--disp)">${MNAME[m]}</div>
+        </div>
+      </div>
+      <div style="text-align:right;flex:none">
+        <div style="font-size:12px;color:${bc};font-weight:700">${done?'✓ SECURED':cur+'/'+target}</div>
+        <div style="font-size:10px;color:var(--text3)">${done?'bounty claimed':'sets this week'}</div>
+      </div>
+    </div>
+    <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${pct}%;background:${done?'#2ECC71':'linear-gradient(90deg,#E8453C,#E8A52A)'};border-radius:999px;box-shadow:0 0 8px ${bc}"></i></div>
+  </div>`;
 }
 
 /* ===== BAT-RANK INSIGNIA EVOLUTION (#9): an emblem that visibly upgrades by tier ===== */
@@ -6094,15 +6105,15 @@ function batRankCard(){
   const cur=RANKS[ri],next=RANKS[ri+1];
   const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
   const tc=["#8a8a8a","#9aa0ab","#7FC8FF","#cd7f32","#c0c0c0","#E8C56A","#E8C56A","#F0524A","#FFD36E"][clamp(ri,0,8)];
-  return `<div class="card" style="display:flex;gap:14px;align-items:center;cursor:pointer;border-color:${tc};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px ${tc}" onclick="openRankLadder()">
-    ${batEmblem(ri,76)}
+  return `<div class="gtv2-panel wide" style="display:flex;gap:10px;align-items:center;margin-bottom:8px;cursor:pointer;border-color:${tc}66;padding:9px 12px" onclick="openRankLadder()">
+    ${batEmblem(ri,44)}
     <div style="flex:1;min-width:0">
-      <div class="mini" style="text-transform:uppercase;letter-spacing:.14em;color:var(--text3)">Rank ${ri+1}/${RANKS.length} · Strength Lv ${sl} <span style="color:${tc}">· all ranks ›</span></div>
-      <h2 style="font-size:24px;margin:1px 0 2px;color:${tc};text-shadow:0 0 18px currentColor">${esc(cur[1])} ${cur[2]}</h2>
-      ${next?`<div class="bar" style="height:7px;background:var(--bg4)"><i style="width:${pct}%;background:linear-gradient(90deg,${tc},var(--gold2));box-shadow:0 0 10px ${tc}"></i></div>
-        <div class="mini" style="margin-top:3px;color:var(--text2)">${Math.max(0,hi-sl)} strength level${(hi-sl)===1?'':'s'} to <b>${esc(next[1])}</b> ${next[2]}</div>`
-      :`<div class="mini" style="color:${tc};text-shadow:0 0 12px currentColor">⭑ Maximum rank reached — you are the Legend of Gotham.</div>`}
-    </div></div>`;
+      <div style="font-family:var(--disp);font-size:15px;color:${tc};line-height:1.1;text-shadow:0 0 12px ${tc}88">${esc(cur[1])} ${cur[2]}</div>
+      <div style="font-size:10px;color:var(--text3);margin:3px 0 5px">Strength Lv ${sl} · Rank ${ri+1}/${RANKS.length} <span style="color:${tc}">· all ranks ›</span></div>
+      <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden"><i style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,${tc},var(--gold2));border-radius:999px;box-shadow:0 0 8px ${tc}"></i></div>
+    </div>
+    ${next?`<div style="text-align:right;font-size:10px;color:var(--text3);flex:none">${Math.max(0,hi-sl)}<br><span style="font-size:9px">to go</span></div>`:`<span style="font-size:16px;flex:none">⭑</span>`}
+  </div>`;
 }
 
 /* ===== NIGHTLY PATROL REPORT (#10): a cinematic crime-log recap of a mission ===== */
@@ -6132,10 +6143,18 @@ function wayneTowersCard(){
   const vol=(typeof ironLedger==="function"?ironLedger().vol:(state.data.u.totalVolume||0))||0;
   if(vol<=0)return "";
   const towers=vol/WAYNE_TOWER_KG, whole=Math.floor(towers), pct=Math.round((towers-whole)*100);
-  return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 20px 48px -22px rgba(0,0,0,.98),0 0 28px -8px var(--gold)" onclick="openIronLedger()"><div class="row sp"><div class="ttl" style="margin:0">🏙️ Wayne Towers Lifted</div><span class="mini" style="color:var(--gold2)">iron ledger ›</span></div>
-    <div class="row sp" style="align-items:flex-end;margin-top:2px"><div class="big" style="text-shadow:0 0 24px rgba(232,168,32,.65)">${whole}<span style="font-size:18px;color:var(--text2)"> ${whole===1?"tower":"towers"}</span></div><div class="mini" style="color:var(--text3);text-align:right">${fmtNum(Math.round(vol))} kg moved<br>${pct}% to tower ${whole+1}</div></div>
-    <div class="bar" style="height:7px;margin-top:8px"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 10px rgba(255,208,72,.5)"></i></div>
-    <div class="mini" style="color:var(--text2);margin-top:7px;font-style:italic">Each tower = ${fmtNum(WAYNE_TOWER_KG)}kg of iron. You're raising Gotham's skyline one rep at a time.</div></div>`;
+  return `<div class="gtv2-panel wide" style="margin-bottom:8px;cursor:pointer;display:flex;gap:12px;align-items:center;padding:10px 12px" onclick="openIronLedger()">
+    <div style="font-size:26px;line-height:1;text-shadow:0 0 18px rgba(232,197,106,.65)">🏙️</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:10px;letter-spacing:.14em;color:var(--text3);font-family:var(--disp);margin-bottom:3px">WAYNE TOWERS LIFTED</div>
+      <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:4px">
+        <span style="font-size:21px;font-family:var(--disp);color:var(--gold2);text-shadow:0 0 16px rgba(232,197,106,.5)">${whole}</span>
+        <span style="font-size:11px;color:var(--text2)">${whole===1?"tower":"towers"} · ${fmtNum(Math.round(vol))}kg</span>
+      </div>
+      <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden"><i style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px;box-shadow:0 0 8px rgba(255,208,72,.5)"></i></div>
+    </div>
+    <div style="font-size:10px;color:var(--text3);text-align:right;flex:none;line-height:1.3">${pct}%<br><span style="font-size:9px">to next</span></div>
+  </div>`;
 }
 /* ========================= PROFILE TAB (Case + History merged) =========================
    One identity page: avatar + rank, the big Strength Index curve, title belts, combat ranks,
@@ -8223,64 +8242,101 @@ function renderAllies(){
   const myRank=board.findIndex(c=>c._you)+1;
   const fc=myFriendCode();
   const cloudOn=(typeof cloud!=="undefined"&&cloud.ready);
-  let html=`<div class="row sp" style="align-items:flex-end;margin-bottom:4px"><h1 style="font-size:34px;color:var(--gold2);margin:0">ALLIES</h1>
-    <span class="chip" style="${cloudOn?'color:var(--green);border-color:var(--green)':'color:var(--text3)'}">${cloudOn?'● LIVE':'○ connecting…'}</span></div>
-    <div class="tag" style="margin-bottom:13px">Train online with friends · share once, sync forever</div>`;
-  // My Patrol Card hero
-  const lifts=me.lifts.length?me.lifts.map(l=>`<span class="chip" style="font-size:11px">${esc(l.n)} ${l.o}kg</span>`).join(" "):'<span class="mini" style="color:var(--text3)">No PRs logged yet</span>';
-  html+=`<div class="card glow"><div class="row sp"><div class="ttl" style="margin:0">${me.re} ${esc(me.n)} <span class="mini" style="color:var(--text3)">(you)</span></div><span class="chip on">${esc(me.rk)}</span></div>
-    <div class="row" style="gap:6px;margin:11px 0">${caveStat("STR "+me.sl,"strength")}${caveStat(fmtNum(me.vol)+"kg","moved")}${caveStat(me.w,"sessions")}${caveStat(me.boss,"villains")}</div>
-    <div class="row sp" style="margin:2px 0 9px"><span class="mini">Vigilante Score</span><b class="gold" style="font-size:18px">${fmtNum(score)}</b></div>
-    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px">${lifts}</div>
-    <button class="btn ghost sm" onclick="shareMyCard()">📋 Copy a one-time snapshot instead</button></div>`;
-  // Connect — friend code + add-ally fused into one tidy card (share once, sync forever)
-  html+=`<div class="card" style="margin-top:12px;background:linear-gradient(160deg,var(--gold-bg),var(--bg2));border-color:var(--gold-dim)">
-    <div class="ttl" style="margin:0 0 3px;font-size:15px;display:flex;align-items:center;gap:7px">🔗 Connect</div>
-    <div class="mini" style="color:var(--text2);margin-bottom:8px">Share your code once — a friend adds it and your Patrol Card streams to them <b style="color:var(--gold2)">live</b> after every workout.</div>
-    <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="width:100%;font-size:12.5px;font-weight:700;color:var(--gold2);background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;letter-spacing:.5px"/>
-    <button class="btn gold sm" style="margin-top:8px" onclick="shareFriendCode()">📋 Copy my friend code</button>
-    <div style="border-top:1px solid var(--border);margin:11px 0 9px"></div>
-    <div class="mini" style="color:var(--text2);margin-bottom:7px"><b style="color:var(--gold2)">Add an ally</b> — paste their code (GTUID:…) or a one-time snapshot.</div>
-    <textarea id="ally-code" placeholder="Paste a friend code or Patrol Card…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:44px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none"></textarea>
-    <div class="row" style="gap:6px;margin-top:7px"><button class="btn gold sm g" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div></div>`;
-  // Inline League — every ally sits right here on the tab, each with ONE-TAP access to their lifts,
-  // split and a head-to-head compare. No more opening a sheet and digging through buttons first.
+
+  // ── Hero header + my card ──
+  let html=`<div style="background:linear-gradient(180deg,rgba(60,150,255,.14),rgba(7,9,13,.0));border:1px solid rgba(60,150,255,.28);border-radius:18px;padding:15px 14px 14px;margin-bottom:13px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(60,150,255,.7),transparent)"></div>
+    <div class="row sp" style="align-items:center;margin-bottom:12px">
+      <div>
+        <div style="font-family:var(--disp);font-size:26px;color:#9fc1f2;letter-spacing:.04em;line-height:1">ALLIES</div>
+        <div style="font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-top:2px">Gotham Patrol Network · live sync</div>
+      </div>
+      <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid ${cloudOn?'rgba(46,204,122,.4)':'rgba(255,255,255,.12)'};color:${cloudOn?'#6ef5a8':'var(--text3)'}"><i style="width:6px;height:6px;border-radius:50%;background:${cloudOn?'#6ef5a8':'rgba(255,255,255,.2)'};${cloudOn?'animation:gtv2pulse 2s infinite':''}"></i>${cloudOn?'LIVE':'CONNECTING'}</span>
+    </div>
+    <div style="background:rgba(0,0,0,.32);border:1px solid rgba(60,150,255,.18);border-radius:12px;padding:12px 13px">
+      <div class="row sp" style="align-items:center;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:22px">${me.re}</span>
+          <div>
+            <div style="font-family:var(--disp);font-size:15px;color:var(--text);line-height:1.1">${esc(me.n)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">YOU · #${myRank} of ${board.length}</div>
+          </div>
+        </div>
+        <span class="chip on" style="font-size:10px">${esc(me.rk)}</span>
+      </div>
+      <div class="row" style="gap:5px;margin-bottom:9px">${caveStat("STR "+me.sl,"strength")}${caveStat(fmtNum(me.vol)+"kg","moved")}${caveStat(me.w,"sessions")}${caveStat(me.boss,"villains")}</div>
+      <div class="row sp">
+        <span style="font-size:11px;color:var(--text2)">Vigilante Score <b style="color:#9fc1f2;font-size:14px">${fmtNum(score)}</b></span>
+        <button class="btn ghost sm" style="width:auto;font-size:11px" onclick="shareMyCard()">📋 Snapshot</button>
+      </div>
+    </div>
+  </div>`;
+
+  // ── Connect ──
+  html+=`<div style="background:linear-gradient(160deg,rgba(242,208,121,.07),rgba(14,14,18,.94));border:1px solid rgba(242,208,121,.28);border-radius:14px;padding:13px 14px;margin-bottom:13px">
+    <div style="font-family:var(--disp);font-size:12px;letter-spacing:.12em;color:var(--gold2);margin-bottom:5px">🔗 CONNECT</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">Share your code once — your ally adds it and your Patrol Card syncs <b style="color:var(--gold2)">live</b> after every workout.</div>
+    <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="width:100%;font-size:12px;font-weight:700;color:var(--gold2);background:rgba(0,0,0,.4);border:1px solid rgba(242,208,121,.25);border-radius:10px;padding:10px 12px;text-align:center;letter-spacing:.5px;margin-bottom:8px"/>
+    <button class="btn gold sm" style="width:100%;margin-bottom:11px" onclick="shareFriendCode()">📋 Copy my friend code</button>
+    <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px"><b style="color:var(--gold2)">Add an ally</b> — paste their code (GTUID:…) or a snapshot</div>
+      <textarea id="ally-code" placeholder="Paste friend code or Patrol Card snapshot…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:42px;font-size:11px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px;resize:none;color:var(--text);margin-bottom:7px"></textarea>
+      <div class="row" style="gap:6px"><button class="btn gold sm g" style="flex:1" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div>
+    </div>
+  </div>`;
+
+  // ── League ──
   if(allies.length){
-    html+=`<div class="ttl" style="margin:17px 0 8px;font-size:15px;display:flex;align-items:center;gap:7px">🦸 Your League <span class="chip">${allies.length}</span></div>`;
+    html+=`<div style="font-family:var(--disp);font-size:11px;letter-spacing:.15em;color:var(--text3);margin:0 0 8px">🦸 YOUR LEAGUE <span style="color:var(--text2)">(${allies.length})</span></div>`;
     html+=allies.map((a,i)=>{
-      const top=(a.lifts||[]).slice(0,3).map(l=>`<span class="chip" style="font-size:10.5px">${esc(l.n)} ${l.o}kg</span>`).join(" ")||'<span class="mini" style="color:var(--text3)">No lifts on their card yet</span>';
+      const top=(a.lifts||[]).slice(0,3).map(l=>`<span class="chip" style="font-size:10px">${esc(l.n)} ${l.o}kg</span>`).join(" ")||'';
       const days=(a.spl&&a.spl.d)?a.spl.d.length:0;
-      return `<div class="card" style="padding:12px 13px;margin-bottom:9px"><div class="row sp" style="align-items:flex-start"><b style="font-family:var(--disp);font-size:16px;color:var(--gold2)">${a.re||"🦸"} ${esc(a.n)}</b><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="chip">${esc(a.rk||"")}</span>${allyStatusPill(a)}</div></div>
-      <div class="row" style="gap:6px;margin:9px 0">${caveStat("STR "+(a.sl||0),"strength")}${caveStat(fmtNum(a.vol||0)+"kg","moved")}${caveStat(a.w||0,"sessions")}${caveStat(a.boss||0,"villains")}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">${top}</div>
-      <div class="row" style="gap:6px"><button class="btn ghost sm g" onclick="allyLifts(${i})">🏋️ Lifts</button><button class="btn ghost sm g" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button><button class="btn ghost sm g" onclick="compareAlly(${i})">⚔️ Compare</button></div>
-      ${(()=>{const risk=allyStreakRisk(a);return risk?`<button class="btn sm" style="width:100%;margin-top:6px;background:linear-gradient(135deg,#ff7a3a,#E8453C);color:#fff;font-weight:800" onclick="streakRescue(${i})">🔥 Rescue their ${risk.streak}-day streak — about to break</button>`:"";})()}
-      <button class="btn ghost sm" style="width:100%;margin-top:6px;color:var(--gold2);border-color:var(--gold-dim)" onclick="nudgeAlly(${i})">🦇 Light the Bat-Signal</button></div>`;
+      const risk=allyStreakRisk(a);
+      return `<div style="background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(10,10,14,.85));border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:12px 13px;margin-bottom:9px">
+        <div class="row sp" style="align-items:center;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px">${a.re||"🦸"}</span>
+            <div>
+              <div style="font-family:var(--disp);font-size:15px;color:var(--gold2);line-height:1.1">${esc(a.n)}</div>
+              <div style="margin-top:3px">${allyStatusPill(a)}</div>
+            </div>
+          </div>
+          <span class="chip" style="font-size:10px">${esc(a.rk||"")}</span>
+        </div>
+        <div class="row" style="gap:5px;margin-bottom:9px">${caveStat("STR "+(a.sl||0),"strength")}${caveStat(fmtNum(a.vol||0)+"kg","moved")}${caveStat(a.w||0,"sessions")}${caveStat(a.boss||0,"villains")}</div>
+        ${top?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px">${top}</div>`:''}
+        <div class="row" style="gap:5px">
+          <button class="btn ghost sm g" style="flex:1" onclick="allyLifts(${i})">🏋️ Lifts</button>
+          <button class="btn ghost sm g" style="flex:1" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button>
+          <button class="btn ghost sm g" style="flex:1" onclick="compareAlly(${i})">⚔️ H2H</button>
+        </div>
+        ${risk?`<button class="btn sm" style="width:100%;margin-top:7px;background:linear-gradient(135deg,#ff7a3a,#E8453C);color:#fff;font-weight:800" onclick="streakRescue(${i})">🔥 Rescue their ${risk.streak}-day streak — about to break</button>`:''}
+        <button class="btn ghost sm" style="width:100%;margin-top:6px;color:#9fc1f2;border-color:rgba(60,150,255,.28)" onclick="nudgeAlly(${i})">🦇 Light the Bat-Signal</button>
+      </div>`;
     }).join("");
   }
-  // Weekly Fight Card — your own week scored like a bout vs last week's self
+
   html+=weeklyFightCard();
-  // Fight Night — weekly personal-records bout with a belt on the line
   html+=fightNightCard();
-  // Tools — compact 2-col grid of tap tiles (Leaderboard · Raid · Sparring · More).
-  // Replaces four stacked cards so the tab reads clean; each opens its own sheet.
+
+  // ── League tools grid ──
   const r=d.raid;const rp=r?raidProgress():null;
   const rv=d.rival;
   const lbSub=board.length>1?('#'+myRank+' of '+board.length):'just you';
   const raidSub=r?(Math.round(rp.pct)+'% vs '+esc(r.boss)):'team boss';
   const sparSub=rv?('vs '+esc(rv.name||'rival')):'1-v-1';
-  const tile=(onclick,icon,label,sub,hot)=>`<div class="card" style="cursor:pointer;margin:0;padding:13px 12px;text-align:center" onclick="${onclick}">
-    <div style="font-size:22px;line-height:1">${icon}</div>
-    <div class="ttl" style="margin:6px 0 2px;font-size:14px">${label}</div>
+  const tile=(onclick,icon,label,sub,hot)=>`<div style="background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(10,10,14,.85));border:1px solid rgba(255,255,255,.09);border-radius:12px;cursor:pointer;padding:14px 12px;text-align:center" onclick="${onclick}">
+    <div style="font-size:24px;line-height:1;margin-bottom:5px">${icon}</div>
+    <div style="font-family:var(--disp);font-size:13px;color:var(--text);margin-bottom:4px">${label}</div>
     <span class="chip ${hot?'on':''}" style="font-size:10px">${sub}</span></div>`;
-  html+=`<div class="ttl" style="margin:17px 0 8px;font-size:15px;display:flex;align-items:center;gap:7px">🧰 League tools</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+  html+=`<div style="font-family:var(--disp);font-size:11px;letter-spacing:.15em;color:var(--text3);margin:14px 0 8px">🧰 LEAGUE TOOLS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
       ${tile('openLeaderboard()','🏆','Leaderboard',lbSub,myRank===1&&board.length>1)}
       ${tile('openRaid()','⚔️','Co-op Raid',raidSub,!!r)}
       ${tile('openSparring()','🥊','Sparring',sparSub,!!rv)}
-      ${tile('openJusticeLeague()','🛠️','Splits & backups',allies.length+' all'+(allies.length===1?'y':'ies'))}
+      ${tile('openJusticeLeague()','🛠️','Splits & Backups',allies.length+' all'+(allies.length===1?'y':'ies'))}
     </div>`;
-  // Live Patrol Feed — your League's activity timeline, at the very bottom as the log
+
   html+=patrolFeedCard();
   $("app").innerHTML=html;
 }
@@ -10250,11 +10306,18 @@ function gtv2ScorePanel(){
   </div>`;
 }
 function gtv2MuscleGrid(){
-  const rows=M12.map(m=>{
-    const s=gtv2Stimulus(m),rec=(state.data.muscleVol[m]||0)?getRecovery(m):0,col=s.kind==="red"?"#ff887f":s.kind==="green"?"#75e5a5":s.kind==="gold"?"var(--gold2)":"var(--text3)";
-    return `<button class="gtv2-muscle" onclick="muscleDrill('${m}')">${mIcon(m,18,col)}<b>${MNAME[m]}</b><span style="color:${col}">${s.zone} · ${rec?rec+"% rec":"no data"}</span></button>`;
-  }).join("");
-  return `<div class="gtv2-panel wide"><div class="row sp"><div><div class="gtv2-label">Batsuit Map</div><div class="gtv2-value" style="font-size:22px;color:var(--gold2)">Volume x recovery by muscle</div></div><button class="btn ghost sm" style="width:auto" onclick="go('suit')">Suit</button></div><div class="gtv2-map">${rows}</div></div>`;
+  const chips=M12.map(m=>{
+    const s=gtv2Stimulus(m);
+    const col=s.kind==="red"?"#ff887f":s.kind==="green"?"#75e5a5":s.kind==="gold"?"var(--gold2)":"rgba(255,255,255,.3)";
+    return `<button class="gtv2-minimusle" onclick="go('suit')" style="border-color:${col}44;background:${col}0d">${mIcon(m,14,col)}<span style="font-size:9.5px;font-weight:700;color:${col};letter-spacing:.03em;white-space:nowrap">${MNAME[m]}</span><i style="width:5px;height:5px;border-radius:50%;background:${col};flex:none;box-shadow:0 0 5px ${col}"></i></button>`;
+  }).join('');
+  return `<div class="gtv2-panel wide" style="margin-bottom:12px;padding:10px 12px;cursor:pointer" onclick="go('suit')">
+    <div class="row sp" style="margin-bottom:8px">
+      <div><div class="gtv2-label">Batsuit Status</div><div style="font-size:11px;color:var(--text2)">Muscle readiness · tap for full Suit</div></div>
+      <span style="color:var(--gold2);font-size:11px;font-weight:700;letter-spacing:.06em">SUIT ›</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px">${chips}</div>
+  </div>`;
 }
 function gtv2OpenProtocolBriefing(){
   const audit=gtv2ActionIntel();
