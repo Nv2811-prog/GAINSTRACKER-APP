@@ -825,6 +825,44 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .log-ex-pill{flex:0 0 auto;padding:7px 12px;border-radius:10px;font-family:var(--disp);font-size:11.5px;letter-spacing:.05em;cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:var(--text3);transition:all .15s;-webkit-tap-highlight-color:transparent}
 .log-ex-pill.ex-active{background:rgba(242,208,121,.11);border-color:rgba(242,208,121,.38);color:var(--gold2)}
 .log-ex-pill.ex-done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.28);color:var(--green,#2ecc71)}
+/* ===== Wave 9 v2: Patrol intro v2 + swipe + input table ===== */
+/* Patrol intro */
+.patrol2-wrap{min-height:100svh;display:flex;flex-direction:column;background:#04060a;position:relative;overflow:hidden}
+.patrol2-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(242,208,121,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.035) 1px,transparent 1px);background-size:44px 44px;animation:pgrid 80s linear infinite;pointer-events:none}
+@keyframes pgrid{to{background-position:0 44px}}
+.patrol2-glow{position:absolute;top:-5%;left:50%;transform:translateX(-50%);width:500px;height:380px;background:radial-gradient(ellipse,rgba(242,208,121,.13) 0%,transparent 68%);pointer-events:none}
+.patrol2-body{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 24px 36px;text-align:center}
+.patrol2-eye{font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:rgba(242,208,121,.4);margin-bottom:14px;animation:pfade .6s ease both}
+.patrol2-day{font-family:var(--disp);font-size:58px;letter-spacing:.03em;color:var(--text);line-height:.88;text-shadow:0 0 60px rgba(242,208,121,.35),0 2px 20px rgba(0,0,0,.95);margin-bottom:6px;animation:pfade .65s .08s ease both}
+.patrol2-day span{color:var(--gold2)}
+.patrol2-split{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:18px;animation:pfade .65s .14s ease both}
+.patrol2-rule{width:100%;max-width:340px;height:1px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.3),transparent);margin:0 auto 18px;animation:pfade .65s .18s ease both}
+.patrol2-muscles{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:18px;animation:pfade .65s .22s ease both}
+.patrol2-mtag{font-family:var(--disp);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;padding:5px 13px;border-radius:20px;border:1px solid;white-space:nowrap}
+.patrol2-targets{width:100%;max-width:380px;margin:0 0 24px;animation:pfade .65s .28s ease both}
+.patrol2-tcard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:10px 14px;margin-bottom:7px;font-size:13px;line-height:1.5;color:var(--text2);text-align:left}
+.patrol2-deploy{font-family:var(--disp);font-size:15px;letter-spacing:.22em;padding:18px 0;border-radius:16px;background:linear-gradient(180deg,rgba(242,208,121,.18),rgba(242,208,121,.07));border:1px solid rgba(242,208,121,.42);color:var(--gold2);box-shadow:0 0 28px -6px rgba(242,208,121,.45),inset 0 1px 0 rgba(255,255,255,.1);cursor:pointer;width:100%;max-width:380px;display:block;transition:all .14s;text-shadow:0 0 18px rgba(242,208,121,.45);animation:pfade .65s .36s ease both;-webkit-tap-highlight-color:transparent}
+.patrol2-deploy:active{transform:scale(.97);box-shadow:0 0 10px -4px rgba(242,208,121,.3)}
+@keyframes pfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+/* Swipable exercise rows */
+.ex-swipable{position:relative;overflow:hidden;margin-bottom:8px;border-radius:14px}
+.ex-act-l{position:absolute;left:0;top:0;bottom:0;width:72px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;background:linear-gradient(90deg,rgba(59,130,246,.35),rgba(59,130,246,.12));color:#93c5fd;font-family:var(--disp);font-size:10px;letter-spacing:.07em;text-transform:uppercase;z-index:1;pointer-events:none;border-radius:14px 0 0 14px}
+.ex-act-r{position:absolute;right:0;top:0;bottom:0;width:72px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;background:linear-gradient(270deg,rgba(232,69,60,.35),rgba(232,69,60,.12));color:#f87171;font-family:var(--disp);font-size:10px;letter-spacing:.07em;text-transform:uppercase;z-index:1;pointer-events:none;border-radius:0 14px 14px 0}
+.ex-act-l span,.ex-act-r span{font-size:18px}
+.ex-swipe-inner{position:relative;z-index:2;transform:translateX(0);background:var(--bg2,#0e0e12);border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+/* Logging set table */
+.log-settbl{width:100%;border-collapse:collapse}
+.log-settbl thead th{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);padding:6px 4px 5px;text-align:center;font-weight:600;border-bottom:1px solid rgba(255,255,255,.07)}
+.log-settbl td{padding:5px 3px;vertical-align:middle;text-align:center}
+.log-settbl .stcell{width:28px}
+.log-settbl .prevcell2{text-align:left;padding-left:6px;white-space:nowrap;font-size:12px;color:var(--text2);min-width:74px}
+.log-settbl .prevcell2 .pv{color:var(--text3);font-size:10.5px}
+.log-settbl .dlt-arrow{font-size:11px;margin-left:3px}
+.log-settbl input{width:100%;min-width:52px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:var(--text);text-align:center;padding:9px 3px;font:inherit;font-size:15px;-webkit-appearance:none;appearance:none}
+.log-settbl input:focus{border-color:rgba(242,208,121,.5);outline:none;background:rgba(242,208,121,.06)}
+.log-settbl tr.set-done-row td{opacity:.72}
+.log-settbl tr.set-warm-row .stype,.log-settbl tr.set-warm-row input{opacity:.8}
+.log-platezone{padding:10px 16px 4px}
 </style>
 </head>
 <body>
@@ -10116,6 +10154,296 @@ function renderLogging(){
   ensureTimers();
   if(!state.wtInt)startTimers();
   initDragReorder();
+}
+
+/* ===== Wave 9 v2: Dramatic patrol intro + proper logging redesign ===== */
+
+/* Kill the car entrance — the patrol intro is the new cinematic moment. */
+function playEntrance(name){try{haptic('light');}catch(e){}}
+
+/* Dramatic mission-briefing patrol intro. */
+function renderPatrolIntro(){
+  const ses=state.session;
+  const muscles=[];const seen=new Set();
+  (ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);muscles.push(m);}});});
+  const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
+  const musTags=muscles.slice(0,8).map(m=>{const col=pCols[m]||'var(--gold2)';return `<span class="patrol2-mtag" style="color:${col};border-color:${col}44;background:${col}0e">${MNAME[m]||m}</span>`;}).join('');
+  const exCount=(ses.exercises||[]).length;
+  const gp=tonightGamePlan();
+  const gpCards=gp&&gp.length?gp.map(t=>`<div class="patrol2-tcard">🎯 ${t}</div>`).join(''):'';
+  // Day name: split into words and highlight the last word in gold
+  const dayWords=ses.day.trim().split(/\s+/);
+  const dayHtml=dayWords.length>1
+    ?dayWords.slice(0,-1).join(' ')+' <span>'+esc(dayWords[dayWords.length-1])+'</span>'
+    :`<span>${esc(ses.day)}</span>`;
+  const statLine=muscles.length?`${muscles.length} target${muscles.length===1?'':'s'} · ${exCount} exercise${exCount===1?'':'s'}`:exCount?`${exCount} exercise${exCount===1?'':'s'} · free session`:'Free patrol';
+
+  $('app').innerHTML=`<div class="patrol2-wrap">
+    <div class="patrol2-grid"></div>
+    <div class="patrol2-glow"></div>
+    <div class="patrol2-body">
+      <div class="patrol2-eye">GOTHAM IRON PROTOCOL · MISSION BRIEFING</div>
+      <div class="patrol2-day">${dayHtml}</div>
+      <div class="patrol2-split">${esc(ses.split)}</div>
+      <div class="patrol2-rule"></div>
+      ${muscles.length?`<div class="patrol2-muscles">${musTags}</div>`:''}
+      ${gpCards?`<div class="patrol2-targets">${gpCards}</div>`:''}
+      <div style="font-size:11px;color:var(--text3);margin-bottom:26px;letter-spacing:.08em;animation:pfade .65s .32s ease both">${statLine}</div>
+      <button class="patrol2-deploy" onclick="beginPatrol()">DEPLOY TO FIELD</button>
+      <button class="btn ghost" style="margin-top:11px;color:var(--text3);max-width:380px;width:100%;animation:pfade .65s .4s ease both" onclick="endSession()">ABORT MISSION</button>
+    </div>
+  </div>`;
+}
+
+function beginPatrol(){state.step='logging';startTimers();try{haptic('done');}catch(e){}render();}
+
+/* Swipe gesture init — attach after render. Right swipe = Swap, Left swipe = Remove. */
+function initSwipeExercises(){
+  document.querySelectorAll('.ex-swipable').forEach(function(el){
+    const inner=el.querySelector('.ex-swipe-inner');if(!inner)return;
+    let sx=0,sy=0,dx=0,vertLock=false,moved=false;
+    inner.addEventListener('touchstart',function(e){
+      sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;vertLock=false;moved=false;
+      inner.style.transition='none';
+    },{passive:true});
+    inner.addEventListener('touchmove',function(e){
+      const nx=e.touches[0].clientX-sx,ny=e.touches[0].clientY-sy;
+      if(!moved&&Math.abs(ny)>Math.abs(nx)+4){vertLock=true;}
+      if(vertLock)return;
+      moved=true;dx=nx;
+      inner.style.transform='translateX('+Math.max(-76,Math.min(76,dx))+'px)';
+    },{passive:true});
+    inner.addEventListener('touchend',function(){
+      inner.style.transition='transform .22s ease';
+      const ei=+(el.dataset.ei);
+      if(dx>60){
+        inner.style.transform='translateX(76px)';
+        setTimeout(function(){inner.style.transition='';inner.style.transform='';focusEx(ei);openSwap(ei);},200);
+      }else if(dx<-60){
+        inner.style.transform='translateX(-76px)';
+        setTimeout(function(){inner.style.transition='';inner.style.transform='';removeExercise(ei);},200);
+      }else{inner.style.transform='';}
+    },{passive:true});
+  });
+}
+
+/* Full logging screen — exercise focus card with input table + swipable list. */
+function renderLogging(){
+  const ses=state.session;if(!ses){try{go('gotham');}catch(e){}return;}
+  const metric=state.data.u.metric;
+
+  // Fixed timer bar
+  let h=`<div class="timers" id="timerbar">
+    <div class="tbox"><span class="num" id="wt-display">${fmtTime(Math.floor((Date.now()-ses.startedAt)/1000))}</span><small>Mission time</small></div>
+    <div class="tbox rest" onclick="reopenRest()" style="cursor:pointer"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>${state.restRunning?"tap to open":"Recovery"}</small></div>
+    <button class="minbtn" onclick="minimizeWorkout()" aria-label="Minimise workout">▾</button>
+  </div><div id="timerspace" aria-hidden="true"></div>`;
+
+  // Exercise nav strip
+  if(ses.exercises.length){
+    const curFei=activeExIdx();
+    h+=`<div class="log-ex-strip">`;
+    ses.exercises.forEach(function(e,ei){
+      const pr=exProgress(e);const isFocus=ei===curFei;
+      const cls=pr.allDone?'ex-done':isFocus?'ex-active':'';
+      const nm=e.name.length>21?e.name.slice(0,20)+'…':e.name;
+      h+=`<div class="log-ex-pill ${cls}" onclick="focusEx(${ei})">${pr.allDone?'✓ ':''}${esc(nm)}</div>`;
+    });
+    h+=`</div>`;
+  }
+
+  // Focus card
+  const fei=activeExIdx();
+  if(fei>=0&&ses.exercises[fei]){
+    const e=ses.exercises[fei];const ex=exFor(e.name);
+    const sug=suggestionFor(e.name);const nt=nextTarget(e.name);
+    const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
+    const col=pCols[(ex.p||[])[0]]||'var(--gold2)';
+    const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
+
+    // Figure — use the established exwrap pattern (always renders something)
+    const fi=exFigImg(ex);
+    const figHtml=`<span class="exwrap" style="width:88px;height:88px;flex:0 0 88px;border-radius:16px;border-color:${col}44;box-shadow:0 0 0 1px ${col}18,0 8px 28px -8px ${col}40">
+      ${fi?`<img class="exfigimg" src="${fi}" alt="" onerror="this.classList.add('hidden')"/>`:''}
+      ${figureSVG(ex)}
+    </span>`;
+
+    h+=`<div class="log-focus">
+      <div class="log-focus-head">
+        ${figHtml}
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">
+          <div class="log-exname">${esc(e.name)}</div>
+          ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
+          <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
+          ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
+        </div>
+        <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove">✕</button>
+      </div>`;
+
+    // Set table — exact previous values shown left, direct inputs for weight+reps
+    h+=`<div style="padding:0 16px 6px">
+      <table class="log-settbl"><thead><tr>
+        <th class="stcell">SET</th>
+        <th style="text-align:left;padding-left:6px">LAST TIME</th>
+        <th>${ex.bw?'+KG':'KG'}</th>
+        <th>REPS</th>
+        <th></th>
+        <th>${metric==='rir'?'RIR':'RPE'}</th>
+        <th>✓</th>
+      </tr></thead><tbody>`;
+    e.sets.forEach(function(s,si){
+      const isW=s.type==='W';
+      const pw=s.prevW!=null?String(s.prevW):null;
+      const pr2=s.prevR!=null?String(s.prevR):null;
+      // Build previous cell — exact weight × reps
+      let prevCellHtml='<span class="pv">—</span>';
+      if(pw!=null||pr2!=null){
+        const pw2=parseFloat(pw)||0,pr3=parseInt(pr2)||0;
+        // Delta arrow vs current
+        let dltHtml='';
+        if(s.done&&(s.w||s.r)){
+          const cw=parseFloat(s.w)||0,cr=parseInt(s.r)||0;
+          if(cw>pw2||(cw===pw2&&cr>pr3))dltHtml='<span class="dlt-arrow dlt-up">↑</span>';
+          else if(cw<pw2||(cw===pw2&&cr<pr3))dltHtml='<span class="dlt-arrow dlt-dn">↓</span>';
+          else if(cw||cr)dltHtml='<span class="dlt-arrow dlt-eq">→</span>';
+        }
+        prevCellHtml=`<b>${pw!=null?pw+'kg':'—'}</b> × ${pr2!=null?pr2:'—'}${dltHtml}`;
+        if(s.prevType&&s.prevType!=='NRM')prevCellHtml=`<span class="pv">${s.prevType} </span>`+prevCellHtml;
+      }
+      const metricCell=isW?'<span class="pv">—</span>':`<select onchange="setField(${fei},${si},'rpe',this.value)" style="padding:7px 2px;font-size:12px;background:var(--bg2);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--text)">${metricOpts(metric,s.rpe)}</select>`;
+      const rowCls=s.done?'set-done-row':isW?'set-warm-row':'';
+      h+=`<tr class="${rowCls}">
+        <td class="stcell"><div class="stype ${s.type}" onclick="cycleType(${fei},${si})">${s.type==='NRM'?(si+1):s.type}</div></td>
+        <td class="prevcell2">${prevCellHtml}</td>
+        <td><input data-fid="${fei}-${si}-w" inputmode="decimal" value="${esc(s.w)}" oninput="setField(${fei},${si},'w',this.value)" placeholder="${ex.bw?(pw||0):(pw||'')}"/></td>
+        <td><input data-fid="${fei}-${si}-r" inputmode="numeric" value="${esc(s.r)}" oninput="setField(${fei},${si},'r',this.value)" placeholder="${pr2||''}"/></td>
+        <td><div class="stype" onclick="openSetSheet(${fei},${si})" title="Options">⋮</div></td>
+        <td>${metricCell}</td>
+        <td><div class="sdone${s.done?' on':''}" onclick="toggleDone(${fei},${si})">${s.done?'✓':''}</div></td>
+      </tr>`;
+    });
+    h+=`</tbody></table></div>`;
+
+    // Plate bar — show for barbell when any working set has a weight
+    if(isBarbell){
+      const workW=(e.sets.filter(s=>s.type!=='W'&&parseFloat(s.w)>0).map(s=>parseFloat(s.w)))[0]||0;
+      if(workW>0)h+=`<div class="log-platezone">${renderPlateBar(workW)}</div>`;
+    }
+
+    // Warm-up suggest
+    const wu=warmupSuggest(fei);
+    if(wu)h+=`<div style="margin:4px 16px 6px;padding:10px;background:#1a1305;border:1px solid var(--gold-dim,#6b5420);border-radius:11px">
+      <div class="mini" style="color:var(--gold2);margin-bottom:4px;display:flex;align-items:center">${secIcon('flame')}Warm-up — ${esc(wu.muscles)} still cold</div>
+      <div class="mini" style="margin-bottom:6px">${wu.sets.map(s=>s.w+'kg × '+s.r).join(' · ')} <span style="color:var(--text3)">— primes the pattern, doesn't count as working volume</span></div>
+      <div class="row" style="gap:8px"><button class="btn gold sm g" onclick="addWarmups(${fei})">Add warm-up</button><button class="btn ghost sm" style="width:auto" onclick="dismissWarm(${fei})">Skip</button></div>
+    </div>`;
+
+    // Machine setting
+    const exEq=(ex.eq||'').toLowerCase();
+    if(['machine','cable','smith','lever','plate-loaded'].includes(exEq)){
+      const ms=machineSetting(e.name);
+      h+=`<div class="mini" onclick="setMachineSetting('${esc(e.name).replace(/'/g,'')}')" style="margin:4px 16px 6px;cursor:pointer">⚙️ <b style="color:var(--gold2)">${esc(state.data.u.activeGym||'Gym')}</b> setup: ${ms?`<b>${esc(ms)}</b> <span style="color:var(--text3)">· edit</span>`:'<span style="color:var(--text3)">tap to save seat / pin / pad ›</span>'}</div>`;
+    }
+
+    // next target line
+    const nt2=nextTarget(e.name);if(nt2&&!nt)h+=`<div class="mini" style="margin:0 16px 8px;color:var(--green);line-height:1.4">🎯 <b>Next target:</b> ${nt2}</div>`;
+
+    // Action row
+    h+=`<div class="row wrap" style="padding:6px 16px 16px;gap:7px">
+      <button class="btn ghost sm g" onclick="addSet(${fei})">+ Set</button>
+      <button class="btn ghost sm" style="width:auto" onclick="fillLast(${fei})" title="Fill from last session">↻ Fill last</button>
+      <button class="btn ghost sm" style="width:auto" onclick="openSwap(${fei})">⇄ Swap</button>
+      <button class="btn ghost sm" style="width:auto" onclick="openPair(${fei})">🤝 Pair</button>
+      <button class="btn ghost sm" style="width:auto" onclick="openProtocolSheet(${fei})">⚡ Intensity</button>
+      ${isBarbell?`<button class="btn ghost sm" style="width:auto" onclick="openPlateSheet(${fei})">${secIcon('plate')}</button>`:''}
+      <button class="btn ghost sm" style="width:auto" onclick="showCues('${esc(e.name).replace(/'/g,'')}')">ℹ️ Cues</button>
+    </div>`;
+    h+=`</div>`; // close .log-focus
+  }else{
+    h+=`<div class="card" style="padding:20px;text-align:center;color:var(--text3)">No exercises yet — add one below.</div>`;
+  }
+
+  // Alfred coach
+  {const _ct=ses._coachTone||'ok';const _cc=_ct==='good'?'var(--green)':_ct==='bad'?'#e8453c':'var(--gold2)';
+   const _cl=ses._coach||"At your service, sir. Log your first set — I'll be watching, and I do not flatter.";
+   h+=`<div class="banner" style="margin-bottom:8px;border-color:${_cc}55"><span>🎩</span><div style="min-width:0"><b style="font-size:11px;letter-spacing:.08em;color:${_cc}">ALFRED${_ct==='bad'?' — UNIMPRESSED':_ct==='good'?' — IMPRESSED':''}</b><div class="mini" style="font-style:italic;color:var(--text2);line-height:1.45">"${esc(_cl)}"</div></div></div>`;}
+
+  // Game plan (dismissible)
+  if(!ses._planDismiss){const _gp=tonightGamePlan();
+    if(_gp&&_gp.length)h+=`<div class="card glow" style="padding:11px;margin-bottom:8px;border-color:rgba(232,197,106,.42);background:rgba(232,197,106,.06)">
+      <div class="row sp" style="margin-bottom:6px"><div class="ttl" style="margin:0;font-size:13px">🗺️ Tonight's game plan</div><span onclick="dismissGamePlan()" style="cursor:pointer;color:var(--text3);font-weight:700;padding:0 4px">✕</span></div>
+      ${_gp.map(function(t){return `<div class="mini" style="line-height:1.5;margin-bottom:4px;color:var(--text2)">🎯 ${t}</div>`;}).join('')}
+    </div>`;}
+
+  // Volume / radar notes (collapsible)
+  {const vn=sessionVolNotes();const rn=stretchRedundancyNotes();
+   if(vn.length||rn.length){const open=state._coachNotesOpen;
+     h+=`<div class="card" style="padding:11px;margin-bottom:8px">
+       <div class="row sp" onclick="state._coachNotesOpen=!state._coachNotesOpen;render()" style="cursor:pointer">
+         <div style="font-size:12px;letter-spacing:.06em;color:var(--gold2)">🧠 Alfred's analysis</div>
+         <span style="color:var(--text3);font-size:13px">${open?'▾':'▸'}</span>
+       </div>
+       ${open?[...vn,...rn].map(function(n){return `<div class="mini" style="margin-top:7px;line-height:1.5;color:var(--text2)">${n.text.replace(/^🧲 |^📡 /,'')}</div>`;}).join(''):''}
+     </div>`;}}
+
+  // Damage report
+  {const hitM=[];ses.exercises.forEach(function(e){
+     const anyDone=(e.sets||[]).some(function(s){return s.type!=='W'&&(s.done||parseFloat(s.r)>0);});
+     if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(function(m){hitM.push(m);});}});
+   if(hitM.length){const dmgOpen=state._dmgOpen===true;
+     h+=`<div class="card glow" style="padding:11px;margin-bottom:8px">
+       <div class="row sp" onclick="toggleDmgReport()" style="cursor:pointer">
+         <div class="ttl" style="margin:0;font-size:13px">⚡ Damage report</div>
+         <div class="row" style="gap:5px;flex:none"><span class="mini" style="color:var(--text3)">${[...new Set(hitM)].length} muscles</span><span style="color:var(--text3);font-weight:700">${dmgOpen?'▾':'▸'}</span></div>
+       </div>
+       ${dmgOpen?`${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:6px;color:var(--text2)">Red = worked this session.</div>`:''}
+     </div>`;}}
+
+  // Other exercises — swipable rows
+  if(ses.exercises.length>1){
+    h+=`<div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin:6px 0 8px">OTHER EXERCISES <span style="font-size:9px;opacity:.6">· swipe ← delete · swipe → swap</span></div>`;
+    const gCount={};ses.exercises.forEach(function(e){if(e.group)gCount[e.group]=(gCount[e.group]||0)+1;});
+    let curG=null,gLetters={},gSeq=0;
+    ses.exercises.forEach(function(e,ei){
+      if(ei===activeExIdx())return;
+      const ex=exFor(e.name);const pr=exProgress(e);
+      const inGroup=e.group&&gCount[e.group]>1;
+      if((e.group||null)!==curG){if(curG&&gCount[curG]>1)h+=`</div>`;curG=e.group||null;
+        if(inGroup){if(!gLetters[e.group])gLetters[e.group]=String.fromCharCode(65+(gSeq++));
+          h+=`<div class="ssgroup"><div class="sshead">${secIcon('link','#ff8378')}SUPERSET ${gLetters[e.group]}</div>`;}}
+      h+=`<div class="ex-swipable" data-ei="${ei}">
+        <div class="ex-act-l"><span>⇄</span>Swap</div>
+        <div class="ex-act-r"><span>✕</span>Delete</div>
+        <div class="ex-swipe-inner">
+          <div class="exrow" style="padding:11px;cursor:pointer;opacity:${pr.allDone?.7:1}" onclick="focusEx(${ei})">
+            ${thumb(ex,true)}
+            <div class="g"><div class="exname" style="font-size:14px">${esc(e.name)}</div>
+              <div class="exmeta">${exTarget(ex)} · ${pr.allDone?`<span style="color:var(--green)">✓ all done</span>`:`${pr.doneN}/${pr.total} sets`}</div></div>
+            <div style="color:${pr.allDone?'var(--green)':'var(--text3)'};font-size:14px">${pr.allDone?'✓':'▸'}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    if(curG&&gCount[curG]>1)h+=`</div>`;
+  }
+
+  h+=`<button class="btn" onclick="openPicker()">＋ Add exercise</button>`;
+
+  // Session notes
+  h+=`<div class="card" style="margin-top:12px;padding:13px">
+    <div class="ttl" style="margin-bottom:4px">📝 Session notes <span class="mini" style="color:var(--text3);font-weight:400">— Alfred reads these before his review</span></div>
+    <textarea id="sessnotes" placeholder="e.g. Glutes sore — skipped leg press." oninput="setSessionNotes(this.value)" style="width:100%;min-height:56px;resize:vertical;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font:inherit;line-height:1.45">${esc(ses.notes||'')}</textarea>
+  </div>`;
+
+  h+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="finishWorkout()">🏁 FINISH WORKOUT</button>
+    <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
+
+  $('app').innerHTML=h;
+  {const _tb=$('timerbar'),_sp=$('timerspace');if(_tb&&_sp)_sp.style.height=_tb.offsetHeight+'px';}
+  ensureTimers();
+  if(!state.wtInt)startTimers();
+  initDragReorder();
+  initSwipeExercises();
 }
 </script>
 </body>
