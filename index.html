@@ -8222,17 +8222,6 @@ function showFightNightResult(res){
     title:youWon?"The belt is yours":w.name+" takes the belt",
     bodyHtml,btn:"NEXT ROUND",accent:"var(--gold2)"});
 }
-function patrolFeedCard(){
-  const feed=(state.data.patrolFeed||[]);
-  if(!feed.length)return"";
-  const rows=feed.slice(0,12).map(f=>`<div class="row" style="gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)">
-    <div style="font-size:19px;flex:none;width:26px;text-align:center">${f.icon||"🦇"}</div>
-    <div class="g" style="min-width:0"><div class="mini" style="color:var(--text);font-size:13px;line-height:1.45">${f.html||""}</div>
-    <div class="mini" style="color:var(--text3);font-size:11px;margin-top:2px">${feedAgo(f.t)}</div></div></div>`).join("");
-  return `<div class="card" style="margin-top:11px"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">📡 Patrol Feed</div><span class="chip" style="color:var(--green);border-color:var(--green)">live</span></div>
-    <div class="mini" style="color:var(--text2);margin:4px 0 2px">Every session, KO and record across your League — newest first.</div>
-    <div style="margin-top:4px">${rows}</div></div>`;
-}
 function renderAllies(){
   const d=state.data;
   const me=myPatrolCard();const score=vigilanteScore(me);
@@ -8272,15 +8261,21 @@ function renderAllies(){
     </div>
   </div>`;
 
-  // ── Connect ──
-  html+=`<div style="background:linear-gradient(160deg,rgba(242,208,121,.07),rgba(14,14,18,.94));border:1px solid rgba(242,208,121,.28);border-radius:12px;padding:10px 12px;margin-bottom:12px">
-    <div style="font-family:var(--disp);font-size:11px;letter-spacing:.12em;color:var(--gold2);margin-bottom:7px">🔗 CONNECT</div>
-    <div class="row" style="gap:6px;margin-bottom:8px">
-      <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="flex:1;min-width:0;font-size:11px;font-weight:700;color:var(--gold2);background:rgba(0,0,0,.4);border:1px solid rgba(242,208,121,.22);border-radius:8px;padding:8px 10px;letter-spacing:.4px"/>
-      <button class="btn gold sm" style="width:auto;flex:none" onclick="shareFriendCode()">📋 Copy</button>
+  // ── Connect (collapsed by default, tap header to expand) ──
+  const cOpen=state.accOpen&&state.accOpen['allies-connect'];
+  html+=`<div style="border:1px solid rgba(242,208,121,.28);border-radius:12px;margin-bottom:12px;overflow:hidden">
+    <button onclick="toggleAcc('allies-connect')" style="width:100%;background:linear-gradient(160deg,rgba(242,208,121,.07),rgba(14,14,18,.94));border:none;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+      <span style="font-family:var(--disp);font-size:11px;letter-spacing:.12em;color:var(--gold2)">🔗 CONNECT WITH ALLIES</span>
+      <span style="color:var(--gold2);font-size:13px;transition:.2s;transform:${cOpen?'rotate(180deg)':'rotate(0deg)'}">▾</span>
+    </button>
+    <div id="allies-connect" class="acc-body ${cOpen?'':'hide'}" style="padding:10px 12px;background:rgba(0,0,0,.25);border-top:1px solid rgba(242,208,121,.15)">
+      <div class="row" style="gap:6px;margin-bottom:8px">
+        <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="flex:1;min-width:0;font-size:11px;font-weight:700;color:var(--gold2);background:rgba(0,0,0,.4);border:1px solid rgba(242,208,121,.22);border-radius:8px;padding:8px 10px;letter-spacing:.4px"/>
+        <button class="btn gold sm" style="width:auto;flex:none" onclick="shareFriendCode()">📋 Copy</button>
+      </div>
+      <textarea id="ally-code" placeholder="Paste a friend code or snapshot to add an ally…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:38px;font-size:11px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:8px;resize:none;color:var(--text);margin-bottom:6px"></textarea>
+      <div class="row" style="gap:6px"><button class="btn gold sm g" style="flex:1" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div>
     </div>
-    <textarea id="ally-code" placeholder="Paste a friend code or snapshot to add an ally…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:38px;font-size:11px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:8px;resize:none;color:var(--text);margin-bottom:6px"></textarea>
-    <div class="row" style="gap:6px"><button class="btn gold sm g" style="flex:1" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div>
   </div>`;
 
   // ── League ──
