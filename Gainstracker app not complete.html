@@ -486,7 +486,7 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .ob-goal-card .ob-gtx .gt{font-family:var(--disp);font-size:22px;color:var(--text);letter-spacing:.03em}
 .ob-goal-card .ob-gtx .mini{color:var(--text2);font-size:12.5px;margin-top:2px}
 /* Alfred FAB — floating butler, visible on all tabs */
-#alfred-fab{position:fixed;bottom:84px;right:14px;z-index:50;width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,#1c1200,#0a0800);border:1.5px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 0 16px rgba(255,208,72,.30),0 4px 18px rgba(0,0,0,.7);transition:.15s transform,.15s opacity}
+#alfred-fab{position:fixed;bottom:84px;right:14px;z-index:50;width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,#1c1200,#0a0800);border:1.5px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;overflow:hidden;box-shadow:0 0 16px rgba(255,208,72,.30),0 4px 18px rgba(0,0,0,.7);transition:.15s transform,.15s opacity}
 #alfred-fab:active{transform:scale(.88)}
 #alfred-fab.hide{opacity:0;pointer-events:none}
 @keyframes fabGlow{0%,100%{box-shadow:0 0 14px rgba(255,208,72,.28),0 4px 14px rgba(0,0,0,.7)}50%{box-shadow:0 0 26px rgba(255,208,72,.55),0 4px 14px rgba(0,0,0,.7)}}
@@ -507,7 +507,8 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .alf-orb-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;flex:none;padding:6px 0 10px}
 .alf-orb{width:176px;height:176px;border-radius:50%;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .alf-orb:active .alf-orb-core{transform:scale(.94)}
-.alf-orb-core{width:128px;height:128px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#1e1400,#060408);border:2px solid rgba(255,208,72,.32);box-shadow:0 0 40px rgba(255,208,72,.12),0 0 80px rgba(255,208,72,.05);display:flex;align-items:center;justify-content:center;font-size:54px;position:relative;z-index:2;transition:border-color .4s,box-shadow .4s,transform .15s}
+.alf-orb-core{width:128px;height:128px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#1e1400,#060408);border:2px solid rgba(255,208,72,.32);box-shadow:0 0 40px rgba(255,208,72,.12),0 0 80px rgba(255,208,72,.05);display:flex;align-items:center;justify-content:center;font-size:54px;position:relative;z-index:2;overflow:hidden;transition:border-color .4s,box-shadow .4s,transform .15s}
+.alf-face{width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;border-radius:50%}
 .alf-orb-r{position:absolute;border-radius:50%;border:1.5px solid rgba(255,208,72,.13);animation:avRing 2.8s ease-in-out infinite}
 .alf-orb-r:nth-child(1){inset:-16px;animation-delay:0s}
 .alf-orb-r:nth-child(2){inset:-32px;animation-delay:.7s;border-color:rgba(255,208,72,.07)}
@@ -1027,7 +1028,7 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 <body>
 <div id="app"></div>
 <nav id="nav" class="hide"></nav>
-<div id="alfred-fab" class="hide" onclick="openAlfredChat()" title="Ask Alfred">🦇</div>
+<div id="alfred-fab" class="hide" onclick="openAlfredChat()" title="Ask Alfred"><img class="alf-face" src="assets/alfred.png" alt="Alfred"/></div>
 <div id="alf-voice-ov">
   <div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:54px 20px 0;flex:none">
     <div style="font-family:var(--disp);font-size:11px;color:var(--gold2);letter-spacing:.22em;opacity:.75">ALFRED · BATCOMPUTER</div>
@@ -1040,7 +1041,7 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
   <div class="alf-orb-wrap">
     <div class="alf-orb" onclick="_alfOrbTap()">
       <div class="alf-orb-r"></div><div class="alf-orb-r"></div><div class="alf-orb-r"></div>
-      <div class="alf-orb-core">🦇</div>
+      <div class="alf-orb-core"><img class="alf-face" src="assets/alfred.png" alt="Alfred"/></div>
     </div>
     <div id="av-status" style="font-size:11px;letter-spacing:.14em;color:var(--text3);text-transform:uppercase;max-width:280px;text-align:center;line-height:1.5">Tap to speak</div>
   </div>
