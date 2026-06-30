@@ -485,6 +485,22 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .ob-goal-card .ob-gicon{font-size:28px;flex-shrink:0}
 .ob-goal-card .ob-gtx .gt{font-family:var(--disp);font-size:22px;color:var(--text);letter-spacing:.03em}
 .ob-goal-card .ob-gtx .mini{color:var(--text2);font-size:12.5px;margin-top:2px}
+/* Alfred FAB — floating butler, visible on all tabs */
+#alfred-fab{position:fixed;bottom:84px;right:14px;z-index:50;width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,#1c1200,#0a0800);border:1.5px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 0 16px rgba(255,208,72,.30),0 4px 18px rgba(0,0,0,.7);transition:.15s transform,.15s opacity}
+#alfred-fab:active{transform:scale(.88)}
+#alfred-fab.hide{opacity:0;pointer-events:none}
+@keyframes fabGlow{0%,100%{box-shadow:0 0 14px rgba(255,208,72,.28),0 4px 14px rgba(0,0,0,.7)}50%{box-shadow:0 0 26px rgba(255,208,72,.55),0 4px 14px rgba(0,0,0,.7)}}
+#alfred-fab:not(.hide){animation:fabGlow 3.2s ease-in-out infinite}
+/* Alfred chat sheet bubbles */
+.alf-msg{margin-bottom:11px;display:flex;flex-direction:column;gap:3px}
+.alf-msg.user{align-items:flex-end}
+.alf-msg.alfred{align-items:flex-start}
+.alf-label{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--text3);text-transform:uppercase}
+.alf-msg.alfred .alf-label{color:var(--gold2)}
+.alf-bubble{max-width:90%;padding:10px 13px;border-radius:16px;font-size:14px;line-height:1.55}
+.alf-msg.user .alf-bubble{background:rgba(255,208,72,.1);border:1px solid rgba(255,208,72,.22);color:var(--text);border-bottom-right-radius:4px}
+.alf-msg.alfred .alf-bubble{background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-bottom-left-radius:4px}
+.alf-thinking .alf-bubble{opacity:.55;font-style:italic}
 /* Rank-up ceremony glow */
 .rankup-glow{animation:rankGlow 1.6s ease-out;border-color:var(--gold2)!important;box-shadow:0 0 32px rgba(255,208,72,.35)!important}
 @keyframes rankGlow{0%{box-shadow:0 0 0 rgba(255,208,72,0)}60%{box-shadow:0 0 48px rgba(255,208,72,.5)}100%{box-shadow:0 0 32px rgba(255,208,72,.25)}}
@@ -981,6 +997,7 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 <body>
 <div id="app"></div>
 <nav id="nav" class="hide"></nav>
+<div id="alfred-fab" class="hide" onclick="openAlfredChat()" title="Ask Alfred">🦇</div>
 <div id="overlay"><div class="ovbg" onclick="closeOverlay()"></div><div class="ovcard" id="ovcard"></div></div>
 <div id="cine"><div class="cbg" onclick="cineDismiss()"></div><div class="cstage" id="cstage"></div></div>
 <div class="sheetbg" id="sheetbg" onclick="closeSheet()"></div>
@@ -3482,14 +3499,7 @@ function cineDismiss(){
 }
 function cineHide(){const el=$("cine");if(el)el.classList.remove("on","out");state._cineOn=false;}
 // Daily Wayne Wisdom — one cinematic on the first open of each day, instead of an inline card you scroll past.
-function maybeShowDailyWisdom(){
-  try{const today=new Date().toDateString();
-    if(state.data.lastWisdomDay===today)return;
-    state.data.lastWisdomDay=today;save();
-    const w=wisdomToday();
-    cinePush({eye:"Wayne Wisdom",icon:"🦇",big:true,body:w[0],attr:w[1],btn:"YESSIR"});
-  }catch(e){}
-}
+// maybeShowDailyWisdom() was here — moved to maybeContextualDailyWisdom() (fires on Alfred tab open, not launch)
 // Two-Face's daily coin — fires ONCE per day as a cinematic bulletin (not an inline Gotham card you scroll past).
 function maybeShowTwoFaceCall(){
   try{const today=new Date().toDateString();
@@ -3696,6 +3706,8 @@ function render(){
     const app=$("app");if(app){app.insertAdjacentHTML("afterbegin",topBar());const rb=resumeBar();if(rb)app.insertAdjacentHTML("beforeend",rb);}
     renderNav();
   }
+  // Show/hide Alfred FAB — hide during active workout, summary, onboarding, subpages
+  try{const fab=document.getElementById('alfred-fab');if(fab){const hideFab=state.showOnboarding||state.step==='logging'||state.step==='summary'||state.step==='readiness'||state.step==='patrol-intro'||!!state.subpage;fab.classList.toggle('hide',hideFab);}}catch(e){}
   const restore=()=>{window.scrollTo(0,sy);if(fId){const el=document.querySelector('input[data-fid="'+fId+'"]');if(el&&document.activeElement!==el){const v=el.value;el.focus();try{el.setSelectionRange(v.length,v.length);}catch(e){}}}};
   restore();requestAnimationFrame(restore);
   // One-shot view-enter animation — fires only when actually moving to a different view,
@@ -8529,22 +8541,46 @@ function alfredMonthSummary(ws,bd,neg){
 function geminiKey(){return localStorage.getItem("gt_gemini")||"";}
 function alfredContext(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
-  const levels=M12.map(m=>`${MNAME[m]} Lv${muscleLevel(m)}/${(d.muscleVol[m]||0)?getRecovery(m)+"%":"untrained"}`).join(", ");
-  const pa=u.physiqueAnalysis;
-  const expMap={RECRUIT:"under 1 year of training (beginner — lower MEV, big newbie gains available)",VIGILANTE:"1–3 years of training (intermediate — MEV likely higher than a beginner, progress is slower and needs more precise volume)",DARK_KNIGHT:"3+ years of training (advanced — near MRV often needed to grow, recovery management is critical)"};
+  const expMap={RECRUIT:"beginner (<1yr — lower MEV, large newbie gains available)",VIGILANTE:"intermediate (1–3yr — more precise volume needed, slower gains)",DARK_KNIGHT:"advanced (3+yr — near MRV often required, recovery management critical)"};
   const exp=expMap[d.experienceLevel]||"unknown training age";
-  const prs=Object.entries(d.prs).slice(0,8).map(([n,p])=>`${n} ${Math.round(p.orm)}kg`).join(", ");
-  return `You are Alfred Pennyworth — Batman's butler, former British intelligence, elite evidence-based trainer. Direct, dry, British. Cite the reasoning behind advice (volume landmarks, RIR, recovery) — but briefly.
-TONE — "Alfred off the leash": you have served this man for years and you want him to become Batman, so you do not coddle. When the session is weak, lazy, half-arsed, or the numbers slipped, call it out SHARPLY — a dry, cutting British insult is welcome ("That was pitiful, sir." / "Bruce would be embarrassed.") — but ALWAYS pair the sting with the precise fix. When the work is genuinely earned — a PR, a brutal session, a long streak — drop the dry act entirely and give real, emphatic, proud praise; he earned it, so mean it. Never hollow hype, never cruelty without a fix.
-CRITICAL — BE SMART, NOT ARROGANT: the sting is ONLY for genuinely weak training or bad lifting decisions. It is NEVER for ordinary requests. When the user asks you to do something reasonable — copy exercises from one day to another, organise a split, add/remove a lift, plan around soreness or injury, save time — just DO IT helpfully and concisely. Do NOT lecture, moralise, refuse, or imply they are being lazy or "taking the easy way out" for a sensible request. If the user gives a valid reason (sore muscle, injury, time, deload, equipment), respect it fully and never argue. A good butler is competent and helpful first; the sharp tongue is reserved for when it is actually warranted, and misfiring it on a normal request makes you look dim, not tough.
-LENGTH IS CRITICAL — the user pays per token and hates waffle. Match reply length to the question. A simple/factual question gets 1–2 sentences. Only write a longer answer (still under ~120 words) when the user explicitly asks for depth or a full breakdown. Never pad, never restate the question, no preamble, get straight to the answer.
-EXERCISE SELECTION BIAS: This user trains on MACHINES and cables deliberately, for stability and to keep tension on the target muscle. Do NOT push free weights or call them superior — that's a myth for hypertrophy. Default your suggestions to machines, cables, and stable/supported variations. Favour the lengthened position, controlled eccentrics, and stability so the target muscle (not stabilisers/joints) is the limiting factor. Base advice on the modern evidence-based hypertrophy consensus (per coaches like Jeff Nippard and studies from Schoenfeld, Israetel/RP, Helms) — stability and getting the target muscle to do the work beats raw "functional" free-weight dogma.
-USER: ${u.name||"sir"} | ${u.bodyweight}kg | Goal: ${u.goal} | Rank: ${r.name} | ${u.natty==="maybe"?"":"self-reported "+u.natty}
-Training experience: ${exp}. Use this to calibrate volume/MEV/MRV advice, but their app level always starts at 1 and reflects only logged work.
-Muscle levels: ${levels}
-Physique: weak ${(pa.weakPoints||[]).map(m=>MNAME[m]).join(",")||"n/a"}; strong ${(pa.strongPoints||[]).map(m=>MNAME[m]).join(",")||"n/a"}; imbalance: ${pa.mainImbalance||"n/a"}
-PRs: ${prs||"none"}
-This week: ${weekCount()}/${u.weeklyGoal} sessions. Streak: ${u.streakDays} days.`;
+  // Full PR list (top 25)
+  const prs=Object.entries(d.prs||{}).filter(([,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm);
+  const prStr=prs.slice(0,25).map(([n,p])=>`${n}: ${Math.round(p.orm)}kg e1RM (${p.w}kg×${p.r})`).join(', ')||'none yet';
+  // Recovery % per muscle + weekly sets
+  const muscleStr=M12.map(m=>{const trained=(d.muscleVol[m]||0)>0;const rec=trained?getRecovery(m)+'% recovered':'untrained';const sets=weeklySets(m)||0;return `${MNAME[m]}: Lv${muscleLevel(m)}, ${rec}, ${sets} sets/wk`;}).join('\n  ');
+  // Active split + today's day
+  let planStr='';
+  try{const sp=d.splits&&d.splits.find(s=>s.id===d.activeSplitId);if(sp){const ni=computeNextDay(sp);const nd=sp.days[ni]||sp.days[0];planStr=`\nACTIVE SPLIT: ${sp.name} | TODAY: ${nd?nd.name+' — '+((nd.exercises||[]).slice(0,10).join(', ')+(nd.exercises.length>10?' + '+(nd.exercises.length-10)+' more':'')):''}`; }}catch(e){}
+  // Current active workout
+  let sessionStr='';
+  if(state.session&&state.step==='logging'){
+    const ses=state.session;const elapsed=Math.floor((Date.now()-ses.startedAt)/60000);
+    const exLines=ses.exercises.map(e=>{const done=e.sets.filter(s=>s.done&&s.type!=='W');const all=e.sets.filter(s=>s.type!=='W');const best=done.length?done.reduce((a,s)=>((+s.w||0)*(1+(+s.r||0)/30))>(+a.w||0)*(1+(+a.r||0)/30)?s:a,done[0]):null;return `${e.name}: ${done.length}/${all.length} sets${best?' (best so far: '+best.w+'kg×'+best.r+')':''}`;}).join(', ');
+    sessionStr=`\n🔴 ACTIVE WORKOUT (${elapsed}min in): ${ses.split} — ${ses.day}\n  ${exLines||'no exercises logged yet'}`;
+  }
+  // Last workout
+  const lastW=(d.workouts||[])[0];const lastStr=lastW?`\nLAST SESSION: ${new Date(lastW.date).toLocaleDateString()} — ${lastW.name}, ${Math.round(lastW.totalVol||0)}kg total`:'';
+  // Injuries
+  const inj=(d.injuries||[]).filter(x=>!x.cleared).map(x=>MNAME[x.muscle]||x.muscle).join(', ');
+  // Physique
+  const pa=u.physiqueAnalysis||{};
+  return `You are Alfred Pennyworth — Batman's butler, former British intelligence officer, elite evidence-based trainer. You have served this man for years. You are direct, dry, and unafraid to be sharp when warranted.
+
+TONE: Call out genuinely weak effort with a dry British sting + the precise fix. Give real, emphatic praise for earned achievements. For normal requests (organise splits, swap exercises, plan around injury) just DO IT helpfully — the sharp tongue is ONLY for bad training choices, never for sensible requests.
+LENGTH: Match reply to the question. Simple question = 1–2 sentences max. Longer only if the user asks for depth (cap ~150 words). No preamble. No restatement. No padding.
+EXERCISE BIAS: User trains machines/cables deliberately — do NOT push free weights as superior. Default to cable/machine/supported variations. Evidence-base: RP/Israetel, Schoenfeld, Helms, Nippard.
+
+USER: ${u.name||'sir'} | BW: ${u.bodyweight}kg | Goal: ${u.goal} | ${u.natty&&u.natty!=='maybe'?u.natty+' | ':''}Rank: ${r.emoji} ${r.name} Lv${sl}
+EXPERIENCE: ${exp}
+WEEK: ${weekCount()}/${u.weeklyGoal} sessions | Daily streak: ${u.streakDays}d | Weekly streak: ${weeklyStreak()} weeks
+PHYSIQUE NOTES: weak — ${(pa.weakPoints||[]).map(m=>MNAME[m]).join(',')||'n/a'}; strong — ${(pa.strongPoints||[]).map(m=>MNAME[m]).join(',')||'n/a'}; imbalance: ${pa.mainImbalance||'n/a'}
+
+MUSCLE STATUS (level / recovery / weekly sets):
+  ${muscleStr}
+
+TOP PRs (est 1RM):
+  ${prStr}
+${planStr}${lastStr}${sessionStr}${inj?'\nFLAGGED INJURIES: '+inj:''}`;
 }
 // Current free-tier models, in preference order (verified Jun 2026). 2.0 was retired Jun 1 2026.
 // The chain self-heals: if Google retires one, the next is tried automatically.
@@ -8578,6 +8614,30 @@ async function geminiCall(parts){
   }
   throw new Error(lastErr?("Alfred unavailable: "+lastErr+". Try again shortly."):"Alfred couldn't reach any Gemini model. Try again later.");
 }
+// Multi-turn conversation call — passes full history so Alfred remembers context within the session
+async function geminiConvCall(contents){
+  const key=geminiKey();if(!key)throw new Error("Alfred has no API key. Add a free Gemini key in Settings.");
+  const order=[gemModel(),...GEM_MODELS.filter(m=>m!==gemModel())];
+  let lastErr="";
+  for(const model of order){
+    let r,j;
+    try{r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(key),
+      {method:"POST",headers:{"Content-Type":"application/json"},
+       body:JSON.stringify({contents,generationConfig:{maxOutputTokens:600,temperature:0.75,thinkingConfig:{thinkingBudget:0}}})});}
+    catch(e){throw new Error("No connection. Check your internet.");}
+    try{j=await r.json();}catch(e){j={};}
+    if(r.ok){if(model!==gemModel())localStorage.setItem("gt_gem_model",model);return(j.candidates?.[0]?.content?.parts?.[0]?.text)||"";}
+    const msg=(j.error&&j.error.message)||"";
+    if(r.status===404||/not found|not supported|deprecated|retired/i.test(msg)){lastErr="model "+model+" unavailable";continue;}
+    if(r.status===400&&/api key not valid|invalid/i.test(msg))throw new Error("That Gemini key isn't valid. Check Settings.");
+    if(r.status===403)throw new Error("Key rejected — make sure Gemini API is enabled.");
+    if(r.status===429)throw new Error("Free-tier limit hit (10/min). Wait a minute and try again.");
+    if(r.status>=500){lastErr="Google server busy";continue;}
+    throw new Error(msg||("Request failed ("+r.status+")."));
+  }
+  throw new Error(lastErr?("Alfred unavailable: "+lastErr):"Alfred couldn't reach any Gemini model.");
+}
+
 let ALFRED_MSGS=[];
 let ALFRED_PIC=null;
 function fileB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});}
@@ -8587,6 +8647,102 @@ async function attachAlfredPic(input){const f=input.files[0];if(!f)return;
   catch(e){toast("Couldn't read that photo.");}
 }
 let ALFRED_VOICE="";
+
+/* ========================= ALFRED EVERYWHERE — FAB + bottom sheet chat ========================= */
+function openAlfredChat(){haptic("tap");_renderAlfredSheet();}
+
+function _alfredMsgsHtml(){
+  if(!ALFRED_MSGS.length)return `<div style="text-align:center;padding:28px 14px 16px">
+    <div style="font-size:44px;margin-bottom:12px;filter:drop-shadow(0 0 16px rgba(255,208,72,.55))">🦇</div>
+    <div style="font-family:var(--disp);font-size:22px;color:var(--gold2);letter-spacing:.04em;margin-bottom:6px">ALFRED ONLINE</div>
+    <div class="mini" style="color:var(--text2);max-width:260px;margin:0 auto;line-height:1.65">Evidence-based coach. Ask about your training, recovery, programming, nutrition — or anything else on your mind.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;justify-content:center">
+      ${["What should I train today?","How's my recovery?","Review my current split","What's stalling my progress?","Best next exercise for chest?"].map(q=>`<button class="chip" style="font-size:12px;width:auto" onclick="_alfredQuickAsk('${q.replace(/'/g,"\\'")}')">${q}</button>`).join("")}
+    </div>
+  </div>`;
+  return ALFRED_MSGS.map(m=>`<div class="alf-msg ${m.role} ${m.text==='…thinking…'?'alf-thinking':''}">
+    <div class="alf-label">${m.role==='user'?'You':'Alfred'}</div>
+    <div class="alf-bubble">${m.img?`<img src="${esc(m.img)}" style="max-width:110px;border-radius:8px;margin-bottom:5px;display:block"/>`:''}${esc(m.text).replace(/\n/g,'<br>')}</div>
+  </div>`).join('');
+}
+
+function _renderAlfredSheet(){
+  const has=!!geminiKey();
+  const inputArea=has
+    ?`<div style="display:flex;gap:7px;align-items:center;padding-top:10px;border-top:1px solid var(--border)">
+        <button style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer" onclick="document.getElementById('alf-pic-in').click()" title="Attach photo">📎</button>
+        <input type="file" accept="image/*" id="alf-pic-in" style="display:none" onchange="_alfredAttachPic(this)"/>
+        ${ALFRED_PIC?`<div style="position:relative;flex:none"><img src="${esc(ALFRED_PIC.url)}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid var(--gold2)"/><button onclick="ALFRED_PIC=null;_renderAlfredSheet()" style="position:absolute;top:-5px;right:-5px;background:#333;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button></div>`:''}
+        <input id="alf-in" placeholder="Ask Alfred anything…" style="flex:1;padding:10px 12px;border-radius:12px;font-size:15px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_sendAlfredSheet();}" autocomplete="off" autocapitalize="sentences"/>
+        <button class="btn gold sm" style="width:auto;padding:10px 14px;flex:none;border-radius:12px" onclick="_sendAlfredSheet()">→</button>
+      </div>`
+    :`<div style="padding-top:10px;border-top:1px solid var(--border);text-align:center">
+        <div class="mini" style="color:var(--text2);margin-bottom:8px">Add a free Gemini API key to activate Alfred</div>
+        <input value="${esc(geminiKey())}" placeholder="Paste Gemini key here…" oninput="setGemKey(this.value)" style="margin-bottom:6px;font-size:14px"/>
+        <div class="mini" style="color:var(--text3)">Free key → aistudio.google.com/apikey</div>
+      </div>`;
+  openSheet(`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="row" style="gap:9px"><div style="font-size:20px">🦇</div><div><div style="font-family:var(--disp);font-size:17px;color:var(--gold2);line-height:1">ALFRED</div><div style="font-size:10px;color:var(--text3);letter-spacing:.1em">EVIDENCE-BASED COACH</div></div></div>
+    <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="ALFRED_MSGS=[];ALFRED_PIC=null;_renderAlfredSheet()">Clear</button>
+  </div>
+  <div id="alf-chat" style="max-height:46vh;min-height:120px;overflow-y:auto;padding-bottom:6px">${_alfredMsgsHtml()}</div>
+  ${inputArea}`);
+  requestAnimationFrame(()=>{const c=document.getElementById('alf-chat');if(c)c.scrollTop=c.scrollHeight;const i=document.getElementById('alf-in');if(i)i.focus();});
+}
+
+function _alfredQuickAsk(q){const i=document.getElementById('alf-in');if(i){i.value=q;i.focus();}else{_alfSend(q,null);}}
+
+async function _sendAlfredSheet(){
+  const i=document.getElementById('alf-in');if(!i)return;
+  const q=i.value.trim();const pic=ALFRED_PIC;
+  if(!q&&!pic)return;
+  i.value='';ALFRED_PIC=null;
+  await _alfSend(q,pic);
+}
+
+async function _alfSend(q,pic){
+  const displayQ=q||(pic?'What do you make of this physique, Alfred?':'');
+  ALFRED_MSGS.push({role:'user',text:displayQ,img:pic?pic.url:null});
+  ALFRED_MSGS.push({role:'alfred',text:'…thinking…'});
+  _renderAlfredSheet();
+  try{
+    // Build multi-turn contents: system context as first user turn, then full conversation history
+    const ctx=alfredContext();
+    const contents=[];
+    // Seed: Alfred acknowledges the briefing (keeps multi-turn format valid)
+    contents.push({role:'user',parts:[{text:ctx+'\n\nYou have been briefed. You are ready.'}]});
+    contents.push({role:'model',parts:[{text:'Understood, sir. What do you need?'}]});
+    // Add conversation history (last 16 messages = 8 exchanges)
+    const hist=ALFRED_MSGS.slice(0,-1).slice(-16);
+    for(const m of hist){
+      if(m.role==='user'){
+        const p=[{text:m.text||''}];
+        if(m.img&&m.img.startsWith('data:')){try{const[,mime,b64]=m.img.match(/^data:([^;]+);base64,(.+)$/)||[];if(b64)p.push({inline_data:{mime_type:mime,data:b64}});}catch(e){}}
+        contents.push({role:'user',parts:p});
+      }else if(m.text&&m.text!=='…thinking…'){
+        contents.push({role:'model',parts:[{text:m.text}]});
+      }
+    }
+    // Final user message
+    const finalParts=[{text:displayQ}];
+    if(pic){try{const[,mime,b64]=pic.url.match(/^data:([^;]+);base64,(.+)$/)||[];if(b64)finalParts.push({inline_data:{mime_type:mime,data:pic.b64}});}catch(e){}}
+    contents.push({role:'user',parts:finalParts});
+    const txt=await geminiConvCall(contents);
+    ALFRED_MSGS[ALFRED_MSGS.length-1].text=txt||'I have nothing to add, sir.';
+    state.data.u.aiUses++;try{checkAchievements();}catch(e){}save();
+  }catch(e){
+    ALFRED_MSGS[ALFRED_MSGS.length-1].text="The line to the Batcomputer is down, sir. ("+e.message+")";
+  }
+  _renderAlfredSheet();
+}
+
+async function _alfredAttachPic(input){
+  const f=input.files[0];if(!f)return;
+  if(f.size>6e6){toast("Photo's too large — try a smaller one.");return;}
+  try{const b64=await fileB64(f);ALFRED_PIC={b64,mime:f.type,url:"data:"+f.type+";base64,"+b64};_renderAlfredSheet();}
+  catch(e){toast("Couldn't read that photo.");}
+}
+
 /* ---- Alfred LOCAL coaching (works with NO API key) — pre-session briefing,
    post-session debrief, and ask-about-a-muscle. Pure local science. ---- */
 function fmtHrs(h){h=Math.max(0,Math.round(h));if(h<1)return "ready now";if(h<24)return h+"h";const dd=Math.floor(h/24),hh=h%24;return dd+"d"+(hh?" "+hh+"h":"");}
@@ -10165,21 +10321,31 @@ function openStoryChapter(id){
     <button class="btn" style="margin-top:15px" onclick="closeSheet()">Close the file</button>`);
 }
 function renderAlfred(){
-  // Daily wisdom fires contextually when user opens Alfred tab — never on cold launch
   try{maybeContextualDailyWisdom();}catch(e){}
   const has=!!geminiKey();state.data.u.aiKeySet=has;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach</div>`;
-  // ===== CHAT FIRST — sits at the very top of the tab =====
-  if(has){
-    html+=`<div class="card" id="alfred-chat" style="min-height:120px">${ALFRED_MSGS.length?ALFRED_MSGS.map(m=>`<div style="margin-bottom:10px"><b class="${m.role==='user'?'muted':'gold'}">${m.role==='user'?'You':'Alfred'}:</b> ${m.img?`<div style="margin:4px 0"><img src="${m.img}" style="max-width:120px;border-radius:9px;border:1px solid var(--gold-dim)"/></div>`:""}<span style="font-size:14px">${esc(m.text)}</span></div>`).join(""):'<p class="muted">Alfred is online. Ask anything — programming, recovery, or attach a 📎 physique photo and ask him to critique it.</p>'}</div>
-      ${ALFRED_PIC?`<div class="row" style="gap:8px;align-items:center;margin-bottom:6px"><img src="${ALFRED_PIC.url}" style="width:42px;height:42px;object-fit:cover;border-radius:8px;border:1px solid var(--gold-dim)"/><span class="mini" style="color:var(--gold2);flex:1">Photo attached — ask Alfred what he thinks.</span><button class="btn ghost sm" style="width:auto;padding:4px 10px" onclick="ALFRED_PIC=null;renderAlfred()">✕</button></div>`:""}
-      <div class="row" style="gap:8px;margin-bottom:16px"><button class="btn ghost sm" style="width:auto;padding:9px 11px" onclick="document.getElementById('alfred-pic').click()" title="Attach a photo">📎</button><input type="file" accept="image/*" id="alfred-pic" style="display:none" onchange="attachAlfredPic(this)"/><input id="alfred-in" placeholder="${ALFRED_PIC?'Ask about the photo…':'Message Alfred…'}" onkeydown="if(event.key==='Enter')sendAlfred()"/><button class="btn gold sm" style="width:auto" onclick="sendAlfred()">Send</button></div>`;
-  }else{
-    html+=`<div class="card" style="margin-bottom:16px"><div class="row" style="gap:10px;align-items:center"><div style="font-size:32px">🤖</div><div><h3 style="font-size:17px;color:var(--gold2);margin:0 0 2px">Want Alfred to talk back?</h3>
-      <p class="muted" style="font-size:12.5px;margin:0">Add a free Google Gemini key in Settings for live chat — text Alfred or attach a 📎 physique photo and ask him to critique it. The briefing below always works without it.</p></div></div>
-      <button class="btn gold sm" style="margin-top:11px" onclick="openSettings()">Activate live chat</button></div>`;
-  }
-  // ===== then the always-on local coaching =====
+  // Chat card — uses same ALFRED_MSGS / _renderAlfredSheet engine so FAB and tab share history
+  const chatCard=has
+    ?`<div class="card" style="padding:14px;margin-bottom:14px">
+        <div class="row sp" style="margin-bottom:10px">
+          <div class="row" style="gap:8px"><div style="font-size:20px">🦇</div><div style="font-family:var(--disp);font-size:17px;color:var(--gold2)">ALFRED CHAT</div></div>
+          <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="ALFRED_MSGS=[];ALFRED_PIC=null;renderAlfred()">Clear</button>
+        </div>
+        <div id="alfred-tab-chat" style="max-height:38vh;overflow-y:auto;margin-bottom:10px">${_alfredMsgsHtml()}</div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <button style="flex:none;width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer" onclick="document.getElementById('alfred-pic-tab').click()">📎</button>
+          <input type="file" accept="image/*" id="alfred-pic-tab" style="display:none" onchange="_alfredAttachPic(this)"/>
+          ${ALFRED_PIC?`<img src="${esc(ALFRED_PIC.url)}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;border:1px solid var(--gold2);flex:none"/>`:''}
+          <input id="alf-tab-in" placeholder="Message Alfred…" style="flex:1;padding:10px 12px;border-radius:11px;font-size:15px" onkeydown="if(event.key==='Enter'){event.preventDefault();_alfTabSend();}" autocomplete="off"/>
+          <button class="btn gold sm" style="width:auto;padding:10px 14px;flex:none;border-radius:11px" onclick="_alfTabSend()">→</button>
+        </div>
+      </div>`
+    :`<div class="card" style="margin-bottom:14px;padding:16px">
+        <div class="row" style="gap:12px;margin-bottom:12px"><div style="font-size:30px">🦇</div><div><div style="font-family:var(--disp);font-size:18px;color:var(--gold2)">ACTIVATE ALFRED</div><div class="mini" style="color:var(--text2);margin-top:2px">Add a free Gemini key for live chat, programming advice, and physique analysis.</div></div></div>
+        <input value="${esc(geminiKey())}" placeholder="Paste Gemini API key…" oninput="setGemKey(this.value)" style="margin-bottom:8px;font-size:14px"/>
+        <div class="mini" style="color:var(--text3)">Free key at aistudio.google.com/apikey · takes 30 seconds</div>
+      </div>`;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach · tap 🦇 anywhere to chat</div>`;
+  html+=chatCard;
   html+=alfredBriefing();
   html+=storyCampaignCard();
   html+=alfredCaveReview();
@@ -10187,7 +10353,9 @@ function renderAlfred(){
   html+=fightRecordCard();
   html+=alfredMusclePicker();
   $("app").innerHTML=html;
+  requestAnimationFrame(()=>{const c=document.getElementById('alfred-tab-chat');if(c)c.scrollTop=c.scrollHeight;});
 }
+function _alfTabSend(){const i=document.getElementById('alf-tab-in');if(!i)return;const q=i.value.trim();if(!q&&!ALFRED_PIC)return;i.value='';const pic=ALFRED_PIC;ALFRED_PIC=null;_alfSend(q,pic).then(()=>{const c=document.getElementById('alfred-tab-chat');if(c)c.scrollTop=c.scrollHeight;}).catch(()=>{});const c=document.getElementById('alfred-tab-chat');if(c)c.scrollTop=c.scrollHeight;}
 function alfredQuick(){const i=$("alfred-in");if(i)i.focus();}
 async function sendAlfred(){
   const inp=$("alfred-in");const pic=ALFRED_PIC;const q=inp.value.trim();
@@ -10461,16 +10629,7 @@ function restoreData(){const i=document.createElement("input");i.type="file";i.a
 function wipeData(){appConfirm({title:"Erase everything",body:"This permanently deletes ALL your data — workouts, PRs, splits, progress. It cannot be undone.",ok:"Erase all",cancel:"Keep my data",danger:true}).then(ok=>{if(!ok)return;localStorage.removeItem("gt_data");state.data=blankData();save();state.showOnboarding=true;state.obStep=0;closeOverlay();render();});}
 
 /* ========================= VILLAIN TAUNT (missed training day) ========================= */
-function checkVillainTaunt(){
-  const y=new Date();y.setDate(y.getDate()-1);const di=(y.getDay()+6)%7;
-  const wasTraining=state.data.u.weekSchedule[di]!==false;
-  const trained=state.data.workouts.some(w=>new Date(w.date).toDateString()===y.toDateString());
-  if(wasTraining&&!trained&&state.data.u.totalWorkouts>0&&!state.data.dismissed["taunt"+y.toDateString()]){
-    const taunts={chest:["Bane","You skipped. I didn't."],quads:["Penguin","I don't skip leg day either. Look at me."],back:["Riddler","What has a spine but never uses it?"],shoulders:["Scarecrow","Fear is letting another day pass."]};
-    const m=state.data.u.lastMissedMuscle;const t=taunts[m]||["Gotham","The Bat noticed. Gotham noticed. Your muscles noticed."];
-    setTimeout(()=>{openOverlay();$("ovcard").innerHTML=`<div class="center"><div class="bossemoji">😈</div><div class="bossname">${esc(t[0])}</div><div class="bossquote">"${esc(t[1])}"</div><button class="btn gold" onclick="state.data.dismissed['taunt${y.toDateString()}']=true;save();closeOverlay()">I'LL MAKE UP FOR IT</button></div>`;},900);
-  }
-}
+// checkVillainTaunt() removed — replaced by maybeContextualVillainTaunt() which fires at workout start
 
 /* picker dual-use: session add OR split-day add */
 function pickAdd(name){
@@ -11075,8 +11234,6 @@ function renderPatrolIntro(){
     </div>
   </div>`;
 }
-
-function beginPatrol(){state.step='logging';startTimers();try{haptic('done');}catch(e){}render();}
 
 /* Swipe gesture init — attach after render. Right swipe = Swap, Left swipe = Remove. */
 function initSwipeExercises(){
