@@ -6377,6 +6377,104 @@ function profileToolsHtml(){
   <button class="btn ghost sm" style="width:100%;border-color:rgba(232,197,106,.3);color:var(--gold2);margin-top:2px" onclick="exportICS()">📅 Export calendar (.ics)</button>`;
 }
 
+function profileEveryLiftTile(d){
+  const exCount=loggedExerciseNames().length;
+  const prCount=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
+  const si=strengthIndexSeries();const siVals=si.vals||[];
+  const siLast=siVals.length?siVals[siVals.length-1]:0;
+  const siUp=siVals.length>=2&&siVals[siVals.length-1]>=siVals[0];
+  const siPct=siVals.length>=2&&siVals[0]?Math.round((siVals[siVals.length-1]-siVals[0])/siVals[0]*100):0;
+  return `<button onclick="openArchive()" style="display:block;width:100%;text-align:left;cursor:pointer;background:linear-gradient(135deg,rgba(232,197,106,.12) 0%,rgba(60,40,10,.08) 50%,rgba(232,197,106,.06) 100%);border:1.5px solid rgba(232,197,106,.5);border-radius:18px;padding:18px 18px 16px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:0 0 40px -10px rgba(232,197,106,.35),inset 0 1px 0 rgba(255,255,255,.08)">
+    <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(232,197,106,.15),transparent 70%);pointer-events:none"></div>
+    <div class="row sp" style="align-items:flex-start;margin-bottom:10px">
+      <div>
+        <div style="font-size:11px;letter-spacing:.18em;color:rgba(232,197,106,.6);text-transform:uppercase;margin-bottom:4px">Your arsenal</div>
+        <div style="font-family:var(--disp);font-size:26px;color:var(--gold2);letter-spacing:.02em;line-height:1">EVERY LIFT</div>
+        <div class="mini" style="color:var(--text2);margin-top:4px">${exCount} exercise${exCount===1?'':'s'} · ${prCount} records · tap for full curves</div>
+      </div>
+      <div style="text-align:right;flex:none">
+        ${siLast?`<div style="font-family:var(--disp);font-size:28px;color:var(--gold2);line-height:1">${siLast}</div>
+        <div class="mini" style="color:${siUp?'var(--green)':'var(--red)'}">${siUp?'▲':'▼'} ${siPct>0?'+':''}${siPct}%</div>
+        <div class="mini" style="color:var(--text3)">strength idx</div>`:`<div style="font-size:28px">📈</div>`}
+      </div>
+    </div>
+    ${siVals.length>=4?trendChart(siVals,{color:"#E8C56A",height:36}):''}
+    <div style="position:absolute;bottom:13px;right:16px;font-size:22px;color:rgba(232,197,106,.4)">›</div>
+  </button>`;
+}
+
+function profileRecordsHtml(d){
+  const prs=Object.entries(d.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm);
+  const volPRs={};
+  (d.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{const v=(e.sets||[]).filter(s=>s.done&&s.type!=="W").reduce((a,s)=>a+((+s.w||0)*(+s.r||0)),0);if(v>(volPRs[e.name]||0))volPRs[e.name]=Math.round(v);});});
+  const bw=bodyW();
+  let html='';
+  // --- PR feed ---
+  if(!prs.length){html+=`<p class="muted" style="margin:0 0 12px">No records yet. Log your first session and records appear here.</p>`;}
+  else{
+    html+=`<div class="row sp" style="margin-bottom:8px"><b style="font-size:13px">🏆 Top lifts · ${d.u.activeGym?esc(d.u.activeGym):'all gyms'}</b><span class="mini" style="color:var(--text3)">${prs.length} records</span></div>`;
+    html+=prs.slice(0,10).map(([n,p],i)=>{
+      const vol=volPRs[n];
+      return `<div style="padding:8px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
+        <div class="row sp">
+          <div class="row" style="gap:7px;min-width:0;align-items:center"><span style="font-size:11px;color:var(--text3);min-width:18px">#${i+1}</span><b style="font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n)} ›</b></div>
+          <b class="gold" style="white-space:nowrap;flex:none">${Math.round(p.orm)}kg</b>
+        </div>
+        <div class="row" style="gap:10px;margin-top:2px;padding-left:25px">
+          ${p.w&&p.r?`<span class="mini" style="color:var(--text3)">${Math.round(p.w)}kg×${p.r}</span>`:''}
+          ${vol?`<span class="mini" style="color:var(--text2)">📦 ${fmtNum(vol)}kg vol</span>`:''}
+          ${bw&&p.orm?`<span class="mini" style="color:var(--text3)">${(p.orm/bw).toFixed(2)}×BW</span>`:''}
+        </div>
+      </div>`;
+    }).join('');
+    if(prs.length>10)html+=`<div class="mini" style="color:var(--text3);text-align:center;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">+${prs.length-10} more in Every Lift ▲</div>`;
+    html+=`<button class="btn ghost sm" style="width:100%;margin-top:10px;border-color:rgba(232,197,106,.3);color:var(--gold2)" onclick="shareProfilePRCard()">📤 Share PR Card</button>`;
+  }
+  // --- Title belts (compact) ---
+  if(bw&&prs.length){
+    const belts=prs.map(([n,p])=>({n,p,ratio:p.orm/bw,t:beltTier(p.orm/bw)})).sort((a,b)=>b.ratio-a.ratio).slice(0,4);
+    html+=`<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(232,197,106,.15)">
+      <div class="mini" style="color:var(--gold-dim);letter-spacing:.1em;margin-bottom:8px">🎖️ TITLE BELTS</div>
+      ${belts.map(r=>{const[,label,emoji,col]=r.t;return `<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(r.n).replace(/'/g,"")}')"><div class="row" style="gap:9px;min-width:0"><span style="font-size:18px">${emoji}</span><div><b style="font-size:13px">${esc(r.n)}</b><div class="mini" style="color:${col}">${label}</div></div></div><div style="text-align:right;flex:none"><b class="gold">${Math.round(r.p.orm)}kg</b><div class="mini" style="color:var(--text3)">${r.ratio.toFixed(2)}×BW</div></div></div>`;}).join('')}
+    </div>`;
+  }
+  // --- Fight record (compact) ---
+  const rec=mmaRecord();
+  if(rec&&rec.weeks>=2){
+    html+=`<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(232,197,106,.15)">
+      <div class="mini" style="color:var(--gold-dim);letter-spacing:.1em;margin-bottom:8px">🥊 FIGHT RECORD · week vs week</div>
+      <div class="row" style="align-items:flex-end;gap:16px">
+        <div class="big" style="font-size:38px;color:var(--gold2)">${rec.wins}<span style="font-size:18px;color:var(--text3)"> – ${rec.losses}${rec.draws?' – '+rec.draws:''}</span></div>
+        <div style="text-align:right"><div class="big" style="font-size:26px;color:#ff6a5e">${rec.kos}</div><div class="mini">KOs</div></div>
+      </div>
+      <div class="mini" style="color:var(--text2);margin-top:4px">Out-train last week = win. Villains felled = KO.</div>
+    </div>`;
+  }
+  return html;
+}
+
+function profileStrengthHtml(){
+  const std=strengthStandardsCard();
+  const combat=combatRatingCard();
+  let html='';
+  if(std)html+=std;
+  if(combat){html+=`<div style="margin-top:4px">${combat}</div>`;}
+  if(!std&&!combat)html=`<p class="muted" style="margin:0">Log sessions with bodyweight set to unlock strength analysis.</p>`;
+  return html;
+}
+
+function profileBasesToolsHtml(d,u){
+  let html=gymCampaignsCard();
+  html+=`<div class="grid2" style="margin-top:10px">
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:20px">🖥️</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Batcomputer</div><div class="mini" style="color:var(--text3)">Analytics</div></button>
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:20px">🃏</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Villains</div></button>
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openMeasure()"><div style="font-size:20px">📐</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Measurements</div><div class="mini" style="color:var(--text3)">Body trends</div></button>
+    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openTrophyRoom()"><div style="font-size:20px">🏆</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Trophy Room</div><div class="mini" style="color:var(--text3)">Honors</div></button>
+  </div>
+  <button class="btn ghost sm" style="width:100%;margin-top:8px;border-color:rgba(232,197,106,.2);color:var(--gold2)" onclick="exportICS()">📅 Export calendar</button>`;
+  return html;
+}
+
 function renderProfile(){
   const d=state.data,u=d.u;
   const sl=strengthLevel(),r=rankFor(sl);
@@ -6389,16 +6487,12 @@ function renderProfile(){
   html+=profileCalendarHtml(d);
   const otd=profileOnThisDay(d);if(otd)html+=otd;
   html+=profileBossPreviewHtml(d,sl);
+  html+=profileEveryLiftTile(d);
   const prCount=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
-  html+=acc('prf-pr','🏆','PR Record Book',profilePRFeedHtml(d),false,prCount+' records');
-  html+=acc('prf-std','📊','Strength Standards',strengthStandardsCard(),false,'vs bodyweight');
-  html+=acc('prf-fight','🥊','Fight Record',mmaRecordCard()||"<p class='muted' style='margin:0'>Log 2+ weeks to unlock.</p>",false,'week vs week');
-  html+=acc('prf-belts','🎖️','Title Belts',titleBeltsCard()||"<p class='muted' style='margin:0'>Log bodyweight + PRs to see belt ranks.</p>",false,'BW-ratio');
-  html+=acc('prf-combat','⚔️','Combat Rating',combatRatingCard()||"<p class='muted' style='margin:0'>Log sets to earn a rank.</p>",false,'per lift');
-  html+=acc('prf-lifts','📈','Every Lift',archiveCardsHtml(),false,'full archive');
-  html+=acc('prf-gyms','🏛️','Gym Campaigns',gymCampaignsCard(),false,(u.gyms||[]).length+' base'+((u.gyms||[]).length===1?'':'s'));
-  html+=acc('prf-log','📜','Patrol Log',profileLogHtml(d),false,'recent missions');
-  html+=acc('prf-tools','⚡','Quick Tools',profileToolsHtml(),false,'');
+  html+=acc('prf-rec','🏆','Records & Ranks',profileRecordsHtml(d),false,prCount+' PRs · belts · fight record');
+  html+=acc('prf-str','📊','Strength Analysis',profileStrengthHtml(),false,'standards · combat rating');
+  html+=acc('prf-bases','🏛️','Bases & Tools',profileBasesToolsHtml(d,u),false,(u.gyms||[]).length+' gym'+(((u.gyms||[]).length)===1?'':'s')+' · tools');
+  html+=acc('prf-log','📜','Mission Log',profileLogHtml(d),false,'recent patrols');
   $("app").innerHTML=html;
 }
 function d_dismiss(k){state.data.dismissed[k]=true;save();render();}
