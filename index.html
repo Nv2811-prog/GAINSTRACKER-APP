@@ -8273,16 +8273,14 @@ function renderAllies(){
   </div>`;
 
   // ── Connect ──
-  html+=`<div style="background:linear-gradient(160deg,rgba(242,208,121,.07),rgba(14,14,18,.94));border:1px solid rgba(242,208,121,.28);border-radius:14px;padding:13px 14px;margin-bottom:13px">
-    <div style="font-family:var(--disp);font-size:12px;letter-spacing:.12em;color:var(--gold2);margin-bottom:5px">🔗 CONNECT</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">Share your code once — your ally adds it and your Patrol Card syncs <b style="color:var(--gold2)">live</b> after every workout.</div>
-    <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="width:100%;font-size:12px;font-weight:700;color:var(--gold2);background:rgba(0,0,0,.4);border:1px solid rgba(242,208,121,.25);border-radius:10px;padding:10px 12px;text-align:center;letter-spacing:.5px;margin-bottom:8px"/>
-    <button class="btn gold sm" style="width:100%;margin-bottom:11px" onclick="shareFriendCode()">📋 Copy my friend code</button>
-    <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px">
-      <div style="font-size:11px;color:var(--text2);margin-bottom:6px"><b style="color:var(--gold2)">Add an ally</b> — paste their code (GTUID:…) or a snapshot</div>
-      <textarea id="ally-code" placeholder="Paste friend code or Patrol Card snapshot…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:42px;font-size:11px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px;resize:none;color:var(--text);margin-bottom:7px"></textarea>
-      <div class="row" style="gap:6px"><button class="btn gold sm g" style="flex:1" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div>
+  html+=`<div style="background:linear-gradient(160deg,rgba(242,208,121,.07),rgba(14,14,18,.94));border:1px solid rgba(242,208,121,.28);border-radius:12px;padding:10px 12px;margin-bottom:12px">
+    <div style="font-family:var(--disp);font-size:11px;letter-spacing:.12em;color:var(--gold2);margin-bottom:7px">🔗 CONNECT</div>
+    <div class="row" style="gap:6px;margin-bottom:8px">
+      <input id="tab-fc" readonly onclick="this.select()" value="${fc?('GTUID:'+esc(fc)):'connecting…'}" style="flex:1;min-width:0;font-size:11px;font-weight:700;color:var(--gold2);background:rgba(0,0,0,.4);border:1px solid rgba(242,208,121,.22);border-radius:8px;padding:8px 10px;letter-spacing:.4px"/>
+      <button class="btn gold sm" style="width:auto;flex:none" onclick="shareFriendCode()">📋 Copy</button>
     </div>
+    <textarea id="ally-code" placeholder="Paste a friend code or snapshot to add an ally…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:38px;font-size:11px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:8px;resize:none;color:var(--text);margin-bottom:6px"></textarea>
+    <div class="row" style="gap:6px"><button class="btn gold sm g" style="flex:1" onclick="pasteAlly()">📥 Paste &amp; Add</button><button class="btn sm" style="width:auto" onclick="addAlly()">＋ Add</button></div>
   </div>`;
 
   // ── League ──
@@ -8337,7 +8335,6 @@ function renderAllies(){
       ${tile('openJusticeLeague()','🛠️','Splits & Backups',allies.length+' all'+(allies.length===1?'y':'ies'))}
     </div>`;
 
-  html+=patrolFeedCard();
   $("app").innerHTML=html;
 }
 function openSparring(){
