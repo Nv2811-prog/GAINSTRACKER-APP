@@ -879,12 +879,20 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 @keyframes garDoorLC{from{transform:translateX(-102%)}to{transform:translateX(0)}}
 @keyframes garDoorRC{from{transform:translateX(102%)}to{transform:translateX(0)}}
 @keyframes garOut{to{opacity:0}}
-/* Vehicle in garage overlay */
-.gar-veh-wrap{position:absolute;bottom:18%;left:0;right:0;display:flex;flex-direction:column;align-items:center;z-index:6;pointer-events:none}
-.gar-veh-e{font-size:100px;line-height:1;filter:drop-shadow(0 0 36px rgba(242,208,121,.65));animation:garveh 1.7s 1.12s cubic-bezier(.06,.8,.2,1) both}
+/* Garage entrance: city background + grappler + vehicle */
+.g9-garage-city-bg{position:absolute;inset:0;background:url(assets/entrance/bat-city.png) center/cover no-repeat;opacity:0;animation:garCity .65s 1.02s ease both;z-index:0}
+@keyframes garCity{to{opacity:.88}}
+.g9-garage.closing .g9-garage-city-bg{animation:garOut .2s ease both}
+.g9-garage-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,6,10,.15) 0%,rgba(4,6,10,.05) 35%,rgba(4,6,10,.55) 65%,rgba(4,6,10,.92) 100%);z-index:1;pointer-events:none}
+/* Grappler sweeps in from right, holds, exits left */
+.gar-grapple-fig{position:absolute;top:6%;left:-4%;width:95%;max-width:400px;opacity:0;animation:garGrapple 3.1s 1.0s ease both;z-index:3;pointer-events:none;object-fit:contain}
+@keyframes garGrapple{0%{transform:translateX(110%);opacity:0}12%{opacity:1}42%{transform:translateX(0);opacity:1}72%{transform:translateX(0);opacity:.9}100%{transform:translateX(-115%);opacity:0}}
+/* Vehicle rolling in at bottom */
+.gar-veh-wrap{position:absolute;bottom:20%;left:0;right:0;display:flex;flex-direction:column;align-items:center;z-index:4;pointer-events:none}
+.gar-veh-e{font-size:96px;line-height:1;filter:drop-shadow(0 0 36px rgba(242,208,121,.65));animation:garveh 1.7s 1.15s cubic-bezier(.06,.8,.2,1) both}
 @keyframes garveh{from{transform:translateX(-70vw) scale(.3);opacity:0}15%{opacity:1}to{transform:translateX(0) scale(1);opacity:1}}
 .gar-veh-nm{font-family:var(--disp);font-size:14px;letter-spacing:.22em;color:rgba(242,208,121,.55);text-transform:uppercase;animation:garTxt .7s 2.2s ease both;margin-top:6px}
-.gar-veh-floor{width:180px;height:28px;background:radial-gradient(ellipse at 50% 0%,rgba(242,208,121,.22),transparent 70%);animation:garveh 1.7s 1.12s cubic-bezier(.06,.8,.2,1) both;margin-top:-4px}
+.gar-veh-floor{width:180px;height:28px;background:radial-gradient(ellipse at 50% 0%,rgba(242,208,121,.22),transparent 70%);animation:garveh 1.7s 1.15s cubic-bezier(.06,.8,.2,1) both;margin-top:-4px}
 /* Patrol intro vehicle bar */
 .pveh-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;animation:pfade .55s .04s ease both}
 .pveh-e{font-size:54px;line-height:1;filter:drop-shadow(0 0 18px rgba(242,208,121,.55));animation:pveh-roll .9s .1s cubic-bezier(.1,0,.2,1.1) both}
@@ -10228,42 +10236,54 @@ function renderLogging(){
 
 /* ===== Wave 9 v5: Garage doors + vehicle roll-out + anatomy-only figures ===== */
 
-/* Garage doors open, then the user's top vehicle rolls out. No skip. */
+/* Garage doors open → Gotham city revealed → grappler sweeps across → vehicle rolls in */
 function playEntrance(name){
   if(state._entrLock)return;state._entrLock=true;
   try{haptic('light');}catch(e){}
   try{document.querySelectorAll('.g9-entr,.g9-entr2,.g9-garage').forEach(n=>n.remove());}catch(_){}
-  // Pick the highest unlocked vehicle
   let topV={e:'🏎️',n:'Batmobile'};
   try{const gs=gothamStats();const own=GARAGE.filter(v=>v.req(gs));if(own.length)topV=own[own.length-1];}catch(_){}
   const nm=typeof esc==='function'?esc(name||'Workout'):(name||'Workout');
+  const vn=typeof esc==='function'?esc(topV.n):topV.n;
   const ov=document.createElement('div');ov.className='g9-garage';
-  ov.innerHTML=`<div class="g9-garage-bg">
-    <div class="g9-garage-grid"></div>
-    <div class="g9-garage-glow"></div>
-    <div class="g9-garage-c tl"></div><div class="g9-garage-c tr"></div>
-    <div class="g9-garage-c bl"></div><div class="g9-garage-c br"></div>
-    <div class="g9-garage-scan"></div>
+  ov.innerHTML=`
+    <div class="g9-garage-city-bg"></div>
+    <div class="g9-garage-overlay"></div>
+    <div class="g9-garage-grid" style="z-index:2;position:absolute;inset:0"></div>
+    <img class="gar-grapple-fig" src="assets/entrance/bat-grapple.png" alt=""/>
     <div class="gar-veh-wrap">
       <div class="gar-veh-e">${topV.e}</div>
       <div class="gar-veh-floor"></div>
-      <div class="gar-veh-nm">${typeof esc==='function'?esc(topV.n):topV.n}</div>
+      <div class="gar-veh-nm">${vn}</div>
     </div>
-    <div class="g9-garage-label" style="position:absolute;bottom:60px;left:0;right:0;text-align:center">GOTHAM IRON PROTOCOL</div>
-    <div class="g9-garage-name" style="position:absolute;bottom:28px;left:0;right:0;text-align:center;padding:0 24px">${nm}</div>
-  </div>
-  <div class="g9-garage-crack"></div>
-  <div class="g9-door-left"></div>
-  <div class="g9-door-right"></div>`;
+    <div style="position:absolute;bottom:10%;left:0;right:0;text-align:center;z-index:5;pointer-events:none">
+      <div class="g9-garage-label" style="animation:garTxt .7s 2.0s ease both">GOTHAM IRON PROTOCOL</div>
+      <div class="g9-garage-name" style="animation:garTxt .7s 2.15s ease both">${nm}</div>
+    </div>
+    <div class="g9-garage-scan" style="z-index:6"></div>
+    <div class="g9-garage-c tl" style="z-index:6"></div><div class="g9-garage-c tr" style="z-index:6"></div>
+    <div class="g9-garage-c bl" style="z-index:6"></div><div class="g9-garage-c br" style="z-index:6"></div>
+    <div class="g9-garage-crack" style="z-index:7"></div>
+    <div class="g9-door-left" style="z-index:8"></div>
+    <div class="g9-door-right" style="z-index:8"></div>`;
   document.body.appendChild(ov);
-  // No tap-to-skip — plays to completion then auto-dismisses
   const close=()=>{if(ov._done)return;ov._done=true;state._entrLock=false;ov.classList.add('closing');setTimeout(()=>{try{ov.remove();}catch(_){}},520);};
-  setTimeout(close,4200);
+  setTimeout(close,4500);
 }
 
 /* Always anatomy SVG — the grey bodybuilder with red worked muscles. Never demo images. */
 function thumb(ex,small){
   return `<span class="exwrap${small?' sm':''}">${figureSVG(ex)}</span>`;
+}
+
+/* Remove the yellow dashed divider + FRONT/BACK labels — clean symmetrical figure */
+function suitFigureFB(colFn){
+  const prev=state._figColor;state._figColor=colFn;
+  const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
+  const P=suitProps();
+  const svg=`<svg viewBox="0 0 500 430" preserveAspectRatio="xMidYMid meet" style="width:100%;display:block">${SUIT_DEFS}${_frontBody(125,P)}${_backBody(375,P)}</svg>`;
+  state._figColor=prev;state._figShade=ps;state._figGlow=pg;
+  return svg;
 }
 
 /* ===== Wave 9 v2: Dramatic patrol intro + proper logging redesign ===== */
