@@ -501,6 +501,36 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .alf-msg.user .alf-bubble{background:rgba(255,208,72,.1);border:1px solid rgba(255,208,72,.22);color:var(--text);border-bottom-right-radius:4px}
 .alf-msg.alfred .alf-bubble{background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-bottom-left-radius:4px}
 .alf-thinking .alf-bubble{opacity:.55;font-style:italic}
+/* ── Alfred Voice Overlay ── */
+#alf-voice-ov{position:fixed;inset:0;z-index:202;background:linear-gradient(170deg,#030206 0%,#07050f 50%,#030206 100%);display:flex;flex-direction:column;align-items:center;opacity:0;pointer-events:none;transition:opacity .28s;overflow:hidden}
+#alf-voice-ov.on{opacity:1;pointer-events:all}
+.alf-orb-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;flex:none;padding:6px 0 10px}
+.alf-orb{width:176px;height:176px;border-radius:50%;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.alf-orb:active .alf-orb-core{transform:scale(.94)}
+.alf-orb-core{width:128px;height:128px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#1e1400,#060408);border:2px solid rgba(255,208,72,.32);box-shadow:0 0 40px rgba(255,208,72,.12),0 0 80px rgba(255,208,72,.05);display:flex;align-items:center;justify-content:center;font-size:54px;position:relative;z-index:2;transition:border-color .4s,box-shadow .4s,transform .15s}
+.alf-orb-r{position:absolute;border-radius:50%;border:1.5px solid rgba(255,208,72,.13);animation:avRing 2.8s ease-in-out infinite}
+.alf-orb-r:nth-child(1){inset:-16px;animation-delay:0s}
+.alf-orb-r:nth-child(2){inset:-32px;animation-delay:.7s;border-color:rgba(255,208,72,.07)}
+.alf-orb-r:nth-child(3){inset:-50px;animation-delay:1.4s;border-color:rgba(255,208,72,.04)}
+@keyframes avRing{0%,100%{opacity:.5;transform:scale(.97)}50%{opacity:1;transform:scale(1.03)}}
+/* Listening */
+#alf-voice-ov.av-listen .alf-orb-core{border-color:rgba(72,170,255,.85);box-shadow:0 0 55px rgba(72,170,255,.38),0 0 110px rgba(72,170,255,.12)}
+#alf-voice-ov.av-listen .alf-orb-r{border-color:rgba(72,170,255,.22);animation-duration:.65s}
+/* Thinking */
+#alf-voice-ov.av-think .alf-orb-core{animation:avThink 1.15s ease-in-out infinite}
+@keyframes avThink{0%,100%{box-shadow:0 0 30px rgba(255,208,72,.1)}50%{box-shadow:0 0 80px rgba(255,208,72,.5),0 0 140px rgba(255,208,72,.18)}}
+/* Speaking */
+#alf-voice-ov.av-speak .alf-orb-core{border-color:rgba(255,208,72,.9);box-shadow:0 0 65px rgba(255,208,72,.45),0 0 130px rgba(255,208,72,.2);animation:avSpeak .5s ease-in-out infinite alternate}
+@keyframes avSpeak{from{transform:scale(.984)}to{transform:scale(1.016)}}
+/* Transcript */
+#av-transcript{flex:1;width:100%;overflow-y:auto;padding:8px 20px 4px;display:flex;flex-direction:column;gap:8px;justify-content:flex-end;-webkit-overflow-scrolling:touch}
+.av-msg{display:flex;animation:avMsgIn .22s ease both}
+.av-msg.user{justify-content:flex-end}
+.av-msg.alfred{justify-content:flex-start}
+.av-bub{max-width:80%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.58}
+.av-msg.user .av-bub{background:rgba(255,208,72,.1);border:1px solid rgba(255,208,72,.2);color:var(--text);border-bottom-right-radius:4px}
+.av-msg.alfred .av-bub{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);color:var(--text2);border-bottom-left-radius:4px}
+@keyframes avMsgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 /* Rank-up ceremony glow */
 .rankup-glow{animation:rankGlow 1.6s ease-out;border-color:var(--gold2)!important;box-shadow:0 0 32px rgba(255,208,72,.35)!important}
 @keyframes rankGlow{0%{box-shadow:0 0 0 rgba(255,208,72,0)}60%{box-shadow:0 0 48px rgba(255,208,72,.5)}100%{box-shadow:0 0 32px rgba(255,208,72,.25)}}
@@ -998,6 +1028,30 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 <div id="app"></div>
 <nav id="nav" class="hide"></nav>
 <div id="alfred-fab" class="hide" onclick="openAlfredChat()" title="Ask Alfred">🦇</div>
+<div id="alf-voice-ov">
+  <div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:54px 20px 0;flex:none">
+    <div style="font-family:var(--disp);font-size:11px;color:var(--gold2);letter-spacing:.22em;opacity:.75">ALFRED · BATCOMPUTER</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="_avOpenTextChat()" title="Text chat" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--text3);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer">⌨</button>
+      <button onclick="closeAlfredVoice()" title="Close" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--text3);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
+    </div>
+  </div>
+  <div id="av-transcript"></div>
+  <div class="alf-orb-wrap">
+    <div class="alf-orb" onclick="_alfOrbTap()">
+      <div class="alf-orb-r"></div><div class="alf-orb-r"></div><div class="alf-orb-r"></div>
+      <div class="alf-orb-core">🦇</div>
+    </div>
+    <div id="av-status" style="font-size:11px;letter-spacing:.14em;color:var(--text3);text-transform:uppercase;max-width:280px;text-align:center;line-height:1.5">Tap to speak</div>
+  </div>
+  <div style="width:100%;padding:2px 16px 44px;flex:none">
+    <div id="av-chips" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="av-in" placeholder="Or type here…" style="flex:1;padding:11px 14px;border-radius:14px;font-size:15px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)" onkeydown="if(event.key==='Enter'){event.preventDefault();_avSendText();}" autocomplete="off" autocapitalize="sentences"/>
+      <button class="btn gold sm" style="width:auto;padding:11px 16px;border-radius:14px;flex:none" onclick="_avSendText()">→</button>
+    </div>
+  </div>
+</div>
 <div id="overlay"><div class="ovbg" onclick="closeOverlay()"></div><div class="ovcard" id="ovcard"></div></div>
 <div id="cine"><div class="cbg" onclick="cineDismiss()"></div><div class="cstage" id="cstage"></div></div>
 <div class="sheetbg" id="sheetbg" onclick="closeSheet()"></div>
@@ -8692,7 +8746,80 @@ async function attachAlfredPic(input){const f=input.files[0];if(!f)return;
 let ALFRED_VOICE="";
 
 /* ========================= ALFRED EVERYWHERE — FAB + bottom sheet chat ========================= */
-function openAlfredChat(){haptic("tap");_renderAlfredSheet();}
+function openAlfredChat(){haptic("tap");openAlfredVoice();}
+
+/* ── Alfred Voice Conversation — Jarvis-style orb overlay ── */
+let _AV_STATE='idle'; // idle | listen | think | speak
+
+function openAlfredVoice(){
+  const ov=document.getElementById('alf-voice-ov');if(!ov)return;
+  ov.classList.add('on');haptic('tap');
+  _avRenderTranscript();_avRenderChips();_avSetState('idle');
+}
+function closeAlfredVoice(){
+  const ov=document.getElementById('alf-voice-ov');if(ov)ov.classList.remove('on');
+  if(_alfRec){try{_alfRec.stop();}catch(e){}}
+  _alfListening=false;
+  try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+  _avSetState('idle');
+}
+function _avOpenTextChat(){closeAlfredVoice();_renderAlfredSheet();}
+function _avSetState(s){
+  _AV_STATE=s;
+  const ov=document.getElementById('alf-voice-ov');if(!ov)return;
+  ov.classList.remove('av-listen','av-think','av-speak');
+  if(s==='listen')ov.classList.add('av-listen');
+  else if(s==='think')ov.classList.add('av-think');
+  else if(s==='speak')ov.classList.add('av-speak');
+  const st=document.getElementById('av-status');
+  if(st)st.textContent={idle:'Tap to speak',listen:'Listening…',think:'Thinking…',speak:'Speaking…'}[s]||'';
+}
+function _avRenderTranscript(){
+  const t=document.getElementById('av-transcript');if(!t)return;
+  const msgs=ALFRED_MSGS.slice(-8);
+  t.innerHTML=msgs.map(m=>{
+    const isThink=m.text==='…thinking…';
+    return `<div class="av-msg ${m.role}"><div class="av-bub">${isThink?'<span style="opacity:.5;font-style:italic">…</span>':esc(m.text).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div></div>`;
+  }).join('');
+  requestAnimationFrame(()=>{t.scrollTop=t.scrollHeight;});
+}
+function _avRenderChips(){
+  const c=document.getElementById('av-chips');if(!c)return;
+  if(ALFRED_MSGS.length){c.innerHTML='';return;}
+  const qs=["What should I train today?","How's my recovery?","Build me a Push Pull Legs split","What's my weakest point?","Am I overtraining?"];
+  c.innerHTML=qs.map(q=>`<button class="chip" style="font-size:12px;width:auto" onclick="_avQuickAsk('${q.replace(/'/g,"\\'")}')">${q}</button>`).join('');
+}
+function _avQuickAsk(q){const i=document.getElementById('av-in');if(i)i.value=q;_avSendText();}
+async function _avSendText(){
+  const i=document.getElementById('av-in');if(!i)return;
+  const q=i.value.trim();if(!q)return;
+  i.value='';const c=document.getElementById('av-chips');if(c)c.innerHTML='';
+  _avSetState('think');
+  await _alfSend(q,null);
+}
+function _alfOrbTap(){
+  if(_AV_STATE==='listen'){if(_alfRec){try{_alfRec.stop();}catch(e){}}_avSetState('idle');return;}
+  if(_AV_STATE==='speak'){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}_avSetState('idle');return;}
+  if(_AV_STATE==='think')return;
+  _avStartListen();
+}
+function _avStartListen(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){const i=document.getElementById('av-in');if(i)i.focus();toast('Voice input not supported here — type below.');return;}
+  if(_alfRec){try{_alfRec.stop();}catch(e){}}
+  _alfRec=new SR();_alfRec.continuous=false;_alfRec.interimResults=true;_alfRec.lang='en-US';
+  _avSetState('listen');_alfListening=true;
+  _alfRec.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}
+    const st=document.getElementById('av-status');
+    if(st&&(interim||final))st.textContent='"'+(final||interim)+'"';
+    if(final){_alfListening=false;const c=document.getElementById('av-chips');if(c)c.innerHTML='';_avSetState('think');_alfSend(final.trim(),null);}
+  };
+  _alfRec.onerror=e=>{_alfListening=false;_avSetState('idle');if(e.error==='not-allowed')toast('Mic permission blocked — enable it in browser settings.');};
+  _alfRec.onend=()=>{_alfListening=false;if(_AV_STATE==='listen')_avSetState('idle');};
+  try{_alfRec.start();haptic('tap');}catch(e){_avSetState('idle');}
+}
 
 function _alfredMsgsHtml(){
   if(!ALFRED_MSGS.length)return `<div style="text-align:center;padding:28px 14px 16px">
@@ -8835,11 +8962,20 @@ function _alfExecAction(type,argsRaw){
   }
 }
 
+function _alfUiSync(){
+  const ov=document.getElementById('alf-voice-ov');
+  if(ov&&ov.classList.contains('on')){_avRenderTranscript();return;}
+  const tabChat=document.getElementById('alfred-tab-chat');
+  if(tabChat){tabChat.innerHTML=_alfredMsgsHtml();requestAnimationFrame(()=>{tabChat.scrollTop=tabChat.scrollHeight;});return;}
+  _renderAlfredSheet();
+}
 async function _alfSend(q,pic){
   const displayQ=q||(pic?'What do you make of this physique, Alfred?':'');
   ALFRED_MSGS.push({role:'user',text:displayQ,img:pic?pic.url:null});
   ALFRED_MSGS.push({role:'alfred',text:'…thinking…'});
-  _renderAlfredSheet();
+  const ov0=document.getElementById('alf-voice-ov');
+  if(ov0&&ov0.classList.contains('on'))_avSetState('think');
+  _alfUiSync();
   try{
     // Build multi-turn contents: system context as first user turn, then full conversation history
     const ctx=alfredContext();
@@ -8868,16 +9004,33 @@ async function _alfSend(q,pic){
     last.text=clean||'I have nothing to add, sir.';
     last.actions=actions;
     state.data.u.aiUses++;try{checkAchievements();}catch(e){}save();
-    // Auto-speak if voice mode on
-    if(_ALF_VOICE&&clean){
-      try{if(window.speechSynthesis){window.speechSynthesis.cancel();setTimeout(()=>{try{window.speechSynthesis.speak(_alfredUtter(clean.replace(/\*\*/g,'').replace(/\*/g,'').slice(0,280),0.92,0.95));}catch(e){}},120);}}catch(e){}
-    }
+    // Voice overlay always speaks; old sheet/tab only speak if voice toggle is on
+    const ovOn=document.getElementById('alf-voice-ov')?.classList.contains('on');
+    if((ovOn||_ALF_VOICE)&&clean){
+      try{
+        if(window.speechSynthesis){
+          window.speechSynthesis.cancel();
+          setTimeout(()=>{
+            try{
+              const utt=_alfredUtter(clean.replace(/\*\*/g,'').replace(/\*/g,'').slice(0,280),0.92,0.95);
+              if(ovOn){
+                utt.onstart=()=>_avSetState('speak');
+                utt.onend=()=>_avSetState('idle');
+                utt.onerror=()=>_avSetState('idle');
+              }
+              window.speechSynthesis.speak(utt);
+            }catch(e){if(ovOn)_avSetState('idle');}
+          },120);
+        }else if(ovOn){_avSetState('idle');}
+      }catch(e){if(ovOn)_avSetState('idle');}
+    }else if(ovOn){_avSetState('idle');}
     // Auto-execute any actions
     if(actions.length){setTimeout(()=>{try{_alfExecAction(actions[0].type,actions[0].args);}catch(e){}},600);}
   }catch(e){
+    if(document.getElementById('alf-voice-ov')?.classList.contains('on'))_avSetState('idle');
     ALFRED_MSGS[ALFRED_MSGS.length-1].text="The line to the Batcomputer is down, sir. ("+e.message+")";
   }
-  _renderAlfredSheet();
+  _alfUiSync();
 }
 
 async function _alfredAttachPic(input){
