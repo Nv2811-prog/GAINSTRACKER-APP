@@ -879,6 +879,21 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 @keyframes garDoorLC{from{transform:translateX(-102%)}to{transform:translateX(0)}}
 @keyframes garDoorRC{from{transform:translateX(102%)}to{transform:translateX(0)}}
 @keyframes garOut{to{opacity:0}}
+/* Vehicle in garage overlay */
+.gar-veh-wrap{position:absolute;bottom:18%;left:0;right:0;display:flex;flex-direction:column;align-items:center;z-index:6;pointer-events:none}
+.gar-veh-e{font-size:100px;line-height:1;filter:drop-shadow(0 0 36px rgba(242,208,121,.65));animation:garveh 1.7s 1.12s cubic-bezier(.06,.8,.2,1) both}
+@keyframes garveh{from{transform:translateX(-70vw) scale(.3);opacity:0}15%{opacity:1}to{transform:translateX(0) scale(1);opacity:1}}
+.gar-veh-nm{font-family:var(--disp);font-size:14px;letter-spacing:.22em;color:rgba(242,208,121,.55);text-transform:uppercase;animation:garTxt .7s 2.2s ease both;margin-top:6px}
+.gar-veh-floor{width:180px;height:28px;background:radial-gradient(ellipse at 50% 0%,rgba(242,208,121,.22),transparent 70%);animation:garveh 1.7s 1.12s cubic-bezier(.06,.8,.2,1) both;margin-top:-4px}
+/* Patrol intro vehicle bar */
+.pveh-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;animation:pfade .55s .04s ease both}
+.pveh-e{font-size:54px;line-height:1;filter:drop-shadow(0 0 18px rgba(242,208,121,.55));animation:pveh-roll .9s .1s cubic-bezier(.1,0,.2,1.1) both}
+@keyframes pveh-roll{from{transform:translateX(-90px);opacity:0}to{transform:translateX(0);opacity:1}}
+.pveh-nm{font-family:var(--disp);font-size:12px;letter-spacing:.18em;color:rgba(242,208,121,.45);text-transform:uppercase}
+/* Batman muscle figure in patrol intro */
+.pbat-fig-outer{width:100%;max-width:340px;margin-bottom:14px;animation:pfade .7s .18s ease both}
+.pbat-fig-lbl{font-size:8px;letter-spacing:.55em;text-transform:uppercase;color:rgba(242,208,121,.38);text-align:center;margin-bottom:7px}
+.pbat-fig{background:rgba(0,0,0,.45);border-radius:14px;border:1px solid rgba(255,255,255,.06);overflow:hidden;padding:6px 6px 2px}
 
 /* ===== Wave 9 v2: Patrol intro v2 + swipe + input table ===== */
 /* Patrol intro */
@@ -10211,13 +10226,16 @@ function renderLogging(){
   initDragReorder();
 }
 
-/* ===== Wave 9 v4: Garage-door Batcave entrance + global thumb() fix ===== */
+/* ===== Wave 9 v5: Garage doors + vehicle roll-out + anatomy-only figures ===== */
 
-/* Two massive Batcave garage doors slide apart to reveal the workout */
+/* Garage doors open, then the user's top vehicle rolls out. No skip. */
 function playEntrance(name){
   if(state._entrLock)return;state._entrLock=true;
   try{haptic('light');}catch(e){}
   try{document.querySelectorAll('.g9-entr,.g9-entr2,.g9-garage').forEach(n=>n.remove());}catch(_){}
+  // Pick the highest unlocked vehicle
+  let topV={e:'🏎️',n:'Batmobile'};
+  try{const gs=gothamStats();const own=GARAGE.filter(v=>v.req(gs));if(own.length)topV=own[own.length-1];}catch(_){}
   const nm=typeof esc==='function'?esc(name||'Workout'):(name||'Workout');
   const ov=document.createElement('div');ov.className='g9-garage';
   ov.innerHTML=`<div class="g9-garage-bg">
@@ -10226,57 +10244,71 @@ function playEntrance(name){
     <div class="g9-garage-c tl"></div><div class="g9-garage-c tr"></div>
     <div class="g9-garage-c bl"></div><div class="g9-garage-c br"></div>
     <div class="g9-garage-scan"></div>
-    <div class="g9-garage-bat">🦇</div>
-    <div class="g9-garage-label">GOTHAM IRON PROTOCOL</div>
-    <div class="g9-garage-name">${nm}</div>
+    <div class="gar-veh-wrap">
+      <div class="gar-veh-e">${topV.e}</div>
+      <div class="gar-veh-floor"></div>
+      <div class="gar-veh-nm">${typeof esc==='function'?esc(topV.n):topV.n}</div>
+    </div>
+    <div class="g9-garage-label" style="position:absolute;bottom:60px;left:0;right:0;text-align:center">GOTHAM IRON PROTOCOL</div>
+    <div class="g9-garage-name" style="position:absolute;bottom:28px;left:0;right:0;text-align:center;padding:0 24px">${nm}</div>
   </div>
   <div class="g9-garage-crack"></div>
   <div class="g9-door-left"></div>
   <div class="g9-door-right"></div>`;
   document.body.appendChild(ov);
+  // No tap-to-skip — plays to completion then auto-dismisses
   const close=()=>{if(ov._done)return;ov._done=true;state._entrLock=false;ov.classList.add('closing');setTimeout(()=>{try{ov.remove();}catch(_){}},520);};
-  ov.addEventListener('click',close);
-  setTimeout(close,3800);
+  setTimeout(close,4200);
 }
 
-/* Fix thumb() globally — one source only, never layer demo photo over SVG anatomy */
+/* Always anatomy SVG — the grey bodybuilder with red worked muscles. Never demo images. */
 function thumb(ex,small){
-  const fi=exFigImg(ex);
-  const cls='exwrap'+(small?' sm':'');
-  if(fi)return `<span class="${cls}"><img class="exfigimg" src="${fi}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'"/></span>`;
-  return `<span class="${cls}">${figureSVG(ex)}</span>`;
+  return `<span class="exwrap${small?' sm':''}">${figureSVG(ex)}</span>`;
 }
 
 /* ===== Wave 9 v2: Dramatic patrol intro + proper logging redesign ===== */
 
-/* Dramatic mission-briefing patrol intro. */
+/* Patrol intro: vehicle strip + large front+back anatomy figure with session muscles red. */
 function renderPatrolIntro(){
   const ses=state.session;
   const muscles=[];const seen=new Set();
-  (ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);muscles.push(m);}});});
+  (ses.exercises||[]).forEach(e=>{
+    const ex=exFor(e.name);
+    (ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);muscles.push(m);}});
+    (ex.s||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);muscles.push(m);}});
+  });
   const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
   const musTags=muscles.slice(0,8).map(m=>{const col=pCols[m]||'var(--gold2)';return `<span class="patrol2-mtag" style="color:${col};border-color:${col}44;background:${col}0e">${MNAME[m]||m}</span>`;}).join('');
   const exCount=(ses.exercises||[]).length;
   const gp=tonightGamePlan();
   const gpCards=gp&&gp.length?gp.map(t=>`<div class="patrol2-tcard">🎯 ${t}</div>`).join(''):'';
-  // Day name: split into words and highlight the last word in gold
   const dayWords=ses.day.trim().split(/\s+/);
-  const dayHtml=dayWords.length>1
-    ?dayWords.slice(0,-1).join(' ')+' <span>'+esc(dayWords[dayWords.length-1])+'</span>'
-    :`<span>${esc(ses.day)}</span>`;
-  const statLine=muscles.length?`${muscles.length} target${muscles.length===1?'':'s'} · ${exCount} exercise${exCount===1?'':'s'}`:exCount?`${exCount} exercise${exCount===1?'':'s'} · free session`:'Free patrol';
-
+  const dayHtml=dayWords.length>1?dayWords.slice(0,-1).join(' ')+' <span>'+esc(dayWords[dayWords.length-1])+'</span>':`<span>${esc(ses.day)}</span>`;
+  // Top vehicle
+  let topV={e:'🏎️',n:'Batmobile'};
+  try{const gs=gothamStats();const own=GARAGE.filter(v=>v.req(gs));if(own.length)topV=own[own.length-1];}catch(_){}
+  // Batman figure: all session muscles in red, secondary amber, rest near-invisible
+  let figHtml='';
+  if(muscles.length){
+    const hi=new Set(muscles.map(MM_NORM));
+    const col=m=>hi.has(m)?{fill:'#E8453C',op:'.95'}:{fill:'#E8C56A',op:'.06'};
+    figHtml=`<div class="pbat-fig-outer">
+      <div class="pbat-fig-lbl">TARGET SYSTEMS ONLINE</div>
+      <div class="pbat-fig">${suitFigureFB(col)}</div>
+      <div class="patrol2-muscles" style="margin-top:10px">${musTags}</div>
+    </div>`;
+  }
   $('app').innerHTML=`<div class="patrol2-wrap">
     <div class="patrol2-grid"></div>
     <div class="patrol2-glow"></div>
     <div class="patrol2-body">
       <div class="patrol2-eye">GOTHAM IRON PROTOCOL · MISSION BRIEFING</div>
+      <div class="pveh-bar"><span class="pveh-e">${topV.e}</span><span class="pveh-nm">${esc(topV.n)}</span></div>
       <div class="patrol2-day">${dayHtml}</div>
       <div class="patrol2-split">${esc(ses.split)}</div>
       <div class="patrol2-rule"></div>
-      ${muscles.length?`<div class="patrol2-muscles">${musTags}</div>`:''}
+      ${figHtml}
       ${gpCards?`<div class="patrol2-targets">${gpCards}</div>`:''}
-      <div style="font-size:11px;color:var(--text3);margin-bottom:26px;letter-spacing:.08em;animation:pfade .65s .32s ease both">${statLine}</div>
       <button class="patrol2-deploy" onclick="beginPatrol()">DEPLOY TO FIELD</button>
       <button class="btn ghost" style="margin-top:11px;color:var(--text3);max-width:380px;width:100%;animation:pfade .65s .4s ease both" onclick="endSession()">ABORT MISSION</button>
     </div>
@@ -10349,11 +10381,8 @@ function renderLogging(){
     const col=pCols[(ex.p||[])[0]]||'var(--gold2)';
     const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
 
-    // Figure — ONE source only: demo photo if exists, anatomy SVG otherwise. Never layer both.
-    const fi=exFigImg(ex);
-    const figHtml=`<span class="exwrap" style="width:88px;height:88px;flex:0 0 88px;border-radius:16px;border-color:${col}44;box-shadow:0 0 0 1px ${col}18,0 8px 28px -8px ${col}40">
-      ${fi?`<img class="exfigimg" src="${fi}" alt="" onerror="this.style.display='none'"/>`:figureSVG(ex)}
-    </span>`;
+    // Figure — anatomy SVG only (grey body + red worked muscles). No demo photos.
+    const figHtml=`<span class="exwrap" style="width:88px;height:88px;flex:0 0 88px;border-radius:16px;border-color:${col}44;box-shadow:0 0 0 1px ${col}18,0 8px 28px -8px ${col}40">${figureSVG(ex)}</span>`;
 
     h+=`<div class="log-focus">
       <div class="log-focus-head">
