@@ -772,6 +772,59 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
   .gtv2-hero-img{width:74%;opacity:.5}
   .gtv2-map{grid-template-columns:repeat(3,1fr)}
 }
+/* ===== Wave 9: Cinematic Logging & Start-Patrol ===== */
+.patrol-hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px 24px;background:radial-gradient(ellipse at 50% 35%,rgba(242,208,121,.16) 0%,transparent 68%),#07090d}
+.patrol-day{font-family:var(--disp);font-size:48px;letter-spacing:.04em;color:var(--gold2);line-height:.9;text-shadow:0 0 40px rgba(242,208,121,.55),0 4px 20px rgba(0,0,0,.9);margin:4px 0 6px}
+.patrol-split-tag{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim,#6b5420);margin-bottom:22px}
+.patrol-muscles{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:4px 0 22px}
+.patrol-mtag{font-family:var(--disp);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;padding:5px 12px;border-radius:20px;border:1px solid;white-space:nowrap}
+.patrol-gp{width:100%;max-width:380px;margin:0 0 20px;display:flex;flex-direction:column;gap:7px}
+.patrol-gp-item{font-size:13px;line-height:1.5;color:var(--text2);background:rgba(242,208,121,.06);border:1px solid rgba(242,208,121,.18);border-radius:11px;padding:10px 13px;text-align:left}
+.patrol-begin{font-family:var(--disp);font-size:18px;letter-spacing:.12em;padding:18px 0;border-radius:16px;background:linear-gradient(180deg,var(--gold3,#d4a828),var(--gold,#b8902e));color:#100c00;box-shadow:0 0 36px -6px rgba(242,208,121,.65),inset 0 1px 0 rgba(255,255,255,.38);border:none;cursor:pointer;width:100%;max-width:380px;transition:transform .12s ease;display:block}
+.patrol-begin:active{transform:scale(.97)}
+.log-focus{border-radius:20px;overflow:hidden;margin-bottom:10px;background:linear-gradient(180deg,#0d1020,#080b12);border:1px solid rgba(242,208,121,.22);box-shadow:0 20px 60px -28px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07)}
+.log-focus-head{display:flex;align-items:stretch;gap:14px;padding:14px 16px 12px}
+.log-fig-wrap{flex:0 0 88px;width:88px;height:88px;border-radius:14px;overflow:hidden;background:#04050a;border:1px solid rgba(255,255,255,.07);position:relative}
+.log-exname{font-family:var(--disp);font-size:18px;letter-spacing:.03em;color:var(--text);line-height:1.1;margin-bottom:5px}
+.log-target{font-size:12px;color:var(--green,#2ecc71);line-height:1.4;margin-bottom:3px}
+.log-muscle-tag{font-size:10px;letter-spacing:.13em;text-transform:uppercase}
+.log-setbar{display:flex;align-items:center;gap:6px;padding:7px 16px;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.22)}
+.log-setdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.13);transition:all .2s;flex:0 0 8px}
+.log-setdot.done{background:var(--green,#2ecc71);box-shadow:0 0 5px rgba(46,204,113,.6)}
+.log-setdot.current{background:var(--gold2,#f2d079);box-shadow:0 0 8px rgba(242,208,121,.75);transform:scale(1.5)}
+.log-stepper-area{padding:10px 16px 12px}
+.log-stepper-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.log-stepper-lbl{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);width:34px;flex:0 0 34px;text-align:right}
+.log-stepper{display:flex;align-items:center;flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;height:56px}
+.log-step-btn{height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:22px;font-weight:300;color:var(--gold2);cursor:pointer;user-select:none;-webkit-user-select:none;background:rgba(242,208,121,.07);border:none;outline:none;-webkit-tap-highlight-color:transparent;transition:background .1s;padding:0}
+.log-step-btn:active{background:rgba(242,208,121,.22)}
+.log-step-val{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.log-step-num{font-family:var(--disp);font-size:28px;letter-spacing:.02em;color:var(--text);line-height:1}
+.log-step-unit{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.log-platebar{margin:4px 0 10px;padding:8px 10px;background:rgba(0,0,0,.38);border-radius:11px;border:1px solid rgba(255,255,255,.07)}
+.log-prev{display:flex;align-items:center;gap:6px;padding:2px 0 8px;font-size:12px;color:var(--text3)}
+.dlt-up{color:var(--green,#2ecc71)}.dlt-dn{color:#e8453c}.dlt-eq{color:var(--text3)}
+.log-save-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:0 16px 14px}
+.log-save-btn{font-family:var(--disp);font-size:15px;letter-spacing:.1em;padding:15px;border-radius:14px;background:linear-gradient(180deg,rgba(46,204,113,.28),rgba(46,204,113,.12));border:1px solid rgba(46,204,113,.45);color:var(--green,#2ecc71);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
+.log-save-btn:active{transform:scale(.97)}
+.log-amrap-btn{padding:15px 12px;border-radius:14px;background:rgba(232,69,60,.1);border:1px solid rgba(232,69,60,.32);color:#e8453c;font-family:var(--disp);font-size:12px;letter-spacing:.06em;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.log-amrap-btn.on{background:rgba(232,69,60,.3);border-color:#e8453c;box-shadow:0 0 10px -3px #e8453c}
+.log-set-hist{padding:0 16px 12px;display:flex;flex-direction:column;gap:5px}
+.log-set-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.log-set-row.done-row{background:rgba(46,204,113,.07);border:1px solid rgba(46,204,113,.18)}
+.log-set-row.warm-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.log-set-row.cur-row{background:rgba(242,208,121,.07);border:1px solid rgba(242,208,121,.25)}
+.log-set-row.pend-row{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05)}
+.log-set-badge{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 22px}
+.log-set-badge.done{background:var(--green,#2ecc71);color:#000}
+.log-set-badge.warm{background:rgba(232,197,106,.28);color:var(--gold2);font-size:9px;letter-spacing:.03em}
+.log-set-badge.cur{background:rgba(242,208,121,.2);color:var(--gold2);border:1px solid rgba(242,208,121,.5)}
+.log-set-badge.pend{background:rgba(255,255,255,.07);color:var(--text3)}
+.log-ex-strip{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:10px}
+.log-ex-strip::-webkit-scrollbar{display:none}
+.log-ex-pill{flex:0 0 auto;padding:7px 12px;border-radius:10px;font-family:var(--disp);font-size:11.5px;letter-spacing:.05em;cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:var(--text3);transition:all .15s;-webkit-tap-highlight-color:transparent}
+.log-ex-pill.ex-active{background:rgba(242,208,121,.11);border-color:rgba(242,208,121,.38);color:var(--gold2)}
+.log-ex-pill.ex-done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.28);color:var(--green,#2ecc71)}
 </style>
 </head>
 <body>
@@ -2624,7 +2677,7 @@ function seedSets(name){
   if(last&&last.length)return last.map(s=>({w:"",r:"",type:s.type||"NRM",done:false,rpe:"",prevW:s.w,prevR:s.r,prevType:s.type||"NRM"}));
   return [0,1,2].map(()=>({w:"",r:"",type:"NRM",done:false,rpe:""}));
 }
-function setReadiness(r){state.session.readiness=r;state.step="logging";startTimers();render();saveSession();}
+function setReadiness(r){state.session.readiness=r;state.step="patrol-intro";render();saveSession();}
 /* Per-gym records: switching the active gym re-points d.prs to that gym's record book, so every PR
    read/write (targets, boss fights, records) automatically reflects the gym you're standing in. */
 function switchGym(gym){const d=state.data;gym=(gym||"").trim();if(!gym)return;d.u.gyms=d.u.gyms||["Fitness X"];if(!d.u.gyms.includes(gym))d.u.gyms.push(gym);d.u.activeGym=gym;d.prsByGym=d.prsByGym||{};d.prsByGym[gym]=d.prsByGym[gym]||{};d.prs=d.prsByGym[gym];save();}
@@ -3457,7 +3510,7 @@ function render(){
   // element (not its innerHTML), so they survive re-renders and otherwise keep firing
   // sumNav→renderSummary on every later swipe/scroll — the "bounce back to Gotham" bug.
   const _app0=$("app");if(_app0){_app0.ontouchstart=null;_app0.ontouchend=null;}
-  const vk=state.showOnboarding?"onb":state.step==="summary"?"sum":state.step==="readiness"?"rdy":state.step==="logging"?"log":state.subpage?("sub:"+state.subpage):("tab:"+state.tab);
+  const vk=state.showOnboarding?"onb":state.step==="summary"?"sum":state.step==="readiness"?"rdy":state.step==="patrol-intro"?"patrol":state.step==="logging"?"log":state.subpage?("sub:"+state.subpage):("tab:"+state.tab);
   const same=(vk===state._vk);
   const sy=same?(window.scrollY||window.pageYOffset||0):0;
   const af=document.activeElement;
@@ -3466,6 +3519,7 @@ function render(){
   if(state.showOnboarding){renderOnboarding();renderNav();}
   else if(state.step==="summary"){renderSummary();renderNav();}
   else if(state.step==="readiness"){renderReadiness();renderNav();}
+  else if(state.step==="patrol-intro"){renderPatrolIntro();renderNav();}
   else if(state.step==="logging"){renderLogging();renderNav();}
   else if(state.subpage==="archive"){renderArchive();renderNav();}
   else if(state.subpage==="garage"){renderGarage();renderNav();}
@@ -3485,7 +3539,7 @@ function render(){
     // into its containing block — the fixed element then scrolls away with the page and never
     // returns. The logging view's pinned timer bar AND the floating resume bar both hit this, so
     // those views use the opacity-only entry (no transform, no will-change) instead of the slide.
-    const soft=state.step==="logging"||!!(state.session&&!state.step&&!state.showOnboarding);
+    const soft=state.step==="logging"||state.step==="patrol-intro"||!!(state.session&&!state.step&&!state.showOnboarding);
     _a.classList.remove("view-enter","view-enter-soft");void _a.offsetWidth;_a.classList.add(soft?"view-enter-soft":"view-enter");}}
 }
 
@@ -9773,6 +9827,296 @@ function boot(){
 }
 boot();
 
+
+/* ===== Wave 9: Cinematic Logging — patrol intro + redesigned logging screen ===== */
+
+function renderPlateBar(totalKg){
+  const bar=state.data.u.barWeight||20;
+  const plist=(state.data.plates&&state.data.plates.length)?state.data.plates.slice().sort((a,b)=>b-a):[25,20,15,10,5,2.5,1.25];
+  const cols={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};
+  let per=(totalKg-bar)/2;if(per<0)per=0;
+  const used=[];plist.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});
+  const H=72,cy=H/2,sl=18,W=270,cx=W/2;
+  const ph=p=>20+p*1.3,pw=p=>p>=20?9:p>=10?7:p>=5?6:5;
+  let gap=2,xR=cx+sl,xL=cx-sl,ps="";
+  used.forEach(p=>{const h=ph(p),w=pw(p),col=cols[p]||"#888";
+    ps+=`<rect x="${xR}" y="${cy-h/2}" width="${w}" height="${h}" rx="2" fill="${col}" stroke="#000" stroke-opacity=".4" stroke-width=".8"/>`;
+    ps+=`<rect x="${xL-w}" y="${cy-h/2}" width="${w}" height="${h}" rx="2" fill="${col}" stroke="#000" stroke-opacity=".4" stroke-width=".8"/>`;
+    xR+=w+gap;xL-=w+gap;});
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;max-height:72px">
+    <defs><linearGradient id="psg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b0b8c5"/><stop offset=".5" stop-color="#7a808c"/><stop offset="1" stop-color="#4a5058"/></linearGradient></defs>
+    <rect x="14" y="${cy-2}" width="${W-28}" height="4" rx="2" fill="url(#psg)"/>
+    <rect x="${cx-sl}" y="${cy-5.5}" width="${sl*2}" height="11" rx="2.5" fill="url(#psg)"/>
+    ${ps}</svg>
+  <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:3px">${used.length?used.join(" + ")+" per side":"Just the bar"} · <b style="color:var(--text2)">${totalKg}kg total</b></div>`;
+}
+
+function renderPatrolIntro(){
+  const ses=state.session;
+  const muscles=[];const seen=new Set();
+  (ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);muscles.push(m);}});});
+  const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
+  const musTags=muscles.slice(0,8).map(m=>{const col=pCols[m]||'var(--gold2)';return `<span class="patrol-mtag" style="color:${col};border-color:${col}44;background:${col}11">${MNAME[m]||m}</span>`;}).join('');
+  const exCount=(ses.exercises||[]).length;
+  const gp=tonightGamePlan();
+  const gpHtml=gp&&gp.length?gp.map(t=>`<div class="patrol-gp-item">🎯 ${t}</div>`).join(''):'';
+  const introLine=muscles.length?`${muscles.length} muscle group${muscles.length===1?'':'s'} · ${exCount} exercise${exCount===1?'':'s'} queued`:"Free session — add exercises as you go";
+  $('app').innerHTML=`<div class="patrol-hero">
+    <div style="font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-dim,#6b5420);margin-bottom:12px">GOTHAM IRON PROTOCOL</div>
+    <div class="patrol-day">${esc(ses.day)}</div>
+    <div class="patrol-split-tag">${esc(ses.split)}</div>
+    <div class="patrol-muscles">${musTags||'<span class="patrol-mtag" style="color:var(--text3);border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.04)">Free patrol</span>'}</div>
+    ${gpHtml?`<div class="patrol-gp">${gpHtml}</div>`:''}
+    <div style="font-size:11px;color:var(--text3);margin:0 0 24px;letter-spacing:.06em">${introLine}</div>
+    <button class="patrol-begin" onclick="beginPatrol()">⚡ BEGIN PATROL</button>
+    <button class="btn ghost" style="margin-top:12px;color:var(--text3);max-width:380px;width:100%" onclick="endSession()">← Cancel mission</button>
+  </div>`;
+}
+
+function beginPatrol(){state.step='logging';startTimers();try{haptic('done');}catch(e){}render();}
+
+function focusEx(ei){if(!state.session)return;state.session._focusEi=ei;try{haptic('tap');}catch(e){}render();window.scrollTo(0,0);}
+
+function stepW(ei,si,delta){
+  const ses=state.session;if(!ses||!ses.exercises[ei])return;
+  const s=ses.exercises[ei].sets[si];if(!s)return;
+  const cur=parseFloat(s.w)||0;
+  s.w=String(Math.max(0,Math.round((cur+delta)*10)/10));
+  saveSessionSoon();render();
+}
+function stepR(ei,si,delta){
+  const ses=state.session;if(!ses||!ses.exercises[ei])return;
+  const s=ses.exercises[ei].sets[si];if(!s)return;
+  const cur=parseInt(s.r)||0;s.r=String(Math.max(0,cur+delta));
+  saveSessionSoon();render();
+}
+function markFail(ei,si){
+  const ses=state.session;if(!ses||!ses.exercises[ei])return;
+  const s=ses.exercises[ei].sets[si];if(!s)return;
+  s.type=s.type==='F'?'NRM':'F';saveSessionSoon();render();
+}
+function saveFocusedSet(ei,si){toggleDone(ei,si);}
+
+/* Override renderLogging with the Wave 9 cinematic layout. */
+function renderLogging(){
+  const ses=state.session;if(!ses){try{go('gotham');}catch(e){}return;}
+  // Timer bar (fixed header)
+  let h=`<div class="timers" id="timerbar">
+    <div class="tbox"><span class="num" id="wt-display">${fmtTime(Math.floor((Date.now()-ses.startedAt)/1000))}</span><small>Mission time</small></div>
+    <div class="tbox rest" onclick="reopenRest()" style="cursor:pointer"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>${state.restRunning?"tap to open":"Recovery"}</small></div>
+    <button class="minbtn" onclick="minimizeWorkout()" aria-label="Minimise workout">▾</button>
+  </div><div id="timerspace" aria-hidden="true"></div>`;
+
+  // Exercise nav strip
+  if(ses.exercises.length){
+    h+=`<div class="log-ex-strip">`;
+    const curFei=activeExIdx();
+    ses.exercises.forEach((e,ei)=>{
+      const pr=exProgress(e);const isFocus=ei===curFei;
+      const cls=pr.allDone?'ex-done':isFocus?'ex-active':'';
+      const nm=e.name.length>20?e.name.slice(0,19)+'…':e.name;
+      h+=`<div class="log-ex-pill ${cls}" onclick="focusEx(${ei})">${pr.allDone?'✓ ':''}${esc(nm)}</div>`;
+    });
+    h+=`</div>`;
+  }
+
+  // Focus card for active exercise
+  const fei=activeExIdx();
+  if(fei>=0&&ses.exercises[fei]){
+    const e=ses.exercises[fei];const ex=exFor(e.name);
+    const fi=exFigImg(ex);
+    const sug=suggestionFor(e.name);const nt=nextTarget(e.name);
+    const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
+    const col=pCols[(ex.p||[])[0]]||'var(--gold2)';
+    // Current set = first undone working set
+    const csi=e.sets.findIndex(s=>!s.done&&s.type!=='W');
+    const cs=csi>=0?e.sets[csi]:null;
+    // Progress dots (working sets only)
+    const wSets=e.sets.filter(s=>s.type!=='W');
+    let dotCnt=0;
+    const dots=wSets.map(s=>{const isDone=s.done;const isCur=!isDone&&wSets.slice(0,dotCnt).every(x=>x.done);dotCnt++;return `<div class="log-setdot${isDone?' done':isCur?' current':''}"></div>`;}).join('');
+    // Delta vs previous for the current set
+    let prevHtml='';
+    if(cs&&cs.prevW!=null&&cs.prevR!=null){
+      const pw=parseFloat(cs.prevW)||0,pr2=parseInt(cs.prevR)||0;
+      if(pw||pr2){
+        const cw=parseFloat(cs.w)||0,cr=parseInt(cs.r)||0;
+        const up=cw>pw||(cw===pw&&cr>pr2);const dn=cw<pw||(cw===pw&&cr<pr2);
+        const arrow=up?'↑':dn?'↓':'→';const dc=up?'dlt-up':dn?'dlt-dn':'dlt-eq';
+        const diff=up||dn?(()=>{const dw=Math.round((cw-pw)*10)/10;const dr=cr-pr2;const parts=[];if(dw!==0)parts.push((dw>0?'+':'')+dw+'kg');if(dr!==0)parts.push((dr>0?'+':'')+dr+' rep'+(Math.abs(dr)===1?'':'s'));return parts.join(' ');})():'same';
+        prevHtml=`<div class="log-prev"><span class="${dc}" style="font-size:15px">${arrow}</span><span>Last: <b>${pw}kg × ${pr2}</b></span><span class="${dc}">${diff}</span></div>`;
+      }
+    }
+    const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
+    const curW=cs?parseFloat(cs.w)||0:0;
+    const isF=cs&&cs.type==='F';
+
+    h+=`<div class="log-focus">
+      <div class="log-focus-head">
+        <div class="log-fig-wrap" style="border-color:${col}33">
+          ${fi?`<img src="${fi}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`:''}
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${figureSVG(ex)}</div>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">
+          <div class="log-exname">${esc(e.name)}</div>
+          ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
+          <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
+          ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
+        </div>
+        <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove exercise">✕</button>
+      </div>
+      ${wSets.length?`<div class="log-setbar">${dots}<span style="flex:1"></span><span style="font-size:10px;letter-spacing:.1em;color:var(--text3)">${wSets.filter(s=>s.done).length}/${wSets.length} DONE</span></div>`:''}`;
+
+    if(cs){
+      h+=`<div class="log-stepper-area">
+        <div class="log-stepper-row">
+          <div class="log-stepper-lbl">KG</div>
+          <div class="log-stepper">
+            <button class="log-step-btn" style="width:52px" onclick="stepW(${fei},${csi},-2.5)">−−</button>
+            <button class="log-step-btn" style="width:38px;background:rgba(242,208,121,.04);font-size:18px" onclick="stepW(${fei},${csi},-0.5)">−</button>
+            <div class="log-step-val"><div class="log-step-num">${cs.w||'—'}</div><div class="log-step-unit">kg</div></div>
+            <button class="log-step-btn" style="width:38px;background:rgba(242,208,121,.04);font-size:18px" onclick="stepW(${fei},${csi},0.5)">+</button>
+            <button class="log-step-btn" style="width:52px" onclick="stepW(${fei},${csi},2.5)">++</button>
+          </div>
+        </div>
+        ${isBarbell&&curW>0?`<div class="log-platebar">${renderPlateBar(curW)}</div>`:''}
+        <div class="log-stepper-row">
+          <div class="log-stepper-lbl">REPS</div>
+          <div class="log-stepper">
+            <button class="log-step-btn" style="width:72px" onclick="stepR(${fei},${csi},-1)">−</button>
+            <div class="log-step-val"><div class="log-step-num">${cs.r||'—'}</div><div class="log-step-unit">reps</div></div>
+            <button class="log-step-btn" style="width:72px" onclick="stepR(${fei},${csi},1)">+</button>
+          </div>
+        </div>
+        ${prevHtml}
+      </div>
+      <div class="log-save-row">
+        <button class="log-save-btn" onclick="saveFocusedSet(${fei},${csi})">✓ SAVE SET${cs.type==='W'?' (WARM-UP)':''}</button>
+        <button class="log-amrap-btn${isF?' on':''}" onclick="markFail(${fei},${csi})" title="Mark as AMRAP / failure — triggers fresh e1RM">AMRAP</button>
+      </div>`;
+    }else{
+      h+=`<div style="padding:10px 16px 14px;text-align:center;font-size:13px;color:var(--green,#2ecc71)">✓ All ${wSets.length} sets complete — tap another exercise below</div>`;
+    }
+
+    // Set history
+    h+=`<div class="log-set-hist">`;
+    let wNum=0;
+    e.sets.forEach((s,si)=>{
+      const isW=s.type==='W';if(!isW)wNum++;
+      const isDone=s.done;const isCur=si===csi;
+      const rowCls=isDone?'done-row':isCur?'cur-row':isW?'warm-row':'pend-row';
+      const badgeCls=isDone?'done':isCur?'cur':isW?'warm':'pend';
+      const badgeLabel=isDone?'✓':isW?'W':isCur?'→':String(wNum);
+      // Delta arrow for done sets
+      let dlt='';
+      if(isDone&&!isW&&(s.prevW!=null||s.prevR!=null)){
+        const pw2=parseFloat(s.prevW)||0,pr3=parseInt(s.prevR)||0;
+        const cw2=parseFloat(s.w)||0,cr2=parseInt(s.r)||0;
+        if(cw2>pw2||(cw2===pw2&&cr2>pr3))dlt='<span class="dlt-up">↑</span>';
+        else if(cw2<pw2||(cw2===pw2&&cr2<pr3))dlt='<span class="dlt-dn">↓</span>';
+        else dlt='<span class="dlt-eq">→</span>';
+      }
+      const lbl=isW?`Warm-up · ${s.w||'—'}kg × ${s.r||'—'}`:`Set ${wNum} · ${s.w||'—'}kg × ${s.r||'—'}${s.type==='F'?' <span style="color:#e8453c;font-size:10px">AMRAP</span>':''}`;
+      const prevInfo=!isW&&(s.prevW!=null||s.prevR!=null)?`<span style="font-size:10.5px;color:var(--text3);margin-left:auto;padding-right:4px">prev ${s.prevW||'—'}×${s.prevR||'—'}</span>`:'';
+      const clickAct=isCur?`saveFocusedSet(${fei},${si})`:`toggleDone(${fei},${si})`;
+      h+=`<div class="log-set-row ${rowCls}" onclick="${clickAct}">
+        <div class="log-set-badge ${badgeCls}">${badgeLabel}</div>
+        <div style="flex:1;font-size:12.5px;color:${isDone?'var(--text)':isCur?'var(--gold2)':'var(--text3)'}">${lbl}</div>
+        ${dlt}${prevInfo}
+        <div class="stype ${s.type}" onclick="event.stopPropagation();openSetSheet(${fei},${si})" title="Set options" style="margin-left:2px">⋮</div>
+      </div>`;
+    });
+    h+=`</div>`;
+
+    // Action row
+    const exEq=(ex.eq||'').toLowerCase();
+    h+=`<div class="row wrap" style="padding:0 16px 16px;gap:7px">
+      <button class="btn ghost sm g" onclick="addSet(${fei})">+ Set</button>
+      <button class="btn ghost sm" style="width:auto" onclick="fillLast(${fei})">↻ Fill</button>
+      <button class="btn ghost sm" style="width:auto" onclick="openSwap(${fei})">⇄ Swap</button>
+      <button class="btn ghost sm" style="width:auto" onclick="openPair(${fei})">🤝 Pair</button>
+      <button class="btn ghost sm" style="width:auto" onclick="openProtocolSheet(${fei})">⚡ Intensity</button>
+      ${isBarbell?`<button class="btn ghost sm" style="width:auto" onclick="openPlateSheet(${fei})">${secIcon('plate')}</button>`:''}
+      ${['machine','cable','smith','lever','plate-loaded'].includes(exEq)?`<button class="btn ghost sm" style="width:auto" onclick="setMachineSetting('${esc(e.name).replace(/'/g,'')}')">⚙️</button>`:''}
+    </div>`;
+    h+=`</div>`; // close .log-focus
+  }else{
+    h+=`<div class="card" style="padding:20px;text-align:center;color:var(--text3)">No exercises yet — add one below.</div>`;
+  }
+
+  // Alfred coach line
+  {const _ct=ses._coachTone||'ok';const _cc=_ct==='good'?'var(--green)':_ct==='bad'?'#e8453c':'var(--gold2)';
+   const _cl=ses._coach||"At your service, sir. Log your first set — I'll be watching, and I do not flatter.";
+   h+=`<div class="banner" style="margin-bottom:8px;border-color:${_cc}55"><span>🎩</span><div style="min-width:0"><b style="font-size:11px;letter-spacing:.08em;color:${_cc}">ALFRED${_ct==='bad'?' — UNIMPRESSED':_ct==='good'?' — IMPRESSED':''}</b><div class="mini" style="font-style:italic;color:var(--text2);line-height:1.45">"${esc(_cl)}"</div></div></div>`;}
+
+  // Game plan (dismissible)
+  if(!ses._planDismiss){const _gp=tonightGamePlan();
+    if(_gp&&_gp.length)h+=`<div class="card glow" style="padding:11px;margin-bottom:8px;border-color:rgba(232,197,106,.42);background:rgba(232,197,106,.06)">
+      <div class="row sp" style="margin-bottom:6px"><div class="ttl" style="margin:0;font-size:13px">🗺️ Tonight's game plan</div><span onclick="dismissGamePlan()" style="cursor:pointer;color:var(--text3);font-weight:700;padding:0 4px">✕</span></div>
+      ${_gp.map(t=>`<div class="mini" style="line-height:1.5;margin-bottom:4px;color:var(--text2)">🎯 ${t}</div>`).join('')}
+    </div>`;}
+
+  // Coach analysis (collapsible)
+  {const vn=sessionVolNotes();const rn=stretchRedundancyNotes();
+   if(vn.length||rn.length){const open=state._coachNotesOpen;
+     h+=`<div class="card" style="padding:11px;margin-bottom:8px">
+       <div class="row sp" onclick="state._coachNotesOpen=!state._coachNotesOpen;render()" style="cursor:pointer">
+         <div style="font-size:12px;letter-spacing:.06em;color:var(--gold2)">🧠 Alfred's analysis</div>
+         <span style="color:var(--text3);font-size:13px">${open?'▾':'▸'}</span>
+       </div>
+       ${open?[...vn,...rn].map(n=>`<div class="mini" style="margin-top:7px;line-height:1.5;color:var(--text2)">${n.text.replace(/^🧲 |^📡 /,'')}</div>`).join(''):''}
+     </div>`;}}
+
+  // Damage map
+  {const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=='W'&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));}});
+   if(hitM.length){const dmgOpen=state._dmgOpen===true;
+     h+=`<div class="card glow" style="padding:11px;margin-bottom:8px">
+       <div class="row sp" onclick="toggleDmgReport()" style="cursor:pointer">
+         <div class="ttl" style="margin:0;font-size:13px">⚡ Damage report</div>
+         <div class="row" style="gap:5px;flex:none"><span class="mini" style="color:var(--text3)">${[...new Set(hitM)].length} muscles</span><span style="color:var(--text3);font-weight:700">${dmgOpen?'▾':'▸'}</span></div>
+       </div>
+       ${dmgOpen?`${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:6px;color:var(--text2)">Red = worked this session.</div>`:''}
+     </div>`;}}
+
+  // Other exercises (collapsed list)
+  if(ses.exercises.length>1){
+    h+=`<div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin:6px 0 8px">OTHER EXERCISES</div>`;
+    const gCount={};ses.exercises.forEach(e=>{if(e.group)gCount[e.group]=(gCount[e.group]||0)+1;});
+    let curG=null,gLetters={},gSeq=0;
+    ses.exercises.forEach((e,ei)=>{
+      if(ei===activeExIdx())return;
+      const ex=exFor(e.name);const pr=exProgress(e);
+      const inGroup=e.group&&gCount[e.group]>1;
+      if((e.group||null)!==curG){if(curG&&gCount[curG]>1)h+=`</div>`;curG=e.group||null;
+        if(inGroup){if(!gLetters[e.group])gLetters[e.group]=String.fromCharCode(65+(gSeq++));
+          h+=`<div class="ssgroup"><div class="sshead">${secIcon('link','#ff8378')}SUPERSET ${gLetters[e.group]}</div>`;}}
+      h+=`<div class="card exrow" style="padding:11px;cursor:pointer;opacity:${pr.allDone?.7:1}" onclick="focusEx(${ei})">
+        ${thumb(ex,true)}
+        <div class="g"><div class="exname" style="font-size:14px">${esc(e.name)}</div>
+          <div class="exmeta">${exTarget(ex)} · ${pr.allDone?`<span style="color:var(--green)">✓ all done</span>`:`${pr.doneN}/${pr.total} sets`}</div></div>
+        <div style="color:${pr.allDone?'var(--green)':'var(--text3)'};font-size:14px">${pr.allDone?'✓':'▸'}</div>
+      </div>`;
+    });
+    if(curG&&gCount[curG]>1)h+=`</div>`;
+  }
+
+  h+=`<button class="btn" onclick="openPicker()">＋ Add exercise</button>`;
+
+  // Session notes
+  h+=`<div class="card" style="margin-top:12px;padding:13px">
+    <div class="ttl" style="margin-bottom:4px">📝 Session notes <span class="mini" style="color:var(--text3);font-weight:400">— Alfred reads these before his review</span></div>
+    <textarea id="sessnotes" placeholder="e.g. Glutes sore — skipped leg press." oninput="setSessionNotes(this.value)" style="width:100%;min-height:56px;resize:vertical;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font:inherit;line-height:1.45">${esc(ses.notes||'')}</textarea>
+  </div>`;
+
+  h+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="finishWorkout()">🏁 FINISH WORKOUT</button>
+    <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
+
+  $('app').innerHTML=h;
+  {const _tb=$('timerbar'),_sp=$('timerspace');if(_tb&&_sp)_sp.style.height=_tb.offsetHeight+'px';}
+  ensureTimers();
+  if(!state.wtInt)startTimers();
+  initDragReorder();
+}
 </script>
 </body>
 </html>
