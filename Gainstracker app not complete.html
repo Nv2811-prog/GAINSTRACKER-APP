@@ -3597,11 +3597,11 @@ function renderNav(){
   const tabs=TABS.map(t=>`<button class="${state.tab===t[0]?"on":""}" onclick="go('${t[0]}')"><span class="ic">${t[1]}</span><span class="lb">${t[2]}</span></button>`).join("");
   $("nav").innerHTML=`<i class="nav-plate"></i><div class="nav-bar">${tabs}</div><i class="nav-plate"></i>`;
 }
-/* Slim utility bar injected at the top of every tab — settings left, command center right. */
+/* Slim utility bar — settings left, search right. */
 function topBar(){
   return `<div class="topbar">
     <button class="tbtn" onclick="openSettings()" style="gap:4px"><span style="font-size:15px;line-height:1">⚙️</span><span class="tbl">SETTINGS</span></button>
-    <button class="tbtn wide" onclick="openMenu()"><span style="font-size:15px;line-height:1">☰</span><span class="tbl">COMMAND CENTER</span></button>
+    <button class="tbtn" onclick="openIndex()" style="gap:5px;background:linear-gradient(160deg,rgba(242,208,121,.13),rgba(14,14,18,.92));border-color:rgba(242,208,121,.4);color:var(--gold2)"><span style="font-size:12px;font-weight:900">⌘</span><span class="tbl">SEARCH</span></button>
   </div>`;
 }
 /* ===================== ACCORDION (expand/collapse for dense sections) ===================== */
