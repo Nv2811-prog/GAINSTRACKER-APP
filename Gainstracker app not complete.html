@@ -4868,61 +4868,6 @@ function muscleRing(m,rec,sets,mav,trained){
       font-family="Bebas Neue,sans-serif" font-size="${labelSz}" fill="${trained?recCol:'#3a3e4a'}">${label}</text>
   </svg>`;
 }
-function suitForecast(){
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  if(!trained.length)return '';
-  const ready=trained.filter(m=>hoursToReady(m)<=0).sort((a,b)=>getRecovery(b)-getRecovery(a));
-  const recovering=trained.filter(m=>hoursToReady(m)>0).sort((a,b)=>hoursToReady(a)-hoursToReady(b));
-  let html=`<div class="card" style="padding:14px"><div class="ttl" style="margin-bottom:10px">🕐 Recovery Forecast</div>`;
-  if(ready.length){
-    html+=`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;letter-spacing:.12em;color:#2ECC71;text-transform:uppercase;margin-bottom:7px">Ready to train now</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">${ready.map(m=>`<div style="display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3)">
-      ${mIcon(m,13,'#2ECC71')}<span style="font-size:12px;color:#2ECC71;font-weight:600">${MNAME[m]}</span></div>`).join('')}</div></div>`;
-  }
-  if(recovering.length){
-    html+=`<div style="font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;margin-bottom:7px">Still recovering</div>
-    <div style="display:flex;flex-direction:column;gap:5px">${recovering.map(m=>{
-      const hrs=hoursToReady(m),rec=getRecovery(m);
-      const col=rec>=50?'#E8C53C':'#E8453C';
-      const when=hrs<24?hrs+'h':Math.round(hrs/24*10)/10+'d';
-      const pct=rec;
-      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:var(--bg2)">
-        ${mIcon(m,14,col)}
-        <span style="font-size:12.5px;color:var(--text1);flex:1;font-weight:600">${MNAME[m]}</span>
-        <div style="flex:2;height:4px;border-radius:4px;background:#1a1e28;overflow:hidden"><div style="width:${pct.toFixed(0)}%;height:100%;background:${col};border-radius:4px;box-shadow:0 0 5px ${col}66"></div></div>
-        <span style="font-size:11px;color:${col};min-width:26px;text-align:right;font-weight:700">${when}</span>
-      </div>`;
-    }).join('')}</div>`;
-  }
-  return html+'</div>';
-}
-function suitWeeklyCoverage(){
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  if(!trained.length)return '';
-  const rows=trained.map(m=>{
-    const sets=weeklySets(m),lm=VL[m]||{mev:8,mav:14,mrv:20};
-    const pct=Math.min(sets/Math.max(lm.mav,1)*100,100).toFixed(0);
-    const overMRV=sets>lm.mrv;
-    const col=sets<lm.mev?'#E8453C':sets<lm.mav?'#E8C53C':'#2ECC71';
-    const badge=overMRV?'MRV⚡':sets>=lm.mav?'✓MAV':sets>=lm.mev?'MEV+':'';
-    const badgeCol=overMRV?'#E8973C':sets>=lm.mav?'#2ECC71':sets>=lm.mev?'#E8C53C':'';
-    const mavPct=Math.min(lm.mav/Math.max(lm.mrv,1)*100,100).toFixed(0);
-    return `<div style="margin-bottom:8px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:12.5px;display:flex;align-items:center;gap:5px">${mIcon(m,13)} ${MNAME[m]}</span>
-        <span style="display:flex;align-items:center;gap:7px">
-          ${badge?`<span style="font-size:10px;font-weight:800;color:${badgeCol}">${badge}</span>`:''}
-          <span style="font-size:11px;color:${col};font-weight:700">${sets} <span style="font-weight:400;color:var(--text3)">/ ${lm.mav}</span></span>
-        </span>
-      </div>
-      <div style="height:5px;border-radius:5px;background:#1a1e28;position:relative;overflow:visible">
-        <div style="width:${pct}%;height:100%;background:${col};border-radius:5px;box-shadow:0 0 6px ${col}55"></div>
-        <div style="position:absolute;left:${mavPct}%;top:-3px;bottom:-3px;width:1.5px;background:#E8C56A;opacity:.55;border-radius:1px"></div>
-      </div>
-    </div>`;
-  });
-  return `<div class="card" style="padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="ttl">📊 Weekly Volume</div><span style="font-size:10px;color:var(--text3)">│ = MAV target</span></div>${rows.join('')}</div>`;
-}
 function miniSuit(hit){
   const front=["chest","shoulders","biceps","forearms","abs","quads","calves","traps"];
   return `<div class="grid3" style="grid-template-columns:repeat(4,1fr)">${M12.map(m=>{
@@ -5070,39 +5015,36 @@ function renderSuit(){
     </div>
   </div>`;
 
-  // Muscle ring grid — recovery outer ring + weekly-set inner ring
+  // Sector Command — THE one per-muscle readout: recovery ring + weekly sets + ready-when.
+  // (Replaces the old separate Recovery Forecast, Weekly Volume and District Control cards.)
   html+=`<div class="card" style="padding:14px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="ttl">⚡ Sector Readiness</div>
-      <div style="font-size:10px;color:var(--text3);line-height:1.4;text-align:right">Outer = recovery<br>Inner = weekly sets</div>
+      <div class="ttl" style="margin:0">⚡ Sector Command</div>
+      <div class="row" style="gap:8px"><button class="chip g" style="font-size:11px;padding:4px 10px" onclick="openDistricts()">🗺️ map ›</button><div style="font-size:10px;color:var(--text3);line-height:1.4;text-align:right">Outer = recovery<br>Inner = weekly sets</div></div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
     ${M12.map(m=>{
-      const rec=getRecovery(m),lvl=muscleLevel(m),trained=(state.data.muscleVol[m]||0)>0;
-      const sets=weeklySets(m),lm=VL[m]||{mav:14,mrv:20};
+      const rec=getRecovery(m),trained=(state.data.muscleVol[m]||0)>0;
+      const sets=weeklySets(m),lm=VL[m]||{mev:8,mav:14,mrv:20};
       const hrs=hoursToReady(m);
       const recCol=trained?(rec>=80?'#2ECC71':rec>=50?'#E8C53C':'#E8453C'):'var(--text3)';
-      const status=!trained?'untrained':hrs>0?(hrs<24?hrs+'h':Math.round(hrs/24*10)/10+'d away'):'READY';
+      const status=!trained?'untrained':hrs>0?(hrs<24?hrs+'h':Math.round(hrs/24*10)/10+'d')+' to ready':'READY';
       const statusCol=!trained?'#3a3e4a':hrs>0?recCol:'#2ECC71';
-      return `<div class="muscle-tile" onclick="muscleDrill('${m}')">
+      const volCol=!trained||sets<=0?'var(--text3)':sets<lm.mev?'#E8453C':sets<lm.mav?'#E8C53C':sets<=lm.mrv?'#2ECC71':'#E8973C';
+      const volTxt=sets>lm.mrv?`${sets} sets ⚡MRV`:`${sets}/${lm.mav} sets`;
+      const glow=trained?`border-color:${recCol}44;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 16px -8px ${recCol}`:'';
+      return `<div class="muscle-tile" style="${glow}" onclick="muscleDrill('${m}')">
         ${muscleRing(m,rec,sets,lm.mav,trained)}
         <div style="font-size:10px;font-weight:800;color:var(--text1);margin-top:5px;letter-spacing:.05em;text-transform:uppercase">${MNAME[m]}</div>
         <div style="font-size:10px;color:${statusCol};margin-top:1px;font-weight:600">${status}</div>
-        <div style="font-size:9px;color:var(--text3);margin-top:1px">Lv ${lvl}</div>
+        <div style="font-size:9.5px;color:${volCol};margin-top:1px;font-weight:700">${volTxt}</div>
       </div>`;
     }).join('')}
     </div>
   </div>`;
 
-  // Recovery forecast
-  html+=suitForecast();
-
-  // Weekly volume tracker
-  html+=suitWeeklyCoverage();
-
-  // Coverage radar + district
+  // Coverage radar (shape of the week — kept, it's the one non-redundant view)
   html+=coverageRadar();
-  html+=districtSummary();
 
 
   const me=state.data.u.measurements;
@@ -9979,15 +9921,6 @@ function districtBand(c){return c<20?["SECURED","var(--green)"]:c<45?["PATROLLED
 function cityCrime(){let s=0,n=0;M12.forEach(m=>{const c=districtCrime(m).crime;if(!isNaN(c)){s+=c;n++;}});return n?Math.round(s/n):0;}
 // Plain-language "last trained" label for any sector — no jargon, no percentages, no NaN.
 function districtAge(dc){return dc.untrained?"never trained":dc.ds<1?"trained today":Math.round(dc.ds)===1?"1 day ago":Math.round(dc.ds)+" days ago";}
-function districtSummary(){
-  const cc=cityCrime();const band=districtBand(cc);
-  const list=M12.map(m=>({m,...districtCrime(m)})).sort((a,b)=>b.crime-a.crime);
-  const worst=list.slice(0,3);const overdue=list.filter(w=>w.crime>=70).length;
-  return `<div class="card" style="padding:14px"><div class="row sp"><div class="ttl" style="margin:0">🗺️ District Control</div><b style="color:${band[1]}">${band[0]}</b></div>
-    <div class="mini" style="color:var(--text2);margin:3px 0 8px">${overdue?`${overdue} sector${overdue>1?"s":""} need work — these muscles are overdue for training.`:"Every sector trained recently — Gotham's locked down."}</div>
-    ${worst.map(w=>{const b=districtBand(w.crime);return `<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${mIcon(w.m,15)} ${esc(MUSCLE_DISTRICT[w.m])} <span class="mini" style="color:var(--text3)">(${MNAME[w.m]})</span></span><span class="mini" style="color:${b[1]}">${esc(districtAge(w))}</span></div>`;}).join("")}
-    <button class="btn ghost sm" style="margin-top:9px" onclick="openDistricts()">Open the map & set priorities ›</button></div>`;
-}
 function openDistricts(){
   const cc=cityCrime();const band=districtBand(cc);
   const rows=M12.slice().map(m=>({m,dc:districtCrime(m)})).sort((a,b)=>b.dc.crime-a.dc.crime).map(({m,dc})=>{
