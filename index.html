@@ -2587,19 +2587,8 @@ function freqGuideCard(){
   return `<div class="card"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:7px">🎯 Frequency coach</div><span class="chip" onclick="go('suit')">Batsuit ›</span></div>
     <div class="mini" style="margin:5px 0 11px;color:var(--text2);line-height:1.5">${lead} <span style="color:var(--text3)">Each muscle grows best trained ~2×/week.</span></div>
     <div class="freq2-dial">${stat(train.length,"Train next","var(--red)")}${stat(soon.length,"Due soon","var(--yellow)")}${stat(ok.length,"Covered","var(--green)")}</div>
-    ${focusLab?`<div class="mini" style="color:var(--text3);letter-spacing:.08em;margin:12px 0 7px">${focusLab.toUpperCase()}</div><div class="freq2-row">${focusArr.map(chip).join("")}</div>`:""}
+    ${focusLab?`<div class="mini" style="color:var(--text3);letter-spacing:.08em;margin:12px 0 7px">${focusLab.toUpperCase()}</div><div class="freq2-row">${focusArr.slice(0,6).map(chip).join("")}${focusArr.length>6?`<button class="freq2-chip" onclick="go('suit')"><span style="color:var(--gold2)">+${focusArr.length-6} more ›</span></button>`:""}</div>`:""}
   </div>`;
-}
-// Compact suit figure + sector readiness, surfaced inside MISSION (mirrors THE BATSUIT tab).
-function missionBodyHtml(){
-  let h=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">The Batsuit</div><span class="chip" onclick="go('suit')">full view ›</span></div>
-    <div class="stage" style="border-radius:14px;padding:6px 6px 2px;margin-top:4px">${buildSuit()}</div>
-    <div class="row" style="justify-content:center;gap:12px;margin-top:6px">
-      <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--green)"></i> ready</span>
-      <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--yellow)"></i> recovering</span>
-      <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--red)"></i> fatigued</span></div></div>`;
-  h+=freqGuideCard();
-  return h;
 }
 
 /* ========================= SUBGROUP VOLUME + COVERAGE COACH =========================
@@ -6831,24 +6820,36 @@ function openSplitSheet(){
 function renderMission(){
   const d=state.data;
   let html=`<h1 style="font-size:34px;color:var(--gold2)">MISSION</h1><div class="tag" style="margin-bottom:12px">Patrol · body · plan · schedule · science</div>`;
-  // ===== 1) MUSCLE MAP on top — the body figure + what-to-train-next coach =====
-  html+=acc("m-body","🩻","Body & frequency",
-    missionBodyHtml(), true, "what to train next · suit status");
-  // ===== 2) SPLITS directly under the map — tonight's patrol =====
+  // ===== 1) TONIGHT — the ACTIVE split leads the tab; no duplicated Batsuit figure here =====
   if(!d.splits.length){
     html+=`<div class="empty-state" style="padding:36px 14px 20px"><div class="es-icon">🗂️</div><div class="es-title">NO TRAINING PLAN</div><div class="es-body">Build your first split and Gotham will track your schedule, day rotation, and muscle balance automatically.</div><button class="btn gold" style="margin-top:10px" onclick="newSplit();setMSub('plan')">BUILD A SPLIT →</button></div>`;
   }
-  d.splits.forEach(sp=>{
+  const splitFull=sp=>{
     const isActive=d.activeSplitId===sp.id;
     const ni=isActive?computeNextDay(sp):-1;       // highlight the day you're actually up for next
-    html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${isActive?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
+    return `<div class="card${isActive?' glow':''}"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${isActive?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
       <div style="margin-top:8px">${sp.days.map((day,i)=>{
         const tn=i===ni?`<span class="chip on" style="font-size:9px;padding:1px 7px;margin-left:7px;vertical-align:middle">TONIGHT</span>`:"";
         return isRest(day)
         ? `<div class="splitday rest${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${restIcon(15)} ${esc(day.name)}${tn}</b><span>Planned recovery — protects your streak</span></div></div><button class="splitday-start rest" onclick="logRestDay()">REST ✓</button></div>`
         : `<div class="splitday${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><span>${day.exercises.length} exercises · tap to preview</span></div></div><button class="splitday-start" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`;
       }).join("")}</div></div>`;
-  });
+  };
+  // compact one-row tile for benched (non-active) splits — tap to expand, no wall of START buttons
+  const splitTile=sp=>{
+    if(state.mExpandSplit===sp.id)return splitFull(sp);
+    const ex=sp.days.reduce((a,dd)=>a+(dd.exercises?dd.exercises.length:0),0);
+    return `<div class="splitday" style="margin:0 0 10px">
+      <div class="splitday-main" onclick="state.mExpandSplit='${sp.id}';render()">${dayThumb(sp.days.find(dd=>!isRest(dd))||sp.days[0])}<div class="splitday-tx"><b>${esc(sp.name)} <span class="mini" style="color:var(--gold2)">›</span></b><span>${sp.days.length} days · ${ex} exercises · tap to open</span></div></div>
+      <button class="splitday-start" onclick="setActiveSplit('${sp.id}')">USE ✓</button></div>`;
+  };
+  const act=d.splits.find(sp=>d.activeSplitId===sp.id);
+  if(act)html+=splitFull(act);
+  // ===== 2) body coach directly under tonight =====
+  html+=freqGuideCard();
+  // ===== 3) the bench — other splits, compact =====
+  const bench=d.splits.filter(sp=>d.activeSplitId!==sp.id);
+  if(bench.length)html+=`<div class="ttl" style="font-size:13px;margin:2px 0 8px">🗂 The bench — other plans</div>`+bench.map(splitTile).join("");
   html+=`<button class="btn" onclick="freeWorkout()">⚡ Free session</button>`;
   // ===== 3) FEATURE SUB-TABS — two clean homes for everything else =====
   html+=missionSubTabs();
