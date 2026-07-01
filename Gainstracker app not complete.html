@@ -1524,7 +1524,6 @@ function restGlyph(cx,cy,scale,c){scale=scale||1;c=c||"#E8C56A";return `<g trans
 const MC=MNAME; // alias used by gotham weather spec
 // runtime muscle mapping for the full on-demand DB
 const RMAP={pectorals:"chest",chest:"chest","upper chest":"chest","serratus anterior":"abs",lats:"back","latissimus dorsi":"back","upper back":"back","lower back":"back",rhomboids:"back",back:"back",spine:"back",delts:"shoulders",deltoids:"shoulders",shoulders:"shoulders","rear deltoids":"shoulders","rotator cuff":"shoulders","levator scapulae":"traps",biceps:"biceps",brachialis:"biceps",triceps:"triceps",forearms:"forearms","wrist extensors":"forearms","wrist flexors":"forearms",wrists:"forearms","grip muscles":"forearms",quadriceps:"quads",quads:"quads","hip flexors":"quads",adductors:"quads","inner thighs":"quads",groin:"quads",hamstrings:"hamstrings",glutes:"glutes",abductors:"glutes",calves:"calves",soleus:"calves",shins:"calves",abs:"abs",abdominals:"abs",core:"abs",obliques:"abs","lower abs":"abs",traps:"traps",trapezius:"traps"};
-function mapMuscles(arr){const o=[];(arr||[]).forEach(m=>{const g=RMAP[(m||'').toLowerCase().trim()];if(g&&!o.includes(g))o.push(g);});return o;}
 
 const VL={chest:{mev:8,mav:16,mrv:22},back:{mev:10,mav:18,mrv:25},shoulders:{mev:8,mav:16,mrv:20},biceps:{mev:8,mav:14,mrv:20},triceps:{mev:8,mav:14,mrv:18},quads:{mev:8,mav:16,mrv:20},hamstrings:{mev:6,mav:12,mrv:16},glutes:{mev:4,mav:10,mrv:16},calves:{mev:8,mav:14,mrv:20},abs:{mev:6,mav:14,mrv:20},traps:{mev:4,mav:10,mrv:16},forearms:{mev:4,mav:10,mrv:16}};
 const STD={"Bench Press":{b:.75,i:1,a:1.25,e:1.5},"Squat":{b:1,i:1.5,a:2,e:2.5},"Deadlift":{b:1.25,i:1.75,a:2.25,e:2.75},"Overhead Press":{b:.45,i:.65,a:.85,e:1},"Barbell Row":{b:.6,i:.9,a:1.15,e:1.4},"Pull-Up":{b:1,i:3,a:5,e:8}};
@@ -1565,7 +1564,6 @@ const SUBBIAS={
 };
 function subBias(m,id){return (SUBBIAS[m]||{})[id]||null;}
 function subName(m,id){const r=(SUBG[m]||[]).find(x=>x[0]===id);return r?r[1]:id;}
-function subTerm(m,id){const r=(SUBG[m]||[]).find(x=>x[0]===id);return r?r[2]:id;}
 // which sub-regions of muscle m does this exercise hit? (inferred from movement name)
 function exSub(ex,m){
   // Curated override: ex.sub maps a muscle group -> its biased sub-regions, hand-set from the
@@ -1848,66 +1846,6 @@ function _drainToasts(){
   },dur);
 }
 function epley(w,r){return w*(1+r/30);}
-function exEmoji(ex){const g=(ex.p&&ex.p[0])||"chest";return MEMOJI[g]||"💪";}
-function muscleSVG(primary,secondary,sz){
-  sz=sz||60;
-  const BACK=new Set(['back','traps','glutes','hamstrings','triceps']);
-  const isB=BACK.has(primary);
-  const R='#E8453C',S='#7a2018',B='#1e1e28',SK='#252535',BG='#13131a',OL='#0a0a10';
-  const c=m=>m===primary?R:((secondary||[]).includes(m)?S:SK);
-  const HEAD=`<ellipse cx="50" cy="14" rx="13" ry="14.5" fill="${B}" stroke="${OL}" stroke-width="0.8"/>
-<ellipse cx="37.5" cy="15" rx="2" ry="3" fill="${B}"/><ellipse cx="62.5" cy="15" rx="2" ry="3" fill="${B}"/>
-<path d="M44,27L44,33Q50,35 56,33L56,27Q50,28 44,27Z" fill="${B}" stroke="${OL}" stroke-width="0.5"/>`;
-  const TORSO=`<path d="M28,33Q22,35 20,40L18,70Q19,75 25,76L30,76L30,68L34,68L34,76Q38,77 50,77Q62,77 66,76L66,68L70,68L70,76L75,76Q81,75 82,70L80,40Q78,35 72,33Q64,31 50,31Q36,31 28,33Z" fill="${B}" stroke="${OL}" stroke-width="0.8"/>`;
-  const FEET=`<ellipse cx="34" cy="160" rx="8" ry="4" fill="${B}" stroke="${OL}" stroke-width="0.5"/><ellipse cx="66" cy="160" rx="8" ry="4" fill="${B}" stroke="${OL}" stroke-width="0.5"/>`;
-  let inner;
-  if(!isB){
-    const LS=`<path d="M22,33Q16,34 14,38Q12,43 14,48Q17,52 22,50Q27,48 28,43Q29,37 26,34Z" fill="${c('shoulders')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RS=`<path d="M78,33Q84,34 86,38Q88,43 86,48Q83,52 78,50Q73,48 72,43Q71,37 74,34Z" fill="${c('shoulders')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LP=`<path d="M29,36Q26,37 25,41Q24,46 27,50Q30,53 35,53Q40,52 43,48Q45,44 44,39Q42,35 38,34Q33,33 29,36Z" fill="${c('chest')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RP=`<path d="M71,36Q74,37 75,41Q76,46 73,50Q70,53 65,53Q60,52 57,48Q55,44 56,39Q58,35 62,34Q67,33 71,36Z" fill="${c('chest')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const AB=c('abs');
-    const ABS=`<path d="M43,56Q43,60 44,63Q47,65 50,65Q53,65 56,63Q57,60 57,56Q53,55 50,55Q47,55 43,56Z" fill="${AB}" stroke="${OL}" stroke-width="0.4"/>
-<path d="M43,66Q43,70 44,73Q47,74 50,74Q53,74 56,73Q57,70 57,66Q53,66 50,66Q47,66 43,66Z" fill="${AB}" stroke="${OL}" stroke-width="0.4"/>
-<line x1="50" y1="55" x2="50" y2="76" stroke="${OL}" stroke-width="0.4" opacity="0.6"/>
-<line x1="43" y1="65" x2="57" y2="65" stroke="${OL}" stroke-width="0.4" opacity="0.5"/>
-<path d="M29,54Q27,60 28,68Q31,72 34,72L34,68Q32,65 31,60Q30,56 32,54Z" fill="${AB}" stroke="${OL}" stroke-width="0.4"/>
-<path d="M71,54Q73,60 72,68Q69,72 66,72L66,68Q68,65 69,60Q70,56 68,54Z" fill="${AB}" stroke="${OL}" stroke-width="0.4"/>`;
-    const LBI=`<path d="M14,50Q11,55 12,62Q14,67 18,67Q22,67 23,63Q24,58 22,52Q19,49 14,50Z" fill="${c('biceps')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RBI=`<path d="M86,50Q89,55 88,62Q86,67 82,67Q78,67 77,63Q76,58 78,52Q81,49 86,50Z" fill="${c('biceps')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LF=`<path d="M12,68Q10,74 11,82Q13,87 17,87Q21,87 22,83Q23,77 22,69Q18,67 12,68Z" fill="${c('forearms')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RF=`<path d="M88,68Q90,74 89,82Q87,87 83,87Q79,87 78,83Q77,77 78,69Q82,67 88,68Z" fill="${c('forearms')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LQ=`<path d="M30,80Q27,85 27,95Q27,108 30,114Q33,118 37,117Q41,116 42,111Q44,104 43,92Q42,83 38,80Z" fill="${c('quads')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RQ=`<path d="M70,80Q73,85 73,95Q73,108 70,114Q67,118 63,117Q59,116 58,111Q56,104 57,92Q58,83 62,80Z" fill="${c('quads')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const KN=`<ellipse cx="36" cy="118" rx="6" ry="4.5" fill="${B}" stroke="${OL}" stroke-width="0.5"/><ellipse cx="64" cy="118" rx="6" ry="4.5" fill="${B}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LC=`<path d="M30,123Q28,130 29,140Q30,148 34,150Q38,151 40,148Q42,143 42,135Q42,127 40,122Z" fill="${c('calves')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RC=`<path d="M70,123Q72,130 71,140Q70,148 66,150Q62,151 60,148Q58,143 58,135Q58,127 60,122Z" fill="${c('calves')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const ST=`<line x1="50" y1="35" x2="50" y2="54" stroke="${OL}" stroke-width="0.4" opacity="0.5"/>`;
-    const HIP=`<path d="M30,76Q35,80 50,80Q65,80 70,76L66,76Q60,78 50,78Q40,78 34,76Z" fill="${B}"/>`;
-    inner=TORSO+LS+RS+LP+RP+ST+ABS+LBI+RBI+LF+RF+HIP+LQ+RQ+KN+LC+RC+FEET+HEAD;
-  } else {
-    const TR=`<path d="M38,28Q44,26 50,26Q56,26 62,28Q68,32 70,37Q65,40 50,41Q35,40 30,37Q32,32 38,28Z" fill="${c('traps')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LS=`<path d="M22,33Q16,34 14,38Q12,43 14,48Q17,52 22,50Q27,48 28,43Q29,37 26,34Z" fill="${c('shoulders')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RS=`<path d="M78,33Q84,34 86,38Q88,43 86,48Q83,52 78,50Q73,48 72,43Q71,37 74,34Z" fill="${c('shoulders')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const MB=`<path d="M33,42Q33,50 35,58Q40,62 50,62Q60,62 65,58Q67,50 67,42Q60,40 50,40Q40,40 33,42Z" fill="${c('back')}" stroke="${OL}" stroke-width="0.4"/>`;
-    const LL=`<path d="M29,40Q27,44 26,50Q26,58 28,64Q30,68 34,68L34,60Q33,54 33,47Q32,43 30,40Z" fill="${c('back')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RL=`<path d="M71,40Q73,44 74,50Q74,58 72,64Q70,68 66,68L66,60Q67,54 67,47Q68,43 70,40Z" fill="${c('back')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const SP=`<line x1="50" y1="33" x2="50" y2="70" stroke="${OL}" stroke-width="0.5" opacity="0.4"/>`;
-    const LT=`<path d="M14,48Q11,54 12,63Q14,68 18,68Q22,67 23,63Q24,57 22,51Q18,48 14,48Z" fill="${c('triceps')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RT=`<path d="M86,48Q89,54 88,63Q86,68 82,68Q78,67 77,63Q76,57 78,51Q82,48 86,48Z" fill="${c('triceps')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LF=`<path d="M12,69Q10,75 11,83Q13,87 17,87Q21,87 22,83Q23,77 22,69Q18,68 12,69Z" fill="${c('forearms')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RF=`<path d="M88,69Q90,75 89,83Q87,87 83,87Q79,87 78,83Q77,77 78,69Q82,68 88,69Z" fill="${c('forearms')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LG=`<path d="M30,68Q27,72 27,80Q28,87 33,89Q38,90 42,87Q46,83 46,76Q45,70 41,68Z" fill="${c('glutes')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RG=`<path d="M70,68Q73,72 73,80Q72,87 67,89Q62,90 58,87Q54,83 54,76Q55,70 59,68Z" fill="${c('glutes')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const GD=`<line x1="50" y1="68" x2="50" y2="88" stroke="${OL}" stroke-width="0.5" opacity="0.4"/>`;
-    const LH=`<path d="M27,90Q25,98 26,110Q27,118 31,120Q35,122 38,120Q41,117 42,110Q43,100 42,91Q38,88 27,90Z" fill="${c('hamstrings')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RH=`<path d="M73,90Q75,98 74,110Q73,118 69,120Q65,122 62,120Q59,117 58,110Q57,100 58,91Q62,88 73,90Z" fill="${c('hamstrings')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const LC=`<path d="M27,122Q25,130 26,140Q28,150 32,152Q36,153 39,150Q42,145 42,137Q42,128 40,122Z" fill="${c('calves')}" stroke="${OL}" stroke-width="0.5"/>`;
-    const RC=`<path d="M73,122Q75,130 74,140Q72,150 68,152Q64,153 61,150Q58,145 58,137Q58,128 60,122Z" fill="${c('calves')}" stroke="${OL}" stroke-width="0.5"/>`;
-    inner=TORSO+MB+LL+RL+TR+SP+LS+RS+LT+RT+LF+RF+LG+RG+GD+LH+RH+LC+RC+FEET+HEAD;
-  }
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 -3 84 172" preserveAspectRatio="xMidYMid meet" style="display:block">${inner}</svg>`;
-}
 /* ========================= MOVEMENT-POSE FIGURES =========================
    Each exercise is classified into a movement pattern; a posed humanoid is drawn in that
    pose (lying press, squat, hinge, curl, pulldown, lateral raise…) with the WORKED muscle
@@ -1966,48 +1904,6 @@ const POSE={
 const MM_NORM=m=>m==="lats"?"back":(m==="delts"?"shoulders":m);
 const MM_BACK=new Set(["back","traps","triceps","glutes","hamstrings","calves"]);
 // Reusable anatomy renderer. view = "front"|"back"; col(muscle)->fill string.
-function muscleBodySVG(view,col){
-  const OL="#262c35";
-  // limb = dark outline + body-gradient core + an offset light sheen for 3D roundness
-  const limb=(x1,y1,x2,y2,w)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${OL}" stroke-width="${w+2}" stroke-linecap="round"/><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="url(#mbg)" stroke-width="${w}" stroke-linecap="round"/><line x1="${(x1-0.5).toFixed(2)}" y1="${(y1-0.4).toFixed(2)}" x2="${(x2-0.5).toFixed(2)}" y2="${(y2-0.4).toFixed(2)}" stroke="#c6cfdc" stroke-width="${(w*0.32).toFixed(2)}" stroke-linecap="round" opacity="0.5"/>`;
-  const defs=`<defs>`
-    +`<linearGradient id="mbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b0b9c8"/><stop offset="0.45" stop-color="#7c8694"/><stop offset="1" stop-color="#474e5b"/></linearGradient>`
-    +`<radialGradient id="mrg" cx="42%" cy="29%" r="74%"><stop offset="0" stop-color="#ff9889"/><stop offset="0.48" stop-color="#f1473b"/><stop offset="1" stop-color="#ad1c14"/></radialGradient>`
-    +`<radialGradient id="gloss" cx="36%" cy="25%" r="80%"><stop offset="0" stop-color="#ffffff" stop-opacity="0.32"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0.06"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>`
-    +`<linearGradient id="occ" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.30"/></linearGradient>`
-    +`</defs>`;
-  const legs=limb(46,65,45,82,7)+limb(45,82,45,95,6)+limb(54,65,55,82,7)+limb(55,82,55,95,6)+`<ellipse cx="44" cy="96" rx="4" ry="2" fill="url(#mbg)"/><ellipse cx="56" cy="96" rx="4" ry="2" fill="url(#mbg)"/>`;
-  const arms=limb(36,32,31,50,5)+limb(31,50,28,66,4)+limb(64,32,69,50,5)+limb(69,50,72,66,4)+`<circle cx="27.5" cy="67" r="2.6" fill="url(#mbg)"/><circle cx="72.5" cy="67" r="2.6" fill="url(#mbg)"/>`;
-  const T1="M36,31 Q50,27 64,31 L59,50 Q56,58 54,64 L46,64 Q44,58 41,50 Z";
-  const torso=`<path d="${T1}" fill="url(#mbg)" stroke="${OL}" stroke-width="0.9"/><path d="${T1}" fill="url(#occ)"/><path d="${T1}" fill="url(#gloss)"/><path d="M46,64 L54,64 L55,70 Q50,72.5 45,70 Z" fill="url(#mbg)" stroke="${OL}" stroke-width="0.9"/>`;
-  const head=`<path d="M46,19 L54,19 L55,25 L45,25 Z" fill="url(#mbg)" stroke="${OL}" stroke-width="0.7"/><circle cx="50" cy="12.5" r="7.5" fill="url(#mbg)" stroke="${OL}" stroke-width="1"/><circle cx="50" cy="12.5" r="7.5" fill="url(#gloss)"/>`;
-  // each muscle = colour fill + bottom occlusion + top-left gloss (per-muscle bbox gradients = instant 3D roundness)
-  const mp=(d,c)=>`<path d="${d}" fill="${c}"/><path d="${d}" fill="url(#occ)"/><path d="${d}" fill="url(#gloss)" stroke="#2b323c" stroke-width="0.35" stroke-linejoin="round"/>`;
-  let L="",C="";
-  if(view==="front"){
-    L =mp("M40,30 C36,28 31,29 30,34 C29,38 32,41 36,40 C40,39 42,34 40,30 Z",col("shoulders"))
-      +mp("M49,31 C45,29 41,30 39,33 C37,37 38,43 43,45 C47,46 49,44 49,40 Z",col("chest"))
-      +mp("M35,39 C31,41 28,46 28,51 C28,54 31,54 33,50 C36,45 37,41 35,39 Z",col("biceps"))
-      +mp("M29,53 C26,57 25,61 26,65 C26,67 29,66 29,62 C30,58 31,55 29,53 Z",col("forearms"))
-      +mp("M44.5,50 C42,53 42,58 44,62 C44.8,60 45,55 45,51 Z",col("abs"))
-      +mp("M47,65 C42,66 40,72 41,79 C42,82 46,82 47,78 C48,72 49,67 47,65 Z",col("quads"))
-      +mp("M45.6,83 C43,86 43,90 44,93 C45,92 46,88 46,84 Z",col("quads"));
-    C =mp("M45.5,45 C47,44 53,44 54.5,45 L54.5,61 C53,62.5 47,62.5 45.5,61 Z",col("abs"))
-      +`<g stroke="#39414d" stroke-width="0.4" opacity="0.7" fill="none"><line x1="50" y1="45.5" x2="50" y2="61"/><line x1="46" y1="50" x2="54" y2="50"/><line x1="46" y1="55" x2="54" y2="55"/></g>`;
-  } else {
-    L =mp("M40,30 C36,28 31,29 30,34 C29,38 32,41 36,40 C40,39 42,34 40,30 Z",col("shoulders"))
-      +mp("M40,34 C35,38 35,47 41,53 C45,56 48,53 48,46 C48,40 45,36 40,34 Z",col("back"))
-      +mp("M35,39 C31,41 28,46 28,51 C28,54 31,54 33,50 C36,45 37,41 35,39 Z",col("triceps"))
-      +mp("M29,53 C26,57 25,61 26,65 C26,67 29,66 29,62 C30,58 31,55 29,53 Z",col("forearms"))
-      +mp("M47,57 C43,58 41,62 43,66 C45,68 48,67 48.5,63 C49,60 49,58 47,57 Z",col("glutes"))
-      +mp("M47,67 C42,68 41,74 42,80 C43,82 46,82 47,78 C48,72 49,69 47,67 Z",col("hamstrings"))
-      +mp("M45.6,83 C42.6,85 42.6,89 44,93 C46,91 46.4,87 46,84 Z",col("calves"));
-    C =mp("M50,23 C45,25 41,29 39,33 C44,35 47,36 50,37 C53,36 56,35 61,33 C59,29 55,25 50,23 Z",col("traps"))
-      +`<g stroke="#39414d" stroke-width="0.4" opacity="0.6" fill="none"><line x1="48" y1="50" x2="48" y2="61"/><line x1="52" y1="50" x2="52" y2="61"/></g>`;
-  }
-  const ov=L+`<g transform="matrix(-1 0 0 1 100 0)">${L}</g>`+C;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="display:block">${defs}${legs}${arms}${torso}${head}${ov}</svg>`;
-}
 // ===== Unified anatomy: the Batsuit body (same one in the SUIT & GOTHAM tabs) used EVERYWHERE. col(muscle)->{fill,op} =====
 function suitFigure(view,colFn,style){
   const prev=state._figColor;state._figColor=colFn;
@@ -2282,7 +2178,6 @@ function thumb(ex,small){
  return `<span class="exwrap${small?' sm':''}">${svgFallback}</span>`;
 }
 function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x[0])r=x;return{name:r[1],emoji:r[2]};}
-function quoteToday(){return QUOTES[new Date().getDate()%QUOTES.length];}
 // Feature 15: bottom note alternates 50/50 between Batman flavour and real training science
 function gothamNote(){
   const day=new Date().getDate();
@@ -2348,12 +2243,6 @@ function resolveImages(){
   });
   indexEx();
 }
-function exImg(ex){
-  if(!ex)return "";
-  if(ex._img!==undefined)return ex._img;
-  if(ex.fb)return FB_BASE+ex.fb+"/0.jpg";
-  return "";
-}
 function buildPairs(arr){FBPAIRS=arr.map(p=>({i:p[1],t:exToks(p[0])}));FB_DF={};FBPAIRS.forEach(p=>{new Set(p.t).forEach(t=>FB_DF[t]=(FB_DF[t]||0)+1);});}
 function loadExDB(){
   EXDB=CORE_EX.slice(); mergeCustomEx();
@@ -2366,17 +2255,6 @@ function loadExDB(){
       buildPairs(arr);resolveImages();
       if(state.pickerOpen)updateExList();
    }).catch(()=>{});
-}
-function mergeFull(full){
-  const have=new Set(EXDB.map(e=>e.id));
-  full.forEach(e=>{if(!have.has(e.id)){EXDB.push(e);have.add(e.id);}});
-  indexEx();
-}
-function titleCase(s){return s.split(/\s+/).map(w=>(w===w.toUpperCase()&&w.length>1)?w:(w.charAt(0).toUpperCase()+w.slice(1))).join(" ");}
-function condense(ins){
-  const out=[];(ins||[]).forEach(i=>{i=i.replace(/^step\s*:?\s*\d+\s*/i,"").trim();if(!i||/^(lie|stand|sit|begin|start|grasp|hold|position|place)/i.test(i)||/repeat/i.test(i))return;i=i.split(".")[0].trim();if(i.length>90)i=i.slice(0,90).replace(/\s\S*$/,"");if(i)out.push(i);});
-  while(out.length<3)out.push("Full range of motion, controlled tempo");
-  return out.slice(0,3);
 }
 function exFor(name){return EXBYNAME[(name||"").toLowerCase()]||{n:name,id:"",eq:"",p:[],s:[],tgt:"Unlisted lift",c:["Control the weight","Full range of motion","Quality reps over ego"]};}
 
@@ -2403,7 +2281,6 @@ function setVolumeRaw(ex,s){
   return v;
 }
 function setE1RM(ex,s){const load=setLoad(ex,s.w),reps=+s.r||0;if(!reps)return 0;return epley(load,reps);}
-function exVolume(exObj){let v=0;(exObj.sets||[]).forEach(s=>v+=setVolume(exFor(exObj.name),s));return v;}
 
 /* ========================= LAST SETS (PREVIOUS column) ========================= */
 function lastSetFor(name){
@@ -2658,9 +2535,6 @@ function suggestForSub(m,id,n){
      • …and on up, getting steeper, capped at MAXLVL for now.
    (Old curve was 120·l² — a quadratic that ballooned to ~20 sessions/level by Lv10.) */
 const MAXLVL=50;
-function lvlBlock(l){return 200+Math.floor((l-1)/10)*100;}   // XP cost of the l-th level
-function xpForLevel(l){if(l<=0)return 0;let t=0;for(let k=1;k<=l;k++)t+=lvlBlock(k);return t;}
-function accountLevel(){const xp=(state.data.u&&state.data.u.xp)||0;let l=0;while(l<MAXLVL&&xpForLevel(l+1)<=xp)l++;return l;}
 
 /* ========================= ACHIEVEMENTS ========================= */
 function achStats(){
@@ -2721,7 +2595,6 @@ function haptic(kind){try{if(navigator.vibrate)navigator.vibrate(HAPTIC[kind]||k
 function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInterval(state.wtInt);state.wtInt=null;}return;}const el=$("wt-display");const secs=Math.floor((Date.now()-state.session.startedAt)/1000);state.workoutTimer=secs;if(el)el.textContent=fmtTime(secs);}
 function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");beep(880);if(el){el.textContent="DONE";el.parentElement.style.borderColor="var(--green)";}const sn=$("rest-sheet-num");if(sn)sn.textContent="GO";restDone();return;}state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const sn=$("rest-sheet-num");if(sn)sn.textContent=fmtTime(rem);updateRestOverlay(rem);}
 /* ----- Liquid-glass rest overlay (transient element — never re-rendered, so no lag) ----- */
-function showRestOverlay(dur){const ov=$("restov");if(!ov)return;state._restTotal=dur;ov.classList.remove("done");const lb=$("restlabel");if(lb)lb.textContent="Recovery";const h=$("resthint");if(h)h.textContent="Breathe in…";ov.classList.add("on");updateRestOverlay(dur);}
 function updateRestOverlay(rem){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;const n=$("restnum");if(n)n.textContent=fmtTime(Math.max(0,rem));const tot=state._restTotal||1,C=728.8,frac=Math.max(0,Math.min(1,rem/tot)),prog=$("restprog");if(prog)prog.style.strokeDashoffset=(C*(1-frac)).toFixed(1);const hint=$("resthint");if(hint&&!ov.classList.contains("done"))hint.textContent=(Math.floor(Date.now()/4000)%2)?"Breathe out…":"Breathe in…";}
 function restDone(){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;ov.classList.add("done");const lb=$("restlabel");if(lb)lb.textContent="Recovered";const n=$("restnum");if(n)n.textContent="GO";const h=$("resthint");if(h)h.textContent="Back to work, sir.";const p=$("restprog");if(p)p.style.strokeDashoffset=0;clearTimeout(state._restCloseT);state._restCloseT=setTimeout(closeRestOverlay,1700);}
 function closeRestOverlay(){const ov=$("restov");if(ov)ov.classList.remove("on","done");}
@@ -2750,72 +2623,7 @@ const MMA_PRESETS=[
   {n:"Heavy Bag HIIT",d:"8 × 0:30 · 0:15 rest",rounds:8,work:30,rest:15},
   {n:"Tabata",d:"8 × 0:20 · 0:10 rest",rounds:8,work:20,rest:10}
 ];
-function mmaBell(t){try{
-  if(t==="round"){beep(880);setTimeout(()=>beep(1175),130);setTimeout(()=>beep(1480),260);}
-  else if(t==="rest"){beep(523);setTimeout(()=>beep(370),150);}
-  else if(t==="warn"){beep(640);}
-  else if(t==="done"){beep(880);setTimeout(()=>beep(1175),150);setTimeout(()=>beep(1480),300);setTimeout(()=>beep(1760),470);}
-}catch(e){}}
-function openRoundTimer(){
-  const rows=MMA_PRESETS.map((p,i)=>`<button class="btn ghost sm" style="margin:5px 0;display:flex;justify-content:space-between;align-items:center" onclick="startRoundTimer(${i})"><b>${esc(p.n)}</b><span class="mini" style="color:var(--text2)">${esc(p.d)}</span></button>`).join("");
-  const c=state.data.u._mmaCustom||{rounds:3,work:180,rest:60};
-  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Round timer</div>
-    <div class="mini" style="margin:-2px 0 8px;color:var(--text2)">Combat conditioning — bell-to-bell rounds with auto rest. Pick a preset or set your own.</div>
-    ${rows}
-    <div class="ttl" style="font-size:14px;margin-top:12px">Custom</div>
-    <div class="row g" style="gap:8px;margin-top:6px">
-      <div style="flex:1"><label class="mini">Rounds</label><input id="mma-cr" inputmode="numeric" value="${c.rounds}"/></div>
-      <div style="flex:1"><label class="mini">Work (s)</label><input id="mma-cw" inputmode="numeric" value="${c.work}"/></div>
-      <div style="flex:1"><label class="mini">Rest (s)</label><input id="mma-crs" inputmode="numeric" value="${c.rest}"/></div>
-    </div>
-    <button class="btn gold" style="margin-top:10px" onclick="startRoundTimer(-1)">START ▶</button>
-    <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Cancel</button>`);
-}
-function startRoundTimer(idx){
-  let cfg;
-  if(idx>=0){cfg=MMA_PRESETS[idx];}
-  else{cfg={rounds:clamp(Math.round(+($("mma-cr")||{}).value||3),1,99),work:clamp(Math.round(+($("mma-cw")||{}).value||180),5,3600),rest:clamp(Math.round(+($("mma-crs")||{}).value||60),0,3600)};
-    state.data.u._mmaCustom={rounds:cfg.rounds,work:cfg.work,rest:cfg.rest};save();}
-  closeSheet();
-  state.mma={rounds:cfg.rounds,work:cfg.work,rest:cfg.rest,round:1,phase:"prep",dur:5,endAt:Date.now()+5000,running:true,paused:false};
-  const ov=$("mmaov");if(ov){ov.classList.remove("rest","prep","done");ov.classList.add("on","prep");}
-  clearInterval(state.mmaInt);state.mmaInt=setInterval(tickMMA,250);
-  requestWakeLock&&requestWakeLock();haptic("tap");
-  paintMMA(5);
-}
 function mmaPhaseDur(){const m=state.mma;return m.phase==="prep"?5:m.phase==="rest"?m.rest:m.work;}
-function tickMMA(){
-  const m=state.mma;if(!m||!m.running||m.paused)return;
-  const rem=Math.ceil((m.endAt-Date.now())/1000);
-  if(rem===10&&m.phase!=="prep")mmaBell("warn");
-  if(rem<=0){mmaAdvance();return;}
-  m.dur=rem;paintMMA(rem);
-}
-function mmaAdvance(){
-  const m=state.mma;
-  if(m.phase==="prep"){m.phase="work";m.round=1;mmaBell("round");haptic("hit");}
-  else if(m.phase==="work"){
-    if(m.round>=m.rounds){mmaFinish();return;}
-    if(m.rest>0){m.phase="rest";mmaBell("rest");haptic("rest");}
-    else{m.round++;mmaBell("round");haptic("hit");}
-  }
-  else if(m.phase==="rest"){m.round++;m.phase="work";mmaBell("round");haptic("hit");}
-  const dur=mmaPhaseDur();m.endAt=Date.now()+dur*1000;m.dur=dur;
-  const ov=$("mmaov");if(ov){ov.classList.remove("prep","rest","work","done");if(m.phase==="rest")ov.classList.add("rest");}
-  paintMMA(dur);
-}
-function mmaFinish(){
-  const m=state.mma;m.running=false;m.phase="done";clearInterval(state.mmaInt);state.mmaInt=null;
-  mmaBell("done");haptic("ko");releaseWakeLock&&releaseWakeLock();
-  const ov=$("mmaov");if(ov){ov.classList.remove("prep","rest","work");ov.classList.add("done");}
-  if($("mma-round"))$("mma-round").textContent=`${m.rounds} ROUNDS · COMPLETE`;
-  if($("mma-phase"))$("mma-phase").textContent="FINISHED";
-  if($("mmanum"))$("mmanum").textContent="✓";
-  if($("mma-next"))$("mma-next").textContent="Rounds banked. Out of the cave, sir.";
-  if($("mmaprog"))$("mmaprog").style.strokeDashoffset=0;
-  if($("mmapause"))$("mmapause").textContent="DONE";
-  clearTimeout(state._mmaCloseT);state._mmaCloseT=setTimeout(closeRoundTimer,4000);
-}
 function paintMMA(rem){
   const m=state.mma;if(!m)return;
   const phaseTxt=m.phase==="prep"?"GET READY":m.phase==="rest"?"RECOVER":m.phase==="done"?"FINISHED":"FIGHT";
@@ -3175,8 +2983,6 @@ function openSetSheet(ei,si){
 }
 function removeExercise(ei){appConfirm({title:"Remove exercise",body:"Remove this exercise from the session?",ok:"Remove",danger:true}).then(ok=>{if(ok){state.session.exercises.splice(ei,1);render();saveSession();}});}
 // Supersets/circuits: link this exercise with the next into one back-to-back group.
-function linkNext(ei){const ex=state.session.exercises;if(ei>=ex.length-1)return;const g=ex[ei].group||ex[ei+1].group||("ss"+now());ex[ei].group=g;ex[ei+1].group=g;haptic&&haptic("tap");render();}
-function unlinkGroup(ei){const ex=state.session.exercises;const g=ex[ei].group;if(!g)return;ex.forEach(e=>{if(e.group===g)delete e.group;});render();}
 function addExerciseToSession(name){if(!state.session.exercises.some(e=>e.name===name))state.session.exercises.push({name,sets:seedSets(name)});closeSheet();render();saveSession();}
 
 /* ========================= COMMIT WORKOUT ========================= */
@@ -3299,16 +3105,6 @@ function villainFace(b){
   const u=villainImgUrl(b.v);
   if(u)return '<img class="vface" src="'+esc(u)+'" alt="'+esc(b.v)+'" onerror="this.remove()">'+(b.e?'<span class="vfallback" style="opacity:0">'+esc(b.e)+'</span>':'');
   return esc(b.e||"");
-}
-async function setVillainImg(v){
-  const cur=villainImgUrl(v);
-  const url=await appPrompt({title:"VILLAIN MUGSHOT",body:"Paste an image URL (https://…) or a data:image/… string for "+esc(v)+". Leave blank to clear.",placeholder:"https://…",ok:"Save",value:cur});
-  if(url===null)return;
-  const t=(url||"").trim();
-  if(!t){const m=state.data.villainImg||{};delete m[v];state.data.villainImg=m;save();render();toast("Mugshot cleared");return;}
-  if(!/^https?:\/\//i.test(t)&&!/^data:image\//i.test(t)){toast("Need an http(s):// or data:image/ link");return;}
-  state.data.villainImg=Object.assign({},state.data.villainImg||{},{[v]:t});
-  save();render();toast("Mugshot saved");
 }
 
 /* ========================= VILLAIN INTRO — taunt cutscene on a weak-point day ========================= */
@@ -3571,7 +3367,6 @@ function pushPatrolFeed(entry){
     save();
   }catch(e){}
 }
-function feedAgo(t){const s=Math.max(0,(Date.now()-t)/1000);if(s<60)return"just now";const m=s/60;if(m<60)return Math.floor(m)+"m ago";const h=m/60;if(h<24)return Math.floor(h)+"h ago";const d=h/24;return Math.floor(d)+"d ago";}
 // Detect when a linked ally has logged new workouts since we last saw them, and pop a cinematic bulletin.
 function cloudDetectAllyWorkout(id,c){
   try{
@@ -3670,36 +3465,6 @@ function toggleAcc(id){
 }
 function goPlan(){state.mSub="plan";go("mission");}
 /* ===================== COMMAND CENTER (the ☰ MORE menu) ===================== */
-function openMenu(){
-  const tile=(fn,ic,nm,ds)=>`<button class="card cc-tile" onclick="closeSheet();${fn}()"><div class="cc-ic">${ic}</div><div class="cc-nm">${nm}</div>${ds?`<div class="cc-ds">${ds}</div>`:""}</button>`;
-  const features=[
-    ["()=>go('alfred')","🤖","Alfred","AI coach"],
-    ["()=>go('tech')","🦾","Wayne Tech","Gadgets & tools"],
-    ["openDistricts","🗺️","Districts","Gotham sectors"],
-    ["openRankLadder","🎖️","Rank Ladder","Climb to Legend"],
-    ["openRecordsHall","🧊","Records Hall","All-time bests"],
-    ["openReportCard","🏅","Report Card","Grade your week"],
-    ["openTestDay","🎯","1RM Test Day","True max ramp"],
-    ["openTimeMachine","🗓️","This Day","Training history"]
-  ];
-  const fHtml=features.map(f=>tile(f[0],f[1],f[2],f[3])).join("");
-  const tools=[
-    ["openForge","⚒️","Forge","Plate-load calculator"],
-    ["openGarage","🏍️","Garage","Milestone ride unlocks"],
-    ["openInfirmary","🏥","Infirmary","Recovery & injuries"],
-    ["openBatcomputer","🧠","Batcomputer","Deep analytics"],
-    ["openSettings","⚙️","Settings","Preferences & data"]
-  ];
-  const tHtml=tools.map(t=>tile(t[0],t[1],t[2],t[3])).join("");
-  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:8px">☰ Command Center</div>
-    <div class="mini" style="color:var(--text2);margin:-2px 0 11px">Everything that isn't a main tab — tap any tile.</div>
-    <button class="btn ghost sm" style="width:100%;margin-bottom:14px;justify-content:center" onclick="closeSheet();openIndex()">🧭 &nbsp;Search every tool & exercise…</button>
-    <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">GADGETS</div>
-    <div class="grid3" style="margin-bottom:15px">${fHtml}</div>
-    <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:7px">TOOLS</div>
-    <div class="grid3" style="margin-bottom:4px">${tHtml}</div>
-    <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
-}
 const _TAB_ORDER=["gotham","mission","suit","case","allies"];
 function go(tab){
   // A tab tap must ALWAYS land on that tab — leave any open subpage, sheet or overlay first,
@@ -4212,61 +3977,12 @@ function metricOpts(metric,val){
 }
 /* ===== Voice logging (Web Speech API) — say "80 kilos 8 reps" to fill the next open set. Guarded for unsupported browsers. ===== */
 const NUMW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fourty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
-function wordsToNums(t){
-  const words=t.replace(/[^a-z0-9.\s-]/g," ").split(/[\s-]+/).filter(Boolean);
-  const out=[];let i=0;
-  while(i<words.length){
-    let w=words[i];
-    if(NUMW[w]!=null){
-      let val=NUMW[w];
-      if(val>=20&&val%10===0&&NUMW[words[i+1]]!=null&&NUMW[words[i+1]]<10){val+=NUMW[words[i+1]];i++;}
-      if(words[i+1]==="hundred"){val*=100;i++;if(NUMW[words[i+1]]!=null){val+=NUMW[words[i+1]];i++;}}
-      out.push(String(val));
-    }else if(w==="hundred"){out.push("100");}
-    else out.push(w);
-    i++;
-  }
-  return out.join(" ");
-}
 function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
 // Only Chrome/Edge (desktop) and Chrome (Android) actually run Web Speech recognition.
 // iOS Safari has no API; Opera/Brave have the object but no Google backend → they error at runtime.
 // So: hide the button where the API is absent, and remember if it dies at runtime.
-function voiceSupported(){
-  try{if(localStorage.getItem("gt_voice_dead")==="1")return false;}catch(e){}
-  return !!(window.SpeechRecognition||window.webkitSpeechRecognition);
-}
-function markVoiceDead(){try{localStorage.setItem("gt_voice_dead","1");}catch(e){}}
 function resetVoiceUI(){const b=$("voicebtn");if(b){b.classList.remove("listening");b.innerHTML="🎤 Voice log";}}
 function stopVoice(){const r=state._rec;state._rec=null;clearTimeout(state._recT);state._recT=null;if(r){try{r.onend=null;r.onresult=null;r.onerror=null;}catch(e){}try{r.stop();}catch(e){}try{r.abort&&r.abort();}catch(e){}}resetVoiceUI();}
-function voiceLog(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast("Voice logging needs Chrome on Android or desktop — your browser doesn't support it. Tap the weight & reps fields instead.");return;}
-  if(state._rec){stopVoice();toast("Voice off.");return;}   // toggle off — always works, never gets stuck
-  let rec;try{rec=new SR();}catch(e){toast("Couldn't start the mic.");return;}
-  rec.lang="en-US";rec.interimResults=false;rec.maxAlternatives=1;rec.continuous=false;state._rec=rec;
-  const btn=$("voicebtn");if(btn){btn.classList.add("listening");btn.innerHTML="● Tap to stop";}
-  rec.onresult=(e)=>{let t="";try{t=(e.results[e.results.length-1][0].transcript||"").toLowerCase();}catch(_){}handleVoice(t);};
-  rec.onerror=(e)=>{const err=e&&e.error;stopVoice();
-    if(err==="network"||err==="service-not-allowed"){markVoiceDead();toast("Voice logging doesn't work in this browser — use your keyboard's mic on the weight & reps fields instead.");render();}
-    else if(err==="not-allowed")toast("Mic permission blocked — enable it in your browser settings.");
-    else if(err==="no-speech")toast("Didn't hear anything — tap and try again.");
-    else if(err!=="aborted")toast("Didn't catch that — tap to retry.");};
-  rec.onend=()=>{state._rec=null;clearTimeout(state._recT);state._recT=null;resetVoiceUI();};
-  state._recT=setTimeout(()=>{toast("Voice timed out — tap to try again.");stopVoice();},12000); // watchdog: never hang
-  try{rec.start();haptic("tap");}catch(e){stopVoice();toast("Mic busy — try again.");}
-}
-function handleVoice(t){
-  const nums=(wordsToNums(t).match(/\d+(?:\.\d+)?/g)||[]).map(Number);
-  if(nums.length<2){toast('Heard "'+t+'". Say weight then reps — e.g. "80 kilos 8 reps".');return;}
-  const w=nums[0],r=Math.round(nums[1]);
-  const open=findOpenSet();
-  if(!open){toast("No open set to log — add a set first.");return;}
-  const s=state.session.exercises[open.ei].sets[open.si];
-  s.w=String(w);s.r=String(r);s.done=true;haptic("done");const ev2=liveCheckPR(open.ei,open.si);restStart(ev2==="boss");
-  toast("✓ "+w+"kg × "+r+" — "+esc(state.session.exercises[open.ei].name));
-  render();saveSession();
-}
 function regionTip(ex){
   const p=(ex.p&&ex.p[0])||"",n=(ex.n||"").toLowerCase();
   if(p==="triceps"){
@@ -4318,7 +4034,6 @@ function openGym(gymName){
 }
 function toggleGymEq(k){state._gymTmp=state._gymTmp||{};state._gymTmp[k]=state._gymTmp[k]===false?true:false;document.querySelectorAll(".gymeq").forEach(b=>{const kk=b.getAttribute("data-k");b.classList.toggle("on",state._gymTmp[kk]!==false);});}
 function saveGym(){const gn=state._gymEditName||state.data.u.activeGym||"";state.data.gymEquipment=state.data.gymEquipment||{};const eqNew=Object.assign({},state._gymTmp||{});state.data.gymEquipment[gn]={equip:eqNew};state.gymFilter=true;save();haptic("done");closeSheet();toast("Equipment saved for "+gn);render();}
-function toggleGymFilter(){state.gymFilter=!state.gymFilter;const c=$("gymfilter-chip");if(c)c.classList.toggle("on",state.gymFilter);updateExList();}
 function openPicker(multi){
   state.pickerMulti=multi||null;
   state.pickerOpen=true;state.pickerQuery="";state.pickerMuscle="all";
@@ -4745,7 +4460,6 @@ function suitProps(){
     neck:dim(sl,9.5,12.5), sh:dim(sl,46,66), pec:dim(sl,32,45), waist:dim(sl,17,21), hip:dim(sl,23,29),
     ua:dim(sl,12,18), fa:dim(sl,9,12.5), th:dim(sl,18,25), cf:dim(sl,12,17.5)};
 }
-function setSuitView(v){state.suitView=v;render();}
 function headShape(cx){
   // Pure anatomy: simple oval head, no cowl, no decoration
   return `<ellipse cx="${cx}" cy="60" rx="18" ry="23" fill="#1b1f28" stroke="#3a4150" stroke-width="1.2"/>`;
@@ -5334,15 +5048,6 @@ function liftVerdict(intel){
   if(intel.trend==="down")return `Going BACKWARDS, sir — ${intel.d}kg down (${intel.pct}%). I won't sugar-coat it: you were stronger than this. Eat, sleep, and reclaim that weight.`;
   return `Holding steady. Steady isn't growth, Master — go and take the next rep.`;
 }
-function progressByExerciseCard(){
-  const names=loggedExerciseNamesByRecency();
-  if(!names.length)return "";
-  return `<div class="card"><div class="ttl">📈 Progress by exercise <span class="mini" style="font-weight:400">— tap any for full charts</span></div>${names.map(n=>{
-    const rows=exerciseRows(n);const e1s=rows.map(r=>r.e1rm);const best=e1s.length?Math.max(...e1s):0;
-    return `<div class="row sp exrow" style="padding:9px 0;border-top:1px solid var(--border);cursor:pointer;gap:10px" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
-      <div style="min-width:0;flex:1"><b style="font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</b><span class="mini">${rows.length} session${rows.length>1?"s":""}</span></div>
-      ${miniSpark(e1s)}<b class="gold" style="white-space:nowrap">${best}kg ›</b></div>`;}).join("")}</div>`;
-}
 // ---- weekly-set volume landmark bar (MEV/MAV/MRV) ----
 function volBar(sets,lm,m){
   const eMrv=m?effectiveMRV(m):lm.mrv;                 // spread across sub-regions raises the ceiling
@@ -5405,16 +5110,6 @@ function strengthForecast(){
   });
   return out.filter(o=>o.days).sort((a,b)=>a.days-b.days).slice(0,5);
 }
-function ironEfficiency(){
-  const out=[];
-  loggedExerciseNames().forEach(n=>{
-    const rows=exerciseRows(n);if(rows.length<2)return;
-    const gain=rows[rows.length-1].e1rm-rows[0].e1rm;
-    const perSession=gain/(rows.length-1);
-    out.push({n,gain,perSession,sessions:rows.length});
-  });
-  return out.sort((a,b)=>b.perSession-a.perSession);
-}
 function archExerciseList(){
   const q=(state._archQ||"").toLowerCase().trim();
   let names=loggedExerciseNamesByRecency();           // most recently trained first
@@ -5470,29 +5165,6 @@ function renderArchive(){
 }
 /* ===== HISTORY TAB — the Archive promoted to a first-class tab, plus the
    chronological patrol log, activity heatmap & body-measurement trends. ===== */
-function renderHistory(){
-  const d=state.data;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">HISTORY</h1>
-    <div class="tag" style="margin-bottom:13px">Curves, records, patrol log & every villain felled</div>`;
-  if(!d.workouts.length){
-    html+=`<div class="empty-state">
-      <div class="es-icon">📜</div>
-      <div class="es-title">NO PATROL LOG YET</div>
-      <div class="es-body">Log your first session and this page fills with strength curves, villain defeats, and your full Gotham training record.</div>
-      <button class="btn gold" style="margin-top:8px" onclick="go('mission')">GO TO MISSION →</button>
-    </div>`;
-    $("app").innerHTML=html;return;
-  }
-  html+=archiveCardsHtml();
-  // Activity heatmap
-  html+=`<div class="card"><div class="row sp"><div class="ttl">Activity — last 6 months</div><button class="btn ghost sm" style="width:auto" onclick="exportICS()">📅 Export</button></div>
-    <div class="mini" style="margin-bottom:8px">Tap any lit day to see what you trained.</div>${heatmap()}</div>`;
-  // Patrol log (chronological)
-  html+=`<div class="card"><div class="ttl">📜 Patrol log <span class="mini" style="font-weight:400">— tap a mission for the full report</span></div>${d.workouts.slice(0,20).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()"><b style="font-size:14px">${esc(w.name)} ›</b><div class="mini">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div></div><div class="row g" style="gap:9px;align-items:center"><b class="gold">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 9px" onclick="patrolReport(${i})">📜</button></div></div>`).join("")}</div>`;
-  // Body measurements & trends
-  html+=`<button class="btn" style="margin:4px 0 18px;border-color:var(--gold-dim)" onclick="openMeasure()">📐 Body measurements & trends</button>`;
-  $("app").innerHTML=html;
-}
 
 function openMeasure(){
   const me=state.data.u.measurements;
@@ -5502,18 +5174,6 @@ function openMeasure(){
 }
 
 /* ========================= GOTHAM TAB ========================= */
-function gothamWeather(){
-  const allReady=M12.every(m=>getRecovery(m)>=80||!(state.data.muscleVol[m]||0));
-  const anyFat=M12.some(m=>getRecovery(m)<50&&(state.data.muscleVol[m]||0)>0);
-  const streak=state.data.u.streakDays;const h=hoursSince(state.data.u.lastTrainedDate);
-  if(h>48&&h<96)return "Fog rolled in last night. Gotham noticed.";
-  if(h>=96)return "The cave has been quiet too long. Gotham needs its hero.";
-  if(streak>=7)return `The Bat-Signal has been burning for ${streak} nights straight.`;
-  if(allReady)return "Clear skies over Gotham. All systems optimal.";
-  if(anyFat)return "Storm warning. Some sectors compromised. Train accordingly.";
-  const q=["Gotham never sleeps. Neither should your training.","Tonight's forecast: heavy iron with a chance of PRs.","The night is young. So are your gains.","Visibility low in the cave. But the iron is clear."];
-  return q[new Date().getDate()%q.length];
-}
 function consecutiveDays(){
   let c=0;let d=new Date();d.setHours(0,0,0,0);
   for(let i=0;i<30;i++){const day=new Date(d);day.setDate(d.getDate()-i);const has=state.data.workouts.some(w=>new Date(w.date).toDateString()===day.toDateString());if(has)c++;else if(i>0)break;else{}}
@@ -5541,11 +5201,6 @@ function gothamThreat(){
   let b=bands[0];for(const x of bands)if(s>=x[0])b=x;
   return {score:s,level:b[1],color:b[2],desc:b[3]};
 }
-function threatCard(){const t=gothamThreat();
-  return `<div class="card" style="padding:14px;cursor:pointer" onclick="openThreatInfo()"><div class="row sp"><div class="ttl" style="margin:0">⚠️ Gotham Threat Level</div><b class="num" style="font-size:19px;color:${t.color}">${t.level}</b></div>
-  <div class="threat"><span class="threat-mk" style="left:${t.score}%"></span></div>
-  <div class="mini" style="margin-top:7px;font-style:italic;color:var(--text2)">${esc(t.desc)}</div></div>`;
-}
 function openThreatInfo(){const t=gothamThreat();const d=state.data;
   const dsl=d.u.lastTrainedDate?Math.round(daysSince(d.u.lastTrainedDate)):"—";const wc=weekCount(),goal=d.u.weeklyGoal||4,streak=d.u.streakDays||0;
   const bands=[["SECURE","var(--green)","0–24","Gotham sleeps safe."],["UNEASY","var(--gold2)","25–49","Whispers in the alleys."],["RISING","var(--orange)","50–71","Crime is ticking up."],["DANGER","var(--red)","72–89","The rogues grow bold."],["CRITICAL","#ff3b30","90–100","The city is burning."]];
@@ -5571,11 +5226,6 @@ function fatigueDebt(){
   else if(pct<80){status="High fatigue debt. Favour quality over junk volume.";color="var(--orange)";}
   else {status="Deep in the red. A deload would pay dividends.";color="var(--red)";}
   return {pct,status,color};
-}
-function fatigueMini(){const f=fatigueDebt();
-  return `<div class="card" style="padding:12px 14px;cursor:pointer" onclick="openFatigueInfo()"><div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="color:${f.color}">${f.pct}%</b></div>
-  <div class="bar" style="margin-top:8px"><i style="width:${f.pct}%;background:${f.color}"></i></div>
-  <div class="mini" style="margin-top:6px;color:var(--text2)">${esc(f.status)}</div></div>`;
 }
 function openFatigueInfo(){const f=fatigueDebt();
   const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0).sort((a,b)=>getRecovery(a)-getRecovery(b));
@@ -5615,30 +5265,6 @@ function patrolReadiness(){
 }
 // Tiny recovery strip that lives UNDER the readiness card — the most-fatigued sectors at a glance,
 // each with its realistic hours-to-ready (bounded by the muscle's own recovery window).
-function recoveryStripMini(){
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  if(!trained.length)return "";
-  const sorted=trained.slice().sort((a,b)=>getRecovery(a)-getRecovery(b)).slice(0,4);
-  const chip=m=>{const rec=getRecovery(m),col=recoveryColor(rec),hrs=hoursToReady(m);
-    return `<span class="mini" onclick="event.stopPropagation();muscleDrill('${m}')" style="display:inline-flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px 7px;cursor:pointer"><b style="color:${col}">${rec}%</b><span style="color:var(--text2)">${MNAME[m]}</span><span style="color:var(--text3);font-size:9px">${hrs>0?hrs+"h":"ready"}</span></span>`;};
-  return `<div style="margin-top:9px;border-top:1px solid var(--border);padding-top:8px"><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Recovering now</div><div class="row" style="gap:5px;flex-wrap:wrap">${sorted.map(chip).join("")}</div></div>`;
-}
-function readinessCard(){
-  const r=patrolReadiness(),C=326.7,off=(C*(1-r.score/100)).toFixed(1);
-  const fac=(l,v)=>`<div style="flex:1;text-align:center"><div class="mini" style="font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)">${l}</div><div style="font-family:var(--disp);font-size:15px;color:var(--text2)">${v}</div></div>`;
-  return `<div class="card glow" style="margin-bottom:12px;padding:13px;cursor:pointer" onclick="openInfirmary()"><div class="row" style="gap:13px;align-items:center">
-    <div style="position:relative;width:84px;height:84px;flex:none">
-      <svg viewBox="0 0 120 120" style="transform:rotate(-90deg)"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/><circle cx="60" cy="60" r="52" fill="none" stroke="${r.color}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" style="transition:stroke-dashoffset .9s ease"/></svg>
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-family:var(--disp);font-size:26px;color:${r.color};line-height:1">${r.score}</div><div class="mini" style="font-size:8px;letter-spacing:.1em;color:var(--text3)">/ 100</div></div>
-    </div>
-    <div style="flex:1;min-width:0">
-      <div class="mini" style="letter-spacing:.16em;text-transform:uppercase;color:var(--text3)">Patrol readiness</div>
-      <div style="font-family:var(--disp);font-size:20px;color:${r.color};line-height:1.1;margin:1px 0 3px">${r.label}</div>
-      <div class="mini" style="color:var(--text2);line-height:1.4">${esc(r.line)}</div>
-      <div class="mini" style="color:var(--gold2);margin-top:4px;font-weight:600">😴 Tap to log sleep &amp; recovery ›</div>
-    </div></div>
-    <div class="row" style="gap:6px;margin-top:9px;border-top:1px solid var(--border);padding-top:8px">${fac("Recovery",r.rec+"%")}${fac("Sleep",r.sleepKnown?r.sleep+"%":"—")}${fac("Freshness",r.fresh+"%")}</div>${recoveryStripMini()}</div>`;
-}
 // Training Age Clock
 const TA_MILES=[[7,"First Week","🌑"],[30,"One Month","🌘"],[90,"90 Nights","🌗"],[180,"Half a Year","🌖"],[365,"One Year","🌕"],[730,"Two Years","⭐"],[1825,"Five Years","🦇"],[3650,"A Decade in the Cave","🔱"]];
 function firstWorkoutDate(){const ws=state.data.workouts;if(!ws.length)return null;let mn=Infinity;ws.forEach(w=>{const t=new Date(w.date).getTime();if(t<mn)mn=t;});return mn;}
@@ -5650,12 +5276,6 @@ function trainingAge(){
   const pct=next?clamp((days-prev)/(next[0]-prev)*100,0,100):100;
   const reached=TA_MILES.filter(m=>days>=m[0]);
   return {days,yrs,mo,dd,next,pct,badge:(reached[reached.length-1]||TA_MILES[0])};
-}
-function trainingAgeCard(){const a=trainingAge();if(!a)return '';
-  const label=a.yrs?`${a.yrs}y ${a.mo}m`:a.mo?`${a.mo}m ${a.dd}d`:`${a.days}d`;
-  return `<div class="card" style="padding:14px"><div class="row sp"><div class="ttl" style="margin:0">⏳ Training Age</div><span class="badgepill">${a.badge[2]} ${esc(a.badge[1])}</span></div>
-  <div class="row sp" style="align-items:flex-end;margin-top:4px"><div class="big" style="font-size:38px">${label}</div><div class="mini">${a.days} nights on patrol</div></div>
-  ${a.next?`<div class="bar" style="margin-top:9px"><i style="width:${a.pct}%;background:linear-gradient(90deg,var(--gold-dim),var(--gold2))"></i></div><div class="mini" style="margin-top:5px">Next: ${a.next[2]} ${esc(a.next[1])} — ${a.next[0]-a.days} nights away</div>`:'<div class="mini" style="margin-top:7px;color:var(--gold2)">Every milestone reached. Legend status.</div>'}</div>`;
 }
 // PR Velocity — rate of progress
 function prVelocity(){
@@ -5692,23 +5312,7 @@ function ironLedger(){
     climbs:(reps*0.5)/everest, batmobiles:vol/1600, elephants:vol/6000,
     prs:Object.keys(state.data.prs).length, bosses:(state.data.bossWins||[]).length};
 }
-function _crnd(a,b,c){return ((a*131+b*17+c*7)%97)/97;}
 // Gotham Cityscape — skyline that builds as lifetime tonnage grows
-function cityscapeBar(){
-  const L=ironLedger();const prog=clamp(Math.log10(L.vol+1)/6,0,1); // 1,000,000kg fills the skyline
-  const N=16,lit=Math.round(prog*N),bw=500/N;
-  const heights=[34,52,40,64,46,58,38,70,50,60,42,56,48,66,44,54];
-  let b='';
-  for(let i=0;i<N;i++){const h=heights[i%heights.length],x=i*bw,on=i<lit;
-    b+=`<rect x="${(x+1).toFixed(1)}" y="${100-h}" width="${(bw-2).toFixed(1)}" height="${h}" rx="1.5" fill="${on?'#1c1810':'#0c0c11'}" stroke="${on?'#3a2f12':'#181820'}" stroke-width="0.6"/>`;
-    if(on){for(let wy=100-h+5;wy<97;wy+=8){for(let wx=Math.round(x+3);wx<x+bw-3;wx+=6){if(_crnd(i,wx,wy)<0.55){const g=_crnd(wy,i,wx)<0.2;b+=`<rect x="${wx}" y="${wy}" width="2.4" height="3" fill="${g?'#E8C56A':'#C9A84C'}" opacity="${(0.45+_crnd(wx,wy,i)*0.55).toFixed(2)}"/>`;}}}}
-  }
-  const sig=state.data.u.streakDays>=7?`<circle cx="428" cy="27" r="21" fill="rgba(201,168,76,0.12)"/><circle cx="428" cy="27" r="13" fill="rgba(201,168,76,0.18)"/><text x="428" y="35" font-size="20" text-anchor="middle">🦇</text>`:'';
-  const moon=`<circle cx="64" cy="24" r="13" fill="#16161e"/><circle cx="59" cy="22" r="13" fill="#20202c"/>`;
-  return `<svg class="cityscape" viewBox="0 0 500 100" preserveAspectRatio="none">
-    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0a14"/><stop offset="1" stop-color="#141018"/></linearGradient></defs>
-    <rect width="500" height="100" fill="url(#sky)"/>${moon}${sig}${b}<rect y="97" width="500" height="3" fill="#070707"/></svg>`;
-}
 function openIronLedger(){
   const L=ironLedger(),v=prVelocity(),nm=villainNemesis();
   const eq=[['🦇','Batmobiles hoisted',L.batmobiles],['🐘','Elephants moved',L.elephants],['🏔️','Everest ascents',L.climbs]];
@@ -5732,27 +5336,6 @@ function openIronLedger(){
   <button class="btn" style="margin-top:16px" onclick="closeSheet()">CLOSE THE LEDGER</button>`);
 }
 /* ===== Recovery rings (glanceable heartbeat dials for the Cowl dashboard) ===== */
-function recoveryRings(){
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  if(!trained.length)return "";
-  const sorted=trained.slice().sort((a,b)=>getRecovery(a)-getRecovery(b)); // most fatigued first — the ones that matter
-  const show=sorted.slice(0,6);
-  const ring=m=>{
-    const rec=getRecovery(m),col=recoveryColor(rec),C=2*Math.PI*15.5,off=C*(1-rec/100),hrs=hoursToReady(m),beat=rec<60;
-    return `<div class="rring" onclick="muscleDrill('${m}')">
-      <svg viewBox="0 0 40 40" width="52" height="52" class="${beat?'beat':''}" style="display:block;margin:0 auto">
-        <circle cx="20" cy="20" r="15.5" fill="none" stroke="#1e1e1e" stroke-width="4"/>
-        <circle cx="20" cy="20" r="15.5" fill="none" stroke="${col}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 20 20)" style="filter:drop-shadow(0 0 3px ${col}88)"/>
-        <text x="20" y="20" font-size="9.5" fill="#fff" text-anchor="middle" dominant-baseline="central" font-weight="700">${rec}</text>
-      </svg>
-      <div style="text-align:center;line-height:1;margin-top:2px">${mIcon(m,17,col)}</div>
-      <div class="mini" style="text-align:center;color:var(--text3);font-size:9px">${hrs>0?hrs+"h":"ready"}</div>
-    </div>`;
-  };
-  return `<div class="card"><div class="row sp"><div class="ttl" style="margin:0">❤️‍🔥 Recovery rings</div><span class="chip" onclick="go('suit')">all sectors ›</span></div>
-    <div class="mini" style="margin-bottom:10px;color:var(--text2)">Live muscle recovery — fuller ring = fresher. Beating rings still need repair. Tap any for the dossier.</div>
-    <div class="row" style="justify-content:space-between;gap:4px;flex-wrap:nowrap">${show.map(ring).join("")}</div></div>`;
-}
 /* ===== Coverage radar — weekly sets vs MAV across all 12 sectors ===== */
 function coverageRadar(){
   const muscles=M12,n=muscles.length,cx=150,cy=140,R=104;
@@ -5866,29 +5449,7 @@ const GAUNTLET=[
   {e:"🧗",n:"The Climb",d:"Find stairs. 10 ascents at pace, or 5 minutes of step-ups. Rise from the pit."},
   {e:"⛓️",n:"Broken Chains",d:"Max push-ups in one set, then max again after 60s rest. Add the two."}
 ];
-function gauntletIdx(){const now=new Date();const start=new Date(now.getFullYear(),0,0);const doy=Math.floor((now-start)/864e5);return doy%GAUNTLET.length;}
 function gauntletKey(){const t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
-function gauntletDoneToday(){return !!(state.data.gauntlet&&state.data.gauntlet.done&&state.data.gauntlet.done[gauntletKey()]);}
-function completeGauntlet(){
-  const g=state.data.gauntlet;const k=gauntletKey();if(g.done[k])return;
-  // streak: increment if yesterday done, else reset to 1
-  const y=new Date();y.setDate(y.getDate()-1);const yk=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
-  g.streak=(g.done[yk]?g.streak:0)+1;g.best=Math.max(g.best||0,g.streak);g.done[k]=true;g.last=k;
-  save();checkAchievements();haptic("pr");toast("Gauntlet cleared — "+g.streak+" day streak 🔥");render();
-}
-function gauntletCard(){
-  const ch=GAUNTLET[gauntletIdx()];const done=gauntletDoneToday();const g=state.data.gauntlet||{streak:0,best:0};
-  return `<div class="card" style="position:relative;overflow:hidden;border-color:${done?'var(--green)':'var(--gold-dim)'}">
-    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🩸 THE GAUNTLET</div>
-      <span class="chip ${g.streak?'on':''}" style="color:${g.streak?'var(--gold2)':'var(--text2)'}">🔥 ${g.streak||0} day${g.streak===1?'':'s'}${g.best>g.streak?` · best ${g.best}`:''}</span></div>
-    <div class="row g" style="gap:11px;margin-top:8px;align-items:flex-start">
-      <div style="font-size:34px;line-height:1">${ch.e}</div>
-      <div style="flex:1"><h2 style="font-size:21px;color:var(--gold2);margin:0">${esc(ch.n)}</h2>
-        <div class="mini" style="color:var(--text2);line-height:1.5;margin-top:3px">${esc(ch.d)}</div></div></div>
-    ${done?`<div class="center" style="margin-top:11px"><span class="chip on" style="color:var(--green)">✓ Cleared today — back tomorrow</span></div>`
-      :`<button class="btn gold sm" style="margin-top:11px" onclick="completeGauntlet()">MARK CLEARED ✓</button>`}
-    <div class="mini" style="margin-top:8px;color:var(--text3);font-style:italic">A new trial every night at midnight. Optional — but Batman never skips conditioning.</div></div>`;
-}
 /* ===== Stalled-lift detector (#2): flags lifts with no est-1RM progress in 3+ sessions ===== */
 function stalledLifts(){
   const out=[];
@@ -5902,22 +5463,6 @@ function stalledLifts(){
 }
 /* ===== Two-Face daily coin (#13): a deterministic 50/50 directive for tonight ===== */
 function twoFaceSide(){const now=new Date();const start=new Date(now.getFullYear(),0,0);const doy=Math.floor((now-start)/864e5);return doy%2;}
-function twoFaceCard(){
-  const heads=twoFaceSide()===0;
-  const face=heads?"🪙":"🩸";
-  const title=heads?"HEADS — Go Heavy":"TAILS — Chase Volume";
-  const dir=heads
-    ? "Two-Face calls it: tonight is about <b style='color:var(--gold2)'>top-end strength</b>. Work up to a heavy top single or triple on your first compound, then back off. Move real iron."
-    : "Two-Face calls it: tonight is about <b style='color:var(--gold2)'>accumulation</b>. Keep 1–2 reps in reserve, add a back-off set, and chase 2 extra reps on everything. Bury the muscle in volume.";
-  const col=heads?"var(--gold2)":"#E8453C";
-  return `<div class="card" style="border-color:${col}44">
-    <div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center;gap:6px">🪙 TWO-FACE'S CALL</div><span class="chip" style="color:${col}">${heads?"HEADS":"TAILS"}</span></div>
-    <div class="row g" style="gap:12px;margin-top:8px;align-items:center">
-      <div style="font-size:34px;line-height:1;filter:drop-shadow(0 0 8px ${col}66)">${face}</div>
-      <div style="flex:1"><h2 style="font-size:19px;color:${col};margin:0">${title}</h2>
-        <div class="mini" style="color:var(--text2);line-height:1.5;margin-top:3px">${dir}</div></div></div>
-    <div class="mini" style="margin-top:8px;color:var(--text3);font-style:italic">The coin decides at midnight. No choosing — that's the point. Heads you win, tails you win.</div></div>`;
-}
 /* ========================================================================
    THE INFIRMARY (Wave 5) — one recovery hub: sleep, soreness, conditioning,
    supplements and an injury board. Sleep already feeds Patrol Readiness.
@@ -5982,7 +5527,6 @@ function soreToday(){return (state.data.soreness=state.data.soreness||{})[infDat
 function toggleSore(m){const k=infDateKey();const map=state.data.soreness[k]=state.data.soreness[k]||{};map[m]=((map[m]||0)+1)%4;if(!map[m])delete map[m];save();haptic("tap");renderInfirmary();}
 // ---- cardio / patrol mileage ----
 function weekCardio(){const wk=now()-7*864e5;return (state.data.cardioLog||[]).filter(c=>new Date(c.date).getTime()>=wk).reduce((a,c)=>a+(+c.mins||0),0);}
-function addCardio(mins,type){state.data.cardioLog=state.data.cardioLog||[];state.data.cardioLog.unshift({date:new Date().toISOString(),type,mins});save();checkAchievements();haptic("done");toast("+"+mins+" min "+type+" logged");renderInfirmary();}
 // ---- supplements ----
 function suppToday(){return (state.data.suppLog=state.data.suppLog||{})[infDateKey()]||{};}
 function toggleSupp(item){const k=infDateKey();const map=state.data.suppLog[k]=state.data.suppLog[k]||{};map[item]=!map[item];save();checkAchievements();haptic("tap");if(state.subpage==="infirmary")renderInfirmary();else render();}
@@ -6196,25 +5740,6 @@ function batRankCard(){
 }
 
 /* ===== NIGHTLY PATROL REPORT (#10): a cinematic crime-log recap of a mission ===== */
-function patrolReport(idx){
-  const w=state.data.workouts[idx];if(!w){toast("No mission found");return;}
-  const avg=avgWeekVol()||1;const ratio=w.totalVol/avg;
-  const heavy=ratio>=1.15?"a heavy haul":ratio>=0.85?"a solid patrol":"a tactical, lighter sweep";
-  const muscles=[...new Set((w.exercises||[]).flatMap(e=>(exFor(e.name).p||[])))].map(m=>MNAME[m]);
-  let top=null,topV=0;(w.exercises||[]).forEach(e=>{const v=(e.sets||[]).reduce((a,s)=>a+((+s.w||0)*(+s.r||0)),0);if(v>topV){topV=v;top=e.name;}});
-  const prs=(w.prs||[]);
-  const dt=new Date(w.date);
-  const open=`The Bat-Signal cut through the fog at ${dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}. ${esc(w.name)} — ${heavy}.`;
-  const mid=`${w.exercises.length} engagements across ${fmtTime(w.duration)}. ${fmtNum(w.totalVol)}kg of iron moved through ${muscles.slice(0,3).join(", ")||"the dark"}.${top?` ${esc(top)} carried the night.`:""}`;
-  const end=prs.length?`Gotham's underworld lost ${prs.length} of its own tonight — ${prs.map(esc).join(", ")} fell to new records. The city sleeps a little safer.`:`No records broken, but the war was waged. Every rep is a brick in the wall between Gotham and the dark.`;
-  openSheet(`<div class="center" style="font-size:40px;margin-bottom:2px">📜</div>
-    <div class="mini center" style="text-align:center;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)">Patrol Report · ${dt.toLocaleDateString()}</div>
-    <h2 style="text-align:center;font-family:var(--disp);color:var(--gold2);font-size:23px;margin:3px 0 13px">${esc(w.name)}</h2>
-    <p style="font-size:14.5px;line-height:1.8;color:var(--text);font-style:italic">${open}<br><br>${mid}<br><br>${end}</p>
-    <div class="row" style="gap:7px;flex-wrap:wrap;margin:14px 0 2px;justify-content:center">
-      <span class="chip">${fmtNum(w.totalVol)}kg</span><span class="chip">${w.exercises.length} lifts</span><span class="chip">${fmtTime(w.duration)}</span>${prs.length?`<span class="chip on" style="color:var(--green)">${prs.length} PR</span>`:""}</div>
-    <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close the file</button>`);
-}
 
 /* Wayne Towers Lifted — lifetime tonnage as a growing Gotham skyline (each tower = 20,000kg moved). */
 const WAYNE_TOWER_KG=20000;
@@ -6279,31 +5804,8 @@ function mmaRecord(){
   for(let i=1;i<weeks.length;i++){const cur=byWeek[weeks[i]],prev=byWeek[weeks[i-1]];if(cur>prev*1.02)wins++;else if(cur<prev*0.98)losses++;else draws++;}
   return {wins,losses,draws,kos:(state.data.bossWins||[]).length,weeks:weeks.length};
 }
-function mmaRecordCard(){
-  const r=mmaRecord();if(!r||r.weeks<2)return "";
-  return `<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🥊 Fight Record</div><span class="mini" style="color:var(--text3)">week vs week · ${r.weeks} weeks</span></div>
-    <div class="row" style="align-items:flex-end;margin:6px 0 4px"><div class="big" style="font-size:46px;color:var(--gold2)">${r.wins}<span style="font-size:22px;color:var(--text3)"> - ${r.losses}${r.draws?" - "+r.draws:""}</span></div>
-      <div style="margin-left:auto;text-align:right"><div class="big" style="font-size:30px;color:#ff6a5e">${r.kos}</div><div class="mini">KO · rogues felled</div></div></div>
-    <div class="mini" style="color:var(--text2);font-style:italic">Out-train last week and it's a win. Every record that fells a villain is a knockout.</div></div>`;
-}
 /* Best-ever Highlight Reel — top lifts by est-1RM at the active gym; tap to open the curve. */
-function highlightReelCard(){
-  const prs=Object.entries(state.data.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm).slice(0,5);
-  if(!prs.length)return "";
-  return `<div class="card"><div class="ttl">🏆 Best-ever reel <span class="mini" style="font-weight:400">— heaviest iron${state.data.u.activeGym?" · "+esc(state.data.u.activeGym):""}</span></div>
-    ${prs.map(([n,p],i)=>`<div class="row sp" style="padding:8px 0;border-top:${i?"1px solid var(--border)":"none"};cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')"><div class="row" style="gap:9px;min-width:0"><span class="num" style="color:var(--text3);width:18px">#${i+1}</span><b style="font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)} ›</b></div><b class="gold" style="white-space:nowrap">${Math.round(p.orm)}kg</b></div>`).join("")}</div>`;
-}
 /* Cross-gym comparison — lifts set at 2+ gyms, side by side (machines differ). */
-function crossGymCard(){
-  const byGym=state.data.prsByGym||{};const gyms=Object.keys(byGym);
-  if(gyms.length<2)return "";
-  const lifts={};
-  gyms.forEach(g=>Object.entries(byGym[g]||{}).forEach(([n,p])=>{if(p&&p.orm>0){lifts[n]=lifts[n]||{};lifts[n][g]=Math.round(p.orm);}}));
-  const multi=Object.entries(lifts).filter(([n,m])=>Object.keys(m).length>=2).slice(0,8);
-  if(!multi.length)return "";
-  return `<div class="card"><div class="ttl">🏟️ Same lift, different gyms <span class="mini" style="font-weight:400">— machines vary</span></div>
-    ${multi.map(([n,m])=>`<div style="padding:8px 0;border-top:1px solid var(--border)"><b style="font-size:13px">${esc(n)}</b><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">${Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([g,o])=>`<span class="chip" style="width:auto">${esc(g)} <b class="gold">${o}kg</b></span>`).join("")}</div></div>`).join("")}</div>`;
-}
 
 /* ========================= PROFILE v2 — compact-by-default ========================= */
 function profileHeroHtml(d,u,sl,r,ri){
@@ -6457,32 +5959,6 @@ function profileBossPreviewHtml(d,sl){
   </div>`;
 }
 
-function profilePRFeedHtml(d){
-  const prs=Object.entries(d.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm);
-  if(!prs.length)return `<div class="empty-state" style="padding:24px 14px 14px"><div class="es-icon">👑</div><div class="es-title">NO RECORDS YET</div><div class="es-body">Log your first session and every PR is stored, ranked, and tracked here.</div></div>`;
-  const volPRs={};
-  (d.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{const v=(e.sets||[]).filter(s=>s.done&&s.type!=="W").reduce((a,s)=>a+((+s.w||0)*(+s.r||0)),0);if(v>(volPRs[e.name]||0))volPRs[e.name]=Math.round(v);});});
-  let html=`<div class="row sp" style="margin-bottom:8px"><span class="mini" style="color:var(--text3)">${prs.length} records${d.u.activeGym?' · '+esc(d.u.activeGym):''}</span><span class="mini" style="color:var(--text3)">e1RM · session vol</span></div>`;
-  html+=prs.slice(0,15).map(([n,p],i)=>{
-    const vol=volPRs[n];
-    return `<div style="padding:9px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
-      <div class="row sp">
-        <div class="row" style="gap:8px;min-width:0;align-items:center">
-          <span style="font-size:11px;color:var(--text3);min-width:20px;font-family:var(--disp)">#${i+1}</span>
-          <b style="font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n)} ›</b>
-        </div>
-        <b class="gold" style="font-size:15px;white-space:nowrap;flex:none">${Math.round(p.orm)}kg</b>
-      </div>
-      <div class="row" style="gap:10px;margin-top:3px;padding-left:28px">
-        ${p.w&&p.r?`<span class="mini" style="color:var(--text3)">${Math.round(p.w)}kg×${p.r}</span>`:''}
-        ${vol?`<span class="mini" style="color:var(--text2)">📦 ${fmtNum(vol)}kg vol</span>`:''}
-      </div>
-    </div>`;
-  }).join('');
-  if(prs.length>15)html+=`<div class="mini" style="color:var(--text3);margin-top:8px;text-align:center">+${prs.length-15} more · open Every Lift ▼</div>`;
-  html+=`<button class="btn ghost sm" style="width:100%;margin-top:12px;border-color:rgba(232,197,106,.3);color:var(--gold2)" onclick="shareProfilePRCard()">📤 Share PR Card</button>`;
-  return html;
-}
 
 function shareProfilePRCard(){
   const prs=Object.entries(state.data.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm).slice(0,5);
@@ -6500,26 +5976,7 @@ function shareProfilePRCard(){
   <button class="btn" onclick="closeSheet()">Done</button>`);
 }
 
-function profileLogHtml(d){
-  if(!d.workouts.length)return '<p class="muted" style="margin:0">No missions logged yet.</p>';
-  return d.workouts.slice(0,12).map((w,i)=>`<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)">
-    <div style="cursor:pointer;flex:1;min-width:0" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()">
-      <b style="font-size:13.5px">${esc(w.name)} ›</b>
-      <div class="mini" style="margin-top:1px">${new Date(w.date).toLocaleDateString()} · ${w.exercises.length} ex · ${fmtTime(w.duration)}</div>
-    </div>
-    <div class="row" style="gap:8px;align-items:center;flex:none"><b class="gold" style="font-size:14px">${fmtNum(w.totalVol)}kg</b><button class="btn ghost sm" style="width:auto;padding:4px 8px" onclick="patrolReport(${i})">📜</button></div>
-  </div>`).join('');
-}
 
-function profileToolsHtml(){
-  return `<div class="grid2" style="margin-bottom:10px">
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:22px">🖥️</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Batcomputer</div><div class="mini" style="color:var(--text3)">Deep analytics</div></button>
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:22px">🃏</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Villains felled</div></button>
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openMeasure()"><div style="font-size:22px">📐</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Measurements</div><div class="mini" style="color:var(--text3)">Body trends</div></button>
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openTrophyRoom()"><div style="font-size:22px">🏆</div><div class="ttl" style="margin:4px 0 1px;font-size:13px">Trophy Room</div><div class="mini" style="color:var(--text3)">26 honors</div></button>
-  </div>
-  <button class="btn ghost sm" style="width:100%;border-color:rgba(232,197,106,.3);color:var(--gold2);margin-top:2px" onclick="exportICS()">📅 Export calendar (.ics)</button>`;
-}
 
 function profileEveryLiftTile(d){
   const exCount=loggedExerciseNames().length;
@@ -6638,7 +6095,6 @@ function renderProfile(){
   html+=acc('prf-bases','🏛️','Bases & Tools',profileBasesToolsHtml(d,u),false,(u.gyms||[]).length+' gym'+(((u.gyms||[]).length)===1?'':'s')+' · tools');
   $("app").innerHTML=html;
 }
-function d_dismiss(k){state.data.dismissed[k]=true;save();render();}
 function weekCount(){const wk=now()-7*864e5;return new Set(state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk).map(w=>new Date(w.date).toDateString())).size;}
 function avgWeekVol(){const wk=now()-7*864e5;const ws=state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk);return ws.length?ws.reduce((a,w)=>a+w.totalVol,0)/ws.length:0;}
 function weakestMuscle(){let weak=null,wl=999;M12.forEach(m=>{if((state.data.muscleVol[m]||0)>0){const l=muscleLevel(m);if(l<wl){wl=l;weak=m;}}});return weak;}
@@ -6665,11 +6121,6 @@ function overloadSuggestions(wk){
       else{text=`RIR ~2, the effective dose. Repeat ${topW}kg and add a rep where it's clean.`;tone="ok";}}
     out.push({name:e.name,text,tone});
   });
-  return out;
-}
-function overloadIntel(){  const out=[];const seen=new Set();
-  for(const w of state.data.workouts.slice(0,3)){for(const e of w.exercises){if(seen.has(e.name)||out.length>=4)continue;const pr=state.data.prs[e.name];if(!pr)continue;seen.add(e.name);
-    out.push({name:e.name,text:`try ${Math.round(pr.w)}kg×${pr.r} → +1 rep`});}}
   return out;
 }
 
@@ -6825,7 +6276,6 @@ function missionSubTabs(){
   }
   return bar+`<div class="fade">${body}</div>`;
 }
-function toggleBelt(){$("belt").classList.toggle("hide");}
 /* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
 /* ══════════ CLOUD SYNC ══════════ Firebase Realtime DB + Anonymous Auth.
    Makes the Justice League fully ONLINE: your Patrol Card auto-publishes, and
@@ -7474,13 +6924,6 @@ function openRaid(){
     <button class="btn ghost sm" style="margin-top:12px;color:var(--text3)" onclick="endRaid()">Abandon raid</button>
     <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
 }
-function raidCard(){const r=state.data.raid;
-  if(!r)return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim)" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0">⚔️ Co-op Raid</div><span class="mini" style="color:var(--gold2)">start ›</span></div><div class="mini" style="color:var(--text2)">Team up with an ally against a boss — pool your records toward one shared target.</div></div>`;
-  const p=raidProgress();
-  return `<div class="card glow" style="cursor:pointer" onclick="openRaid()"><div class="row sp"><div class="ttl" style="margin:0">${r.e} Raid: ${esc(r.boss.split(" — ")[0])}</div><span class="chip ${p.done?'on':''}">${Math.round(p.pct)}%</span></div>
-    <div style="height:10px;border-radius:6px;background:var(--bg2);overflow:hidden;margin:8px 0 5px"><div style="height:100%;width:${p.pct}%;background:${p.done?'#2ECC71':r.c}"></div></div>
-    <div class="mini" style="color:var(--text2)">${p.done?`Boss broken — tap to claim the kill with ${esc(r.allyName)}.`:`${p.combined}/${r.target} records with ${esc(r.allyName)} · tap to view`}</div></div>`;
-}
 function setActiveSplit(id){const d=state.data;d.activeSplitId=id;d._nextDay=0;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;save();render();}
 function open1RM(){openSheet(`<div class="ttl">1RM calculator (Epley)</div>
   <label class="mini">Weight (kg)</label><input id="o-w" inputmode="decimal" oninput="calc1rm()" style="margin-bottom:8px"/>
@@ -8080,84 +7523,12 @@ function combatRatingCard(){
     ${acc('combatLifts','🥊','Per-lift combat ranks',body+`<div class="mini" style="margin-top:8px;color:var(--text3)">Each lift is judged against a standard tuned to its movement and equipment. Legend is an elite ceiling now — earned, not handed out. Your Fighter Rank above climbs with the <b>total weight you've moved since day one</b>, not any single lift.</div>`,false,`${rows.length} lifts ranked`)}</div>`;
 }
 // ---- staleness detector + muscle balance analyzer ----
-function stalenessReport(){
-  const out=[],cut=now()-35*864e5,byName={};
-  state.data.workouts.slice().reverse().forEach(w=>{if(new Date(w.date).getTime()<cut)return;(w.exercises||[]).forEach(e=>{const ex=exFor(e.name);let best=0;(e.sets||[]).forEach(s=>{if(s.done&&s.type!=="W"){const o=setE1RM(ex,s);if(o>best)best=o;}});if(best>0)(byName[e.name]=byName[e.name]||[]).push(best);});});
-  Object.entries(byName).forEach(([n,arr])=>{if(arr.length<3)return;const l3=arr.slice(-3);if(!(l3[2]>l3[0]+0.5))out.push({name:n,e1:Math.round(Math.max(...l3)),sessions:arr.length});});
-  return out;
-}
-function muscleBalance(){
-  const v=m=>state.data.muscleVol[m]||0;
-  const push=v("chest")+v("shoulders")+v("triceps"),pull=v("back")+v("biceps")+v("traps"),quad=v("quads"),ham=v("hamstrings");
-  const flags=[];
-  if(push&&pull){const r=push/pull;if(r>1.4)flags.push({k:"warn",t:`Push volume is ${r.toFixed(1)}× your pull. Add rows, pulldowns and rear delts — chronic push dominance rounds the shoulders forward (Schoenfeld's balance guidance).`});else if(r<0.7)flags.push({k:"ok",t:`Pull-dominant — good for posture. Just keep pressing strength progressing too.`});}
-  if(quad&&ham){const r=quad/ham;if(r>1.6)flags.push({k:"warn",t:`Quads are ${r.toFixed(1)}× hamstring volume. More hip-hinge work (RDL, leg curl) protects the knee and hamstring.`});}
-  return {push,pull,quad,ham,flags};
-}
-function analysisCard(){
-  if(state.data.workouts.length<3)return "";
-  const stale=stalenessReport(),bal=muscleBalance();
-  let html=`<div class="card"><div class="ttl">🖥️ Batcomputer analysis</div>`;
-  if(bal.push&&bal.pull)html+=`<div class="mini" style="margin-bottom:4px"><b>Push : Pull</b> volume — <b class="gold">${(bal.push/bal.pull).toFixed(2)} : 1</b></div>`;
-  if(bal.quad&&bal.ham)html+=`<div class="mini" style="margin-bottom:8px"><b>Quad : Hamstring</b> volume — <b class="gold">${(bal.quad/bal.ham).toFixed(2)} : 1</b></div>`;
-  bal.flags.forEach(f=>html+=`<div class="banner" style="margin-bottom:6px"><span>${f.k==="warn"?"⚠️":"✓"}</span><div class="mini">${esc(f.t)}</div></div>`);
-  if(stale.length)html+=`<div class="ttl" style="font-size:14px;margin-top:8px">⏳ Plateau watch</div>`+stale.slice(0,4).map(s=>`<div class="mini" style="margin-bottom:4px;cursor:pointer" onclick="exerciseHistory('${esc(s.name).replace(/'/g,"")}')"><b>${esc(s.name)} ›</b> — no est. 1RM progress in 3 sessions. Try a variation, a small load bump, or deload &amp; rebuild.</div>`).join("");
-  else html+=`<div class="mini" style="color:var(--text3)">No plateaus detected — your lifts are still progressing.</div>`;
-  return html+`</div>`;
-}
 // ---- MMA title belts: bodyweight-ratio weight-class titles per lift ----
 const BELT_TIERS=[[2.4,"Undisputed Champion","🏆","#F7DD93"],[1.9,"World Champion","🥇","#EBC76B"],[1.45,"Title Holder","🥈","#9fb0c4"],[1.0,"#1 Contender","🥉","#c8915a"],[0,"Prospect","🎖️","#8b8b8b"]];
 function beltTier(ratio){for(const t of BELT_TIERS)if(ratio>=t[0])return t;return BELT_TIERS[BELT_TIERS.length-1];}
-function titleBeltsCard(){
-  const bw=bodyW();if(!bw)return "";
-  const prs=Object.entries(state.data.prs||{}).filter(([n,p])=>p&&p.orm>0);
-  if(!prs.length)return "";
-  const rows=prs.map(([n,p])=>({n,p,ratio:p.orm/bw,t:beltTier(p.orm/bw)}))
-    .sort((a,b)=>b.ratio-a.ratio).slice(0,6);
-  const body=rows.map(r=>{
-    const[min,label,emoji,col]=r.t;
-    const cnt=r.p.count||1;
-    const def=cnt>1?`Defended ×${cnt-1}`:"Newly won";
-    return `<div class="beltrow row sp" style="padding:9px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(r.n).replace(/'/g,"")}')">
-      <div class="row" style="gap:10px;align-items:center">
-        <div class="beltmedal" style="--bc:${col}">${emoji}</div>
-        <div><b style="font-size:14px">${esc(r.n)} ›</b><div class="mini" style="color:${col}">${label} <span style="color:var(--text3)">· ${def}</span></div></div>
-      </div>
-      <div style="text-align:right"><b class="gold">${Math.round(r.p.orm)}kg</b><div class="mini">${r.ratio.toFixed(2)}×BW</div></div>
-    </div>`;
-  }).join("");
-  return `<div class="card"><div class="ttl">🥊 Title belts <span class="mini" style="font-weight:400">— your lifts ranked like MMA championships</span></div>${body}
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Each lift earns a belt by strength-to-bodyweight ratio. Keep PRing the same lift to defend your title.</div></div>`;
-}
 /* ===== VILLAIN CAMPAIGN (#5) =====
    Turns the boss roster into a Rogues-Gallery progression path: defeated villains
    behind you, your current target highlighted, the rest locked behind Fighter levels. */
-function villainCampaignCard(){
-  const d=state.data;const sl=strengthLevel();
-  const wins=new Set((d.bossWins||[]).map(b=>b.villain));
-  const list=BOSSES.slice().sort((a,b)=>a.min-b.min);
-  let curIdx=list.findIndex(b=>sl>=b.min&&!wins.has(b.v));
-  if(curIdx<0)curIdx=list.findIndex(b=>!wins.has(b.v));
-  const defeated=list.filter(b=>wins.has(b.v)).length;
-  const rows=list.map((b,i)=>{
-    const done=wins.has(b.v),unlocked=sl>=b.min,cur=i===curIdx;
-    const cls=done?'done':cur?'cur':unlocked?'':'lock';
-    let right;
-    if(done){const w=(d.bossWins||[]).slice().reverse().find(x=>x.villain===b.v);
-      right=`<div class="mini" style="color:var(--green)">DEFEATED${w?` · ${esc(w.ex)} ${w.orm}kg`:""}</div>`;}
-    else if(cur)right=`<div class="mini" style="color:var(--gold2);font-weight:700">⚔ NEXT TARGET</div><div class="mini" style="color:var(--text2);font-style:italic;line-height:1.4;margin-top:2px">“${esc(b.q)}”</div>`;
-    else if(unlocked)right=`<div class="mini" style="color:var(--text3)">Ready — land a PR to engage</div>`;
-    else right=`<div class="mini" style="color:var(--text3)">🔒 Locked · reach Lv ${b.min}</div>`;
-    return `<div class="vrow">
-      <div class="vmed ${cls}" style="--bc:${b.c}">${villainFace(b)}${done?'<span class="vchk">✓</span>':''}</div>
-      <div class="g" style="padding-top:3px"><b style="font-size:14px;color:${done?'var(--text)':cur?'var(--gold2)':unlocked?'var(--text)':'var(--text3)'}">${esc(b.v)}</b>${right}</div>
-      <button class="vcam" data-v="${esc(b.v)}" onclick="setVillainImg(this.dataset.v)" title="Set mugshot">${villainImgUrl(b.v)?'🖼':'📷'}</button>
-    </div>`;
-  }).join("");
-  return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('radar')}Villain campaign</div><span class="chip">${defeated}/${list.length} down</span></div>
-    <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Your Rogues Gallery. Set PRs to take them down one by one — stronger villains unlock as your Fighter level climbs.</div>
-    <div class="vcamp"><div class="vrail"></div>${rows}</div></div>`;
-}
 /* ===== Batcomputer — full analytics dashboard ===== */
 function weeklySeries(weeks,fn){const out=[];for(let i=weeks-1;i>=0;i--){const s=now()-(i+1)*7*864e5,e=now()-i*7*864e5;const ws=state.data.workouts.filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;});out.push(fn(ws));}return out;}
 function openBatcomputer(){
@@ -8443,34 +7814,6 @@ function openSparring(){
   }
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:7px">🥊 Sparring ${rv?'with '+esc(rv.name||'rival'):'<span class="chip" style="font-weight:400">1-v-1</span>'}</div>${body}`);
 }
-function renderCase(){
-  const d=state.data;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">CASE FILE</h1><div class="tag" style="margin-bottom:12px">Records, standards & achievements</div>`;
-  if(d.workouts.length)html+=`<button class="btn gold" style="margin-bottom:9px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="openBatcomputer()">${secIcon('radar','#0c0f15')}Open Batcomputer analytics</button>`;
-  if(d.workouts.length)html+=`<button class="btn" style="margin-bottom:13px;display:flex;align-items:center;justify-content:center;gap:8px;border-color:var(--gold-dim)" onclick="go('history')">📜 See full history — strength curves, patrol log & every lift</button>`;
-  // monthly report
-  if(daysSince(d.workouts[d.workouts.length-1]?.date)>=30||d.u.totalWorkouts>=12)
-    html+=`<button class="btn" style="margin-bottom:13px" onclick="periodReport(30)">📂 Batcomputer report — 30d · 90d · yearly</button>`;
-  // PRs
-  const prs=Object.entries(d.prs).sort((a,b)=>b[1].orm-a[1].orm).slice(0,10);
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🎯 Records (est. 1RM) <span class="mini" style="font-weight:400">— tap for full history</span></div><button class="btn ghost sm" style="width:auto" onclick="openForge()">🛠️ Forge</button></div>${prs.length?prs.map(([n,p])=>`<div style="margin-bottom:6px"><div class="row sp" style="cursor:pointer" onclick="openForge(${p.w},${p.r})"><span style="font-size:13px">${esc(n)}${prProfileTag(n)} ›</span><b class="gold">${Math.round(p.orm)}kg <span class="mini">${p.w}×${p.r}</span></b></div>${prVaultLine(n)}</div>`).join(""):'<p class="muted">No PRs yet. Go set one.</p>'}<div class="mini" style="color:var(--text3);margin-top:4px">Tap a record to open it in The Forge · plan every working set by percentage.</div></div>`;
-  // MMA title belts (bodyweight-ratio championships)
-  html+=titleBeltsCard();
-  // combat rating — per-exercise rank tuned by movement (replaces freeweight-only standards)
-  html+=combatRatingCard();
-  // staleness + balance intelligence
-  html+=analysisCard();
-  // villain campaign — Rogues Gallery progression path
-  html+=villainCampaignCard();
-  // achievements
-  const ec=d.u.earnedBadges.length,tc=ACHIEVEMENTS.length,pct=Math.round(ec/tc*100);
-  const acSorted=ACHIEVEMENTS.slice().sort((a,b)=>{const ga=d.u.earnedBadges.includes(a.id),gb=d.u.earnedBadges.includes(b.id);return ga===gb?0:ga?-1:1;});
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('strength')}Achievements</div><span class="chip">${ec}/${tc}</span></div>
-    <div class="acbar"><i style="width:${pct}%"></i></div>
-    <div class="grid3" style="grid-template-columns:repeat(4,1fr)">${acSorted.map(a=>{const g=d.u.earnedBadges.includes(a.id);return `<div class="badge ${g?'earned':'locked'}"><div class="be">${a.e}</div><div class="bn">${esc(a.n)}</div></div>`;}).join("")}</div></div>`;
-  if(d.workouts.length)html+=`<button class="btn ghost" style="margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="go('history')">📜 Patrol log, strength curves & activity → HISTORY</button>`;
-  $("app").innerHTML=html;
-}
 function heatmap(){
   const d=state.data;
   const vols={};
@@ -8533,7 +7876,6 @@ function exportICS(){
     setTimeout(()=>URL.revokeObjectURL(url),1500);toast(ws.length+" sessions exported to calendar.");
   }catch(e){toast("Export failed on this device.");}
 }
-function monthlyReport(){periodReport(30);}        // back-compat entry point
 const REPORT_PERIODS=[[30,"30-DAY","30D"],[90,"90-DAY","90D"],[365,"ANNUAL","1YR"]];
 function periodReport(days){
   days=days||30;
@@ -9225,12 +8567,6 @@ function fileLiftProfile(o,label){
   }catch(e){try{toast("Couldn't file that profile.");}catch(_){}}
 }
 // Sub-line listing the OTHER profiles' bests for a lift, so two PR versions show side by side.
-function prVaultLine(name){
-  const vault=(state.data.prVault&&state.data.prVault[name])||{};
-  const ks=Object.keys(vault).filter(k=>vault[k]&&(vault[k].orm>0||vault[k].maxW>0));
-  if(!ks.length)return "";
-  return `<div class="mini" style="color:var(--text3);margin-top:1px">Other profiles: ${ks.map(k=>`${esc(k)} <b style="color:var(--text2)">${Math.round(vault[k].orm||0)}kg</b>`).join(" · ")}</div>`;
-}
 function alfredAsk(q){
   const raw=(q||"").trim(),s=raw.toLowerCase();const d=state.data;
   // EDIT: resistance-profile PR variants — "set leg press to hard resistance profile", "switch leg
@@ -10067,8 +9403,6 @@ const WISDOM=[
   ["Show up when you don't want to — that's when it counts.","The Cave"]
 ];
 function wisdomToday(){const i=(state._wisdomI!=null)?state._wisdomI:(_daySeed()%WISDOM.length);return WISDOM[i%WISDOM.length];}
-function nextWisdom(){state._wisdomI=((state._wisdomI!=null?state._wisdomI:_daySeed())+1)%WISDOM.length;haptic("tap");render();}
-function wisdomCard(){const w=wisdomToday();return `<div class="card" style="padding:15px"><div style="font-size:14.5px;font-style:italic;line-height:1.6;color:var(--text)">"${esc(w[0])}"</div><div class="row sp" style="margin-top:9px"><span class="mini" style="color:var(--gold2)">— ${esc(w[1])}</span><div class="row g" style="gap:6px"><button class="btn ghost sm" style="width:auto;padding:5px 11px" onclick="alfredSpeak('${esc(w[0]).replace(/'/g,"\\'")}')" title="Hear it from Alfred">🔊</button><button class="btn ghost sm" style="width:auto;padding:5px 11px" onclick="nextWisdom()">↻ Next</button></div></div></div>`;}
 
 /* ---- 3) Rank Ladder ---- */
 function openRankLadder(){
@@ -10085,64 +9419,10 @@ function openRankLadder(){
 }
 
 /* ---- 4) Records Hall (PR vault) ---- */
-function recordsList(){
-  return loggedExerciseNames().map(n=>{const rows=exerciseRows(n);if(!rows.length)return null;let best=rows[0];rows.forEach(r=>{if(r.e1rm>best.e1rm)best=r;});return {n,e1rm:best.e1rm,date:best.date,topW:best.topW};}).filter(Boolean).sort((a,b)=>b.e1rm-a.e1rm);
-}
-function openRecordsHall(){
-  const recs=recordsList();
-  const rows=recs.length?recs.map((r,i)=>`<div class="rl-row"><div style="font-family:var(--disp);font-size:18px;color:${i<3?'var(--gold2)':'var(--text3)'};min-width:24px;text-align:center">${i+1}</div><div class="g"><b style="font-size:14px">${esc(r.n)}</b><div class="mini" style="color:var(--text3)">top set ${r.topW}kg · ${new Date(r.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</div></div><div style="text-align:right"><b style="font-size:17px;color:var(--gold2)">${r.e1rm}<span style="font-size:11px">kg</span></b><div class="mini" style="color:var(--text3)">e1RM</div></div></div>`).join(""):`<p class="mini" style="color:var(--text3);padding:8px 0">No completed lifts yet. Log a session and your records appear here, ranked.</p>`;
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🧊 Records Hall</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 12px">Every lift's all-time best estimated 1RM, ranked. Your personal hall of records.</div>${rows}
-    <button class="btn" style="margin-top:12px" onclick="closeOverlay()">Close</button>`;
-}
 
 /* ---- 5) Weekly Report Card ---- */
-function weekGrade(){
-  const wk=now()-7*864e5;const ws=state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk);
-  const sessions=ws.length;const vol=Math.round(ws.reduce((a,w)=>a+(w.totalVol||0),0));
-  const musc=M12.filter(m=>weeklySets(m)>0).length;const streak=state.data.u.streakDays||0;
-  const cons=clamp(sessions/4*100,0,100),cov=clamp(musc/12*100,0,100),mom=clamp(streak/7*100,0,100);
-  const score=Math.round((cons+cov+mom)/3);
-  const L=score>=90?["A+","#2ECC71"]:score>=80?["A","#2ECC71"]:score>=70?["B","#8FD14F"]:score>=60?["C","#E8C56A"]:score>=45?["D","#E8A52A"]:["F","#FF6B5E"];
-  return {sessions,vol,musc,streak,cons,cov,mom,score,grade:L[0],color:L[1]};
-}
-function openReportCard(){
-  const g=weekGrade();
-  const note=g.score>=80?"Outstanding work this week. Keep the pressure on.":g.score>=60?"Solid. Tighten one area and you jump a grade.":"Gotham needs more of you. Get back on patrol.";
-  const bar=(label,v)=>`<div style="margin:10px 0 0"><div class="row sp"><span class="mini">${label}</span><span class="mini" style="color:var(--gold2)">${Math.round(v)}%</span></div><div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:4px;overflow:hidden"><div style="height:100%;width:${v}%;background:var(--gold2)"></div></div></div>`;
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🏅 Weekly Report Card</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
-    <div class="card" style="text-align:center;padding:20px"><div class="grade-badge" style="color:${g.color}">${g.grade}</div><div class="mini" style="color:var(--text2);margin-top:6px">${g.score}/100 · last 7 days</div></div>
-    <div class="card" style="padding:14px;margin-top:10px">${bar("Consistency — 4 sessions",g.cons)}${bar("Coverage — 12 muscles",g.cov)}${bar("Momentum — streak",g.mom)}
-      <div class="hr"></div>
-      <div class="grid2"><div><div class="mini" style="color:var(--text3)">Sessions</div><b>${g.sessions}</b></div><div><div class="mini" style="color:var(--text3)">Volume</div><b>${fmtNum(g.vol)}kg</b></div><div><div class="mini" style="color:var(--text3)">Muscles hit</div><b>${g.musc}/12</b></div><div><div class="mini" style="color:var(--text3)">Streak</div><b>${g.streak}d</b></div></div></div>
-    <div class="mini" style="color:var(--text2);font-style:italic;margin-top:10px;text-align:center">${note}</div>
-    <button class="btn" style="margin-top:12px" onclick="closeOverlay()">Close</button>`;
-}
 
 /* ---- 6) Tempo Trainer (rep-cadence metronome) ---- */
-function tempoDefaults(){return {ecc:3,pb:1,con:1,pt:0};}
-function tempoSlider(k,label,v,min,max){return `<div class="row sp" style="margin-top:7px"><span class="mini">${label}</span><span class="mini" id="tempo-${k}-v" style="color:var(--gold2)">${v}s</span></div><input type="range" min="${min}" max="${max}" step="1" value="${v}" oninput="setTempo('${k}',this.value)" style="width:100%;accent-color:var(--gold2)">`;}
-function setTempo(k,v){state._tempo=state._tempo||tempoDefaults();state._tempo[k]=parseInt(v);const el=$("tempo-"+k+"-v");if(el)el.textContent=v+"s";const t=state._tempo;const c=$("tempo-count");if(c)c.textContent=`${t.ecc}-${t.pb}-${t.con}-${t.pt}`;}
-function openTempo(){
-  state._tempo=state._tempo||tempoDefaults();const t=state._tempo;
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">⏱️ Tempo Trainer</div><button class="btn ghost sm" style="width:auto" onclick="stopTempo();closeOverlay()">✕</button></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 4px">Own the eccentric. Set a cadence, follow the orb, and every rep earns its keep.</div>
-    <div class="tempo-dot" id="tempo-dot"><span class="focus-phase" id="tempo-phase" style="font-size:15px">READY</span></div>
-    <div class="center" style="text-align:center"><div id="tempo-count" style="color:var(--gold2);font-size:22px;font-family:var(--disp)">${t.ecc}-${t.pb}-${t.con}-${t.pt}</div><div class="mini" style="color:var(--text3)">eccentric · pause · concentric · pause</div></div>
-    <div class="card" style="padding:13px;margin-top:12px">${tempoSlider("ecc","Eccentric (lower)",t.ecc,1,6)}${tempoSlider("pb","Pause at bottom",t.pb,0,5)}${tempoSlider("con","Concentric (lift)",t.con,1,6)}${tempoSlider("pt","Pause at top",t.pt,0,5)}</div>
-    <button class="btn gold" id="tempo-btn" style="margin-top:12px" onclick="toggleTempo()">▶ Start cadence</button>`;
-}
-function toggleTempo(){if(state._tempoInt){stopTempo();return;}startTempo();}
-function startTempo(){
-  const t=state._tempo||tempoDefaults();
-  const phases=[["DOWN",t.ecc,0.55],["HOLD",t.pb,0.55],["UP",t.con,1],["HOLD",t.pt,1]].filter(p=>p[1]>0);
-  if(!phases.length)return;
-  let pi=0,sec=0;const btn=$("tempo-btn");if(btn)btn.textContent="⏸ Stop";
-  const apply=()=>{const ph=phases[pi];const dot=$("tempo-dot"),lab=$("tempo-phase");if(dot)dot.style.transform=`scale(${ph[2]})`;if(lab)lab.textContent=ph[0];beep(ph[0]==="UP"?740:ph[0]==="DOWN"?440:560);haptic("tap");};
-  apply();
-  state._tempoInt=setInterval(()=>{sec++;if(sec>=phases[pi][1]){sec=0;pi=(pi+1)%phases.length;apply();}},1000);
-}
-function stopTempo(){if(state._tempoInt){clearInterval(state._tempoInt);state._tempoInt=null;}const btn=$("tempo-btn");if(btn)btn.textContent="▶ Start cadence";const lab=$("tempo-phase");if(lab)lab.textContent="READY";const dot=$("tempo-dot");if(dot)dot.style.transform="scale(1)";}
 
 /* ---- 7) Random Patrol (workout roulette) ---- */
 function openRoulette(){
@@ -10159,24 +9439,6 @@ function openRoulette(){
 }
 
 /* ---- 8) This Day (time machine) ---- */
-function nearestWorkout(daysAgo){
-  const target=now()-daysAgo*864e5;let best=null,bd=Infinity;
-  state.data.workouts.forEach(w=>{const t=new Date(w.date).getTime();const d=Math.abs(t-target);if(d<bd&&d<11*864e5){bd=d;best=w;}});
-  return best;
-}
-function openTimeMachine(){
-  const marks=[[7,"A week ago"],[30,"A month ago"],[90,"3 months ago"],[365,"A year ago"]];
-  const blocks=marks.map(([dd,label])=>{const w=nearestWorkout(dd);if(!w)return "";
-    const dt=new Date(w.date);const ex=(w.exercises||[]).slice(0,4).map(e=>esc(e.name)).join(", ");const more=(w.exercises||[]).length>4?"…":"";
-    return `<div class="card" style="padding:13px"><div class="row sp"><b style="font-size:14px;color:var(--gold2)">${label}</b><span class="mini" style="color:var(--text3)">${dt.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}</span></div>
-      <div class="mini" style="color:var(--text2);margin-top:4px">${esc(w.split||w.name||"Session")} · ${fmtNum(Math.round(w.totalVol||0))}kg</div>
-      ${ex?`<div class="mini" style="color:var(--text3);margin-top:3px">${ex}${more}</div>`:""}</div>`;
-  }).filter(Boolean).join("");
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🗓️ This Day</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 12px">Look back. The closest session to each milestone — proof of how far you've come.</div>
-    ${blocks||'<p class="mini" style="color:var(--text3);padding:8px 0">Not enough history yet — keep logging and the time machine fills up.</p>'}
-    <button class="btn" style="margin-top:12px" onclick="closeOverlay()">Close</button>`;
-}
 
 /* ---- 9) Pre-Patrol Hype ---- */
 function openHype(){
@@ -10200,41 +9462,6 @@ function runHype(){
 function stopHype(){(state._hypeT||[]).forEach(clearTimeout);state._hypeT=[];}
 
 /* ---- 10) Fuel Math (TDEE & macro estimator) ---- */
-function tdeeState(){return state._tdee||(state._tdee={w:Math.round(bodyW()),h:178,age:28,sex:1,act:1.55,goal:0});}
-function setTDEE(k,v){const t=tdeeState();t[k]=parseFloat(v);drawTDEE();}
-function tdeeSex(s){tdeeState().sex=s;drawTDEE();}
-function tdeeCalc(){const t=tdeeState();const bmr=10*t.w+6.25*t.h-5*t.age+(t.sex?5:-161);const tdee=bmr*t.act;const target=tdee+t.goal;const protein=Math.round(t.w*2.0);const fat=Math.round(t.w*0.9);const carbs=Math.max(0,Math.round((target-protein*4-fat*9)/4));return {bmr:Math.round(bmr),tdee:Math.round(tdee),target:Math.round(target),protein,fat,carbs};}
-function drawTDEE(){
-  const t=tdeeState();const r=tdeeCalc();const el=$("tdee-out");if(!el)return;
-  const wv=$("tdee-w-v"),hv=$("tdee-h-v"),av=$("tdee-age-v"),actv=$("tdee-act-v"),gv=$("tdee-goal-v");
-  if(wv)wv.textContent=t.w+"kg";if(hv)hv.textContent=t.h+"cm";if(av)av.textContent=t.age;
-  if(actv)actv.textContent=["sedentary","light","moderate","active","athlete"][Math.round((t.act-1.2)/0.175)]||"moderate";
-  if(gv)gv.textContent=(t.goal>0?"+":"")+t.goal+" kcal";
-  const sm=$("tdee-sex-m"),sf=$("tdee-sex-f");if(sm)sm.className="btn "+(t.sex?"gold":"ghost")+" sm";if(sf)sf.className="btn "+(t.sex?"ghost":"gold")+" sm";
-  el.innerHTML=`<div class="center" style="text-align:center;margin:4px 0"><div style="font-size:38px;font-family:var(--disp);font-weight:700;color:var(--gold2)">${fmtNum(r.target)}</div><div class="mini" style="color:var(--text2)">target kcal/day · maintenance ${fmtNum(r.tdee)}</div></div>
-    <div class="grid2" style="margin-top:8px"><div class="card" style="padding:11px;text-align:center"><div style="font-size:18px;font-weight:700;color:#FF8A7A">${r.protein}g</div><div class="mini" style="color:var(--text3)">Protein</div></div>
-    <div class="card" style="padding:11px;text-align:center"><div style="font-size:18px;font-weight:700;color:#7FC8FF">${r.carbs}g</div><div class="mini" style="color:var(--text3)">Carbs</div></div>
-    <div class="card" style="padding:11px;text-align:center"><div style="font-size:18px;font-weight:700;color:#E8C56A">${r.fat}g</div><div class="mini" style="color:var(--text3)">Fat</div></div>
-    <div class="card" style="padding:11px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--text2)">${fmtNum(r.bmr)}</div><div class="mini" style="color:var(--text3)">BMR</div></div></div>`;
-}
-function openTDEE(){return openFuel();} // merged — single calorie/macro calculator (Fuel protocol)
-function _openTDEE_legacy(){
-  const t=tdeeState();
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🍳 Fuel Math</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 12px">Mifflin-St Jeor estimate — your maintenance calories and a macro split to hit them.</div>
-    <div class="card" style="padding:14px">
-      <div class="row g" style="gap:8px;margin-bottom:10px"><button id="tdee-sex-m" class="btn gold sm" onclick="tdeeSex(1)">♂ Male</button><button id="tdee-sex-f" class="btn ghost sm" onclick="tdeeSex(0)">♀ Female</button></div>
-      <div class="row sp"><span class="mini">Weight</span><span class="mini" id="tdee-w-v" style="color:var(--gold2)">${t.w}kg</span></div><input type="range" min="40" max="160" step="1" value="${t.w}" oninput="setTDEE('w',this.value)" style="width:100%;accent-color:var(--gold2);margin:3px 0 9px">
-      <div class="row sp"><span class="mini">Height</span><span class="mini" id="tdee-h-v" style="color:var(--gold2)">${t.h}cm</span></div><input type="range" min="140" max="210" step="1" value="${t.h}" oninput="setTDEE('h',this.value)" style="width:100%;accent-color:var(--gold2);margin:3px 0 9px">
-      <div class="row sp"><span class="mini">Age</span><span class="mini" id="tdee-age-v" style="color:var(--gold2)">${t.age}</span></div><input type="range" min="14" max="80" step="1" value="${t.age}" oninput="setTDEE('age',this.value)" style="width:100%;accent-color:var(--gold2);margin:3px 0 9px">
-      <div class="row sp"><span class="mini">Activity</span><span class="mini" id="tdee-act-v" style="color:var(--gold2)">moderate</span></div><input type="range" min="1.2" max="1.9" step="0.175" value="${t.act}" oninput="setTDEE('act',this.value)" style="width:100%;accent-color:var(--gold2);margin:3px 0 9px">
-      <div class="row sp"><span class="mini">Goal adjust</span><span class="mini" id="tdee-goal-v" style="color:var(--gold2)">0 kcal</span></div><input type="range" min="-700" max="500" step="50" value="${t.goal}" oninput="setTDEE('goal',this.value)" style="width:100%;accent-color:var(--gold2);margin:3px 0 0">
-    </div>
-    <div class="card" style="padding:14px;margin-top:10px" id="tdee-out"></div>
-    <div class="mini" style="color:var(--text3);margin-top:8px">Estimate only — adjust by 100-200 kcal after two weeks based on the scale & the mirror.</div>
-    <button class="btn" style="margin-top:12px" onclick="closeOverlay()">Close</button>`;
-  drawTDEE();
-}
 
 /* ---- 11) Combo Trainer (MMA) ---- */
 const STRIKES=["Jab","Cross","Lead Hook","Rear Hook","Lead Uppercut","Rear Uppercut","Jab to Body","Cross to Body","Low Kick","Body Kick","Head Kick","Lead Teep","Switch Kick","Rear Knee","Lead Elbow","Slip & Counter"];
@@ -10624,7 +9851,6 @@ function renderAlfred(){
 function gtv2Clr(kind){
   return kind==="red"?"#ff887f":kind==="green"?"#75e5a5":kind==="blue"?"#9fd0ff":kind==="gold"?"var(--gold2)":"var(--text2)";
 }
-function gtv2Pct(v){return clamp(Math.round(v||0),0,100);}
 function gtv2Stimulus(m){
   const ws=weeklySets(m),vl=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m);
   if(ws<=0)return {zone:"Silent",kind:"",text:"no sets this week"};
