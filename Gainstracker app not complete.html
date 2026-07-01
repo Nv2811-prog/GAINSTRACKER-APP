@@ -136,10 +136,13 @@ padding:7px 9px calc(9px + env(safe-area-inset-bottom));background:linear-gradie
 .subtab.on{color:var(--gold2);background:var(--gold-bg);box-shadow:inset 0 0 0 1px var(--gold-dim)}
 .subtab:active{transform:scale(.97)}
 /* Accordion sections — expand/collapse for dense areas */
-.accsec{border:1px solid var(--border);border-radius:15px;margin-bottom:12px;overflow:hidden;background:linear-gradient(160deg,#121217,#0d0d11)}
+.accsec{border:1px solid rgba(242,208,121,.26);border-radius:15px;margin-bottom:12px;overflow:hidden;position:relative;
+  background:radial-gradient(ellipse 80% 60% at 0% 0%,rgba(242,208,121,.07),transparent 58%),linear-gradient(160deg,rgba(24,28,40,.96),rgba(9,11,17,.98));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(242,208,121,.06),0 14px 34px -18px rgba(0,0,0,.9),0 0 24px -14px rgba(242,208,121,.35)}
+.accsec::before{content:"";position:absolute;left:12px;right:12px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,208,72,.5),transparent);pointer-events:none}
 .acc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 15px;cursor:pointer;user-select:none}
-.acc-head:active{background:rgba(235,199,107,.05)}
-.acc-head .acc-ttl{display:flex;align-items:center;gap:9px;font-family:var(--disp);font-size:15px;letter-spacing:.02em;color:var(--gold2)}
+.acc-head:active{background:rgba(235,199,107,.07)}
+.acc-head .acc-ttl{display:flex;align-items:center;gap:9px;font-family:var(--disp);font-size:15px;letter-spacing:.02em;color:var(--gold2);text-shadow:0 0 14px rgba(255,208,72,.35)}
 .acc-head .acc-sub{font-size:11px;color:var(--text3);font-family:var(--sans);letter-spacing:0}
 .acc-arrow{color:var(--text3);font-size:13px;transition:transform .22s ease;display:inline-block}
 .acc-arrow.cl{transform:rotate(-90deg)}
@@ -8412,16 +8415,16 @@ function renderAllies(){
   const lbSub=board.length>1?('#'+myRank+' of '+board.length):'just you';
   const raidSub=r?(Math.round(rp.pct)+'% vs '+esc(r.boss)):'team boss';
   const sparSub=rv?('vs '+esc(rv.name||'rival')):'1-v-1';
-  const tile=(onclick,icon,label,sub,hot)=>`<div style="background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(10,10,14,.85));border:1px solid rgba(255,255,255,.09);border-radius:12px;cursor:pointer;padding:14px 12px;text-align:center" onclick="${onclick}">
-    <div style="font-size:24px;line-height:1;margin-bottom:5px">${icon}</div>
-    <div style="font-family:var(--disp);font-size:13px;color:var(--text);margin-bottom:4px">${label}</div>
+  const tile=(onclick,icon,label,sub,ac,hot)=>`<div style="background:radial-gradient(ellipse 90% 70% at 50% 0%,${ac}1c,transparent 62%),linear-gradient(160deg,rgba(255,255,255,.04),rgba(10,10,14,.9));border:1px solid ${ac}55;border-radius:14px;cursor:pointer;padding:14px 12px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 22px -10px ${ac}" onclick="${onclick}">
+    <div style="font-size:26px;line-height:1;margin-bottom:6px;filter:drop-shadow(0 0 10px ${ac})">${icon}</div>
+    <div style="font-family:var(--disp);font-size:14px;color:${ac};letter-spacing:.05em;text-shadow:0 0 12px ${ac}66;margin-bottom:4px">${label}</div>
     <span class="chip ${hot?'on':''}" style="font-size:10px">${sub}</span></div>`;
   html+=`<div style="font-family:var(--disp);font-size:11px;letter-spacing:.15em;color:var(--text3);margin:14px 0 8px">🧰 LEAGUE TOOLS</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      ${tile('openLeaderboard()','🏆','Leaderboard',lbSub,myRank===1&&board.length>1)}
-      ${tile('openRaid()','⚔️','Co-op Raid',raidSub,!!r)}
-      ${tile('openSparring()','🥊','Sparring',sparSub,!!rv)}
-      ${tile('openJusticeLeague()','🛠️','Splits & Backups',allies.length+' all'+(allies.length===1?'y':'ies'))}
+      ${tile('openLeaderboard()','🏆','Leaderboard',lbSub,'#FFD048',myRank===1&&board.length>1)}
+      ${tile('openRaid()','⚔️','Co-op Raid',raidSub,'#FF5A4C',!!r)}
+      ${tile('openSparring()','🥊','Sparring',sparSub,'#FF8C22',!!rv)}
+      ${tile('openJusticeLeague()','🛠️','Splits & Backups',allies.length+' all'+(allies.length===1?'y':'ies'),'#3C96FF')}
     </div>`;
 
   $("app").innerHTML=html;
@@ -11302,7 +11305,7 @@ function renderLogging(){
     </div>`;
     h+=`</div>`; // close .log-focus
   }else{
-    h+=`<div class="empty-state" style="padding:36px 14px 24px"><div class="es-icon">🏋️</div><div class="es-title">ADD YOUR WEAPON</div><div class="es-body">Tap + below to add the first exercise. Gotham is watching.</div></div>`;
+    h+=`<div class="empty-state" style="padding:26px 14px 24px"><div style="height:150px;filter:drop-shadow(0 0 22px rgba(232,197,106,.35))">${suitFigure("front",m=>({fill:"#E8C56A",op:".16"}),"height:150px;width:auto;display:block;margin:0 auto")}</div><div class="es-title" style="margin-top:8px">ADD YOUR WEAPON</div><div class="es-body">Tap + below to add the first exercise. Gotham is watching.</div></div>`;
   }
 
   // Alfred coach line
@@ -11638,7 +11641,7 @@ function renderLogging(){
     </div>`;
     h+=`</div>`; // close .log-focus
   }else{
-    h+=`<div class="empty-state" style="padding:36px 14px 24px"><div class="es-icon">🏋️</div><div class="es-title">ADD YOUR WEAPON</div><div class="es-body">Tap + below to add the first exercise. Gotham is watching.</div></div>`;
+    h+=`<div class="empty-state" style="padding:26px 14px 24px"><div style="height:150px;filter:drop-shadow(0 0 22px rgba(232,197,106,.35))">${suitFigure("front",m=>({fill:"#E8C56A",op:".16"}),"height:150px;width:auto;display:block;margin:0 auto")}</div><div class="es-title" style="margin-top:8px">ADD YOUR WEAPON</div><div class="es-body">Tap + below to add the first exercise. Gotham is watching.</div></div>`;
   }
 
   // Alfred coach
