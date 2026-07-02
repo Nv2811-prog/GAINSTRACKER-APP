@@ -106,6 +106,16 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 .stg-title{font-family:var(--disp);font-size:40px;letter-spacing:.14em;margin-top:14px;animation:stgSlam .6s .12s cubic-bezier(.2,1.4,.4,1) both}
 .stg-sub{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--text2);margin-top:8px;animation:stgIn .5s .4s both}
 @keyframes stgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* ===== KO CAM — slow-mo finish replay ===== */
+#kocam{position:fixed;inset:0;z-index:230;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;
+  background:radial-gradient(ellipse 90% 70% at 50% 45%,rgba(40,6,4,.94),rgba(2,3,6,.98));animation:stgFade 1.65s ease-in-out forwards}
+.koc-lines{position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.09) 0deg 2deg,transparent 2deg 14deg);animation:kocSpin 1.6s linear forwards;opacity:.5}
+@keyframes kocSpin{from{transform:rotate(0deg) scale(1.4)}to{transform:rotate(14deg) scale(1)}}
+.koc-face{width:150px;height:150px;animation:kocFall 1.5s cubic-bezier(.3,.6,.4,1) forwards;filter:drop-shadow(0 0 34px rgba(255,54,34,.6))}
+.koc-face img.vface,.koc-face .vface{width:150px;height:150px;font-size:90px}
+@keyframes kocFall{0%{transform:scale(1.7) rotate(0deg);filter:grayscale(0)}55%{transform:scale(1.15) rotate(9deg) translateY(14px)}100%{transform:scale(1) rotate(17deg) translateY(46px);filter:grayscale(1) brightness(.7)}}
+.koc-txt{position:absolute;font-family:var(--disp);font-size:110px;letter-spacing:.06em;color:#FF3622;text-shadow:0 0 44px rgba(255,54,34,.8),0 4px 0 #7a0e06;animation:stgSlam .5s .5s cubic-bezier(.2,1.5,.4,1) both}
+.koc-fin{position:absolute;bottom:14%;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--text2);animation:stgIn .4s .8s both}
 /* alive hero backdrops — slow breathing pan so the top of a tab feels in motion */
 @keyframes hsBreathe{0%{transform:scale(1) translateX(0)}100%{transform:scale(1.07) translateX(-8px)}}
 .gtv2-hero-img{animation:hsBreathe 12s ease-in-out infinite alternate}
@@ -1691,7 +1701,7 @@ const SCIENCE_LIBRARY=[
 // boss roster keyed by improvement %
 /* Roster trimmed to rogues you have real mugshots for (Mr. Freeze kept — famous, add a pic and it lights up). */
 const BOSSES=[{v:"Penguin",e:"🐧",c:"#4a6a8a",q:"Waddled into the wrong gym, Cobblepot.",min:0},{v:"Catwoman",e:"🐱",c:"#9c5ce8",q:"She steals everything. You just stole a PR from your past self.",min:8},{v:"Scarecrow",e:"🎃",c:"#c97a2a",q:"He weaponizes fear. You weaponized iron.",min:15},{v:"Riddler",e:"❓",c:"#3ca84c",q:"Riddle me this: how much can you lift? More than last time.",min:22},{v:"Harley Quinn",e:"🃏",c:"#e84c8c",q:"Mistah J would be proud. You absolutely wrecked it.",min:28},{v:"Poison Ivy",e:"🌿",c:"#2eae5c",q:"Her thorns spread fast — but not faster than your gains.",min:35},{v:"Man-Bat",e:"🦇",c:"#6a5a8a",q:"Half man, half bat, all defeated by your discipline.",min:42},{v:"Hugo Strange",e:"🧠",c:"#8a6a4a",q:"He profiled the Bat. He never profiled this work ethic.",min:48},{v:"Carmine Falcone",e:"🕴️",c:"#8a7a5a",q:"The Roman ran Gotham's underworld. You just ran a new record.",min:54},{v:"Two-Face",e:"🪙",c:"#c9a84c",q:"Heads you win. Tails you win. There was never a loss.",min:70},{v:"Ra's al Ghul",e:"⚔️",c:"#2eae5c",q:"The League trained for centuries. You trained for this moment.",min:82},{v:"Bane",e:"💉",c:"#e8453c",q:"He broke the Bat's back. You just broke your own record.",min:95},{v:"Joker",e:"🃏",c:"#5cae3c",q:"Why so serious? Because no one's laughing at this PR.",min:115}];
-const NEMESIS_MAP={chest:{villain:"Bane",quote:"The chest is the shield of Gotham's hero. Yours is paper."},back:{villain:"Riddler",quote:"Strong in front. Empty behind. I wonder what that says about you."},quads:{villain:"Penguin",quote:"You look impressive until you stand up. Train the legs."},shoulders:{villain:"Scarecrow",quote:"Wide shoulders inspire fear. Narrow ones inspire pity."},biceps:{villain:"Joker",quote:"Big chest, tiny arms. The joke writes itself."},triceps:{villain:"Joker",quote:"Arms that press but can't extend. Half a weapon."},abs:{villain:"Two-Face",quote:"Half the work done. Half neglected. Which side are you?"},hamstrings:{villain:"Bane",quote:"Your quads push. Your hamstrings surrender. Fix it."},glutes:{villain:"Penguin",quote:"Power comes from the posterior chain. Yours has gone missing."},calves:{villain:"Killer Croc",quote:"Even Croc has better calf development. Sort it out."},traps:{villain:"Deathstroke",quote:"A warrior's traps carry the weight of battle. Yours carry nothing."},forearms:{villain:"Catwoman",quote:"Grip is everything in Gotham. You'd drop the grappling hook."}};
+const NEMESIS_MAP={chest:{villain:"Bane",quote:"The chest is the shield of Gotham's hero. Yours is paper."},back:{villain:"Riddler",quote:"Strong in front. Empty behind. I wonder what that says about you."},quads:{villain:"Penguin",quote:"You look impressive until you stand up. Train the legs."},shoulders:{villain:"Scarecrow",quote:"Wide shoulders inspire fear. Narrow ones inspire pity."},biceps:{villain:"Joker",quote:"Big chest, tiny arms. The joke writes itself."},triceps:{villain:"Joker",quote:"Arms that press but can't extend. Half a weapon."},abs:{villain:"Two-Face",quote:"Half the work done. Half neglected. Which side are you?"},hamstrings:{villain:"Bane",quote:"Your quads push. Your hamstrings surrender. Fix it."},glutes:{villain:"Penguin",quote:"Power comes from the posterior chain. Yours has gone missing."},calves:{villain:"Man-Bat",quote:"The bat of the night launches skyward on his calves. Yours couldn't clear a curb."},traps:{villain:"Ra's al Ghul",quote:"A warrior's traps carry the weight of battle. Yours carry nothing."},forearms:{villain:"Catwoman",quote:"Grip is everything in Gotham. You'd drop the grappling hook."}};
 
 const EXP_FILL={RECRUIT:{chest:800,back:700,shoulders:600,biceps:400,triceps:400,forearms:200,quads:1200,hamstrings:600,glutes:500,calves:300,abs:400,traps:250},VIGILANTE:{chest:30000,back:26000,shoulders:22000,biceps:14000,triceps:14000,forearms:6000,quads:45000,hamstrings:22000,glutes:18000,calves:11000,abs:15000,traps:9000},DARK_KNIGHT:{chest:75000,back:65000,shoulders:55000,biceps:35000,triceps:35000,forearms:15000,quads:110000,hamstrings:55000,glutes:45000,calves:27000,abs:38000,traps:22000}};
 
@@ -3132,7 +3142,9 @@ const VILLAIN_IMG_DEFAULT={
   "Ra's al Ghul":"Ras%20a%20gul.jpg",
   "Catwoman":"Catwoman.jpg",
   "Man-Bat":"man%20bat.jpg",
-  "Carmine Falcone":"Carmine_Falcone_%28circa_2014%29.png"
+  "Carmine Falcone":"Carmine_Falcone_%28circa_2014%29.png",
+  "Joe Chill":"Joe_Chill_%28DC_Comics_character%29.png",
+  "Calendar Man":"Calendarman.avif"
 };
 function villainImgUrl(v){const m=state.data.villainImg||{};return m[v]||VILLAIN_IMG_DEFAULT[v]||"";}
 function villainFace(b){
@@ -3194,16 +3206,25 @@ function villainIntroForDay(){
 function pickBoss(prs){
   if(!prs.length)return null;
   const top=prs.slice().sort((a,b)=>(b.improve||(b.first?9999:0))-(a.improve||(a.first?9999:0)))[0];
-  // specials
-  if(prs.length>=3)return Object.assign({},{v:"Hush",e:"🩹",c:"#b0b0b0",q:"Tommy Elliot planned everything. So did you. All of it worked."},{pr:top});
+  // never repeat a villain within one workout — the night has a full rogues' gallery
+  const fought=(state.session&&(state.session._fought=state.session._fought||[]))||[];
+  const fresh=BOSSES.filter(x=>!fought.includes(x.v));
+  const pool=fresh.length?fresh:BOSSES;
+  const imp=top.first?12:top.improve;
+  const tierPick=()=>{let b=pool[0];for(const x of pool)if(imp>=x.min)b=x;return b;};
+  // GANG-UP: 3+ records in one session → the rogues jump you together
+  if(prs.length>=3){
+    const main=tierPick();
+    const others=pool.filter(x=>x.v!==main.v).slice(-4).slice(0,2);
+    return Object.assign({},main,{pr:top,gang:others,q:"They came together. They fall together."});
+  }
+  // specials — pictured villains only
   if(state.data.bossWins.length===0&&top.first)return Object.assign({},{v:"Joe Chill",e:"🔫",c:"#6a6a6a",q:"He created Batman by taking everything. You just took a PR."},{pr:top});
   if(top.r&&top.w>=bodyW())return Object.assign({},{v:"Hugo Strange",e:"🧠",c:"#7a5ca8",q:"He studied Batman for years. Your body just studied gravity and won."},{pr:top});
-  if(/deadlift/i.test(top.name))return Object.assign({},{v:"Clayface",e:"🪨",c:"#8a6a4a",q:"Shapeshifter meets immovable iron. Iron wins."},{pr:top});
-  if((top.ex.p||[]).some(m=>["quads","hamstrings","glutes","calves"].includes(m))&&top.first)return Object.assign({},{v:"Killer Croc",e:"🐊",c:"#4a7a3a",q:"Croc lives underground. Your quads just moved mountains."},{pr:top});
+  if(/deadlift/i.test(top.name)&&!fought.includes("Bane"))return Object.assign({},{v:"Bane",e:"💉",c:"#e8453c",q:"He breaks backs. Yours just picked the whole city up."},{pr:top});
+  if((top.ex.p||[]).some(m=>["quads","hamstrings","glutes","calves"].includes(m))&&top.first)return Object.assign({},{v:"Poison Ivy",e:"🌿",c:"#2eae5c",q:"Robinson Park was her territory. Your legs just repossessed it."},{pr:top});
   if(new Date().getDay()===1)return Object.assign({},{v:"Calendar Man",e:"📅",c:"#c98a3a",q:"Julian Day marks every date. Today's date: NEW PR."},{pr:top});
-  const imp=top.first?12:top.improve;
-  let b=BOSSES[0];for(const x of BOSSES)if(imp>=x.min)b=x;
-  return Object.assign({},b,{pr:top});
+  return Object.assign({},tierPick(),{pr:top});
 }
 
 /* ========================= BOSS FIGHT UI (animated MMA) ========================= */
@@ -3224,17 +3245,22 @@ const KO_FINISH=[
 function showBossFight(boss,onDone){
   state._bossDone=onDone;state._bossActive=true;
   let hp=100,n=0;
+  // remember everyone in this bout so the next PR tonight summons someone NEW
+  try{const f=state.session._fought=state.session._fought||[];
+    f.push(boss.v);(boss.gang||[]).forEach(g=>f.push(g.v));}catch(e){}
+  const isGang=!!(boss.gang&&boss.gang.length);
+  const gangNames=isGang?[boss.v].concat(boss.gang.map(g=>g.v)):null;
   // Lower per-hit damage so the fight lasts 4–6 strikes — slower, with build-up and drama.
   const dmgPer=boss.pr.first?22:clamp(15+(boss.pr.improve||6)*0.6,15,23);
   $("ovcard").innerHTML=`
     <div class="center">
-      <div class="roundbadge">● LIVE · THE OCTAGON</div>
-      <div class="bossname" style="margin:2px 0 1px">${esc(boss.v)}</div>
+      <div class="roundbadge" ${isGang?'style="color:var(--red);border-color:var(--red)"':''}>● LIVE · ${isGang?'3-ON-1 AMBUSH':'THE OCTAGON'}</div>
+      <div class="bossname" style="margin:2px 0 1px">${esc(isGang?gangNames.join(" · "):boss.v)}</div>
       <div class="bossquote" style="margin:0 0 8px">"${esc(boss.q)}"</div>
       <div class="fightstage" id="fstage">
         <div class="flash" id="fflash"></div>
         <div class="fighter hero" id="fhero">🦇</div>
-        <div class="fighter boss" id="fboss">${villainFace(boss)}</div>
+        <div class="fighter boss" id="fboss" ${isGang?'style="display:flex;gap:2px;align-items:center"':''}>${villainFace(boss)}${isGang?boss.gang.map(g=>`<span style="transform:scale(.72);margin-left:-14px">${villainFace(g)}</span>`).join(""):""}</div>
         <div class="strikemoji" id="fstrike"></div>
       </div>
       <div class="hpwrap" style="margin-top:10px"><i id="fhp" style="width:100%;background:linear-gradient(90deg,${boss.c},#ff8c7c)"></i></div>
@@ -3271,12 +3297,13 @@ function showBossFight(boss,onDone){
       clearTimeout(state._bossT);
       re(stage,"komode");screenFlash();spawn("shockwave");   // slow-mo finish + screen flash
       if(navigator.vibrate)navigator.vibrate([40,60,160]);
-      setTimeout(()=>bossVictory(boss,KO_FINISH[Math.floor(Math.random()*KO_FINISH.length)]),1150);
+      const fin=KO_FINISH[Math.floor(Math.random()*KO_FINISH.length)];
+      setTimeout(()=>showKOCam(boss,fin,()=>bossVictory(boss,fin)),750);
     } else {
       state._bossT=setTimeout(strike,1050);   // slower cadence = more tension
     }
   };
-  const skip=()=>{clearTimeout(state._bossT);const bossEl=$("fboss"),stage=$("fstage");re(bossEl,"ko");re(stage,"komode");screenFlash();if($("fhp"))$("fhp").style.width="0%";const btn=$("atkbtn");if(btn)btn.disabled=true;haptic("ko");beep(990);setTimeout(()=>bossVictory(boss,KO_FINISH[Math.floor(Math.random()*KO_FINISH.length)]),820);};
+  const skip=()=>{clearTimeout(state._bossT);const bossEl=$("fboss"),stage=$("fstage");re(bossEl,"ko");re(stage,"komode");screenFlash();if($("fhp"))$("fhp").style.width="0%";const btn=$("atkbtn");if(btn)btn.disabled=true;haptic("ko");beep(990);const fin=KO_FINISH[Math.floor(Math.random()*KO_FINISH.length)];setTimeout(()=>showKOCam(boss,fin,()=>bossVictory(boss,fin)),600);};
   const ab=$("atkbtn");if(ab)ab.onclick=skip;
   openOverlay();
   clearTimeout(state._bossT);
@@ -3296,10 +3323,35 @@ function confettiBurst(){
   host.appendChild(layer);
   setTimeout(()=>layer.remove(),3400);
 }
+/* KO CAM — slow-mo replay of the finish: villain face drops through frame, K.O. slams in. */
+function showKOCam(boss,fin,then){
+  try{
+    const old=document.getElementById('kocam');if(old)old.remove();
+    const el=document.createElement('div');el.id='kocam';
+    el.innerHTML=`<div class="koc-lines"></div>
+      <div class="koc-face">${villainFace(boss)}</div>
+      <div class="koc-txt">K.O.</div>
+      <div class="koc-fin">${esc((fin&&fin.t)||"KNOCKOUT")} · KO CAM</div>`;
+    document.body.appendChild(el);
+    try{haptic('ko');}catch(e){}try{beep(180);}catch(e){}
+    setTimeout(()=>{try{el.remove();}catch(e){}if(then)then();},1650);
+  }catch(e){if(then)then();}
+}
 function bossVictory(boss,ko){
   ko=ko||KO_FINISH[0];
   confettiBurst();
   state.data.bossWins.push({villain:boss.v,ex:boss.pr.name,w:boss.pr.w,r:boss.pr.r,orm:Math.round(boss.pr.orm),prevOrm:Math.round(boss.pr.prevOrm),date:new Date().toISOString()});
+  (boss.gang||[]).forEach(g=>state.data.bossWins.push({villain:g.v,ex:boss.pr.name,w:boss.pr.w,r:boss.pr.r,orm:Math.round(boss.pr.orm),prevOrm:Math.round(boss.pr.prevOrm),date:new Date().toISOString()}));
+  // Beating a villain has stakes: sometimes he vows to RETURN, demanding you beat this weight again +2.5%.
+  let vow="";
+  if(!boss.pr.first&&!boss.gang&&Math.random()<0.35){
+    state.data.bossReturns=state.data.bossReturns||[];
+    if(!state.data.bossReturns.some(b=>!b.defeated&&b.villain===boss.v)){
+      const tw=Math.round(boss.pr.w*1.025*2)/2;
+      state.data.bossReturns.push({villain:boss.v,ex:boss.pr.name,targetW:tw,defeated:false,date:new Date().toISOString()});
+      vow=`<div class="mini" style="margin-top:7px;color:var(--red)">👁️ "${esc(boss.v)}" vows to RETURN — put up ${tw}kg on ${esc(boss.pr.name)} to end him for good.</div>`;
+    }
+  }
   checkAchievements();checkUnlocks();save();
   if(navigator.vibrate)navigator.vibrate([60,40,120,40,200]);beep(990);
   const _d=new Date();const caseNo="GC-"+String(_d.getFullYear()).slice(2)+("0"+(_d.getMonth()+1)).slice(-2)+("0"+_d.getDate()).slice(-2)+"-"+(1000+((state.data.bossWins.length*37)%9000));
@@ -3309,16 +3361,19 @@ function bossVictory(boss,ko){
       <div class="vrule"></div>
       <div class="vflash"></div>
       <div class="vpanels">
-        <div class="vpanel"><div class="vplabel">FRONT</div>${villainImgUrl(boss.v)?`<img class="vface" src="${esc(villainImgUrl(boss.v))}" alt="${esc(boss.v)}">`:`<div class="vface">${boss.e}</div>`}</div>
-        <div class="vpanel"><div class="vplabel">PROFILE</div>${villainImgUrl(boss.v)?`<img class="vface side" src="${esc(villainImgUrl(boss.v))}" alt="">`:`<div class="vface side">${boss.e}</div>`}</div>
+        ${boss.gang&&boss.gang.length
+          ?[boss].concat(boss.gang).map(g=>`<div class="vpanel"><div class="vplabel">${esc(g.v.toUpperCase()).slice(0,12)}</div>${villainImgUrl(g.v)?`<img class="vface" src="${esc(villainImgUrl(g.v))}" alt="${esc(g.v)}">`:`<div class="vface">${g.e}</div>`}</div>`).join("")
+          :`<div class="vpanel"><div class="vplabel">FRONT</div>${villainImgUrl(boss.v)?`<img class="vface" src="${esc(villainImgUrl(boss.v))}" alt="${esc(boss.v)}">`:`<div class="vface">${boss.e}</div>`}</div>
+        <div class="vpanel"><div class="vplabel">PROFILE</div>${villainImgUrl(boss.v)?`<img class="vface side" src="${esc(villainImgUrl(boss.v))}" alt="">`:`<div class="vface side">${boss.e}</div>`}</div>`}
       </div>
       <div class="vslate"><b>GCPD</b><span>${esc((boss.pr.name||"").toUpperCase()).slice(0,18)}</span><span class="vcase">${caseNo}</span></div>
       <div class="vstamp">DEFEATED</div>
     </div>
-    <div class="vname2" style="color:${boss.c}">${esc(boss.v)}</div>
-    <div class="vsub">DOWN FOR THE COUNT</div>
+    <div class="vname2" style="color:${boss.c}">${esc(boss.gang&&boss.gang.length?"THE GANG":boss.v)}</div>
+    <div class="vsub">${boss.gang&&boss.gang.length?"AMBUSH DISMANTLED · ALL DOWN":"DOWN FOR THE COUNT"}</div>
     <div class="muted" style="margin:9px 6px 3px;font-style:italic">${esc(ko.l)}</div>
-    <div class="mini" style="margin-bottom:13px">${esc(boss.v)} falls. Gotham is safer tonight.</div>
+    <div class="mini" style="margin-bottom:13px">${esc(boss.gang&&boss.gang.length?[boss.v].concat(boss.gang.map(g=>g.v)).join(", ")+" — all of them fall":boss.v+" falls")}. Gotham is safer tonight.</div>
+    ${vow}
     <div class="card" style="text-align:left">
       <div class="row sp"><span class="muted">Lift</span><b>${esc(boss.pr.name)}</b></div>
       <div class="row sp"><span class="muted">New 1RM (est.)</span><b class="gold">${Math.round(boss.pr.orm)}kg</b></div>
