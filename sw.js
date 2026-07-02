@@ -5,7 +5,7 @@
 
    IMPORTANT: this only manages the Cache Storage of fetched files. It NEVER touches
    localStorage, where all your workouts, PRs, splits and progress live — your data is safe. */
-const RUNTIME = 'gt-runtime-v1';
+const RUNTIME = 'gt-runtime-v2';
 
 self.addEventListener('install', () => {
   // Take over as soon as possible instead of waiting for all tabs to close.
@@ -25,8 +25,10 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith((async () => {
     try {
-      // Always try the network first so updates land immediately.
-      const fresh = await fetch(e.request);
+      // Always try the network first so updates land immediately. cache:'no-cache' forces a
+      // revalidation with the server (ETag) instead of trusting iOS's sticky HTTP cache —
+      // without it, GitHub Pages' 10-min cache header can serve a stale copy from disk.
+      const fresh = await fetch(e.request, { cache: 'no-cache' });
       try {
         const cache = await caches.open(RUNTIME);
         await cache.put(e.request, fresh.clone());

@@ -10363,7 +10363,8 @@ function openSettings(){
     <button class="btn ghost sm" style="margin-bottom:8px" onclick="exportCSV()">📊 Export workouts (CSV)</button>
     <button class="btn ghost sm" style="margin-bottom:8px" onclick="state.showOnboarding=true;state.obStep=0;state.obTmp={};closeOverlay();render()">Edit hero profile</button>
     <button class="btn danger" onclick="wipeData()">Wipe everything</button>
-    <button class="btn" style="margin-top:10px" onclick="closeOverlay();render()">Done</button>`;
+    <button class="btn" style="margin-top:10px" onclick="closeOverlay();render()">Done</button>
+    <div class="mini center" style="margin-top:10px;color:var(--text3)">Build: ${esc(document.lastModified)} · if this date looks old, close the app fully and reopen on wifi</div>`;
 }
 function u_set(k,v){state.data.u[k]=v;save();}
 function setGemKey(v){if(v.trim())localStorage.setItem("gt_gemini",v.trim());else localStorage.removeItem("gt_gemini");state.data.u.aiKeySet=!!v.trim();save();}
