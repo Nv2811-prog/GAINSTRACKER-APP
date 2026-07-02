@@ -75,6 +75,26 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 /* figure stage: a lit pedestal so the Batsuit pops off the black */
 .stage{position:relative;background:radial-gradient(ellipse 56% 46% at 50% 18%,rgba(150,170,212,.2),transparent 60%),radial-gradient(ellipse 72% 62% at 50% 36%,#2c323f 0%,#13161f 56%,#060708 100%)!important;border:1px solid rgba(201,168,76,.24)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 72px -22px rgba(124,150,255,.2),inset 0 -34px 54px -30px rgba(0,0,0,.72),0 0 0 1px rgba(201,168,76,.1),0 22px 56px -26px rgba(0,0,0,.92)!important}
 .stage::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse 64% 40% at 50% 98%,rgba(232,197,106,.2),transparent 72%),radial-gradient(ellipse 130% 72% at 50% -4%,rgba(0,0,0,.28),transparent 46%)}
+/* ===== GOTHAM LIVE skyline — the city that lives and dies by your training ===== */
+.gcity{padding:0!important}
+.gcity svg{display:block;width:100%}
+@keyframes gcTw{0%,100%{opacity:.22}50%{opacity:.95}}
+.gc-star{animation:gcTw 3.4s ease-in-out infinite}
+@keyframes gcCloud{0%{transform:translateX(-42px)}100%{transform:translateX(64px)}}
+.gc-cloud{animation:gcCloud 28s ease-in-out infinite alternate}
+.gc-cloud.b{animation-duration:41s;animation-direction:alternate-reverse}
+@keyframes gcRainF{0%{transform:translateY(0)}100%{transform:translateY(262px)}}
+.gc-rain line{animation:gcRainF 1.05s linear infinite}
+@keyframes gcSig{0%,100%{opacity:.6}50%{opacity:1}}
+.gc-signal{animation:gcSig 2.8s ease-in-out infinite;cursor:pointer}
+@keyframes gcWin{0%,91%,100%{opacity:.85}94%{opacity:.12}}
+.gc-wf{animation:gcWin 4.8s steps(1) infinite}
+@keyframes gcBeacon{0%,100%{opacity:.95}50%{opacity:.15}}
+.gc-beacon{animation:gcBeacon 1.7s ease-in-out infinite}
+@keyframes gcBat{0%{transform:translate(-70px,8px)}48%{transform:translate(280px,-10px)}100%{transform:translate(640px,6px)}}
+.gc-bat{animation:gcBat 36s linear infinite}
+.gc-bld{cursor:pointer}
+.gc-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 13px;border-top:1px solid rgba(255,255,255,.07)}
 .card h2,.card h3{color:var(--gold2)}
 .ttl{font-family:var(--disp);font-size:15px;letter-spacing:.17em;text-transform:uppercase;color:var(--gold2);opacity:.95;margin-bottom:12px}
 .big{font-family:var(--disp);font-size:58px;color:var(--gold2);line-height:.86;font-variant-numeric:tabular-nums;text-shadow:0 0 22px rgba(255,208,72,.55),0 0 48px rgba(255,208,72,.22)}
@@ -9245,7 +9265,7 @@ function cycleMusclePrio(m){const order=PRIORITIES.map(p=>p.k);const cur=order.i
 
 /* ---- District Control ---- */
 const MUSCLE_DISTRICT={chest:"The Narrows",back:"Bristol Docks",shoulders:"Burnley Heights",biceps:"Otisburg",triceps:"Coventry",forearms:"The Cauldron",quads:"Robinson Park",hamstrings:"Park Row",glutes:"Amusement Mile",calves:"Tricorner Yards",abs:"Old Gotham",traps:"Diamond District"};
-function daysSinceMuscle(m){const t=state.data.muscleLastTrained&&state.data.muscleLastTrained[m];if(!t)return null;const d=(now()-t)/864e5;return isNaN(d)?null:d;}
+function daysSinceMuscle(m){const t=state.data.muscleLastTrained&&state.data.muscleLastTrained[m];if(!t)return null;const d=(now()-new Date(t).getTime())/864e5;return isNaN(d)?null:d;}
 // "crime" = how overdue a muscle is for training, 0 (just trained) → 100 (badly neglected).
 // Guarded at every step so an untrained / unknown sector can NEVER produce NaN.
 function districtCrime(m){
@@ -10011,10 +10031,98 @@ function gtv2OpenProtocolBriefing(){
     ${muscleRows}
     <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
 }
+/* ===== GOTHAM LIVE — animated skyline where every tower is a muscle district.
+   Windows light with weekly sets, towers glow by district crime (training neglect),
+   the Bat-Signal burns when you're primed to train, rain falls when fatigue debt is high.
+   Tap a tower → that muscle's dossier. Tap the signal → start tonight's patrol. ===== */
+function gothamSkylineCard(){
+  const r=patrolReadiness(),f=fatigueDebt(),cc=cityCrime(),band=districtBand(cc);
+  const cur=gtv2CurrentPlanDay();
+  const restNight=!!(cur&&cur.day&&isRest(cur.day));
+  const signalOn=!restNight&&r.score>=55;
+  const startAct=cur&&cur.day&&!restNight?`startWorkout('${cur.sp.id}',${cur.i})`:"freeWorkout()";
+  const W=560,GY=208;
+  let s="";
+  // stars
+  for(let i=0;i<16;i++){const x=(i*97)%548+6,y=(i*61)%74+6,rr=((i%3)*0.4+0.7).toFixed(1);
+    s+=`<circle class="${i%3===0?'gc-star':''}" cx="${x}" cy="${y}" r="${rr}" fill="#cfd8ea" opacity=".5" style="animation-delay:${(i*0.7)%3.4}s"/>`;}
+  // moon
+  s+=`<circle cx="486" cy="34" r="24" fill="#E9EDF4" opacity=".08"/><circle cx="486" cy="34" r="13" fill="#E9EDF4" opacity=".85"/>`;
+  // clouds
+  s+=`<g class="gc-cloud"><ellipse cx="120" cy="46" rx="64" ry="11" fill="#0d1119" opacity=".65"/><ellipse cx="170" cy="38" rx="42" ry="8" fill="#0d1119" opacity=".5"/></g>
+      <g class="gc-cloud b"><ellipse cx="380" cy="58" rx="72" ry="10" fill="#0c1017" opacity=".6"/></g>`;
+  // bat flock
+  const bat=`M0 0 q3 -4.5 6.5 0 q3.5 -4.5 6.5 0 l-6.5 3.5 z`;
+  s+=`<g class="gc-bat" style="animation-delay:0s"><path d="${bat}" fill="#04060a" transform="translate(0,52) scale(.9)"/></g>
+      <g class="gc-bat" style="animation-delay:12s"><path d="${bat}" fill="#04060a" transform="translate(0,34) scale(.6)"/></g>`;
+  // back skyline silhouette
+  let bp=`M0 ${GY}`;for(let k=0;k<14;k++){const bx=k*40,bh=104+((k*29)%54);bp+=` L${bx} ${GY-bh} L${bx+40} ${GY-bh}`;}bp+=` L560 ${GY} Z`;
+  s+=`<path d="${bp}" fill="#0a0d15"/>`;
+  // foreground: 12 muscle towers (6 left, Wayne center, 6 right)
+  const order=M12.slice();
+  order.forEach((m,i)=>{
+    const x=i<6?6+i*41.5:311+(i-6)*41.5;
+    const h=86+((i*47)%72), y=GY-h, w=38, cx2=x+w/2;
+    const dc=districtCrime(m), b=districtBand(dc.crime), hot=dc.crime>=45;
+    const sets=weeklySets(m), lm=VL[m]||{mav:14};
+    const pct=Math.min(sets/Math.max(lm.mav,1),1);
+    const rows=Math.max(2,Math.floor((h-16)/13)), cols=3, lit=Math.round(rows*cols*pct);
+    let wins="",n=0;
+    for(let rw=0;rw<rows;rw++)for(let c2=0;c2<cols;c2++){
+      const on=n<lit;n++;
+      wins+=`<rect class="${on&&n%5===0?'gc-wf':''}" x="${x+6+c2*11}" y="${y+8+rw*13}" width="7" height="6" rx="1" fill="${on?'#FFD048':'#131a28'}" opacity="${on?.9:.9}" style="${on&&n%5===0?`animation-delay:${(i*1.3+rw)%4.8}s`:''}"/>`;}
+    s+=`<g class="gc-bld" onclick="muscleDrill('${m}')">
+      ${hot?`<ellipse cx="${cx2}" cy="${y}" rx="27" ry="11" fill="${b[1]}" opacity=".32"/>`:""}
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#gcbld)" stroke="${hot?b[1]:'rgba(242,208,121,.14)'}" stroke-opacity="${hot?'.75':'1'}" stroke-width="1"/>
+      <rect x="${x+4}" y="${y-5}" width="${w-8}" height="5" fill="#0d1220" stroke="rgba(255,255,255,.06)"/>
+      ${hot?`<circle class="gc-beacon" cx="${cx2}" cy="${y-8}" r="2.2" fill="${b[1]}" style="animation-delay:${(i*0.4)%1.7}s"/>`:""}
+      ${wins}</g>`;
+  });
+  // Wayne Tower — centerpiece, opens the Iron Ledger
+  const wx=257,ww=46,wh=176,wy=GY-wh;
+  let wwin="";const wrows=11;
+  for(let rw=0;rw<wrows;rw++)for(let c2=0;c2<3;c2++){wwin+=`<rect x="${wx+8+c2*11}" y="${wy+18+rw*14}" width="7" height="6" rx="1" fill="${rw>2?'#FFD048':'#1a2233'}" opacity=".85"/>`;}
+  s+=`<g class="gc-bld" onclick="openIronLedger()">
+    <rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="url(#gcwayne)" stroke="rgba(255,208,72,.4)" stroke-width="1"/>
+    <path d="M${wx} ${wy} L${wx+ww/2} ${wy-16} L${wx+ww} ${wy} Z" fill="#141a29" stroke="rgba(255,208,72,.35)"/>
+    <text x="${wx+ww/2}" y="${wy+11}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" letter-spacing="2" fill="#FFD048" opacity=".9">WAYNE</text>
+    ${wwin}</g>`;
+  // Bat-Signal beaming from Wayne Tower roof
+  if(signalOn)s+=`<g class="gc-signal" onclick="${startAct}" transform="rotate(-22 ${wx+10} ${wy-14})">
+      <rect x="${wx-158}" y="${wy-24}" width="170" height="22" fill="url(#gcbeam)"/>
+      <circle cx="${wx-150}" cy="${wy-13}" r="17" fill="#FFF3C9" opacity=".95"/>
+      <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx-172},${wy-32}) scale(.44)" fill="#0b0d12"/>
+    </g>`;
+  // rain when fatigue debt is high
+  if(f.pct>=40){let rain="";for(let i=0;i<16;i++){rain+=`<line x1="${i*35+12}" y1="-24" x2="${i*35+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;}
+    s+=`<g class="gc-rain" opacity=".3">${rain}</g>`;}
+  // ground
+  s+=`<rect x="0" y="${GY}" width="560" height="24" fill="#05070c"/><rect x="0" y="${GY}" width="560" height="1.5" fill="rgba(242,208,121,.22)"/>`;
+  const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
+  const line=restNight?"Rest night — the city holds its breath":signalOn?"The signal is lit — Gotham calls":"Recover first — the signal stays dark";
+  return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px">
+    <svg viewBox="0 0 560 232" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="gcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#060a14"/><stop offset=".7" stop-color="#0b1220"/><stop offset="1" stop-color="#131a2b"/></linearGradient>
+        <linearGradient id="gcbld" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0e1422"/><stop offset=".5" stop-color="#161e30"/><stop offset="1" stop-color="#0b101c"/></linearGradient>
+        <linearGradient id="gcwayne" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#131a2c"/><stop offset=".5" stop-color="#1d2740"/><stop offset="1" stop-color="#101624"/></linearGradient>
+        <linearGradient id="gcbeam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></linearGradient>
+      </defs>
+      <rect x="0" y="0" width="560" height="232" fill="url(#gcsky)"/>
+      ${s}
+    </svg>
+    <div class="gc-strip">
+      <div style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:var(--disp);font-size:12px;letter-spacing:.16em;color:var(--gold2)">GOTHAM LIVE</span>
+        <span style="font-size:11px;color:${band[1]};font-weight:800;margin-left:7px">${band[0]}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in trouble":"all districts held"}</span></div>
+      <span style="font-size:10px;color:var(--text3);flex:none;text-align:right;max-width:44%">${esc(line)}</span>
+    </div>
+  </div>`;
+}
 function renderGotham(){
   const d=state.data,u=d.u;
   const ws=weeklyStreak(),dop=daysOnProtocol();
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${gothamSkylineCard()}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
