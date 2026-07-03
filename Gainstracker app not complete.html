@@ -2412,6 +2412,9 @@ function muscleLevel(m){
   const v=state.data.muscleVol[m]||0; if(v<=0)return 0;
   return clamp(Math.floor(Math.pow(v/MLV_BASE,MLV_EXP)),0,20);
 }
+// Mastery rarity — a muscle you've trained for years reads LEGENDARY, a neglected one stays STREET.
+function masteryOf(m){const l=muscleLevel(m);
+  return l>=16?["LEGENDARY","#FFD048"]:l>=12?["EPIC","#9840F8"]:l>=8?["RARE","#3C96FF"]:l>=4?["HONED","#22E87A"]:l>=1?["TRAINED","#9aa0ab"]:["STREET","#566070"];}
 function muscleXP(m){const v=state.data.muscleVol[m]||0;const l=muscleLevel(m);
   const lo=MLV_BASE*Math.pow(l,MLV_INV),hi=MLV_BASE*Math.pow(l+1,MLV_INV);
   return{lvl:l,cur:Math.max(0,v-lo),need:Math.max(1,hi-lo),pct:clamp((v-lo)/(hi-lo)*100,0,100)};}
@@ -4876,13 +4879,23 @@ function renderSuit(){
   // Big suit stage — dramatic dark backdrop
   html+=`<div class="card" style="background:linear-gradient(175deg,rgba(18,13,6,.98) 0%,rgba(6,5,3,1) 100%);border:1.5px solid ${skin.c}33;padding:14px;position:relative;overflow:hidden">
     <div style="position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% 35%,${skin.c}10 0%,transparent 68%);pointer-events:none;animation:suitGlowPulse 5s ease-in-out infinite"></div>
-    <div class="suit-stage-glow">${buildSuit()}</div>
-    <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:12px">
-      <span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#2ECC71;box-shadow:0 0 6px #2ECC71;margin-right:4px"></i>Fresh ≥80%</span>
-      <span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E8C53C;box-shadow:0 0 6px #E8C53C;margin-right:4px"></i>50–79%</span>
-      <span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E8453C;box-shadow:0 0 6px #E8453C;margin-right:4px"></i>Fatigued &lt;50%</span>
-      <span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold2);opacity:.25;margin-right:4px"></i>Untrained</span>
-    </div>
+    ${(()=>{ // two slides of the suit: READINESS (recovery colors) vs MASTERY (rarity tiers)
+      const mastery=state.suitMode==="lvl";
+      let svg;
+      if(mastery){const prev=state._figColor;
+        state._figColor=m=>{const v=state.data.muscleVol[m]||0;if(!v)return{fill:"#E8C56A",op:".07"};return{fill:masteryOf(m)[1],op:".92"};};
+        svg=buildSuit();state._figColor=prev;
+      }else svg=buildSuit();
+      const dot=(c,t)=>`<span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};box-shadow:0 0 6px ${c};margin-right:4px"></i>${t}</span>`;
+      const legend=mastery
+        ?[dot("#FFD048","Legendary"),dot("#9840F8","Epic"),dot("#3C96FF","Rare"),dot("#22E87A","Honed"),dot("#9aa0ab","Trained")].join("")
+        :[dot("#2ECC71","Fresh ≥80%"),dot("#E8C53C","50–79%"),dot("#E8453C","Fatigued &lt;50%"),`<span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold2);opacity:.25;margin-right:4px"></i>Untrained</span>`].join("");
+      return `<div class="row" style="gap:7px;justify-content:center;margin-bottom:8px;position:relative">
+        <button class="chip ${!mastery?'on':''}" onclick="state.suitMode='rec';render()">⚡ Readiness</button>
+        <button class="chip ${mastery?'on':''}" onclick="state.suitMode='lvl';render()">👑 Mastery</button></div>
+      <div class="suit-stage-glow">${svg}</div>
+      <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:12px">${legend}</div>`;
+    })()}
   </div>`;
 
   // Sector Command — THE one per-muscle readout: recovery ring + weekly sets + ready-when.
@@ -4908,6 +4921,7 @@ function renderSuit(){
         <div style="font-size:10px;font-weight:800;color:var(--text1);margin-top:5px;letter-spacing:.05em;text-transform:uppercase">${MNAME[m]}</div>
         <div style="font-size:10px;color:${statusCol};margin-top:1px;font-weight:600">${status}</div>
         <div style="font-size:9.5px;color:${volCol};margin-top:1px;font-weight:700">${volTxt}</div>
+        ${trained?(()=>{const t=masteryOf(m);return `<div style="font-size:8.5px;letter-spacing:.08em;color:${t[1]};margin-top:1px;font-weight:800;text-shadow:0 0 6px ${t[1]}66">Lv ${muscleLevel(m)} · ${t[0]}</div>`;})():""}
       </div>`;
     }).join('')}
     </div>
@@ -5131,6 +5145,17 @@ function exerciseHistory(name){
   openSheet(`<div class="row sp"><div class="ttl">${esc(name)}</div><span class="chip">${rows.length} sessions</span></div>
     ${verdict?`<div class="banner" style="margin:2px 0 10px"><span>🎩</span><div class="mini" style="color:${vcol}">${esc(verdict)}</div></div>`:""}
     ${tgtBlock}
+    ${(()=>{ // rep-PR matrix — your best weight at every rep count, 12 targets to beat
+      const best={};(state.data.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{if(e.name!==name)return;
+        (e.sets||[]).forEach(s=>{if(s.type==="W")return;const r=+s.r||0,wt=setLoad(ex,s.w);if(r>=1&&r<=12&&wt>(best[r]||0))best[r]=wt;});});});
+      if(!Object.keys(best).length)return "";
+      const cells=[];for(let r=1;r<=12;r++){const b=best[r];
+        cells.push(`<div style="text-align:center;padding:7px 2px;border-radius:9px;background:${b?'rgba(255,208,72,.08)':'rgba(255,255,255,.025)'};border:1px solid ${b?'rgba(255,208,72,.28)':'rgba(255,255,255,.06)'}">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:.06em">${r}RM</div>
+          <div style="font-family:var(--disp);font-size:${b?'15':'12'}px;color:${b?'var(--gold2)':'var(--text3)'}">${b?Math.round(b):'—'}</div></div>`);}
+      return `<div class="card" style="padding:12px"><div class="ttl" style="font-size:13px;margin-bottom:8px">👑 Rep-max record book <span class="mini" style="color:var(--text3);letter-spacing:0">— 12 targets, beat any of them</span></div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">${cells.join("")}</div></div>`;
+    })()}
     ${fcBlock}
     <div class="row" style="gap:16px;margin:4px 0 12px;flex-wrap:wrap">
       <div><div class="mini">Record e1RM</div><b class="gold" style="font-size:20px">${recordE1}kg</b></div>
