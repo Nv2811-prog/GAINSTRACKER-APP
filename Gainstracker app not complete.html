@@ -10326,12 +10326,21 @@ function gothamSkylineCard(){
   const signalOn=!restNight&&r.score>=55;
   const startAct=cur&&cur.day&&!restNight?`startWorkout('${cur.sp.id}',${cur.i})`:"freeWorkout()";
   const W=560,GY=208;
+  // the sky follows the real clock: night / dawn / day / dusk
+  const hr=new Date().getHours();
+  const phase=hr>=21||hr<5?"night":hr<8?"dawn":hr<17?"day":"dusk";
+  const SKY={night:["#060a14","#0b1220","#131a2b"],dawn:["#1a1626","#3a2233","#7a4a3a"],day:["#22344e","#3a5578","#5b7da6"],dusk:["#141127","#3a2140","#8a4a2e"]}[phase];
   let s="";
-  // stars
-  for(let i=0;i<16;i++){const x=(i*97)%548+6,y=(i*61)%74+6,rr=((i%3)*0.4+0.7).toFixed(1);
+  // stars (night + dusk only)
+  if(phase==="night"||phase==="dusk")for(let i=0;i<16;i++){const x=(i*97)%548+6,y=(i*61)%74+6,rr=((i%3)*0.4+0.7).toFixed(1);
     s+=`<circle class="${i%3===0?'gc-star':''}" cx="${x}" cy="${y}" r="${rr}" fill="#cfd8ea" opacity=".5" style="animation-delay:${(i*0.7)%3.4}s"/>`;}
-  // moon
-  s+=`<circle cx="486" cy="34" r="24" fill="#E9EDF4" opacity=".08"/><circle cx="486" cy="34" r="13" fill="#E9EDF4" opacity=".85"/>`;
+  // moon or sun
+  if(phase==="night")s+=`<circle cx="486" cy="34" r="24" fill="#E9EDF4" opacity=".08"/><circle cx="486" cy="34" r="13" fill="#E9EDF4" opacity=".85"/>`;
+  else if(phase==="day")s+=`<circle cx="486" cy="34" r="26" fill="#FFE9A8" opacity=".14"/><circle cx="486" cy="34" r="14" fill="#FFEfc2" opacity=".92"/>`;
+  else s+=`<circle cx="${phase==="dawn"?70:486}" cy="52" r="30" fill="#FFB067" opacity=".18"/><circle cx="${phase==="dawn"?70:486}" cy="52" r="15" fill="#FFC98A" opacity=".9"/>`;
+  // season chapter tint — the city wears the current villain's colour, faintly
+  try{const ssn=seasonState();if(ssn.week<SEASON_CHAPTERS.length){const chc=SEASON_CHAPTERS[ssn.week].c;
+    s+=`<ellipse cx="280" cy="60" rx="330" ry="120" fill="${chc}" opacity=".055"/>`;}}catch(e){}
   // clouds
   s+=`<g class="gc-cloud"><ellipse cx="120" cy="46" rx="64" ry="11" fill="#0d1119" opacity=".65"/><ellipse cx="170" cy="38" rx="42" ry="8" fill="#0d1119" opacity=".5"/></g>
       <g class="gc-cloud b"><ellipse cx="380" cy="58" rx="72" ry="10" fill="#0c1017" opacity=".6"/></g>`;
@@ -10379,9 +10388,11 @@ function gothamSkylineCard(){
     <text x="${wx+ww/2}" y="${wy+11}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" letter-spacing="2" fill="#FFD048" opacity=".9">WAYNE</text>
     ${wwin}</g>`;
   // Bat-Signal beaming from Wayne Tower roof
-  if(signalOn)s+=`<g class="gc-signal" onclick="${startAct}" transform="rotate(-22 ${wx+10} ${wy-14})">
-      <rect x="${wx-158}" y="${wy-24}" width="170" height="22" fill="url(#gcbeam)"/>
-      <circle cx="${wx-150}" cy="${wy-13}" r="17" fill="#FFF3C9" opacity=".95"/>
+  const wStreak=(typeof weeklyStreak==="function"?weeklyStreak():0)||0;
+  const bH=22+Math.min(wStreak,5)*3, bY=wy-24-Math.min(wStreak,5)*1.5;
+  if(signalOn)s+=`<g class="gc-signal" onclick="${startAct}" transform="rotate(-22 ${wx+10} ${wy-14})" opacity="${(0.7+Math.min(wStreak,5)*0.06).toFixed(2)}">
+      <rect x="${wx-158}" y="${bY.toFixed(0)}" width="170" height="${bH}" fill="url(#gcbeam)"/>
+      <circle cx="${wx-150}" cy="${wy-13}" r="${17+Math.min(wStreak,5)}" fill="#FFF3C9" opacity=".95"/>
       <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx-172},${wy-32}) scale(.44)" fill="#0b0d12"/>
     </g>`;
   // rain when fatigue debt is high
@@ -10394,7 +10405,7 @@ function gothamSkylineCard(){
   return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px">
     <svg viewBox="0 0 560 232" preserveAspectRatio="xMidYMax slice">
       <defs>
-        <linearGradient id="gcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#060a14"/><stop offset=".7" stop-color="#0b1220"/><stop offset="1" stop-color="#131a2b"/></linearGradient>
+        <linearGradient id="gcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY[0]}"/><stop offset=".7" stop-color="${SKY[1]}"/><stop offset="1" stop-color="${SKY[2]}"/></linearGradient>
         <linearGradient id="gcbld" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0e1422"/><stop offset=".5" stop-color="#161e30"/><stop offset="1" stop-color="#0b101c"/></linearGradient>
         <linearGradient id="gcwayne" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#131a2c"/><stop offset=".5" stop-color="#1d2740"/><stop offset="1" stop-color="#101624"/></linearGradient>
         <linearGradient id="gcbeam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></linearGradient>
@@ -10413,7 +10424,11 @@ function gothamSkylineCard(){
 function renderGotham(){
   const d=state.data,u=d.u;
   const ws=weeklyStreak(),dop=daysOnProtocol();
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${gothamSkylineCard()}${gothamSeasonCard()}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  // Memoize the two heaviest cards (SVG city + season eval) — rebuilt at most once/min or when data changes
+  const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
+  const mm=state._gcMemo=state._gcMemo||{};
+  if(mm.k!==memoKey){mm.k=memoKey;mm.sky=gothamSkylineCard();mm.season=gothamSeasonCard();}
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${mm.sky}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
