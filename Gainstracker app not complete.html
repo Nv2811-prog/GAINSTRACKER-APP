@@ -125,6 +125,8 @@ body.rest-final::after{content:"";position:fixed;inset:0;z-index:60;pointer-even
 .gc-light{animation:gcLightning 26s linear infinite;pointer-events:none}
 @keyframes gcBM{0%,92%{transform:translateX(600px)}97%,100%{transform:translateX(-120px)}}
 .gc-bm{animation:gcBM 47s linear infinite}
+.gar-v{animation:garWob 3.6s ease-in-out infinite;display:inline-block}
+@keyframes garWob{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-2px)}}
 /* ===== KO CAM — slow-mo finish replay ===== */
 #kocam{position:fixed;inset:0;z-index:230;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;
   background:radial-gradient(ellipse 90% 70% at 50% 45%,rgba(40,6,4,.94),rgba(2,3,6,.98));animation:stgFade 1.65s ease-in-out forwards}
@@ -5728,11 +5730,11 @@ function closeGarage(){state.subpage=null;go("gotham");}
 // Garage box for the Gotham home — compact tactile tile, taps through to the full fleet.
 function garageCard(){
   const s=gothamStats();const owned=GARAGE.filter(v=>v.req(s));const top=owned[owned.length-1]||GARAGE[0];const next=GARAGE.find(v=>!v.req(s));
-  return `<div class="gtv2-panel wide" style="margin-bottom:8px;display:flex;gap:12px;align-items:center;cursor:pointer;border-color:rgba(232,197,106,.32);padding:10px 12px" onclick="openGarage()">
-    <div style="font-size:36px;line-height:1;flex:none;filter:drop-shadow(0 0 14px rgba(232,197,106,.65))">${top.e}</div>
+  return `<div class="gtv2-panel wide" style="margin-bottom:8px;display:flex;gap:14px;align-items:center;cursor:pointer;border-color:rgba(255,208,72,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 26px -10px rgba(255,208,72,.55);padding:14px 14px" onclick="openGarage()">
+    <div class="gar-v" style="font-size:52px;line-height:1;flex:none;filter:drop-shadow(0 0 18px rgba(255,208,72,.75))">${top.e}</div>
     <div style="flex:1;min-width:0">
-      <div style="font-size:10px;letter-spacing:.14em;color:var(--text3);font-family:var(--disp);margin-bottom:2px">THE GARAGE · ${owned.length}/${GARAGE.length} UNLOCKED</div>
-      <div style="font-size:14px;color:var(--gold2);font-family:var(--disp);line-height:1.1">${esc(top.n)}</div>
+      <div style="font-size:10px;letter-spacing:.14em;color:var(--text3);font-family:var(--disp);margin-bottom:2px">🏎 THE GARAGE · ${owned.length}/${GARAGE.length} UNLOCKED</div>
+      <div style="font-size:19px;color:var(--gold2);font-family:var(--disp);line-height:1.05;text-shadow:0 0 14px rgba(255,208,72,.4)">${esc(top.n)}</div>
       ${next?`<div style="font-size:11px;color:var(--text2);margin-top:2px">Next: ${next.e} ${esc(next.n)} — ${esc(next.how)}</div>`:`<div style="font-size:11px;color:var(--green);margin-top:2px">Full fleet earned. Legend of the cave.</div>`}
     </div>
     <span style="color:var(--gold2);font-size:16px;flex:none">›</span>
@@ -10044,41 +10046,6 @@ function gtv2ProgressionFor(name){
   if(r>=6)return {kind:"blue",icon:"🎯",title:"Progression order",copy:`${name}${profile}: hold ${load}kg and beat ${r} reps first. No weight jump until the last set reaches 9+ reps.`};
   return {kind:"gold",icon:"🛠️",title:"Progression order",copy:`${name}${profile}: ${load}kg x ${r} is still heavy. Repeat the load, own technique, and build reps before adding weight.`};
 }
-function gtv2ActionIntel(){
-  const items=[];
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  M12.forEach(m=>{
-    const ws=weeklySets(m),vl=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m),rec=getRecovery(m);
-    if(ws>mrv)items.push({kind:"red",icon:"🔥",title:`${MNAME[m]} past MRV`,copy:`${ws} sets this week vs recoverable ceiling around ${mrv}. Stop adding sets; recover or train a different sector.`});
-    else if(ws>0&&ws<vl.mev)items.push({kind:"gold",icon:"📉",title:`${MNAME[m]} below MEV`,copy:`Only ${ws}/${vl.mev} hard sets this week. Add ${vl.mev-ws} focused set${vl.mev-ws===1?"":"s"} if you want growth.`});
-    else if(ws===0&&(state.data.muscleVol[m]||0)>0&&daysSince(muscleLastTrained(m))>8)items.push({kind:"gold",icon:"🕯️",title:`${MNAME[m]} has gone quiet`,copy:`No useful weekly stimulus and last trained ${Math.round(daysSince(muscleLastTrained(m)))} days ago. Put it back on patrol.`});
-    else if(rec>=75&&ws<vl.mav&&(state.data.muscleVol[m]||0)>0)items.push({kind:"green",icon:"✅",title:`${MNAME[m]} ready`,copy:`${rec}% recovered with ${ws}/${vl.mav} sets. Good target if tonight's split allows it.`});
-    const fr=typeof freqInfo==="function"?freqInfo(m):null;
-    if(fr&&ws>=10&&fr.sessions<2)items.push({kind:"blue",icon:"🔁",title:`Split ${MNAME[m]} volume`,copy:`${ws} sets are crammed into ${fr.sessions} session. Consider 2 exposures so set quality stays high. Optional, not a nag.`});
-  });
-  const bal=gtv2BalanceAudit();if(bal)items.unshift(bal);
-  const red=gtv2RedundancyAudit();if(red)items.unshift(red);
-  const names=(typeof loggedExerciseNamesByRecency==="function"?loggedExerciseNamesByRecency():loggedExerciseNames()).slice(0,4);
-  const prog=names.map(gtv2ProgressionFor).find(Boolean);if(prog)items.unshift(prog);
-  if(!items.length&&trained.length)items.push({kind:"green",icon:"🦇",title:"Protocol clean",copy:"Volume, recovery and balance look orderly. Execute tonight's mission and chase quality reps."});
-  if(!items.length)items.push({kind:"blue",icon:"🎩",title:"Alfred needs evidence",copy:"Log a workout and the protocol will start reading recovery, weekly sets, balance and progression."});
-  const weight={red:0,gold:1,blue:2,green:3};
-  return items.sort((a,b)=>(weight[a.kind]??2)-(weight[b.kind]??2)).slice(0,5);
-}
-function gtv2ProtocolDeck(){
-  const items=gtv2ActionIntel(),top=items[0],rest=items.slice(1);
-  const counts={};rest.forEach(a=>{counts[a.kind]=(counts[a.kind]||0)+1;});
-  const label={red:"urgent",gold:"add volume",blue:"option",green:"ready"};
-  const order=["red","gold","blue","green"];
-  const chips=order.filter(k=>counts[k]).map(k=>`<span class="gtv2-chip ${k}">${counts[k]} ${label[k]}</span>`).join("");
-  const headline=`<div class="gtv2-alfred-top" onclick="gtv2OpenProtocolBriefing()">
-      <div class="gtv2-alfred-ic ${top.kind}" style="color:${gtv2Clr(top.kind)}">${top.icon}</div>
-      <div class="gtv2-alfred-tx"><div class="gtv2-alfred-title">${esc(top.title)}</div><div class="gtv2-alfred-copy">${top.copy}</div></div>
-    </div>`;
-  return `<div class="gtv2-panel gtv2-protocol wide"><div class="row sp"><div><div class="gtv2-label">🎩 Alfred Protocol</div><div class="gtv2-value" style="font-size:21px;color:var(--gold2)">What matters tonight</div></div><button class="btn ghost sm" style="width:auto" onclick="gtv2OpenProtocolBriefing()">Briefing</button></div>
-    ${headline}
-    ${rest.length?`<div class="gtv2-alfred-more" onclick="gtv2OpenProtocolBriefing()">${chips}<span class="gtv2-alfred-link">+${rest.length} more ›</span></div>`:""}</div>`;
-}
 function gtv2MissionHero(){
   const d=state.data,u=d.u,cur=gtv2CurrentPlanDay(),title=u.name?u.name.toUpperCase():"GOTHAM";
   const dateStr=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
@@ -10101,7 +10068,12 @@ function gtv2MissionHero(){
   return `<section class="gtv2-hero">
     <img class="gtv2-hero-img" src="Batman.jpg" alt="">
     <div class="gtv2-hero-body">
-      <div class="gtv2-idrow"><img class="gtv2-idlogo" src="logo_t.png" alt=""><div class="gtv2-idtext"><span class="gtv2-idname">${esc(title)}</span><span class="gtv2-iddate">${dateStr} · Strength Lv ${strengthLevel()}</span></div></div>
+      <div class="gtv2-idrow"><img class="gtv2-idlogo" src="logo_t.png" alt=""><div class="gtv2-idtext"><span class="gtv2-idname">${esc(title)}</span><span class="gtv2-iddate">${dateStr}</span></div>
+      ${(()=>{const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);const cur=RANKS[ri],next=RANKS[ri+1];const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,hi-lo)*100,0,100):100;const C=2*Math.PI*19;
+      return `<div style="margin-left:auto;flex:none;text-align:center;cursor:pointer" onclick="openRankLadder()">
+        <svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="rgba(0,0,0,.45)" stroke="rgba(255,255,255,.14)" stroke-width="3"/><circle cx="23" cy="23" r="19" fill="none" stroke="var(--gold2)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${(C*pct/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 23 23)" style="filter:drop-shadow(0 0 5px rgba(255,208,72,.8))"/><text x="23" y="20" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8.5" fill="#A06E14">LV</text><text x="23" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="15" fill="#FFD048">${sl}</text></svg>
+        <div style="font-size:7.5px;letter-spacing:.08em;color:var(--gold-dim);font-family:var(--disp);margin-top:1px">${esc(cur[1]).toUpperCase().slice(0,13)}</div></div>`;})()}
+    </div>
       ${focal}
       ${track}
       <div class="gtv2-hero-actions">${btn}</div>
@@ -10116,7 +10088,6 @@ function gtv2ScorePanel(){
     <div class="gtv2-panel" style="border-color:${t.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${t.color}" onclick="openThreatInfo()"><div class="gtv2-label">Threat</div><div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div><div class="gtv2-note">${esc(t.desc)}</div><div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color};box-shadow:0 0 10px currentColor"></i></div></div>
     <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.pct}%</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
     <div class="gtv2-panel" style="border-color:${patrolClr};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${patrolClr}" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"};text-shadow:0 0 18px currentColor">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
-    ${gtv2ProtocolDeck()}
   </div>`;
 }
 function gtv2MuscleGrid(){
@@ -10138,18 +10109,6 @@ function gtv2MuscleGrid(){
     <div style="background:radial-gradient(ellipse 62% 52% at 50% 30%,rgba(124,150,255,.1),transparent 62%),radial-gradient(ellipse 70% 40% at 50% 100%,rgba(232,197,106,.12),transparent 70%);border-radius:12px">${svg}</div>
     <div class="row" style="justify-content:center;gap:14px;padding:4px 0 3px">${leg(ready,"ready","var(--green)")}${leg(rec,"recovering","var(--yellow)")}${leg(fat,"fatigued","var(--red)")}</div>
   </div>`;
-}
-function gtv2OpenProtocolBriefing(){
-  const audit=gtv2ActionIntel();
-  const muscleRows=M12.map(m=>{const s=gtv2Stimulus(m),fr=typeof freqInfo==="function"?freqInfo(m):null;
-    return `<div class="gtv2-audit-row"><span>${mIcon(m,18,gtv2Clr(s.kind||""))}</span><div><strong>${MNAME[m]}</strong><p>${esc(s.text)} · recovery ${state.data.muscleVol[m]?getRecovery(m)+"%":"unknown"}${fr?` · ${fr.sessions} session${fr.sessions===1?"":"s"} this week`:""}</p></div></div>`;
-  }).join("");
-  openSheet(`<div class="ttl">🎩 Alfred Protocol Briefing</div>
-    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">Read-only audit of weekly sets, recovery, frequency, redundancy and progression. No data is changed here.</div>
-    <div class="gtv2-panel gtv2-protocol" style="margin-bottom:10px">${audit.map(a=>`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:${gtv2Clr(a.kind)}">${a.icon}</div><div><div class="gtv2-action-title">${esc(a.title)}</div><div class="gtv2-action-copy">${a.copy}</div></div><span class="gtv2-chip ${a.kind}">${a.kind}</span></div>`).join("")}</div>
-    <div class="ttl" style="font-size:14px;margin:12px 0 4px">All sectors</div>
-    ${muscleRows}
-    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
 }
 /* ===== SEASON — THE LONG NIGHT: an 8-week story campaign. One villain per chapter seizes
    districts (muscles); you clear the chapter by training them, the bounty is a real PR.
@@ -10230,9 +10189,15 @@ function gothamSeasonCard(){
         ${ch.m.length?`<div class="mini" style="margin-top:9px;color:var(--text2)">He's taken <b style="color:${ch.c}">${ch.m.map(m=>MUSCLE_DISTRICT[m]).join(" & ")}</b>. Train ${ch.m.map(m=>MNAME[m]).join(" and ")} this week to drive him out.</div>`:`<div class="mini" style="margin-top:9px;color:var(--text2)">The finale. Records are the only language he understands.</div>`}`,
       btn:"ACCEPT THE CHAPTER"});}catch(e){}},1400);
   }
-  const dots=SEASON_CHAPTERS.map((c,i)=>{
-    const on=i===ss.week;const past=i<ss.week;const st=past?seasonChapterEval(i).stars:0;
-    return `<span style="width:${on?10:7}px;height:${on?10:7}px;border-radius:50%;flex:none;display:inline-block;background:${past?(st>=2?'var(--gold2)':st>0?'var(--orange)':'var(--red)'):on?ch.c:'rgba(255,255,255,.14)'};${on?`box-shadow:0 0 10px ${ch.c}`:''}"></span>`;}).join("");
+  const totSt=SEASON_CHAPTERS.reduce((a,_,i)=>a+(i<ss.week?seasonChapterEval(i).stars:i===ss.week?ev.stars:0),0);
+  const track=SEASON_CHAPTERS.map((cc,i)=>{
+    const past=i<ss.week,on=i===ss.week,fut=i>ss.week;
+    const st=past?seasonChapterEval(i).stars:on?ev.stars:0;
+    const ring=past?(st>=2?'#FFD048':st>0?'#FF8C22':'#FF3622'):on?cc.c:'rgba(255,255,255,.18)';
+    return `<div style="flex:none;width:42px;text-align:center">
+      <div class="season-face" style="width:33px;height:33px;margin:0 auto;border-radius:50%;overflow:hidden;border:2px solid ${ring};${on?`box-shadow:0 0 12px ${cc.c}`:''}${fut?';filter:grayscale(1) brightness(.45)':''}">${villainFace({v:cc.v,e:"🦹"})}</div>
+      <div style="font-size:8.5px;color:${fut?'var(--text3)':ring};margin-top:2px;font-family:var(--disp);letter-spacing:.06em">${fut?"🔒":("★".repeat(st)||(on?"NOW":"✗"))}</div>
+    </div>`;}).join("");
   const obRow=ev.obs.map(o=>`<div class="row" style="gap:7px;padding:3px 0"><span style="flex:none;width:16px;text-align:center;color:${o.done?'var(--green)':'var(--text3)'}">${o.done?'✓':'○'}</span><span class="mini" style="flex:1;color:${o.done?'var(--text2)':'var(--text)'}">${o.lab}</span><b class="mini" style="color:${o.done?'var(--green)':ch.c}">${Math.min(o.cur,o.tgt)}/${o.tgt}</b></div>`).join("");
   return `<div class="gtv2-panel wide" style="margin-bottom:12px;cursor:pointer;border-color:${ch.c}66;box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 24px -10px ${ch.c}" onclick="openSeason()">
     <div class="row" style="gap:11px;align-items:flex-start">
@@ -10245,7 +10210,11 @@ function gothamSeasonCard(){
       <span style="font-family:var(--disp);font-size:15px;color:var(--gold2);flex:none">${"★".repeat(ev.stars)}${"☆".repeat(ev.max-ev.stars)}</span>
     </div>
     <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.07);padding-top:6px">${obRow}</div>
-    <div class="row" style="gap:5px;justify-content:center;margin-top:8px;align-items:center">${dots}</div>
+    <div style="margin-top:9px;border-top:1px solid rgba(255,255,255,.07);padding-top:8px">
+      <div class="row sp" style="margin-bottom:5px"><span class="mini" style="letter-spacing:.14em;color:var(--gold2);font-family:var(--disp)">SEASON PASS</span><b class="mini" style="color:var(--gold2)">★ ${totSt}/24</b></div>
+      <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:8px"><i style="display:block;height:100%;width:${(totSt/24*100).toFixed(0)}%;background:linear-gradient(90deg,${ch.c},var(--gold2));box-shadow:0 0 8px ${ch.c}"></i></div>
+      <div class="row" style="gap:2px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">${track}</div>
+    </div>
   </div>`;
 }
 function openSeason(){
