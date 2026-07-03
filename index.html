@@ -10352,7 +10352,7 @@ function gothamCampaignMap(){
     const dc=districtCrime(m), b=districtBand(dc.crime);
     const held=dc.crime<45, lost=dc.crime>=70;
     const villain=(NEMESIS_MAP[m]||{}).villain||"the Rogues";
-    const fill=held?"rgba(255,208,72,.13)":lost?"rgba(255,54,34,.16)":"rgba(255,140,34,.14)";
+    const fill=held?"rgba(255,208,72,.22)":lost?"rgba(255,54,34,.26)":"rgba(255,140,34,.22)";
     const sub=lost?"HELD BY "+villain.toUpperCase():held?"YOURS":"CONTESTED";
     s+=`<g style="cursor:pointer" onclick="closeOverlay();muscleDrill('${m}')">
       <rect x="${mx-RW/2}" y="${my-RH/2}" width="${RW}" height="${RH}" rx="11" fill="${fill}" stroke="${b[1]}" stroke-opacity="${held?'.65':'.95'}" stroke-width="1.6"/>
@@ -10403,25 +10403,26 @@ function gothamSkylineCard(){
     const dc=districtCrime(m), b=districtBand(dc.crime), hot=dc.crime>=45;
     const sets=weeklySets(m), lm=VL[m]||{mev:8,mav:14};
     const pct=Math.min(sets/Math.max(lm.mav,1),1);
-    const cols=backRow?3:4, rows=Math.max(2,Math.floor((h-(backRow?54:12))/13));
-    const lit=Math.round(rows*cols*pct*(1-gloom*.6));
-    let wins="",n=0;
-    for(let rw=0;rw<rows;rw++)for(let c2=0;c2<cols;c2++){const on=n<lit;n++;wins+=`<rect class="${on&&n%5===0?'gc-wf':''}" x="${x+6+c2*((w-12)/cols)}" y="${y+(backRow?36:10)+rw*13}" width="7" height="6" rx="1" fill="${on?'#FFD048':(backRow?'#10141f':'#131a28')}" style="${on&&n%5===0?`animation-delay:${(i*1.3+rw)%4.8}s`:''}"/>`;}
-    const sc=hot?b[1]:'#FFD048';
     const trained=(state.data.muscleVol[m]||0)>0;
-    const hrs2=trained?hoursToReady(m):0;
-    const status=!trained?"—":hrs2>0?(hrs2<24?hrs2+"H":(hrs2/24).toFixed(1)+"D"):"READY";
-    const stCol=!trained?"#566070":hrs2>0?(getRecovery(m)>=50?"#E8C53C":"#E8453C"):"#2ECC71";
-    const setsCol=sets<=0?"#566070":sets<lm.mev?"#E8453C":sets<lm.mav?"#E8C53C":"#2ECC71";
-    const bw2=Math.max(w+6,64), bx2=cx2-bw2/2, by2=y-34;
-    return `<g class="gc-bld" onclick="muscleDrill('${m}')" ${backRow?'opacity=".93"':''}>
-      ${hot?`<ellipse cx="${cx2}" cy="${y}" rx="${w/2+6}" ry="10" fill="${b[1]}" opacity=".3"/>`:""}
+    const rec=trained?getRecovery(m):-1;
+    // WINDOW COLOUR = readiness (green ready / amber recovering / red spent), COUNT lit = weekly volume
+    const winCol=!trained?'#243040':rec>=80?'#22E87A':rec>=50?'#E8C53C':'#E8453C';
+    const cols=backRow?3:4, rows=Math.max(2,Math.floor((h-(backRow?38:16))/13));
+    const lit=Math.round(rows*cols*pct*(1-gloom*.5));
+    let wins="",n=0;
+    for(let rw=0;rw<rows;rw++)for(let c2=0;c2<cols;c2++){const on=n<lit;n++;
+      wins+=`<rect class="${on&&n%4===0?'gc-wf':''}" x="${x+6+c2*((w-12)/cols)}" y="${y+(backRow?22:14)+rw*13}" width="7" height="6" rx="1" fill="${on?winCol:(backRow?'#0c111b':'#101724')}" ${on&&n%4===0?`style="animation-delay:${((i*1.3+rw)%4.8)}s"`:''}/>`;}
+    const nameCol=hot?b[1]:'#FFD048';
+    const dotCol=!trained?'#566070':winCol;
+    const bw2=Math.max(w+8,62), bx2=cx2-bw2/2, by2=y-21;
+    return `<g class="gc-bld" onclick="muscleDrill('${m}')" ${backRow?'opacity=".9"':''}>
+      ${hot?`<ellipse cx="${cx2}" cy="${y}" rx="${w/2+6}" ry="10" fill="${b[1]}" opacity=".32"/>`:""}
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${backRow?'gcbldB':'gcbld'})" stroke="${hot?b[1]:'rgba(242,208,121,.15)'}" stroke-opacity="${hot?'.8':'1'}"/>
       ${backRow?`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#030509" opacity=".34"/>`:""}
-      <rect x="${bx2}" y="${by2}" width="${bw2}" height="30" rx="3.5" fill="rgba(3,5,9,.94)" stroke="${sc}" stroke-opacity=".65" stroke-width=".8"/>
-      <text x="${cx2}" y="${by2+13}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="1.4" fill="${sc}" style="text-shadow:0 0 8px ${sc}">${AB[m]||MNAME[m].toUpperCase()}</text>
-      <text x="${cx2}" y="${by2+25}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9.5" letter-spacing=".5"><tspan fill="${setsCol}">${sets}/${lm.mav} SETS</tspan><tspan fill="rgba(255,255,255,.25)"> · </tspan><tspan fill="${stCol}">${status}</tspan></text>
-      ${hot?`<circle class="gc-beacon" cx="${cx2}" cy="${by2-6}" r="2.2" fill="${b[1]}" style="animation-delay:${(i*0.4)%1.7}s"/>`:""}
+      <rect x="${bx2}" y="${by2}" width="${bw2}" height="17" rx="4" fill="rgba(3,5,9,.95)" stroke="${nameCol}" stroke-opacity=".6" stroke-width=".8"/>
+      <circle cx="${bx2+9}" cy="${by2+8.5}" r="3.1" fill="${dotCol}" style="filter:drop-shadow(0 0 5px ${dotCol})">${trained?`<animate attributeName="opacity" values="1;.35;1" dur="${rec>=80?'2.6':rec>=50?'1.7':'1'}s" repeatCount="indefinite"/>`:""}</circle>
+      <text x="${bx2+bw2/2+5}" y="${by2+12.5}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="1.1" fill="${nameCol}" style="text-shadow:0 0 8px ${nameCol}">${AB[m]||MNAME[m].toUpperCase()}</text>
+      ${hot?`<circle class="gc-beacon" cx="${cx2}" cy="${by2-5}" r="2.2" fill="${b[1]}" style="animation-delay:${(i*0.4)%1.7}s"/>`:""}
       ${wins}</g>`;
   };
   // BACK row (even muscles) — taller, dimmer, billboards high in the sky
@@ -10439,7 +10440,7 @@ function gothamSkylineCard(){
       <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx-bl+3},${wy-23}) scale(.4)" fill="#0b0d12"/></g>`;
   // FRONT row (odd muscles) — brighter, lower, overlapping for depth
   M12.forEach((m,i)=>{if(!(i%2))return;const k=(i-1)/2;
-    s+=tower(m,52+k*90,74,80+((k*47)%36),false,i);});
+    s+=tower(m,40+k*88,74,80+((k*47)%36),false,i);});
   if(f.pct>=40||gloom>=.5){let rain="";for(let i=0;i<16;i++)rain+=`<line x1="${i*35+12}" y1="-24" x2="${i*35+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;s+=`<g class="gc-rain" opacity=".3">${rain}</g>`;}
   s+=`<rect class="gc-light" width="${TW}" height="${SH}" fill="#cfe0ff" opacity="0"/>`;
   s+=`<g class="gc-bm"><path d="M0 0 L6 -5 L20 -6 L26 -10 L38 -10 L41 -6 L52 -5 L58 0 Z M44 -6 L47 -13 L49 -6 Z" transform="translate(0,${GY+10})" fill="#04060a"/></g>`;
@@ -10462,7 +10463,11 @@ function gothamSkylineCard(){
       <div style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:var(--disp);font-size:12px;letter-spacing:.16em;color:var(--gold2)">GOTHAM LIVE</span>
         <span style="font-size:11px;color:${band[1]};font-weight:800;margin-left:7px">${band[0]}</span>
         <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in trouble":"all districts held"}</span></div>
-      <span style="font-size:10px;color:var(--text3);flex:none;letter-spacing:.06em">tap a tower ›</span>
+      <span style="display:flex;gap:9px;flex:none;align-items:center">
+        <span class="mini" style="display:inline-flex;align-items:center;gap:4px"><i style="width:8px;height:8px;border-radius:2px;background:#22E87A;box-shadow:0 0 6px #22E87A"></i>ready</span>
+        <span class="mini" style="display:inline-flex;align-items:center;gap:4px"><i style="width:8px;height:8px;border-radius:2px;background:#E8C53C;box-shadow:0 0 6px #E8C53C"></i>recover</span>
+        <span class="mini" style="display:inline-flex;align-items:center;gap:4px"><i style="width:8px;height:8px;border-radius:2px;background:#E8453C;box-shadow:0 0 6px #E8453C"></i>spent</span>
+      </span>
     </div>
     <div style="padding:0 12px 12px"><button class="btn gold" onclick="openDistricts()">🗺 OPEN THE CAMPAIGN MAP — who controls Gotham</button></div>
   </div>`;
