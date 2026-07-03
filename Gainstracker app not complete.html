@@ -2774,7 +2774,45 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}}render();saveSession();}
+/* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
+function sessionSetsOn(m){
+  let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
+    if(!(ex.p&&ex.p.includes(m)))return;
+    (e.sets||[]).forEach(s=>{if(s.done&&s.type!=="W")c++;});});
+  return c;
+}
+function checkLiberation(ei){
+  const ses=state.session;if(!ses)return;
+  ses._liberated=ses._liberated||[];
+  const ex=exFor(ses.exercises[ei].name);
+  (ex.p||[]).forEach(m=>{
+    if(ses._liberated.includes(m))return;
+    if(districtCrime(m).crime<45)return;
+    if(sessionSetsOn(m)<3)return;
+    ses._liberated.push(m);
+    playStinger("DISTRICT LIBERATED",esc((MUSCLE_DISTRICT[m]||"")+" — "+MNAME[m]+" retaken"),"#FFD048");
+    try{haptic("ko");}catch(e){}
+  });
+}
+// under the focused exercise: how close the current district is to falling
+function liberationTicker(ei){
+  const ses=state.session;if(!ses)return "";
+  const ex=exFor(ses.exercises[ei].name);
+  const m=(ex.p||[])[0];if(!m)return "";
+  if((ses._liberated||[]).includes(m))return `<div class="mini" style="color:var(--gold2);margin:4px 0 0">🦇 ${esc(MUSCLE_DISTRICT[m]||"")} liberated tonight</div>`;
+  if(districtCrime(m).crime<45)return "";
+  const left=Math.max(0,3-sessionSetsOn(m));
+  return left?`<div class="mini" style="color:var(--orange);margin:4px 0 0">🔥 ${left} more set${left===1?"":"s"} to retake ${esc(MUSCLE_DISTRICT[m]||MNAME[m])}</div>`:"";
+}
+// Alfred speaks when the night's tonnage crosses another Batmobile (2,300kg)
+function tonnageQuip(){
+  const ses=state.session;if(!ses)return;
+  let vol=0;(ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{if(s.done)vol+=setVolume(ex,s);});});
+  const cars=Math.floor(vol/2300);
+  if(cars>0&&cars>(ses._quipCars||0)){ses._quipCars=cars;
+    if(state.data.u.coachVoice)try{alfredSpeak(cars===1?"That's a Batmobile's worth of iron moved, sir.":"That's "+cars+" Batmobiles lifted tonight, sir.");}catch(e){}}
+}
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
 function liveCheckPR(ei,si){
@@ -4381,6 +4419,7 @@ function renderSummary(){
   const R=state.lastResult;if(!R){state.step=null;go("gotham");return;}
   const cards=[summaryCard1,summaryCardRecap,summaryCard2,summaryCard3,summaryCard4];const last=cards.length-1;
   $("app").innerHTML=`<div class="fade">${cards[state.sumCard](R)}
+    ${state.sumCard===0?lifeboatBanner():""}
     <div class="dots">${cards.map((_,i)=>`<i class="${i===state.sumCard?"on":""}"></i>`).join("")}</div>
     <div class="row" style="margin-top:14px;gap:9px">
       ${state.sumCard>0?`<button class="btn ghost g" onclick="sumNav(-1)">← Back</button>`:""}
@@ -10478,7 +10517,25 @@ function setGemKey(v){if(v.trim())localStorage.setItem("gt_gemini",v.trim());els
 function exportRival(){const d=state.data;const code=btoa(unescape(encodeURIComponent(JSON.stringify({name:d.u.name||"Vigilante",totalVol:d.u.totalVolume,totalWorkouts:d.u.totalWorkouts,streak:d.u.streakDays,prs:d.prs}))));
   if(navigator.clipboard)navigator.clipboard.writeText(code);appAlert({title:"Sparring code",ok:"Done",html:`Copied to your clipboard. Send this to a rival:<input readonly value="${esc(code)}" style="margin-top:10px" onclick="this.select()"/>`});}
 function importRival(){appPrompt({title:"Add rival",body:"Paste a rival's sparring code:",ok:"Spar"}).then(c=>{if(!c)return;try{const clean=(c||"").replace(/\s+/g,"");const r=JSON.parse(decodeURIComponent(escape(atob(clean))));if(!r||typeof r!=="object"){toast("Invalid code.");return;}state.data.rival=r;save();checkAchievements();toast("Now sparring with "+(r.name||"your rival"));closeOverlay();render();}catch(e){toast("Invalid code.");}});}
-function backupData(){const blob=new Blob([JSON.stringify(state.data)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gainstracker-backup.json";a.click();}
+function backupData(){const blob=new Blob([JSON.stringify(state.data)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gainstracker-backup.json";a.click();state.data.u.lastBackupAt=new Date().toISOString();save();try{toast("💾 Backup saved — store it in iCloud/Files");}catch(e){}}
+/* Data lifeboat — iOS can evict PWA localStorage under storage pressure. Nudge a backup
+   AFTER a workout (contextual, never on launch) when none exists for 30+ days. */
+function lifeboatBanner(){
+  const u=state.data.u;
+  if((state.data.workouts||[]).length<8)return "";
+  const last=u.lastBackupAt?new Date(u.lastBackupAt).getTime():0;
+  if(now()-last<30*864e5)return "";
+  return `<div class="card" style="border-color:rgba(60,150,255,.4);box-shadow:0 0 24px -12px rgba(60,150,255,.6);padding:13px 14px;margin-top:12px">
+    <div class="row" style="gap:10px;align-items:flex-start">
+      <span style="font-size:22px;filter:drop-shadow(0 0 10px rgba(60,150,255,.7))">🛟</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--disp);font-size:14px;color:#9fc1f2;letter-spacing:.06em">PROTECT THE CAVE</div>
+        <div class="mini" style="color:var(--text2);line-height:1.5">${u.lastBackupAt?"Your last backup is over a month old.":"No backup on file."} iPhone can purge app storage — one tap saves every workout, PR and split to a file. Keep it in iCloud.</div>
+      </div>
+      <button class="btn gold sm" style="width:auto;flex:none" onclick="backupData();render()">💾 Back up</button>
+    </div>
+  </div>`;
+}
 function exportCSV(){
   const rows=[["date","exercise","set","weight_kg","reps","type","est_1rm_kg"]];
   (state.data.workouts||[]).slice().reverse().forEach(w=>{
@@ -10841,6 +10898,7 @@ function renderLogging(){
           <div class="log-exname">${esc(e.name)}</div>
           ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
           <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
+          ${liberationTicker(fei)}
           ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
         </div>
         <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove exercise">✕</button>
@@ -11172,6 +11230,7 @@ function renderLogging(){
           <div class="log-exname">${esc(e.name)}</div>
           ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
           <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
+          ${liberationTicker(fei)}
           ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
         </div>
         <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove">✕</button>
