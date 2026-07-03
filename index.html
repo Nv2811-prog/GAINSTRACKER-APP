@@ -4827,7 +4827,7 @@ async function alfredPhysiqueReview(){
 function progressPhotosCard(){
   const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
   const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
-  const cmp=ph.length>=2?`<button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button>`:"";
+  const cmp=ph.length>=2?`<span class="row" style="gap:6px"><button class="btn ghost sm" style="width:auto" onclick="openPhotoTimeline()">🎞 Timeline</button><button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button></span>`:"";
   const cells=ph.map(p=>`<div class="pcell" onclick="viewProgress('${p.id}')"><img src="${p.img}" alt=""><div class="pdate">${fmtP(p.date)}${p.bw?" · "+p.bw+"kg":""}</div></div>`).join("");
   const add=`<label class="pcell add"><input type="file" accept="image/*" capture="environment" style="display:none" onchange="addProgress(this)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#E8C56A" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg><span class="mini">Add photo</span></label>`;
   return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
@@ -6023,7 +6023,9 @@ function profileRecordsHtml(d){
   const _inm=new Set((d.bossWins||[]).map(w=>w.villain)).size;
   const _esc=(d.bossReturns||[]).filter(b=>!b.defeated).length;
   const lockupBtn=`<button class="splitday" style="width:100%;margin:0 0 10px;cursor:pointer" onclick="openArkhamLockup()">
-    <div class="splitday-main"><span style="font-size:22px;flex:none">🔒</span><div class="splitday-tx"><b>Arkham Lockup <span class="mini" style="color:var(--gold2)">›</span></b><span>${_inm} inmate${_inm===1?"":"s"}${_esc?` · <span style="color:var(--red)">${_esc} at large</span>`:""}</span></div></div></button>`;
+    <div class="splitday-main"><span style="font-size:22px;flex:none">🔒</span><div class="splitday-tx"><b>Arkham Lockup <span class="mini" style="color:var(--gold2)">›</span></b><span>${_inm} inmate${_inm===1?"":"s"}${_esc?` · <span style="color:var(--red)">${_esc} at large</span>`:""}</span></div></div></button>
+  <button class="splitday" style="width:100%;margin:0 0 10px;cursor:pointer" onclick="openGazette()">
+    <div class="splitday-main"><span style="font-size:22px;flex:none">🗞</span><div class="splitday-tx"><b>The Gotham Gazette <span class="mini" style="color:var(--gold2)">›</span></b><span>this month's front page — your numbers as news</span></div></div></button>`;
   const prs=Object.entries(d.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm);
   const volPRs={};
   (d.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{const v=(e.sets||[]).filter(s=>s.done&&s.type!=="W").reduce((a,s)=>a+((+s.w||0)*(+s.r||0)),0);if(v>(volPRs[e.name]||0))volPRs[e.name]=Math.round(v);});});
@@ -6630,7 +6632,8 @@ function myPatrolCard(){
     return {n:(w.name||"Session").slice(0,16),v:Math.round(w.totalVol||0),t:(w.date||"").slice(0,10),top:top.slice(0,18)};
   });
   const prTot=(d.workouts||[]).reduce((n,w)=>n+((w.prs||[]).length),0); // cumulative PR events ever — lets Fight Night score progress, not tonnage
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent};
+  let ssn=null;try{const ss=seasonState();if(ss.week<SEASON_CHAPTERS.length)ssn={n:ss.n,w:ss.week+1,st:seasonChapterEval(ss.week).stars};}catch(e){}
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent,ssn};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
@@ -7768,7 +7771,7 @@ function renderAllies(){
               <div style="margin-top:3px">${allyStatusPill(a)}</div>
             </div>
           </div>
-          <span class="chip" style="font-size:10px">${esc(a.rk||"")}</span>
+          <span class="row" style="gap:4px;flex:none">${a.ssn?`<span class="chip" style="font-size:10px;color:var(--gold2);border-color:rgba(255,208,72,.4)">S${a.ssn.n} W${a.ssn.w} ${"★".repeat(a.ssn.st||0)||"☆"}</span>`:""}<span class="chip" style="font-size:10px">${esc(a.rk||"")}</span></span>
         </div>
         <div class="row" style="gap:5px;margin-bottom:9px">${caveStat("STR "+(a.sl||0),"strength")}${caveStat(fmtNum(a.vol||0)+"kg","moved")}${caveStat(a.w||0,"sessions")}${caveStat(a.boss||0,"villains")}</div>
         ${top?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px">${top}</div>`:''}
@@ -7776,6 +7779,7 @@ function renderAllies(){
           <button class="btn ghost sm g" style="flex:1" onclick="allyLifts(${i})">🏋️ Lifts</button>
           <button class="btn ghost sm g" style="flex:1" onclick="allySplit(${i})">🗂️ Split${days?` (${days})`:""}</button>
           <button class="btn ghost sm g" style="flex:1" onclick="compareAlly(${i})">⚔️ H2H</button>
+          <button class="btn ghost sm g" style="flex:1;color:var(--gold2);border-color:rgba(255,208,72,.3)" onclick="openGauntlet(${i})">🧤 Gauntlet</button>
         </div>
         ${risk?`<button class="btn sm" style="width:100%;margin-top:7px;background:linear-gradient(135deg,#ff7a3a,#E8453C);color:#fff;font-weight:800" onclick="streakRescue(${i})">🔥 Rescue their ${risk.streak}-day streak — about to break</button>`:''}
         <button class="btn ghost sm" style="width:100%;margin-top:6px;color:#9fc1f2;border-color:rgba(60,150,255,.28)" onclick="nudgeAlly(${i})">🦇 Light the Bat-Signal</button>
@@ -10203,12 +10207,77 @@ function openSeason(){
         <div style="font-family:var(--disp);font-size:14px;color:${fut?'var(--text3)':ch.c}">WEEK ${i+1} — ${fut&&!ch.finale?'▓▓▓▓▓▓':ch.v.toUpperCase()+": "+ch.t}</div>
         <div class="mini" style="color:var(--text3)">${fut?(ch.finale?"The finale. He's waiting.":"Intel sealed until the week begins"):ch.m.length?("targets: "+ch.m.map(m=>MNAME[m]).join(", ")):"any 2 records + weekly goal"}</div>
       </div>
-      <span style="font-family:var(--disp);color:var(--gold2);flex:none">${on?'<span class="chip on" style="font-size:9px;padding:1px 7px">NOW</span> ':''}${st}</span>
+      <span style="font-family:var(--disp);color:var(--gold2);flex:none">${on?'<span class="chip on" style="font-size:9px;padding:1px 7px">NOW</span> ':''}${st}
+        ${past&&ev&&ev.stars>0&&!((state.data.season.claimed||{})[i])?`<button class="chip on" style="font-size:9px;padding:2px 8px;margin-left:4px" onclick="event.stopPropagation();state.data.season.claimed=state.data.season.claimed||{};state.data.season.claimed[${i}]=true;state.data.u.xp=(state.data.u.xp||0)+${40}*${ev.stars};save();try{confettiBurst();}catch(e){}toast('★ Chapter reward — +${40*ev.stars} XP');closeSheet();openSeason();">COLLECT +${40*ev.stars}</button>`:""}</span>
     </div>`;}).join("");
   openSheet(`<div class="ttl" style="margin:0 0 2px">🌒 SEASON ${ss.n} — THE LONG NIGHT</div>
     <div class="mini" style="color:var(--text2);margin-bottom:9px">Eight weeks. Eight rogues. Every chapter is cleared with real training — the bounty is always a record. Gotham remembers the stars you leave behind.</div>
     ${rows}
     <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close the case file</button>`);
+}
+/* ===== GAUNTLET — throw a concrete challenge at an ally over the live nudge channel ===== */
+function openGauntlet(i){
+  const a=(state.data.allies||[])[i];if(!a)return;
+  const lifts=Object.entries(state.data.prs||{}).filter(([n,p])=>p&&p.w>0).sort((x,y)=>y[1].orm-x[1].orm).slice(0,6);
+  if(!lifts.length){toast("Set a record first — then throw the gauntlet.");return;}
+  openSheet(`<div class="ttl">🧤 Throw the gauntlet — ${esc(a.n)}</div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 10px">Pick a lift. The challenge is your current best +2.5% — beat it by Sunday or bow out.</div>
+    ${lifts.map(([n,p])=>{const tw=Math.round(p.w*1.025*2)/2;
+      return `<button class="btn ghost" style="width:100%;text-align:left;margin-bottom:7px" onclick="sendGauntlet(${i},'${esc(n).replace(/'/g,"")}',${tw})"><b>${esc(n)}</b> — beat <b class="gold">${tw}kg</b></button>`;}).join("")}
+    <button class="btn" onclick="closeSheet()">Not tonight</button>`);
+}
+function sendGauntlet(i,liftN,tw){
+  state._nudgePresets=[`🧤 GAUNTLET THROWN: beat ${tw}kg on ${liftN} by Sunday. — ${state.data.u.name||"a rival"}`];
+  try{sendNudge(i,0);}catch(e){toast("Couldn't reach them — try when the cloud is live.");return;}
+  state.data.gauntlets=state.data.gauntlets||[];
+  state.data.gauntlets.push({ally:((state.data.allies||[])[i]||{}).n,ex:liftN,targetW:tw,date:new Date().toISOString()});
+  save();closeSheet();toast("🧤 Gauntlet thrown. No backing out now.");
+}
+/* ===== THE GOTHAM GAZETTE — this month's front page, from your real numbers ===== */
+function openGazette(){
+  const d=state.data,t=new Date(),m0=new Date(t.getFullYear(),t.getMonth(),1).getTime();
+  const ws=(d.workouts||[]).filter(w=>new Date(w.date).getTime()>=m0);
+  const ton=ws.reduce((a,w)=>a+(w.totalVol||0),0);
+  const prN=ws.reduce((a,w)=>a+((w.prs||[]).length),0);
+  const kos=(d.bossWins||[]).filter(b=>new Date(b.date).getTime()>=m0);
+  const held=M12.filter(m=>districtCrime(m).crime<45).length;
+  let top=null,tv=0;ws.forEach(w=>{if((w.totalVol||0)>tv){tv=w.totalVol;top=w;}});
+  const month=t.toLocaleDateString(undefined,{month:"long",year:"numeric"}).toUpperCase();
+  const head=ton>0?`${(d.u.name||"THE BAT").toUpperCase()} MOVES ${fmtNum(Math.round(ton))} KG`:"GOTHAM WAITS FOR ITS HERO";
+  openSheet(`<div style="background:linear-gradient(180deg,#efe6d0,#e2d6bc);border-radius:14px;padding:16px 15px;color:#191512">
+    <div style="text-align:center;border-bottom:2.5px solid #191512;padding-bottom:6px;margin-bottom:9px">
+      <div style="font-family:var(--disp);font-size:31px;letter-spacing:.09em;color:#141210">THE GOTHAM GAZETTE</div>
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#5a5040">${month} EDITION · 1 KRONE</div></div>
+    <div style="font-family:var(--disp);font-size:25px;line-height:1.06;color:#141210;margin-bottom:7px">${head}</div>
+    <div style="font-size:12.5px;line-height:1.65;color:#33291d">
+      ${ws.length?`Sources confirm <b>${ws.length} patrol${ws.length===1?"":"s"}</b> this month${prN?`, with <b>${prN} record${prN===1?"":"s"} shattered</b>`:""}.
+      ${kos.length?` The underworld reels — <b>${kos.length} rogue${kos.length===1?"":"s"} put down</b>${kos[0]?` (${esc(kos[kos.length-1].villain)} most recently)`:""}.`:""}
+      ${top?` The heaviest night: <b>${esc(top.name)}</b>, ${fmtNum(top.totalVol)}kg moved.`:""}
+      City control stands at <b>${held}/12 districts</b>.`:`No confirmed sightings this month. The rogues grow bold.`}
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px;border-top:1px solid #a99e86;padding-top:8px">
+      ${[["PATROLS",ws.length],["TONNAGE",fmtNum(Math.round(ton))],["RECORDS",prN],["KOs",kos.length]].map(([l,v])=>`<div style="flex:1;text-align:center"><div style="font-family:var(--disp);font-size:19px;color:#141210">${v}</div><div style="font-size:8.5px;letter-spacing:.14em;color:#5a5040">${l}</div></div>`).join("")}
+    </div>
+  </div>
+  <button class="btn" style="margin-top:12px" onclick="closeSheet()">Fold the paper</button>`);
+}
+/* ===== PHOTO TIME-MACHINE — slide through your transformation ===== */
+function openPhotoTimeline(){
+  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(ph.length<2){toast("Add at least two progress photos first.");return;}
+  state._ptIdx=ph.length-1;
+  const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
+  openSheet(`<div class="ttl">🎞 Time-machine</div>
+    <div style="position:relative;border-radius:14px;overflow:hidden;background:#000">
+      <img id="pt-a" src="${ph[0].img}" style="width:100%;display:block">
+      <img id="pt-b" src="${ph[ph.length-1].img}" style="width:100%;display:block;position:absolute;inset:0;opacity:1">
+      <div id="pt-lab" style="position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-family:var(--disp);font-size:15px;color:var(--gold2)"></div>
+    </div>
+    <input type="range" min="0" max="${ph.length-1}" step="1" value="${ph.length-1}" style="margin-top:12px"
+      oninput="(function(v){const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));const p=ph[+v];const b=document.getElementById('pt-b');b.src=p.img;b.style.opacity=1;document.getElementById('pt-lab').textContent=new Date(p.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'2-digit'})+(p.bw?' · '+p.bw+'kg':'');})(this.value)">
+    <div class="row sp" style="margin-top:4px"><span class="mini">${fmtP(ph[0].date)}</span><span class="mini">${fmtP(ph[ph.length-1].date)}</span></div>
+    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
+  setTimeout(()=>{const p=ph[ph.length-1];const l=document.getElementById("pt-lab");if(l)l.textContent=fmtP(p.date)+(p.bw?" · "+p.bw+"kg":"");},50);
 }
 /* ===== WARM-UP RAMP — tap a working weight, get the exact ramp with plates per side ===== */
 function openRamp(fei){
