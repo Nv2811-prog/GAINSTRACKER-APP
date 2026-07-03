@@ -108,6 +108,23 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 @keyframes stgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 /* season chapter faces stay inside their slot */
 .season-face img.vface,.season-face .vface{width:100%;height:100%;font-size:30px}
+/* ===== JUICE — impact, tension, ritual ===== */
+.btn:active{transform:scale(.94)!important}
+.chip:active{transform:scale(.9)!important}
+.prflash{position:fixed;inset:0;z-index:240;background:#fff;opacity:.85;pointer-events:none;animation:prfl .38s ease-out forwards}
+@keyframes prfl{0%{opacity:.85}100%{opacity:0}}
+.goflash{position:fixed;inset:0;z-index:235;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:120px;color:var(--green);text-shadow:0 0 60px rgba(34,232,122,.9);background:rgba(3,5,8,.55);pointer-events:none;animation:gofl .7s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes gofl{0%{opacity:0;transform:scale(2.2)}25%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+body.rest-final::after{content:"";position:fixed;inset:0;z-index:60;pointer-events:none;box-shadow:inset 0 0 120px 30px rgba(255,60,40,.28);animation:rfPulse 1s ease-in-out infinite}
+@keyframes rfPulse{0%,100%{opacity:.5}50%{opacity:1}}
+.landed{animation:landShake .35s ease}
+@keyframes landShake{0%{transform:scale(1.12)}40%{transform:scale(.97) translateX(-2px)}70%{transform:translateX(2px)}100%{transform:none}}
+.gsweep{position:fixed;inset:0;z-index:225;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,222,120,.35) 47%,rgba(255,240,180,.5) 50%,rgba(255,222,120,.35) 53%,transparent 70%);background-size:280% 100%;animation:gswp 1s ease-in-out forwards;mix-blend-mode:screen}
+@keyframes gswp{0%{background-position:120% 0;opacity:0}15%{opacity:1}100%{background-position:-40% 0;opacity:0}}
+@keyframes gcLightning{0%,96.5%,98.2%,100%{opacity:0}97%{opacity:.5}97.6%{opacity:.15}97.9%{opacity:.6}}
+.gc-light{animation:gcLightning 26s linear infinite;pointer-events:none}
+@keyframes gcBM{0%,92%{transform:translateX(600px)}97%,100%{transform:translateX(-120px)}}
+.gc-bm{animation:gcBM 47s linear infinite}
 /* ===== KO CAM — slow-mo finish replay ===== */
 #kocam{position:fixed;inset:0;z-index:230;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;
   background:radial-gradient(ellipse 90% 70% at 50% 45%,rgba(40,6,4,.94),rgba(2,3,6,.98));animation:stgFade 1.65s ease-in-out forwards}
@@ -2621,11 +2638,46 @@ function checkUnlocks(){
 
 /* ========================= TIMERS (Rule 2: no render() in setInterval) ========================= */
 function beep(p){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=p||660;g.gain.value=.12;o.start();g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.18);o.stop(c.currentTime+.2);}catch(e){}}
+/* ── SFX — synthesized WebAudio, zero assets, offline. Iron should SOUND heavy. ── */
+function sfx(kind){try{
+  const c=sfx._c=sfx._c||new(window.AudioContext||window.webkitAudioContext)();
+  if(c.state==="suspended")c.resume();
+  const t=c.currentTime;
+  const tone=(f0,f1,dur,type,vol)=>{const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);g.gain.setValueAtTime(vol||.2,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.02);};
+  const noise=(dur,vol,fc)=>{const n=c.createBufferSource(),b=c.createBuffer(1,Math.max(1,c.sampleRate*dur|0),c.sampleRate),dd=b.getChannelData(0);for(let i=0;i<dd.length;i++)dd[i]=(Math.random()*2-1)*(1-i/dd.length);n.buffer=b;const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=fc||900;const g=c.createGain();g.gain.setValueAtTime(vol||.25,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);n.connect(f);f.connect(g);g.connect(c.destination);n.start(t);};
+  if(kind==="thud"){tone(130,42,.16,"sine",.5);noise(.09,.18,500);}
+  else if(kind==="clank"){tone(820,640,.05,"square",.05);}
+  else if(kind==="slam"){tone(90,28,.42,"sine",.6);noise(.32,.3,700);}
+  else if(kind==="pop"){tone(300,920,.18,"triangle",.25);noise(.26,.12,2400);}
+  else if(kind==="go"){tone(440,880,.12,"square",.15);}
+}catch(e){}}
+/* PR flashbulb — one frame of white before the chaos */
+function prFlash(){try{const f=document.createElement("div");f.className="prflash";document.body.appendChild(f);setTimeout(()=>f.remove(),380);}catch(e){}}
+/* count-up — makes big numbers LAND instead of appear */
+function countUpEl(id,target,suffix){const el=document.getElementById(id);if(!el)return;const t0=performance.now(),dur=850;
+  const step=(tn)=>{const p=Math.min(1,(tn-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=fmtNum(Math.round(target*e))+(suffix||"");
+    if(p<1)requestAnimationFrame(step);else{el.classList.add("landed");setTimeout(()=>el.classList.remove("landed"),400);}};
+  requestAnimationFrame(step);}
+/* once-a-day arrival ritual — an 900ms signal sweep, never twice, never blocking */
+function signalSweep(){try{const el=document.createElement("div");el.className="gsweep";document.body.appendChild(el);setTimeout(()=>el.remove(),1000);}catch(e){}}
+/* Alfred, live: a REAL AI message (Gemini) — throttled, silent without a key */
+function alfredPingAI(ctx){try{
+  if(!geminiKey())return false;
+  if(Date.now()-(state._aiPingT||0)<8*60000)return true;
+  state._aiPingT=Date.now();
+  geminiCall([{text:alfredContext()+"\n\nSend ONE short in-character Alfred Pennyworth message (max 25 words) for this exact moment: "+ctx+" Be specific to the training data above. Dry wit welcome. No preamble, no quotes."}]).then(txt=>{
+    if(!txt)return;const line=txt.trim().replace(/^["“]|["”]$/g,"").slice(0,180);
+    try{ALFRED_MSGS.push({role:"alfred",text:line});}catch(e){}
+    toast("🎩 "+line);
+    if(state.data.u.coachVoice)setTimeout(()=>{try{alfredSpeak(line);}catch(e){}},500);
+  }).catch(()=>{});
+  return true;
+}catch(e){return false;}}
 /* Centralized haptics — one place to tune feel. Silently no-ops where unsupported (iOS Safari). */
 const HAPTIC={tap:14,toggle:[12,18,26],done:[18,24,40],pr:[30,30,60],hit:38,ko:[60,40,120,40,200],rest:200,success:[40,30,80],warn:[80,40,80]};
 function haptic(kind){try{if(navigator.vibrate)navigator.vibrate(HAPTIC[kind]||kind||14);}catch(e){}}
 function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInterval(state.wtInt);state.wtInt=null;}return;}const el=$("wt-display");const secs=Math.floor((Date.now()-state.session.startedAt)/1000);state.workoutTimer=secs;if(el)el.textContent=fmtTime(secs);}
-function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");beep(880);if(el){el.textContent="DONE";el.parentElement.style.borderColor="var(--green)";}const sn=$("rest-sheet-num");if(sn)sn.textContent="GO";restDone();return;}state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const sn=$("rest-sheet-num");if(sn)sn.textContent=fmtTime(rem);updateRestOverlay(rem);}
+function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");sfx("go");beep(880);document.body.classList.remove("rest-final");try{const gf=document.createElement("div");gf.className="goflash";gf.textContent="GO";document.body.appendChild(gf);setTimeout(()=>gf.remove(),700);}catch(e){}if(el){el.textContent="DONE";el.parentElement.style.borderColor="var(--green)";}const sn=$("rest-sheet-num");if(sn)sn.textContent="GO";restDone();return;}if(rem<=5){document.body.classList.add("rest-final");haptic([16,50]);}else document.body.classList.remove("rest-final");state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const sn=$("rest-sheet-num");if(sn)sn.textContent=fmtTime(rem);updateRestOverlay(rem);}
 /* ----- Liquid-glass rest overlay (transient element — never re-rendered, so no lag) ----- */
 function updateRestOverlay(rem){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;const n=$("restnum");if(n)n.textContent=fmtTime(Math.max(0,rem));const tot=state._restTotal||1,C=728.8,frac=Math.max(0,Math.min(1,rem/tot)),prog=$("restprog");if(prog)prog.style.strokeDashoffset=(C*(1-frac)).toFixed(1);const hint=$("resthint");if(hint&&!ov.classList.contains("done"))hint.textContent=(Math.floor(Date.now()/4000)%2)?"Breathe out…":"Breathe in…";}
 function restDone(){const ov=$("restov");if(!ov||!ov.classList.contains("on"))return;ov.classList.add("done");const lb=$("restlabel");if(lb)lb.textContent="Recovered";const n=$("restnum");if(n)n.textContent="GO";const h=$("resthint");if(h)h.textContent="Back to work, sir.";const p=$("restprog");if(p)p.style.strokeDashoffset=0;clearTimeout(state._restCloseT);state._restCloseT=setTimeout(closeRestOverlay,1700);}
@@ -2645,7 +2697,7 @@ function reopenRest(){
     <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Keep resting</button>`);
 }
 function addRest(delta){if(!state.restRunning){closeRestOverlay();return;}state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);let rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();closeSheet();return;}haptic("tap");updateRestOverlay(rem);const el=$("rest-display");if(el)el.textContent=fmtTime(Math.max(0,rem));const sn=$("rest-sheet-num");if(sn)sn.textContent=fmtTime(Math.max(0,rem));}
-function skipRest(){state.restRunning=false;state.restTimer=0;haptic("tap");closeRestOverlay();const el=$("rest-display");if(el){el.textContent="REST";el.parentElement.style.borderColor="";}}
+function skipRest(){state.restRunning=false;state.restTimer=0;haptic("tap");document.body.classList.remove("rest-final");closeRestOverlay();const el=$("rest-display");if(el){el.textContent="REST";el.parentElement.style.borderColor="";}}
 /* ===== MMA Round Timer — combat-conditioning interval timer ===== */
 const MMA_PRESETS=[
   {n:"MMA Title",d:"5 × 5:00 · 1:00 rest",rounds:5,work:300,rest:60},
@@ -2736,7 +2788,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -4265,6 +4317,7 @@ function renderSummary(){
       ${state.sumCard>0?`<button class="btn ghost g" onclick="sumNav(-1)">← Back</button>`:""}
       ${state.sumCard<last?`<button class="btn gold g" onclick="sumNav(1)">Next →</button>`:`<button class="btn gold g" onclick="closeSummary()">DONE</button>`}
     </div></div>`;
+  if(state.sumCard===0){setTimeout(()=>countUpEl("sumvol",Math.round(R.totalVol)),80);try{navigator.vibrate&&navigator.vibrate([30,180,30,300,30]);}catch(e){}}
   // swipe — handlers live on #app and are cleared at the top of render() when we leave summary,
   // so a stray swipe after dismissing the summary can never re-trigger this flow.
   const app=$("app");let sx=0;
@@ -4305,7 +4358,7 @@ function summaryCard1(R){
       <div class="sumstat"><div class="si">🏋️</div><div class="sv">${R.wk.exercises.length}</div><div class="sk">lifts</div></div>
       <div class="sumstat"><div class="si">🎯</div><div class="sv">${sets}</div><div class="sk">sets</div></div>
     </div>
-    <div class="sumvol"><div class="vbig">${fmtNum(R.totalVol)}<span style="font-size:20px;color:var(--text2)">kg</span></div>
+    <div class="sumvol"><div class="vbig"><span id="sumvol">0</span><span style="font-size:20px;color:var(--text2)">kg</span></div>
       ${liftedVisual(R.totalVol)||`<div class="muted" style="font-size:13px">≈ ${batCompare(R.totalVol)}</div>`}${vsPrev}</div>
     ${prN?`<div class="prribbon"><div class="row" style="gap:10px;align-items:center"><div style="font-size:26px;filter:drop-shadow(0 0 8px rgba(46,204,113,.5))">🏆</div><div style="flex:1"><div class="prr-t">${prN} NEW PERSONAL RECORD${prN>1?"S":""}</div><div class="prr-s">${R.prsThis.map(p=>esc(p.name)).join(" · ")}</div></div></div></div>`:""}
     <div class="hr"></div>
@@ -10388,6 +10441,7 @@ const VILLAIN_LINES={
    Windows light with weekly sets, towers glow by district crime (training neglect),
    the Bat-Signal burns when you're primed to train, rain falls when fatigue debt is high.
    Tap a tower → that muscle's dossier. Tap the signal → start tonight's patrol. ===== */
+function gothamMarkFallen(){const d=state.data;d.fallenSeen=d.fallenSeen||{};M12.forEach(m=>{if(districtCrime(m).crime>=70)d.fallenSeen[m]=1;});save();render();}
 function gothamSkylineCard(){
   const r=patrolReadiness(),f=fatigueDebt(),cc=cityCrime(),band=districtBand(cc);
   const cur=gtv2CurrentPlanDay();
@@ -10395,6 +10449,7 @@ function gothamSkylineCard(){
   const signalOn=!restNight&&r.score>=55;
   const startAct=cur&&cur.day&&!restNight?`startWorkout('${cur.sp.id}',${cur.i})`:"freeWorkout()";
   const W=560,GY=208;
+  const lastW=(state.data.workouts||[])[0];const gloom=lastW?clamp(((now()-new Date(lastW.date).getTime())/864e5-3)/4,0,1):0;
   // the sky follows the real clock: night / dawn / day / dusk
   const hr=new Date().getHours();
   const phase=hr>=21||hr<5?"night":hr<8?"dawn":hr<17?"day":"dusk";
@@ -10428,7 +10483,7 @@ function gothamSkylineCard(){
     const dc=districtCrime(m), b=districtBand(dc.crime), hot=dc.crime>=45;
     const sets=weeklySets(m), lm=VL[m]||{mav:14};
     const pct=Math.min(sets/Math.max(lm.mav,1),1);
-    const rows=Math.max(2,Math.floor((h-22)/13)), cols=2, lit=Math.round(rows*cols*pct);
+    const rows=Math.max(2,Math.floor((h-22)/13)), cols=2, lit=Math.round(rows*cols*pct*(1-gloom*.6));
     let wins="",n=0;
     for(let rw=0;rw<rows;rw++)for(let c2=0;c2<cols;c2++){
       const on=n<lit;n++;
@@ -10465,8 +10520,11 @@ function gothamSkylineCard(){
       <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx-172},${wy-32}) scale(.44)" fill="#0b0d12"/>
     </g>`;
   // rain when fatigue debt is high
-  if(f.pct>=40){let rain="";for(let i=0;i<16;i++){rain+=`<line x1="${i*35+12}" y1="-24" x2="${i*35+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;}
+  if(f.pct>=40||gloom>=.5){let rain="";for(let i=0;i<16;i++){rain+=`<line x1="${i*35+12}" y1="-24" x2="${i*35+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;}
     s+=`<g class="gc-rain" opacity=".3">${rain}</g>`;}
+  s+=`<rect class="gc-light" width="560" height="232" fill="#cfe0ff" opacity="0"/>`;
+  s+=`<g class="gc-bm"><path d="M0 0 L6 -5 L20 -6 L26 -10 L38 -10 L41 -6 L52 -5 L58 0 Z M44 -6 L47 -13 L49 -6 Z" transform="translate(0,${GY-1})" fill="#04060a"/></g>`;
+  if(gloom>0)s+=`<rect width="560" height="232" fill="#020305" opacity="${(gloom*.3).toFixed(2)}"/>`;
   // ground
   s+=`<rect x="0" y="${GY}" width="560" height="24" fill="#05070c"/><rect x="0" y="${GY}" width="560" height="1.5" fill="rgba(242,208,121,.22)"/>`;
   const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
@@ -10493,11 +10551,23 @@ function gothamSkylineCard(){
 function renderGotham(){
   const d=state.data,u=d.u;
   const ws=weeklyStreak(),dop=daysOnProtocol();
+  // once-a-day arrival ritual + Alfred noticing you
+  try{const today=new Date().toDateString();
+    if(u._ritualDay!==today&&!state.showOnboarding){u._ritualDay=today;save();signalSweep();
+      const lastW=(d.workouts||[])[0];const away=lastW?Math.floor((now()-new Date(lastW.date).getTime())/864e5):0;
+      if(away>=4){if(!alfredPingAI("the user just opened the app after "+away+" days away from training. Welcome them back — warm but pointed."))setTimeout(()=>toast("🎩 Good to see you again, sir. I kept the lights on."),900);}
+      else if(ws>=3){if(!alfredPingAI("weekly streak is "+ws+" weeks strong. A brief nod of respect."))setTimeout(()=>toast("🎩 "+ws+" weeks unbroken. I shall stop worrying, sir."),900);}
+    }}catch(e){}
+  // districts that FELL while you were away — the city hurts when you don't show up
+  d.fallenSeen=d.fallenSeen||{};
+  M12.forEach(m=>{if(districtCrime(m).crime<70)delete d.fallenSeen[m];});
+  const fallenNew=M12.filter(m=>districtCrime(m).crime>=70&&(d.muscleVol[m]||0)>0&&!d.fallenSeen[m]);
+  const fallenBanner=fallenNew.length?`<div class="card" style="border-color:var(--red);box-shadow:0 0 26px -10px var(--red);padding:11px 13px;margin-bottom:12px;cursor:pointer;animation:rfPulse 1.4s ease-in-out 3" onclick="gothamMarkFallen()"><div class="row" style="gap:9px"><span style="font-size:20px">🚨</span><div style="flex:1;min-width:0"><div style="font-family:var(--disp);font-size:14px;color:var(--red);letter-spacing:.06em">DISTRICT${fallenNew.length>1?"S":""} FALLEN WHILE YOU WERE AWAY</div><div class="mini" style="color:var(--text2)">${fallenNew.slice(0,2).map(m=>esc(MUSCLE_DISTRICT[m])+" — taken by "+esc((NEMESIS_MAP[m]||{}).villain||"the rogues")).join(" · ")}${fallenNew.length>2?" · +"+(fallenNew.length-2)+" more":""} · tap to acknowledge</div></div></div></div>`:"";
   // Memoize the two heaviest cards (SVG city + season eval) — rebuilt at most once/min or when data changes
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.sky=gothamSkylineCard();mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${mm.sky}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${fallenBanner}${mm.sky}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
@@ -10855,6 +10925,7 @@ function playStinger(title,sub,accent){
       <div class="stg-title" style="color:${c};text-shadow:0 0 30px ${c}">${title}</div>
       ${sub?`<div class="stg-sub">${sub}</div>`:''}`;
     document.body.appendChild(el);
+    try{sfx("slam");}catch(e){}
     try{haptic('done');}catch(e){}
     setTimeout(()=>{try{el.remove();}catch(e){}},1500);
   }catch(e){}
@@ -10870,14 +10941,14 @@ function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.ses
 
 function focusEx(ei){if(!state.session)return;state.session._focusEi=ei;try{haptic('tap');}catch(e){}render();window.scrollTo(0,0);}
 
-function stepW(ei,si,delta){
+function stepW(ei,si,delta){try{sfx("clank");}catch(e){}
   const ses=state.session;if(!ses||!ses.exercises[ei])return;
   const s=ses.exercises[ei].sets[si];if(!s)return;
   const cur=parseFloat(s.w)||0;
   s.w=String(Math.max(0,Math.round((cur+delta)*10)/10));
   saveSessionSoon();render();
 }
-function stepR(ei,si,delta){
+function stepR(ei,si,delta){try{sfx("clank");}catch(e){}
   const ses=state.session;if(!ses||!ses.exercises[ei])return;
   const s=ses.exercises[ei].sets[si];if(!s)return;
   const cur=parseInt(s.r)||0;s.r=String(Math.max(0,cur+delta));
