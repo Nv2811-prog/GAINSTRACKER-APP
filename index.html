@@ -10318,94 +10318,6 @@ const VILLAIN_LINES={
    Windows light with weekly sets, towers glow by district crime (training neglect),
    the Bat-Signal burns when you're primed to train, rain falls when fatigue debt is high.
    Tap a tower → that muscle's dossier. Tap the signal → start tonight's patrol. ===== */
-function gothamSkylineCard(){
-  const r=patrolReadiness(),f=fatigueDebt(),cc=cityCrime(),band=districtBand(cc);
-  const cur=gtv2CurrentPlanDay();
-  const restNight=!!(cur&&cur.day&&isRest(cur.day));
-  const signalOn=!restNight&&r.score>=55;
-  const startAct=cur&&cur.day&&!restNight?`startWorkout('${cur.sp.id}',${cur.i})`:"freeWorkout()";
-  const lastW=(state.data.workouts||[])[0];const gloom=lastW?clamp(((now()-new Date(lastW.date).getTime())/864e5-3)/4,0,1):0;
-  const TW=1014,GY=206,SH=262;
-  const hr=new Date().getHours();
-  const phase=hr>=21||hr<5?"night":hr<8?"dawn":hr<17?"day":"dusk";
-  const SKY={night:["#060a14","#0b1220","#131a2b"],dawn:["#1a1626","#3a2233","#7a4a3a"],day:["#22344e","#3a5578","#5b7da6"],dusk:["#141127","#3a2140","#8a4a2e"]}[phase];
-  let s="";
-  if(phase==="night"||phase==="dusk")for(let i=0;i<26;i++){const x=(i*97)%990+8,y=(i*61)%60+6;s+=`<circle class="${i%3===0?'gc-star':''}" cx="${x}" cy="${y}" r="${((i%3)*0.4+0.7).toFixed(1)}" fill="#cfd8ea" opacity=".5" style="animation-delay:${(i*0.7)%3.4}s"/>`;}
-  if(phase==="night")s+=`<circle cx="930" cy="34" r="24" fill="#E9EDF4" opacity=".08"/><circle cx="930" cy="34" r="13" fill="#E9EDF4" opacity=".85"/>`;
-  else if(phase==="day")s+=`<circle cx="930" cy="34" r="26" fill="#FFE9A8" opacity=".14"/><circle cx="930" cy="34" r="14" fill="#FFEFC2" opacity=".92"/>`;
-  else s+=`<circle cx="${phase==="dawn"?120:930}" cy="46" r="30" fill="#FFB067" opacity=".18"/><circle cx="${phase==="dawn"?120:930}" cy="46" r="15" fill="#FFC98A" opacity=".9"/>`;
-  try{const ssn=seasonState();if(ssn.week<SEASON_CHAPTERS.length){const chc=SEASON_CHAPTERS[ssn.week].c;s+=`<ellipse cx="507" cy="56" rx="560" ry="110" fill="${chc}" opacity=".05"/>`;}}catch(e){}
-  s+=`<g class="gc-cloud"><ellipse cx="220" cy="44" rx="72" ry="11" fill="#0d1119" opacity=".6"/></g><g class="gc-cloud b"><ellipse cx="660" cy="56" rx="80" ry="10" fill="#0c1017" opacity=".55"/></g>`;
-  s+=`<g class="gc-bat"><path d="M0 0 q3 -4.5 6.5 0 q3.5 -4.5 6.5 0 l-6.5 3.5 z" fill="#04060a" transform="translate(0,48) scale(.9)"/></g>`;
-  let bp=`M0 ${GY}`;for(let k=0;k<26;k++){const bx=k*40,bh=94+((k*29)%48);bp+=` L${bx} ${GY-bh} L${bx+40} ${GY-bh}`;}bp+=` L${TW} ${GY} Z`;
-  s+=`<path d="${bp}" fill="#0a0d15"/>`;
-  // ground + stat strip FIRST so tower stats draw on top
-  s+=`<rect x="0" y="${GY}" width="${TW}" height="${SH-GY}" fill="#05070c"/><rect x="0" y="${GY}" width="${TW}" height="1.5" fill="rgba(242,208,121,.22)"/>`;
-  // Wayne Tower anchors the left end — tap for the Iron Ledger
-  const wx=10,ww=58,wh=176,wy=GY-wh;
-  let wwin="";for(let rw=0;rw<9;rw++)for(let c2=0;c2<4;c2++)wwin+=`<rect x="${wx+8+c2*13}" y="${wy+24+rw*16}" width="9" height="7" rx="1" fill="${rw>2?'#FFD048':'#1a2233'}" opacity=".85"/>`;
-  s+=`<g class="gc-bld" onclick="openIronLedger()"><rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="url(#gcwayne)" stroke="rgba(255,208,72,.4)"/><path d="M${wx} ${wy} L${wx+ww/2} ${wy-16} L${wx+ww} ${wy} Z" fill="#141a29" stroke="rgba(255,208,72,.35)"/><text x="${wx+ww/2}" y="${wy+14}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="10" letter-spacing="2" fill="#FFD048" opacity=".9">WAYNE</text>${wwin}
-    <text x="${wx+ww/2}" y="${GY+20}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="#FFD048">LEDGER</text><text x="${wx+ww/2}" y="${GY+34}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(255,255,255,.45)">${fmtNum(Math.round((state.data.u.totalVolume||0)/1000))}t</text></g>`;
-  const wStreak=(typeof weeklyStreak==="function"?weeklyStreak():0)||0;
-  const bl=180+Math.min(wStreak,5)*10;
-  if(signalOn)s+=`<g class="gc-signal" onclick="${startAct}" transform="rotate(11 ${wx+ww} ${wy+2})" opacity="${(0.7+Math.min(wStreak,5)*0.06).toFixed(2)}">
-      <rect x="${wx+ww}" y="${wy-8}" width="${bl}" height="${22+Math.min(wStreak,5)*3}" fill="url(#gcbeamR)"/>
-      <circle cx="${wx+ww+bl}" cy="${wy+4}" r="${16+Math.min(wStreak,5)}" fill="#FFF3C9" opacity=".95"/>
-      <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx+ww+bl-11},${wy-7}) scale(.44)" fill="#0b0d12"/></g>`;
-  // 12 muscle towers — wide, billboarded, with sets + readiness printed under each
-  const AB={chest:"CHEST",back:"BACK",shoulders:"DELTS",biceps:"BICEPS",triceps:"TRICEPS",forearms:"GRIP",quads:"QUADS",hamstrings:"HAMS",glutes:"GLUTES",calves:"CALVES",abs:"ABS",traps:"TRAPS"};
-  M12.forEach((m,i)=>{
-    const x=86+i*77, w=62, cx2=x+w/2;
-    const h=90+((i*47)%58), y=GY-h;
-    const dc=districtCrime(m), b=districtBand(dc.crime), hot=dc.crime>=45;
-    const sets=weeklySets(m), lm=VL[m]||{mev:8,mav:14};
-    const pct=Math.min(sets/Math.max(lm.mav,1),1);
-    const rows=Math.max(2,Math.floor((h-14)/14)), cols=4, lit=Math.round(rows*cols*pct*(1-gloom*.6));
-    let wins="",n=0;
-    for(let rw=0;rw<rows;rw++)for(let c2=0;c2<cols;c2++){const on=n<lit;n++;wins+=`<rect class="${on&&n%5===0?'gc-wf':''}" x="${x+7+c2*13}" y="${y+8+rw*14}" width="9" height="7" rx="1" fill="${on?'#FFD048':'#131a28'}" style="${on&&n%5===0?`animation-delay:${(i*1.3+rw)%4.8}s`:''}"/>`;}
-    const sc=hot?b[1]:'#FFD048';
-    const trained=(state.data.muscleVol[m]||0)>0;
-    const hrs2=trained?hoursToReady(m):0;
-    const status=!trained?"—":hrs2>0?(hrs2<24?hrs2+"H":(hrs2/24).toFixed(1)+"D"):"READY";
-    const stCol=!trained?"#3a3e4a":hrs2>0?(getRecovery(m)>=50?"#E8C53C":"#E8453C"):"#2ECC71";
-    const setsCol=sets<=0?"#566070":sets<lm.mev?"#E8453C":sets<lm.mav?"#E8C53C":"#2ECC71";
-    s+=`<g class="gc-bld" onclick="muscleDrill('${m}')">
-      ${hot?`<ellipse cx="${cx2}" cy="${y}" rx="36" ry="12" fill="${b[1]}" opacity=".3"/>`:""}
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#gcbld)" stroke="${hot?b[1]:'rgba(242,208,121,.16)'}" stroke-opacity="${hot?'.8':'1'}"/>
-      <rect x="${x-3}" y="${y-22}" width="${w+6}" height="18" rx="3" fill="rgba(3,5,9,.92)" stroke="${sc}" stroke-opacity=".65" stroke-width=".8"/>
-      <text x="${cx2}" y="${y-8}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="1.6" fill="${sc}" style="text-shadow:0 0 8px ${sc}">${AB[m]||MNAME[m].toUpperCase()}</text>
-      ${hot?`<circle class="gc-beacon" cx="${cx2}" cy="${y-29}" r="2.4" fill="${b[1]}" style="animation-delay:${(i*0.4)%1.7}s"/>`:""}
-      ${wins}
-      <text x="${cx2}" y="${GY+20}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12.5" fill="${setsCol}">${sets}/${lm.mav} SETS</text>
-      <text x="${cx2}" y="${GY+35}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="${stCol}">${status}</text>
-      <text x="${cx2}" y="${GY+48}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" font-weight="700" fill="${hot?b[1]:'rgba(255,255,255,.38)'}">${hot?(dc.crime>=70?"VILLAIN-HELD":"CONTESTED"):"HELD"}</text>
-    </g>`;
-  });
-  if(f.pct>=40||gloom>=.5){let rain="";for(let i=0;i<28;i++)rain+=`<line x1="${i*36+12}" y1="-24" x2="${i*36+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;s+=`<g class="gc-rain" opacity=".3">${rain}</g>`;}
-  s+=`<rect class="gc-light" width="${TW}" height="${SH}" fill="#cfe0ff" opacity="0"/>`;
-  s+=`<g class="gc-bm"><path d="M0 0 L6 -5 L20 -6 L26 -10 L38 -10 L41 -6 L52 -5 L58 0 Z M44 -6 L47 -13 L49 -6 Z" transform="translate(0,${GY-1})" fill="#04060a"/></g>`;
-  if(gloom>0)s+=`<rect width="${TW}" height="${SH}" fill="#020305" opacity="${(gloom*.3).toFixed(2)}"/>`;
-  const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
-  return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px">
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><svg viewBox="0 0 ${TW} ${SH}" style="width:${TW}px;height:auto;display:block">
-      <defs>
-        <linearGradient id="gcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY[0]}"/><stop offset=".7" stop-color="${SKY[1]}"/><stop offset="1" stop-color="${SKY[2]}"/></linearGradient>
-        <linearGradient id="gcbld" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0e1422"/><stop offset=".5" stop-color="#161e30"/><stop offset="1" stop-color="#0b101c"/></linearGradient>
-        <linearGradient id="gcwayne" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#131a2c"/><stop offset=".5" stop-color="#1d2740"/><stop offset="1" stop-color="#101624"/></linearGradient>
-        <linearGradient id="gcbeamR" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFE9A8" stop-opacity="0"/><stop offset="1" stop-color="#FFE9A8" stop-opacity=".9"/></linearGradient>
-      </defs>
-      <rect width="${TW}" height="${SH}" fill="url(#gcsky)"/>
-      ${s}
-    </svg></div>
-    <div class="gc-strip">
-      <div style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:var(--disp);font-size:12px;letter-spacing:.16em;color:var(--gold2)">GOTHAM LIVE</span>
-        <span style="font-size:11px;color:${band[1]};font-weight:800;margin-left:7px">${band[0]}</span>
-        <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in trouble":"all districts held"}</span></div>
-      <span style="font-size:10px;color:var(--text3);flex:none;letter-spacing:.06em">‹ swipe the city · tap a tower ›</span>
-    </div>
-    <div style="padding:0 12px 12px"><button class="btn gold" onclick="openDistricts()">🗺 OPEN THE CAMPAIGN MAP — who controls Gotham</button></div>
-  </div>`;
-}
 function gothamCampaignMap(){
   const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
   const blob=(cx,cy,rx,ry,seed)=>{
@@ -10462,6 +10374,98 @@ function gothamCampaignMap(){
     ${s}
   </svg>
   <div class="mini center" style="color:var(--text3);margin-top:6px">tap any district for its full dossier</div>`;
+}
+function gothamSkylineCard(){
+  const r=patrolReadiness(),f=fatigueDebt(),cc=cityCrime(),band=districtBand(cc);
+  const cur=gtv2CurrentPlanDay();
+  const restNight=!!(cur&&cur.day&&isRest(cur.day));
+  const signalOn=!restNight&&r.score>=55;
+  const startAct=cur&&cur.day&&!restNight?`startWorkout('${cur.sp.id}',${cur.i})`:"freeWorkout()";
+  const lastW=(state.data.workouts||[])[0];const gloom=lastW?clamp(((now()-new Date(lastW.date).getTime())/864e5-3)/4,0,1):0;
+  const TW=560,GY=214,SH=240;
+  const hr=new Date().getHours();
+  const phase=hr>=21||hr<5?"night":hr<8?"dawn":hr<17?"day":"dusk";
+  const SKY={night:["#060a14","#0b1220","#131a2b"],dawn:["#1a1626","#3a2233","#7a4a3a"],day:["#22344e","#3a5578","#5b7da6"],dusk:["#141127","#3a2140","#8a4a2e"]}[phase];
+  let s="";
+  if(phase==="night"||phase==="dusk")for(let i=0;i<16;i++){const x=(i*97)%548+6,y=(i*61)%46+4;s+=`<circle class="${i%3===0?'gc-star':''}" cx="${x}" cy="${y}" r="${((i%3)*0.4+0.7).toFixed(1)}" fill="#cfd8ea" opacity=".5" style="animation-delay:${(i*0.7)%3.4}s"/>`;}
+  if(phase==="night")s+=`<circle cx="500" cy="26" r="20" fill="#E9EDF4" opacity=".08"/><circle cx="500" cy="26" r="11" fill="#E9EDF4" opacity=".85"/>`;
+  else if(phase==="day")s+=`<circle cx="500" cy="26" r="22" fill="#FFE9A8" opacity=".14"/><circle cx="500" cy="26" r="12" fill="#FFEFC2" opacity=".92"/>`;
+  else s+=`<circle cx="${phase==="dawn"?60:500}" cy="30" r="24" fill="#FFB067" opacity=".18"/><circle cx="${phase==="dawn"?60:500}" cy="30" r="12" fill="#FFC98A" opacity=".9"/>`;
+  try{const ssn=seasonState();if(ssn.week<SEASON_CHAPTERS.length){const chc=SEASON_CHAPTERS[ssn.week].c;s+=`<ellipse cx="280" cy="50" rx="330" ry="100" fill="${chc}" opacity=".05"/>`;}}catch(e){}
+  s+=`<g class="gc-cloud"><ellipse cx="130" cy="34" rx="60" ry="9" fill="#0d1119" opacity=".55"/></g><g class="gc-cloud b"><ellipse cx="400" cy="44" rx="66" ry="9" fill="#0c1017" opacity=".5"/></g>`;
+  s+=`<g class="gc-bat"><path d="M0 0 q3 -4.5 6.5 0 q3.5 -4.5 6.5 0 l-6.5 3.5 z" fill="#04060a" transform="translate(0,40) scale(.8)"/></g>`;
+  let bp=`M0 ${GY}`;for(let k=0;k<14;k++){const bx=k*40,bh=100+((k*29)%42);bp+=` L${bx} ${GY-bh} L${bx+40} ${GY-bh}`;}bp+=` L${TW} ${GY} Z`;
+  s+=`<path d="${bp}" fill="#090c13"/>`;
+  const AB={chest:"CHEST",back:"BACK",shoulders:"DELTS",biceps:"BICEPS",triceps:"TRICEPS",forearms:"GRIP",quads:"QUADS",hamstrings:"HAMS",glutes:"GLUTES",calves:"CALVES",abs:"ABS",traps:"TRAPS"};
+  // one tower builder used for both depth rows — the billboard carries name + sets + readiness
+  const tower=(m,x,w,h,backRow,i)=>{
+    const y=GY-h,cx2=x+w/2;
+    const dc=districtCrime(m), b=districtBand(dc.crime), hot=dc.crime>=45;
+    const sets=weeklySets(m), lm=VL[m]||{mev:8,mav:14};
+    const pct=Math.min(sets/Math.max(lm.mav,1),1);
+    const cols=backRow?3:4, rows=Math.max(2,Math.floor((h-(backRow?54:12))/13));
+    const lit=Math.round(rows*cols*pct*(1-gloom*.6));
+    let wins="",n=0;
+    for(let rw=0;rw<rows;rw++)for(let c2=0;c2<cols;c2++){const on=n<lit;n++;wins+=`<rect class="${on&&n%5===0?'gc-wf':''}" x="${x+6+c2*((w-12)/cols)}" y="${y+(backRow?36:10)+rw*13}" width="7" height="6" rx="1" fill="${on?'#FFD048':(backRow?'#10141f':'#131a28')}" style="${on&&n%5===0?`animation-delay:${(i*1.3+rw)%4.8}s`:''}"/>`;}
+    const sc=hot?b[1]:'#FFD048';
+    const trained=(state.data.muscleVol[m]||0)>0;
+    const hrs2=trained?hoursToReady(m):0;
+    const status=!trained?"—":hrs2>0?(hrs2<24?hrs2+"H":(hrs2/24).toFixed(1)+"D"):"READY";
+    const stCol=!trained?"#566070":hrs2>0?(getRecovery(m)>=50?"#E8C53C":"#E8453C"):"#2ECC71";
+    const setsCol=sets<=0?"#566070":sets<lm.mev?"#E8453C":sets<lm.mav?"#E8C53C":"#2ECC71";
+    const bw2=Math.max(w+6,64), bx2=cx2-bw2/2, by2=y-34;
+    return `<g class="gc-bld" onclick="muscleDrill('${m}')" ${backRow?'opacity=".93"':''}>
+      ${hot?`<ellipse cx="${cx2}" cy="${y}" rx="${w/2+6}" ry="10" fill="${b[1]}" opacity=".3"/>`:""}
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${backRow?'gcbldB':'gcbld'})" stroke="${hot?b[1]:'rgba(242,208,121,.15)'}" stroke-opacity="${hot?'.8':'1'}"/>
+      ${backRow?`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#030509" opacity=".34"/>`:""}
+      <rect x="${bx2}" y="${by2}" width="${bw2}" height="30" rx="3.5" fill="rgba(3,5,9,.94)" stroke="${sc}" stroke-opacity=".65" stroke-width=".8"/>
+      <text x="${cx2}" y="${by2+13}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="1.4" fill="${sc}" style="text-shadow:0 0 8px ${sc}">${AB[m]||MNAME[m].toUpperCase()}</text>
+      <text x="${cx2}" y="${by2+25}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9.5" letter-spacing=".5"><tspan fill="${setsCol}">${sets}/${lm.mav} SETS</tspan><tspan fill="rgba(255,255,255,.25)"> · </tspan><tspan fill="${stCol}">${status}</tspan></text>
+      ${hot?`<circle class="gc-beacon" cx="${cx2}" cy="${by2-6}" r="2.2" fill="${b[1]}" style="animation-delay:${(i*0.4)%1.7}s"/>`:""}
+      ${wins}</g>`;
+  };
+  // BACK row (even muscles) — taller, dimmer, billboards high in the sky
+  M12.forEach((m,i)=>{if(i%2)return;const k=i/2;
+    s+=tower(m,10+k*92,72,124+((k*37)%42),true,i);});
+  // Wayne Tower — center, tallest, between the rows
+  const wx=250,ww=52,wh=188,wy=GY-wh;
+  let wwin="";for(let rw=0;rw<10;rw++)for(let c2=0;c2<3;c2++)wwin+=`<rect x="${wx+8+c2*13}" y="${wy+22+rw*15.5}" width="9" height="7" rx="1" fill="${rw>2?'#FFD048':'#1a2233'}" opacity=".85"/>`;
+  s+=`<g class="gc-bld" onclick="openIronLedger()"><rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="url(#gcwayne)" stroke="rgba(255,208,72,.45)"/><path d="M${wx} ${wy} L${wx+ww/2} ${wy-15} L${wx+ww} ${wy} Z" fill="#141a29" stroke="rgba(255,208,72,.35)"/><text x="${wx+ww/2}" y="${wy+13}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9.5" letter-spacing="2" fill="#FFD048" opacity=".9">WAYNE</text>${wwin}</g>`;
+  const wStreak=(typeof weeklyStreak==="function"?weeklyStreak():0)||0;
+  const bl=160+Math.min(wStreak,5)*8, bh2=20+Math.min(wStreak,5)*3;
+  if(signalOn)s+=`<g class="gc-signal" onclick="${startAct}" transform="rotate(-20 ${wx+10} ${wy-10})" opacity="${(0.7+Math.min(wStreak,5)*0.06).toFixed(2)}">
+      <rect x="${wx-bl+8}" y="${wy-22}" width="${bl}" height="${bh2}" fill="url(#gcbeam)"/>
+      <circle cx="${wx-bl+14}" cy="${wy-12}" r="${15+Math.min(wStreak,5)}" fill="#FFF3C9" opacity=".95"/>
+      <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx-bl+3},${wy-23}) scale(.4)" fill="#0b0d12"/></g>`;
+  // FRONT row (odd muscles) — brighter, lower, overlapping for depth
+  M12.forEach((m,i)=>{if(!(i%2))return;const k=(i-1)/2;
+    s+=tower(m,52+k*90,74,80+((k*47)%36),false,i);});
+  if(f.pct>=40||gloom>=.5){let rain="";for(let i=0;i<16;i++)rain+=`<line x1="${i*35+12}" y1="-24" x2="${i*35+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;s+=`<g class="gc-rain" opacity=".3">${rain}</g>`;}
+  s+=`<rect class="gc-light" width="${TW}" height="${SH}" fill="#cfe0ff" opacity="0"/>`;
+  s+=`<g class="gc-bm"><path d="M0 0 L6 -5 L20 -6 L26 -10 L38 -10 L41 -6 L52 -5 L58 0 Z M44 -6 L47 -13 L49 -6 Z" transform="translate(0,${GY+10})" fill="#04060a"/></g>`;
+  if(gloom>0)s+=`<rect width="${TW}" height="${SH}" fill="#020305" opacity="${(gloom*.3).toFixed(2)}"/>`;
+  s+=`<rect x="0" y="${GY}" width="${TW}" height="${SH-GY}" fill="#05070c"/><rect x="0" y="${GY}" width="${TW}" height="1.5" fill="rgba(242,208,121,.22)"/>`;
+  const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
+  return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px">
+    <svg viewBox="0 0 ${TW} ${SH}" style="width:100%;display:block">
+      <defs>
+        <linearGradient id="gcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY[0]}"/><stop offset=".7" stop-color="${SKY[1]}"/><stop offset="1" stop-color="${SKY[2]}"/></linearGradient>
+        <linearGradient id="gcbld" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0e1422"/><stop offset=".5" stop-color="#161e30"/><stop offset="1" stop-color="#0b101c"/></linearGradient>
+        <linearGradient id="gcbldB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0a0f1a"/><stop offset=".5" stop-color="#101726"/><stop offset="1" stop-color="#080d16"/></linearGradient>
+        <linearGradient id="gcwayne" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#131a2c"/><stop offset=".5" stop-color="#1d2740"/><stop offset="1" stop-color="#101624"/></linearGradient>
+        <linearGradient id="gcbeam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></linearGradient>
+      </defs>
+      <rect width="${TW}" height="${SH}" fill="url(#gcsky)"/>
+      ${s}
+    </svg>
+    <div class="gc-strip">
+      <div style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:var(--disp);font-size:12px;letter-spacing:.16em;color:var(--gold2)">GOTHAM LIVE</span>
+        <span style="font-size:11px;color:${band[1]};font-weight:800;margin-left:7px">${band[0]}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in trouble":"all districts held"}</span></div>
+      <span style="font-size:10px;color:var(--text3);flex:none;letter-spacing:.06em">tap a tower ›</span>
+    </div>
+    <div style="padding:0 12px 12px"><button class="btn gold" onclick="openDistricts()">🗺 OPEN THE CAMPAIGN MAP — who controls Gotham</button></div>
+  </div>`;
 }
 function gothamMarkFallen(){const d=state.data;d.fallenSeen=d.fallenSeen||{};M12.forEach(m=>{if(districtCrime(m).crime>=70)d.fallenSeen[m]=1;});save();render();}
 function renderGotham(){
