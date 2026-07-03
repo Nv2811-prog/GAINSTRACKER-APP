@@ -1963,16 +1963,6 @@ function suitFigure(view,colFn,style){
   const defs=(state._figShade||state._figGlow)?SUIT_DEFS:'';
   return `<svg viewBox="58 40 134 380" preserveAspectRatio="xMidYMid meet" style="${style||'width:100%;height:100%;display:block'}">${defs}${body}</svg>`;
 }
-function suitFigureFB(colFn){
-  const prev=state._figColor;state._figColor=colFn;
-  const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
-  const P=suitProps();
-  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#8B6B2A">${t}</text>`;
-  const div=`<line x1="250" y1="12" x2="250" y2="418" stroke="#2A2520" stroke-width="1" stroke-dasharray="4,4"/>`;
-  const svg=`<svg viewBox="0 0 500 430" preserveAspectRatio="xMidYMid meet" style="width:100%;display:block">${SUIT_DEFS}${lbl(125,"FRONT")}${lbl(375,"BACK")}${div}${_frontBody(125,P)}${_backBody(375,P)}</svg>`;
-  state._figColor=prev;state._figShade=ps;state._figGlow=pg;
-  return svg;
-}
 function bodyFig(ex){
   const prim=MM_NORM((ex.p&&ex.p[0])||"chest");
   const sec=new Set((ex.s||[]).map(MM_NORM));
@@ -2216,17 +2206,6 @@ function exFigImg(ex){
  return k?`assets/exfig/${k}.png`:'';
 }
 
-function thumb(ex,small){
- const fi=exFigImg(ex);
- const svgFallback=figureSVG(ex);
- if(fi){
-   return `<span class="exwrap${small?' sm':''}">
-     <img class="exfigimg" src="${fi}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('hidden')" />
-     ${svgFallback}
-   </span>`;
- }
- return `<span class="exwrap${small?' sm':''}">${svgFallback}</span>`;
-}
 function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x[0])r=x;return{name:r[1],emoji:r[2]};}
 // Feature 15: bottom note alternates 50/50 between Batman flavour and real training science
 function gothamNote(){
@@ -2733,26 +2712,6 @@ function startWorkout(splitId,dayIdx){
 function freeWorkout(){try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");try{maybeContextualVillainTaunt();}catch(e){}}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
 const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
-function playEntrance(name){
-  if(state._entrLock)return;state._entrLock=true;
-  haptic&&haptic("light");
-  try{document.querySelectorAll(".entr").forEach(n=>n.remove());}catch(_){}
-  const ride=_ENTR_RIDES[Math.floor(Math.random()*_ENTR_RIDES.length)];
-  const ov=document.createElement("div");ov.className="entr";
-  ov.innerHTML=`<div class="entr-lights"><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="entr-floor"></div>
-    <div class="entr-beam"></div>
-    <div class="entr-stage">
-      <div class="entr-streak s1"></div><div class="entr-streak s2"></div><div class="entr-streak s3"></div>
-      <div class="entr-veh">${ride[0]}</div>
-      <div class="entr-cap"><div class="entr-kick">${esc(ride[1])}</div><div class="entr-name">${esc(name||"Workout")}</div><div class="entr-sub">Welcome to the Cave</div></div>
-    </div>
-    <div class="entr-flash"></div>`;
-  document.body.appendChild(ov);
-  ov.addEventListener("click",()=>fin());
-  let done=false;const fin=()=>{if(done)return;done=true;state._entrLock=false;ov.classList.add("out");setTimeout(()=>{try{ov.remove();}catch(_){}}, 520);};
-  setTimeout(fin,3450);
-}
 function seedSets(name){
   const last=lastSetFor(name);
   if(last&&last.length)return last.map(s=>({w:"",r:"",type:s.type||"NRM",done:false,rpe:"",prevW:s.w,prevR:s.r,prevType:s.type||"NRM"}));
@@ -3985,129 +3944,6 @@ function fillLast(ei){const ses=state.session;if(!ses)return;const e=ses.exercis
 /* Per-gym machine settings — remember seat height / pin / pad for this machine AT THIS GYM. */
 function machineSetting(name){const d=state.data;return ((d.machineSettings||{})[d.u.activeGym]||{})[name]||"";}
 function setMachineSetting(name){const d=state.data;appPrompt({title:"Machine setup · "+(d.u.activeGym||"gym"),body:"Save your settings for this machine (seat height, pin, pad position…). Stored per gym.",ok:"Save",value:machineSetting(name)}).then(v=>{if(v===null)return;d.machineSettings=d.machineSettings||{};d.machineSettings[d.u.activeGym]=d.machineSettings[d.u.activeGym]||{};v=(v||"").trim();if(v)d.machineSettings[d.u.activeGym][name]=v;else delete d.machineSettings[d.u.activeGym][name];save();render();});}
-function renderLogging(){
-  const ses=state.session;const metric=state.data.u.metric;
-  let html=`<div class="timers" id="timerbar">
-    <div class="tbox"><span class="num" id="wt-display">${fmtTime(state.session?Math.floor((Date.now()-state.session.startedAt)/1000):0)}</span><small>Mission time</small></div>
-    <div class="tbox rest" onclick="reopenRest()" style="cursor:pointer"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>${state.restRunning?"tap to open":"Recovery"}</small></div>
-    <button class="minbtn" onclick="minimizeWorkout()" title="Minimise — keep the workout running and browse tabs" aria-label="Minimise workout">▾</button>
-  </div>
-  <div id="timerspace" aria-hidden="true"></div>`;
-  html+=`<div class="row sp" style="margin-bottom:8px">
-    <div><div class="tag">${esc(ses.split)}</div><h2 style="font-size:26px">${esc(ses.day)}</h2></div>
-    <div class="row" style="gap:8px"><button class="btn ghost sm" style="width:auto" title="${state.data.u.coachVoice?"Alfred's voice on — tap to mute":"Alfred's voice off — tap to enable"}" onclick="toggleCoachVoice()">${state.data.u.coachVoice?'🔊':'🔇'}</button></div>
-  </div>`;
-  // Tonight's game plan — Alfred's pre-session briefing with 1-2 concrete targets (dismissible per session).
-  if(!ses._planDismiss){const _gp=tonightGamePlan();
-    if(_gp&&_gp.length){
-      html+=`<div class="card glow" style="padding:13px;margin-bottom:8px;border-color:rgba(232,197,106,.42);background:rgba(232,197,106,.06)">
-        <div class="row sp" style="margin-bottom:7px"><div class="ttl" style="margin:0">🗺️ Tonight's game plan</div><span onclick="dismissGamePlan()" title="Dismiss" style="cursor:pointer;color:var(--text3);font-weight:700;padding:0 4px;flex:none">✕</span></div>
-        ${_gp.map(t=>`<div class="mini" style="line-height:1.5;margin-bottom:5px;color:var(--text2)">🎯 ${t}</div>`).join("")}
-        <div class="mini" style="color:var(--text3);margin-top:3px">Hit one of these and tonight counts as a win, sir.</div>
-      </div>`;
-    }
-  }
-  const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=="W"&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));(x.s||[]).forEach(m=>hitM.push(m));}});
-  {const dmgOpen=state._dmgOpen===true; // collapsed by default — keeps the working sets in view (Gestalt: less clutter, clear focus)
-   html+=`<div class="card glow" style="padding:13px">
-     <div class="row sp" onclick="toggleDmgReport()" style="cursor:pointer"><div class="ttl" style="margin:0">⚡ Tonight's damage report</div><div class="row" style="gap:6px;flex:none"><span class="mini" style="color:var(--text3)">${hitM.length?[...new Set(hitM)].length+" muscles":"tap to view"}</span><span style="color:var(--text3);font-weight:700">${dmgOpen?"▾":"▸"}</span></div></div>
-     ${dmgOpen?`${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:8px;color:var(--text2)">${hitM.length?"Red = muscles already worked this session.":"Log a set and watch the muscles light up."}</div>`:""}
-   </div>`;}
-  // Alfred, ever-present at ringside — reacts to your last set, harsh or proud.
-  {const _ct=ses._coachTone||"ok";const _cc=_ct==="good"?"var(--green)":_ct==="bad"?"#e8453c":"var(--gold2)";
-   const _cl=ses._coach||"At your service, sir. Log your first set — I'll be watching, and I do not flatter.";
-   html+=`<div class="banner" style="margin-bottom:8px;border-color:${_cc}55"><span>🎩</span><div style="min-width:0"><b style="font-size:11px;letter-spacing:.08em;color:${_cc}">ALFRED${_ct==="bad"?" — UNIMPRESSED":_ct==="good"?" — IMPRESSED":""}</b><div class="mini" style="font-style:italic;color:var(--text2);line-height:1.45">"${esc(_cl)}"</div></div></div>`;}
-  sessionVolNotes().forEach(nt=>{html+=`<div class="banner" style="background:rgba(232,197,106,.10);border-color:rgba(232,197,106,.4);margin-bottom:8px"><span>🧠</span><div class="mini" style="line-height:1.5">${nt.text}</div></div>`;});
-  // Coverage radar — stretch-debt (teal) & redundant-coverage (cyan), distinct from the gold volume notes above.
-  stretchRedundancyNotes().forEach(nt=>{const ac=nt.kind==="stretch"?"86,204,182":"96,165,250";html+=`<div class="banner" style="background:rgba(${ac},.10);border-color:rgba(${ac},.42);margin-bottom:8px"><span>${nt.kind==="stretch"?"🧲":"📡"}</span><div class="mini" style="line-height:1.5">${nt.text.replace(/^🧲 |^📡 /,"")}</div></div>`;});
-  // Supersets & circuits: consecutive exercises sharing e.group render inside a linked wrapper.
-  const gCount={};ses.exercises.forEach(e=>{if(e.group)gCount[e.group]=(gCount[e.group]||0)+1;});
-  let curG=null,gLetters={},gSeq=0;
-  ses.exercises.forEach((e,ei)=>{
-    const ex=exFor(e.name);const sug=suggestionFor(e.name);
-    const inGroup=e.group&&gCount[e.group]>1;
-    if((e.group||null)!==curG){
-      if(curG&&gCount[curG]>1)html+=`</div>`;            // close previous group wrapper
-      curG=e.group||null;
-      if(inGroup){
-        if(!gLetters[e.group])gLetters[e.group]=String.fromCharCode(65+(gSeq++));
-        const isCirc=gCount[e.group]>=3;
-        html+=`<div class="ssgroup"><div class="sshead">${secIcon('link','#ff8378')}${isCirc?'CIRCUIT':'SUPERSET'} ${gLetters[e.group]} <em>· ${gCount[e.group]} moves, back-to-back — rest after the round</em></div>`;
-      }
-    }
-    if(!isExOpen(ei)){
-      const pr=exProgress(e);
-      html+=`<div class="card exfold exrow exdrag" data-ei="${ei}" onclick="toggleExCollapse(${ei})" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px;${pr.allDone?'opacity:.7':''}">
-        ${thumb(ex,true)}
-        <div class="g" style="min-width:0"><div class="exname" style="font-size:16px">${esc(e.name)}</div>
-          <div class="exmeta">${exTarget(ex)} · ${pr.allDone?`<span style="color:var(--green)">✓ ${pr.total} done</span>`:`${pr.doneN}/${pr.total} sets`}</div></div>
-        <div class="row" style="gap:2px;flex:none" onclick="event.stopPropagation()">
-          <button class="btn ghost sm" style="width:auto;padding:6px 8px;color:var(--text3)" title="Move up" ${ei===0?'disabled style="opacity:.25;width:auto;padding:6px 8px"':''} onclick="moveExercise(${ei},-1)">↑</button>
-          <button class="btn ghost sm" style="width:auto;padding:6px 8px;color:var(--text3)" title="Move down" ${ei===ses.exercises.length-1?'disabled style="opacity:.25;width:auto;padding:6px 8px"':''} onclick="moveExercise(${ei},1)">↓</button>
-        </div>
-        <div class="draghandle" title="Drag to reorder" onclick="event.stopPropagation()">⠿</div>
-        <div style="color:var(--text3);font-size:15px;font-weight:700;letter-spacing:1px">${pr.allDone?'✓':'▸'}</div>
-      </div>`;
-      return;
-    }
-    html+=`<div class="card exdrag" data-ei="${ei}">
-      <div class="row" style="margin-bottom:8px">
-        ${thumb(ex,true)}
-        <div class="g" onclick="toggleExCollapse(${ei})" style="cursor:pointer"><div class="exname">${esc(e.name)} <span style="color:var(--text3);font-size:13px;font-weight:700">▾</span></div>
-          <div class="exmeta">${exTarget(ex)}${ex.bw?" · bodyweight":""} <span style="color:var(--text3)">· drag ⠿ to reorder</span></div></div>
-        <div class="draghandle" title="Drag to reorder" style="align-self:center" onclick="event.stopPropagation()">⠿</div>
-        ${ex.eq==="barbell"||ex.eq==="smith"||ex.eq==="ez bar"||ex.eq==="trap bar"?`<button class="btn ghost sm" style="width:auto;padding:8px 9px;display:flex;align-items:center" title="Plate calculator" onclick="openPlateSheet(${ei})">${secIcon('plate')}</button>`:""}
-        <button class="btn ghost sm" style="width:auto;padding:8px 9px;color:var(--text3)" title="Move up" ${ei===0?'disabled style="opacity:.3;width:auto;padding:8px 9px"':''} onclick="moveExercise(${ei},-1)">↑</button>
-        <button class="btn ghost sm" style="width:auto;padding:8px 9px;color:var(--text3)" title="Move down" ${ei===ses.exercises.length-1?'disabled style="opacity:.3;width:auto;padding:8px 9px"':''} onclick="moveExercise(${ei},1)">↓</button>
-        <button class="btn ghost sm" style="width:auto;padding:8px 10px;color:var(--text3)" onclick="removeExercise(${ei})">✕</button>
-      </div>
-      ${sug?`<div class="mini" style="margin-bottom:6px">💡 Intel: last best ≈ ${sug}kg ${ex.bw?"added":""}. ${ses.readiness==="tired"?"Tired — match it.":"Beat it."}</div>`:""}
-      ${(()=>{const nt=nextTarget(e.name);return nt?`<div class="mini" style="margin-bottom:6px;color:var(--green);line-height:1.4">🎯 <b>Next target:</b> ${nt}</div>`:"";})()}
-      ${(ex.c&&ex.c[0])?`<div class="mini" style="margin-bottom:6px;color:var(--blue);line-height:1.4">🧪 ${esc(ex.c[0])}${ex.c.length>1?` <span onclick="showCues('${esc(e.name).replace(/'/g,"")}')" style="color:var(--gold2);cursor:pointer">+${ex.c.length-1} more</span>`:""}</div>`:""}
-      ${(()=>{const w=warmupSuggest(ei);return w?`<div class="card" style="margin:6px 0;padding:10px;background:#1a1305;border-color:var(--gold-dim,#6b5420)">
-        <div class="mini" style="color:var(--gold2);margin-bottom:4px;display:flex;align-items:center">${secIcon('flame')}Warm-up — ${esc(w.muscles)} still cold</div>
-        <div class="mini" style="margin-bottom:6px">${w.sets.map(s=>s.w+"kg × "+s.r).join("  ·  ")} <span style="color:var(--text3)">— primes the pattern, doesn't count as working volume</span></div>
-        <div class="row" style="gap:8px"><button class="btn gold sm g" onclick="addWarmups(${ei})">Add warm-up</button><button class="btn ghost sm" style="width:auto" onclick="dismissWarm(${ei})">Skip</button></div></div>`:"";})()}
-      ${["machine","cable","smith","lever","plate-loaded"].includes((ex.eq||"").toLowerCase())?`<div class="mini" onclick="setMachineSetting('${esc(e.name).replace(/'/g,"")}')" style="margin-bottom:7px;cursor:pointer">⚙️ <b style="color:var(--gold2)">${esc(state.data.u.activeGym||"Gym")}</b> setup: ${(()=>{const ms=machineSetting(e.name);return ms?`<b>${esc(ms)}</b> <span style="color:var(--text3)">· edit</span>`:`<span style="color:var(--text3)">tap to save seat / pin / pad ›</span>`;})()}</div>`:""}
-      <table class="settbl"><thead><tr><th>SET</th><th>PREVIOUS</th><th>${ex.bw?"+KG":"KG"}</th><th>REPS</th><th></th><th>${metric==="rir"?"RIR":"RPE"}</th><th>✓</th></tr></thead><tbody>`;
-    e.sets.forEach((s,si)=>{
-      const prev=(s.prevW!=null||s.prevR!=null)?`${s.prevType&&s.prevType!=="NRM"?s.prevType+" ":""}${s.prevW||0}×${s.prevR||0}`:"—";
-      const metricCell=(s.type==="W")?"—":`<select onchange="setField(${ei},${si},'rpe',this.value)" style="padding:7px 2px">${metricOpts(metric,s.rpe)}</select>`;
-      html+=`<tr>
-        <td><div class="stype ${s.type}" onclick="cycleType(${ei},${si})">${s.type==="NRM"?(si+1):s.type}</div></td>
-        <td class="prevcell">${prev}</td>
-        <td><input data-fid="${ei}-${si}-w" inputmode="decimal" value="${s.w}" oninput="setField(${ei},${si},'w',this.value)" placeholder="${ex.bw?(s.prevW||0):''}"/></td>
-        <td><input data-fid="${ei}-${si}-r" inputmode="numeric" value="${s.r}" oninput="setField(${ei},${si},'r',this.value)" placeholder="${s.prevR||''}"/></td>
-        <td><div class="stype ${s.type}" onclick="openSetSheet(${ei},${si})" title="Set options">⋮</div></td>
-        <td>${metricCell}</td>
-        <td><div class="sdone ${s.done?"on":""}" onclick="toggleDone(${ei},${si})">${s.done?"✓":""}</div></td>
-      </tr>`;
-    });
-    html+=`</tbody></table>
-      <div class="row wrap" style="margin-top:9px;gap:8px">
-        <button class="btn ghost sm g" onclick="addSet(${ei})">+ Add set</button>
-        <button class="btn ghost sm" style="width:auto" title="Fill these sets with last session's numbers" onclick="fillLast(${ei})">↻ Fill last</button>
-        <button class="btn ghost sm" style="width:auto" title="Swap for a similar lift" onclick="openSwap(${ei})">⇄ Swap</button>
-        <button class="btn ghost sm" style="width:auto" title="Add the antagonist / other forearm side" onclick="openPair(${ei})">🤝 Pair</button>
-        <button class="btn ghost sm" style="width:auto" onclick="showCues('${esc(e.name).replace(/'/g,"")}')">ℹ️ Cues</button>
-      </div></div>`;
-  });
-  if(curG&&gCount[curG]>1)html+=`</div>`;                  // close trailing group wrapper
-  html+=`<button class="btn" onclick="openPicker()">＋ Add exercise</button>`;
-  // Workout notes — written before Alfred's review so he reads them and respects your reasons.
-  html+=`<div class="card" style="margin-top:12px;padding:13px">
-      <div class="ttl" style="margin-bottom:4px">📝 Session notes <span class="mini" style="color:var(--text3);font-weight:400">— Alfred reads these before his review</span></div>
-      <textarea id="sessnotes" placeholder="e.g. Glutes & adductors were sore, so I skipped the two exercises that hit them directly." oninput="setSessionNotes(this.value)" style="width:100%;min-height:62px;resize:vertical;background:var(--bg2,#0e0e12);border:1px solid var(--line,#26262e);border-radius:10px;color:var(--text);padding:10px;font:inherit;line-height:1.45">${esc(ses.notes||"")}</textarea>
-    </div>`;
-  html+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="finishWorkout()">🏁 FINISH WORKOUT</button>
-    <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
-  $("app").innerHTML=html;
-  // Reserve exactly the fixed timer-bar's height so the content below it isn't hidden underneath.
-  {const _tb=$("timerbar"),_sp=$("timerspace");if(_tb&&_sp)_sp.style.height=_tb.offsetHeight+"px";}
-  ensureTimers();
-  if(!state.wtInt)startTimers();
-  initDragReorder();
-}
 function metricOpts(metric,val){
   const arr=metric==="rir"?["","0","1","2","3","4+"]:["","6","7","8","9","10"];
   return arr.map(o=>`<option ${String(val)===o?"selected":""}>${o}</option>`).join("");
@@ -6287,25 +6123,6 @@ function sparkline(){
   return `<div class="spark" style="margin-top:8px">${vals.map(v=>`<i style="height:${clamp(v/mx*100,4,100)}%;background:${up?'var(--gold-dim)':'var(--red)'}"></i>`).join("")}</div>`;
 }
 // Progressive overload: per completed exercise, what to do next time, from RIR/RPE + completion.
-function overloadSuggestions(wk){
-  const metric=state.data.u.metric;const out=[];
-  (wk.exercises||[]).forEach(e=>{
-    const ex=exFor(e.name);
-    const working=(e.sets||[]).filter(s=>s.done&&s.type!=="W"&&+s.r>0);
-    if(!working.length)return;
-    const rirs=working.map(s=>{const v=parseFloat(s.rpe);if(isNaN(v))return null;return metric==="rir"?v:(10-v);}).filter(v=>v!=null);
-    const topW=Math.max(...working.map(s=>+s.w||0));
-    const inc=ex.bw?"add reps, then add load":"+2.5kg";
-    let text,tone;
-    if(!rirs.length){text=`Add a rep on each set; once you top your range, go ${ex.bw?"weighted":"+2.5kg"}. (Log RIR for sharper calls.)`;tone="info";}
-    else{const avg=rirs.reduce((a,b)=>a+b,0)/rirs.length;
-      if(avg>2){text=`All sets left ${avg.toFixed(0)}+ in reserve — add load next time (${inc}).`;tone="up";}
-      else if(avg<=1){text=`Near failure (RIR ${avg.toFixed(1)}). Hold ${topW}kg, chase +1–2 reps before adding weight.`;tone="hold";}
-      else{text=`RIR ~2, the effective dose. Repeat ${topW}kg and add a rep where it's clean.`;tone="ok";}}
-    out.push({name:e.name,text,tone});
-  });
-  return out;
-}
 
 /* ========================= GYM CAMPAIGNS ========================= */
 function gymStats(gymName){
@@ -10393,6 +10210,27 @@ function openSeason(){
     ${rows}
     <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close the case file</button>`);
 }
+/* ===== WARM-UP RAMP — tap a working weight, get the exact ramp with plates per side ===== */
+function openRamp(fei){
+  const e=state.session&&state.session.exercises[fei];if(!e)return;
+  const ex=exFor(e.name);
+  const wSet=(e.sets||[]).find(s=>!s.done&&s.type!=="W")||e.sets[e.sets.length-1]||{};
+  const top=setLoad(ex,wSet.w)||((state.data.prs[e.name]||{}).w)||60;
+  const bar=+state.data.u.barWeight||20;
+  const steps=[[.4,10],[.55,6],[.7,4],[.85,2]];
+  const rows=steps.map(([p,r])=>{
+    const wt=Math.max(bar,Math.round(top*p/2.5)*2.5);
+    let rem=Math.max(0,(wt-bar)/2),parts=[];
+    [25,20,15,10,5,2.5,1.25].forEach(pl=>{while(rem>=pl-0.01){parts.push(pl);rem-=pl;}});
+    return `<div class="row sp" style="padding:8px 2px;border-top:1px solid var(--border)">
+      <b style="font-size:15px">${wt}kg × ${r}</b>
+      <span class="mini" style="color:var(--text2)">${parts.length?parts.join(" + ")+" / side":"bar only"}</span></div>`;
+  }).join("");
+  openSheet(`<div class="ttl">🪜 Warm-up ramp — ${esc(e.name)}</div>
+    <div class="mini" style="color:var(--text2);margin-bottom:6px">Built off your ${top}kg working weight (bar ${bar}kg). Fast, light, explosive — save the grind for the money sets.</div>
+    ${rows}
+    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Ready</button>`);
+}
 /* ===== ALFRED'S WEEKLY CONTRACT — three concrete goals from your real data, real reward ===== */
 function contractWeekKey(){const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7));return t.toISOString().slice(0,10);}
 function weeklyContract(){
@@ -10969,226 +10807,6 @@ function markFail(ei,si){
 function saveFocusedSet(ei,si){toggleDone(ei,si);}
 
 /* Override renderLogging with the Wave 9 cinematic layout. */
-function renderLogging(){
-  const ses=state.session;if(!ses){try{go('gotham');}catch(e){}return;}
-  // Timer bar (fixed header)
-  let h=`<div class="timers" id="timerbar">
-    <div class="tbox"><span class="num" id="wt-display">${fmtTime(Math.floor((Date.now()-ses.startedAt)/1000))}</span><small>Mission time</small></div>
-    <div class="tbox rest" onclick="reopenRest()" style="cursor:pointer"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>${state.restRunning?"tap to open":"Recovery"}</small></div>
-    <button class="minbtn" onclick="minimizeWorkout()" aria-label="Minimise workout">▾</button>
-  </div><div id="timerspace" aria-hidden="true"></div>`;
-
-  // Exercise nav strip
-  if(ses.exercises.length){
-    h+=`<div class="log-ex-strip">`;
-    const curFei=activeExIdx();
-    ses.exercises.forEach((e,ei)=>{
-      const pr=exProgress(e);const isFocus=ei===curFei;
-      const cls=pr.allDone?'ex-done':isFocus?'ex-active':'';
-      const nm=e.name.length>20?e.name.slice(0,19)+'…':e.name;
-      h+=`<div class="log-ex-pill ${cls}" onclick="focusEx(${ei})">${pr.allDone?'✓ ':''}${esc(nm)}</div>`;
-    });
-    h+=`</div>`;
-  }
-
-  // Focus card for active exercise
-  const fei=activeExIdx();
-  if(fei>=0&&ses.exercises[fei]){
-    const e=ses.exercises[fei];const ex=exFor(e.name);
-    const fi=exFigImg(ex);
-    const sug=suggestionFor(e.name);const nt=nextTarget(e.name);
-    const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
-    const col=pCols[(ex.p||[])[0]]||'var(--gold2)';
-    // Current set = first undone working set
-    const csi=e.sets.findIndex(s=>!s.done&&s.type!=='W');
-    const cs=csi>=0?e.sets[csi]:null;
-    // Progress dots (working sets only)
-    const wSets=e.sets.filter(s=>s.type!=='W');
-    let dotCnt=0;
-    const dots=wSets.map(s=>{const isDone=s.done;const isCur=!isDone&&wSets.slice(0,dotCnt).every(x=>x.done);dotCnt++;return `<div class="log-setdot${isDone?' done':isCur?' current':''}"></div>`;}).join('');
-    // Delta vs previous for the current set
-    let prevHtml='';
-    if(cs&&cs.prevW!=null&&cs.prevR!=null){
-      const pw=parseFloat(cs.prevW)||0,pr2=parseInt(cs.prevR)||0;
-      if(pw||pr2){
-        const cw=parseFloat(cs.w)||0,cr=parseInt(cs.r)||0;
-        const up=cw>pw||(cw===pw&&cr>pr2);const dn=cw<pw||(cw===pw&&cr<pr2);
-        const arrow=up?'↑':dn?'↓':'→';const dc=up?'dlt-up':dn?'dlt-dn':'dlt-eq';
-        const diff=up||dn?(()=>{const dw=Math.round((cw-pw)*10)/10;const dr=cr-pr2;const parts=[];if(dw!==0)parts.push((dw>0?'+':'')+dw+'kg');if(dr!==0)parts.push((dr>0?'+':'')+dr+' rep'+(Math.abs(dr)===1?'':'s'));return parts.join(' ');})():'same';
-        prevHtml=`<div class="log-prev"><span class="${dc}" style="font-size:15px">${arrow}</span><span>Last: <b>${pw}kg × ${pr2}</b></span><span class="${dc}">${diff}</span></div>`;
-      }
-    }
-    const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
-    const curW=cs?parseFloat(cs.w)||0:0;
-    const isF=cs&&cs.type==='F';
-
-    h+=`<div class="log-focus">
-      <div class="log-focus-head">
-        <div class="log-fig-wrap" style="border-color:${col}33">
-          ${fi?`<img src="${fi}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>`:''}
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${figureSVG(ex)}</div>
-        </div>
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">
-          <div class="log-exname">${esc(e.name)}</div>
-          ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
-          <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
-          ${liberationTicker(fei)}
-          ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
-        </div>
-        <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove exercise">✕</button>
-      </div>
-      ${wSets.length?`<div class="log-setbar">${dots}<span style="flex:1"></span><span style="font-size:10px;letter-spacing:.1em;color:var(--text3)">${wSets.filter(s=>s.done).length}/${wSets.length} DONE</span></div>`:''}`;
-
-    if(cs){
-      h+=`<div class="log-stepper-area">
-        <div class="log-stepper-row">
-          <div class="log-stepper-lbl">KG</div>
-          <div class="log-stepper">
-            <button class="log-step-btn" style="width:52px" onclick="stepW(${fei},${csi},-2.5)">−−</button>
-            <button class="log-step-btn" style="width:38px;background:rgba(242,208,121,.04);font-size:18px" onclick="stepW(${fei},${csi},-0.5)">−</button>
-            <div class="log-step-val"><div class="log-step-num">${cs.w||'—'}</div><div class="log-step-unit">kg</div></div>
-            <button class="log-step-btn" style="width:38px;background:rgba(242,208,121,.04);font-size:18px" onclick="stepW(${fei},${csi},0.5)">+</button>
-            <button class="log-step-btn" style="width:52px" onclick="stepW(${fei},${csi},2.5)">++</button>
-          </div>
-        </div>
-        ${isBarbell&&curW>0?`<div class="log-platebar">${renderPlateBar(curW)}</div>`:''}
-        <div class="log-stepper-row">
-          <div class="log-stepper-lbl">REPS</div>
-          <div class="log-stepper">
-            <button class="log-step-btn" style="width:72px" onclick="stepR(${fei},${csi},-1)">−</button>
-            <div class="log-step-val"><div class="log-step-num">${cs.r||'—'}</div><div class="log-step-unit">reps</div></div>
-            <button class="log-step-btn" style="width:72px" onclick="stepR(${fei},${csi},1)">+</button>
-          </div>
-        </div>
-        ${prevHtml}
-      </div>
-      <div class="log-save-row">
-        <button class="log-save-btn" onclick="saveFocusedSet(${fei},${csi})">✓ SAVE SET${cs.type==='W'?' (WARM-UP)':''}</button>
-        <button class="log-amrap-btn${isF?' on':''}" onclick="markFail(${fei},${csi})" title="Mark as AMRAP / failure — triggers fresh e1RM">AMRAP</button>
-      </div>`;
-    }else{
-      h+=`<div style="padding:10px 16px 14px;text-align:center;font-size:13px;color:var(--green,#2ecc71)">✓ All ${wSets.length} sets complete — tap another exercise below</div>`;
-    }
-
-    // Set history
-    h+=`<div class="log-set-hist">`;
-    let wNum=0;
-    e.sets.forEach((s,si)=>{
-      const isW=s.type==='W';if(!isW)wNum++;
-      const isDone=s.done;const isCur=si===csi;
-      const rowCls=isDone?'done-row':isCur?'cur-row':isW?'warm-row':'pend-row';
-      const badgeCls=isDone?'done':isCur?'cur':isW?'warm':'pend';
-      const badgeLabel=isDone?'✓':isW?'W':isCur?'→':String(wNum);
-      // Delta arrow for done sets
-      let dlt='';
-      if(isDone&&!isW&&(s.prevW!=null||s.prevR!=null)){
-        const pw2=parseFloat(s.prevW)||0,pr3=parseInt(s.prevR)||0;
-        const cw2=parseFloat(s.w)||0,cr2=parseInt(s.r)||0;
-        if(cw2>pw2||(cw2===pw2&&cr2>pr3))dlt='<span class="dlt-up">↑</span>';
-        else if(cw2<pw2||(cw2===pw2&&cr2<pr3))dlt='<span class="dlt-dn">↓</span>';
-        else dlt='<span class="dlt-eq">→</span>';
-      }
-      const lbl=isW?`Warm-up · ${s.w||'—'}kg × ${s.r||'—'}`:`Set ${wNum} · ${s.w||'—'}kg × ${s.r||'—'}${s.type==='F'?' <span style="color:#e8453c;font-size:10px">AMRAP</span>':''}`;
-      const prevInfo=!isW&&(s.prevW!=null||s.prevR!=null)?`<span style="font-size:10.5px;color:var(--text3);margin-left:auto;padding-right:4px">prev ${s.prevW||'—'}×${s.prevR||'—'}</span>`:'';
-      const clickAct=isCur?`saveFocusedSet(${fei},${si})`:`toggleDone(${fei},${si})`;
-      h+=`<div class="log-set-row ${rowCls}" onclick="${clickAct}">
-        <div class="log-set-badge ${badgeCls}">${badgeLabel}</div>
-        <div style="flex:1;font-size:12.5px;color:${isDone?'var(--text)':isCur?'var(--gold2)':'var(--text3)'}">${lbl}</div>
-        ${dlt}${prevInfo}
-        <div class="stype ${s.type}" onclick="event.stopPropagation();openSetSheet(${fei},${si})" title="Set options" style="margin-left:2px">⋮</div>
-      </div>`;
-    });
-    h+=`</div>`;
-
-    // Action row
-    const exEq=(ex.eq||'').toLowerCase();
-    h+=`<div class="row wrap" style="padding:0 16px 16px;gap:7px">
-      <button class="btn ghost sm g" onclick="addSet(${fei})">+ Set</button>
-      <button class="btn ghost sm" style="width:auto" onclick="fillLast(${fei})">↻ Fill</button>
-      <button class="btn ghost sm" style="width:auto" onclick="openSwap(${fei})">⇄ Swap</button>
-      <button class="btn ghost sm" style="width:auto" onclick="openPair(${fei})">🤝 Pair</button>
-      <button class="btn ghost sm" style="width:auto" onclick="openProtocolSheet(${fei})">⚡ Intensity</button>
-      ${isBarbell?`<button class="btn ghost sm" style="width:auto" onclick="openPlateSheet(${fei})">${secIcon('plate')}</button>`:''}
-      ${['machine','cable','smith','lever','plate-loaded'].includes(exEq)?`<button class="btn ghost sm" style="width:auto" onclick="setMachineSetting('${esc(e.name).replace(/'/g,'')}')">⚙️</button>`:''}
-    </div>`;
-    h+=`</div>`; // close .log-focus
-  }else{
-    h+=`<div class="empty-state" style="padding:26px 14px 24px"><div style="height:150px;filter:drop-shadow(0 0 22px rgba(232,197,106,.35))">${suitFigure("front",m=>({fill:"#E8C56A",op:".16"}),"height:150px;width:auto;display:block;margin:0 auto")}</div><div class="es-title" style="margin-top:8px">ADD YOUR WEAPON</div><div class="es-body">Tap + below to add the first exercise. Gotham is watching.</div></div>`;
-  }
-
-  // Alfred coach line
-  {const _ct=ses._coachTone||'ok';const _cc=_ct==='good'?'var(--green)':_ct==='bad'?'#e8453c':'var(--gold2)';
-   const _cl=ses._coach||"At your service, sir. Log your first set — I'll be watching, and I do not flatter.";
-   h+=`<div class="banner" style="margin-bottom:8px;border-color:${_cc}55"><span>🎩</span><div style="min-width:0"><b style="font-size:11px;letter-spacing:.08em;color:${_cc}">ALFRED${_ct==='bad'?' — UNIMPRESSED':_ct==='good'?' — IMPRESSED':''}</b><div class="mini" style="font-style:italic;color:var(--text2);line-height:1.45">"${esc(_cl)}"</div></div></div>`;}
-
-  // Game plan (dismissible)
-  if(!ses._planDismiss){const _gp=tonightGamePlan();
-    if(_gp&&_gp.length)h+=`<div class="card glow" style="padding:11px;margin-bottom:8px;border-color:rgba(232,197,106,.42);background:rgba(232,197,106,.06)">
-      <div class="row sp" style="margin-bottom:6px"><div class="ttl" style="margin:0;font-size:13px">🗺️ Tonight's game plan</div><span onclick="dismissGamePlan()" style="cursor:pointer;color:var(--text3);font-weight:700;padding:0 4px">✕</span></div>
-      ${_gp.map(t=>`<div class="mini" style="line-height:1.5;margin-bottom:4px;color:var(--text2)">🎯 ${t}</div>`).join('')}
-    </div>`;}
-
-  // Coach analysis (collapsible)
-  {const vn=sessionVolNotes();const rn=stretchRedundancyNotes();
-   if(vn.length||rn.length){const open=state._coachNotesOpen;
-     h+=`<div class="card" style="padding:11px;margin-bottom:8px">
-       <div class="row sp" onclick="state._coachNotesOpen=!state._coachNotesOpen;render()" style="cursor:pointer">
-         <div style="font-size:12px;letter-spacing:.06em;color:var(--gold2)">🧠 Alfred's analysis</div>
-         <span style="color:var(--text3);font-size:13px">${open?'▾':'▸'}</span>
-       </div>
-       ${open?[...vn,...rn].map(n=>`<div class="mini" style="margin-top:7px;line-height:1.5;color:var(--text2)">${n.text.replace(/^🧲 |^📡 /,'')}</div>`).join(''):''}
-     </div>`;}}
-
-  // Damage map
-  {const hitM=[];ses.exercises.forEach(e=>{const anyDone=(e.sets||[]).some(s=>s.type!=='W'&&(s.done||parseFloat(s.r)>0));if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(m=>hitM.push(m));}});
-   if(hitM.length){const dmgOpen=state._dmgOpen===true;
-     h+=`<div class="card glow" style="padding:11px;margin-bottom:8px">
-       <div class="row sp" onclick="toggleDmgReport()" style="cursor:pointer">
-         <div class="ttl" style="margin:0;font-size:13px">⚡ Damage report</div>
-         <div class="row" style="gap:5px;flex:none"><span class="mini" style="color:var(--text3)">${[...new Set(hitM)].length} muscles</span><span style="color:var(--text3);font-weight:700">${dmgOpen?'▾':'▸'}</span></div>
-       </div>
-       ${dmgOpen?`${sessionMuscleMap(hitM)}<div class="mini center" style="margin-top:6px;color:var(--text2)">Red = worked this session.</div>`:''}
-     </div>`;}}
-
-  // Other exercises (collapsed list)
-  if(ses.exercises.length>1){
-    h+=`<div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin:6px 0 8px">OTHER EXERCISES</div>`;
-    const gCount={};ses.exercises.forEach(e=>{if(e.group)gCount[e.group]=(gCount[e.group]||0)+1;});
-    let curG=null,gLetters={},gSeq=0;
-    ses.exercises.forEach((e,ei)=>{
-      if(ei===activeExIdx())return;
-      const ex=exFor(e.name);const pr=exProgress(e);
-      const inGroup=e.group&&gCount[e.group]>1;
-      if((e.group||null)!==curG){if(curG&&gCount[curG]>1)h+=`</div>`;curG=e.group||null;
-        if(inGroup){if(!gLetters[e.group])gLetters[e.group]=String.fromCharCode(65+(gSeq++));
-          h+=`<div class="ssgroup"><div class="sshead">${secIcon('link','#ff8378')}SUPERSET ${gLetters[e.group]}</div>`;}}
-      h+=`<div class="card exrow" style="padding:11px;cursor:pointer;opacity:${pr.allDone?.7:1}" onclick="focusEx(${ei})">
-        ${thumb(ex,true)}
-        <div class="g"><div class="exname" style="font-size:14px">${esc(e.name)}</div>
-          <div class="exmeta">${exTarget(ex)} · ${pr.allDone?`<span style="color:var(--green)">✓ all done</span>`:`${pr.doneN}/${pr.total} sets`}</div></div>
-        <div style="color:${pr.allDone?'var(--green)':'var(--text3)'};font-size:14px">${pr.allDone?'✓':'▸'}</div>
-      </div>`;
-    });
-    if(curG&&gCount[curG]>1)h+=`</div>`;
-  }
-
-  h+=`<button class="btn" onclick="openPicker()">＋ Add exercise</button>`;
-
-  // Session notes
-  h+=`<div class="card" style="margin-top:12px;padding:13px">
-    <div class="ttl" style="margin-bottom:4px">📝 Session notes <span class="mini" style="color:var(--text3);font-weight:400">— Alfred reads these before his review</span></div>
-    <textarea id="sessnotes" placeholder="e.g. Glutes sore — skipped leg press." oninput="setSessionNotes(this.value)" style="width:100%;min-height:56px;resize:vertical;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font:inherit;line-height:1.45">${esc(ses.notes||'')}</textarea>
-  </div>`;
-
-  h+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="finishWorkout()">🏁 FINISH WORKOUT</button>
-    <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
-
-  $('app').innerHTML=h;
-  {const _tb=$('timerbar'),_sp=$('timerspace');if(_tb&&_sp)_sp.style.height=_tb.offsetHeight+'px';}
-  ensureTimers();
-  if(!state.wtInt)startTimers();
-  initDragReorder();
-}
 
 /* ===== Wave 9 v5: Garage doors + vehicle roll-out + anatomy-only figures ===== */
 
@@ -11331,6 +10949,14 @@ function renderLogging(){
     <div class="tbox rest" onclick="reopenRest()" style="cursor:pointer"><span class="num" id="rest-display">${state.restRunning?fmtTime(Math.max(0,Math.ceil((state.restEnd-Date.now())/1000))):"REST"}</span><small>${state.restRunning?"tap to open":"Recovery"}</small></div>
     <button class="minbtn" onclick="minimizeWorkout()" aria-label="Minimise workout">▾</button>
   </div><div id="timerspace" aria-hidden="true"></div>`;
+  // 👻 GHOST RACE — live tonnage vs the last time you ran this same day
+  {const ghost=(state.data.workouts||[]).find(w=>w.name===ses.day&&w.totalVol>0);
+   if(ghost){let lv=0;(ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{if(s.done)lv+=setVolume(ex,s);});});
+     const pct=clamp(lv/ghost.totalVol*100,0,100),beat=lv>ghost.totalVol;
+     h+=`<div style="margin:0 0 10px;padding:8px 12px;border-radius:12px;border:1px solid ${beat?'rgba(255,208,72,.55)':'rgba(124,150,255,.28)'};background:${beat?'rgba(255,208,72,.08)':'rgba(124,150,255,.06)'};${beat?'box-shadow:0 0 18px -8px rgba(255,208,72,.7)':''}">
+       <div class="row sp" style="margin-bottom:4px"><span class="mini" style="letter-spacing:.1em;color:${beat?'var(--gold2)':'#9fb6f0'};font-weight:800">👻 GHOST RACE ${beat?'— GHOST BEATEN ✓':'· vs last '+esc(ses.day)}</span><b class="mini num" style="color:${beat?'var(--gold2)':'var(--text2)'}">${fmtNum(Math.round(lv))} / ${fmtNum(ghost.totalVol)}kg</b></div>
+       <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden"><i style="display:block;height:100%;width:${pct.toFixed(0)}%;background:${beat?'linear-gradient(90deg,var(--gold),var(--gold2))':'linear-gradient(90deg,#5a7ce0,#9fb6f0)'};box-shadow:0 0 8px ${beat?'rgba(255,208,72,.8)':'rgba(124,150,255,.7)'}"></i></div>
+     </div>`;}}
 
   // Exercise nav strip
   if(ses.exercises.length){
@@ -11365,6 +10991,7 @@ function renderLogging(){
           ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
           <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
           ${liberationTicker(fei)}
+          <button class="chip" style="font-size:10.5px;padding:3px 9px;margin-top:5px;align-self:flex-start" onclick="openRamp(${fei})">🪜 Warm-up ramp</button>
           ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
         </div>
         <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove">✕</button>
