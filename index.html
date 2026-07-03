@@ -5136,7 +5136,8 @@ function exerciseHistory(name){
   const intel=liftIntel(name);
   const verdict=intel?liftVerdict(intel):"";
   const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
-  const tgtBlock=intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"";
+  const tgtBlock=(intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"")
+    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Drop the load 5% and own 9 clean reps before adding weight again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
   // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
   const recordE1=Math.max(...e1s);
   const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
@@ -6426,7 +6427,8 @@ function renderMission(){
   };
   const act=d.splits.find(sp=>d.activeSplitId===sp.id);
   if(act)html+=splitFull(act);
-  // ===== 2) body coach directly under tonight =====
+  // ===== 2) the weekly contract + body coach directly under tonight =====
+  html+=contractCard();
   html+=freqGuideCard();
   // ===== 3) the bench — other splits, compact =====
   const bench=d.splits.filter(sp=>d.activeSplitId!==sp.id);
@@ -10391,6 +10393,42 @@ function openSeason(){
     ${rows}
     <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close the case file</button>`);
 }
+/* ===== ALFRED'S WEEKLY CONTRACT — three concrete goals from your real data, real reward ===== */
+function contractWeekKey(){const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7));return t.toISOString().slice(0,10);}
+function weeklyContract(){
+  const wk=contractWeekKey(),t0=new Date(wk).getTime(),t1=t0+7*864e5;
+  const goal=state.data.u.weeklyGoal||4;
+  const sessions=(state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=t0&&t<t1;}).length;
+  // the most neglected sector becomes this week's named target
+  let weak=null,wc=-1;M12.forEach(m=>{const c=districtCrime(m).crime;if(c>wc){wc=c;weak=m;}});
+  const mev=(VL[weak]||{mev:8}).mev, wsets=seasonSetsInWeek(weak,t0,t1);
+  const prs=seasonPRsInWeek(t0,t1,null);
+  const goals=[
+    {lab:`Patrol ${goal}× this week`,cur:sessions,tgt:goal,done:sessions>=goal},
+    {lab:`${MNAME[weak]} — ${mev} sets (your most neglected sector)`,cur:wsets,tgt:mev,done:wsets>=mev},
+    {lab:"Break one record — any lift",cur:prs,tgt:1,done:prs>=1}
+  ];
+  const claimed=(state.data.contracts||{})[wk];
+  return {wk,goals,done:goals.filter(g=>g.done).length,all:goals.every(g=>g.done),claimed};
+}
+function claimContract(){
+  const c=weeklyContract();if(!c.all||c.claimed)return;
+  state.data.contracts=state.data.contracts||{};state.data.contracts[c.wk]=true;
+  state.data.u.xp=(state.data.u.xp||0)+150;save();
+  try{confettiBurst();haptic("ko");}catch(e){}
+  playStinger("CONTRACT FULFILLED","+150 XP · Alfred approves, sir","#22E87A");
+  render();
+}
+function contractCard(){
+  const c=weeklyContract();
+  const rows=c.goals.map(g=>`<div class="row" style="gap:7px;padding:3px 0"><span style="flex:none;width:16px;text-align:center;color:${g.done?'var(--green)':'var(--text3)'}">${g.done?'✓':'○'}</span><span class="mini" style="flex:1;color:${g.done?'var(--text2)':'var(--text)'}">${g.lab}</span><b class="mini" style="color:${g.done?'var(--green)':'var(--gold2)'}">${Math.min(g.cur,g.tgt)}/${g.tgt}</b></div>`).join("");
+  return `<div class="card" style="border-color:rgba(255,208,72,.3);padding:13px 14px">
+    <div class="row sp" style="margin-bottom:4px"><div class="ttl" style="margin:0;font-size:14px">🎩 Alfred's weekly contract</div>
+      ${c.claimed?`<span class="chip" style="color:var(--green)">✓ fulfilled</span>`:c.all?`<button class="btn gold sm" style="width:auto" onclick="claimContract()">CLAIM +150 XP</button>`:`<span class="chip">${c.done}/3</span>`}</div>
+    ${rows}
+    <div class="mini" style="color:var(--text3);margin-top:5px;font-style:italic">"Complete all three and I shall say something almost complimentary, sir."</div>
+  </div>`;
+}
 /* ===== ARKHAM LOCKUP — every villain you've ever put down, behind glass ===== */
 function openArkhamLockup(){
   const wins={};(state.data.bossWins||[]).forEach(w=>{wins[w.villain]=wins[w.villain]||{n:0,last:null,ex:null};wins[w.villain].n++;wins[w.villain].last=w.date;wins[w.villain].ex=w.ex;});
@@ -10899,7 +10937,14 @@ function playStinger(title,sub,accent){
     setTimeout(()=>{try{el.remove();}catch(e){}},1500);
   }catch(e){}
 }
-function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.session.day)||''));state.step='logging';startTimers();try{haptic('done');}catch(e){}render();}
+function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.session.day)||''));state.step='logging';startTimers();try{haptic('done');}catch(e){}
+  // spoken mission brief — Alfred reads tonight's plan as the doors open
+  try{const ses=state.session;
+    if(state.data.u.coachVoice&&ses&&!ses._briefSpoken){ses._briefSpoken=true;
+      const mus=[];const seen=new Set();(ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);mus.push(MNAME[m]);}});});
+      alfredSpeak(`Tonight: ${ses.day}. ${(ses.exercises||[]).length} exercises${mus.length?", targeting "+mus.slice(0,3).join(", "):""}. Gotham is watching, sir.`);}
+  }catch(e){}
+  render();}
 
 function focusEx(ei){if(!state.session)return;state.session._focusEi=ei;try{haptic('tap');}catch(e){}render();window.scrollTo(0,0);}
 
