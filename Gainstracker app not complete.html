@@ -10445,107 +10445,99 @@ function gothamCampaignMap(){
   <div class="mini center" style="color:var(--text3);margin-top:6px">tap any district for its full dossier</div>`;
 }
 function gothamSkylineCard(){
-  const r=patrolReadiness(),f=fatigueDebt(),cc=cityCrime(),band=districtBand(cc);
-  const cur=gtv2CurrentPlanDay();
-  const restNight=!!(cur&&cur.day&&isRest(cur.day));
-  const signalOn=!restNight&&r.score>=55;
-  const startAct=cur&&cur.day&&!restNight?`startWorkout('${cur.sp.id}',${cur.i})`:"freeWorkout()";
-  const lastW=(state.data.workouts||[])[0];const gloom=lastW?clamp(((now()-new Date(lastW.date).getTime())/864e5-3)/4,0,1):0;
-  const TW=560,GY=236,SH=272;
-  const hr=new Date().getHours();
-  const phase=hr>=21||hr<5?"night":hr<8?"dawn":hr<17?"day":"dusk";
-  const SKY={night:["#060a14","#0b1220","#131a2b"],dawn:["#1a1626","#3a2233","#7a4a3a"],day:["#22344e","#3a5578","#5b7da6"],dusk:["#141127","#3a2140","#8a4a2e"]}[phase];
+  const band=districtBand(cityCrime());
+  const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
+  const hr=new Date().getHours(), night=hr>=20||hr<6;
+  // irregular coastline blob (8 jittered control points → smooth quadratic loop)
+  const blob=(cx,cy,rx,ry,sd)=>{let r=sd*99;const rnd=()=>{r=(r*9301+49297)%233280;return r/233280;};
+    const pts=[];for(let a2=0;a2<8;a2++){const a=a2/8*Math.PI*2,jit=0.82+rnd()*0.36;
+      pts.push([cx+Math.cos(a)*rx*jit, cy+Math.sin(a)*ry*jit]);}
+    let pth="M"+((pts[7][0]+pts[0][0])/2).toFixed(1)+" "+((pts[7][1]+pts[0][1])/2).toFixed(1);
+    for(let k=0;k<8;k++){const nn=pts[(k+1)%8];pth+=` Q${pts[k][0].toFixed(1)} ${pts[k][1].toFixed(1)} ${((pts[k][0]+nn[0])/2).toFixed(1)} ${((pts[k][1]+nn[1])/2).toFixed(1)}`;}
+    return pth+" Z";};
+  const POS={shoulders:[330,84],traps:[464,100],triceps:[344,180],forearms:[470,196],
+             back:[100,150],chest:[234,138],biceps:[92,262],abs:[228,252],
+             quads:[318,336],hamstrings:[458,350],glutes:[326,434],calves:[464,446]};
+  const ISLES=[[398,140,158,112,3],[162,198,152,124,7],[392,392,166,118,11]];
+  const isle=ISLES.map(([cx,cy,rx,ry,sd])=>({glow:blob(cx,cy,rx+15,ry+15,sd+1),land:blob(cx,cy,rx,ry,sd),cx,cy,rx,ry}));
   let s="";
-  if(phase==="night"||phase==="dusk")for(let i=0;i<16;i++){const x=(i*97)%548+6,y=(i*61)%46+4;s+=`<circle class="${i%3===0?'gc-star':''}" cx="${x}" cy="${y}" r="${((i%3)*0.4+0.7).toFixed(1)}" fill="#cfd8ea" opacity=".5" style="animation-delay:${(i*0.7)%3.4}s"/>`;}
-  if(phase==="night")s+=`<circle cx="500" cy="26" r="20" fill="#E9EDF4" opacity=".08"/><circle cx="500" cy="26" r="11" fill="#E9EDF4" opacity=".85"/>`;
-  else if(phase==="day")s+=`<circle cx="500" cy="26" r="22" fill="#FFE9A8" opacity=".14"/><circle cx="500" cy="26" r="12" fill="#FFEFC2" opacity=".92"/>`;
-  else s+=`<circle cx="${phase==="dawn"?60:500}" cy="30" r="24" fill="#FFB067" opacity=".18"/><circle cx="${phase==="dawn"?60:500}" cy="30" r="12" fill="#FFC98A" opacity=".9"/>`;
-  try{const ssn=seasonState();if(ssn.week<SEASON_CHAPTERS.length){const chc=SEASON_CHAPTERS[ssn.week].c;s+=`<ellipse cx="280" cy="50" rx="330" ry="100" fill="${chc}" opacity=".05"/>`;}}catch(e){}
-  s+=`<g class="gc-cloud"><ellipse cx="130" cy="34" rx="60" ry="9" fill="#0d1119" opacity=".55"/></g><g class="gc-cloud b"><ellipse cx="400" cy="44" rx="66" ry="9" fill="#0c1017" opacity=".5"/></g>`;
-  s+=`<g class="gc-bat"><path d="M0 0 q3 -4.5 6.5 0 q3.5 -4.5 6.5 0 l-6.5 3.5 z" fill="#04060a" transform="translate(0,40) scale(.8)"/></g>`;
-  let bp=`M0 ${GY}`;for(let k=0;k<14;k++){const bx=k*40,bh=100+((k*29)%42);bp+=` L${bx} ${GY-bh} L${bx+40} ${GY-bh}`;}bp+=` L${TW} ${GY} Z`;
-  s+=`<path d="${bp}" fill="#090c13"/>`;
-  const AB={chest:"CHEST",back:"BACK",shoulders:"DELTS",biceps:"BICEPS",triceps:"TRICEPS",forearms:"GRIP",quads:"QUADS",hamstrings:"HAMS",glutes:"GLUTES",calves:"CALVES",abs:"ABS",traps:"TRAPS"};
-  // one tower builder used for both depth rows. Billboards (name plates) are collected here and
-  // drawn in a FINAL pass on top of the whole skyline, in two clean fixed bands, so no tower,
-  // roof, beam or neighbour can ever cover the text — and it's obvious which sign is which tower.
-  const bills=[];
-  const tower=(m,x,w,h,backRow,i,labelY)=>{
-    const y=GY-h,cx2=x+w/2;
-    const dc=districtCrime(m), b=districtBand(dc.crime), hot=dc.crime>=45;
-    const sets=weeklySets(m), lm=VL[m]||{mev:8,mav:14};
-    const pct=Math.min(sets/Math.max(lm.mav,1),1);
-    const trained=(state.data.muscleVol[m]||0)>0;
-    const rec=trained?getRecovery(m):-1;
-    // WINDOW COLOUR = readiness (green ready / amber recovering / red spent), COUNT lit = weekly volume
-    const winCol=!trained?'#243040':rec>=80?'#22E87A':rec>=50?'#E8C53C':'#E8453C';
-    const cols=backRow?3:4, rows=Math.max(2,Math.floor((h-(backRow?38:16))/13));
-    const lit=Math.round(rows*cols*pct*(1-gloom*.5));
-    let wins="",n=0;
-    for(let rw=0;rw<rows;rw++)for(let c2=0;c2<cols;c2++){const on=n<lit;n++;
-      wins+=`<rect class="${on&&n%4===0?'gc-wf':''}" x="${x+6+c2*((w-12)/cols)}" y="${y+(backRow?22:14)+rw*13}" width="7" height="6" rx="1" fill="${on?winCol:(backRow?'#0c111b':'#101724')}" ${on&&n%4===0?`style="animation-delay:${((i*1.3+rw)%4.8)}s"`:''}/>`;}
-    const nameCol=hot?b[1]:'#FFD048';
-    const dotCol=!trained?'#566070':winCol;
-    // Billboard: fixed-band y, clamped inside the frame, connector line down to its own roof.
-    const bw2=Math.max(w+10,64), bx2=Math.max(4,Math.min(TW-bw2-4,cx2-bw2/2)), lcx=bx2+bw2/2;
-    bills.push(`<g class="gc-bld" onclick="muscleDrill('${m}')">
-      <line x1="${lcx}" y1="${labelY+17}" x2="${cx2}" y2="${y}" stroke="${nameCol}" stroke-opacity=".4" stroke-width="1.1"/>
-      <rect x="${bx2}" y="${labelY}" width="${bw2}" height="17" rx="4" fill="rgba(3,5,9,.97)" stroke="${nameCol}" stroke-opacity=".7" stroke-width=".9"/>
-      <circle cx="${bx2+9}" cy="${labelY+8.5}" r="3.1" fill="${dotCol}" style="filter:drop-shadow(0 0 5px ${dotCol})">${trained?`<animate attributeName="opacity" values="1;.35;1" dur="${rec>=80?'2.6':rec>=50?'1.7':'1'}s" repeatCount="indefinite"/>`:""}</circle>
-      <text x="${lcx+4}" y="${labelY+12.5}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="1.1" fill="${nameCol}" style="text-shadow:0 0 8px ${nameCol}">${AB[m]||MNAME[m].toUpperCase()}</text></g>`);
-    return `<g class="gc-bld" onclick="muscleDrill('${m}')" ${backRow?'opacity=".9"':''}>
-      ${hot?`<ellipse cx="${cx2}" cy="${y}" rx="${w/2+6}" ry="10" fill="${b[1]}" opacity=".32"/>`:""}
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${backRow?'gcbldB':'gcbld'})" stroke="${hot?b[1]:'rgba(242,208,121,.15)'}" stroke-opacity="${hot?'.8':'1'}"/>
-      ${backRow?`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#030509" opacity=".34"/>`:""}
-      ${wins}</g>`;
-  };
-  // BACK row (even muscles) — taller, dimmer, billboards in the high band
-  M12.forEach((m,i)=>{if(i%2)return;const k=i/2;
-    s+=tower(m,10+k*92,72,124+((k*37)%42),true,i,20);});
-  // Wayne Tower — center, tallest, between the rows
-  const wx=250,ww=52,wh=188,wy=GY-wh;
-  let wwin="";for(let rw=0;rw<10;rw++)for(let c2=0;c2<3;c2++)wwin+=`<rect x="${wx+8+c2*13}" y="${wy+22+rw*15.5}" width="9" height="7" rx="1" fill="${rw>2?'#FFD048':'#1a2233'}" opacity=".85"/>`;
-  s+=`<g class="gc-bld" onclick="openIronLedger()"><rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="url(#gcwayne)" stroke="rgba(255,208,72,.45)"/><path d="M${wx} ${wy} L${wx+ww/2} ${wy-15} L${wx+ww} ${wy} Z" fill="#141a29" stroke="rgba(255,208,72,.35)"/>${wwin}</g>`;
-  const wStreak=(typeof weeklyStreak==="function"?weeklyStreak():0)||0;
-  const bl=160+Math.min(wStreak,5)*8, bh2=20+Math.min(wStreak,5)*3;
-  if(signalOn)s+=`<g class="gc-signal" onclick="${startAct}" transform="rotate(-20 ${wx+10} ${wy-10})" opacity="${(0.7+Math.min(wStreak,5)*0.06).toFixed(2)}">
-      <rect x="${wx-bl+8}" y="${wy-22}" width="${bl}" height="${bh2}" fill="url(#gcbeam)"/>
-      <circle cx="${wx-bl+14}" cy="${wy-12}" r="${15+Math.min(wStreak,5)}" fill="#FFF3C9" opacity=".95"/>
-      <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx-bl+3},${wy-23}) scale(.4)" fill="#0b0d12"/></g>`;
-  // FRONT row (odd muscles) — brighter, lower, overlapping for depth; billboards in the low band
-  M12.forEach((m,i)=>{if(!(i%2))return;const k=(i-1)/2;
-    s+=tower(m,40+k*88,74,80+((k*47)%36),false,i,100);});
-  if(f.pct>=40||gloom>=.5){let rain="";for(let i=0;i<16;i++)rain+=`<line x1="${i*35+12}" y1="-24" x2="${i*35+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;s+=`<g class="gc-rain" opacity=".3">${rain}</g>`;}
-  s+=`<rect class="gc-light" width="${TW}" height="${SH}" fill="#cfe0ff" opacity="0"/>`;
-  s+=`<g class="gc-bm"><path d="M0 0 L6 -5 L20 -6 L26 -10 L38 -10 L41 -6 L52 -5 L58 0 Z M44 -6 L47 -13 L49 -6 Z" transform="translate(0,${GY+10})" fill="#04060a"/></g>`;
-  if(gloom>0)s+=`<rect width="${TW}" height="${SH}" fill="#020305" opacity="${(gloom*.3).toFixed(2)}"/>`;
-  s+=`<rect x="0" y="${GY}" width="${TW}" height="${SH-GY}" fill="#05070c"/><rect x="0" y="${GY}" width="${TW}" height="1.5" fill="rgba(242,208,121,.22)"/>`;
-  // FINAL PASS — every billboard on top of the whole skyline so no text is ever blocked.
-  s+=bills.join("");
+  // faint nautical lat/long grid over the water
+  for(let gx=0;gx<=560;gx+=56)s+=`<line x1="${gx}" y1="0" x2="${gx}" y2="510" stroke="rgba(120,155,205,.06)" stroke-width="1"/>`;
+  for(let gy=0;gy<=510;gy+=56)s+=`<line x1="0" y1="${gy}" x2="560" y2="${gy}" stroke="rgba(120,155,205,.06)" stroke-width="1"/>`;
+  // depth contour rings + island bodies with clipped street texture
+  isle.forEach((p,idx)=>{
+    s+=`<path d="${blob(p.cx,p.cy,p.rx+30,p.ry+26,idx+21)}" fill="none" stroke="rgba(110,150,205,.10)" stroke-width="1" stroke-dasharray="3 6"/>
+        <path d="${p.glow}" fill="#0b1120" opacity=".9"/>
+        <path d="${p.land}" fill="#141d31" stroke="rgba(150,180,225,.24)" stroke-width="1.5"/>
+        <g clip-path="url(#gmisl${idx})">
+          <rect x="${p.cx-p.rx-24}" y="${p.cy-p.ry-24}" width="${p.rx*2+48}" height="${p.ry*2+48}" fill="url(#gmstreet)"/>
+          <path d="M${p.cx-p.rx-6} ${p.cy} H${p.cx+p.rx+6}" stroke="rgba(190,205,235,.18)" stroke-width="3"/>
+          <path d="M${p.cx} ${p.cy-p.ry-6} V${p.cy+p.ry+6}" stroke="rgba(190,205,235,.18)" stroke-width="3"/>
+          <path d="M${p.cx-p.rx} ${p.cy-p.ry} L${p.cx+p.rx} ${p.cy+p.ry}" stroke="rgba(190,205,235,.09)" stroke-width="2"/>
+        </g>`;
+  });
+  // bridges between the three isles
+  s+=`<g stroke="rgba(210,220,245,.42)" stroke-width="4" stroke-dasharray="9 5" stroke-linecap="round" fill="none">
+    <path d="M300 150 L250 176"/><path d="M250 250 Q290 320 316 344"/><path d="M400 250 Q400 300 396 320"/></g>
+    <g stroke="rgba(210,220,245,.16)" stroke-width="8" fill="none"><path d="M300 150 L250 176"/><path d="M250 250 Q290 320 316 344"/></g>`;
+  // Robinson Park — a green patch (ties to the quads district)
+  s+=`<path d="${blob(292,404,30,20,5)}" fill="rgba(46,150,86,.4)" stroke="rgba(90,210,130,.4)" stroke-width="1"/>
+      <text x="292" y="407" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" letter-spacing="1.5" fill="rgba(150,230,180,.75)">PARK</text>`;
+  // docks along the north isle + harbor boats
+  s+=`<g fill="rgba(150,180,225,.28)">${[0,1,2,3].map(i=>`<rect x="${300+i*11}" y="52" width="6" height="14" rx="1"/>`).join("")}</g>`;
+  s+=`<g fill="rgba(200,215,240,.32)" stroke="rgba(200,215,240,.4)" stroke-width=".6">
+    <path d="M70 470 l14 0 l-3 6 l-8 0 z"/><path d="M540 300 l12 0 l-3 5 l-6 0 z"/><path d="M40 300 l11 0 l-3 5 l-5 0 z"/></g>
+    <g stroke="rgba(200,215,240,.2)" stroke-width="1"><path d="M77 470 v-8"/><path d="M546 300 v-7"/></g>`;
+  // lighthouse
+  s+=`<g transform="translate(524,470)"><path d="M-3 8 L-2 -6 L2 -6 L3 8 Z" fill="rgba(220,225,240,.5)"/><circle cy="-8" r="3" fill="#FFD86A" style="filter:drop-shadow(0 0 6px #FFD86A)"><animate attributeName="opacity" values="1;.3;1" dur="2.4s" repeatCount="indefinite"/></circle></g>`;
+  // bat-signal wash at night
+  if(night)s+=`<circle cx="234" cy="138" r="120" fill="url(#gmsig)"/>`;
+  // DISTRICTS — every named city, its assigned villain, coloured by control
+  const RW=128,RH=64;
+  M12.forEach((m,i)=>{
+    const[mx,my]=POS[m], x=mx-RW/2, y=my-RH/2;
+    const dc=districtCrime(m), b=districtBand(dc.crime), held=dc.crime<45, lost=dc.crime>=70;
+    const vil=(NEMESIS_MAP[m]||{}).villain||"the Rogues", col=b[1];
+    const fill=held?"rgba(255,208,72,.15)":lost?"rgba(255,54,34,.2)":"rgba(255,140,34,.15)";
+    s+=`<g style="cursor:pointer" onclick="muscleDrill('${m}')">
+      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="10" fill="${fill}" stroke="${col}" stroke-opacity="${held?'.6':'.95'}" stroke-width="1.5"/>
+      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="10" fill="url(#gmblock)" opacity=".5"/>
+      <text x="${x+10}" y="${y+15}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="700" letter-spacing=".7" fill="rgba(215,225,245,.62)">${esc((MUSCLE_DISTRICT[m]||'').toUpperCase())}</text>
+      <text x="${x+10}" y="${y+39}" font-family="Bebas Neue,sans-serif" font-size="20" letter-spacing="1.3" fill="${held?'#FFD048':col}" style="text-shadow:0 0 10px ${col}">${MNAME[m].toUpperCase()}</text>
+      <text x="${x+10}" y="${y+RH-9}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="800" letter-spacing=".5" fill="${held?'rgba(255,208,72,.8)':col}">${held?'🦇 SECURED':'☠ '+esc(vil.toUpperCase())} · ${b[0]}</text>
+      <circle cx="${x+RW-15}" cy="${y+15}" r="10" fill="rgba(5,9,16,.92)" stroke="${col}" stroke-width="1.3"${held?'':' class="gc-beacon"'} style="${lost?'animation-delay:'+((i*0.3)%1.7)+'s':''};filter:drop-shadow(0 0 5px ${col})"/>
+      <text x="${x+RW-15}" y="${y+19}" text-anchor="middle" font-size="11">${held?'🦇':'☠️'}</text>
+    </g>`;
+  });
+  // map furniture — labels, compass, scale, title cartouche
+  s+=`<text x="30" y="345" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="4" fill="rgba(140,170,215,.42)" transform="rotate(-64 30 345)">GOTHAM RIVER</text>
+      <text x="150" y="500" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="6" fill="rgba(140,170,215,.42)">GOTHAM HARBOR</text>
+      <g transform="translate(24,30)"><text font-family="Bebas Neue,sans-serif" font-size="21" letter-spacing="3" fill="rgba(255,208,72,.92)" style="text-shadow:0 0 12px rgba(255,208,72,.4)">GOTHAM CITY</text><text y="14" font-family="DM Sans,sans-serif" font-size="8" letter-spacing="2.5" fill="rgba(200,215,240,.5)">TACTICAL PATROL MAP · 12 DISTRICTS</text></g>
+      <g transform="translate(526,52)" opacity=".62"><circle r="16" fill="rgba(5,9,16,.55)" stroke="rgba(200,215,240,.4)"/><path d="M0 -13 L4 0 L0 13 L-4 0 Z" fill="#FFD048"/><path d="M-13 0 L0 4 L13 0 L0 -4 Z" fill="rgba(200,215,240,.5)"/><text y="-19" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(200,215,240,.75)">N</text></g>
+      <g transform="translate(28,492)"><rect width="64" height="4" fill="none" stroke="rgba(200,215,240,.4)"/><rect width="32" height="4" fill="rgba(200,215,240,.28)"/><text y="-4" font-family="DM Sans,sans-serif" font-size="7.5" fill="rgba(200,215,240,.5)">2 KM</text></g>`;
   const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
-  return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px">
-    <svg viewBox="0 0 ${TW} ${SH}" style="width:100%;display:block">
+  const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
+  return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px;padding:0;overflow:hidden">
+    <svg viewBox="0 0 560 510" style="width:100%;display:block">
       <defs>
-        <linearGradient id="gcsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY[0]}"/><stop offset=".7" stop-color="${SKY[1]}"/><stop offset="1" stop-color="${SKY[2]}"/></linearGradient>
-        <linearGradient id="gcbld" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0e1422"/><stop offset=".5" stop-color="#161e30"/><stop offset="1" stop-color="#0b101c"/></linearGradient>
-        <linearGradient id="gcbldB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0a0f1a"/><stop offset=".5" stop-color="#101726"/><stop offset="1" stop-color="#080d16"/></linearGradient>
-        <linearGradient id="gcwayne" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#131a2c"/><stop offset=".5" stop-color="#1d2740"/><stop offset="1" stop-color="#101624"/></linearGradient>
-        <linearGradient id="gcbeam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></linearGradient>
+        <radialGradient id="gmsea" cx="50%" cy="34%" r="80%"><stop offset="0" stop-color="#0e1a2c"/><stop offset=".6" stop-color="#0a1120"/><stop offset="1" stop-color="#070c17"/></radialGradient>
+        <pattern id="gmwave" width="34" height="17" patternUnits="userSpaceOnUse"><path d="M0 13 Q8.5 7 17 13 T34 13" stroke="rgba(110,150,205,.09)" fill="none" stroke-width="1"/></pattern>
+        <pattern id="gmstreet" width="17" height="17" patternUnits="userSpaceOnUse"><path d="M0 0 H17 M0 0 V17" stroke="rgba(150,175,215,.11)" stroke-width="1"/></pattern>
+        <pattern id="gmblock" width="13" height="11" patternUnits="userSpaceOnUse"><rect x="2" y="2" width="6" height="5" fill="rgba(210,222,248,.05)"/></pattern>
+        <radialGradient id="gmsig" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="rgba(255,241,196,.14)"/><stop offset="1" stop-color="rgba(255,241,196,0)"/></radialGradient>
+        ${isle.map((p,idx)=>`<clipPath id="gmisl${idx}"><path d="${p.land}"/></clipPath>`).join("")}
       </defs>
-      <rect width="${TW}" height="${SH}" fill="url(#gcsky)"/>
+      <rect width="560" height="510" fill="url(#gmsea)"/>
+      <rect width="560" height="510" fill="url(#gmwave)"/>
       ${s}
     </svg>
     <div class="gc-strip">
       <div style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:var(--disp);font-size:12px;letter-spacing:.16em;color:var(--gold2)">GOTHAM LIVE</span>
         <span style="font-size:11px;color:${band[1]};font-weight:800;margin-left:7px">${band[0]}</span>
-        <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in trouble":"all districts held"}</span></div>
-      <span style="display:flex;gap:9px;flex:none;align-items:center">
-        <span class="mini" style="display:inline-flex;align-items:center;gap:4px"><i style="width:8px;height:8px;border-radius:2px;background:#22E87A;box-shadow:0 0 6px #22E87A"></i>ready</span>
-        <span class="mini" style="display:inline-flex;align-items:center;gap:4px"><i style="width:8px;height:8px;border-radius:2px;background:#E8C53C;box-shadow:0 0 6px #E8C53C"></i>recover</span>
-        <span class="mini" style="display:inline-flex;align-items:center;gap:4px"><i style="width:8px;height:8px;border-radius:2px;background:#E8453C;box-shadow:0 0 6px #E8453C"></i>spent</span>
-      </span>
+        <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in enemy hands":"all districts secured"}</span></div>
+      <span style="display:flex;gap:9px;flex:none;align-items:center">${leg("#FFD048","yours")}${leg("#FF8C22","contested")}${leg("#FF3622","villain-held")}</span>
     </div>
-    <div style="padding:0 12px 12px"><button class="btn gold" onclick="openDistricts()">🗺 OPEN THE CAMPAIGN MAP — who controls Gotham</button></div>
+    <div style="padding:0 12px 12px"><button class="btn gold" onclick="openDistricts()">🗺 OPEN THE CAMPAIGN MAP — set district priorities</button></div>
   </div>`;
 }
 function gothamMarkFallen(){const d=state.data;d.fallenSeen=d.fallenSeen||{};M12.forEach(m=>{if(districtCrime(m).crime>=70)d.fallenSeen[m]=1;});save();render();}
