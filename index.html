@@ -154,6 +154,21 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .btn.ghost{background:rgba(255,255,255,.03);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:none;border-color:rgba(255,255,255,.08)}
 .btn.sm{padding:8px 12px;font-size:13px;width:auto}
 .btn.danger{color:var(--red);border-color:rgba(232,82,74,.32);background:linear-gradient(180deg,rgba(40,20,21,.55),rgba(20,12,13,.42))}
+/* ── TACTILE ACTION TILES — embossed metal buttons that kill the flat ghost-button stacks ── */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:10px}
+.tgrid.two{grid-template-columns:repeat(2,1fr)}
+.ttile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px 12px;border-radius:16px;cursor:pointer;min-height:76px;text-align:center;
+  background:linear-gradient(180deg,rgba(48,55,72,.92),rgba(17,21,31,.94));
+  border:1px solid rgba(255,255,255,.11);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 -16px 28px -20px rgba(0,0,0,.8),0 10px 26px -14px rgba(0,0,0,.92);
+  transition:transform .12s var(--ease-out),filter .12s,box-shadow .2s}
+.ttile:active{transform:scale(.95);filter:brightness(1.12)}
+.ttile .ti{font-size:23px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+.ttile .tl{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);line-height:1.2}
+.ttile.gold{border-color:rgba(255,208,72,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -16px 28px -20px rgba(0,0,0,.6),0 10px 28px -12px rgba(255,208,72,.32)}
+.ttile.gold .tl{color:var(--gold2)}
+.ttile.danger{border-color:rgba(255,54,34,.4);background:linear-gradient(180deg,rgba(52,26,24,.9),rgba(22,13,13,.94))}
+.ttile.danger .ti,.ttile.danger .tl{color:var(--red)}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(38,42,54,.5),rgba(20,24,32,.4));backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:600;width:auto;flex:none;white-space:nowrap;transition:transform .12s,filter .12s}
 .chip:active{transform:scale(.95)}
 .chip.on{background:linear-gradient(180deg,rgba(50,32,4,.75),rgba(32,20,2,.65));border-color:rgba(255,208,72,.6);color:var(--gold2);box-shadow:0 0 18px -3px rgba(255,208,72,.6)}
@@ -1142,6 +1157,7 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
     <div class="restnum" id="restnum">2:00</div>
   </div>
   <div class="resthint" id="resthint">Breathe in…</div>
+  <button id="restapply" onclick="restApplyTarget()" style="display:none;margin-top:-6px;padding:11px 22px;border-radius:13px;border:1px solid rgba(255,208,72,.5);background:linear-gradient(180deg,rgba(255,208,72,.18),rgba(58,42,8,.55));color:var(--gold2);font-family:var(--disp);font-size:15px;letter-spacing:.09em;box-shadow:0 0 24px -8px rgba(255,208,72,.75),inset 0 1px 0 rgba(255,255,255,.22);cursor:pointer"></button>
   <div class="restbtns">
     <button class="restbtn" onclick="addRest(-15)">−15s</button>
     <button class="restbtn go" onclick="minimizeRest()">▾ MINIMISE</button>
@@ -2700,6 +2716,28 @@ function restNextIntel(){
   if(ni>=0)return `<span style="color:var(--text3);font-size:11px;letter-spacing:.14em">NEXT UP</span><br><span style="letter-spacing:.04em">${esc(ses.exercises[ni].name)}</span>`;
   return "LAST SET LOGGED — finish strong";
 }
+// Concrete numeric next-set target (double progression) — for one-tap auto-fill on the rest ring.
+function nextTargetSet(name){
+  const ex=exFor(name),lb=lastBestSet(name);
+  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
+  const r=lb.r;let lo,hi;
+  if(r<=5){lo=4;hi=6;}else if(r<=9){lo=6;hi=10;}else if(r<=14){lo=10;hi=15;}else{lo=15;hi=20;}
+  if(ex.bw)return {w:lb.w||0,r:(r<hi)?r+1:lo};
+  const inc=(r<=6&&lb.w>=60)?5:2.5;
+  return (r<hi)?{w:lb.w,r:r+1}:{w:lb.w+inc,r:lo};
+}
+// Load the computed progression target straight into the next unlogged set — progressive overload, no math.
+function restApplyTarget(){
+  const ses=state.session;if(!ses)return;
+  const fei=(typeof activeExIdx==="function")?activeExIdx():-1;if(fei<0)return;
+  const e=ses.exercises[fei];if(!e)return;
+  const si=(e.sets||[]).findIndex(s=>!s.done);if(si<0)return;
+  const tg=nextTargetSet(e.name);if(!tg)return;
+  e.sets[si].w=tg.w?String(tg.w):"";e.sets[si].r=String(tg.r);
+  haptic("light");saveSession();
+  const b=$("restapply");if(b){b.textContent="✓ SET "+(si+1)+" LOADED · "+(tg.w?tg.w+"kg × ":"")+tg.r;b.style.pointerEvents="none";b.style.opacity=".82";}
+  try{render();}catch(_){}
+}
 // Open the full-screen cinematic rest overlay (#restov). Header timer keeps running when minimised.
 function openRestOverlay(labelHtml){
   const ov=$("restov");if(!ov)return;
@@ -2709,6 +2747,14 @@ function openRestOverlay(labelHtml){
   const lb=$("restlabel");if(lb)lb.innerHTML=labelHtml||restNextIntel();
   const n=$("restnum");if(n)n.textContent=fmtTime(rem);
   const p=$("restprog");if(p)p.style.strokeDashoffset=0;
+  // Auto-progression button — only when the focused lift has a computed target and an unlogged set left.
+  const b=$("restapply");
+  if(b){const fei=(typeof activeExIdx==="function")?activeExIdx():-1;
+    const e=(fei>=0&&state.session)?state.session.exercises[fei]:null;
+    const hasNext=e&&(e.sets||[]).some(s=>!s.done);
+    const tg=e?nextTargetSet(e.name):null;
+    if(hasNext&&tg){b.style.display="block";b.style.pointerEvents="";b.style.opacity="";b.textContent="⚡ LOAD "+(tg.w?tg.w+"KG × ":"")+tg.r+" INTO NEXT SET";}
+    else b.style.display="none";}
   ov.classList.add("on");
   updateRestOverlay(rem);
 }
@@ -6317,12 +6363,12 @@ function missionSubTabs(){
     body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, deload & every quick tool — all in one place.</div>`
       +scienceCardsHtml()
       +`<div class="ttl" style="font-size:14px;margin:18px 0 9px;display:flex;align-items:center;gap:7px">🔧 Utility belt</div>
-        <div class="grid2">
-          <button class="btn ghost sm" onclick="openPlateSheet(-1)">⚖️ Plate calc</button>
-          <button class="btn ghost sm" onclick="open1RM()">🏋️ 1RM calc</button>
-          <button class="btn ghost sm" onclick="openTestDay()">🎯 1RM test day</button>
-          <button class="btn ghost sm" onclick="openForge()">⚒️ Forge</button>
-          <button class="btn ghost sm" onclick="openMeasure()">📐 Measure</button>
+        <div class="tgrid">
+          <div class="ttile" onclick="openPlateSheet(-1)"><span class="ti">⚖️</span><span class="tl">Plate calc</span></div>
+          <div class="ttile" onclick="open1RM()"><span class="ti">🏋️</span><span class="tl">1RM calc</span></div>
+          <div class="ttile" onclick="openTestDay()"><span class="ti">🎯</span><span class="tl">1RM test day</span></div>
+          <div class="ttile" onclick="openForge()"><span class="ti">⚒️</span><span class="tl">Forge</span></div>
+          <div class="ttile" onclick="openMeasure()"><span class="ti">📐</span><span class="tl">Measure</span></div>
         </div>`;
   }
   return bar+`<div class="fade">${body}</div>`;
@@ -10564,12 +10610,14 @@ function openSettings(){
     <label class="mini">Gemini 1.5 Flash API key (stored on this device only)</label>
     <input value="${esc(geminiKey())}" placeholder="Paste key to activate Alfred" oninput="setGemKey(this.value)" style="margin-bottom:14px"/>
     <div class="hr"></div>
-    <button class="btn ghost sm" style="margin-bottom:8px" onclick="exportRival()">👥 Generate sparring code</button>
-    <button class="btn ghost sm" style="margin-bottom:8px" onclick="importRival()">📥 Import a rival</button>
-    <button class="btn ghost sm" style="margin-bottom:8px" onclick="backupData()">💾 Backup data (JSON)</button>
-    <button class="btn ghost sm" style="margin-bottom:8px" onclick="restoreData()">📂 Restore data</button>
-    <button class="btn ghost sm" style="margin-bottom:8px" onclick="exportCSV()">📊 Export workouts (CSV)</button>
-    <button class="btn ghost sm" style="margin-bottom:8px" onclick="state.showOnboarding=true;state.obStep=0;state.obTmp={};closeOverlay();render()">Edit hero profile</button>
+    <div class="tgrid">
+      <div class="ttile gold" onclick="exportRival()"><span class="ti">👥</span><span class="tl">Sparring code</span></div>
+      <div class="ttile" onclick="importRival()"><span class="ti">📥</span><span class="tl">Import rival</span></div>
+      <div class="ttile" onclick="state.showOnboarding=true;state.obStep=0;state.obTmp={};closeOverlay();render()"><span class="ti">🦇</span><span class="tl">Edit hero</span></div>
+      <div class="ttile" onclick="backupData()"><span class="ti">💾</span><span class="tl">Backup</span></div>
+      <div class="ttile" onclick="restoreData()"><span class="ti">📂</span><span class="tl">Restore</span></div>
+      <div class="ttile" onclick="exportCSV()"><span class="ti">📊</span><span class="tl">Export CSV</span></div>
+    </div>
     <button class="btn danger" onclick="wipeData()">Wipe everything</button>
     <button class="btn" style="margin-top:10px" onclick="closeOverlay();render()">Done</button>
     <div class="mini center" style="margin-top:10px;color:var(--text3)">Build: ${esc(document.lastModified)} · if this date looks old, close the app fully and reopen on wifi</div>`;
