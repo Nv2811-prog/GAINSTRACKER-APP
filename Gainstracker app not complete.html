@@ -6308,9 +6308,13 @@ function openSplitSheet(){
 /* ========================= MISSION TAB ========================= */
 function renderMission(){
   const d=state.data;
-  let html=`<div style="position:relative;overflow:hidden;border-radius:18px;border:1px solid rgba(242,208,121,.24);margin-bottom:13px;padding:16px 15px 14px;background:linear-gradient(90deg,rgba(7,9,13,.94) 40%,rgba(7,9,13,.55)),url('Joker.jpg') right top/44% auto no-repeat,#07090d;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 16px 40px -22px #000">
-    <h1 style="font-size:34px;color:var(--gold2);text-shadow:0 0 24px rgba(255,208,72,.35)">MISSION</h1>
-    <div class="tag" style="margin-top:2px">Know your enemy · plan the war</div>
+  let html=`<div style="position:relative;overflow:hidden;border-radius:18px;border:1px solid rgba(242,208,121,.24);margin-bottom:13px;min-height:134px;background:#07090d;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 16px 40px -22px #000">
+    <img src="Joker.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 26%;opacity:.62;filter:saturate(.95) contrast(1.06);animation:hsBreathe 14s ease-in-out infinite alternate">
+    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,13,.93) 24%,rgba(7,9,13,.3) 72%,rgba(7,9,13,.62))"></div>
+    <div style="position:relative;padding:18px 16px 16px">
+      <h1 style="font-size:34px;color:var(--gold2);text-shadow:0 0 24px rgba(255,208,72,.45)">MISSION</h1>
+      <div class="tag" style="margin-top:2px">Know your enemy · plan the war</div>
+    </div>
   </div>`;
   // ===== 1) TONIGHT — the ACTIVE split leads the tab; no duplicated Batsuit figure here =====
   if(!d.splits.length){
@@ -10462,8 +10466,11 @@ function gothamSkylineCard(){
   let bp=`M0 ${GY}`;for(let k=0;k<14;k++){const bx=k*40,bh=100+((k*29)%42);bp+=` L${bx} ${GY-bh} L${bx+40} ${GY-bh}`;}bp+=` L${TW} ${GY} Z`;
   s+=`<path d="${bp}" fill="#090c13"/>`;
   const AB={chest:"CHEST",back:"BACK",shoulders:"DELTS",biceps:"BICEPS",triceps:"TRICEPS",forearms:"GRIP",quads:"QUADS",hamstrings:"HAMS",glutes:"GLUTES",calves:"CALVES",abs:"ABS",traps:"TRAPS"};
-  // one tower builder used for both depth rows — the billboard carries name + sets + readiness
-  const tower=(m,x,w,h,backRow,i)=>{
+  // one tower builder used for both depth rows. Billboards (name plates) are collected here and
+  // drawn in a FINAL pass on top of the whole skyline, in two clean fixed bands, so no tower,
+  // roof, beam or neighbour can ever cover the text — and it's obvious which sign is which tower.
+  const bills=[];
+  const tower=(m,x,w,h,backRow,i,labelY)=>{
     const y=GY-h,cx2=x+w/2;
     const dc=districtCrime(m), b=districtBand(dc.crime), hot=dc.crime>=45;
     const sets=weeklySets(m), lm=VL[m]||{mev:8,mav:14};
@@ -10479,38 +10486,42 @@ function gothamSkylineCard(){
       wins+=`<rect class="${on&&n%4===0?'gc-wf':''}" x="${x+6+c2*((w-12)/cols)}" y="${y+(backRow?22:14)+rw*13}" width="7" height="6" rx="1" fill="${on?winCol:(backRow?'#0c111b':'#101724')}" ${on&&n%4===0?`style="animation-delay:${((i*1.3+rw)%4.8)}s"`:''}/>`;}
     const nameCol=hot?b[1]:'#FFD048';
     const dotCol=!trained?'#566070':winCol;
-    const bw2=Math.max(w+8,62), bx2=cx2-bw2/2, by2=y-21;
+    // Billboard: fixed-band y, clamped inside the frame, connector line down to its own roof.
+    const bw2=Math.max(w+10,64), bx2=Math.max(4,Math.min(TW-bw2-4,cx2-bw2/2)), lcx=bx2+bw2/2;
+    bills.push(`<g class="gc-bld" onclick="muscleDrill('${m}')">
+      <line x1="${lcx}" y1="${labelY+17}" x2="${cx2}" y2="${y}" stroke="${nameCol}" stroke-opacity=".4" stroke-width="1.1"/>
+      <rect x="${bx2}" y="${labelY}" width="${bw2}" height="17" rx="4" fill="rgba(3,5,9,.97)" stroke="${nameCol}" stroke-opacity=".7" stroke-width=".9"/>
+      <circle cx="${bx2+9}" cy="${labelY+8.5}" r="3.1" fill="${dotCol}" style="filter:drop-shadow(0 0 5px ${dotCol})">${trained?`<animate attributeName="opacity" values="1;.35;1" dur="${rec>=80?'2.6':rec>=50?'1.7':'1'}s" repeatCount="indefinite"/>`:""}</circle>
+      <text x="${lcx+4}" y="${labelY+12.5}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="1.1" fill="${nameCol}" style="text-shadow:0 0 8px ${nameCol}">${AB[m]||MNAME[m].toUpperCase()}</text></g>`);
     return `<g class="gc-bld" onclick="muscleDrill('${m}')" ${backRow?'opacity=".9"':''}>
       ${hot?`<ellipse cx="${cx2}" cy="${y}" rx="${w/2+6}" ry="10" fill="${b[1]}" opacity=".32"/>`:""}
       <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${backRow?'gcbldB':'gcbld'})" stroke="${hot?b[1]:'rgba(242,208,121,.15)'}" stroke-opacity="${hot?'.8':'1'}"/>
       ${backRow?`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#030509" opacity=".34"/>`:""}
-      <rect x="${bx2}" y="${by2}" width="${bw2}" height="17" rx="4" fill="rgba(3,5,9,.95)" stroke="${nameCol}" stroke-opacity=".6" stroke-width=".8"/>
-      <circle cx="${bx2+9}" cy="${by2+8.5}" r="3.1" fill="${dotCol}" style="filter:drop-shadow(0 0 5px ${dotCol})">${trained?`<animate attributeName="opacity" values="1;.35;1" dur="${rec>=80?'2.6':rec>=50?'1.7':'1'}s" repeatCount="indefinite"/>`:""}</circle>
-      <text x="${bx2+bw2/2+5}" y="${by2+12.5}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="1.1" fill="${nameCol}" style="text-shadow:0 0 8px ${nameCol}">${AB[m]||MNAME[m].toUpperCase()}</text>
-      ${hot?`<circle class="gc-beacon" cx="${cx2}" cy="${by2-5}" r="2.2" fill="${b[1]}" style="animation-delay:${(i*0.4)%1.7}s"/>`:""}
       ${wins}</g>`;
   };
-  // BACK row (even muscles) — taller, dimmer, billboards high in the sky
+  // BACK row (even muscles) — taller, dimmer, billboards in the high band
   M12.forEach((m,i)=>{if(i%2)return;const k=i/2;
-    s+=tower(m,10+k*92,72,124+((k*37)%42),true,i);});
+    s+=tower(m,10+k*92,72,124+((k*37)%42),true,i,26);});
   // Wayne Tower — center, tallest, between the rows
   const wx=250,ww=52,wh=188,wy=GY-wh;
   let wwin="";for(let rw=0;rw<10;rw++)for(let c2=0;c2<3;c2++)wwin+=`<rect x="${wx+8+c2*13}" y="${wy+22+rw*15.5}" width="9" height="7" rx="1" fill="${rw>2?'#FFD048':'#1a2233'}" opacity=".85"/>`;
-  s+=`<g class="gc-bld" onclick="openIronLedger()"><rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="url(#gcwayne)" stroke="rgba(255,208,72,.45)"/><path d="M${wx} ${wy} L${wx+ww/2} ${wy-15} L${wx+ww} ${wy} Z" fill="#141a29" stroke="rgba(255,208,72,.35)"/><text x="${wx+ww/2}" y="${wy+13}" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9.5" letter-spacing="2" fill="#FFD048" opacity=".9">WAYNE</text>${wwin}</g>`;
+  s+=`<g class="gc-bld" onclick="openIronLedger()"><rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="url(#gcwayne)" stroke="rgba(255,208,72,.45)"/><path d="M${wx} ${wy} L${wx+ww/2} ${wy-15} L${wx+ww} ${wy} Z" fill="#141a29" stroke="rgba(255,208,72,.35)"/>${wwin}</g>`;
   const wStreak=(typeof weeklyStreak==="function"?weeklyStreak():0)||0;
   const bl=160+Math.min(wStreak,5)*8, bh2=20+Math.min(wStreak,5)*3;
   if(signalOn)s+=`<g class="gc-signal" onclick="${startAct}" transform="rotate(-20 ${wx+10} ${wy-10})" opacity="${(0.7+Math.min(wStreak,5)*0.06).toFixed(2)}">
       <rect x="${wx-bl+8}" y="${wy-22}" width="${bl}" height="${bh2}" fill="url(#gcbeam)"/>
       <circle cx="${wx-bl+14}" cy="${wy-12}" r="${15+Math.min(wStreak,5)}" fill="#FFF3C9" opacity=".95"/>
       <path d="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z" transform="translate(${wx-bl+3},${wy-23}) scale(.4)" fill="#0b0d12"/></g>`;
-  // FRONT row (odd muscles) — brighter, lower, overlapping for depth
+  // FRONT row (odd muscles) — brighter, lower, overlapping for depth; billboards in the low band
   M12.forEach((m,i)=>{if(!(i%2))return;const k=(i-1)/2;
-    s+=tower(m,40+k*88,74,80+((k*47)%36),false,i);});
+    s+=tower(m,40+k*88,74,80+((k*47)%36),false,i,78);});
   if(f.pct>=40||gloom>=.5){let rain="";for(let i=0;i<16;i++)rain+=`<line x1="${i*35+12}" y1="-24" x2="${i*35+8}" y2="-8" stroke="#9fb6d8" stroke-width="1" style="animation-delay:${-(i*0.13)%1.05}s"/>`;s+=`<g class="gc-rain" opacity=".3">${rain}</g>`;}
   s+=`<rect class="gc-light" width="${TW}" height="${SH}" fill="#cfe0ff" opacity="0"/>`;
   s+=`<g class="gc-bm"><path d="M0 0 L6 -5 L20 -6 L26 -10 L38 -10 L41 -6 L52 -5 L58 0 Z M44 -6 L47 -13 L49 -6 Z" transform="translate(0,${GY+10})" fill="#04060a"/></g>`;
   if(gloom>0)s+=`<rect width="${TW}" height="${SH}" fill="#020305" opacity="${(gloom*.3).toFixed(2)}"/>`;
   s+=`<rect x="0" y="${GY}" width="${TW}" height="${SH-GY}" fill="#05070c"/><rect x="0" y="${GY}" width="${TW}" height="1.5" fill="rgba(242,208,121,.22)"/>`;
+  // FINAL PASS — every billboard on top of the whole skyline so no text is ever blocked.
+  s+=bills.join("");
   const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
   return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px">
     <svg viewBox="0 0 ${TW} ${SH}" style="width:100%;display:block">
