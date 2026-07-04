@@ -367,7 +367,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
   backdrop-filter:blur(24px) saturate(140%);-webkit-backdrop-filter:blur(24px) saturate(140%)}
 #restov.on{display:flex;animation:fade .28s ease both}
 #restov.done{background:radial-gradient(circle at 50% 36%,rgba(20,62,40,.58),rgba(4,9,6,.9))}
-.restlabel{font-family:var(--disp);letter-spacing:.24em;font-size:13px;color:var(--blue);text-transform:uppercase}
+.restlabel{font-family:var(--disp);letter-spacing:.24em;font-size:17px;color:#dbe8ff;text-transform:uppercase;text-align:center;max-width:340px;line-height:1.55;text-shadow:0 2px 14px rgba(0,0,0,.5)}
 #restov.done .restlabel{color:var(--green)}
 .restring{position:relative;width:250px;height:250px;display:flex;align-items:center;justify-content:center}
 .restring .glasscircle{position:absolute;inset:8px;border-radius:50%;
@@ -2686,17 +2686,36 @@ function restDone(){const ov=$("restov");if(!ov||!ov.classList.contains("on"))re
 function closeRestOverlay(){const ov=$("restov");if(ov)ov.classList.remove("on","done");}
 // Minimise — hide the big overlay but KEEP the clock running; it keeps counting in the workout header's REST box. Tap that box to bring the overlay back.
 function minimizeRest(){haptic("tap");closeRestOverlay();if(state.restRunning)toast("Rest still running — tap the REST timer to reopen.");}
+// Intel line shown at the top of the rest overlay — what you're recovering FOR.
+function restNextIntel(){
+  const ses=state.session;if(!ses)return "RECOVERY";
+  const fei=(typeof activeExIdx==="function")?activeExIdx():-1;
+  const e=fei>=0?ses.exercises[fei]:null;
+  if(e){
+    const nextSi=(e.sets||[]).findIndex(s=>!s.done);
+    if(nextSi>=0){let nt="";try{nt=nextTarget(e.name)||"";}catch(_){}
+      return `<span style="color:var(--text3);font-size:11px;letter-spacing:.14em">NEXT · SET ${nextSi+1}</span><br><span style="letter-spacing:.04em">${esc(e.name)}</span>${nt?`<br><span style="color:var(--gold2);font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:none">🎯 ${nt}</span>`:""}`;}
+  }
+  const ni=(ses.exercises||[]).findIndex((x,i)=>i>fei&&(x.sets||[]).some(s=>!s.done));
+  if(ni>=0)return `<span style="color:var(--text3);font-size:11px;letter-spacing:.14em">NEXT UP</span><br><span style="letter-spacing:.04em">${esc(ses.exercises[ni].name)}</span>`;
+  return "LAST SET LOGGED — finish strong";
+}
+// Open the full-screen cinematic rest overlay (#restov). Header timer keeps running when minimised.
+function openRestOverlay(labelHtml){
+  const ov=$("restov");if(!ov)return;
+  const rem=Math.max(0,Math.ceil((state.restEnd-Date.now())/1000));if(rem<=0)return;
+  clearTimeout(state._restCloseT);
+  ov.classList.remove("done");
+  const lb=$("restlabel");if(lb)lb.innerHTML=labelHtml||restNextIntel();
+  const n=$("restnum");if(n)n.textContent=fmtTime(rem);
+  const p=$("restprog");if(p)p.style.strokeDashoffset=0;
+  ov.classList.add("on");
+  updateRestOverlay(rem);
+}
 function reopenRest(){
-  if(!state.restRunning){return;}
-  const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0)return;haptic("tap");
-  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:7px">⏳ Rest timer</div>
-    <div class="center" style="margin:10px 0 14px"><div id="rest-sheet-num" style="font-size:46px;font-weight:800;color:var(--gold2);font-variant-numeric:tabular-nums">${fmtTime(Math.max(0,rem))}</div><div class="mini" style="color:var(--text2)">recovery remaining</div></div>
-    <div class="row" style="gap:8px;margin-bottom:8px">
-      <button class="btn ghost g" onclick="addRest(-15)">−15s</button>
-      <button class="btn ghost g" onclick="addRest(15)">+15s</button>
-    </div>
-    <button class="btn gold" onclick="skipRest();closeSheet()">Skip rest — back to work</button>
-    <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Keep resting</button>`);
+  if(!state.restRunning)return;
+  const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0)return;
+  haptic("tap");openRestOverlay();
 }
 function addRest(delta){if(!state.restRunning){closeRestOverlay();return;}state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);let rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();closeSheet();return;}haptic("tap");updateRestOverlay(rem);const el=$("rest-display");if(el)el.textContent=fmtTime(Math.max(0,rem));const sn=$("rest-sheet-num");if(sn)sn.textContent=fmtTime(Math.max(0,rem));}
 function skipRest(){state.restRunning=false;state.restTimer=0;haptic("tap");document.body.classList.remove("rest-final");closeRestOverlay();const el=$("rest-display");if(el){el.textContent="REST";el.parentElement.style.borderColor="";}}
@@ -2790,7 +2809,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){try{openRestOverlay(ev==="boss"?"★ BOSS DOWN · RECOVER, THEN GO AGAIN":ev==="pr"?"★ NEW RECORD · RECOVER, THEN GO AGAIN":null);}catch(_){}const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
