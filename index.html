@@ -848,6 +848,14 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .gtv2-note{font-size:11px;line-height:1.38;color:var(--text2);margin-top:3px}
 .gtv2-meter{height:5px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:7px}
 .gtv2-meter i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 10px rgba(255,208,72,.5)}
+.gtv2-threat{position:relative;overflow:hidden}
+.gtv2-threat .thz{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:repeating-linear-gradient(45deg,rgba(255,54,34,.09) 0 9px,transparent 9px 20px);opacity:0;transition:opacity .3s}
+.gtv2-threat.crit .thz{opacity:1;animation:thzscroll 1.5s linear infinite}
+@keyframes thzscroll{to{background-position:40px 0}}
+.gtv2-threat.crit{animation:thzedge 1.4s ease-in-out infinite}
+@keyframes thzedge{0%,100%{filter:brightness(1)}50%{filter:brightness(1.22)}}
+.threat-skull{display:inline-block;margin-left:3px;animation:thzblink 1.5s ease-in-out infinite;filter:drop-shadow(0 0 5px currentColor)}
+@keyframes thzblink{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
 
 /* ── Action rows inside panels ── */
 .gtv2-action{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.07)}
@@ -10062,7 +10070,14 @@ function gtv2ScorePanel(){
   const patrolClr=w>=goal?"var(--green)":"var(--gold)";
   return `<div class="gtv2-grid">
     <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score}</div><div class="gtv2-note">${esc(r.label)} — ${esc(r.line)}</div><div class="gtv2-meter"><i style="width:${r.score}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
-    <div class="gtv2-panel" style="border-color:${t.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${t.color}" onclick="openThreatInfo()"><div class="gtv2-label">Threat</div><div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div><div class="gtv2-note">${esc(t.desc)}</div><div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    ${(()=>{let worstM=null,wcr=-1;M12.forEach(m=>{const c=districtCrime(m).crime;if(c>wcr){wcr=c;worstM=m;}});
+      const vil=worstM?((NEMESIS_MAP[worstM]||{}).villain||"the Rogues"):"",dist=worstM?(MUSCLE_DISTRICT[worstM]||MNAME[worstM]):"";
+      const crit=t.score>=72,hot=t.score>=50,note=(hot&&vil)?`<b style="color:${t.color}">${esc(vil)}</b> ${crit?"holds":"rising in"} ${esc(dist)}`:esc(t.desc);
+      return `<div class="gtv2-panel gtv2-threat${crit?" crit":""}" style="border-color:${t.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${t.color}" onclick="openThreatInfo()"><i class="thz"></i>
+      <div class="gtv2-label">Threat <span class="threat-skull" style="color:${t.color}">${hot?"☠️":"🦇"}</span></div>
+      <div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div>
+      <div class="gtv2-note">${note}</div>
+      <div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color};box-shadow:0 0 10px currentColor"></i></div></div>`;})()}
     <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.pct}%</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
     <div class="gtv2-panel" style="border-color:${patrolClr};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${patrolClr}" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"};text-shadow:0 0 18px currentColor">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
   </div>`;
@@ -10554,8 +10569,8 @@ function renderGotham(){
   // Memoize the two heaviest cards (SVG city + season eval) — rebuilt at most once/min or when data changes
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
-  if(mm.k!==memoKey){mm.k=memoKey;mm.sky=gothamSkylineCard();mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${fallenBanner}${mm.sky}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${fallenBanner}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
