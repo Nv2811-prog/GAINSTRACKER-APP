@@ -10448,73 +10448,69 @@ function gothamSkylineCard(){
   const band=districtBand(cityCrime());
   const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
   const hr=new Date().getHours(), night=hr>=20||hr<6;
-  // irregular coastline blob (8 jittered control points → smooth quadratic loop)
   const blob=(cx,cy,rx,ry,sd)=>{let r=sd*99;const rnd=()=>{r=(r*9301+49297)%233280;return r/233280;};
-    const pts=[];for(let a2=0;a2<8;a2++){const a=a2/8*Math.PI*2,jit=0.82+rnd()*0.36;
+    const pts=[];for(let a2=0;a2<8;a2++){const a=a2/8*Math.PI*2,jit=0.9+rnd()*0.2;
       pts.push([cx+Math.cos(a)*rx*jit, cy+Math.sin(a)*ry*jit]);}
     let pth="M"+((pts[7][0]+pts[0][0])/2).toFixed(1)+" "+((pts[7][1]+pts[0][1])/2).toFixed(1);
     for(let k=0;k<8;k++){const nn=pts[(k+1)%8];pth+=` Q${pts[k][0].toFixed(1)} ${pts[k][1].toFixed(1)} ${((pts[k][0]+nn[0])/2).toFixed(1)} ${((pts[k][1]+nn[1])/2).toFixed(1)}`;}
     return pth+" Z";};
-  const POS={shoulders:[330,84],traps:[464,100],triceps:[344,180],forearms:[470,196],
-             back:[100,150],chest:[234,138],biceps:[92,262],abs:[228,252],
-             quads:[318,336],hamstrings:[458,350],glutes:[326,434],calves:[464,446]};
-  const ISLES=[[398,140,158,112,3],[162,198,152,124,7],[392,392,166,118,11]];
-  const isle=ISLES.map(([cx,cy,rx,ry,sd])=>({glow:blob(cx,cy,rx+15,ry+15,sd+1),land:blob(cx,cy,rx,ry,sd),cx,cy,rx,ry}));
+  // clean anatomical grid — one district per cell, never overlapping (upper body top → legs bottom)
+  const COLX=[80,214,348,482], ROWY=[122,252,382];
+  const POS={chest:[COLX[0],ROWY[0]],back:[COLX[1],ROWY[0]],shoulders:[COLX[2],ROWY[0]],traps:[COLX[3],ROWY[0]],
+             biceps:[COLX[0],ROWY[1]],triceps:[COLX[1],ROWY[1]],forearms:[COLX[2],ROWY[1]],abs:[COLX[3],ROWY[1]],
+             quads:[COLX[0],ROWY[2]],hamstrings:[COLX[1],ROWY[2]],glutes:[COLX[2],ROWY[2]],calves:[COLX[3],ROWY[2]]};
+  const land=blob(281,252,272,200,4);
   let s="";
-  // faint nautical lat/long grid over the water
-  for(let gx=0;gx<=560;gx+=56)s+=`<line x1="${gx}" y1="0" x2="${gx}" y2="510" stroke="rgba(120,155,205,.06)" stroke-width="1"/>`;
-  for(let gy=0;gy<=510;gy+=56)s+=`<line x1="0" y1="${gy}" x2="560" y2="${gy}" stroke="rgba(120,155,205,.06)" stroke-width="1"/>`;
-  // depth contour rings + island bodies with clipped street texture
-  isle.forEach((p,idx)=>{
-    s+=`<path d="${blob(p.cx,p.cy,p.rx+30,p.ry+26,idx+21)}" fill="none" stroke="rgba(110,150,205,.10)" stroke-width="1" stroke-dasharray="3 6"/>
-        <path d="${p.glow}" fill="#0b1120" opacity=".9"/>
-        <path d="${p.land}" fill="#141d31" stroke="rgba(150,180,225,.24)" stroke-width="1.5"/>
-        <g clip-path="url(#gmisl${idx})">
-          <rect x="${p.cx-p.rx-24}" y="${p.cy-p.ry-24}" width="${p.rx*2+48}" height="${p.ry*2+48}" fill="url(#gmstreet)"/>
-          <path d="M${p.cx-p.rx-6} ${p.cy} H${p.cx+p.rx+6}" stroke="rgba(190,205,235,.18)" stroke-width="3"/>
-          <path d="M${p.cx} ${p.cy-p.ry-6} V${p.cy+p.ry+6}" stroke="rgba(190,205,235,.18)" stroke-width="3"/>
-          <path d="M${p.cx-p.rx} ${p.cy-p.ry} L${p.cx+p.rx} ${p.cy+p.ry}" stroke="rgba(190,205,235,.09)" stroke-width="2"/>
-        </g>`;
-  });
-  // bridges between the three isles
-  s+=`<g stroke="rgba(210,220,245,.42)" stroke-width="4" stroke-dasharray="9 5" stroke-linecap="round" fill="none">
-    <path d="M300 150 L250 176"/><path d="M250 250 Q290 320 316 344"/><path d="M400 250 Q400 300 396 320"/></g>
-    <g stroke="rgba(210,220,245,.16)" stroke-width="8" fill="none"><path d="M300 150 L250 176"/><path d="M250 250 Q290 320 316 344"/></g>`;
-  // Robinson Park — a green patch (ties to the quads district)
-  s+=`<path d="${blob(292,404,30,20,5)}" fill="rgba(46,150,86,.4)" stroke="rgba(90,210,130,.4)" stroke-width="1"/>
-      <text x="292" y="407" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" letter-spacing="1.5" fill="rgba(150,230,180,.75)">PARK</text>`;
-  // docks along the north isle + harbor boats
-  s+=`<g fill="rgba(150,180,225,.28)">${[0,1,2,3].map(i=>`<rect x="${300+i*11}" y="52" width="6" height="14" rx="1"/>`).join("")}</g>`;
-  s+=`<g fill="rgba(200,215,240,.32)" stroke="rgba(200,215,240,.4)" stroke-width=".6">
-    <path d="M70 470 l14 0 l-3 6 l-8 0 z"/><path d="M540 300 l12 0 l-3 5 l-6 0 z"/><path d="M40 300 l11 0 l-3 5 l-5 0 z"/></g>
-    <g stroke="rgba(200,215,240,.2)" stroke-width="1"><path d="M77 470 v-8"/><path d="M546 300 v-7"/></g>`;
-  // lighthouse
-  s+=`<g transform="translate(524,470)"><path d="M-3 8 L-2 -6 L2 -6 L3 8 Z" fill="rgba(220,225,240,.5)"/><circle cy="-8" r="3" fill="#FFD86A" style="filter:drop-shadow(0 0 6px #FFD86A)"><animate attributeName="opacity" values="1;.3;1" dur="2.4s" repeatCount="indefinite"/></circle></g>`;
-  // bat-signal wash at night
-  if(night)s+=`<circle cx="234" cy="138" r="120" fill="url(#gmsig)"/>`;
-  // DISTRICTS — every named city, its assigned villain, coloured by control
-  const RW=128,RH=64;
+  // nautical grid over the water
+  for(let gx=0;gx<=560;gx+=56)s+=`<line x1="${gx}" y1="0" x2="${gx}" y2="510" stroke="rgba(120,155,205,.055)" stroke-width="1"/>`;
+  for(let gy=0;gy<=510;gy+=56)s+=`<line x1="0" y1="${gy}" x2="560" y2="${gy}" stroke="rgba(120,155,205,.055)" stroke-width="1"/>`;
+  // depth contours + the Gotham landmass with clipped street texture and avenue grid
+  s+=`<path d="${blob(281,252,292,220,5)}" fill="none" stroke="rgba(110,150,205,.10)" stroke-width="1" stroke-dasharray="3 7"/>
+      <path d="${blob(281,252,282,210,4)}" fill="#0b1120" opacity=".85"/>
+      <path d="${land}" fill="#141d31" stroke="rgba(150,180,225,.26)" stroke-width="1.6"/>
+      <g clip-path="url(#gmland)">
+        <rect x="8" y="40" width="546" height="430" fill="url(#gmstreet)"/>
+        <g stroke="rgba(195,210,240,.16)" stroke-width="4" stroke-linecap="round">
+          <line x1="147" y1="60" x2="147" y2="446"/><line x1="281" y1="60" x2="281" y2="446"/><line x1="415" y1="60" x2="415" y2="446"/>
+          <line x1="20" y1="187" x2="544" y2="187"/><line x1="20" y1="317" x2="544" y2="317"/></g>
+        <g stroke="rgba(195,210,240,.07)" stroke-width="2"><line x1="80" y1="60" x2="80" y2="446"/><line x1="214" y1="60" x2="214" y2="446"/><line x1="348" y1="60" x2="348" y2="446"/><line x1="482" y1="60" x2="482" y2="446"/></g>
+      </g>`;
+  // Gotham River — a channel down the middle avenue, with two bridges
+  s+=`<path d="M281 58 Q262 160 281 258 Q300 356 281 448" fill="none" stroke="rgba(26,52,82,.6)" stroke-width="12" stroke-linecap="round"/>
+      <path d="M281 58 Q262 160 281 258 Q300 356 281 448" fill="none" stroke="rgba(90,140,200,.18)" stroke-width="12" stroke-linecap="round" stroke-dasharray="2 9"/>
+      <g stroke="rgba(210,220,245,.5)" stroke-width="4" stroke-dasharray="7 4"><line x1="258" y1="187" x2="304" y2="187"/><line x1="258" y1="317" x2="304" y2="317"/></g>`;
+  // Robinson Park — green patch tucked under the legs row
+  s+=`<path d="${blob(96,432,34,17,6)}" fill="rgba(46,150,86,.4)" stroke="rgba(90,210,130,.4)" stroke-width="1"/>
+      <text x="96" y="435" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" letter-spacing="1.5" fill="rgba(150,230,180,.75)">PARK</text>`;
+  // harbor boats + lighthouse
+  s+=`<g fill="rgba(200,215,240,.3)" stroke="rgba(200,215,240,.4)" stroke-width=".6"><path d="M60 476 l14 0 l-3 6 l-8 0 z"/><path d="M498 474 l12 0 l-3 5 l-6 0 z"/></g>
+      <g transform="translate(538,450)"><path d="M-3 8 L-2 -6 L2 -6 L3 8 Z" fill="rgba(220,225,240,.5)"/><circle cy="-8" r="3" fill="#FFD86A" style="filter:drop-shadow(0 0 6px #FFD86A)"><animate attributeName="opacity" values="1;.3;1" dur="2.4s" repeatCount="indefinite"/></circle></g>`;
+  if(night)s+=`<circle cx="80" cy="122" r="110" fill="url(#gmsig)"/>`;
+  // DISTRICTS — one clear card per cell: city name, muscle, its villain + control state
+  const RW=126,RH=74;
   M12.forEach((m,i)=>{
     const[mx,my]=POS[m], x=mx-RW/2, y=my-RH/2;
-    const dc=districtCrime(m), b=districtBand(dc.crime), held=dc.crime<45, lost=dc.crime>=70;
+    const dc=districtCrime(m), b=districtBand(dc.crime), held=dc.crime<45;
     const vil=(NEMESIS_MAP[m]||{}).villain||"the Rogues", col=b[1];
-    const fill=held?"rgba(255,208,72,.15)":lost?"rgba(255,54,34,.2)":"rgba(255,140,34,.15)";
+    const fill=held?"rgba(255,208,72,.14)":dc.crime>=70?"rgba(255,54,34,.19)":"rgba(255,140,34,.15)";
     s+=`<g style="cursor:pointer" onclick="muscleDrill('${m}')">
-      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="10" fill="${fill}" stroke="${col}" stroke-opacity="${held?'.6':'.95'}" stroke-width="1.5"/>
-      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="10" fill="url(#gmblock)" opacity=".5"/>
-      <text x="${x+10}" y="${y+15}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="700" letter-spacing=".7" fill="rgba(215,225,245,.62)">${esc((MUSCLE_DISTRICT[m]||'').toUpperCase())}</text>
-      <text x="${x+10}" y="${y+39}" font-family="Bebas Neue,sans-serif" font-size="20" letter-spacing="1.3" fill="${held?'#FFD048':col}" style="text-shadow:0 0 10px ${col}">${MNAME[m].toUpperCase()}</text>
-      <text x="${x+10}" y="${y+RH-9}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="800" letter-spacing=".5" fill="${held?'rgba(255,208,72,.8)':col}">${held?'🦇 SECURED':'☠ '+esc(vil.toUpperCase())} · ${b[0]}</text>
-      <circle cx="${x+RW-15}" cy="${y+15}" r="10" fill="rgba(5,9,16,.92)" stroke="${col}" stroke-width="1.3"${held?'':' class="gc-beacon"'} style="${lost?'animation-delay:'+((i*0.3)%1.7)+'s':''};filter:drop-shadow(0 0 5px ${col})"/>
-      <text x="${x+RW-15}" y="${y+19}" text-anchor="middle" font-size="11">${held?'🦇':'☠️'}</text>
+      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="11" fill="rgba(8,13,22,.82)"/>
+      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="11" fill="${fill}" stroke="${col}" stroke-opacity="${held?'.6':'.95'}" stroke-width="1.5"/>
+      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="11" fill="url(#gmblock)" opacity=".5"/>
+      <text x="${x+11}" y="${y+16}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="700" letter-spacing=".8" fill="rgba(215,225,245,.62)">${esc((MUSCLE_DISTRICT[m]||'').toUpperCase())}</text>
+      <text x="${x+11}" y="${y+40}" font-family="Bebas Neue,sans-serif" font-size="21" letter-spacing="1.3" fill="${held?'#FFD048':col}" style="text-shadow:0 0 10px ${col}">${MNAME[m].toUpperCase()}</text>
+      <circle cx="${x+RW-16}" cy="${y+16}" r="11" fill="rgba(4,8,15,.95)" stroke="${col}" stroke-width="1.4"${held?'':' class="gc-beacon"'} style="animation-delay:${((i*0.3)%1.7)}s;filter:drop-shadow(0 0 5px ${col})"/>
+      <text x="${x+RW-16}" y="${y+20}" text-anchor="middle" font-size="12">${held?'🦇':'☠️'}</text>
+      <text x="${x+11}" y="${y+RH-19}" font-family="DM Sans,sans-serif" font-size="9.5" font-weight="800" letter-spacing=".3" fill="${held?'#FFD048':col}">${held?'DEFENDED BY YOU':esc(vil.toUpperCase())}</text>
+      <text x="${x+11}" y="${y+RH-7}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="700" letter-spacing=".8" fill="${held?'rgba(255,208,72,.7)':'rgba(215,225,245,.6)'}">${held?'🦇 SECURED':'☠ VILLAIN · '+b[0]}</text>
     </g>`;
   });
-  // map furniture — labels, compass, scale, title cartouche
-  s+=`<text x="30" y="345" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="4" fill="rgba(140,170,215,.42)" transform="rotate(-64 30 345)">GOTHAM RIVER</text>
-      <text x="150" y="500" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="6" fill="rgba(140,170,215,.42)">GOTHAM HARBOR</text>
+  // map furniture
+  s+=`<text x="26" y="330" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="4" fill="rgba(140,170,215,.42)" transform="rotate(-90 26 330)">GOTHAM RIVER</text>
+      <text x="281" y="500" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="6" fill="rgba(140,170,215,.42)">GOTHAM HARBOR</text>
       <g transform="translate(24,30)"><text font-family="Bebas Neue,sans-serif" font-size="21" letter-spacing="3" fill="rgba(255,208,72,.92)" style="text-shadow:0 0 12px rgba(255,208,72,.4)">GOTHAM CITY</text><text y="14" font-family="DM Sans,sans-serif" font-size="8" letter-spacing="2.5" fill="rgba(200,215,240,.5)">TACTICAL PATROL MAP · 12 DISTRICTS</text></g>
-      <g transform="translate(526,52)" opacity=".62"><circle r="16" fill="rgba(5,9,16,.55)" stroke="rgba(200,215,240,.4)"/><path d="M0 -13 L4 0 L0 13 L-4 0 Z" fill="#FFD048"/><path d="M-13 0 L0 4 L13 0 L0 -4 Z" fill="rgba(200,215,240,.5)"/><text y="-19" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(200,215,240,.75)">N</text></g>
-      <g transform="translate(28,492)"><rect width="64" height="4" fill="none" stroke="rgba(200,215,240,.4)"/><rect width="32" height="4" fill="rgba(200,215,240,.28)"/><text y="-4" font-family="DM Sans,sans-serif" font-size="7.5" fill="rgba(200,215,240,.5)">2 KM</text></g>`;
+      <g transform="translate(482,60)" opacity=".62"><circle r="15" fill="rgba(5,9,16,.55)" stroke="rgba(200,215,240,.4)"/><path d="M0 -12 L4 0 L0 12 L-4 0 Z" fill="#FFD048"/><path d="M-12 0 L0 4 L12 0 L0 -4 Z" fill="rgba(200,215,240,.5)"/><text y="-18" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(200,215,240,.75)">N</text></g>
+      <g transform="translate(28,486)"><rect width="64" height="4" fill="none" stroke="rgba(200,215,240,.4)"/><rect width="32" height="4" fill="rgba(200,215,240,.28)"/><text y="-4" font-family="DM Sans,sans-serif" font-size="7.5" fill="rgba(200,215,240,.5)">2 KM</text></g>`;
   const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
   const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
   return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px;padding:0;overflow:hidden">
@@ -10522,10 +10518,10 @@ function gothamSkylineCard(){
       <defs>
         <radialGradient id="gmsea" cx="50%" cy="34%" r="80%"><stop offset="0" stop-color="#0e1a2c"/><stop offset=".6" stop-color="#0a1120"/><stop offset="1" stop-color="#070c17"/></radialGradient>
         <pattern id="gmwave" width="34" height="17" patternUnits="userSpaceOnUse"><path d="M0 13 Q8.5 7 17 13 T34 13" stroke="rgba(110,150,205,.09)" fill="none" stroke-width="1"/></pattern>
-        <pattern id="gmstreet" width="17" height="17" patternUnits="userSpaceOnUse"><path d="M0 0 H17 M0 0 V17" stroke="rgba(150,175,215,.11)" stroke-width="1"/></pattern>
+        <pattern id="gmstreet" width="17" height="17" patternUnits="userSpaceOnUse"><path d="M0 0 H17 M0 0 V17" stroke="rgba(150,175,215,.1)" stroke-width="1"/></pattern>
         <pattern id="gmblock" width="13" height="11" patternUnits="userSpaceOnUse"><rect x="2" y="2" width="6" height="5" fill="rgba(210,222,248,.05)"/></pattern>
-        <radialGradient id="gmsig" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="rgba(255,241,196,.14)"/><stop offset="1" stop-color="rgba(255,241,196,0)"/></radialGradient>
-        ${isle.map((p,idx)=>`<clipPath id="gmisl${idx}"><path d="${p.land}"/></clipPath>`).join("")}
+        <radialGradient id="gmsig" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="rgba(255,241,196,.13)"/><stop offset="1" stop-color="rgba(255,241,196,0)"/></radialGradient>
+        <clipPath id="gmland"><path d="${land}"/></clipPath>
       </defs>
       <rect width="560" height="510" fill="url(#gmsea)"/>
       <rect width="560" height="510" fill="url(#gmwave)"/>
@@ -10537,7 +10533,6 @@ function gothamSkylineCard(){
         <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in enemy hands":"all districts secured"}</span></div>
       <span style="display:flex;gap:9px;flex:none;align-items:center">${leg("#FFD048","yours")}${leg("#FF8C22","contested")}${leg("#FF3622","villain-held")}</span>
     </div>
-    <div style="padding:0 12px 12px"><button class="btn gold" onclick="openDistricts()">🗺 OPEN THE CAMPAIGN MAP — set district priorities</button></div>
   </div>`;
 }
 function gothamMarkFallen(){const d=state.data;d.fallenSeen=d.fallenSeen||{};M12.forEach(m=>{if(districtCrime(m).crime>=70)d.fallenSeen[m]=1;});save();render();}
