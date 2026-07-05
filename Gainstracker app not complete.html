@@ -396,6 +396,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .reststrip .rs-int b{color:var(--text);letter-spacing:.02em}
 .rs-btn{flex:none;padding:10px 13px;border-radius:11px;border:1px solid var(--border2);background:linear-gradient(180deg,var(--bg4),var(--bg3));color:var(--text2);font-family:var(--disp);font-size:12.5px;letter-spacing:.08em;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
 .rs-btn.gold{border-color:rgba(255,208,72,.5);background:linear-gradient(180deg,rgba(255,208,72,.18),rgba(58,42,8,.5));color:var(--gold2);box-shadow:0 0 16px -7px rgba(255,208,72,.9),inset 0 1px 0 rgba(255,255,255,.16)}
+@keyframes calpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,208,72,0)}50%{box-shadow:0 0 14px 2px rgba(255,208,72,.45)}}
 .restbtn{padding:13px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));color:#e9eef6;font-family:var(--disp);letter-spacing:.06em;font-size:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .restbtn.go{background:linear-gradient(180deg,rgba(201,168,76,.34),rgba(201,168,76,.12));border-color:rgba(201,168,76,.5);color:var(--gold2)}
 /* ===== MMA Round Timer overlay ===== */
@@ -6004,10 +6005,11 @@ function profileHeroHtml(d,u,sl,r,ri){
 function calPrev(){state._calOff=(state._calOff||0)-1;render();}
 function calNext(){if((state._calOff||0)<0){state._calOff=(state._calOff||0)+1;render();}}
 function profileCalendarHtml(d){
-  const vols={},dayNames={};
+  const vols={},dayNames={},prsD={};
   (d.workouts||[]).forEach(w=>{
     const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toISOString().slice(0,10);
     vols[key]=(vols[key]||0)+(w.totalVol||0);
+    prsD[key]=(prsD[key]||0)+((w.prs||[]).length);
     if(!dayNames[key])dayNames[key]=[];
     if(w.name&&!dayNames[key].includes(w.name))dayNames[key].push(w.name);
   });
@@ -6030,17 +6032,26 @@ function profileCalendarHtml(d){
     if(v&&!future){
       const names=dayNames[k]||[];
       const label=names.join(' · ')||'Training';
-      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.11+t*0.13).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1.5px solid rgba(235,199,107,${(0.25+t*0.55).toFixed(2)});box-shadow:0 0 ${Math.round(3+t*10)}px rgba(235,199,107,${(t*.35).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 3px 8px;min-height:76px">
+      const prN=prsD[k]||0;
+      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="position:relative;border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.11+t*0.13).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1.5px solid rgba(235,199,107,${(0.25+t*0.55).toFixed(2)});box-shadow:0 0 ${Math.round(3+t*10)}px rgba(235,199,107,${(t*.35).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 3px 6px;min-height:78px">
         <span style="font-size:8px;color:rgba(255,255,255,.3);font-weight:500;line-height:1;align-self:center">${day}</span>
         <span style="font-size:8.5px;font-weight:800;color:var(--gold2);text-align:center;line-height:1.25;letter-spacing:.02em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%;padding:0 2px">${esc(label)}</span>
+        <span class="num" style="font-size:10.5px;color:var(--gold2);line-height:1;opacity:.92">${v>=1000?(v/1000).toFixed(1)+'t':Math.round(v)+''}</span>
+        ${prN?`<span style="position:absolute;top:2px;right:3px;font-size:9.5px;filter:drop-shadow(0 0 4px rgba(255,208,72,.9))">👑</span>`:''}
       </div>`;
     } else {
-      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.02)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;min-height:76px">
+      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.02)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};${isToday?'animation:calpulse 2.2s ease-in-out infinite;':''}display:flex;align-items:center;justify-content:center;min-height:78px">
         <span style="font-size:${isToday?13:11}px;color:${isToday?'var(--gold2)':'rgba(255,255,255,.15)'};font-weight:${isToday?'700':'400'};line-height:1">${future?'':day}</span>
       </div>`;
     }
   }
-  const active=Object.entries(vols).filter(([k,v])=>v>0&&new Date(k).getFullYear()===yr&&new Date(k).getMonth()===mo).length;
+  const inMonth=([k])=>{const dk=new Date(k);return dk.getFullYear()===yr&&dk.getMonth()===mo;};
+  const active=Object.entries(vols).filter(([k,v])=>v>0&&inMonth([k])).length;
+  const monthVol=Object.entries(vols).filter(inMonth).reduce((a,[,v])=>a+v,0);
+  const monthPRs=Object.entries(prsD).filter(inMonth).reduce((a,[,v])=>a+v,0);
+  const pm=new Date(yr,mo-1,1);
+  const prevVol=Object.entries(vols).filter(([k])=>{const dk=new Date(k);return dk.getFullYear()===pm.getFullYear()&&dk.getMonth()===pm.getMonth();}).reduce((a,[,v])=>a+v,0);
+  const dPct=prevVol>0?Math.round((monthVol-prevVol)/prevVol*100):null;
   const navBtn=(label,fn,disabled)=>`<button onclick="${fn}()" style="background:none;border:1px solid rgba(232,197,106,${disabled?.15:.35});border-radius:8px;color:${disabled?'rgba(255,255,255,.2)':'var(--gold2)'};font-size:18px;font-weight:700;padding:0 11px;height:34px;line-height:1;cursor:${disabled?'default':'pointer'}">${label}</button>`;
   return `<div style="background:linear-gradient(160deg,rgba(232,197,106,.07) 0%,rgba(10,12,18,.98) 55%);border:1px solid rgba(232,197,106,.28);border-radius:20px;padding:18px;margin-bottom:10px"
     ontouchstart="state._calSwipeX=event.touches[0].clientX"
@@ -6049,7 +6060,8 @@ function profileCalendarHtml(d){
       ${navBtn('‹','calPrev',false)}
       <div style="text-align:center">
         <div style="font-family:var(--disp);font-size:16px;color:var(--gold2);letter-spacing:.05em">${MON[mo].toUpperCase()} ${yr}</div>
-        <div class="mini" style="color:var(--text3);margin-top:2px">${active} session${active===1?'':'s'}${isCurrentMonth?' this month':''}</div>
+        <div class="mini" style="color:var(--text3);margin-top:2px">${active} session${active===1?'':'s'} · <b class="num" style="color:var(--gold2)">${monthVol>=1000?(monthVol/1000).toFixed(1)+'t':Math.round(monthVol)+'kg'}</b>${monthPRs?` · 👑 ${monthPRs}`:''}</div>
+        ${dPct!==null&&active?`<div class="mini num" style="margin-top:1px;font-weight:700;color:${dPct>=0?'var(--green)':'#ff7a6e'}">${dPct>=0?'▲ +':'▼ '}${dPct}% vs last month</div>`:''}
       </div>
       <div style="display:flex;gap:6px;align-items:center">
         ${navBtn('›','calNext',isCurrentMonth)}
