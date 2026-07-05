@@ -3926,7 +3926,9 @@ function saveGym(){const gn=state._gymEditName||state.data.u.activeGym||"";state
 function openPicker(multi){
   state.pickerMulti=multi||null;
   state.pickerOpen=true;state.pickerQuery="";state.pickerMuscle="all";
-  state.gymFilter=false;
+  const gymNm=state.data.u.activeGym||"";
+  const hasEquipProfile=!!(((state.data.gymEquipment||{})[gymNm]||{}).equip);
+  state.gymFilter=hasEquipProfile; // default: only show what YOUR gym has, when a profile exists
   const mm=!!state.pickerMulti;
   $("sheet").innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -3944,11 +3946,35 @@ function openPicker(multi){
         style="padding-left:36px;background:linear-gradient(180deg,rgba(20,26,40,.9),rgba(12,15,22,.9));border-color:rgba(255,208,72,.22)"/>
       <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5">🔍</span>
     </div>
-    <div class="scroll-x" id="ex-musc" style="margin-bottom:10px;gap:6px">${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')" style="font-family:var(--disp);letter-spacing:.06em">${m==='all'?'ALL':MNAME[m].toUpperCase()}</button>`).join("")}</div>
+    <div class="scroll-x" id="ex-musc" style="margin-bottom:10px;gap:6px">${hasEquipProfile?`<button class="chip ${state.gymFilter?'on':''}" id="gymfchip" onclick="toggleGymFilter()" style="font-family:var(--disp);letter-spacing:.06em;border-color:rgba(255,208,72,.4)">🏛 ${esc(gymNm.toUpperCase())} ONLY</button>`:''}${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')" style="font-family:var(--disp);letter-spacing:.06em">${m==='all'?'ALL':MNAME[m].toUpperCase()}</button>`).join("")}</div>
     <button class="btn" style="margin:0 0 10px;border:1px dashed rgba(255,208,72,.22);background:rgba(255,208,72,.04);color:var(--gold2);font-family:var(--disp);letter-spacing:.06em" onclick="openCustomCreator()">⚙ CREATE CUSTOM LIFT</button>
     <div id="ex-list" style="max-height:50vh;overflow-y:auto;overflow-x:hidden;margin:0 -2px;padding:0 2px"></div>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
   updateExList();
+}
+function toggleGymFilter(){state.gymFilter=!state.gymFilter;const c=$("gymfchip");if(c)c.classList.toggle("on",state.gymFilter);try{haptic("tap");}catch(e){}updateExList();}
+/* ===== 🔍 Omni-search — one light finder for lifts, muscles and tools (not a crutch: rarely needed) ===== */
+const OMNI_TOOLS=[["Splits & schedule","🗂️","openSplitSheet()"],["Patrol calendar","🗓️","go('case')"],["Records & ranks","🏆","go('case')"],["Suit status","🦇","go('suit')"],["Mission plan","🎯","go('mission')"],["Allies","🤝","go('allies')"],["Forge — build a split","⚒️","openForge()"],["Arkham Lockup","🔒","openArkhamLockup()"],["Gotham Gazette","📰","openGazette()"],["Season pass","🎬","openSeason()"],["Settings","⚙️","openSettings()"]];
+function openOmni(){
+  try{haptic("tap");}catch(e){}
+  openSheet(`<div class="ttl">🔍 Find anything</div>
+    <input id="omni-q" placeholder="Exercise, muscle, tool…" autocomplete="off" oninput="omniList()" style="margin-bottom:10px"/>
+    <div id="omni-res" style="max-height:55vh;overflow-y:auto;margin:0 -2px;padding:0 2px"></div>`);
+  setTimeout(()=>{const i=$("omni-q");if(i)i.focus();},80);
+  omniList();
+}
+function omniList(){
+  const q=(($("omni-q")||{}).value||"").toLowerCase().trim();
+  const row=(ic,t,sub,act)=>`<div class="exrow" style="padding:10px;cursor:pointer;margin-bottom:6px" onclick="closeSheet();${act}"><span style="font-size:19px;flex:none;width:26px;text-align:center">${ic}</span><div class="g"><div style="font-size:14px;font-weight:600">${t}</div>${sub?`<div class="mini" style="color:var(--text3)">${sub}</div>`:''}</div><span style="color:var(--text3)">›</span></div>`;
+  let h="";
+  if(q){
+    M12.filter(m=>MNAME[m].toLowerCase().includes(q)).slice(0,3).forEach(m=>{h+=row("💪",MNAME[m],"Muscle dossier",`muscleDrill('${m}')`);});
+    const seen=new Set();
+    Object.keys(state.data.prs||{}).filter(n=>n.toLowerCase().includes(q)).slice(0,4).forEach(n=>{seen.add(n.toLowerCase());h+=row("👑",esc(n),"Your record book",`exerciseHistory('${esc(n).replace(/'/g,"")}')`);});
+    EXDB.filter(e=>e.n.toLowerCase().includes(q)&&!seen.has(e.n.toLowerCase())).slice(0,6).forEach(e=>{h+=row("🏋️",esc(e.n),esc(e.eq),`openExDetail('${esc(e.n).replace(/'/g,"")}')`);});
+  }
+  OMNI_TOOLS.filter(t=>!q||t[0].toLowerCase().includes(q)).slice(0,q?4:11).forEach(t=>{h+=row(t[1],t[0],"",t[2]);});
+  const box=$("omni-res");if(box)box.innerHTML=h||`<div class="mini" style="color:var(--text3);padding:10px">Nothing in the files matching "${esc(q)}", sir.</div>`;
 }
 /* Exercise detail sheet — shows big figure + cues, lets you add from there */
 function openExDetail(exName){
@@ -9946,6 +9972,7 @@ function gtv2MissionHero(){
           <div style="font-size:9px;color:var(--text3)">RANK ${ri+1}/${RANKS.length}</div>
           <div style="font-size:9px;color:${next?'var(--gold-dim)':'var(--green)'}">${next?`${Math.max(0,hi-sl)} lv → ${esc(next[1])}`:"MAX RANK"}</div>
         </div></div>`;})()}
+      <button onclick="openOmni()" aria-label="Find anything" style="flex:none;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,208,72,.3);background:rgba(0,0,0,.45);color:var(--gold2);font-size:15px;margin-left:7px;box-shadow:0 0 14px -6px rgba(255,208,72,.7)">🔍</button>
     </div>
       ${focal}
       ${track}
