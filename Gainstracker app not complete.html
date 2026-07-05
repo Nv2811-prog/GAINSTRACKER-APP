@@ -1990,13 +1990,13 @@ const MM_NORM=m=>m==="lats"?"back":(m==="delts"?"shoulders":m);
 const MM_BACK=new Set(["back","traps","triceps","glutes","hamstrings","calves"]);
 // Reusable anatomy renderer. view = "front"|"back"; col(muscle)->fill string.
 // ===== Unified anatomy: the Batsuit body (same one in the SUIT & GOTHAM tabs) used EVERYWHERE. col(muscle)->{fill,op} =====
-function suitFigure(view,colFn,style){
+function suitFigure(view,colFn,style,extraDefs){
   const prev=state._figColor;state._figColor=colFn;
   const P=suitProps();
   const body=(view==="back"?_backBody:_frontBody)(125,P);
   state._figColor=prev;
   const defs=(state._figShade||state._figGlow)?SUIT_DEFS:'';
-  return `<svg viewBox="58 40 134 380" preserveAspectRatio="xMidYMid meet" style="${style||'width:100%;height:100%;display:block'}">${defs}${body}</svg>`;
+  return `<svg viewBox="58 40 134 380" preserveAspectRatio="xMidYMid meet" style="${style||'width:100%;height:100%;display:block'}">${defs}${extraDefs||''}${body}</svg>`;
 }
 function bodyFig(ex){
   const prim=MM_NORM((ex.p&&ex.p[0])||"chest");
@@ -2035,18 +2035,35 @@ function heatLabel(m){
   return ["Over MRV — junk risk","var(--red)"];
 }
 // Compact heat body: lights the tapped muscle by training intensity, on a Gym80-style dark tile.
+/* Sub-region heat ON the figure: for muscles whose heads stack vertically on the body, the muscle
+   path is filled with a gradient — each band = that sub-region's weekly-volume heat. */
+const SUBAXIS={chest:["up","mid","lo"],back:["ulat","mid","llat","ere"],traps:["up","mid","lo"],abs:["up","lo"],hamstrings:["hip","knee"],glutes:["med","max"],calves:["gas","sol"]};
 function muscleHeatFig(m){
   const nm=MM_NORM(m), view=MM_BACK.has(nm)?"back":"front";
-  const hc=heatColor(nm), col=mm=> mm===nm?{fill:hc,op:".95"}:{fill:"#E8C56A",op:".06"};
+  const hc=heatColor(nm);
+  let fillV=hc,extraDefs="",axNote="";
+  const ax=SUBAXIS[nm];
+  if(ax){
+    const counts=subSetCounts(nm),n=ax.length;
+    if(ax.some(id=>counts[id]>0)){
+      const colors=ax.map(id=>heatColorFor(nm,(counts[id]||0)*n));
+      const stops=colors.map((c,i)=>`<stop offset="${(((i+0.5)/n)*100).toFixed(0)}%" stop-color="${c}"/>`).join("");
+      extraDefs=`<defs><linearGradient id="subheatG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${colors[0]}"/>${stops}<stop offset="100%" stop-color="${colors[n-1]}"/></linearGradient></defs>`;
+      fillV="url(#subheatG)";
+      axNote=`<div class="mini" style="margin-top:4px;color:var(--text3);line-height:1.35">Figure top→bottom: ${ax.map(id=>subName(nm,id)).join(" → ")}</div>`;
+    }
+  }
+  const col=mm=> mm===nm?{fill:fillV,op:".95"}:{fill:"#E8C56A",op:".06"};
   const [lab,lc]=heatLabel(nm), s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20};
   const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
-  const fig=suitFigure(view,col);state._figShade=ps;state._figGlow=pg;
+  const fig=suitFigure(view,col,null,extraDefs);state._figShade=ps;state._figGlow=pg;
   return `<div class="row" style="gap:12px;align-items:center;margin-bottom:10px">
     <div class="stage" style="width:104px;height:104px;flex:none;border-radius:14px;overflow:hidden">${fig}</div>
     <div style="min-width:0">
       <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:2px">INTENSITY HEAT</div>
       <div style="font-weight:800;color:${lc};font-size:15px;line-height:1.1">${lab}</div>
       <div class="mini" style="margin-top:4px;color:var(--text2)">${s>0?s+" hard set"+(s===1?"":"s")+" this week":"No sets logged this week"}</div>
+      ${axNote}
       <div style="height:7px;border-radius:5px;margin-top:7px;background:linear-gradient(90deg,#566070,hsl(6 80% 38%),hsl(4 92% 56%),hsl(0 94% 64%))"></div>
       <div class="row sp mini" style="margin-top:2px;color:var(--text3)"><span>MEV ${lm.mev}</span><span>MAV ${lm.mav}</span><span>MRV ${lm.mrv}</span></div>
     </div></div>`;
