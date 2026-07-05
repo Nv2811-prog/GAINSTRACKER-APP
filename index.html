@@ -2347,9 +2347,12 @@ function setVolumeRaw(ex,s){
 function setE1RM(ex,s){const load=setLoad(ex,s.w),reps=+s.r||0;if(!reps)return 0;return epley(load,reps);}
 
 /* ========================= LAST SETS (PREVIOUS column) ========================= */
+/* Workouts of the ACTIVE gym only — a split reused across gyms must never show another gym's
+   numbers (machine weights differ). Legacy entries with no gym stamp belong to the first gym. */
+function gymWs(){const d=state.data,g=d.u.activeGym||((d.u.gyms||[])[0]||"");const home=(d.u.gyms||[])[0]||g;return (d.workouts||[]).filter(w=>(w.gym||home)===g);}
 function lastSetFor(name){
   const key=(name||"").toLowerCase().trim();
-  const ws=state.data.workouts;
+  const ws=gymWs();
   for(let i=0;i<ws.length;i++){
     const e=(ws[i].exercises||[]).find(x=>(x.name||"").toLowerCase().trim()===key);
     if(e&&e.sets&&e.sets.length)return e.sets;
@@ -3724,7 +3727,7 @@ function suggestionFor(name){
 }
 // Most recent logged top working set for a lift (scans workout history, newest first).
 function lastBestSet(name){
-  const ws=state.data.workouts||[];const ex=exFor(name);
+  const ws=gymWs();const ex=exFor(name);
   for(const w of ws){
     const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;
     let best=null,bv=-1;
@@ -4281,7 +4284,7 @@ function prevExercise(name){
   return null;
 }
 // Previous workout sharing this session's name (e.g. last "Chest Day") for total-volume comparison.
-function prevSameDay(wk){const ws=state.data.workouts||[];for(let i=1;i<ws.length;i++){if(ws[i].name===wk.name&&ws[i].totalVol)return ws[i];}return null;}
+function prevSameDay(wk){const ws=gymWs();for(const w of ws){if(w!==wk&&w.id!==wk.id&&w.name===wk.name&&w.totalVol)return w;}return null;}
 function summaryCardRecap(R){
   const rows=R.wk.exercises.map(e=>{
     const ex=exFor(e.name);let topW=0,topR=0,bestO=0,vol=0;
@@ -11170,7 +11173,7 @@ function renderLogging(){
     ${restStripHtml}
   </div><div id="timerspace" aria-hidden="true"></div>`;
   // 👻 GHOST RACE — live tonnage vs the last time you ran this same day
-  {const ghost=(state.data.workouts||[]).find(w=>w.name===ses.day&&w.totalVol>0);
+  {const ghost=gymWs().find(w=>w.name===ses.day&&w.totalVol>0);
    if(ghost){let lv=0;(ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{if(s.done)lv+=setVolume(ex,s);});});
      const pct=clamp(lv/ghost.totalVol*100,0,100),beat=lv>ghost.totalVol;
      h+=`<div style="margin:0 0 10px;padding:8px 12px;border-radius:12px;border:1px solid ${beat?'rgba(255,208,72,.55)':'rgba(124,150,255,.28)'};background:${beat?'rgba(255,208,72,.08)':'rgba(124,150,255,.06)'};${beat?'box-shadow:0 0 18px -8px rgba(255,208,72,.7)':''}">
