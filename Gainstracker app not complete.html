@@ -4311,13 +4311,14 @@ function saveSessionNote(v){if(state.lastResult){state.lastResult.wk.notes=v;sav
 function setSessionFeel(v){if(!state.lastResult)return;const wk=state.lastResult.wk;wk.feel=(wk.feel===v?"":v);save();haptic("tap");document.querySelectorAll(".feelchip").forEach(c=>c.classList.toggle("on",c.getAttribute("data-feel")===wk.feel));}
 function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";playStinger('PATROL COMPLETE',state.lastResult?fmtNum(Math.round(state.lastResult.totalVol))+' kg moved':'', '#22E87A');render();}
 /* "You lifted ≈ 2.8 Batmobiles" — session tonnage drawn as Gotham hardware, not just a number. */
+const BAT_PATH="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
+const LIFT_UNITS=[[25000,"GOTHAM FERRIES",`<path d="M2 13 H46 L40 19 H8 Z M10 13 V8 H34 V13 M28 8 V4 H32 V8"/>`],
+         [11000,"BATWINGS",`<g transform="translate(3,-3) scale(.44)"><path d="${BAT_PATH}"/></g>`],
+         [5000,"BAT-TANKS",`<path d="M2 13 H42 L38 18 H6 Z M14 13 V8 H26 V13 M26 9 h14 v2 h-14 z"/>`],
+         [2300,"BATMOBILES",`<path d="M1 16 L8 10 L18 9 L22 4 L30 4 L32 9 L40 10 L47 16 Z M33 9 L36 2 L38 9 Z"/><circle cx="10" cy="16" r="3"/><circle cx="38" cy="16" r="3"/>`],
+         [230,"BATCYCLES",`<circle cx="8" cy="15" r="4"/><circle cx="34" cy="15" r="4"/><path d="M8 15 L17 6 H27 L34 15 Z M27 6 L31 3 L33 5 Z"/>`]];
 function liftedVisual(v){
-  const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
-  const U=[[25000,"GOTHAM FERRIES",`<path d="M2 13 H46 L40 19 H8 Z M10 13 V8 H34 V13 M28 8 V4 H32 V8"/>`],
-           [11000,"BATWINGS",`<g transform="translate(3,-3) scale(.44)"><path d="${bat}"/></g>`],
-           [5000,"BAT-TANKS",`<path d="M2 13 H42 L38 18 H6 Z M14 13 V8 H26 V13 M26 9 h14 v2 h-14 z"/>`],
-           [2300,"BATMOBILES",`<path d="M1 16 L8 10 L18 9 L22 4 L30 4 L32 9 L40 10 L47 16 Z M33 9 L36 2 L38 9 Z"/><circle cx="10" cy="16" r="3"/><circle cx="38" cy="16" r="3"/>`],
-           [230,"BATCYCLES",`<circle cx="8" cy="15" r="4"/><circle cx="34" cy="15" r="4"/><path d="M8 15 L17 6 H27 L34 15 Z M27 6 L31 3 L33 5 Z"/>`]];
+  const U=LIFT_UNITS;
   let u=null;for(const x of U){if(v>=x[0]){u=x;break;}}
   if(!u)return "";
   const cnt=v/u[0], full=Math.min(Math.floor(cnt),7), frac=cnt-Math.floor(cnt);
@@ -4327,6 +4328,89 @@ function liftedVisual(v){
   else if(frac>=.15)icons+=ic(.26);
   return `<div style="margin-top:9px"><div style="font-family:var(--disp);font-size:19px;letter-spacing:.06em;color:var(--gold2)">YOU LIFTED ≈ ${cnt>=10?Math.round(cnt):cnt.toFixed(1)} ${u[1]}</div>
     <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:5px">${icons}</div></div>`;
+}
+/* ===== 📸 PATROL CARD — auto-rendered shareable PNG (1080×1350) shown right on the finish screen ===== */
+function _scImg(src,ms){return new Promise(res=>{if(!src)return res(null);const im=new Image();const t=setTimeout(()=>res(null),ms||900);im.onload=()=>{clearTimeout(t);res(im);};im.onerror=()=>{clearTimeout(t);res(null);};im.src=src;});}
+async function renderShareCard(R){
+  const el=$("sharecard");if(!el||!R)return;
+  try{await document.fonts.load('90px "Bebas Neue"');}catch(e){}
+  const cv=document.createElement("canvas");cv.width=1080;cv.height=1350;const x=cv.getContext("2d");
+  const GOLD="#FFD048",W=1080;
+  x.fillStyle="#04060b";x.fillRect(0,0,W,1350);
+  const rg=x.createRadialGradient(540,140,60,540,140,940);rg.addColorStop(0,"rgba(232,168,32,.22)");rg.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=rg;x.fillRect(0,0,W,1350);
+  x.strokeStyle="rgba(60,150,255,.055)";x.lineWidth=1;
+  for(let i=0;i<=W;i+=54){x.beginPath();x.moveTo(i,0);x.lineTo(i,1350);x.stroke();}
+  for(let j=0;j<=1350;j+=54){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke();}
+  try{const bp=new Path2D(BAT_PATH);x.save();x.translate(540-50*7.6,140);x.scale(7.6,7.6);x.fillStyle="rgba(255,208,72,.06)";x.fill(bp);x.restore();}catch(e){}
+  x.textAlign="center";
+  x.fillStyle=GOLD;x.font='36px "Bebas Neue",sans-serif';try{x.letterSpacing="10px";}catch(e){}
+  x.fillText("GOTHAM IRON PROTOCOL · "+new Date(R.wk.date).toLocaleDateString().toUpperCase(),540,86);
+  try{x.letterSpacing="2px";}catch(e){}
+  x.fillStyle="#F6F2E6";x.font='120px "Bebas Neue",sans-serif';
+  x.shadowColor="rgba(255,208,72,.5)";x.shadowBlur=42;
+  x.fillText(String(R.wk.name||"PATROL").toUpperCase().slice(0,20),540,226);
+  x.shadowBlur=0;
+  // tonnage hero
+  x.fillStyle=GOLD;x.font='230px "Bebas Neue",sans-serif';x.shadowColor="rgba(232,168,32,.65)";x.shadowBlur=60;
+  x.fillText(fmtNum(Math.round(R.totalVol)),540,500);
+  x.shadowBlur=0;x.fillStyle="#98A4B4";x.font='42px "Bebas Neue",sans-serif';try{x.letterSpacing="12px";}catch(e){}
+  x.fillText("KG MOVED TONIGHT",540,556);try{x.letterSpacing="2px";}catch(e){}
+  // hardware equivalence row
+  let unit=null;for(const u of LIFT_UNITS){if(R.totalVol>=u[0]){unit=u;break;}}
+  if(unit){
+    const cnt=R.totalVol/unit[0],n=Math.min(Math.max(1,Math.floor(cnt)),6);
+    x.fillStyle=GOLD;x.font='58px "Bebas Neue",sans-serif';
+    x.fillText("≈ "+(cnt>=10?Math.round(cnt):cnt.toFixed(1))+" "+unit[1],540,660);
+    const gs=[];for(let i=0;i<n;i++)gs.push(`<g transform="translate(${i*52},0)">${unit[2]}</g>`);
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${n*52*2}" height="40" viewBox="0 0 ${n*52} 20" fill="#FFD048">${gs.join("")}</svg>`;
+    const im=await _scImg("data:image/svg+xml;utf8,"+encodeURIComponent(svg),700);
+    if(im)x.drawImage(im,540-n*52,684,n*52*2,80);
+  }
+  // stats row
+  const sets=R.wk.exercises.reduce((a,e)=>a+e.sets.filter(s=>s.type!=="W").length,0);
+  const stats=[[fmtTime(R.dur),"TIME"],[String(R.wk.exercises.length),"LIFTS"],[String(sets),"SETS"],[String((R.prsThis||[]).length),"NEW PRS"]];
+  stats.forEach((s,i)=>{const cx=135+i*270;
+    x.fillStyle="#F6F2E6";x.font='84px "Bebas Neue",sans-serif';x.fillText(s[0],cx,900);
+    x.fillStyle="#606872";x.font='30px "Bebas Neue",sans-serif';try{x.letterSpacing="6px";}catch(e){}x.fillText(s[1],cx,944);try{x.letterSpacing="2px";}catch(e){}});
+  x.strokeStyle="rgba(255,208,72,.28)";x.lineWidth=2;x.beginPath();x.moveTo(80,985);x.lineTo(1000,985);x.stroke();
+  // PRs broken
+  let py=1026;
+  if((R.prsThis||[]).length){
+    x.fillStyle="#22E87A";x.font='44px "Bebas Neue",sans-serif';
+    x.fillText("🏆 "+R.prsThis.length+" RECORD"+(R.prsThis.length>1?"S":"")+" BROKEN",540,py);
+    x.fillStyle="#98A4B4";x.font='30px "Bebas Neue",sans-serif';
+    x.fillText(R.prsThis.map(p=>p.name).join("  ·  ").toUpperCase().slice(0,60),540,py+42);py+=96;
+  }
+  // villains booked tonight (mugshots)
+  const vs=[];const seenV={};
+  (R.prsThis||[]).forEach(p=>{try{const b=pickBoss([p]);if(b&&!seenV[b.v]){seenV[b.v]=1;vs.push(b);}}catch(e){}});
+  if(vs.length){
+    const v3=vs.slice(0,3);const imgs=await Promise.all(v3.map(b=>_scImg(villainImgUrl(b.v),900)));
+    const cw=120,gap=36,total=v3.length*cw+(v3.length-1)*gap;let vx=540-total/2+cw/2;
+    v3.forEach((b,i)=>{const im=imgs[i];
+      x.save();x.beginPath();x.arc(vx,py+60,60,0,7);x.closePath();x.clip();
+      if(im)x.drawImage(im,vx-60,py,120,150);else{x.fillStyle="#1b2234";x.fillRect(vx-60,py,120,150);x.fillStyle=GOLD;x.font='56px sans-serif';x.fillText("☠",vx,py+80);}
+      x.restore();
+      x.strokeStyle="rgba(255,54,34,.8)";x.lineWidth=4;x.beginPath();x.arc(vx,py+60,60,0,7);x.stroke();vx+=cw+gap;});
+    x.fillStyle="#FF3622";x.font='32px "Bebas Neue",sans-serif';try{x.letterSpacing="5px";}catch(e){}
+    x.fillText(vs.length+" ROGUE"+(vs.length>1?"S":"")+" BOOKED — "+vs.map(b=>b.v).join(" · ").toUpperCase().slice(0,46),540,py+152);try{x.letterSpacing="2px";}catch(e){}
+  }
+  // footer — rank + streak (streak only when it exists)
+  try{const sl=strengthLevel();const ri=Math.max(0,RANKS.map(r=>r[0]).filter(t=>sl>=t).length-1);
+    const ws=weeklyStreak();
+    x.fillStyle=GOLD;x.font='38px "Bebas Neue",sans-serif';
+    x.fillText(RANKS[ri][2]+" "+String(RANKS[ri][1]).toUpperCase()+" · LV "+sl+(ws>0?"     🔥 "+ws+"-WEEK STREAK":""),540,1330);}catch(e){}
+  el.src=cv.toDataURL("image/png");
+  cv.toBlob(b=>{state._shareBlob=b;},"image/png");
+}
+function shareCardShare(){
+  const b=state._shareBlob;if(!b){toast("Card is still rendering, sir…");return;}
+  haptic("tap");
+  try{
+    const f=new File([b],"gainstracker-patrol.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[f]}))return void navigator.share({files:[f]}).catch(()=>{});
+  }catch(e){}
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="gainstracker-patrol.png";a.click();
 }
 function renderSummary(){
   const R=state.lastResult;if(!R){state.step=null;go("gotham");return;}
@@ -4338,7 +4422,7 @@ function renderSummary(){
       ${state.sumCard>0?`<button class="btn ghost g" onclick="sumNav(-1)">← Back</button>`:""}
       ${state.sumCard<last?`<button class="btn gold g" onclick="sumNav(1)">Next →</button>`:`<button class="btn gold g" onclick="closeSummary()">DONE</button>`}
     </div></div>`;
-  if(state.sumCard===0){setTimeout(()=>countUpEl("sumvol",Math.round(R.totalVol)),80);try{navigator.vibrate&&navigator.vibrate([30,180,30,300,30]);}catch(e){}}
+  if(state.sumCard===0){setTimeout(()=>countUpEl("sumvol",Math.round(R.totalVol)),80);setTimeout(()=>{try{renderShareCard(R);}catch(e){}},160);try{navigator.vibrate&&navigator.vibrate([30,180,30,300,30]);}catch(e){}}
   // swipe — handlers live on #app and are cleared at the top of render() when we leave summary,
   // so a stray swipe after dismissing the summary can never re-trigger this flow.
   const app=$("app");let sx=0;
@@ -4387,6 +4471,10 @@ function summaryCard1(R){
     <div class="bar xpbar"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
     <div class="center" style="margin-top:11px"><span class="chip on">🔥 ${state.data.u.streakDays} day streak</span></div>
     ${sessionRoguesGallery(R)}
+    <div class="hr"></div>
+    <div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:8px">📸 PATROL CARD — long-press to save, or share</div>
+    <img id="sharecard" alt="Patrol card" style="width:100%;border-radius:16px;border:1px solid rgba(255,208,72,.35);box-shadow:0 16px 44px -18px rgba(0,0,0,.9);min-height:140px;background:#0a0d14">
+    <button class="btn gold" style="margin-top:10px" onclick="shareCardShare()">📤 SHARE / SAVE PATROL CARD</button>
   </div>`;
 }
 function summaryCard2(R){
