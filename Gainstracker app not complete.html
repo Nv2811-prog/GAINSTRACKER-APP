@@ -4800,6 +4800,7 @@ function renderSummary(){
 function closeSummary(){
   try{maybeShowRankUp();}catch(e){}
   try{checkStreakMilestone();}catch(e){}
+  try{masteryCeremonyCheck();}catch(e){}
   state.lastResult=null;state.step=null;const a=$("app");if(a){a.ontouchstart=null;a.ontouchend=null;}go("gotham");
 }
 function sumNav(d){if(state.step!=="summary")return;state.sumCard=clamp(state.sumCard+d,0,4);renderSummary();window.scrollTo(0,0);}
@@ -8285,6 +8286,108 @@ function titleBeltsCard(){
     <div class="ttl" style="color:var(--gold2)">🏆 Title Belts</div>
     <div class="mini" style="color:var(--text3);margin-bottom:2px">Won in title fights — one max attempt, belt on the line.</div>${rows}</div>`;
 }
+/* ═══════════ 👑 MASTERY CEREMONIES — a tier crossing is an EVENT, not a silent color change ═══════════ */
+function masteryCeremonyCheck(){
+  try{
+    const d=state.data;d.masterySeen=d.masterySeen||{};
+    M12.forEach(m=>{
+      if(!(d.muscleVol[m]||0))return;
+      const lv=muscleLevel(m);const t=masteryOf(m);const seen=d.masterySeen[m];
+      if(!seen){d.masterySeen[m]={t:t[0],lv};return;}       // first sighting = baseline, no pop
+      if(t[0]!==seen.t&&lv>(seen.lv||0)){
+        d.masterySeen[m]={t:t[0],lv};
+        setTimeout(()=>{try{playStinger(t[0]+" MASTERY",MNAME[m].toUpperCase()+" · LV "+lv,t[1]);}catch(e){}},700);
+        setTimeout(()=>{try{cinePush({killcam:true,hold:true,icon:"👑",eye:"MASTERY ASCENSION",title:MNAME[m],titleHtml:`${MNAME[m]} <span style="color:${t[1]}">→ ${t[0]}</span>`,bodyHtml:`<div style="font-family:var(--disp);font-size:42px;color:${t[1]};text-shadow:0 0 26px ${t[1]}">${t[0]}</div><div class="mini" style="margin-top:9px;color:var(--text2)">Level ${lv}. Years of iron now read on the suit — see the Mastery view.</div>`,btn:"WEAR IT",accent:t[1]});}catch(e){}},1700);
+      }else d.masterySeen[m]={t:t[0],lv};
+    });
+    save();
+  }catch(e){}
+}
+/* ═══════════ 🗓️ GOTHAM CALENDAR — seasonal event weeks through the year ═══════════ */
+const SEASON_EVENTS=[
+  {id:"owls",   n:"Court of Owls Week", e:"🦉",c:"#c9b8ff",m:3, d:[10,17],goal:"tonnage", need:20000,desc:"The Court is watching. Move 20,000kg while they judge."},
+  {id:"riddler",n:"Riddler Gauntlet",   e:"❓",c:"#3ce87a",m:7, d:[1,14], goal:"sets",    need:60,   desc:"Sixty working sets in the first fortnight. Solve it with volume."},
+  {id:"hallow", n:"The Long Halloween", e:"🎃",c:"#ff9a3c",m:10,d:[24,31],goal:"prs",     need:2,    desc:"Scarecrow's fog rolls in. Break two records before November."},
+  {id:"freeze", n:"Mr. Freeze Siege",   e:"❄️",c:"#7fd8ff",m:12,d:[20,31],goal:"sessions",need:3,    desc:"Gotham iced over. Train three times before the year thaws."}
+];
+function activeSeasonEvent(){const n=new Date(),m=n.getMonth()+1,day=n.getDate();return SEASON_EVENTS.find(ev=>ev.m===m&&day>=ev.d[0]&&day<=ev.d[1])||null;}
+function seasonEventWindow(ev){const y=new Date().getFullYear();return {a:new Date(y,ev.m-1,ev.d[0]).getTime(),b:new Date(y,ev.m-1,ev.d[1],23,59,59).getTime()};}
+function seasonEventProgress(ev){
+  const{a,b}=seasonEventWindow(ev);let val=0;
+  gymWs().forEach(w=>{const t=new Date(w.date).getTime();if(t<a||t>b)return;
+    if(ev.goal==="sessions")val++;
+    else if(ev.goal==="prs")val+=(w.prs||[]).length;
+    else if(ev.goal==="sets")val+=(w.exercises||[]).reduce((x,e)=>x+(e.sets||[]).filter(s=>s.type!=="W").length,0);
+    else if(ev.goal==="tonnage")val+=Math.round(w.totalVol||0);});
+  return val;
+}
+function seasonEventCard(){
+  const ev=activeSeasonEvent();if(!ev)return "";
+  const key=ev.id+"_"+new Date().getFullYear();
+  state.data.eventWins=state.data.eventWins||{};
+  const val=seasonEventProgress(ev),done=val>=ev.need,claimed=!!state.data.eventWins[key];
+  if(done&&!claimed){state.data.eventWins[key]=true;state.data.u.xp=(state.data.u.xp||0)+200;save();
+    setTimeout(()=>{try{playStinger(ev.e+" EVENT CLEARED",ev.n.toUpperCase()+" · +200 XP",ev.c);}catch(e){}},600);}
+  const left=Math.max(0,Math.ceil((seasonEventWindow(ev).b-Date.now())/864e5));
+  const pct=clamp(val/ev.need*100,0,100);
+  const unit=ev.goal==="tonnage"?"kg":ev.goal==="sets"?" sets":ev.goal==="prs"?" PRs":" sessions";
+  return `<div class="card" style="border:1.5px solid ${ev.c}55;background:linear-gradient(165deg,${ev.c}10,rgba(6,6,9,1));box-shadow:0 0 26px -12px ${ev.c};position:relative;overflow:hidden">
+    <div style="position:absolute;right:-14px;top:-16px;font-size:76px;opacity:.10;pointer-events:none">${ev.e}</div>
+    <div class="row sp" style="align-items:center;margin-bottom:5px">
+      <div style="font-family:var(--disp);font-size:15px;letter-spacing:.06em;color:${ev.c};text-shadow:0 0 12px ${ev.c}66">${ev.e} ${ev.n.toUpperCase()}</div>
+      <span class="chip" style="font-size:10px">${done?"✓ CLEARED":left+"d left"}</span></div>
+    <div class="mini" style="color:var(--text2);margin-bottom:7px">${ev.desc}</div>
+    <div style="height:9px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden"><i style="display:block;height:100%;width:${pct.toFixed(0)}%;background:linear-gradient(90deg,${ev.c}66,${ev.c});box-shadow:0 0 10px ${ev.c};border-radius:6px;transition:width .5s"></i></div>
+    <div class="row sp" style="margin-top:5px"><span class="mini" style="color:${done?ev.c:'var(--text3)'};font-weight:800">${fmtNum(val)}${unit} / ${fmtNum(ev.need)}${unit}</span><span class="mini" style="color:var(--text3)">${done?"honor claimed · +200 XP":"seasonal event"}</span></div>
+  </div>`;
+}
+/* ═══════════ 📰 GOTHAM CHRONICLE — the month, wrapped like a front page ═══════════ */
+function chronicleKey(){const n=new Date();const pm=new Date(n.getFullYear(),n.getMonth()-1,1);return pm.getFullYear()+"-"+pm.getMonth();}
+function chroniclePrevWs(){
+  const n=new Date();const pm=new Date(n.getFullYear(),n.getMonth()-1,1);
+  return gymWs().filter(w=>{const t=new Date(w.date);return t.getFullYear()===pm.getFullYear()&&t.getMonth()===pm.getMonth();});
+}
+function chronicleCard(){
+  try{
+    if(new Date().getDate()>12)return "";
+    if(state.data.chronicleSeen===chronicleKey())return "";
+    const ws=chroniclePrevWs();if(ws.length<2)return "";
+    const pm=new Date(new Date().getFullYear(),new Date().getMonth()-1,1);
+    const mn=pm.toLocaleString(undefined,{month:"long"});
+    return `<div class="card" onclick="openChronicle()" style="cursor:pointer;border:1.5px solid rgba(255,208,72,.45);background:linear-gradient(165deg,rgba(28,20,5,.98),rgba(8,6,2,1));box-shadow:0 0 26px -12px rgba(255,208,72,.9)">
+      <div class="row sp" style="align-items:center">
+        <div class="row" style="gap:10px;align-items:center"><span style="font-size:24px">📰</span>
+          <div><div style="font-family:var(--disp);font-size:15px;letter-spacing:.06em;color:var(--gold2)">THE GOTHAM CHRONICLE</div>
+          <div class="mini" style="color:var(--text3)">Your ${mn} — ${ws.length} patrols, wrapped like a front page</div></div></div>
+        <span style="font-size:12px;color:var(--gold2);font-weight:800;text-shadow:0 0 10px rgba(255,208,72,.5)">READ ›</span>
+      </div></div>`;
+  }catch(e){return "";}
+}
+function openChronicle(){
+  haptic("pr");
+  state.data.chronicleSeen=chronicleKey();save();
+  const ws=chroniclePrevWs();
+  const pm=new Date(new Date().getFullYear(),new Date().getMonth()-1,1);
+  const mn=pm.toLocaleString(undefined,{month:"long"}).toUpperCase();
+  let vol=0,sets=0,prN=0,prNames=[],mus={},best=null,bestE=0;
+  ws.forEach(w=>{vol+=Math.round(w.totalVol||0);
+    prN+=((w.prs||[]).length);(w.prs||[]).forEach(p=>prNames.push(p.name||p));
+    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
+      (e.sets||[]).forEach(s=>{if(s.type==="W")return;sets++;
+        const o=setE1RM(ex,s);if(o>bestE){bestE=o;best={n:e.name,w:setLoad(ex,s.w),r:+s.r||0};}
+        (ex.p||[]).forEach(mm=>mus[mm]=(mus[mm]||0)+setVolume(ex,s));});});});
+  const topM=Object.keys(mus).sort((a,b)=>mus[b]-mus[a])[0];
+  const cars=Math.floor(vol/2300);
+  const stat=(v,k,c)=>`<div style="flex:1;text-align:center;padding:12px 6px;border-radius:13px;background:${c||'var(--gold2)'}0d;border:1px solid ${c||'var(--gold2)'}40"><div style="font-family:var(--disp);font-size:24px;color:${c||'var(--gold2)'};text-shadow:0 0 14px ${c||'var(--gold2)'}66">${v}</div><div style="font-size:8.5px;letter-spacing:.16em;color:var(--text3);text-transform:uppercase;margin-top:3px">${k}</div></div>`;
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">📰 THE GOTHAM CHRONICLE</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+    ${sumHero("Special edition",mn+" WRAPPED","📰","#FFD048")}
+    <div class="row" style="gap:8px;margin-bottom:9px">${stat(fmtNum(vol),"kg moved")}${stat(ws.length,"patrols","#3C96FF")}${stat(prN,"records","#22E87A")}</div>
+    <div class="row" style="gap:8px;margin-bottom:12px">${stat(sets,"working sets","#FF8C22")}${stat(cars,"batmobiles","#9840F8")}${topM?stat(MNAME[topM],"most-hit","#FF3622"):""}</div>
+    ${best?`<div class="card" style="border-color:rgba(255,208,72,.4)"><div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:4px">⚔️ LIFT OF THE MONTH</div><div class="row sp" style="align-items:baseline"><b style="font-size:15px">${esc(best.n)}</b><span style="font-family:var(--disp);font-size:22px;color:var(--gold2)">${Math.round(best.w)}kg × ${best.r}</span></div><div class="mini" style="color:var(--text3)">≈ ${Math.round(bestE)}kg estimated 1RM</div></div>`:""}
+    ${prNames.length?`<div class="card"><div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:6px">🏆 RECORDS SET</div><div style="display:flex;flex-wrap:wrap;gap:6px">${prNames.slice(0,10).map(n=>`<span class="chip" style="font-size:10.5px;color:var(--gold2);border-color:rgba(255,208,72,.4)">${esc(String(n))}</span>`).join("")}${prNames.length>10?`<span class="chip" style="font-size:10.5px">+${prNames.length-10} more</span>`:""}</div></div>`:""}
+    <div class="mini center" style="color:var(--text3);margin-top:4px;font-style:italic">"Gotham sleeps safer when you don't." — The Chronicle</div>
+    <button class="btn gold" style="margin-top:12px" onclick="closeOverlay()">FILE IT</button>`;
+}
 /* ═══════════ WATCHTOWER — live chat, presence, duels & duo patrol over the existing cloud link ═══════════ */
 /* ── 💬 Chat: one thread per ally pair at chats/{uidA_uidB}, live via child_added. ── */
 function chatPairId(uid){return [cloud.uid,uid].sort().join("_");}
@@ -11563,7 +11666,7 @@ function renderGotham(){
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${alfredDebriefStrip()}${fallenBanner}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${alfredDebriefStrip()}${(()=>{try{return seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${fallenBanner}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
