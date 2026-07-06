@@ -413,6 +413,33 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .prwin{margin-top:5px;padding:5px 9px;border-radius:9px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--gold2);background:rgba(255,208,72,.12);border:1px solid rgba(255,208,72,.45);animation:calpulse 2.4s ease-in-out infinite}
 /* 🦇 night progress arc along the bottom of the fixed timer bar */
 #nightarc{position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 12px rgba(255,208,72,.9);transition:width .5s var(--ease-out);border-radius:0 2px 2px 0;z-index:1}
+/* ═══════════ TACTILE PASS — one set of overrides that lifts EVERY tab at once ═══════════ */
+/* Primary action = a real embossed gold slab with a live sheen sweep */
+.btn.gold{background:linear-gradient(180deg,#FFE082,#E8A820 55%,#B97F16);color:#241800;font-weight:800;letter-spacing:.05em;border:1px solid #FFEBA6;box-shadow:0 10px 26px -10px rgba(232,168,32,.75),inset 0 1px 0 rgba(255,255,255,.75),inset 0 -2px 0 rgba(0,0,0,.28);text-shadow:0 1px 0 rgba(255,255,255,.35);position:relative;overflow:hidden}
+.btn.gold::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:34%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:btnsheen 5s ease-in-out infinite;pointer-events:none}
+@keyframes btnsheen{0%,74%{left:-70%}92%,100%{left:135%}}
+.btn.gold:active{transform:translateY(1px);box-shadow:0 5px 14px -8px rgba(232,168,32,.7),inset 0 1px 0 rgba(255,255,255,.55),inset 0 2px 6px rgba(0,0,0,.25)}
+/* Chips feel pressed from metal; active chip glows loaded-gold */
+.chip{background:linear-gradient(180deg,var(--bg4),var(--bg3));border:1px solid var(--border2);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px -3px rgba(0,0,0,.6)}
+.chip.on{background:linear-gradient(180deg,rgba(255,208,72,.30),rgba(120,84,16,.30));border-color:rgba(255,208,72,.65);color:var(--gold3);box-shadow:0 0 14px -5px rgba(255,208,72,.85),inset 0 1px 0 rgba(255,255,255,.25)}
+/* Bottom sheets: grab handle + gold hairline + deeper shadow */
+.sheet{border-top:1px solid rgba(255,208,72,.38);box-shadow:0 -24px 70px -22px rgba(0,0,0,.95),0 0 44px -18px rgba(255,208,72,.45)}
+.sheet::before{content:"";display:block;width:44px;height:5px;border-radius:99px;margin:2px auto 12px;background:linear-gradient(90deg,rgba(255,208,72,.55),rgba(255,208,72,.22));box-shadow:0 0 8px rgba(255,208,72,.45)}
+/* Toast + inputs get the same living gold edge */
+.toast{border:1px solid rgba(255,208,72,.42);box-shadow:0 12px 32px -12px rgba(0,0,0,.9),0 0 18px -8px rgba(255,208,72,.55)}
+input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-shadow:0 0 0 3px rgba(255,208,72,.13),0 0 16px -6px rgba(255,208,72,.5)}
+/* Section titles carry a gold service stripe */
+.ttl{position:relative;padding-left:11px}
+.ttl::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:13px;border-radius:2px;background:linear-gradient(180deg,var(--gold2),var(--gold-dim));box-shadow:0 0 8px rgba(255,208,72,.6)}
+/* Banners lead with an accent bar */
+.banner{border-left-width:3px}
+/* Comfort: bigger set-table touch tiles */
+.stype,.sdone{width:38px;height:38px}
+/* Finish-screen hero polish */
+.sumtitle{font-size:44px;text-shadow:0 0 28px rgba(255,208,72,.45)}
+.sumstats .sv{font-size:26px}
+.prribbon{background:linear-gradient(135deg,rgba(255,208,72,.16),rgba(46,204,113,.10));border:1px solid rgba(255,208,72,.5);box-shadow:0 0 26px -10px rgba(255,208,72,.7)}
+.es-title{color:var(--gold2);text-shadow:0 0 18px rgba(255,208,72,.4)}
 /* Animated exercise demo (ExerciseDB) — REPLACES the SVG figure inside any .exwrap (never both) */
 .exgif{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;background:#fff;z-index:3;animation:viewFade .3s var(--ease-out) both}
 .exwrap.hasgif svg,.exwrap.hasgif .exfigimg{visibility:hidden}
@@ -11435,6 +11462,17 @@ function initSwipeExercises(){
 }
 
 /* Full logging screen — exercise focus card with input table + swipable list. */
+/* Finish guard — if working sets are still open, ask before ending the night (one accidental tap must never cost a session). */
+function confirmFinish(){
+  const ses=state.session;if(!ses)return;
+  const open=(ses.exercises||[]).reduce((a,e)=>a+(e.sets||[]).filter(s=>s.type!=="W"&&!s.done&&!(parseFloat(s.r)>0)).length,0);
+  if(!open)return finishWorkout();
+  try{haptic("warn");}catch(e){}
+  openSheet(`<div class="ttl">Leave the field?</div>
+    <p class="mini" style="color:var(--text2);line-height:1.55;margin:6px 0 12px">${open} working set${open===1?"":"s"} still unlogged, sir. Finish anyway — or go back and close the job.</p>
+    <button class="btn gold" onclick="closeSheet();finishWorkout()">🏁 FINISH — LEAVE ${open} BEHIND</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">← Back to the iron</button>`);
+}
 /* 🦹 FOE HUD — the session's villain (nemesis of tonight's most-worked muscle) takes damage per working set. */
 function sessionFoe(ses){
   if(ses._foe)return ses._foe;
@@ -11696,7 +11734,7 @@ function renderLogging(){
     <textarea id="sessnotes" placeholder="e.g. Glutes sore — skipped leg press." oninput="setSessionNotes(this.value)" style="width:100%;min-height:56px;resize:vertical;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font:inherit;line-height:1.45">${esc(ses.notes||'')}</textarea>
   </div>`;
 
-  h+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="finishWorkout()">🏁 FINISH WORKOUT</button>
+  h+=`<button class="btn gold" style="margin-top:12px;font-size:17px;padding:15px" onclick="confirmFinish()">🏁 FINISH WORKOUT</button>
     <button class="btn ghost" style="margin-top:10px;color:var(--text3)" onclick="discardSession()">Discard session</button>`;
 
   $('app').innerHTML=h;
