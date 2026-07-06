@@ -110,6 +110,33 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 .stg-title{font-family:var(--disp);font-size:40px;letter-spacing:.14em;padding-left:.14em;text-align:center;margin-top:14px;animation:stgSlam .6s .12s cubic-bezier(.2,1.4,.4,1) both}
 .stg-sub{font-size:12px;letter-spacing:.22em;padding-left:.22em;text-align:center;text-transform:uppercase;color:var(--text2);margin-top:8px;animation:stgIn .5s .4s both}
 @keyframes stgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* ===== OUTRO — return to the cave: doors slam shut on the night, the emblem is stamped, then the debrief ===== */
+#outro{position:fixed;inset:0;z-index:225;background:#04060a;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:outroIn .45s ease both;cursor:pointer}
+#outro.leaving{animation:outroOut .55s ease both}
+@keyframes outroIn{from{opacity:0}to{opacity:1}}
+@keyframes outroOut{from{opacity:1}to{opacity:0}}
+.out-city{position:absolute;inset:0;background:radial-gradient(ellipse 95% 60% at 50% 110%,rgba(255,166,60,.17),transparent 62%),radial-gradient(ellipse 75% 48% at 50% -10%,rgba(60,120,255,.11),transparent 65%)}
+.out-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(242,208,121,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.04) 1px,transparent 1px);background-size:44px 44px}
+.out-veh{position:absolute;left:50%;bottom:26%;transform:translateX(-50%);font-size:62px;filter:drop-shadow(0 14px 22px rgba(0,0,0,.8));animation:outVeh 1.15s .1s cubic-bezier(.5,.02,.75,.4) forwards}
+@keyframes outVeh{0%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(-130px) scale(.14);opacity:0}}
+.out-ret{position:absolute;left:0;right:0;bottom:16%;text-align:center;font-size:10.5px;letter-spacing:.4em;text-transform:uppercase;color:rgba(242,208,121,.65);animation:outRet 1.2s ease both}
+@keyframes outRet{0%{opacity:0}25%,80%{opacity:1}100%{opacity:0}}
+.out-doorL,.out-doorR{position:absolute;top:0;bottom:0;width:52%;z-index:4;background:linear-gradient(90deg,#07080c,#141821 52%,#07080c);box-shadow:inset 0 0 44px rgba(0,0,0,.85)}
+.out-doorL{left:-2%;transform:translateX(-103%);animation:outShutL .55s 1.05s cubic-bezier(.75,.02,.9,.4) forwards}
+.out-doorR{right:-2%;transform:translateX(103%);animation:outShutR .55s 1.05s cubic-bezier(.75,.02,.9,.4) forwards}
+@keyframes outShutL{to{transform:translateX(0)}}
+@keyframes outShutR{to{transform:translateX(0)}}
+.out-doorL::after,.out-doorR::after{content:"";position:absolute;top:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent,rgba(242,208,121,.5),transparent)}
+.out-doorL::after{right:0}.out-doorR::after{left:0}
+.out-stamp{position:relative;z-index:6;text-align:center;padding:0 24px;animation:outStamp .6s 1.62s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes outStamp{0%{opacity:0;transform:scale(2.4)}62%{opacity:1;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
+.out-stamp .os-bat{filter:drop-shadow(0 0 34px rgba(255,208,72,.8))}
+.out-stamp .os-title{font-family:var(--disp);font-size:34px;letter-spacing:.14em;padding-left:.14em;color:var(--gold2);text-shadow:0 0 34px rgba(255,208,72,.7);margin-top:10px}
+.out-stamp .os-vol{font-family:var(--disp);font-size:52px;line-height:1;color:#fff;text-shadow:0 0 30px rgba(255,255,255,.35);margin-top:12px}
+.out-stamp .os-volk{font-size:19px;color:var(--text2)}
+.out-stamp .os-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.out-stamp .os-chip{font-size:11px;font-weight:800;letter-spacing:.08em;padding:6px 13px;border-radius:18px;border:1px solid rgba(242,208,121,.4);background:rgba(242,208,121,.09);color:var(--gold2)}
+.out-stamp .os-sub{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--text3);margin-top:16px;animation:outRet 2.4s 2.4s ease both}
 /* season chapter faces stay inside their slot */
 .season-face img.vface,.season-face .vface{width:100%;height:100%;font-size:30px}
 /* ===== JUICE — impact, tension, ritual ===== */
@@ -4585,16 +4612,18 @@ function summaryCardRecap(R){
   const rows=R.wk.exercises.map(e=>{
     const ex=exFor(e.name);let topW=0,topR=0,bestO=0,vol=0;
     e.sets.forEach(s=>{vol+=setVolume(ex,s);const o=setE1RM(ex,s);if(o>bestO){bestO=o;topW=setLoad(ex,s.w);topR=+s.r||0;}});
-    const prev=prevExercise(e.name);let delta;
-    if(prev&&prev.e1>0&&bestO>0){const dp=bestO-prev.e1,up=dp>0.5,dn=dp<-0.5;delta=`<span style="color:${up?'var(--green)':dn?'#e8453c':'var(--text3)'};font-size:12px;font-weight:600">${up?'▲':dn?'▼':'='} ${dp>0?'+':''}${Math.round(dp)}kg</span>`;}
-    else delta=`<span class="mini" style="color:var(--gold2)">★ first time</span>`;
-    return `<div style="padding:9px 0;border-top:1px solid var(--border)">
-      <div class="row sp"><b style="font-size:14px">${esc(e.name)}</b>${delta}</div>
-      <div class="row sp mini" style="margin-top:3px;color:var(--text2)"><span>Top: ${Math.round(topW)}kg × ${topR}</span><span>${e.sets.length} sets · ${fmtNum(Math.round(vol))}kg</span></div></div>`;
+    const prev=prevExercise(e.name);let delta,ac='#8b93a3';
+    if(prev&&prev.e1>0&&bestO>0){const dp=bestO-prev.e1,up=dp>0.5,dn=dp<-0.5;ac=up?'#22E87A':dn?'#FF5545':'#8b93a3';
+      delta=`<span style="color:${ac};font-size:12.5px;font-weight:800;text-shadow:0 0 8px ${ac}66">${up?'▲':dn?'▼':'='} ${dp>0?'+':''}${Math.round(dp)}kg</span>`;}
+    else{ac='#FFD048';delta=`<span style="color:#FFD048;font-size:11.5px;font-weight:800;letter-spacing:.06em">★ FIRST TIME</span>`;}
+    const mc=MCOL[(exFor(e.name).p||[])[0]]||'#FFD048';
+    return `<div style="position:relative;margin-bottom:9px;padding:11px 13px 10px 17px;border-radius:13px;background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid ${ac}30;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 14px -8px rgba(0,0,0,.8);overflow:hidden">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,${mc},${mc}22)"></div>
+      <div class="row sp"><b style="font-size:14.5px">${esc(e.name)}</b>${delta}</div>
+      <div class="row sp" style="margin-top:5px;align-items:baseline"><span style="font-family:var(--disp);font-size:18px;color:var(--text)">${Math.round(topW)}<span style="font-size:11px;color:var(--text3)">kg</span> × ${topR}</span><span class="mini" style="color:var(--text3)">${e.sets.length} sets · ${fmtNum(Math.round(vol))}kg moved</span></div></div>`;
   }).join("");
-  return `<div class="tag center">Exercise breakdown</div><h1 style="font-size:34px;text-align:center;color:var(--gold2);margin-bottom:10px">LIFT BY LIFT</h1>
-    <div class="card">${rows}</div>
-    <div class="mini center" style="color:var(--text3)">▲ = beat your last estimated 1RM on that lift.</div>`;
+  return sumHero("Exercise breakdown","LIFT BY LIFT","🏋️","#FFD048")+rows+
+    `<div class="mini center" style="color:var(--text3);margin-top:2px">▲ = beat your last estimated 1RM on that lift.</div>`;
 }
 function sessionNoteBlock(R){
   const wk=R.wk;const feel=wk.feel||"";
@@ -4609,7 +4638,40 @@ function sessionNoteBlock(R){
 }
 function saveSessionNote(v){if(state.lastResult){state.lastResult.wk.notes=v;save();}}
 function setSessionFeel(v){if(!state.lastResult)return;const wk=state.lastResult.wk;wk.feel=(wk.feel===v?"":v);save();haptic("tap");document.querySelectorAll(".feelchip").forEach(c=>c.classList.toggle("on",c.getAttribute("data-feel")===wk.feel));}
-function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";playStinger('PATROL COMPLETE',state.lastResult?fmtNum(Math.round(state.lastResult.totalVol))+' kg moved':'', '#22E87A');render();}
+function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";try{playOutro(state.lastResult);}catch(e){try{playStinger('PATROL COMPLETE','','#22E87A');}catch(_){}}render();}
+/* ===== OUTRO — the mirror of the garage-door entrance. Vehicle returns, doors slam shut on the
+   night, the emblem is stamped with the night's numbers, then it lifts to reveal the debrief. ===== */
+function playOutro(R){
+  const old=document.getElementById('outro');if(old)old.remove();
+  const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
+  let topV={e:'🏎️'};try{const gs=gothamStats();const own=GARAGE.filter(v=>v.req(gs));if(own.length)topV=own[own.length-1];}catch(_){}
+  const vol=R?fmtNum(Math.round(R.totalVol)):'';
+  const sets=R?R.wk.exercises.reduce((a,e)=>a+e.sets.length,0):0;
+  const prN=R?(R.prsThis||[]).length:0;
+  const dur=R?fmtTime(R.dur):'';
+  const el=document.createElement('div');el.id='outro';
+  el.innerHTML=`<div class="out-city"></div><div class="out-grid"></div>
+    <div class="out-veh">${topV.e}</div>
+    <div class="out-ret">RETURNING TO THE CAVE</div>
+    <div class="out-doorL"></div><div class="out-doorR"></div>
+    <div class="out-stamp">
+      <svg class="os-bat" viewBox="0 0 100 100" width="76" height="76"><path fill="#FFD048" d="${bat}"/></svg>
+      <div class="os-title">PATROL COMPLETE</div>
+      ${vol?`<div class="os-vol">${vol}<span class="os-volk"> kg</span></div>`:''}
+      <div class="os-chips">
+        ${sets?`<span class="os-chip">🎯 ${sets} SETS</span>`:''}
+        ${prN?`<span class="os-chip" style="border-color:rgba(34,232,122,.5);color:#22E87A;background:rgba(34,232,122,.09)">🏆 ${prN} RECORD${prN>1?'S':''}</span>`:''}
+        ${dur?`<span class="os-chip">⏱️ ${dur}</span>`:''}
+      </div>
+      <div class="os-sub">TAP FOR THE FULL DEBRIEF</div>
+    </div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>{try{sfx("slam");haptic("done");}catch(e){}},1100);
+  setTimeout(()=>{try{sfx("pop");}catch(e){}},1650);
+  const leave=()=>{if(el._done)return;el._done=true;el.classList.add('leaving');setTimeout(()=>{try{el.remove();}catch(_){}},560);};
+  el.onclick=leave;
+  setTimeout(leave,5200);
+}
 /* "You lifted ≈ 2.8 Batmobiles" — session tonnage drawn as Gotham hardware, not just a number. */
 const BAT_PATH="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
 const LIFT_UNITS=[[25000,"GOTHAM FERRIES",`<path d="M2 13 H46 L40 19 H8 Z M10 13 V8 H34 V13 M28 8 V4 H32 V8"/>`],
@@ -4736,6 +4798,16 @@ function closeSummary(){
   state.lastResult=null;state.step=null;const a=$("app");if(a){a.ontouchstart=null;a.ontouchend=null;}go("gotham");
 }
 function sumNav(d){if(state.step!=="summary")return;state.sumCard=clamp(state.sumCard+d,0,4);renderSummary();window.scrollTo(0,0);}
+/* Shared muscle accent palette + cinematic slide hero — every debrief slide opens like the patrol card. */
+const MCOL={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
+function sumHero(kick,title,icon,accent){
+  return `<div style="position:relative;text-align:center;padding:12px 0 4px;margin-bottom:12px">
+    <div style="position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:82px;opacity:.09;pointer-events:none;filter:blur(.5px)">${icon}</div>
+    <span style="display:inline-block;font-size:10px;font-weight:800;letter-spacing:.3em;text-transform:uppercase;color:${accent};padding:4px 13px;border:1px solid ${accent}55;border-radius:20px;background:${accent}12;text-shadow:0 0 10px ${accent}66;animation:sumFade .5s both">${kick}</span>
+    <h1 style="font-family:var(--disp);font-size:40px;line-height:.96;margin:11px 0 9px;color:${accent};text-shadow:0 0 36px ${accent}66,0 2px 14px rgba(0,0,0,.9);animation:sumFade .55s .08s both">${title}</h1>
+    <div style="width:150px;height:2px;margin:0 auto;background:linear-gradient(90deg,transparent,${accent},transparent);box-shadow:0 0 12px ${accent};animation:sumFade .6s .14s both"></div>
+  </div>`;
+}
 function sessionRoguesGallery(R){
   if(!R.prsThis||!R.prsThis.length)return"";
   const seen={};const tiles=[];
@@ -4779,23 +4851,36 @@ function summaryCard1(R){
 }
 function summaryCard2(R){
   const hit=Object.keys(R.sessVol).sort((a,b)=>R.sessVol[b]-R.sessVol[a]);
-  return `<div class="tag center">Muscle intel</div><h1 style="font-size:34px;text-align:center;color:var(--gold2);margin-bottom:10px">SECTORS HIT</h1>
-  <div class="card">${miniSuit(R.musclesHit)}</div>
-  <div class="card">${hit.map(m=>`<div class="row sp" style="margin-bottom:7px"><span>${mIcon(m,16)} ${MNAME[m]}</span><b class="${R.musclesHit[m]>=1?'gold':'muted'}">${fmtNum(R.sessVol[m])}kg ${R.musclesHit[m]<1?'<span class="mini">(secondary)</span>':''}</b></div>`).join("")}</div>`;
+  const maxV=Math.max(1,...hit.map(m=>R.sessVol[m]||0));
+  return sumHero("Muscle intel","SECTORS HIT","🎯","#FF3622")
+  +`<div class="card" style="background:linear-gradient(175deg,rgba(18,10,6,.98),rgba(6,4,3,1));border:1.5px solid rgba(255,54,34,.28);position:relative;overflow:hidden;box-shadow:0 0 30px -14px rgba(255,54,34,.7)">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% 35%,rgba(255,54,34,.10),transparent 68%);pointer-events:none"></div>
+      ${miniSuit(R.musclesHit)}</div>`
+  +`<div class="card">${hit.map(m=>{const mc=MCOL[m]||'#FFD048';const pct=clamp((R.sessVol[m]||0)/maxV*100,3,100);const sec=R.musclesHit[m]<1;
+    return `<div style="margin-bottom:11px">
+      <div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px;font-weight:700;${sec?'opacity:.55':''}">${mIcon(m,15)} ${MNAME[m]}${sec?' <span class="mini" style="color:var(--text3)">(secondary)</span>':''}</span><b style="font-family:var(--disp);font-size:14.5px;color:${sec?'var(--text3)':mc};text-shadow:0 0 8px ${mc}44">${fmtNum(Math.round(R.sessVol[m]))}kg</b></div>
+      <div style="height:8px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden"><i style="display:block;height:100%;width:${pct.toFixed(0)}%;background:linear-gradient(90deg,${mc}55,${mc});box-shadow:0 0 10px ${mc}88;border-radius:5px;${sec?'opacity:.45':''}"></i></div>
+    </div>`;}).join("")}</div>`;
 }
 function summaryCard3(R){
   let bestSet=null,bestORM=0,rpeSum=0,rpeN=0;
   R.wk.exercises.forEach(e=>{const ex=exFor(e.name);e.sets.forEach(s=>{const o=setE1RM(ex,s);if(o>bestORM){bestORM=o;bestSet={n:e.name,w:setLoad(ex,s.w),r:s.r};}if(s.rpe&&s.type!=="W"){rpeSum+=parseFloat(s.rpe)||0;rpeN++;}});});
   const density=Math.round(R.totalVol/(R.dur/60||1));
   const gn=gothamNote();
-  return `<div class="tag center">Performance analysis</div><h1 style="font-size:34px;text-align:center;color:var(--gold2);margin-bottom:10px">THE NUMBERS</h1>
-  <div class="card">
-    ${bestSet?`<div class="row sp" style="margin-bottom:9px"><span class="muted">Best set</span><b>${esc(bestSet.n)} · ${Math.round(bestSet.w)}×${bestSet.r}</b></div>`:""}
-    <div class="row sp" style="margin-bottom:9px"><span class="muted">Avg ${state.data.u.metric.toUpperCase()}</span><b>${rpeN?(rpeSum/rpeN).toFixed(1):"—"}</b></div>
-    <div class="row sp" style="margin-bottom:9px"><span class="muted">Density</span><b>${density} kg/min</b></div>
-    <div class="row sp"><span class="muted">Readiness</span><b style="text-transform:capitalize">${esc(R.readiness||"—")}</b></div>
-    ${R.readiness==="tired"&&rpeN&&(rpeSum/rpeN)<=7?`<div class="mini" style="margin-top:8px;color:var(--gold2)">Batman works best under pressure.</div>`:""}
+  const tile=(ic,k,v,sub,ac)=>`<div style="position:relative;text-align:center;padding:14px 8px 12px;border-radius:14px;background:linear-gradient(165deg,${ac}10,rgba(255,255,255,.015));border:1px solid ${ac}38;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 20px -12px ${ac};overflow:hidden">
+    <div style="font-size:15px;margin-bottom:4px">${ic}</div>
+    <div style="font-family:var(--disp);font-size:23px;line-height:1;color:${ac};text-shadow:0 0 14px ${ac}66;text-transform:capitalize">${v}</div>
+    <div style="font-size:8.5px;letter-spacing:.18em;color:var(--text3);text-transform:uppercase;margin-top:5px">${k}</div>
+    ${sub?`<div class="mini" style="color:var(--text2);margin-top:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>`:""}
+  </div>`;
+  return sumHero("Performance analysis","THE NUMBERS","📊","#3C96FF")
+  +`<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
+    ${bestSet?tile("⚔️","best set",`${Math.round(bestSet.w)}×${bestSet.r}`,esc(bestSet.n),"#FFD048"):""}
+    ${tile("🔥","avg "+state.data.u.metric.toUpperCase(),rpeN?(rpeSum/rpeN).toFixed(1):"—","effort logged","#FF8C22")}
+    ${tile("⚡","density",density+"","kg per minute","#3C96FF")}
+    ${tile("🌙","readiness",esc(R.readiness||"—"),"tonight's state","#22E87A")}
   </div>
+  ${R.readiness==="tired"&&rpeN&&(rpeSum/rpeN)<=7?`<div class="mini center" style="margin:-2px 0 10px;color:var(--gold2)">Batman works best under pressure.</div>`:""}
   ${(()=>{const sug=overloadSuggestions(R.wk);return sug.length?`<div class="card"><div class="ttl">📈 Next session — progressive overload</div>${sug.map(s=>`<div style="padding:7px 0;border-top:1px solid var(--border)"><b style="font-size:13px;color:${s.tone==="up"?"var(--green)":s.tone==="hold"?"var(--gold2)":"var(--text)"}">${esc(s.name)}</b><div class="mini" style="margin-top:2px">${esc(s.text)}</div></div>`).join("")}<div class="mini" style="margin-top:8px;color:var(--text3)">Overload is the actual driver of growth — add reps or load over time, or the stimulus stops adapting.</div></div>`:"";})()}
   <div class="card" id="ai-analysis"><div class="ttl">🤖 Alfred's read</div><div id="ai-out" class="muted" style="font-size:13.5px">Alfred is reviewing the session…</div></div>
   <div class="card center"><div class="tag" style="color:${gn.kind==='science'?'var(--blue)':'var(--gold-dim)'};margin-bottom:5px">${gn.kind==='science'?'🧪 ':'🦇 '}${gn.label}</div><div class="muted" style="font-style:italic;font-size:13.5px">${gn.kind==='science'?esc(gn.text):'"'+esc(gn.text)+'"'}</div></div>`;
@@ -4803,12 +4888,16 @@ function summaryCard3(R){
 function summaryCard4(R){
   const ready=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)>=80);
   const rec=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)<80).sort((a,b)=>getRecovery(a)-getRecovery(b));
-  return `<div class="tag center">Next mission</div><h1 style="font-size:34px;text-align:center;color:var(--gold2);margin-bottom:10px">WHAT'S READY</h1>
-  <div class="card"><div class="ttl">Ready to strike (≥80%)</div>
-    ${ready.length?ready.map(m=>`<div class="row sp" style="margin-bottom:6px"><span>${mIcon(m,16)} ${MNAME[m]}</span><b class="green">✓ ${getRecovery(m)}%</b></div>`).join(""):'<p class="muted">Everything is still recovering. Rest is a weapon.</p>'}
+  return sumHero("Next mission","WHAT'S READY","🌅","#22E87A")
+  +`<div class="card" style="border:1.5px solid rgba(34,232,122,.28);box-shadow:0 0 26px -14px rgba(34,232,122,.8)">
+    <div class="mini" style="letter-spacing:.16em;color:#22E87A;margin-bottom:10px;font-weight:800">⚡ READY TO STRIKE (≥80%)</div>
+    ${ready.length?`<div style="display:flex;flex-wrap:wrap;gap:7px">${ready.map(m=>`<span style="font-size:12px;font-weight:800;padding:8px 13px;border-radius:19px;border:1px solid rgba(34,232,122,.45);background:rgba(34,232,122,.09);color:#7df0b0;box-shadow:0 0 12px -4px rgba(34,232,122,.6)">${mIcon(m,14)} ${MNAME[m]} · ${getRecovery(m)}%</span>`).join("")}</div>`:'<p class="muted">Everything is still recovering. Rest is a weapon.</p>'}
   </div>
-  <div class="card"><div class="ttl">Still recovering</div>
-    ${rec.length?rec.map(m=>`<div class="row sp" style="margin-bottom:6px"><span>${mIcon(m,16)} ${MNAME[m]}</span><span class="muted">~${hoursToReady(m)}h</span></div>`).join(""):'<p class="muted">All sectors green.</p>'}
+  <div class="card">
+    <div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:10px;font-weight:800">🌙 STILL RECOVERING</div>
+    ${rec.length?rec.map(m=>{const rv=getRecovery(m);const mc=rv>=50?'#E8C53C':'#E8453C';
+      return `<div style="margin-bottom:10px"><div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px;font-weight:700">${mIcon(m,15)} ${MNAME[m]}</span><span class="mini" style="color:${mc};font-weight:800">~${hoursToReady(m)}h · ${rv}%</span></div>
+      <div style="height:7px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden"><i style="display:block;height:100%;width:${rv}%;background:linear-gradient(90deg,${mc}66,${mc});border-radius:5px;box-shadow:0 0 8px ${mc}66"></i></div></div>`;}).join(""):'<p class="muted">All sectors green.</p>'}
   </div>
   ${sessionNoteBlock(R)}
   <button class="btn gold" onclick="shareWorkout()">📤 SHARE WITH ALLIES</button>`;
