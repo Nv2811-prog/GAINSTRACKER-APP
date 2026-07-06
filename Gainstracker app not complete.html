@@ -2996,7 +2996,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W").length,0),D=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W"&&x.done).length,0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W").length,0),D=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W"&&x.done).length,0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3067,7 +3067,7 @@ function liveCheckPR(ei,si){
         state.session._profileFlags[exObj.name]={name:exObj.name,prevRec:JSON.parse(JSON.stringify(rec)),prevOrm:cOrm,newOrm:e1,newW:w,newR:r,jump:Math.round((e1-cOrm)/cOrm*100)};
     }}catch(e){}
   // Co-op raid: an e1RM crown is a "record landed" — pool it toward the shared boss.
-  if(hits.some(h=>h.t==="e1rm")){try{raidNotePR(1);}catch(e){}try{resolveCallouts(exObj.name);}catch(e){}}
+  if(hits.some(h=>h.t==="e1rm")){try{raidNotePR(1);}catch(e){}try{resolveCallouts(exObj.name);}catch(e){}try{wraithNotePR(exObj.name,e1);}catch(e){}try{titleNoteCrown(exObj.name,e1);}catch(e){}}
   const willBoss=hits.some(h=>h.t==="e1rm")&&!state.session.bossed[exObj.name];
   if(hits.length){
     if(willBoss){
@@ -6691,6 +6691,7 @@ function renderProfile(){
   const otd=profileOnThisDay(d);if(otd)html+=otd;
   html+=profileBossPreviewHtml(d,sl);
   html+=profileEveryLiftTile(d);
+  try{html+=titleBeltsCard();}catch(e){}
   const prCount=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
   html+=acc('prf-rec','🏆','Records & Ranks',profileRecordsHtml(d),false,prCount+' PRs · belts · fight record');
   html+=acc('prf-str','📊','Strength Analysis',profileStrengthHtml(),false,'standards · combat rating');
@@ -8158,6 +8159,132 @@ function openBatcomputer(){
       ${movers.map(x=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><span style="font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.n)}</span><b class="gold" style="white-space:nowrap;margin-left:8px">+${x.gain}kg <span class="mini" style="color:var(--text3)">→ ${x.now}</span></b></div>`).join("")}`:""}
     <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
 }
+/* ═══════════ 🩶 THE WRAITH — your dark mirror. His lifts always sit just past yours. ═══════════ */
+function wraithData(){const w=state.data.wraith=state.data.wraith||{lv:1,wins:0,losses:0};return w;}
+function wraithMargin(){return 1.02+(wraithData().lv||1)*0.006;} // every time you put him down, he comes back stronger
+function wraithTargets(){
+  const prs=state.data.prs||{};
+  return Object.keys(prs).filter(n=>(prs[n].orm||0)>=20)
+    .map(n=>({n,mine:Math.round(prs[n].orm),his:Math.round(prs[n].orm*wraithMargin())}))
+    .sort((a,b)=>b.mine-a.mine).slice(0,5);
+}
+const WRAITH_TAUNTS=["Everything you lift, I lifted first.","You train in a cave. I AM the cave.","Your best set is my warm-up.","Chase me. You never catch what casts you.","Add the plates or stay my shadow.","I don't rest between sets. Or ever."];
+function wraithCard(){
+  const t=wraithTargets();if(!t.length)return "";
+  const w=wraithData();
+  const gap=t.slice().sort((a,b)=>(a.his-a.mine)-(b.his-b.mine))[0];
+  const taunt=WRAITH_TAUNTS[(new Date().getDate()+(w.lv||1))%WRAITH_TAUNTS.length];
+  return `<div class="card" onclick="openWraith()" style="cursor:pointer;border:1.5px solid rgba(150,160,180,.35);background:linear-gradient(165deg,rgba(16,18,24,.98),rgba(5,6,9,1));box-shadow:0 0 26px -12px rgba(150,170,210,.6);position:relative;overflow:hidden">
+    <div class="row" style="gap:12px;align-items:center">
+      <div style="width:56px;height:56px;border-radius:14px;overflow:hidden;flex:none;border:1.5px solid rgba(150,160,180,.5);box-shadow:0 0 16px -4px rgba(150,170,210,.8)"><img src="assets/wraith.jpg" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+      <div style="flex:1;min-width:0">
+        <div class="row sp"><div style="font-family:var(--disp);font-size:16px;letter-spacing:.06em;color:#c9d2e2">THE WRAITH <span style="font-size:11px;color:var(--text3)">· LV ${w.lv||1}</span></div>
+        <span class="chip" style="font-size:10px">${w.wins||0}W – ${w.losses||0}L</span></div>
+        <div class="mini" style="font-style:italic;color:var(--text2);margin-top:2px">“${taunt}”</div>
+        ${gap?`<div class="mini" style="margin-top:4px;color:#9fb2d0">Closest fight: <b style="color:var(--text)">${esc(gap.n)}</b> — he holds <b style="color:#c9d2e2">${gap.his}kg</b>, you hold ${gap.mine}kg</div>`:""}
+      </div>
+      <div style="font-size:12px;color:#c9d2e2;font-weight:800;flex:none">›</div>
+    </div>
+  </div>`;
+}
+function openWraith(){
+  haptic("tap");
+  const t=wraithTargets(),w=wraithData();
+  const rows=t.map(x=>{const pct=clamp(x.mine/x.his*100,4,100);const close=x.his-x.mine<=Math.max(2,x.his*0.02);
+    return `<div style="margin-bottom:11px">
+      <div class="row sp" style="margin-bottom:3px"><b style="font-size:13px">${esc(x.n)}</b><span class="mini"><b style="color:var(--gold2)">${x.mine}kg</b> <span style="color:var(--text3)">vs</span> <b style="color:#c9d2e2">${x.his}kg</b></span></div>
+      <div style="height:8px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden"><i style="display:block;height:100%;width:${pct.toFixed(0)}%;background:linear-gradient(90deg,#8a6f22,var(--gold2));box-shadow:0 0 8px rgba(255,208,72,.7)"></i></div>
+      ${close?`<div class="mini" style="color:#ffd048;margin-top:2px">⚡ within striking distance — beat ${x.his}kg e1RM and he flinches</div>`:""}
+    </div>`;}).join("");
+  openSheet(`<div class="row" style="gap:11px;align-items:center;margin-bottom:10px">
+      <div style="width:64px;height:64px;border-radius:16px;overflow:hidden;flex:none;border:1.5px solid rgba(150,160,180,.55);box-shadow:0 0 20px -4px rgba(150,170,210,.9)"><img src="assets/wraith.jpg" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+      <div><div class="ttl" style="margin:0">THE WRAITH · LV ${w.lv||1}</div><div class="mini" style="color:var(--text3)">Your dark mirror — always ${Math.round((wraithMargin()-1)*100)}% ahead. Record ${w.wins||0}W–${w.losses||0}L.</div></div></div>
+    ${rows||'<p class="muted">Set records on your big lifts and he appears.</p>'}
+    <div class="hr"></div>
+    <div class="mini" style="color:var(--text3);line-height:1.5">Beat one of his marks with a new e1RM record and <b style="color:#c9d2e2">he flinches — then levels up</b>. End a month with 3+ records and you take the monthly SHOWDOWN (+300 XP). He never stays beaten.</div>
+    <button class="btn ghost sm" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
+}
+function wraithNotePR(name,e1){
+  const prs=state.data.prs||{};const prev=(prs[name]&&prs[name].orm)||0;
+  if(!prev||prev<20)return;
+  const his=Math.round(prev*wraithMargin());
+  if(e1>his){const w=wraithData();w.wins=(w.wins||0)+1;w.lv=(w.lv||1)+1;save();
+    setTimeout(()=>{try{playStinger("THE WRAITH FLINCHES","YOU PASSED HIS "+his+"KG MARK — HE GROWS","#c9d2e2");}catch(e){}},2700);}
+}
+function wraithShowdownCheck(){
+  const d=state.data;const nowD=new Date();const mk=nowD.getFullYear()+"-"+nowD.getMonth();
+  if(!d.wraithMk){d.wraithMk=mk;return;}
+  if(d.wraithMk===mk)return;
+  const w=wraithData();
+  // settle the month that just ended: 3+ records = you take the showdown
+  const pm=new Date(nowD.getFullYear(),nowD.getMonth()-1,1);
+  let prN=0;(d.workouts||[]).forEach(x=>{const dt=new Date(x.date);if(dt.getFullYear()===pm.getFullYear()&&dt.getMonth()===pm.getMonth())prN+=((x.prs||[]).length);});
+  if(prN>=3){w.wins=(w.wins||0)+1;d.u.xp=(d.u.xp||0)+300;
+    cinePush({killcam:true,hold:true,icon:"🩶",eye:"MONTHLY SHOWDOWN — WON",title:"The Wraith kneels",titleHtml:`The Wraith <span style="color:#22E87A">kneels</span>`,bodyHtml:`<div style="font-size:15px">${prN} records last month. He couldn't match one of them.</div><div class="mini" style="margin-top:8px;color:var(--gold2)">+300 XP · he returns stronger</div>`,btn:"STAY SHARP",accent:"#22E87A"});}
+  else{w.losses=(w.losses||0)+1;
+    cinePush({icon:"🩶",eye:"MONTHLY SHOWDOWN — LOST",title:"The Wraith laughs",titleHtml:`The Wraith <span style="color:#FF5545">laughs</span>`,bodyHtml:`<div style="font-size:14px">${prN} record${prN===1?"":"s"} last month. He needed three to even notice you.</div><div class="mini" style="margin-top:8px;color:var(--text3)">“${WRAITH_TAUNTS[(w.losses||0)%WRAITH_TAUNTS.length]}”</div>`,btn:"AVENGE IT",accent:"#FF5545"});}
+  d.wraithMk=mk;save();
+}
+/* ═══════════ 🏆 TITLE FIGHTS — championship belts on the big lifts ═══════════ */
+function titleBelts(){return state.data.titles=state.data.titles||{};}
+function titleFightEligible(name){
+  try{
+    const ses=state.session;if(!ses||ses.readiness==="tired")return false;
+    const e=(ses.exercises||[]).find(x=>x.name===name);if(!e||e._title)return false;
+    const pr=state.data.prs[name],lb=lastBestSet(name);const ex=exFor(name);const m0=(ex.p||[])[0];
+    return !!(pr&&pr.orm>=20&&lb&&lb.e1>=pr.orm*0.97&&(!m0||getRecovery(m0)>=80));
+  }catch(e){return false;}
+}
+function openTitleFight(ei){
+  const ses=state.session;if(!ses)return;const e=ses.exercises[ei];if(!e)return;
+  const pr=state.data.prs[e.name]||{};const T=titleBelts()[e.name];
+  haptic("pr");
+  openSheet(`<div style="text-align:center;padding:4px 0 2px">
+      <div style="font-size:10px;letter-spacing:.34em;color:#FF8C22;font-weight:800">TITLE FIGHT · TALE OF THE TAPE</div>
+      <div style="font-family:var(--disp);font-size:26px;color:var(--text);margin-top:6px">${esc(e.name).toUpperCase()}</div>
+    </div>
+    <div class="row" style="gap:9px;margin:12px 0;align-items:stretch">
+      <div style="flex:1;text-align:center;padding:13px 8px;border-radius:14px;border:1.5px solid rgba(255,208,72,.5);background:rgba(255,208,72,.07)">
+        <div style="font-size:9px;letter-spacing:.2em;color:var(--gold2);font-weight:800">THE CHAMPION</div>
+        <div style="font-family:var(--disp);font-size:30px;color:var(--gold2);text-shadow:0 0 16px rgba(255,208,72,.6);margin-top:4px">${Math.round(pr.orm||0)}<span style="font-size:13px">kg</span></div>
+        <div class="mini" style="color:var(--text3)">standing e1RM record${T?` · 🏆 ${T.n||1} reign${(T.n||1)>1?"s":""}`:""}</div>
+      </div>
+      <div style="align-self:center;font-family:var(--disp);font-size:19px;color:var(--text3)">VS</div>
+      <div style="flex:1;text-align:center;padding:13px 8px;border-radius:14px;border:1.5px solid rgba(255,140,34,.5);background:rgba(255,140,34,.07)">
+        <div style="font-size:9px;letter-spacing:.2em;color:#FF8C22;font-weight:800">THE CHALLENGER</div>
+        <div style="font-family:var(--disp);font-size:30px;color:#FF8C22;text-shadow:0 0 16px rgba(255,140,34,.6);margin-top:4px">YOU</div>
+        <div class="mini" style="color:var(--text3)">fresh · trending ≥97%</div>
+      </div>
+    </div>
+    <div class="mini" style="color:var(--text2);line-height:1.5;text-align:center;margin-bottom:12px">Beat the record on this lift <b>tonight</b> and the belt is yours — +150 XP. Fail, and the champion retains.</div>
+    <button class="btn gold" onclick="acceptTitleFight(${ei});closeSheet()">🏆 ACCEPT THE FIGHT</button>
+    <button class="btn ghost sm" style="margin-top:8px" onclick="closeSheet()">Not tonight</button>`);
+}
+function acceptTitleFight(ei){
+  const ses=state.session;if(!ses||!ses.exercises[ei])return;
+  ses.exercises[ei]._title=true;saveSession();
+  playStinger("TITLE FIGHT","THE BELT IS ON THE LINE — "+ses.exercises[ei].name.toUpperCase(),"#FF8C22");
+  try{if(state.data.u.coachVoice)alfredVoiceLine("Title fight accepted, sir. One clean maximal effort — I'll be watching.");}catch(e){}
+  render();
+}
+function titleNoteCrown(name,e1){
+  const ses=state.session;if(!ses)return;
+  const e=(ses.exercises||[]).find(x=>x.name===name);if(!e||!e._title||e._titleWon)return;
+  e._titleWon=true;
+  const T=titleBelts();const prev=T[name];
+  T[name]={w:Math.round(e1),n:(prev?(prev.n||1)+1:1),t:Date.now()};
+  state.data.u.xp=(state.data.u.xp||0)+150;save();
+  setTimeout(()=>{try{playStinger("🏆 NEW CHAMPION",name.toUpperCase()+" · "+Math.round(e1)+"KG E1RM · +150 XP","#FFD048");}catch(e){}},2500);
+}
+function titleBeltsCard(){
+  const T=titleBelts();const ks=Object.keys(T);if(!ks.length)return "";
+  const rows=ks.sort((a,b)=>(T[b].w||0)-(T[a].w||0)).map(k=>`<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)">
+    <div><b style="font-size:13.5px">🏆 ${esc(k)}</b><div class="mini" style="color:var(--text3)">${T[k].n||1} reign${(T[k].n||1)>1?"s":""} · claimed ${new Date(T[k].t).toLocaleDateString()}</div></div>
+    <div style="font-family:var(--disp);font-size:19px;color:var(--gold2);text-shadow:0 0 10px rgba(255,208,72,.5)">${T[k].w}<span style="font-size:11px;color:var(--text3)">kg</span></div></div>`).join("");
+  return `<div class="card" style="border:1.5px solid rgba(255,208,72,.4);background:linear-gradient(165deg,rgba(26,19,4,.98),rgba(8,6,2,1));box-shadow:0 0 26px -12px rgba(255,208,72,.8)">
+    <div class="ttl" style="color:var(--gold2)">🏆 Title Belts</div>
+    <div class="mini" style="color:var(--text3);margin-bottom:2px">Won in title fights — one max attempt, belt on the line.</div>${rows}</div>`;
+}
 /* ═══════════ WATCHTOWER — live chat, presence, duels & duo patrol over the existing cloud link ═══════════ */
 /* ── 💬 Chat: one thread per ally pair at chats/{uidA_uidB}, live via child_added. ── */
 function chatPairId(uid){return [cloud.uid,uid].sort().join("_");}
@@ -8532,6 +8659,8 @@ function renderAllies(){
 
   // ⚔️ active duel rides at the top — it's the hottest thing on the tab
   try{html+=duelCard();}catch(e){}
+  // 🩶 your dark mirror lives here too
+  try{html+=wraithCard();}catch(e){}
 
   // ── Recruit an ally — lives at the BOTTOM of the tab (appended before render) ──
   const cOpen=state.accOpen&&state.accOpen['allies-connect'];
@@ -11423,6 +11552,7 @@ function renderGotham(){
       if(away>=4){if(!alfredPingAI("the user just opened the app after "+away+" days away from training. Welcome them back — warm but pointed."))setTimeout(()=>toast("🎩 Good to see you again, sir. I kept the lights on."),900);}
       else if(ws>=3){if(!alfredPingAI("weekly streak is "+ws+" weeks strong. A brief nod of respect."))setTimeout(()=>toast("🎩 "+ws+" weeks unbroken. I shall stop worrying, sir."),900);}
       else if(new Date().getDay()===1){alfredPingAI("It's Monday — a new training week begins. One-line marching order for the week based on the training data above.");}
+      try{wraithShowdownCheck();}catch(e){}
     }}catch(e){}
   // districts that FELL while you were away — the city hurts when you don't show up
   d.fallenSeen=d.fallenSeen||{};
@@ -12079,6 +12209,7 @@ function renderLogging(){
           ${(()=>{try{const pr=state.data.prs[e.name],lb=lastBestSet(e.name),m0=(ex.p||[])[0];
             if(pr&&pr.orm>0&&lb&&lb.e1>=pr.orm*0.97&&(!m0||getRecovery(m0)>=80)&&ses.readiness!=="tired")
               return `<div class="prwin">🔥 PR WINDOW: HIGH — fresh + trending at ${Math.round(lb.e1/pr.orm*100)}% of your record. Send it.</div>`;}catch(_){}return '';})()}
+          ${(()=>{try{if(e._title&&!e._titleWon)return `<div class="prwin" style="border-color:rgba(255,140,34,.6);color:#FF8C22">🏆 TITLE FIGHT LIVE — beat the record, take the belt.</div>`;if(titleFightEligible(e.name))return `<button class="chip" style="font-size:10.5px;padding:4px 10px;margin-top:5px;align-self:flex-start;border-color:rgba(255,140,34,.55);color:#FF8C22;box-shadow:0 0 12px -4px rgba(255,140,34,.8)" onclick="openTitleFight(${fei})">🏆 TITLE FIGHT AVAILABLE</button>`;}catch(_){}return '';})()}
           <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
           ${liberationTicker(fei)}
           <button class="chip" style="font-size:10.5px;padding:3px 9px;margin-top:5px;align-self:flex-start" onclick="quickRamp(${fei})">🪜 Warm-up ramp</button>
