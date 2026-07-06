@@ -11645,6 +11645,27 @@ function alfredDebriefStrip(){
     </div>`;
   }catch(e){return "";}
 }
+/* 🗺️ TERRITORY WAR entry card — the map art itself as a slim, pressable home banner. */
+function territoryWarCard(){
+  try{
+    const held=M12.filter(m=>districtCrime(m).crime<45).length;
+    const lost=M12.filter(m=>districtCrime(m).crime>=70&&(state.data.muscleVol[m]||0)>0);
+    const band=districtBand(cityCrime());
+    const worst=lost[0]?((NEMESIS_MAP[lost[0]]||{}).villain||"the Rogues"):null;
+    return `<div onclick="openDistricts()" style="cursor:pointer;position:relative;overflow:hidden;border-radius:16px;border:1.5px solid ${band[1]}55;margin-bottom:14px;box-shadow:0 14px 36px -16px rgba(0,0,0,.95),0 0 26px -12px ${band[1]};min-height:86px;background:url('assets/gotham-war-map.jpg') center 38%/cover no-repeat">
+      <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,6,10,.94) 30%,rgba(4,6,10,.55) 65%,rgba(4,6,10,.25))"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${band[1]}aa,transparent)"></div>
+      <div style="position:relative;z-index:2;padding:13px 14px;display:flex;align-items:center;gap:12px">
+        <div style="font-family:var(--disp);font-size:30px;line-height:1;color:${band[1]};text-shadow:0 0 18px ${band[1]}">${held}<span style="font-size:14px;color:var(--text3)">/12</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:var(--disp);font-size:14.5px;letter-spacing:.08em;color:var(--text)">🗺️ TERRITORY WAR</div>
+          <div class="mini" style="color:${band[1]};font-weight:800;letter-spacing:.08em">${band[0]}${worst?` · <span style="color:#ff8a7a">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</span>`:" · the city is yours"}</div>
+        </div>
+        <span style="font-size:12px;color:var(--gold2);font-weight:800;white-space:nowrap;text-shadow:0 0 10px rgba(255,208,72,.5)">OPEN MAP ›</span>
+      </div>
+    </div>`;
+  }catch(e){return "";}
+}
 function renderGotham(){
   const d=state.data,u=d.u;
   const ws=weeklyStreak(),dop=daysOnProtocol();
@@ -11666,7 +11687,7 @@ function renderGotham(){
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${alfredDebriefStrip()}${(()=>{try{return seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${fallenBanner}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${alfredDebriefStrip()}${(()=>{try{return seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${fallenBanner}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}${territoryWarCard()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
