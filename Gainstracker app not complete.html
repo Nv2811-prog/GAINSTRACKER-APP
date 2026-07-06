@@ -4638,7 +4638,10 @@ function sessionNoteBlock(R){
 }
 function saveSessionNote(v){if(state.lastResult){state.lastResult.wk.notes=v;save();}}
 function setSessionFeel(v){if(!state.lastResult)return;const wk=state.lastResult.wk;wk.feel=(wk.feel===v?"":v);save();haptic("tap");document.querySelectorAll(".feelchip").forEach(c=>c.classList.toggle("on",c.getAttribute("data-feel")===wk.feel));}
-function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";try{playOutro(state.lastResult);}catch(e){try{playStinger('PATROL COMPLETE','','#22E87A');}catch(_){}}render();}
+function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";try{playOutro(state.lastResult);}catch(e){try{playStinger('PATROL COMPLETE','','#22E87A');}catch(_){}}
+  // Alfred speaks his verdict over the debrief (mixes with music — never pauses it)
+  setTimeout(()=>{try{if(state.step==="summary")alfredVoiceLine(alfredSessionVerdict());}catch(e){}},5600);
+  render();}
 /* ===== OUTRO — the mirror of the garage-door entrance. Vehicle returns, doors slam shut on the
    night, the emblem is stamped with the night's numbers, then it lifts to reveal the debrief. ===== */
 function playOutro(R){
@@ -11165,6 +11168,44 @@ function gothamSkylineCard(){
   </div>`;
 }
 function gothamMarkFallen(){const d=state.data;d.fallenSeen=d.fallenSeen||{};M12.forEach(m=>{if(districtCrime(m).crime>=70)d.fallenSeen[m]=1;});save();render();}
+/* 🎩 ALFRED DEBRIEF STRIP — one context-aware butler line pinned under the hero. It changes with
+   the state of the night: pre-mission intel, post-patrol debrief, recovery watch, long-absence nudge,
+   Sunday case-file pointer. Tap = straight into Alfred's chat. */
+function alfredDebriefStrip(){
+  try{
+    const d=state.data,h=new Date().getHours();
+    const lastW=(d.workouts||[])[0];
+    const daysSince=lastW?Math.floor((Date.now()-new Date(lastW.date).getTime())/864e5):99;
+    const trainedToday=!!(lastW&&new Date(lastW.date).toDateString()===new Date().toDateString());
+    const ready=M12.filter(m=>(d.muscleVol[m]||0)&&getRecovery(m)>=80);
+    let kick,line,ic="🎩";
+    if(trainedToday){
+      kick="POST-PATROL";
+      line=`${fmtNum(Math.round(lastW.totalVol||0))}kg banked today, sir. Protein, water, sleep — recovery is where it becomes muscle.`;
+    }else if(daysSince>=4&&daysSince<90){
+      kick="THE CAVE WAITS";ic="🕯️";
+      line=`${daysSince} days since the last patrol. Gotham forgives — the iron doesn't. Tonight would be an excellent night, sir.`;
+    }else if(ready.length>=3){
+      kick="PRE-MISSION INTEL";ic="⚡";
+      line=`${ready.slice(0,3).map(m=>MNAME[m]).join(", ")}${ready.length>3?" and more":""} are fresh and ready to strike. ${h>=17?"The night is young, sir.":"An evening patrol beckons, sir."}`;
+    }else if(ready.length){
+      kick="PRE-MISSION INTEL";ic="⚡";
+      line=`${MNAME[ready[0]]} is back to full strength. One precise strike beats a scattered one, sir.`;
+    }else{
+      kick="RECOVERY WATCH";ic="🌙";
+      line=`Every trained sector is still rebuilding. Rest is a weapon too — sharpen it with sleep and food, sir.`;
+    }
+    if(new Date().getDay()===0&&h>=17&&!trainedToday){kick="SUNDAY DEBRIEF";ic="🗂️";line="The week's case file is compiled below, sir. Worth two minutes before we plan the next assault.";}
+    return `<div class="gtv2-alfred-top" onclick="openAlfredVoice()" style="display:flex;gap:11px;align-items:center;cursor:pointer;margin-bottom:12px">
+      <div style="width:42px;height:42px;border-radius:12px;overflow:hidden;flex:none;border:1px solid rgba(255,208,72,.45);box-shadow:0 0 14px -4px rgba(255,208,72,.7)"><img src="assets/alfred.png" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:9px;font-weight:800;letter-spacing:.26em;color:var(--gold2);opacity:.85">${ic} ALFRED · ${kick}</div>
+        <div style="font-size:12.5px;line-height:1.45;color:var(--text2);margin-top:2px;font-style:italic">“${line}”</div>
+      </div>
+      <div style="font-size:13px;color:var(--gold2);font-weight:800;flex:none;text-shadow:0 0 10px rgba(255,208,72,.5)">›</div>
+    </div>`;
+  }catch(e){return "";}
+}
 function renderGotham(){
   const d=state.data,u=d.u;
   const ws=weeklyStreak(),dop=daysOnProtocol();
@@ -11174,6 +11215,7 @@ function renderGotham(){
       const lastW=(d.workouts||[])[0];const away=lastW?Math.floor((now()-new Date(lastW.date).getTime())/864e5):0;
       if(away>=4){if(!alfredPingAI("the user just opened the app after "+away+" days away from training. Welcome them back — warm but pointed."))setTimeout(()=>toast("🎩 Good to see you again, sir. I kept the lights on."),900);}
       else if(ws>=3){if(!alfredPingAI("weekly streak is "+ws+" weeks strong. A brief nod of respect."))setTimeout(()=>toast("🎩 "+ws+" weeks unbroken. I shall stop worrying, sir."),900);}
+      else if(new Date().getDay()===1){alfredPingAI("It's Monday — a new training week begins. One-line marching order for the week based on the training data above.");}
     }}catch(e){}
   // districts that FELL while you were away — the city hurts when you don't show up
   d.fallenSeen=d.fallenSeen||{};
@@ -11184,7 +11226,7 @@ function renderGotham(){
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${fallenBanner}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${alfredDebriefStrip()}${fallenBanner}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
