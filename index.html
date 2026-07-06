@@ -4825,6 +4825,7 @@ function renderSuit(){
     <div class="grid3 center">${[["chest","Chest"],["waist","Waist"],["leftArm","L Arm"],["rightArm","R Arm"],["leftThigh","L Thigh"],["rightThigh","R Thigh"]].map(([k,l])=>`<div><div class="num gold" style="font-size:22px">${me[k]?me[k]+"":"—"}</div><div class="mini">${l}${me[k]?" cm":""}</div></div>`).join("")}</div></div>`;
 
   html+=symmetryCard();
+  try{html+=timeLapseCard();}catch(e){}
   html+=progressPhotosCard();
   html+=suitPhysiqueAlfredCard();
   $("app").innerHTML=html;
@@ -5047,6 +5048,25 @@ function exerciseHistory(name){
         <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">${cells.join("")}</div></div>`;
     })()}
     ${fcBlock}
+    ${(()=>{ // 🪜 PR LADDER — each rung = the session your record e1RM climbed; dashed rung = the next target
+      const steps=[];let mx=0;
+      rows.forEach(r=>{if(r.e1rm>mx){mx=r.e1rm;steps.push(r);}});
+      const shown=steps.slice(-5);
+      if(shown.length<2)return "";
+      const nxt=Math.round(mx+(mx>=100?5:2.5));
+      const blocks=shown.map((s,i)=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="text-align:center;font-family:var(--disp);font-size:14px;color:var(--gold2)">${s.e1rm}</div>
+          <div style="height:${26+i*13}px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,rgba(255,208,72,${(0.28+i*0.12).toFixed(2)}),rgba(58,42,8,.5));border:1px solid rgba(255,208,72,.4);border-bottom:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.15)"></div>
+          <div style="text-align:center;font-size:8.5px;color:var(--text3);padding-top:3px">${new Date(s.date).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div>
+        </div>`).join("");
+      const nextRung=`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="text-align:center;font-family:var(--disp);font-size:14px;color:var(--text2)">${nxt}</div>
+          <div style="height:${26+shown.length*13}px;border-radius:8px 8px 0 0;border:1.5px dashed rgba(255,208,72,.55);border-bottom:none;background:rgba(255,208,72,.04)"></div>
+          <div style="text-align:center;font-size:8.5px;color:var(--gold-dim);padding-top:3px;font-weight:700">NEXT</div>
+        </div>`;
+      return `<div class="card" style="padding:12px"><div class="ttl" style="font-size:13px;margin-bottom:8px">🪜 PR ladder <span class="mini" style="color:var(--text3);letter-spacing:0">— every rung = your record moving up (e1RM)</span></div>
+        <div style="display:flex;align-items:flex-end;gap:5px">${blocks}${nextRung}</div></div>`;
+    })()}
     <div class="row" style="gap:16px;margin:4px 0 12px;flex-wrap:wrap">
       <div><div class="mini">Record e1RM</div><b class="gold" style="font-size:20px">${recordE1}kg</b></div>
       <div><div class="mini">Top weight</div><b style="font-size:20px">${Math.max(...tws)}kg</b></div>
@@ -6110,13 +6130,33 @@ function profileRecordsHtml(d){
   return html;
 }
 
+/* ⚖️ Relative strength — top-3 e1RM total vs bodyweight, with a 4-week delta. */
+function relStrengthCard(){
+  const d=state.data,bw=bodyW();if(!bw)return "";
+  const tops=Object.entries(d.prs||{}).filter(([,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm).slice(0,3);
+  if(tops.length<2)return "";
+  const cutoff=Date.now()-28*864e5;
+  let nowT=0,thenT=0;
+  tops.forEach(([n])=>{let a=0,b=0;exerciseRows(n).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});nowT+=a;thenT+=b;});
+  if(!nowT)return "";
+  const dPct=thenT>0?Math.round((nowT-thenT)/thenT*100):null;
+  return `<div class="card" style="padding:13px">
+    <div class="ttl" style="font-size:13px;margin-bottom:6px">⚖️ Relative strength <span class="mini" style="color:var(--text3);letter-spacing:0">— big-3 e1RM total vs bodyweight</span></div>
+    <div class="row" style="gap:14px;align-items:flex-end">
+      <div><div class="big" style="font-size:34px;color:var(--gold2)">${(nowT/bw).toFixed(2)}×</div><div class="mini">bodyweight — ${fmtNum(Math.round(nowT))}kg ÷ ${bw}kg</div></div>
+      ${dPct!==null&&dPct!==0?`<div class="mini num" style="font-weight:800;color:${dPct>=0?'var(--green)':'#ff7a6e'}">${dPct>=0?'▲ +':'▼ '}${dPct}% / 4 wk</div>`:''}
+    </div>
+    <div class="mini" style="margin-top:6px;color:var(--text3)">${tops.map(([n,p])=>esc(n)+" "+Math.round(p.orm)+"kg").join(" · ")}</div>
+  </div>`;
+}
 function profileStrengthHtml(){
   const std=strengthStandardsCard();
   const combat=combatRatingCard();
   let html='';
+  try{html+=relStrengthCard();}catch(e){}
   if(std)html+=std;
   if(combat){html+=`<div style="margin-top:4px">${combat}</div>`;}
-  if(!std&&!combat)html=`<p class="muted" style="margin:0">Log sessions with bodyweight set to unlock strength analysis.</p>`;
+  if(!std&&!combat&&!html)html=`<p class="muted" style="margin:0">Log sessions with bodyweight set to unlock strength analysis.</p>`;
   return html;
 }
 
