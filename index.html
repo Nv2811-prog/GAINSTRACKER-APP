@@ -1113,7 +1113,7 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .g9-garage-bat{font-size:88px;line-height:1;animation:garBat .6s 1.08s cubic-bezier(.15,.85,.25,1.1) both;filter:drop-shadow(0 0 40px rgba(242,208,121,.75));position:relative;z-index:2}
 @keyframes garBat{from{opacity:0;transform:scale(5) rotate(-18deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
 .g9-garage-label{font-size:8px;letter-spacing:.7em;text-transform:uppercase;color:rgba(242,208,121,.38);margin-top:16px;animation:garTxt .8s 1.28s ease both;position:relative;z-index:2}
-.g9-garage-name{font-family:var(--disp);font-size:52px;letter-spacing:.04em;color:var(--gold2);text-shadow:0 0 60px rgba(242,208,121,.7),0 2px 30px rgba(0,0,0,.9);animation:garTxt .8s 1.44s ease both;text-align:center;padding:0 20px;max-width:400px;position:relative;z-index:2;line-height:1}
+.g9-garage-name{font-family:var(--disp);font-size:52px;letter-spacing:.04em;color:var(--gold2);text-shadow:0 0 60px rgba(242,208,121,.7),0 2px 30px rgba(0,0,0,.9);animation:garTxt .8s 1.44s ease both;text-align:center;padding:0 20px;max-width:400px;margin:0 auto;position:relative;z-index:2;line-height:1}
 @keyframes garTxt{from{opacity:0;letter-spacing:.9em}to{opacity:1}}
 .g9-garage-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.85) 50%,transparent);box-shadow:0 0 18px 5px rgba(242,208,121,.4);animation:garScan 1.1s 1.15s ease both;pointer-events:none;z-index:3}
 @keyframes garScan{from{top:-3px;opacity:0}8%{opacity:1}88%{opacity:.4}to{top:100%;opacity:0}}
@@ -11487,18 +11487,18 @@ function gothamCampaignMap(){
     const vimg=lost?villainImgUrl(villain):"";
     const col=held?"#FFD048":lost?"#FF3622":"#FF8C22";
     const plateFill=lost?"rgba(28,4,2,.88)":held?"rgba(26,19,4,.86)":"rgba(28,15,3,.86)";
-    if(vimg)defs+=`<clipPath id="gwv${i}"><circle cx="${x-52}" cy="${y}" r="15"/></clipPath>`;
+    if(vimg)defs+=`<clipPath id="gwv${i}"><circle cx="${x-58}" cy="${y}" r="19"/></clipPath>`;
     s+=`<g style="cursor:pointer" onclick="closeOverlay();muscleDrill('${m}')">
-      <rect x="${x-46}" y="${y-16}" width="100" height="32" rx="9" fill="${plateFill}" stroke="${col}" stroke-opacity="${held?'.75':'.95'}" stroke-width="1.5" style="filter:drop-shadow(0 0 ${lost?'9':'5'}px ${col}${lost?'':'66'})"/>
+      <rect x="${x-52}" y="${y-21}" width="122" height="42" rx="11" fill="${plateFill}" stroke="${col}" stroke-opacity="${held?'.8':'.95'}" stroke-width="1.8" style="filter:drop-shadow(0 0 ${lost?'11':'6'}px ${col}${lost?'':'66'})"/>
       ${lost?(vimg
-        ?`<circle cx="${x-52}" cy="${y}" r="16.5" fill="#1a0300" stroke="#FF3622" stroke-width="1.8" style="filter:drop-shadow(0 0 7px rgba(255,54,34,.9))"/>
-          <image href="${esc(vimg)}" x="${x-69}" y="${y-17}" width="34" height="34" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
-        :`<circle cx="${x-52}" cy="${y}" r="13" fill="#2a0602" stroke="#FF3622" stroke-width="1.6"/><text x="${x-52}" y="${y+5}" text-anchor="middle" font-size="14">🦹</text>`)
+        ?`<circle cx="${x-58}" cy="${y}" r="21" fill="#1a0300" stroke="#FF3622" stroke-width="2.2" style="filter:drop-shadow(0 0 8px rgba(255,54,34,.9))"/>
+          <image href="${esc(vimg)}" x="${x-79}" y="${y-21}" width="42" height="42" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
+        :`<circle cx="${x-58}" cy="${y}" r="17" fill="#2a0602" stroke="#FF3622" stroke-width="2"/><text x="${x-58}" y="${y+6}" text-anchor="middle" font-size="18">🦹</text>`)
       :held
-        ?`<path d="${bat}" transform="translate(${x+36},${y-14}) scale(.3)" fill="#FFD048" style="filter:drop-shadow(0 0 5px rgba(255,208,72,.9))"/>`
-        :`<circle class="gc-beacon" cx="${x+44}" cy="${y-10}" r="3.5" fill="${col}" style="animation-delay:${(i*0.3)%1.7}s"/>`}
-      <text x="${x-40}" y="${y-3}" font-family="Bebas Neue,sans-serif" font-size="14.5" letter-spacing="1.1" fill="${held?'#FFD048':col}">${MNAME[m].toUpperCase()}</text>
-      <text x="${x-40}" y="${y+10}" font-family="DM Sans,sans-serif" font-size="7" font-weight="800" letter-spacing=".7" fill="${lost?'rgba(255,140,120,.9)':held?'rgba(255,208,72,.62)':'rgba(255,190,120,.8)'}">${lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
+        ?`<path d="${bat}" transform="translate(${x+42},${y-19}) scale(.4)" fill="#FFD048" style="filter:drop-shadow(0 0 6px rgba(255,208,72,.9))"/>`
+        :`<circle class="gc-beacon" cx="${x+56}" cy="${y-12}" r="4.5" fill="${col}" style="animation-delay:${(i*0.3)%1.7}s"/>`}
+      <text x="${x-44}" y="${y-2}" font-family="Bebas Neue,sans-serif" font-size="19" letter-spacing="1.2" fill="${held?'#FFD048':col}">${MNAME[m].toUpperCase()}</text>
+      <text x="${x-44}" y="${y+14}" font-family="DM Sans,sans-serif" font-size="9" font-weight="800" letter-spacing=".7" fill="${lost?'rgba(255,140,120,.95)':held?'rgba(255,208,72,.7)':'rgba(255,190,120,.85)'}">${lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
     </g>`;
   });
   const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
@@ -11652,16 +11652,17 @@ function territoryWarCard(){
     const lost=M12.filter(m=>districtCrime(m).crime>=70&&(state.data.muscleVol[m]||0)>0);
     const band=districtBand(cityCrime());
     const worst=lost[0]?((NEMESIS_MAP[lost[0]]||{}).villain||"the Rogues"):null;
-    return `<div onclick="openDistricts()" style="cursor:pointer;position:relative;overflow:hidden;border-radius:16px;border:1.5px solid ${band[1]}55;margin-bottom:14px;box-shadow:0 14px 36px -16px rgba(0,0,0,.95),0 0 26px -12px ${band[1]};min-height:86px;background:url('assets/gotham-war-map.jpg') center 38%/cover no-repeat">
-      <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,6,10,.94) 30%,rgba(4,6,10,.55) 65%,rgba(4,6,10,.25))"></div>
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${band[1]}aa,transparent)"></div>
-      <div style="position:relative;z-index:2;padding:13px 14px;display:flex;align-items:center;gap:12px">
-        <div style="font-family:var(--disp);font-size:30px;line-height:1;color:${band[1]};text-shadow:0 0 18px ${band[1]}">${held}<span style="font-size:14px;color:var(--text3)">/12</span></div>
+    return `<div onclick="openDistricts()" style="cursor:pointer;position:relative;overflow:hidden;border-radius:18px;border:1.5px solid ${band[1]}66;margin-bottom:14px;box-shadow:0 16px 40px -16px rgba(0,0,0,.95),0 0 32px -12px ${band[1]};min-height:124px;background:url('assets/gotham-war-map.jpg') center 38%/cover no-repeat">
+      <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,6,10,.94) 32%,rgba(4,6,10,.55) 66%,rgba(4,6,10,.22))"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,${band[1]}cc,transparent)"></div>
+      <div style="position:relative;z-index:2;padding:20px 16px;display:flex;align-items:center;gap:15px">
+        <div style="font-family:var(--disp);font-size:44px;line-height:1;color:${band[1]};text-shadow:0 0 24px ${band[1]}">${held}<span style="font-size:19px;color:var(--text3)">/12</span></div>
         <div style="flex:1;min-width:0">
-          <div style="font-family:var(--disp);font-size:14.5px;letter-spacing:.08em;color:var(--text)">🗺️ TERRITORY WAR</div>
-          <div class="mini" style="color:${band[1]};font-weight:800;letter-spacing:.08em">${band[0]}${worst?` · <span style="color:#ff8a7a">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</span>`:" · the city is yours"}</div>
+          <div style="font-family:var(--disp);font-size:19px;letter-spacing:.07em;color:var(--text);text-shadow:0 2px 12px rgba(0,0,0,.9)">🗺️ TERRITORY WAR</div>
+          <div style="font-size:12.5px;color:${band[1]};font-weight:800;letter-spacing:.07em;margin-top:3px;text-shadow:0 0 10px ${band[1]}66">${band[0]}${worst?` · <span style="color:#ff8a7a">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</span>`:" · the city is yours"}</div>
+          <div class="mini" style="color:var(--text2);margin-top:2px">districts under your control</div>
         </div>
-        <span style="font-size:12px;color:var(--gold2);font-weight:800;white-space:nowrap;text-shadow:0 0 10px rgba(255,208,72,.5)">OPEN MAP ›</span>
+        <span style="font-size:12px;font-weight:800;color:#0b0a06;background:linear-gradient(180deg,#f4d98a,#d8ab45);border-radius:11px;padding:10px 13px;white-space:nowrap;box-shadow:0 4px 14px -4px rgba(255,208,72,.7),inset 0 1px 0 rgba(255,255,255,.5)">OPEN MAP ›</span>
       </div>
     </div>`;
   }catch(e){return "";}
