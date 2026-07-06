@@ -103,8 +103,8 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 @keyframes stgSlam{0%{transform:scale(3.6);opacity:0}62%{transform:scale(.93);opacity:1}100%{transform:scale(1)}}
 .stg-ring{position:absolute;width:130px;height:130px;border-radius:50%;border:2px solid #FFD048;animation:stgRing 1s ease-out .28s both}
 @keyframes stgRing{0%{transform:scale(.4);opacity:.9}100%{transform:scale(4.6);opacity:0}}
-.stg-title{font-family:var(--disp);font-size:40px;letter-spacing:.14em;margin-top:14px;animation:stgSlam .6s .12s cubic-bezier(.2,1.4,.4,1) both}
-.stg-sub{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--text2);margin-top:8px;animation:stgIn .5s .4s both}
+.stg-title{font-family:var(--disp);font-size:40px;letter-spacing:.14em;padding-left:.14em;text-align:center;margin-top:14px;animation:stgSlam .6s .12s cubic-bezier(.2,1.4,.4,1) both}
+.stg-sub{font-size:12px;letter-spacing:.22em;padding-left:.22em;text-align:center;text-transform:uppercase;color:var(--text2);margin-top:8px;animation:stgIn .5s .4s both}
 @keyframes stgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 /* season chapter faces stay inside their slot */
 .season-face img.vface,.season-face .vface{width:100%;height:100%;font-size:30px}
@@ -307,7 +307,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 /* timer bars */
 .minbar{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);border-radius:10px;padding:7px 10px;margin:0 0 10px;font-size:12.5px;font-weight:700;letter-spacing:.03em;cursor:pointer}
 .minbar:active{transform:scale(.99)}
-.resumebar{position:fixed;left:10px;right:10px;bottom:74px;z-index:40;display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:14px;border:1px solid var(--gold2);background:linear-gradient(180deg,#1a1407,#0e0b05);box-shadow:0 10px 30px rgba(0,0,0,.55);cursor:pointer;animation:rbIn .25s ease}
+.resumebar{position:fixed;left:10px;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:41;display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:14px;border:1px solid var(--gold2);background:linear-gradient(180deg,#1a1407,#0e0b05);box-shadow:0 10px 30px rgba(0,0,0,.55);cursor:pointer;animation:rbIn .25s ease}
 @keyframes rbIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .resumebar .rb-pulse{font-size:20px;animation:rbPulse 1.4s ease-in-out infinite}
 @keyframes rbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
@@ -621,9 +621,13 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .ob-goal-card .ob-gtx .gt{font-family:var(--disp);font-size:22px;color:var(--text);letter-spacing:.03em}
 .ob-goal-card .ob-gtx .mini{color:var(--text2);font-size:12.5px;margin-top:2px}
 /* Alfred FAB — floating butler, visible on all tabs */
-#alfred-fab{position:fixed;bottom:84px;right:14px;z-index:50;width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,#1c1200,#0a0800);border:1.5px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;overflow:hidden;box-shadow:0 0 16px rgba(255,208,72,.30),0 4px 18px rgba(0,0,0,.7);transition:.15s transform,.15s opacity}
+#alfred-fab{position:fixed;bottom:calc(78px + env(safe-area-inset-bottom));right:12px;z-index:50;width:46px;height:46px;border-radius:50%;background:linear-gradient(145deg,#1c1200,#0a0800);border:1.5px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;overflow:hidden;box-shadow:0 0 16px rgba(255,208,72,.30),0 4px 18px rgba(0,0,0,.7);transition:transform .22s ease,opacity .22s ease,bottom .22s ease}
 #alfred-fab:active{transform:scale(.88)}
 #alfred-fab.hide{opacity:0;pointer-events:none}
+/* Butler steps aside: while you scroll he slides half off-screen so he never covers content;
+   he steps back in the moment you stop. Lift = resume bar is docked below him. */
+#alfred-fab.dodge{transform:translateX(30px);opacity:.38}
+#alfred-fab.lift{bottom:calc(146px + env(safe-area-inset-bottom))}
 @keyframes fabGlow{0%,100%{box-shadow:0 0 14px rgba(255,208,72,.28),0 4px 14px rgba(0,0,0,.7)}50%{box-shadow:0 0 26px rgba(255,208,72,.55),0 4px 14px rgba(0,0,0,.7)}}
 #alfred-fab:not(.hide){animation:fabGlow 3.2s ease-in-out infinite}
 /* Alfred chat sheet bubbles */
@@ -1136,7 +1140,7 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .patrol2-glow{position:absolute;top:-5%;left:50%;transform:translateX(-50%);width:500px;height:380px;background:radial-gradient(ellipse,rgba(242,208,121,.13) 0%,transparent 68%);pointer-events:none}
 .patrol2-body{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 24px 36px;text-align:center}
 .patrol2-eye{font-size:9px;letter-spacing:.36em;text-transform:uppercase;color:rgba(242,208,121,.4);margin-bottom:14px;animation:pfade .6s ease both}
-.patrol2-day{font-family:var(--disp);font-size:58px;letter-spacing:.03em;color:var(--text);line-height:.88;text-shadow:0 0 60px rgba(242,208,121,.35),0 2px 20px rgba(0,0,0,.95);margin-bottom:6px;animation:pfade .65s .08s ease both}
+.patrol2-day{font-family:var(--disp);font-size:58px;letter-spacing:.03em;padding-left:.03em;text-align:center;width:100%;color:var(--text);line-height:.88;text-shadow:0 0 60px rgba(242,208,121,.35),0 2px 20px rgba(0,0,0,.95);margin-bottom:6px;animation:pfade .65s .08s ease both}
 .patrol2-day span{color:var(--gold2)}
 .patrol2-split{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);margin-bottom:18px;animation:pfade .65s .14s ease both}
 .patrol2-rule{width:100%;max-width:340px;height:1px;background:linear-gradient(90deg,transparent,rgba(242,208,121,.3),transparent);margin:0 auto 18px;animation:pfade .65s .18s ease both}
@@ -2799,9 +2803,16 @@ function checkUnlocks(){
 }
 
 /* ========================= TIMERS (Rule 2: no render() in setInterval) ========================= */
-function beep(p){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=p||660;g.gain.value=.12;o.start();g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.18);o.stop(c.currentTime+.2);}catch(e){}}
+function beep(p){try{audioMix();const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=p||660;g.gain.value=.12;o.start();g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.18);o.stop(c.currentTime+.2);}catch(e){}}
+/* ── Audio session: MIX WITH MUSIC — never pause the user's Spotify/Music. iOS 16.4+ lets a
+   web app declare its sounds "ambient" (mix-with-others); without this, the first SFX or
+   Alfred line hijacks the audio session and pauses whatever is playing. Re-asserted before
+   every sound because iOS can silently reset the session between gestures. ── */
+function audioMix(){try{if(navigator.audioSession&&navigator.audioSession.type!=='ambient')navigator.audioSession.type='ambient';}catch(e){}}
+audioMix();
 /* ── SFX — synthesized WebAudio, zero assets, offline. Iron should SOUND heavy. ── */
 function sfx(kind){try{
+  audioMix();
   const c=sfx._c=sfx._c||new(window.AudioContext||window.webkitAudioContext)();
   if(c.state==="suspended")c.resume();
   const t=c.currentTime;
@@ -3033,8 +3044,18 @@ function liveCheckPR(ei,si){
       // of the victory so you clearly see exactly which record you just broke.
       state._pendingPRpop={name:exObj.name,hits:hits.slice(),info:{w,r,e1,vol}};
     }else{
-      prKillCam(exObj.name,hits,{w,r,e1,vol});
+      // A record broken AFTER an earlier record tonight is a bigger story, not a smaller one.
+      // Set 1 crowned it, set 3 raised it — full stinger + kill cam every time, with escalation copy.
+      const again=state.session.bossed[exObj.name]||(state.session._prCount&&state.session._prCount[exObj.name]);
+      if(again){
+        try{playStinger("RECORD RAISED — AGAIN","SAME NIGHT · SAME LIFT · HIGHER","#FFD048");}catch(e){}
+        setTimeout(()=>{try{prKillCam(exObj.name,hits,{w,r,e1,vol},true);}catch(e){}},950);
+      }else{
+        prKillCam(exObj.name,hits,{w,r,e1,vol});
+      }
     }
+    state.session._prCount=state.session._prCount||{};
+    state.session._prCount[exObj.name]=(state.session._prCount[exObj.name]||0)+1;
     fired="pr";
   }
   // Boss fires once per exercise per session, only on an e1RM crown — the ultimate tier.
@@ -3087,7 +3108,7 @@ function showPRToast(name,hits,info){
 // PR KILL-CAM — full-screen slow-mo cinematic when a record falls. Reuses the #cine overlay
 // with a kill-cam skin: the exercise, a smashing big number, the delta over your old best.
 // Auto-dismisses so it never blocks logging; tap anywhere (or ONWARD) to skip.
-function prKillCam(name,hits,info){
+function prKillCam(name,hits,info,again){
   try{
     hits=hits.slice().sort((a,b)=>PR_TIER[b.t].rank-PR_TIER[a.t].rank);
     const top=hits[0],cfg=PR_TIER[top.t];
@@ -3103,7 +3124,7 @@ function prKillCam(name,hits,info){
     const bodyHtml=`<div class="kcnum" style="color:${cfg.accent}">${big}<span class="kcunit">${esc(cfg.unit)}</span></div>
       <div class="kcdelta" style="color:${cfg.accent}">${deltaStr}</div>
       ${(liftStr||extra)?`<div class="mini" style="margin-top:11px;color:var(--text3);letter-spacing:.1em">${liftStr}${extra}</div>`:""}`;
-    cinePush({killcam:true,hold:true,icon:cfg.badge,eye:"RECORD SHATTERED",titleHtml:esc(name),title:name,bodyHtml,btn:"ONWARD",accent:cfg.accent});
+    cinePush({killcam:true,hold:true,icon:cfg.badge,eye:again?"RAISED AGAIN — SAME NIGHT":"RECORD SHATTERED",titleHtml:esc(name),title:name,bodyHtml,btn:again?"UNSTOPPABLE":"ONWARD",accent:cfg.accent});
   }catch(e){try{showPRToast(name,hits,info);}catch(_){}}
 }
 function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();saveSession();}
@@ -3237,7 +3258,7 @@ const STYPE_LABEL={NRM:"Normal",W:"Warm-up",F:"Failure",D:"Drop set",L:"Left",R:
 function openSetSheet(ei,si){
   const ex=state.session.exercises[ei];if(!ex)return;const s=ex.sets[si];const n=ex.sets.length;
   const chip=(t)=>`<button class="chip ${s.type===t?'on':''}" onclick="setSetType(${ei},${si},'${t}')">${STYPE_LABEL[t]}</button>`;
-  $("sheet").innerHTML=`<div class="ttl" style="margin-bottom:2px">Set ${si+1} options</div>
+  $("sheet").innerHTML=`<div class="ttl" style="margin-bottom:2px">${s.type==='W'?'Warm-up options':'Set '+ex.sets.slice(0,si+1).filter(x=>x.type!=='W').length+' options'}</div>
     <div class="mini" style="color:var(--text2);margin-bottom:10px">${esc(ex.name)}</div>
     <label class="lbl">Set type</label>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px">${["NRM","W","F","D","L","R"].map(chip).join("")}</div>
@@ -3625,7 +3646,11 @@ function closeOverlay(){$("overlay").classList.remove("on");}
 
 /* ===== Cinematic pop-ups ===== queued, dramatic full-screen bulletins the user taps through.
    Used for the daily Wayne Wisdom quote and live "an ally just trained" alerts. */
-function cinePush(it){state._cineQ=state._cineQ||[];state._cineQ.push(it);if(!state._cineOn)cineNext();}
+function cinePush(it){state._cineQ=state._cineQ||[];state._cineQ.push(it);
+  // self-heal: if the flag says a cinematic is up but the overlay isn't actually on screen,
+  // the queue is stuck — reset so a PR celebration can never be silently swallowed.
+  try{const el=$("cine");if(state._cineOn&&el&&!el.classList.contains("on"))state._cineOn=false;}catch(e){}
+  if(!state._cineOn)cineNext();}
 function cineNext(){
   const q=state._cineQ||[];
   if(!q.length){cineHide();return;}
@@ -3824,7 +3849,7 @@ function render(){
     renderNav();
   }
   // Show/hide Alfred FAB — hide during active workout, summary, onboarding, subpages
-  try{const fab=document.getElementById('alfred-fab');if(fab){const hideFab=state.showOnboarding||state.step==='logging'||state.step==='summary'||state.step==='readiness'||state.step==='patrol-intro'||!!state.subpage;fab.classList.toggle('hide',hideFab);}}catch(e){}
+  try{const fab=document.getElementById('alfred-fab');if(fab){const hideFab=state.showOnboarding||state.step==='logging'||state.step==='summary'||state.step==='readiness'||state.step==='patrol-intro'||!!state.subpage;fab.classList.toggle('hide',hideFab);fab.classList.toggle('lift',!hideFab&&!!document.querySelector('.resumebar'));}}catch(e){}
   const restore=()=>{window.scrollTo(0,sy);if(fId){const el=document.querySelector('input[data-fid="'+fId+'"]');if(el&&document.activeElement!==el){const v=el.value;el.focus();try{el.setSelectionRange(v.length,v.length);}catch(e){}}}};
   restore();requestAnimationFrame(restore);
   // One-shot view-enter animation — fires only when actually moving to a different view,
@@ -8450,6 +8475,11 @@ let ALFRED_VOICE="";
 
 /* ========================= ALFRED EVERYWHERE — FAB + bottom sheet chat ========================= */
 function openAlfredChat(){haptic("tap");openAlfredVoice();}
+/* Butler etiquette: Alfred steps aside while you scroll so he never blocks what you're reading. */
+(function(){let t=null;window.addEventListener("scroll",()=>{
+  const fab=document.getElementById("alfred-fab");if(!fab||fab.classList.contains("hide"))return;
+  fab.classList.add("dodge");clearTimeout(t);t=setTimeout(()=>fab.classList.remove("dodge"),420);
+},{passive:true});})();
 
 /* ── Alfred Voice Conversation — Jarvis-style orb overlay ── */
 let _AV_STATE='idle'; // idle | listen | think | speak
@@ -8465,6 +8495,7 @@ function _avUnlockSpeech(){
   if(_AV_SPEECH_UNLOCKED)return;
   try{
     if(!window.speechSynthesis)return;
+    try{audioMix();}catch(e){}
     window.speechSynthesis.speak(new SpeechSynthesisUtterance(' '));
     _AV_SPEECH_UNLOCKED=true;
   }catch(e){}
@@ -9381,6 +9412,7 @@ function pickAlfredVoice(){
   return best||vs.find(v=>/^en/i.test(v.lang))||null;
 }
 function _alfredUtter(text,rate,pitch){
+  try{audioMix();}catch(e){}
   const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
   u.rate=rate;u.pitch=pitch;u.volume=1;
   const pick=pickAlfredVoice();if(pick)u.voice=pick;
@@ -11509,7 +11541,9 @@ function renderLogging(){
     let intel='Recovering…',tg=null,hasNext=false;
     try{const fei0=activeExIdx();const e0=fei0>=0?ses.exercises[fei0]:null;
       if(e0){const nsi=(e0.sets||[]).findIndex(s=>!s.done);hasNext=nsi>=0;tg=hasNext?nextTargetSet(e0.name):null;
-        intel=hasNext?`NEXT · SET ${nsi+1} — <b>${esc(e0.name)}</b>`:'ALL SETS IN — <b>next exercise</b>';}}catch(e){}
+        const nIsW=hasNext&&e0.sets[nsi].type==='W';
+        const nWnum=hasNext?e0.sets.slice(0,nsi+1).filter(x=>x.type!=='W').length:0;
+        intel=hasNext?`NEXT · ${nIsW?'WARM-UP':'SET '+nWnum} — <b>${esc(e0.name)}</b>`:'ALL SETS IN — <b>next exercise</b>';}}catch(e){}
     restStripHtml=`<div class="reststrip" id="reststrip">
       <div class="rs-int">${intel}</div>
       ${tg?`<button class="rs-btn gold" id="restapply" onclick="restApplyTarget()">⚡ ${tg.w?fmtNum(tg.w)+'kg × ':''}${tg.r}</button>`:''}
@@ -11592,6 +11626,8 @@ function renderLogging(){
       </tr></thead><tbody>`;
     e.sets.forEach(function(s,si){
       const isW=s.type==='W';
+      // Working sets number from 1 — warm-ups don't inflate the count (2 warmups ≠ "set 3").
+      const wnum=e.sets.slice(0,si+1).filter(x=>x.type!=='W').length;
       const pw=s.prevW!=null?String(s.prevW):null;
       const pr2=s.prevR!=null?String(s.prevR):null;
       // Build previous cell — exact weight × reps
@@ -11612,7 +11648,7 @@ function renderLogging(){
       const metricCell=isW?'<span class="pv">—</span>':`<select onchange="setField(${fei},${si},'rpe',this.value)" style="padding:7px 2px;font-size:12px;background:var(--bg2);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--text)">${metricOpts(metric,s.rpe)}</select>`;
       const rowCls=s.done?'set-done-row':isW?'set-warm-row':'';
       h+=`<tr class="${rowCls}">
-        <td class="stcell"><div class="stype ${s.type}" onclick="cycleType(${fei},${si})">${s.type==='NRM'?(si+1):s.type}</div></td>
+        <td class="stcell"><div class="stype ${s.type}" onclick="cycleType(${fei},${si})">${s.type==='NRM'?wnum:s.type}</div></td>
         <td class="prevcell2">${prevCellHtml}</td>
         <td><input data-fid="${fei}-${si}-w" inputmode="decimal" value="${esc(s.w)}" oninput="setField(${fei},${si},'w',this.value)" placeholder="${ex.bw?(pw||0):(pw||'')}"/></td>
         <td><input data-fid="${fei}-${si}-r" inputmode="numeric" value="${esc(s.r)}" oninput="setField(${fei},${si},'r',this.value)" placeholder="${pr2||''}"/></td>
