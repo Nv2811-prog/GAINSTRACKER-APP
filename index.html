@@ -10166,7 +10166,7 @@ function openDistricts(){
       <div style="height:6px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${dc.crime}%;background:${b[1]};transition:.3s"></div></div>
       <div class="mini" style="margin-top:3px;color:${b[1]}">${b[0]} · ${esc(districtAge(dc))}</div></div></div>`;
   }).join("");
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🗺️ Gotham Campaign</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🗺️ GOTHAM TERRITORY WAR</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
     <div class="row sp" style="margin:4px 0 8px;align-items:flex-end">
       <div><div style="font-family:var(--disp);font-size:34px;line-height:1;color:${band[1]};text-shadow:0 0 20px ${band[1]}66">${held}<span style="font-size:16px;color:var(--text3)">/12</span></div><div class="mini" style="color:var(--text2)">districts under your control</div></div>
       <div style="font-family:var(--disp);font-size:15px;color:${band[1]}">${band[0]}</div>
@@ -11238,59 +11238,48 @@ const VILLAIN_LINES={
    the Bat-Signal burns when you're primed to train, rain falls when fatigue debt is high.
    Tap a tower → that muscle's dossier. Tap the signal → start tonight's patrol. ===== */
 function gothamCampaignMap(){
+  /* TERRITORY WAR map v2 — real aerial-Gotham art underneath, compact war tokens on top.
+     Held district = gold plate + bat emblem. Overrun = red plate + the occupying villain's MUGSHOT.
+     Contested = amber pulsing beacon. Tap any token for the muscle's full dossier. */
   const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
-  const blob=(cx,cy,rx,ry,seed)=>{
-    const pts=[];for(let k=0;k<8;k++){const a=k/8*2*Math.PI;
-      const jit=1+((((seed*31+k*17)%9)-4)/40);
-      pts.push([cx+Math.cos(a)*rx*jit, cy+Math.sin(a)*ry*jit]);}
-    let pth="M"+((pts[7][0]+pts[0][0])/2).toFixed(1)+" "+((pts[7][1]+pts[0][1])/2).toFixed(1);
-    for(let k=0;k<8;k++){const nn=pts[(k+1)%8];
-      pth+=` Q${pts[k][0].toFixed(1)} ${pts[k][1].toFixed(1)} ${((pts[k][0]+nn[0])/2).toFixed(1)} ${((pts[k][1]+nn[1])/2).toFixed(1)}`;}
-    return pth+" Z";
-  };
-  const POS={shoulders:[330,84],traps:[464,100],triceps:[344,180],forearms:[470,196],
-             back:[100,150],chest:[234,138],biceps:[92,262],abs:[228,252],
-             quads:[318,336],hamstrings:[458,350],glutes:[326,434],calves:[464,446]};
-  const ISLES=[[398,140,158,112,3],[162,198,152,124,7],[392,390,162,114,11]];
-  let s="";
-  ISLES.forEach(([cx,cy,rx,ry,sd])=>{
-    s+=`<path d="${blob(cx,cy,rx+16,ry+16,sd+1)}" fill="#0e1524" opacity=".8"/>
-        <path d="${blob(cx,cy,rx,ry,sd)}" fill="#161f33" stroke="rgba(140,170,220,.14)" stroke-width="1.2"/>`;
-  });
-  // straight city-grid roads inside each island + dashed bridges between them
-  s+=`<g stroke="rgba(190,205,235,.18)" stroke-width="3.5" fill="none" stroke-linecap="round">
-    <path d="M330 84 L464 100 M344 180 L470 196 M330 84 L344 180 M464 100 L470 196"/>
-    <path d="M100 150 L234 138 M92 262 L228 252 M100 150 L92 262 M234 138 L228 252"/>
-    <path d="M318 336 L458 350 M326 434 L464 446 M318 336 L326 434 M458 350 L464 446"/>
-  </g>
-  <g stroke="rgba(200,215,240,.34)" stroke-width="3.5" stroke-dasharray="8 4" fill="none">
-    <path d="M234 190 Q280 224 316 288"/><path d="M300 130 Q322 116 336 108"/><path d="M180 300 Q244 356 300 386"/><path d="M436 240 Q432 268 424 296"/></g>`;
-  const RW=124,RH=66;
+  // positions sit on the three islands of the art (left, right, bottom)
+  const POS={back:[112,128],chest:[232,152],biceps:[100,248],abs:[218,268],
+             shoulders:[352,108],traps:[464,132],triceps:[348,214],forearms:[458,238],
+             quads:[232,376],hamstrings:[366,362],glutes:[248,458],calves:[382,444]};
+  let s="",defs="";
   M12.forEach((m,i)=>{
-    const[mx,my]=POS[m];
+    const[x,y]=POS[m];
     const dc=districtCrime(m), b=districtBand(dc.crime);
     const held=dc.crime<45, lost=dc.crime>=70;
     const villain=(NEMESIS_MAP[m]||{}).villain||"the Rogues";
-    const fill=held?"rgba(255,208,72,.22)":lost?"rgba(255,54,34,.26)":"rgba(255,140,34,.22)";
-    const sub=lost?"HELD BY "+villain.toUpperCase():held?"YOURS":"CONTESTED";
+    const vimg=lost?villainImgUrl(villain):"";
+    const col=held?"#FFD048":lost?"#FF3622":"#FF8C22";
+    const plateFill=lost?"rgba(28,4,2,.88)":held?"rgba(26,19,4,.86)":"rgba(28,15,3,.86)";
+    if(vimg)defs+=`<clipPath id="gwv${i}"><circle cx="${x-52}" cy="${y}" r="15"/></clipPath>`;
     s+=`<g style="cursor:pointer" onclick="closeOverlay();muscleDrill('${m}')">
-      <rect x="${mx-RW/2}" y="${my-RH/2}" width="${RW}" height="${RH}" rx="11" fill="${fill}" stroke="${b[1]}" stroke-opacity="${held?'.65':'.95'}" stroke-width="1.6"/>
-      ${held?`<path d="${bat}" transform="translate(${mx+RW/2-27},${my-RH/2+2}) scale(.34)" fill="#FFD048" opacity=".95"/>`
-            :`<circle class="gc-beacon" cx="${mx+RW/2-13}" cy="${my-RH/2+12}" r="3" fill="${b[1]}" style="animation-delay:${(i*0.3)%1.7}s"/>`}
-      <text x="${mx-RW/2+9}" y="${my-RH/2+16}" font-family="DM Sans,sans-serif" font-size="8" font-weight="700" letter-spacing=".8" fill="rgba(215,225,245,.65)">${esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
-      <text x="${mx-RW/2+9}" y="${my+7}" font-family="Bebas Neue,sans-serif" font-size="19" letter-spacing="1.4" fill="${held?'#FFD048':b[1]}" style="text-shadow:0 0 10px ${b[1]}">${MNAME[m].toUpperCase()}</text>
-      <text x="${mx-RW/2+9}" y="${my+22}" font-family="DM Sans,sans-serif" font-size="8" font-weight="800" letter-spacing=".6" fill="${held?'rgba(255,208,72,.75)':b[1]}">${esc(sub)}</text>
+      <rect x="${x-46}" y="${y-16}" width="100" height="32" rx="9" fill="${plateFill}" stroke="${col}" stroke-opacity="${held?'.75':'.95'}" stroke-width="1.5" style="filter:drop-shadow(0 0 ${lost?'9':'5'}px ${col}${lost?'':'66'})"/>
+      ${lost?(vimg
+        ?`<circle cx="${x-52}" cy="${y}" r="16.5" fill="#1a0300" stroke="#FF3622" stroke-width="1.8" style="filter:drop-shadow(0 0 7px rgba(255,54,34,.9))"/>
+          <image href="${esc(vimg)}" x="${x-69}" y="${y-17}" width="34" height="34" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
+        :`<circle cx="${x-52}" cy="${y}" r="13" fill="#2a0602" stroke="#FF3622" stroke-width="1.6"/><text x="${x-52}" y="${y+5}" text-anchor="middle" font-size="14">🦹</text>`)
+      :held
+        ?`<path d="${bat}" transform="translate(${x+36},${y-14}) scale(.3)" fill="#FFD048" style="filter:drop-shadow(0 0 5px rgba(255,208,72,.9))"/>`
+        :`<circle class="gc-beacon" cx="${x+44}" cy="${y-10}" r="3.5" fill="${col}" style="animation-delay:${(i*0.3)%1.7}s"/>`}
+      <text x="${x-40}" y="${y-3}" font-family="Bebas Neue,sans-serif" font-size="14.5" letter-spacing="1.1" fill="${held?'#FFD048':col}">${MNAME[m].toUpperCase()}</text>
+      <text x="${x-40}" y="${y+10}" font-family="DM Sans,sans-serif" font-size="7" font-weight="800" letter-spacing=".7" fill="${lost?'rgba(255,140,120,.9)':held?'rgba(255,208,72,.62)':'rgba(255,190,120,.8)'}">${lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
     </g>`;
   });
-  s+=`<text x="30" y="345" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="4" fill="rgba(140,170,215,.4)" transform="rotate(-64 30 345)">GOTHAM RIVER</text>
-      <text x="285" y="498" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="6" fill="rgba(140,170,215,.4)">GOTHAM HARBOR</text>
-      <g transform="translate(528,470)" opacity=".55"><circle r="14" fill="none" stroke="rgba(200,215,240,.4)"/><path d="M0 -11 L3 0 L0 11 L-3 0 Z" fill="#FFD048"/><text y="-17" text-anchor="middle" font-size="8" fill="rgba(200,215,240,.6)" font-family="Bebas Neue,sans-serif">N</text></g>`;
   const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
   return `<div class="row" style="gap:13px;justify-content:center;margin-bottom:7px">${leg("#FFD048","yours")}${leg("#FF8C22","contested")}${leg("#FF3622","villain-held")}</div>
-  <svg viewBox="0 0 560 510" style="width:100%;display:block;border-radius:14px;background:linear-gradient(180deg,#0b1626,#091220 60%,#0a1322)">
-    <defs><pattern id="gmw" width="36" height="18" patternUnits="userSpaceOnUse"><path d="M0 14 Q9 8 18 14 T36 14" stroke="rgba(110,150,205,.08)" fill="none" stroke-width="1"/></pattern></defs>
-    <rect width="560" height="510" fill="url(#gmw)"/>
+  <svg viewBox="0 0 560 560" style="width:100%;display:block;border-radius:16px;border:1px solid rgba(120,155,205,.22);box-shadow:0 18px 50px -20px rgba(0,0,0,.95),0 0 34px -16px rgba(90,140,200,.5)">
+    <defs>
+      <radialGradient id="gwvig" cx="50%" cy="42%" r="72%"><stop offset="55%" stop-color="rgba(2,4,8,0)"/><stop offset="100%" stop-color="rgba(2,4,8,.72)"/></radialGradient>
+      ${defs}
+    </defs>
+    <image href="assets/gotham-war-map.jpg" x="0" y="0" width="560" height="560" preserveAspectRatio="xMidYMid slice"/>
+    <rect width="560" height="560" fill="url(#gwvig)"/>
     ${s}
+    <text x="280" y="546" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="6" fill="rgba(160,190,230,.5)">GOTHAM CITY · TERRITORY WAR</text>
   </svg>
   <div class="mini center" style="color:var(--text3);margin-top:6px">tap any district for its full dossier</div>`;
 }
