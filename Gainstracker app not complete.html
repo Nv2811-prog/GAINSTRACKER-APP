@@ -103,6 +103,10 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 @keyframes stgSlam{0%{transform:scale(3.6);opacity:0}62%{transform:scale(.93);opacity:1}100%{transform:scale(1)}}
 .stg-ring{position:absolute;width:130px;height:130px;border-radius:50%;border:2px solid #FFD048;animation:stgRing 1s ease-out .28s both}
 @keyframes stgRing{0%{transform:scale(.4);opacity:.9}100%{transform:scale(4.6);opacity:0}}
+/* RIR tile — one-tap effort logging, color = proximity to failure (red 0 → gold 1-2 → green 3 → blue 4+) */
+.rirtile{width:34px;height:34px;margin:0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13.5px;background:var(--bg2);border:1px solid rgba(255,255,255,.13);color:var(--text3);cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;user-select:none}
+.rirtile:active{transform:scale(.85)}
+.rirtile.set{background:#131007}
 .stg-title{font-family:var(--disp);font-size:40px;letter-spacing:.14em;padding-left:.14em;text-align:center;margin-top:14px;animation:stgSlam .6s .12s cubic-bezier(.2,1.4,.4,1) both}
 .stg-sub{font-size:12px;letter-spacing:.22em;padding-left:.22em;text-align:center;text-transform:uppercase;color:var(--text2);margin-top:8px;animation:stgIn .5s .4s both}
 @keyframes stgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -2965,7 +2969,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W").length,0),D=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W"&&x.done).length,0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W").length,0),D=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W"&&x.done).length,0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -4191,6 +4195,105 @@ function metricOpts(metric,val){
   const arr=metric==="rir"?["","0","1","2","3","4+"]:["","6","7","8","9","10"];
   return arr.map(o=>`<option ${String(val)===o?"selected":""}>${o}</option>`).join("");
 }
+/* ═══════════ RIR ENGINE — proximity-to-failure intel ═══════════
+   One-tap tactile logging in the set table + a full Effort Dossier on the Suit tab.
+   All history is normalized to RIR 0–4 (RPE-era logs convert as RIR = 10 − RPE). */
+function cycleMetric(ei,si){
+  const s=state.session&&state.session.exercises[ei]&&state.session.exercises[ei].sets[si];if(!s)return;
+  const arr=state.data.u.metric==="rir"?["","0","1","2","3","4+"]:["","10","9","8","7","6"];
+  s.rpe=arr[(arr.indexOf(String(s.rpe||""))+1)%arr.length];
+  try{sfx("clank");haptic("tap");}catch(e){}
+  saveSessionSoon();render();
+}
+function rirTone(v){const s=String(v);const r=s==="4+"?4:parseFloat(s);const rr=isNaN(r)?null:(r>=6?10-r:r);
+  return rr==null?"#8b93a3":rr<=0?"#FF3622":rr<=2?"#FFD048":rr<=3?"#22E87A":"#5f8fd6";}
+function rirOfSet(s){
+  if(!s||s.type==="W")return null;const v=String(s.rpe==null?"":s.rpe).trim();if(!v)return null;
+  if(v==="4+")return 4;const n=parseFloat(v);if(isNaN(n))return null;
+  return n>=6?clamp(Math.round(10-n),0,4):clamp(n,0,4);
+}
+function rirIntel(days){
+  const cut=Date.now()-(days||30)*86400000;
+  const per={};let sum=0,n=0,eff=0,work=0;
+  gymWs().forEach(w=>{if(new Date(w.date).getTime()<cut)return;
+    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);const m=(ex.p||[])[0];
+      (e.sets||[]).forEach(s=>{if(s.type==="W")return;work++;
+        const r=rirOfSet(s);if(r==null)return;
+        sum+=r;n++;if(r<=3)eff++;
+        if(m){per[m]=per[m]||{sum:0,n:0};per[m].sum+=r;per[m].n++;}
+      });});});
+  return {avg:n?sum/n:null,n,work,eff,rate:n?eff/n:null,logRate:work?n/work:0,per};
+}
+function rirBand(avg){
+  if(avg==null)return {t:"NO EFFORT DATA",c:"var(--text3)",d:"Log RIR on your sets and Alfred reads how hard you actually train — not just what you lift."};
+  if(avg<0.75)return {t:"REDLINING",c:"#FF3622",d:"You live at absolute failure. Effective — but technique and recovery pay the bill. Bank 1–2 RIR on early sets."};
+  if(avg<=2.5)return {t:"THE KILL ZONE",c:"#FFD048",d:"0–2 reps in reserve — the exact range where muscle is built. Textbook execution, sir."};
+  if(avg<=3.4)return {t:"EFFECTIVE",c:"#22E87A",d:"Solid stimulus. Push the last set of each lift 1 rep closer and the graphs will thank you."};
+  return {t:"SANDBAGGING",c:"#5f8fd6",d:"Too much left in the tank, sir. Sets this far from failure barely count — add load or reps."};
+}
+function rirSuitCard(){
+  const I=rirIntel(30),B=rirBand(I.avg);
+  const avgTxt=I.avg==null?"—":(Math.round(I.avg*10)/10).toFixed(1);
+  const effTxt=I.rate==null?"—":Math.round(I.rate*100)+"%";
+  return `<div class="card" onclick="openRirDossier()" style="cursor:pointer;position:relative;overflow:hidden;border:1.5px solid ${B.c}44;background:linear-gradient(165deg,rgba(20,15,6,.98),rgba(7,6,4,1));box-shadow:0 0 26px -12px ${B.c},inset 0 1px 0 rgba(255,255,255,.06)">
+    <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,${B.c},transparent)"></div>
+    <div class="row sp" style="align-items:center">
+      <div class="row" style="gap:11px;align-items:center">
+        <div style="width:52px;height:52px;border-radius:13px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,${B.c}2e,${B.c}0a);border:1px solid ${B.c}55;box-shadow:0 0 18px -6px ${B.c}">
+          <div style="font-family:var(--disp);font-size:20px;color:${B.c};text-shadow:0 0 12px ${B.c}">${avgTxt}</div>
+          <div style="font-size:7.5px;letter-spacing:.14em;color:var(--text3)">AVG RIR</div>
+        </div>
+        <div>
+          <div style="font-family:var(--disp);font-size:15px;letter-spacing:.04em;color:var(--text)">EFFORT DOSSIER</div>
+          <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:${B.c};text-shadow:0 0 10px ${B.c}66">${B.t}</div>
+          <div class="mini" style="color:var(--text3);margin-top:1px">${effTxt} of sets in the effective zone · 30 days</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--gold2);font-weight:800;white-space:nowrap;text-shadow:0 0 10px rgba(255,208,72,.4)">OPEN ›</div>
+    </div>
+  </div>`;
+}
+function openRirDossier(){
+  haptic("tap");
+  const I30=rirIntel(30),I7=rirIntel(7),B=rirBand(I30.avg);
+  const avgTxt=I30.avg==null?"—":(Math.round(I30.avg*10)/10).toFixed(1);
+  // 7-day drift vs the month
+  let drift="";
+  if(I7.avg!=null&&I30.avg!=null&&I7.n>=5){
+    const d=I7.avg-I30.avg;
+    if(d<=-0.35)drift=`<div class="banner" style="border-color:rgba(255,54,34,.4)"><span>🔥</span><div><b style="color:#ff8a7a">Intensity climbing.</b><div class="mini">This week you're averaging ${(Math.round(I7.avg*10)/10).toFixed(1)} RIR — closer to failure than your monthly norm. Earned aggression.</div></div></div>`;
+    else if(d>=0.35)drift=`<div class="banner"><span>🧊</span><div><b style="color:#9fc4ff">Drifting from failure.</b><div class="mini">This week averages ${(Math.round(I7.avg*10)/10).toFixed(1)} RIR vs ${(Math.round(I30.avg*10)/10).toFixed(1)} for the month. Tighten it up before it becomes a habit, sir.</div></div></div>`;
+  }
+  // Per-muscle effort ledger
+  const rows=Object.keys(I30.per).filter(m=>I30.per[m].n>=3).sort((a,b)=>I30.per[b].n-I30.per[a].n).map(m=>{
+    const a=I30.per[m].sum/I30.per[m].n,mb=rirBand(a);
+    const pct=clamp(a/4*100,0,100);
+    return `<div style="margin-bottom:10px">
+      <div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px;font-weight:700">${mIcon(m,15)} ${MNAME[m]}</span>
+        <span class="mini"><b style="color:${mb.c}">${(Math.round(a*10)/10).toFixed(1)} RIR</b> <span style="color:${mb.c};font-size:9.5px;letter-spacing:.08em">${mb.t}</span></span></div>
+      <div style="height:7px;border-radius:5px;background:linear-gradient(90deg,rgba(255,54,34,.25),rgba(255,208,72,.25) 40%,rgba(95,143,214,.25));position:relative">
+        <i style="position:absolute;top:-3px;left:calc(${pct.toFixed(0)}% - 6px);width:13px;height:13px;border-radius:50%;background:${mb.c};box-shadow:0 0 10px ${mb.c},inset 0 1px 0 rgba(255,255,255,.4);border:1.5px solid rgba(0,0,0,.5)"></i>
+      </div></div>`;
+  }).join("");
+  const logPct=Math.round(I30.logRate*100);
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:8px">🔥 Effort Dossier <span class="mini" style="color:var(--text3);font-weight:400">· proximity to failure</span></div>
+    <div style="text-align:center;padding:14px 0 10px">
+      <div style="font-family:var(--disp);font-size:56px;line-height:1;color:${B.c};text-shadow:0 0 34px ${B.c}88">${avgTxt}</div>
+      <div style="font-size:10px;letter-spacing:.3em;color:var(--text3);margin-top:2px">AVG REPS IN RESERVE · 30 DAYS</div>
+      <div style="font-size:14px;font-weight:800;letter-spacing:.14em;color:${B.c};margin-top:7px;text-shadow:0 0 14px ${B.c}66">${B.t}</div>
+      <div class="mini" style="color:var(--text2);margin-top:6px;line-height:1.5;max-width:330px;margin-left:auto;margin-right:auto">${B.d}</div>
+    </div>
+    <div class="row" style="gap:8px;margin-bottom:12px">
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--disp);font-size:20px;color:var(--gold2)">${I30.rate==null?"—":Math.round(I30.rate*100)+"%"}</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">EFFECTIVE SETS<br>(0–3 RIR)</div></div>
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--disp);font-size:20px;color:var(--text)">${I30.n}</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">SETS WITH<br>EFFORT LOGGED</div></div>
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--disp);font-size:20px;color:${logPct>=60?'var(--green)':logPct>=30?'var(--gold2)':'#ff8a7a'}">${logPct}%</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">LOGGING<br>COVERAGE</div></div>
+    </div>
+    ${drift}
+    ${rows?`<div class="hr"></div><div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:10px">EFFORT BY MUSCLE — WHERE YOU FIGHT vs WHERE YOU COAST</div>${rows}`:`<p class="muted" style="font-size:13px">Not enough logged effort yet. Tap the RIR tile on each working set — one tap per set is all the intel Alfred needs.</p>`}
+    <div class="hr"></div>
+    <div class="mini" style="color:var(--text3);line-height:1.55"><b style="color:var(--gold2)">The science:</b> sets are effective from roughly 0–4 reps in reserve; 0–2 RIR is the sweet spot. Rising e1RM at the same RIR = real strength. Same weight drifting to higher RIR = you got stronger. Same weight at lower RIR = fatigue talking.</div>
+    <button class="btn ghost sm" style="margin-top:12px" onclick="closeSheet()">Close dossier</button>`);
+}
 /* ===== Voice logging (Web Speech API) — say "80 kilos 8 reps" to fill the next open set. Guarded for unsupported browsers. ===== */
 const NUMW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fourty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
 function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
@@ -5092,6 +5195,9 @@ function renderSuit(){
       <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:12px">${legend}</div>`;
     })()}
   </div>`;
+
+  // 🔥 Effort Dossier — pressable RIR intel, right under the suit
+  html+=rirSuitCard();
 
   // Sector Command — THE one per-muscle readout: recovery ring + weekly sets + ready-when.
   // (Replaces the old separate Recovery Forecast, Weekly Volume and District Control cards.)
@@ -9533,10 +9639,37 @@ function alfredCoachLine(ei,si,ev){
   const over=alfredOver12(ei,si);if(over){if(state.session)state.session._coachTone="bad";return over;}
   const weak=alfredWeakCallout(ei,si);if(weak){if(state.session)state.session._coachTone="bad";return weak;}
   const reg=alfredRegressionCallout(ei,si);if(reg){if(state.session)state.session._coachTone="bad";return reg;}
+  const rirC=alfredRirCallout(ei,si);if(rirC){return rirC;}
   if(state.session)state.session._coachTone="ok";
   const working=(e.sets||[]).filter(s=>s.type!=="W");
   const doneN=working.filter(s=>s.done).length;const last=working.length>0&&doneN>=working.length;
   return last?_pickLine(_ALFRED_LAST,"last"):_pickLine(_ALFRED_SET,"set");
+}
+/* Alfred reads the RIR tile the instant a set lands — sandbagging gets a sting, emptying the
+   tank on the final set gets respect, living at failure gets a raised eyebrow. */
+function alfredRirCallout(ei,si){
+  try{
+    const e=state.session.exercises[ei],s=e.sets[si];
+    const r=rirOfSet(s);if(r==null)return null;
+    const working=(e.sets||[]).filter(x=>x.type!=="W");
+    const isLast=working.length>0&&working.filter(x=>x.done).length>=working.length;
+    if(r>=4){state.session._coachTone="bad";
+      return _pickLine(["Four in reserve, sir? That was a handshake, not a fight — add weight.",
+        "The bar barely noticed you. 4+ RIR builds nothing but patience — load it.",
+        "Plenty left in the tank. Next set, bring the tank."],"rir4");}
+    if(r===0&&isLast){state.session._coachTone="good";
+      return _pickLine(["Emptied the tank on the final set — textbook. That's where growth lives.",
+        "Zero left in reserve to close the lift. Gotham approves, sir.",
+        "Last set to failure — precisely how the job should be finished."],"rir0last");}
+    if(r===0){
+      const prev=working.filter(x=>x.done&&x!==s);
+      const prevZero=prev.length&&rirOfSet(prev[prev.length-1])===0;
+      if(prevZero){state.session._coachTone="ok";
+        return _pickLine(["Back-to-back trips to failure — brave. Keep the technique honest, sir.",
+          "Two sets at zero in reserve. Effective, but watch the form tax on what's left."],"rir00");}
+    }
+    return null;
+  }catch(e){return null;}
 }
 // Post-session verdict — objective, can be harsh. Used in the summary note.
 function alfredSessionVerdict(){
@@ -11645,7 +11778,8 @@ function renderLogging(){
         prevCellHtml=`<b>${pw!=null?pw+'kg':'—'}</b> × ${pr2!=null?pr2:'—'}${dltHtml}`;
         if(s.prevType&&s.prevType!=='NRM')prevCellHtml=`<span class="pv">${s.prevType} </span>`+prevCellHtml;
       }
-      const metricCell=isW?'<span class="pv">—</span>':`<select onchange="setField(${fei},${si},'rpe',this.value)" style="padding:7px 2px;font-size:12px;background:var(--bg2);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--text)">${metricOpts(metric,s.rpe)}</select>`;
+      const metricCell=isW?'<span class="pv">—</span>':(()=>{const v=String(s.rpe||"");const on=v!=="";const rc=on?rirTone(v):null;
+        return `<div class="rirtile${on?' set':''}" style="${on?`color:${rc};border-color:${rc}77;box-shadow:0 0 12px -4px ${rc},inset 0 1px 0 rgba(255,255,255,.09);text-shadow:0 0 9px ${rc}`:''}" onclick="cycleMetric(${fei},${si})">${on?esc(v):'–'}</div>`;})();
       const rowCls=s.done?'set-done-row':isW?'set-warm-row':'';
       h+=`<tr class="${rowCls}">
         <td class="stcell"><div class="stype ${s.type}" onclick="cycleType(${fei},${si})">${s.type==='NRM'?wnum:s.type}</div></td>
