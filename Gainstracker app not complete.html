@@ -2996,7 +2996,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W").length,0),D=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W"&&x.done).length,0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W").length,0),D=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W"&&x.done).length,0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3380,11 +3380,13 @@ function finishWorkout(){
   // to file them once the summary is up (the session object is about to be cleared).
   try{const pf=ses._profileFlags;state._profileOffers=pf?Object.keys(pf).map(k=>pf[k]):null;}catch(e){state._profileOffers=null;}
   stopTimers();state.step=null;state.session=null;state.minimized=false;clearSavedSession(); // session is committed — clear it so the resume bar can't linger
+  try{cloudPresence(false);}catch(e){}
+  try{duelNote(state.lastResult);}catch(e){}
   // Bosses now fire live during the session (see liveCheckPR), so just show the summary.
   openSummary();
   try{setTimeout(maybeOfferProfile,900);}catch(e){}
 }
-function endSession(){stopTimers();state.session=null;state.step=null;state.minimized=false;clearSavedSession();state.tab="gotham";render();}
+function endSession(){stopTimers();try{cloudPresence(false);}catch(e){}state.session=null;state.step=null;state.minimized=false;clearSavedSession();state.tab="gotham";render();}
 // Minimise the live workout: keep the session + timers running, drop back to the tabs so you can
 // check history, fuel, etc. A floating resume bar lets you jump straight back into logging.
 function minimizeWorkout(){if(!state.session)return;state.minimized=true;state.step=null;haptic("tap");if(!state.tab)state.tab="gotham";render();window.scrollTo(0,0);saveSession();}
@@ -3777,7 +3779,7 @@ function cloudDetectAllyWorkout(id,c){
   }catch(e){}
 }
 function openSheet(html){$("sheet").innerHTML=html;$("sheet").classList.add("on");$("sheetbg").classList.add("on");state.pickerOpen=false;}
-function closeSheet(){$("sheet").classList.remove("on");$("sheetbg").classList.remove("on");state.pickerOpen=false;if(state.pickerMulti){state.pickerMulti=null;render();}}
+function closeSheet(){$("sheet").classList.remove("on");$("sheetbg").classList.remove("on");state.pickerOpen=false;state._chatOpen=null;if(state.pickerMulti){state.pickerMulti=null;render();}}
 
 /* ===== in-app modal: mobile-safe replacements for confirm/alert/prompt ===== */
 function _normOpts(o,def){if(typeof o==="string")o={body:o};o=o||{};if(o.title==null)o.title=def;return o;}
@@ -6909,6 +6911,9 @@ async function cloudInit(){
     cloudSubscribeAll();
     cloudListenNudges();
     cloudListenRaidInvites();
+    try{(state.data.allyIds||[]).forEach(id=>{cloudListenChat(id);cloudListenPresence(id);});}catch(e){}
+    try{if(state.data.duel){cloudListenDuel(state.data.duel.id);duelSettleCheck();}}catch(e){}
+    try{if(state.session&&state.step==="logging")cloudPresence(true);}catch(e){}
     if(state.tab==="allies")render();
   }catch(e){cloud._initing=false;/* stay offline-only */}
 }
@@ -6925,6 +6930,7 @@ function cloudSubscribe(id){
   const ref=cloud.db.ref("cards/"+id);
   const cb=snap=>{const c=snap.val();if(c)cloudMergeAlly(id,c);};
   ref.on("value",cb,()=>{});cloud.subs[id]={ref,cb};
+  try{cloudListenChat(id);cloudListenPresence(id);}catch(e){}
 }
 function cloudUnsubscribe(id){const s=cloud.subs[id];if(s){try{s.ref.off("value",s.cb);}catch(e){}delete cloud.subs[id];}}
 // Fold a live card into state.data.allies, matched by uid (fall back to name for legacy pastes).
@@ -6968,6 +6974,8 @@ function cloudListenNudges(){
       if(n.type==="callout")showCallout(n);
       else if(n.type==="callout-won")showCalloutWon(n);
       else if(n.type==="recap")showRecap(n);
+      else if(n.type==="duel")showDuelInvite(n);
+      else if(n.type==="duel-accept"){try{const D=state.data.duel;if(D&&D.id===n.duelId){delete D.pending;save();}toast("⚔️ "+(n.name||"An ally")+" accepted your duel!");haptic("pr");}catch(e){}}
       else showBatSignal(n);
     }}catch(e){}
     try{snap.ref.remove();}catch(e){}   // consume so it never replays
@@ -6980,6 +6988,8 @@ function showBatSignal(n){
     bodyHtml:`<div style="font-size:42px;line-height:1">🦇</div><div class="mini" style="margin-top:9px;font-style:italic;color:var(--text);font-size:14px">"${esc(msg)}"</div>`,
     btn:"ON MY WAY"});
   try{pushPatrolFeed({icon:"🦇",accent:"var(--gold2)",name:nm,kind:"nudge",html:`<b>${esc(nm)}</b> lit the <span style="color:var(--gold2)">Bat-Signal</span> for you — "${esc(msg)}"`});}catch(e){}
+  // mid-workout hype gets READ ALOUD by Alfred, over your music
+  try{if(state.session&&state.data.u.coachVoice)alfredVoiceLine("Message from "+nm+", sir: "+msg);}catch(e){}
   try{haptic("pr");}catch(e){}
 }
 // Inbound mission recap — an ally tapped "Share with allies" after finishing. Lands quietly in the
@@ -8148,6 +8158,206 @@ function openBatcomputer(){
       ${movers.map(x=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><span style="font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.n)}</span><b class="gold" style="white-space:nowrap;margin-left:8px">+${x.gain}kg <span class="mini" style="color:var(--text3)">→ ${x.now}</span></b></div>`).join("")}`:""}
     <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
 }
+/* ═══════════ WATCHTOWER — live chat, presence, duels & duo patrol over the existing cloud link ═══════════ */
+/* ── 💬 Chat: one thread per ally pair at chats/{uidA_uidB}, live via child_added. ── */
+function chatPairId(uid){return [cloud.uid,uid].sort().join("_");}
+function cloudListenChat(uid){
+  if(!cloud.ready||!cloud.db||!uid||cloud.subs["chat:"+uid])return;
+  const ref=cloud.db.ref("chats/"+chatPairId(uid)).limitToLast(40);
+  const cb=snap=>{const m=snap.val();if(m)chatFold(uid,m);};
+  ref.on("child_added",cb,()=>{});cloud.subs["chat:"+uid]={ref,cb};
+}
+function chatFold(uid,m){
+  const d=state.data;d.chats=d.chats||{};d.chatUnread=d.chatUnread||{};
+  const th=d.chats[uid]=d.chats[uid]||[];
+  if(th.some(x=>x.t===m.t&&x.from===m.from))return;   // dedupe (our own echoes fold back too)
+  th.push({from:m.from,name:m.name,txt:String(m.txt||"").slice(0,300),t:m.t||Date.now()});
+  th.sort((a,b)=>a.t-b.t);if(th.length>60)th.splice(0,th.length-60);
+  const mine=m.from===cloud.uid;
+  if(!mine&&state._chatOpen!==uid&&Date.now()-(m.t||0)<864e5){
+    d.chatUnread[uid]=(d.chatUnread[uid]||0)+1;
+    try{toast("💬 "+(m.name||"Ally")+": "+String(m.txt||"").slice(0,60));haptic("tap");}catch(e){}
+  }
+  save();
+  if(state._chatOpen===uid)renderChatThread(uid);
+  else if(state.tab==="allies"&&!state.session)render();
+}
+function openChat(i){
+  const a=(state.data.allies||[])[i];
+  if(!a||!a._uid){toast("Chat needs a live friend-code ally, sir.");return;}
+  openChatUid(a._uid,a.n,a.re);
+}
+function openChatUid(uid,nm,re){
+  state._chatOpen=uid;state.data.chatUnread=state.data.chatUnread||{};state.data.chatUnread[uid]=0;save();
+  const quick=["🦇 Respect.","You training tonight?","🔥🔥🔥","One more set. No excuses."];
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:8px">${re||"💬"} ${esc(nm||"Ally")} <span class="mini" style="color:var(--text3);font-weight:400">· Watchtower line</span></div>
+    <div id="chat-scroll" style="max-height:44vh;overflow-y:auto;padding:4px 2px;margin:6px 0">${chatThreadHtml(uid)}</div>
+    <div class="row" style="gap:5px;flex-wrap:wrap;margin-bottom:9px">${quick.map(q=>`<button class="chip" style="font-size:10.5px" onclick="sendChatQuick('${uid}',this.textContent)">${q}</button>`).join("")}</div>
+    <div class="row" style="gap:7px">
+      <input id="chat-in" placeholder="Message ${esc(nm||"ally")}…" style="flex:1" onkeydown="if(event.key==='Enter')sendChat('${uid}')">
+      <button class="btn gold sm" style="width:auto;padding:11px 17px" onclick="sendChat('${uid}')">SEND</button>
+    </div>`);
+  setTimeout(()=>{const sc=document.getElementById("chat-scroll");if(sc)sc.scrollTop=sc.scrollHeight;},60);
+}
+function chatThreadHtml(uid){
+  const th=((state.data.chats||{})[uid])||[];
+  if(!th.length)return `<div class="mini" style="color:var(--text3);text-align:center;padding:18px 8px">No messages yet. Open the line, sir.</div>`;
+  const myId=cloud.uid||state.data.myUid;
+  return th.map(m=>{const mine=m.from===myId;
+    return `<div style="display:flex;justify-content:${mine?'flex-end':'flex-start'};margin-bottom:6px">
+      <div style="max-width:80%;padding:8px 12px;border-radius:${mine?'13px 13px 4px 13px':'13px 13px 13px 4px'};font-size:13px;line-height:1.45;${mine?'background:linear-gradient(160deg,rgba(242,208,121,.18),rgba(242,208,121,.07));border:1px solid rgba(242,208,121,.35);color:var(--text)':'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text2)'}">
+        ${esc(m.txt)}<div style="font-size:8.5px;color:var(--text3);margin-top:3px;text-align:right">${new Date(m.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+      </div></div>`;}).join("");
+}
+function renderChatThread(uid){const sc=document.getElementById("chat-scroll");if(sc){sc.innerHTML=chatThreadHtml(uid);sc.scrollTop=sc.scrollHeight;}}
+function sendChat(uid){
+  const inp=document.getElementById("chat-in");const txt=(inp&&inp.value||"").trim();if(!txt)return;
+  if(inp)inp.value="";_chatPush(uid,txt);
+}
+function sendChatQuick(uid,txt){_chatPush(uid,(txt||"").trim());}
+function _chatPush(uid,txt){
+  if(!txt)return;
+  if(!cloud.ready||!cloud.db){toast("Offline — the Watchtower line needs signal.");return;}
+  try{cloud.db.ref("chats/"+chatPairId(uid)).push({from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),txt:String(txt).slice(0,300),t:Date.now()});haptic("tap");sfx("clank");}catch(e){toast("Couldn't send, sir.");}
+}
+/* ── 🟢 Presence: presence/{uid} while a session runs; allies see ON PATROL live. ── */
+cloud.presence={};
+function cloudPresence(on){
+  if(!cloud.ready||!cloud.db||!cloud.uid)return;
+  const ref=cloud.db.ref("presence/"+cloud.uid);
+  try{
+    if(on){const ses=state.session||{};
+      ref.set({on:true,day:String(ses.day||"").slice(0,24),startedAt:ses.startedAt||Date.now(),sets:0,name:(state.data.u.name||"An ally").slice(0,22),re:(myPatrolCard().re||"🦇"),t:Date.now()});
+      ref.onDisconnect().remove();
+    }else ref.remove();
+  }catch(e){}
+}
+function cloudPresencePulse(exName,setStr){
+  if(!cloud.ready||!cloud.db||!cloud.uid||!state.session)return;
+  const nowT=Date.now();if(cloud._presT&&nowT-cloud._presT<4000)return;cloud._presT=nowT;
+  const sets=(state.session.exercises||[]).reduce((a,e)=>a+e.sets.filter(s=>s.done&&s.type!=="W").length,0);
+  try{cloud.db.ref("presence/"+cloud.uid).update({sets,last:String(exName||"").slice(0,26)+(setStr?" — "+setStr:""),t:nowT});}catch(e){}
+}
+function cloudListenPresence(id){
+  if(!cloud.ready||!cloud.db||!id||cloud.subs["pres:"+id])return;
+  const ref=cloud.db.ref("presence/"+id);
+  const cb=snap=>{presenceFold(id,snap.val());};
+  ref.on("value",cb,()=>{});cloud.subs["pres:"+id]={ref,cb};
+}
+function presenceFold(id,v){
+  const was=cloud.presence[id];cloud.presence[id]=v;
+  const ally=(state.data.allies||[]).find(a=>a&&a._uid===id)||{};
+  const nm=ally.n||(v&&v.name)||"An ally",re=ally.re||(v&&v.re)||"🦇";
+  if(v&&v.on&&!(was&&was.on)){
+    try{toast("🟢 "+nm+" is ON PATROL"+(v.day?" — "+v.day:""));haptic("tap");}catch(e){}
+    try{pushPatrolFeed({icon:re,accent:"#22E87A",name:nm,kind:"live",html:`<b>${esc(nm)}</b> is <span style="color:#22E87A">on patrol right now</span>${v.day?" — "+esc(v.day):""}`});}catch(e){}
+  }
+  // duo patrol — their sets land live in MY session
+  if(v&&v.on&&v.last&&state.session&&state.step==="logging"&&was&&was.last!==v.last&&(v.sets||0)>(was.sets||0)){
+    try{toast("⚔️ "+nm+": "+v.last);haptic("tap");}catch(e){}
+  }
+  if(state.step==="logging"){try{const el=document.getElementById("duostrip");if(el)el.outerHTML=duoStripHtml();}catch(e){}}
+  else if(state.tab==="allies"&&!state.session)render();
+}
+function duoStripHtml(){
+  const lives=Object.keys(cloud.presence||{}).filter(k=>cloud.presence[k]&&cloud.presence[k].on);
+  if(!lives.length)return `<div id="duostrip"></div>`;
+  const rows=lives.slice(0,2).map(k=>{const v=cloud.presence[k];const a=(state.data.allies||[]).find(x=>x&&x._uid===k)||{};
+    const mins=v.startedAt?Math.max(0,Math.round((Date.now()-v.startedAt)/60000)):0;
+    return `<div class="row sp" style="align-items:center;margin-top:3px">
+      <span style="font-size:12px;font-weight:800;color:#7df0b0">${a.re||v.re||"🦇"} ${esc(a.n||v.name||"Ally")} <span style="color:var(--text3);font-weight:600">· ${mins}min</span></span>
+      <span class="mini" style="color:var(--text2)">${v.sets||0} sets${v.last?" · "+esc(v.last):""}</span></div>`;}).join("");
+  return `<div id="duostrip" style="margin:0 0 10px;padding:9px 12px;border-radius:12px;border:1px solid rgba(34,232,122,.4);background:linear-gradient(160deg,rgba(34,232,122,.08),rgba(6,10,7,.92));box-shadow:0 0 18px -8px rgba(34,232,122,.7)">
+    <div class="mini" style="letter-spacing:.16em;color:#22E87A;font-weight:800"><i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22E87A;box-shadow:0 0 8px #22E87A;margin-right:5px;animation:gtv2pulse 1.6s infinite"></i>DUO PATROL — ALLY IN THE FIELD</div>
+    ${rows}</div>`;
+}
+/* ── ⚔️ Ally Duel: a 7-night head-to-head bounty. Both sides publish to duels/{id}/{uid}. ── */
+function openDuel(i){
+  const a=(state.data.allies||[])[i];
+  if(!a||!a._uid){toast("Duels need a live friend-code ally, sir.");return;}
+  if(state.data.duel){toast("One bounty at a time — settle the active duel first.");return;}
+  openSheet(`<div class="ttl">⚔️ Duel ${esc(a.n)}</div>
+    <p class="mini" style="color:var(--text2);line-height:1.5;margin:4px 0 12px">Seven nights. One bounty. Winner takes <b style="color:var(--gold2)">+300 XP</b>. Pick the terms — they get an invite.</p>
+    ${[["vol","🏋️ Total tonnage","every kg moved this week"],["sets","🎯 Working sets","most working sets logged"],["prs","🏆 Records broken","most PRs set"]].map(x=>`<button class="btn ghost" style="margin-bottom:8px;text-align:left" onclick="sendDuel(${i},'${x[0]}')"><b>${x[1]}</b><div class="mini" style="color:var(--text3)">${x[2]}</div></button>`).join("")}
+    <button class="btn ghost sm" onclick="closeSheet()">Cancel</button>`);
+}
+function sendDuel(i,metric){
+  const a=(state.data.allies||[])[i];if(!a||!a._uid)return;
+  if(!cloud.ready){toast("Offline — duels need signal.");return;}
+  const id="duel_"+String(cloud.uid).slice(0,5)+Date.now().toString(36);
+  const end=Date.now()+7*864e5;
+  state.data.duel={id,uid:a._uid,nm:a.n,re:a.re,metric,end,mine:0,theirs:0,pending:true};save();
+  try{cloud.db.ref("nudges/"+a._uid).push({type:"duel",from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),duelId:id,metric,end,t:Date.now()});}catch(e){}
+  cloudDuelPublish();cloudListenDuel(id);
+  closeSheet();toast("⚔️ Gauntlet thrown — awaiting their acceptance.");haptic("done");
+}
+function showDuelInvite(n){
+  const mLbl=n.metric==="vol"?"total tonnage":n.metric==="sets"?"working sets":"records broken";
+  cinePush({eye:"DUEL CHALLENGE",icon:"⚔️",accent:"#FF8C22",hold:true,
+    title:(n.name||"An ally")+" throws the gauntlet",titleHtml:`${esc(n.name||"An ally")} <span style="color:#FF8C22">throws the gauntlet</span>`,
+    bodyHtml:`<div style="font-size:15px;color:var(--text)">7 nights · <b>${mLbl}</b></div><div class="mini" style="margin-top:8px;color:var(--text3)">Winner takes +300 XP and the bragging rights.</div><div class="row" style="gap:8px;margin-top:14px"><button class="btn gold g" onclick="acceptDuel('${esc(n.duelId||"")}','${esc(n.from||"")}','${esc(n.name||"Ally")}','${esc(n.metric||"vol")}',${+n.end||0});cineDismiss()">ACCEPT</button><button class="btn ghost g" onclick="cineDismiss()">DECLINE</button></div>`,
+    btn:"LATER"});
+  try{haptic("pr");}catch(e){}
+}
+function acceptDuel(id,uid,nm,metric,end){
+  if(state.data.duel){toast("A duel is already running, sir.");return;}
+  state.data.duel={id,uid,nm,metric,end:end||Date.now()+7*864e5,mine:0,theirs:0};save();
+  cloudDuelPublish();cloudListenDuel(id);
+  try{cloud.db.ref("nudges/"+uid).push({type:"duel-accept",from:cloud.uid,name:(state.data.u.name||"An ally").slice(0,22),duelId:id,t:Date.now()});}catch(e){}
+  toast("⚔️ Duel accepted — it's on.");haptic("pr");
+}
+function cloudDuelPublish(){
+  const D=state.data.duel;if(!D||!cloud.ready||!cloud.db)return;
+  try{cloud.db.ref("duels/"+D.id+"/"+cloud.uid).set({val:Math.round(D.mine||0),name:(state.data.u.name||"An ally").slice(0,22),t:Date.now()});}catch(e){}
+}
+function cloudListenDuel(id){
+  if(!cloud.ready||!cloud.db||!id||cloud.subs["duel:"+id])return;
+  const ref=cloud.db.ref("duels/"+id);
+  const cb=snap=>{const v=snap.val()||{};const D=state.data.duel;if(!D||D.id!==id)return;
+    const theirs=v[D.uid];
+    if(theirs){D.theirs=Math.round(theirs.val||0);
+      if(D.pending){delete D.pending;try{toast("⚔️ "+(D.nm||"Ally")+" accepted the duel!");haptic("pr");}catch(e){}}
+      save();if(state.tab==="allies"&&!state.session)render();}};
+  ref.on("value",cb,()=>{});cloud.subs["duel:"+id]={ref,cb};
+}
+function duelNote(R){
+  const D=state.data.duel;if(!D||!R)return;
+  const add=D.metric==="vol"?Math.round(R.totalVol||0)
+    :D.metric==="sets"?R.wk.exercises.reduce((a,e)=>a+e.sets.filter(s=>s.type!=="W").length,0)
+    :(R.prsThis||[]).length;
+  D.mine=(D.mine||0)+add;save();cloudDuelPublish();
+}
+function duelSettleCheck(){
+  const D=state.data.duel;if(!D||D.pending||Date.now()<D.end)return;
+  const mine=Math.round(D.mine||0),theirs=Math.round(D.theirs||0);
+  const won=mine>theirs,draw=mine===theirs;
+  const unit=D.metric==="vol"?"kg":D.metric==="sets"?" sets":" PRs";
+  if(won){state.data.u.xp=(state.data.u.xp||0)+300;playStinger("BOUNTY CLAIMED","+300 XP · "+fmtNum(mine)+unit+" vs "+fmtNum(theirs)+unit,"#22E87A");}
+  else if(draw)playStinger("DUEL DRAWN",fmtNum(mine)+unit+" apiece — run it back","#FFD048");
+  else playStinger("BOUNTY LOST",fmtNum(theirs)+unit+" vs your "+fmtNum(mine)+unit+" — avenge it","#FF5545");
+  try{pushPatrolFeed({icon:"⚔️",accent:won?"#22E87A":"#FF5545",name:D.nm,kind:"duel",html:`Duel vs <b>${esc(D.nm)}</b> settled — ${won?"<b style='color:#22E87A'>you won</b>":draw?"a draw":"<b style='color:#FF5545'>they took it</b>"} (${fmtNum(mine)}${unit} vs ${fmtNum(theirs)}${unit})`});}catch(e){}
+  try{if(cloud.ready)cloud.db.ref("duels/"+D.id+"/"+cloud.uid).remove();}catch(e){}
+  delete state.data.duel;save();
+}
+function duelCard(){
+  const D=state.data.duel;if(!D)return "";
+  const unit=D.metric==="vol"?"kg":D.metric==="sets"?"sets":"PRs";
+  const mine=Math.round(D.mine||0),theirs=Math.round(D.theirs||0);
+  const tot=Math.max(1,mine+theirs);
+  const daysLeft=Math.max(0,Math.ceil((D.end-Date.now())/864e5));
+  const lead=mine>theirs?"YOU LEAD":mine<theirs?"THEY LEAD":"DEAD EVEN";
+  const lc=mine>theirs?"#22E87A":mine<theirs?"#FF5545":"#FFD048";
+  return `<div class="card" style="border:1.5px solid rgba(255,140,34,.45);background:linear-gradient(165deg,rgba(30,16,5,.98),rgba(8,5,3,1));box-shadow:0 0 26px -12px rgba(255,140,34,.8)">
+    <div class="row sp" style="align-items:center;margin-bottom:8px">
+      <div style="font-family:var(--disp);font-size:15px;color:#FF8C22;letter-spacing:.06em">⚔️ DUEL — ${D.metric==="vol"?"TONNAGE":D.metric==="sets"?"WORKING SETS":"RECORDS"}</div>
+      <span class="chip" style="font-size:10px">${D.pending?"awaiting accept":daysLeft+"d left"}</span></div>
+    <div class="row sp" style="margin-bottom:5px"><b style="color:var(--gold2)">You · ${fmtNum(mine)} ${unit}</b><b style="color:#9fc1f2">${esc(D.nm||"Ally")} · ${fmtNum(theirs)} ${unit}</b></div>
+    <div style="height:12px;border-radius:7px;overflow:hidden;display:flex;background:rgba(255,255,255,.07)">
+      <i style="width:${(mine/tot*100).toFixed(1)}%;background:linear-gradient(90deg,#b8862e,#FFD048);box-shadow:0 0 10px rgba(255,208,72,.7);transition:width .5s"></i>
+      <i style="flex:1;background:linear-gradient(90deg,#2b5f9e,#3C96FF)"></i></div>
+    <div class="mini" style="margin-top:7px;text-align:center;font-weight:800;letter-spacing:.14em;color:${lc}">${D.pending?"THE GAUNTLET IS THROWN":lead+" · +300 XP ON THE LINE"}</div>
+  </div>`;
+}
 /* ===== ALLIES TAB — one social hub: your Patrol Card, the Justice League,
    the Leaderboard, Co-op Raids & 1-v-1 Sparring, grouped in one place. ===== */
 /* ========================= FIGHT NIGHT — weekly KO scorecard ========================= */
@@ -8282,6 +8492,7 @@ function showFightNightResult(res){
 }
 function renderAllies(){
   const d=state.data;
+  try{duelSettleCheck();}catch(e){}
   const me=myPatrolCard();const score=vigilanteScore(me);
   const allies=d.allies||[];
   const board=[Object.assign({_you:true},me)].concat(allies.map(a=>Object.assign({},a)));
@@ -8319,6 +8530,9 @@ function renderAllies(){
     </div>
   </div>`;
 
+  // ⚔️ active duel rides at the top — it's the hottest thing on the tab
+  try{html+=duelCard();}catch(e){}
+
   // ── Recruit an ally — lives at the BOTTOM of the tab (appended before render) ──
   const cOpen=state.accOpen&&state.accOpen['allies-connect'];
   const connectHtml=`<div style="border:1px solid rgba(242,208,121,.3);border-radius:14px;margin:4px 0 14px;overflow:hidden;box-shadow:0 0 24px -14px rgba(242,208,121,.5)">
@@ -8351,7 +8565,7 @@ function renderAllies(){
             <span style="font-size:20px">${a.re||"🦸"}</span>
             <div>
               <div style="font-family:var(--disp);font-size:15px;color:var(--gold2);line-height:1.1">${esc(a.n)}</div>
-              <div style="margin-top:3px">${allyStatusPill(a)}</div>
+              <div style="margin-top:3px">${(a._uid&&cloud.presence&&cloud.presence[a._uid]&&cloud.presence[a._uid].on)?`<span style="display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;letter-spacing:.08em;padding:2px 8px;border-radius:999px;border:1px solid rgba(34,232,122,.5);background:rgba(34,232,122,.12);color:#7df0b0;margin-right:4px"><i style="width:5px;height:5px;border-radius:50%;background:#22E87A;box-shadow:0 0 6px #22E87A;animation:gtv2pulse 1.6s infinite"></i>ON PATROL</span>`:""}${allyStatusPill(a)}</div>
             </div>
           </div>
           <span class="row" style="gap:4px;flex:none">${a.ssn?`<span class="chip" style="font-size:10px;color:var(--gold2);border-color:rgba(255,208,72,.4)">S${a.ssn.n} W${a.ssn.w} ${"★".repeat(a.ssn.st||0)||"☆"}</span>`:""}<span class="chip" style="font-size:10px">${esc(a.rk||"")}</span></span>
@@ -8365,7 +8579,11 @@ function renderAllies(){
           <button class="btn ghost sm g" style="flex:1;color:var(--gold2);border-color:rgba(255,208,72,.3)" onclick="openGauntlet(${i})">🧤 Gauntlet</button>
         </div>
         ${risk?`<button class="btn sm" style="width:100%;margin-top:7px;background:linear-gradient(135deg,#ff7a3a,#E8453C);color:#fff;font-weight:800" onclick="streakRescue(${i})">🔥 Rescue their ${risk.streak}-day streak — about to break</button>`:''}
-        <button class="btn ghost sm" style="width:100%;margin-top:6px;color:#9fc1f2;border-color:rgba(60,150,255,.28)" onclick="nudgeAlly(${i})">🦇 Light the Bat-Signal</button>
+        <div class="row" style="gap:5px;margin-top:6px">
+          <button class="btn ghost sm g" style="flex:1;color:var(--gold2);border-color:rgba(255,208,72,.35)" onclick="openChat(${i})">💬 Chat${(state.data.chatUnread&&a._uid&&state.data.chatUnread[a._uid])?` <span style="display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:9px;background:#FF3622;color:#fff;font-size:9.5px;font-weight:800;padding:0 4px;box-shadow:0 0 8px rgba(255,54,34,.8)">${state.data.chatUnread[a._uid]}</span>`:""}</button>
+          <button class="btn ghost sm g" style="flex:1;color:#FF8C22;border-color:rgba(255,140,34,.35)" onclick="openDuel(${i})">⚔️ Duel</button>
+          <button class="btn ghost sm g" style="flex:1;color:#9fc1f2;border-color:rgba(60,150,255,.28)" onclick="nudgeAlly(${i})">🦇 Signal</button>
+        </div>
       </div>`;
     }).join("");
   }
@@ -11594,6 +11812,7 @@ function playStinger(title,sub,accent){
   }catch(e){}
 }
 function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.session.day)||''));state.step='logging';startTimers();try{haptic('done');}catch(e){}
+  try{cloudPresence(true);}catch(e){}
   // spoken mission brief — Alfred reads tonight's plan as the doors open
   try{const ses=state.session;
     if(state.data.u.coachVoice&&ses&&!ses._briefSpoken){ses._briefSpoken=true;
@@ -11834,6 +12053,8 @@ function renderLogging(){
 
   // 🦹 tonight's foe takes damage per working set
   h+=foeHudHtml(ses,wsDone,wsTotal);
+  // 🟢 duo patrol — a linked ally training at the same time shows up live
+  try{h+=duoStripHtml();}catch(e){}
 
   // Exercise nav strip
   if(ses.exercises.length){
