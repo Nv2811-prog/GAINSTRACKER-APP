@@ -4656,7 +4656,7 @@ function playOutro(R){
   const dur=R?fmtTime(R.dur):'';
   const el=document.createElement('div');el.id='outro';
   el.innerHTML=`<div class="out-city"></div><div class="out-grid"></div>
-    <div class="out-veh">${topV.e}</div>
+    <div class="out-veh">${vehImg(topV.n,120,"margin:0 auto;")||topV.e}</div>
     <div class="out-ret">RETURNING TO THE CAVE</div>
     <div class="out-doorL"></div><div class="out-doorR"></div>
     <div class="out-stamp">
@@ -4727,11 +4727,20 @@ async function renderShareCard(R){
   if(unit){
     const cnt=R.totalVol/unit[0],n=Math.min(Math.max(1,Math.floor(cnt)),6);
     x.fillStyle=GOLD;x.font='58px "Bebas Neue",sans-serif';
-    x.fillText("≈ "+(cnt>=10?Math.round(cnt):cnt.toFixed(1))+" "+unit[1],540,660);
-    const gs=[];for(let i=0;i<n;i++)gs.push(`<g transform="translate(${i*52},0)">${unit[2]}</g>`);
-    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${n*52*2}" height="40" viewBox="0 0 ${n*52} 20" fill="#FFD048">${gs.join("")}</svg>`;
-    const im=await _scImg("data:image/svg+xml;utf8,"+encodeURIComponent(svg),700);
-    if(im)x.drawImage(im,540-n*52,684,n*52*2,80);
+    x.fillText("≈ "+(cnt>=10?Math.round(cnt):cnt.toFixed(1))+" "+unit[1],540,648);
+    // real cinematic render of the hardware — screen-blended so the black plate melts into the card
+    const VEH_BY_UNIT={"BATMOBILES":"batmobile","BATWINGS":"batwing","BATCYCLES":"batcycle","BAT-TANKS":"tumbler","GOTHAM FERRIES":"batboat"};
+    const vf=VEH_BY_UNIT[unit[1]];
+    let drew=false;
+    if(vf){const im=await _scImg("assets/veh/"+vf+".jpg",900);
+      if(im){x.save();x.globalCompositeOperation="screen";
+        const sy=im.height*0.24,sh=im.height*0.52;
+        x.drawImage(im,0,sy,im.width,sh,290,662,500,250);x.restore();drew=true;}}
+    if(!drew){
+      const gs=[];for(let i=0;i<n;i++)gs.push(`<g transform="translate(${i*52},0)">${unit[2]}</g>`);
+      const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${n*52*2}" height="40" viewBox="0 0 ${n*52} 20" fill="#FFD048">${gs.join("")}</svg>`;
+      const im2=await _scImg("data:image/svg+xml;utf8,"+encodeURIComponent(svg),700);
+      if(im2)x.drawImage(im2,540-n*52,684,n*52*2,80);}
   }
   // stats row
   const sets=R.wk.exercises.reduce((a,e)=>a+e.sets.filter(s=>s.type!=="W").length,0);
@@ -4766,7 +4775,14 @@ async function renderShareCard(R){
   try{const sl=strengthLevel();const ri=Math.max(0,RANKS.map(r=>r[0]).filter(t=>sl>=t).length-1);
     const ws=weeklyStreak();
     x.fillStyle=GOLD;x.font='38px "Bebas Neue",sans-serif';
-    x.fillText(RANKS[ri][2]+" "+String(RANKS[ri][1]).toUpperCase()+" · LV "+sl+(ws>0?"     🔥 "+ws+"-WEEK STREAK":""),540,1330);}catch(e){}
+    const ti=activeTitle();
+    x.fillText(RANKS[ri][2]+" "+String(RANKS[ri][1]).toUpperCase()+(ti?" · "+String(ti.n).toUpperCase():"")+" · LV "+sl+(ws>0?"     🔥 "+ws+"-WEEK STREAK":""),540,1330);}catch(e){}
+  // earned card frame — rarest unlocked auto-applies (blood > gold leaf > foil)
+  try{const fr=(state.data.prestige||0)>=1?"blood":((state.data.frames||{}).goldleaf?"goldleaf":((state.data.frames||{}).foil?"foil":""));
+    if(fr==="foil"){const g=x.createLinearGradient(0,0,W,1350);["#7fd8ff","#c9b8ff","#ffd048","#7fffc9"].forEach((c,i)=>g.addColorStop(i/3,c));x.strokeStyle=g;x.lineWidth=14;x.strokeRect(10,10,W-20,1330);}
+    else if(fr==="goldleaf"){x.strokeStyle="#FFD048";x.lineWidth=16;x.strokeRect(12,12,W-24,1326);x.strokeStyle="rgba(255,208,72,.45)";x.lineWidth=4;x.strokeRect(34,34,W-68,1282);}
+    else if(fr==="blood"){x.strokeStyle="#FF3622";x.lineWidth=14;x.strokeRect(10,10,W-20,1330);x.strokeStyle="rgba(255,54,34,.5)";x.lineWidth=4;x.strokeRect(30,30,W-60,1290);}
+  }catch(e){}
   el.src=cv.toDataURL("image/png");
   cv.toBlob(b=>{state._shareBlob=b;},"image/png");
 }
@@ -6253,11 +6269,83 @@ const GARAGE=[
 function openGarage(){state.subpage="garage";render();window.scrollTo(0,0);}
 function closeGarage(){state.subpage=null;go("gotham");}
 // Garage box for the Gotham home — compact tactile tile, taps through to the full fleet.
+/* ═══════════ 🏎 REAL VEHICLE ART — generated fleet. mix-blend-mode:screen sinks the black
+   backgrounds into any dark surface, so the cars read as cinematic renders, not stickers. ═══════════ */
+const VEH_IMG={"Grappling Hook":"grapple","Batcycle":"batcycle","The Tumbler":"tumbler","The Batboat":"batboat","The Batmobile":"batmobile","The Batwing":"batwing",'"The Bat"':"thebat","Justice Cruiser":"cruiser","Wayne Hypercar":"hypercar"};
+function vehImg(n,h,extra){const f=VEH_IMG[n];if(!f)return "";return `<img src="assets/veh/${f}.jpg" alt="" style="height:${h||64}px;display:block;mix-blend-mode:screen;${liveryCss()}${extra||""}">`;}
+/* Liveries — auto-equipped, rarest first (no settings, great by default). Earned via events & prestige. */
+const LIVERIES=[
+  {id:"blood", n:"Crimson Protocol",f:"sepia(.6) saturate(3) hue-rotate(-48deg) brightness(1.05)",req:()=>(state.data.prestige||0)>=1},
+  {id:"wargold",n:"War Gold",       f:"sepia(.55) saturate(2.2) hue-rotate(-12deg) brightness(1.12)",req:()=>Object.keys(state.data.eventWins||{}).length>=2},
+  {id:"chrome",n:"Midnight Chrome", f:"saturate(.25) brightness(1.28) contrast(1.12)",req:()=>Object.keys(state.data.eventWins||{}).length>=1}
+];
+function liveryCss(){try{const l=LIVERIES.find(x=>x.req());return l?`filter:${l.f};`:"";}catch(e){return "";}}
+/* 🎖 Honorifics — earned, auto-equipped (highest feat wins). Alfred uses them out loud. */
+const TITLES=[
+  {n:"Knight of the Narrows",req:w=>w.totalWorkouts>=25},
+  {n:"the Unbroken",req:w=>w.streakDays>=30},
+  {n:"Breaker of Bane",req:w=>w.bossCount>=10},
+  {n:"Iron Saint of Gotham",req:w=>w.totalVolume>=250000},
+  {n:"Wraithbane",req:()=>((state.data.wraith||{}).wins||0)>=5},
+  {n:"Heart of the City",req:()=>M12.filter(m=>districtCrime(m).crime<45).length>=12&&M12.some(m=>(state.data.muscleVol[m]||0)>0)}
+];
+function activeTitle(){try{const w=achStats();let best=null;TITLES.forEach(t=>{try{if(t.req(w))best=t;}catch(e){}});return best;}catch(e){return null;}}
+/* 📦 GCPD Evidence Crate — hit the weekly goal, a crate drops. One per week, earned only. */
+function crateWeekKey(){const d=new Date();d.setHours(0,0,0,0);const dow=(d.getDay()+6)%7;d.setDate(d.getDate()-dow);return d.toISOString().slice(0,10);}
+function crateCard(){
+  try{
+    const goal=Math.max(1,state.data.u.weeklyGoal||4);
+    if(weekCount()<goal)return "";
+    if(state.data.crateWk===crateWeekKey())return "";
+    return `<div class="card" onclick="openCrate()" style="cursor:pointer;border:1.5px solid rgba(255,208,72,.55);background:linear-gradient(165deg,rgba(30,22,5,.98),rgba(9,7,2,1));box-shadow:0 0 30px -10px rgba(255,208,72,.9);animation:fabGlow 2.6s ease-in-out infinite">
+      <div class="row" style="gap:12px;align-items:center">
+        <span style="font-size:30px;filter:drop-shadow(0 0 12px rgba(255,208,72,.9))">📦</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:var(--disp);font-size:15px;letter-spacing:.06em;color:var(--gold2)">GCPD EVIDENCE CRATE</div>
+          <div class="mini" style="color:var(--text2)">Weekly goal hit — the drop is yours. One per week.</div>
+        </div>
+        <span style="font-size:11px;font-weight:800;color:#0b0a06;background:linear-gradient(180deg,#f4d98a,#d8ab45);border-radius:10px;padding:9px 12px;box-shadow:0 4px 12px -4px rgba(255,208,72,.8)">CRACK IT</span>
+      </div></div>`;
+  }catch(e){return "";}
+}
+function openCrate(){
+  const d=state.data;d.crateWk=crateWeekKey();d.frames=d.frames||{};
+  const roll=Math.random();let title,body;
+  if(roll<0.15&&!d.frames.foil){d.frames.foil=1;d.u.xp=(d.u.xp||0)+60;title="FOIL FRAME RECOVERED";body="Your Patrol Card now ships in an event foil frame. Allies will notice.";}
+  else if(roll<0.40){d.u.xp=(d.u.xp||0)+150;title="+150 XP";body="High-grade evidence, sir. The case grows.";}
+  else if(roll<0.75){d.u.xp=(d.u.xp||0)+100;title="+100 XP";body="A solid haul. Filed and banked.";}
+  else{d.u.xp=(d.u.xp||0)+60;title="+60 XP · INTEL";body="“"+QUOTES[Math.floor(Math.random()*QUOTES.length)]+"”";}
+  save();haptic("pr");try{sfx("pop");}catch(e){}
+  playStinger("📦 CRATE CRACKED",title,"#FFD048");
+  setTimeout(()=>{try{cinePush({icon:"📦",eye:"GCPD EVIDENCE CRATE",title:title,bodyHtml:`<div style="font-size:14px;line-height:1.55;color:var(--text2)">${body}</div>`,btn:"BAG IT",accent:"#FFD048"});}catch(e){}},950);
+  render();
+}
+/* 🔱 Prestige — past The Legend there is only the forge. Cosmetic rebirth, records untouched. */
+function canPrestige(){try{return strengthLevel()>=RANKS[RANKS.length-1][0];}catch(e){return false;}}
+function forgePrestige(){
+  if(!canPrestige())return;
+  const p=(state.data.prestige||0)+1;
+  appConfirm({title:"Forge Prestige "+p+"?",body:"The emblem re-forges in crimson. Unlocks the Midnight Sovereign suit, the Crimson Protocol livery and the blood card frame. Rank and records stay.",ok:"FORGE",cancel:"Not yet"}).then(ok=>{
+    if(!ok)return;state.data.prestige=p;save();haptic("pr");
+    playStinger("PRESTIGE "+p+" FORGED","THE EMBLEM RUNS CRIMSON","#FF3622");
+    setTimeout(()=>{try{cinePush({killcam:true,hold:true,icon:"🔱",eye:"PRESTIGE "+p,title:"Beyond the Legend",titleHtml:`Beyond <span style="color:#FF3622">the Legend</span>`,bodyHtml:`<div class="mini" style="color:var(--text2);line-height:1.55">Midnight Sovereign suit, Crimson Protocol livery and the blood frame are yours. Gotham has no rank left to give — only nights left to win.</div>`,btn:"RISE",accent:"#FF3622"});}catch(e){}},1500);
+    render();});
+}
+function profileIdentityStrip(){
+  try{
+    const ti=activeTitle(),p=state.data.prestige||0,bits=[];
+    if(ti)bits.push(`<span class="chip on" style="font-size:10.5px">🎖 ${esc(ti.n)}</span>`);
+    if(p)bits.push(`<span class="chip" style="font-size:10.5px;color:#ff6a5c;border-color:rgba(255,54,34,.5)">🔱 PRESTIGE ${p}</span>`);
+    if(canPrestige())bits.push(`<button class="chip g" style="font-size:10.5px;color:#ff6a5c;border-color:rgba(255,54,34,.6);box-shadow:0 0 12px -4px #FF3622" onclick="forgePrestige()">🔱 FORGE PRESTIGE ${p+1}</button>`);
+    if(!bits.length)return "";
+    return `<div class="row" style="gap:6px;flex-wrap:wrap;justify-content:center;margin:-4px 0 12px">${bits.join("")}</div>`;
+  }catch(e){return "";}
+}
 function garageCard(){
   const s2=gothamStats();const owned=GARAGE.filter(v=>v.req(s2));const top=owned[owned.length-1]||GARAGE[0];const next=GARAGE.find(v=>!v.req(s2));
   return `<div class="gtv2-panel wide" style="margin-bottom:8px;cursor:pointer;padding:0;overflow:hidden;border-color:rgba(255,208,72,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 28px -10px rgba(255,208,72,.6)" onclick="openGarage()">
     <div style="display:flex;align-items:center;gap:14px;padding:14px 14px 10px;background:radial-gradient(ellipse 70% 90% at 16% 50%,rgba(255,208,72,.13),transparent 62%)">
-      <div class="gar-v" style="font-size:56px;line-height:1;flex:none;filter:drop-shadow(0 0 20px rgba(255,208,72,.8))">${top.e}</div>
+      <div class="gar-v" style="font-size:56px;line-height:1;flex:none;filter:drop-shadow(0 0 20px rgba(255,208,72,.8))">${vehImg(top.n,74)||top.e}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:10px;letter-spacing:.16em;color:var(--text3);font-family:var(--disp)">🏎 THE GARAGE — YOUR CURRENT RIDE</div>
         <div style="font-size:22px;color:var(--gold2);font-family:var(--disp);line-height:1.05;text-shadow:0 0 16px rgba(255,208,72,.5)">${esc(top.n)}</div>
@@ -6684,6 +6772,7 @@ function renderProfile(){
   const sl=strengthLevel(),r=rankFor(sl);
   const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
   let html=profileHeroHtml(d,u,sl,r,ri);
+  html+=profileIdentityStrip();
   if(!d.workouts.length){
     html+=`<div class="empty-state"><div class="es-icon">🦇</div><div class="es-title">PROFILE AWAITS</div><div class="es-body">Your profile, rank, and combat record fill in as you train. Log your first session, sir.</div><button class="btn gold" style="margin-top:10px" onclick="go('mission')">GO TO MISSION →</button></div>`;
     $("app").innerHTML=html;return;
@@ -10061,7 +10150,9 @@ function pickAlfredVoice(){
 }
 function _alfredUtter(text,rate,pitch){
   try{audioMix();}catch(e){}
-  const u=new SpeechSynthesisUtterance((text||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
+  let spoken=(text||"");
+  try{const ti=activeTitle();if(ti&&Math.random()<0.35)spoken=spoken.replace(/\bsir\b/i,ti.n);}catch(e){}
+  const u=new SpeechSynthesisUtterance((spoken||"").replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/gu,""));
   u.rate=rate;u.pitch=pitch;u.volume=1;
   const pick=pickAlfredVoice();if(pick)u.voice=pick;
   return u;
@@ -10450,11 +10541,20 @@ const SKINS=[
   {id:"tactical",n:"Tactical Grey",e:"🌫️",lvl:6,c:"#9aa3ad",d:"Vigilante field issue"},
   {id:"armored",n:"Armored Knight",e:"🛡️",lvl:12,c:"#6f7bdc",d:"Built to take the hits"},
   {id:"beyond",n:"Batman Beyond",e:"🔴",lvl:20,c:"#ff4d4d",d:"The future of the cowl"},
-  {id:"gold",n:"Midas Plate",e:"🥇",lvl:28,c:"#ffd34d",d:"Legend-tier. Untouchable."}
+  {id:"gold",n:"Midas Plate",e:"🥇",lvl:28,c:"#ffd34d",d:"Legend-tier. Untouchable."},
+  // ── THE VAULT — suits money can't buy: seasonal-event honors + the prestige forge ──
+  {id:"talon",n:"Talon Regalia",e:"🦉",lvl:0,c:"#c9b8ff",d:"Court of Owls Week honor — March only",ev:"owls"},
+  {id:"enigma",n:"Enigma Weave",e:"❓",lvl:0,c:"#3ce87a",d:"Riddler Gauntlet honor — July only",ev:"riddler"},
+  {id:"stitch",n:"Scarecrow Stitch",e:"🎃",lvl:0,c:"#ff9a3c",d:"Long Halloween honor — October only",ev:"hallow"},
+  {id:"frost",n:"Frostplate",e:"❄️",lvl:0,c:"#7fd8ff",d:"Freeze Siege honor — December only",ev:"freeze"},
+  {id:"sovereign",n:"Midnight Sovereign",e:"🌑",lvl:0,c:"#9fb6ff",d:"Prestige-forged. Beyond rank.",prestige:1}
 ];
-function skinUnlocked(s){return strengthLevel()>=s.lvl;}
+function skinUnlocked(s){
+  if(s.ev)return Object.keys(state.data.eventWins||{}).some(k=>k.indexOf(s.ev)===0);
+  if(s.prestige)return (state.data.prestige||0)>=s.prestige;
+  return strengthLevel()>=s.lvl;}
 function activeSkin(){const s=SKINS.find(x=>x.id===state.data.suitSkin&&skinUnlocked(x));if(s)return s;const un=SKINS.filter(skinUnlocked);return un[un.length-1]||SKINS[0];}
-function selectSkin(id){const s=SKINS.find(x=>x.id===id);if(!s)return;if(!skinUnlocked(s)){haptic("warn");toast("🔒 Reach strength level "+s.lvl);return;}state.data.suitSkin=id;save();haptic("success");toast(s.e+" "+s.n+" equipped");openSkins();}
+function selectSkin(id){const s=SKINS.find(x=>x.id===id);if(!s)return;if(!skinUnlocked(s)){haptic("warn");toast("🔒 "+(s.ev?"Clear its seasonal event first: "+s.d:s.prestige?"Forge Prestige to claim this.":"Reach strength level "+s.lvl));return;}state.data.suitSkin=id;save();haptic("success");toast(s.e+" "+s.n+" equipped");openSkins();}
 const BELTS=[
   {id:"iron",n:"Iron Belt",e:"🥉",stat:"totalWorkouts",need:25},
   {id:"steel",n:"Steel Belt",e:"🥈",stat:"totalWorkouts",need:100},
@@ -11593,6 +11693,8 @@ function territoryWarCard(){
     const lost=M12.filter(m=>districtCrime(m).crime>=70&&(state.data.muscleVol[m]||0)>0);
     const band=districtBand(cityCrime());
     const worst=lost[0]?((NEMESIS_MAP[lost[0]]||{}).villain||"the Rogues"):null;
+    // holding the whole city stamps the gold-leaf card frame — permanent honor
+    if(held===12&&M12.some(m=>(state.data.muscleVol[m]||0)>0)&&!((state.data.frames||{}).goldleaf)){state.data.frames=state.data.frames||{};state.data.frames.goldleaf=1;save();}
     return `<div class="gtv2-panel wide" style="margin-bottom:12px;padding:12px 12px 10px;border-color:${band[1]}44;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 44px -20px rgba(0,0,0,.94),0 0 26px -12px ${band[1]}">
       <div class="row sp" style="align-items:center;margin-bottom:9px">
         <div><div class="gtv2-label">🗺️ Territory War</div>
@@ -11621,7 +11723,7 @@ function renderGotham(){
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${territoryWarCard()}${(()=>{try{return seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}`;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${territoryWarCard()}${(()=>{try{return crateCard()+seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
@@ -12039,7 +12141,7 @@ function playEntrance(name){
     <div class="g9-garage-overlay"></div>
     <div class="g9-garage-grid" style="z-index:2;position:absolute;inset:0"></div>
     <div class="gar-veh-wrap" style="bottom:30%">
-      <div class="gar-veh-e">${topV.e}</div>
+      <div class="gar-veh-e">${vehImg(topV.n,170,"margin:0 auto;filter:drop-shadow(0 14px 26px rgba(0,0,0,.9));")||topV.e}</div>
       <div class="gar-veh-floor"></div>
       <div class="gar-veh-nm">${vn}</div>
     </div>
@@ -12111,7 +12213,7 @@ function renderPatrolIntro(){
     <div class="patrol2-glow"></div>
     <div class="patrol2-body">
       <div class="patrol2-eye">GOTHAM IRON PROTOCOL · MISSION BRIEFING</div>
-      <div class="pveh-bar"><span class="pveh-e">${topV.e}</span><span class="pveh-nm">${esc(topV.n)}</span></div>
+      <div class="pveh-bar"><span class="pveh-e" style="display:flex;align-items:center">${vehImg(topV.n,52)||topV.e}</span><span class="pveh-nm">${esc(topV.n)}</span></div>
       <div class="patrol2-day">${dayHtml}</div>
       <div class="patrol2-split">${esc(ses.split)}</div>
       <div class="patrol2-rule"></div>
