@@ -6450,14 +6450,14 @@ function profileCalendarHtml(d){
       const names=dayNames[k]||[];
       const label=names.join(' · ')||'Training';
       const prN=prsD[k]||0;
-      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="position:relative;border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.11+t*0.13).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1.5px solid rgba(235,199,107,${(0.25+t*0.55).toFixed(2)});box-shadow:0 0 ${Math.round(3+t*10)}px rgba(235,199,107,${(t*.35).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 3px 6px;min-height:78px">
+      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="position:relative;border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.11+t*0.13).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1.5px solid rgba(235,199,107,${(0.25+t*0.55).toFixed(2)});box-shadow:0 0 ${Math.round(3+t*10)}px rgba(235,199,107,${(t*.35).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 3px 6px;min-height:66px">
         <span style="font-size:8px;color:rgba(255,255,255,.3);font-weight:500;line-height:1;align-self:center">${day}</span>
         <span style="font-size:8.5px;font-weight:800;color:var(--gold2);text-align:center;line-height:1.25;letter-spacing:.02em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%;padding:0 2px">${esc(label)}</span>
         <span class="num" style="font-size:10.5px;color:var(--gold2);line-height:1;opacity:.92">${v>=1000?(v/1000).toFixed(1)+'t':Math.round(v)+''}</span>
         ${prN?`<span style="position:absolute;top:2px;right:3px;font-size:9.5px;filter:drop-shadow(0 0 4px rgba(255,208,72,.9))">👑</span>`:''}
       </div>`;
     } else {
-      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.02)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};${isToday?'animation:calpulse 2.2s ease-in-out infinite;':''}display:flex;align-items:center;justify-content:center;min-height:78px">
+      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.02)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};${isToday?'animation:calpulse 2.2s ease-in-out infinite;':''}display:flex;align-items:center;justify-content:center;min-height:66px">
         <span style="font-size:${isToday?13:11}px;color:${isToday?'var(--gold2)':'rgba(255,255,255,.15)'};font-weight:${isToday?'700':'400'};line-height:1">${future?'':day}</span>
       </div>`;
     }
@@ -11092,26 +11092,6 @@ function gtv2ScorePanel(){
     <div class="gtv2-panel" style="border-color:${patrolClr};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${patrolClr}" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"};text-shadow:0 0 18px currentColor">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
   </div>`;
 }
-function gtv2MuscleGrid(){
-  // REAL mini muscle map on home — the live Batsuit figure colored by recovery, not a chip list.
-  let ready=0,rec=0,fat=0,silent=0;
-  M12.forEach(m=>{const c=suitColor(m);if(!c){silent++;return;}const r=getRecovery(m);if(r>=80)ready++;else if(r>=50)rec++;else fat++;});
-  const col=m=>{const c=suitColor(m);return c?{fill:c,op:".92"}:{fill:"#E8C56A",op:".07"};};
-  const prev=state._figColor;state._figColor=col;
-  const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
-  const P=suitProps();
-  const svg=`<svg viewBox="46 34 408 386" preserveAspectRatio="xMidYMid meet" style="width:100%;height:226px;display:block">${SUIT_DEFS}${_frontBody(125,P)}${_backBody(375,P)}</svg>`;
-  state._figColor=prev;state._figShade=ps;state._figGlow=pg;
-  const leg=(n,lab,c)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:8px;height:8px;border-radius:50%;background:${c};box-shadow:0 0 7px ${c}"></i><b style="color:${c}">${n}</b> ${lab}</span>`;
-  return `<div class="gtv2-panel wide" style="margin-bottom:12px;padding:10px 12px 8px;cursor:pointer" onclick="go('suit')">
-    <div class="row sp" style="margin-bottom:2px">
-      <div><div class="gtv2-label">Batsuit Status</div><div style="font-size:11px;color:var(--text2)">Muscle readiness · tap for full Suit</div></div>
-      <span style="color:var(--gold2);font-size:11px;font-weight:700;letter-spacing:.06em">SUIT ›</span>
-    </div>
-    <div style="background:radial-gradient(ellipse 62% 52% at 50% 30%,rgba(124,150,255,.1),transparent 62%),radial-gradient(ellipse 70% 40% at 50% 100%,rgba(232,197,106,.12),transparent 70%);border-radius:12px">${svg}</div>
-    <div class="row" style="justify-content:center;gap:14px;padding:4px 0 3px">${leg(ready,"ready","var(--green)")}${leg(rec,"recovering","var(--yellow)")}${leg(fat,"fatigued","var(--red)")}</div>
-  </div>`;
-}
 /* ===== SEASON — THE LONG NIGHT: an 8-week story campaign. One villain per chapter seizes
    districts (muscles); you clear the chapter by training them, the bounty is a real PR.
    Stars are PURE — always recomputed from workout/PR history, nothing stored but {n,start}. ===== */
@@ -11606,64 +11586,22 @@ function gothamSkylineCard(){
     </div>
   </div>`;
 }
-function gothamMarkFallen(){const d=state.data;d.fallenSeen=d.fallenSeen||{};M12.forEach(m=>{if(districtCrime(m).crime>=70)d.fallenSeen[m]=1;});save();render();}
-/* 🎩 ALFRED DEBRIEF STRIP — one context-aware butler line pinned under the hero. It changes with
-   the state of the night: pre-mission intel, post-patrol debrief, recovery watch, long-absence nudge,
-   Sunday case-file pointer. Tap = straight into Alfred's chat. */
-function alfredDebriefStrip(){
-  try{
-    const d=state.data,h=new Date().getHours();
-    const lastW=(d.workouts||[])[0];
-    const daysSince=lastW?Math.floor((Date.now()-new Date(lastW.date).getTime())/864e5):99;
-    const trainedToday=!!(lastW&&new Date(lastW.date).toDateString()===new Date().toDateString());
-    const ready=M12.filter(m=>(d.muscleVol[m]||0)&&getRecovery(m)>=80);
-    let kick,line,ic="🎩";
-    if(trainedToday){
-      kick="POST-PATROL";
-      line=`${fmtNum(Math.round(lastW.totalVol||0))}kg banked today, sir. Protein, water, sleep — recovery is where it becomes muscle.`;
-    }else if(daysSince>=4&&daysSince<90){
-      kick="THE CAVE WAITS";ic="🕯️";
-      line=`${daysSince} days since the last patrol. Gotham forgives — the iron doesn't. Tonight would be an excellent night, sir.`;
-    }else if(ready.length>=3){
-      kick="PRE-MISSION INTEL";ic="⚡";
-      line=`${ready.slice(0,3).map(m=>MNAME[m]).join(", ")}${ready.length>3?" and more":""} are fresh and ready to strike. ${h>=17?"The night is young, sir.":"An evening patrol beckons, sir."}`;
-    }else if(ready.length){
-      kick="PRE-MISSION INTEL";ic="⚡";
-      line=`${MNAME[ready[0]]} is back to full strength. One precise strike beats a scattered one, sir.`;
-    }else{
-      kick="RECOVERY WATCH";ic="🌙";
-      line=`Every trained sector is still rebuilding. Rest is a weapon too — sharpen it with sleep and food, sir.`;
-    }
-    if(new Date().getDay()===0&&h>=17&&!trainedToday){kick="SUNDAY DEBRIEF";ic="🗂️";line="The week's case file is compiled below, sir. Worth two minutes before we plan the next assault.";}
-    return `<div class="gtv2-alfred-top" onclick="openAlfredVoice()" style="display:flex;gap:11px;align-items:center;cursor:pointer;margin-bottom:12px">
-      <div style="width:42px;height:42px;border-radius:12px;overflow:hidden;flex:none;border:1px solid rgba(255,208,72,.45);box-shadow:0 0 14px -4px rgba(255,208,72,.7)"><img src="assets/alfred.png" alt="" style="width:100%;height:100%;object-fit:cover"></div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:9px;font-weight:800;letter-spacing:.26em;color:var(--gold2);opacity:.85">${ic} ALFRED · ${kick}</div>
-        <div style="font-size:12.5px;line-height:1.45;color:var(--text2);margin-top:2px;font-style:italic">“${line}”</div>
-      </div>
-      <div style="font-size:13px;color:var(--gold2);font-weight:800;flex:none;text-shadow:0 0 10px rgba(255,208,72,.5)">›</div>
-    </div>`;
-  }catch(e){return "";}
-}
-/* 🗺️ TERRITORY WAR entry card — the map art itself as a slim, pressable home banner. */
+/* 🗺️ TERRITORY WAR — the full living map, front and center on the Gotham tab. */
 function territoryWarCard(){
   try{
     const held=M12.filter(m=>districtCrime(m).crime<45).length;
     const lost=M12.filter(m=>districtCrime(m).crime>=70&&(state.data.muscleVol[m]||0)>0);
     const band=districtBand(cityCrime());
     const worst=lost[0]?((NEMESIS_MAP[lost[0]]||{}).villain||"the Rogues"):null;
-    return `<div onclick="openDistricts()" style="cursor:pointer;position:relative;overflow:hidden;border-radius:18px;border:1.5px solid ${band[1]}66;margin-bottom:14px;box-shadow:0 16px 40px -16px rgba(0,0,0,.95),0 0 32px -12px ${band[1]};min-height:124px;background:url('assets/gotham-war-map.jpg') center 38%/cover no-repeat">
-      <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,6,10,.94) 32%,rgba(4,6,10,.55) 66%,rgba(4,6,10,.22))"></div>
-      <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,${band[1]}cc,transparent)"></div>
-      <div style="position:relative;z-index:2;padding:20px 16px;display:flex;align-items:center;gap:15px">
-        <div style="font-family:var(--disp);font-size:44px;line-height:1;color:${band[1]};text-shadow:0 0 24px ${band[1]}">${held}<span style="font-size:19px;color:var(--text3)">/12</span></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-family:var(--disp);font-size:19px;letter-spacing:.07em;color:var(--text);text-shadow:0 2px 12px rgba(0,0,0,.9)">🗺️ TERRITORY WAR</div>
-          <div style="font-size:12.5px;color:${band[1]};font-weight:800;letter-spacing:.07em;margin-top:3px;text-shadow:0 0 10px ${band[1]}66">${band[0]}${worst?` · <span style="color:#ff8a7a">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</span>`:" · the city is yours"}</div>
-          <div class="mini" style="color:var(--text2);margin-top:2px">districts under your control</div>
+    return `<div class="gtv2-panel wide" style="margin-bottom:12px;padding:12px 12px 10px;border-color:${band[1]}44;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 44px -20px rgba(0,0,0,.94),0 0 26px -12px ${band[1]}">
+      <div class="row sp" style="align-items:center;margin-bottom:9px">
+        <div><div class="gtv2-label">🗺️ Territory War</div>
+          <div style="font-family:var(--disp);font-size:22px;line-height:1.1;color:${band[1]};text-shadow:0 0 16px ${band[1]}66">${held}<span style="font-size:13px;color:var(--text3)">/12</span> <span style="font-size:13px;letter-spacing:.08em">${band[0]}</span></div>
+          ${worst?`<div class="mini" style="color:#ff8a7a;font-weight:800;letter-spacing:.06em;margin-top:1px">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</div>`:`<div class="mini" style="color:var(--text3);margin-top:1px">the city is yours, sir</div>`}
         </div>
-        <span style="font-size:12px;font-weight:800;color:#0b0a06;background:linear-gradient(180deg,#f4d98a,#d8ab45);border-radius:11px;padding:10px 13px;white-space:nowrap;box-shadow:0 4px 14px -4px rgba(255,208,72,.7),inset 0 1px 0 rgba(255,255,255,.5)">OPEN MAP ›</span>
+        <button class="chip g" style="font-size:11px;padding:5px 11px" onclick="openDistricts()">⚙️ priorities ›</button>
       </div>
+      ${gothamCampaignMap()}
     </div>`;
   }catch(e){return "";}
 }
@@ -11679,16 +11617,11 @@ function renderGotham(){
       else if(new Date().getDay()===1){alfredPingAI("It's Monday — a new training week begins. One-line marching order for the week based on the training data above.");}
       try{wraithShowdownCheck();}catch(e){}
     }}catch(e){}
-  // districts that FELL while you were away — the city hurts when you don't show up
-  d.fallenSeen=d.fallenSeen||{};
-  M12.forEach(m=>{if(districtCrime(m).crime<70)delete d.fallenSeen[m];});
-  const fallenNew=M12.filter(m=>districtCrime(m).crime>=70&&(d.muscleVol[m]||0)>0&&!d.fallenSeen[m]);
-  const fallenBanner=fallenNew.length?`<div class="card" style="border-color:var(--red);box-shadow:0 0 26px -10px var(--red);padding:11px 13px;margin-bottom:12px;cursor:pointer;animation:rfPulse 1.4s ease-in-out 3" onclick="gothamMarkFallen()"><div class="row" style="gap:9px"><span style="font-size:20px">🚨</span><div style="flex:1;min-width:0"><div style="font-family:var(--disp);font-size:14px;color:var(--red);letter-spacing:.06em">DISTRICT${fallenNew.length>1?"S":""} FALLEN WHILE YOU WERE AWAY</div><div class="mini" style="color:var(--text2)">${fallenNew.slice(0,2).map(m=>esc(MUSCLE_DISTRICT[m])+" — taken by "+esc((NEMESIS_MAP[m]||{}).villain||"the rogues")).join(" · ")}${fallenNew.length>2?" · +"+(fallenNew.length-2)+" more":""} · tap to acknowledge</div></div></div></div>`:"";
   // Memoize the two heaviest cards (SVG city + season eval) — rebuilt at most once/min or when data changes
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${alfredDebriefStrip()}${(()=>{try{return seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${fallenBanner}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}${gtv2MuscleGrid()}${territoryWarCard()}`;
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${territoryWarCard()}${(()=>{try{return seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
