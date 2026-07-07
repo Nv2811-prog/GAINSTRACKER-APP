@@ -11555,9 +11555,10 @@ function gothamCampaignMap(){
      Contested = amber pulsing beacon. Tap any token for the muscle's full dossier. */
   const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
   // positions sit on the three islands of the art (left, right, bottom)
-  const POS={back:[112,128],chest:[232,152],biceps:[100,248],abs:[218,268],
-             shoulders:[352,108],traps:[464,132],triceps:[348,214],forearms:[458,238],
-             quads:[232,376],hamstrings:[366,362],glutes:[248,458],calves:[382,444]};
+  // 560×430 canvas — tokens hand-placed so no plate or medallion ever overlaps another
+  const POS={back:[110,85],chest:[272,112],biceps:[110,162],abs:[258,198],
+             shoulders:[400,58],traps:[452,114],triceps:[405,164],forearms:[452,220],
+             quads:[225,300],hamstrings:[388,328],glutes:[225,378],calves:[388,404]};
   let s="",defs="";
   M12.forEach((m,i)=>{
     const[x,y]=POS[m];
@@ -11567,7 +11568,7 @@ function gothamCampaignMap(){
     const vimg=lost?villainImgUrl(villain):"";
     const col=held?"#FFD048":lost?"#FF3622":"#FF8C22";
     const plateFill=lost?"rgba(28,4,2,.88)":held?"rgba(26,19,4,.86)":"rgba(28,15,3,.86)";
-    if(vimg)defs+=`<clipPath id="gwv${i}"><circle cx="${x-58}" cy="${y}" r="19"/></clipPath>`;
+    if(vimg||held)defs+=`<clipPath id="gwv${i}"><circle cx="${x-58}" cy="${y}" r="19"/></clipPath>`;
     s+=`<g style="cursor:pointer" onclick="closeOverlay();muscleDrill('${m}')">
       <rect x="${x-52}" y="${y-21}" width="122" height="42" rx="11" fill="${plateFill}" stroke="${col}" stroke-opacity="${held?'.8':'.95'}" stroke-width="1.8" style="filter:drop-shadow(0 0 ${lost?'11':'6'}px ${col}${lost?'':'66'})"/>
       ${lost?(vimg
@@ -11575,23 +11576,23 @@ function gothamCampaignMap(){
           <image href="${esc(vimg)}" x="${x-79}" y="${y-21}" width="42" height="42" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
         :`<circle cx="${x-58}" cy="${y}" r="17" fill="#2a0602" stroke="#FF3622" stroke-width="2"/><text x="${x-58}" y="${y+6}" text-anchor="middle" font-size="18">🦹</text>`)
       :held
-        ?`<path d="${bat}" transform="translate(${x+42},${y-19}) scale(.4)" fill="#FFD048" style="filter:drop-shadow(0 0 6px rgba(255,208,72,.9))"/>`
+        ?`<circle cx="${x-58}" cy="${y}" r="21" fill="#0d0a02" stroke="#FFD048" stroke-width="2.2" style="filter:drop-shadow(0 0 8px rgba(255,208,72,.95))"/>
+          <image href="assets/batman-medal.jpg" x="${x-79}" y="${y-21}" width="42" height="42" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
         :`<circle class="gc-beacon" cx="${x+56}" cy="${y-12}" r="4.5" fill="${col}" style="animation-delay:${(i*0.3)%1.7}s"/>`}
-      <text x="${x-44}" y="${y-2}" font-family="Bebas Neue,sans-serif" font-size="19" letter-spacing="1.2" fill="${held?'#FFD048':col}">${MNAME[m].toUpperCase()}</text>
-      <text x="${x-44}" y="${y+14}" font-family="DM Sans,sans-serif" font-size="9" font-weight="800" letter-spacing=".7" fill="${lost?'rgba(255,140,120,.95)':held?'rgba(255,208,72,.7)':'rgba(255,190,120,.85)'}">${lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
+      <text x="${x-31}" y="${y-2}" font-family="Bebas Neue,sans-serif" font-size="19" letter-spacing="1.2" fill="${held?'#FFD048':col}">${MNAME[m].toUpperCase()}</text>
+      <text x="${x-31}" y="${y+14}" font-family="DM Sans,sans-serif" font-size="9" font-weight="800" letter-spacing=".7" fill="${lost?'rgba(255,140,120,.95)':held?'rgba(255,208,72,.7)':'rgba(255,190,120,.85)'}">${lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
     </g>`;
   });
   const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
   return `<div class="row" style="gap:13px;justify-content:center;margin-bottom:7px">${leg("#FFD048","yours")}${leg("#FF8C22","contested")}${leg("#FF3622","villain-held")}</div>
-  <svg viewBox="0 0 560 560" style="width:100%;display:block;border-radius:16px;border:1px solid rgba(120,155,205,.22);box-shadow:0 18px 50px -20px rgba(0,0,0,.95),0 0 34px -16px rgba(90,140,200,.5)">
+  <svg viewBox="0 0 560 430" style="width:100%;display:block;border-radius:16px;border:1px solid rgba(120,155,205,.22);box-shadow:0 18px 50px -20px rgba(0,0,0,.95),0 0 34px -16px rgba(90,140,200,.5)">
     <defs>
       <radialGradient id="gwvig" cx="50%" cy="42%" r="72%"><stop offset="55%" stop-color="rgba(2,4,8,0)"/><stop offset="100%" stop-color="rgba(2,4,8,.72)"/></radialGradient>
       ${defs}
     </defs>
-    <image href="assets/gotham-war-map.jpg" x="0" y="0" width="560" height="560" preserveAspectRatio="xMidYMid slice"/>
-    <rect width="560" height="560" fill="url(#gwvig)"/>
+    <image href="assets/gotham-war-map.jpg" x="0" y="-65" width="560" height="560" preserveAspectRatio="xMidYMid slice"/>
+    <rect width="560" height="430" fill="url(#gwvig)"/>
     ${s}
-    <text x="280" y="546" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="6" fill="rgba(160,190,230,.5)">GOTHAM CITY · TERRITORY WAR</text>
   </svg>
   <div class="mini center" style="color:var(--text3);margin-top:6px">tap any district for its full dossier</div>`;
 }
