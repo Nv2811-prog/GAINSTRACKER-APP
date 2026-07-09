@@ -2996,7 +2996,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=null;if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W").length,0),D=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.type!=="W"&&x.done).length,0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3375,6 +3375,7 @@ function finishWorkout(){
   if(ses.split&&ses.split!=="Free Session")advanceDay();
   save();
   // store result for summary + boss
+  try{const sk=(ses.exercises||[]).filter(e=>e._skip);if(sk.length){const line="Skipped: "+sk.map(e=>e.name+" ("+String(e._skip).replace(/^[^\s]+\s/,"")+")").join(", ");wk.notes=(wk.notes?wk.notes+"\n":"")+line;}}catch(e){}
   state.lastResult={wk,totalVol,xpGain,prsThis,sessVol,musclesHit,dur,readiness:ses.readiness,notes:wk.notes};
   // Smart profile capture: carry any "suspicious leap" flags out of the session so Alfred can offer
   // to file them once the summary is up (the session object is about to be cleared).
@@ -3679,7 +3680,10 @@ function closeOverlay(){$("overlay").classList.remove("on");}
 
 /* ===== Cinematic pop-ups ===== queued, dramatic full-screen bulletins the user taps through.
    Used for the daily Wayne Wisdom quote and live "an ally just trained" alerts. */
-function cinePush(it){state._cineQ=state._cineQ||[];state._cineQ.push(it);
+function cinePush(it){state._cineQ=state._cineQ||[];
+  // mid-workout: never stack popups — if one is already up, non-essential extras are dropped
+  if(state.step==="logging"&&state._cineOn&&!it.hold)return;
+  state._cineQ.push(it);
   // self-heal: if the flag says a cinematic is up but the overlay isn't actually on screen,
   // the queue is stuck — reset so a PR celebration can never be silently swallowed.
   try{const el=$("cine");if(state._cineOn&&el&&!el.classList.contains("on"))state._cineOn=false;}catch(e){}
@@ -3708,6 +3712,8 @@ function cineNext(){
 function cineDismiss(){
   const el=$("cine");if(!el||!state._cineOn)return;
   clearTimeout(state._cineAutoT);
+  // one dismissal clears the whole queue — mid-workout even held items go; elsewhere PR holds survive
+  state._cineQ=(state._cineQ||[]).filter(x=>x.hold&&state.step!=="logging");
   el.classList.add("out");
   try{haptic("tap");}catch(e){}
   setTimeout(()=>{el.classList.remove("on","out");state._cineOn=false;if((state._cineQ||[]).length)cineNext();},330);
@@ -4220,10 +4226,6 @@ function fillLast(ei){const ses=state.session;if(!ses)return;const e=ses.exercis
 /* Per-gym machine settings — remember seat height / pin / pad for this machine AT THIS GYM. */
 function machineSetting(name){const d=state.data;return ((d.machineSettings||{})[d.u.activeGym]||{})[name]||"";}
 function setMachineSetting(name){const d=state.data;appPrompt({title:"Machine setup · "+(d.u.activeGym||"gym"),body:"Save your settings for this machine (seat height, pin, pad position…). Stored per gym.",ok:"Save",value:machineSetting(name)}).then(v=>{if(v===null)return;d.machineSettings=d.machineSettings||{};d.machineSettings[d.u.activeGym]=d.machineSettings[d.u.activeGym]||{};v=(v||"").trim();if(v)d.machineSettings[d.u.activeGym][name]=v;else delete d.machineSettings[d.u.activeGym][name];save();render();});}
-function metricOpts(metric,val){
-  const arr=metric==="rir"?["","0","1","2","3","4+"]:["","6","7","8","9","10"];
-  return arr.map(o=>`<option ${String(val)===o?"selected":""}>${o}</option>`).join("");
-}
 /* ═══════════ RIR ENGINE — proximity-to-failure intel ═══════════
    One-tap tactile logging in the set table + a full Effort Dossier on the Suit tab.
    All history is normalized to RIR 0–4 (RPE-era logs convert as RIR = 10 − RPE). */
@@ -4325,7 +4327,7 @@ function openRirDossier(){
 }
 /* ===== Voice logging (Web Speech API) — say "80 kilos 8 reps" to fill the next open set. Guarded for unsupported browsers. ===== */
 const NUMW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fourty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
-function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
+function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){if(ses.exercises[ei]._skip)continue;const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
 // Only Chrome/Edge (desktop) and Chrome (Android) actually run Web Speech recognition.
 // iOS Safari has no API; Opera/Brave have the object but no Google backend → they error at runtime.
 // So: hide the button where the API is absent, and remember if it dies at runtime.
@@ -4732,10 +4734,9 @@ async function renderShareCard(R){
     const VEH_BY_UNIT={"BATMOBILES":"batmobile","BATWINGS":"batwing","BATCYCLES":"batcycle","BAT-TANKS":"tumbler","GOTHAM FERRIES":"batboat"};
     const vf=VEH_BY_UNIT[unit[1]];
     let drew=false;
-    if(vf){const im=await _scImg("assets/veh/"+vf+".jpg",900);
-      if(im){x.save();x.globalCompositeOperation="screen";
-        const sy=im.height*0.24,sh=im.height*0.52;
-        x.drawImage(im,0,sy,im.width,sh,290,662,500,250);x.restore();drew=true;}}
+    if(vf){const im=await _scImg("assets/veh/"+vf+".png",900);
+      if(im){const sy=im.height*0.24,sh=im.height*0.52;
+        x.drawImage(im,0,sy,im.width,sh,290,662,500,250);drew=true;}}
     if(!drew){
       const gs=[];for(let i=0;i<n;i++)gs.push(`<g transform="translate(${i*52},0)">${unit[2]}</g>`);
       const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${n*52*2}" height="40" viewBox="0 0 ${n*52} 20" fill="#FFD048">${gs.join("")}</svg>`;
@@ -6272,14 +6273,14 @@ function closeGarage(){state.subpage=null;go("gotham");}
 /* ═══════════ 🏎 REAL VEHICLE ART — generated fleet. mix-blend-mode:screen sinks the black
    backgrounds into any dark surface, so the cars read as cinematic renders, not stickers. ═══════════ */
 const VEH_IMG={"Grappling Hook":"grapple","Batcycle":"batcycle","The Tumbler":"tumbler","The Batboat":"batboat","The Batmobile":"batmobile","The Batwing":"batwing",'"The Bat"':"thebat","Justice Cruiser":"cruiser","Wayne Hypercar":"hypercar"};
-function vehImg(n,h,extra){const f=VEH_IMG[n];if(!f)return "";return `<img src="assets/veh/${f}.jpg" alt="" style="height:${h||64}px;display:block;mix-blend-mode:screen;${liveryCss()}${extra||""}">`;}
+function vehImg(n,h,extra){const f=VEH_IMG[n];if(!f)return "";return `<img src="assets/veh/${f}.png" alt="" style="height:${h||64}px;display:block;filter:drop-shadow(0 10px 18px rgba(0,0,0,.65));${liveryCss()}${extra||""}">`;}
 /* Liveries — auto-equipped, rarest first (no settings, great by default). Earned via events & prestige. */
 const LIVERIES=[
   {id:"blood", n:"Crimson Protocol",f:"sepia(.6) saturate(3) hue-rotate(-48deg) brightness(1.05)",req:()=>(state.data.prestige||0)>=1},
   {id:"wargold",n:"War Gold",       f:"sepia(.55) saturate(2.2) hue-rotate(-12deg) brightness(1.12)",req:()=>Object.keys(state.data.eventWins||{}).length>=2},
   {id:"chrome",n:"Midnight Chrome", f:"saturate(.25) brightness(1.28) contrast(1.12)",req:()=>Object.keys(state.data.eventWins||{}).length>=1}
 ];
-function liveryCss(){try{const l=LIVERIES.find(x=>x.req());return l?`filter:${l.f};`:"";}catch(e){return "";}}
+function liveryCss(){try{const l=LIVERIES.find(x=>x.req());return l?`filter:drop-shadow(0 10px 18px rgba(0,0,0,.65)) ${l.f};`:"";}catch(e){return "";}}
 /* 🎖 Honorifics — earned, auto-equipped (highest feat wins). Alfred uses them out loud. */
 const TITLES=[
   {n:"Knight of the Narrows",req:w=>w.totalWorkouts>=25},
@@ -11596,97 +11597,6 @@ function gothamCampaignMap(){
   </svg>
   <div class="mini center" style="color:var(--text3);margin-top:6px">tap any district for its full dossier</div>`;
 }
-function gothamSkylineCard(){
-  const band=districtBand(cityCrime());
-  const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
-  const hr=new Date().getHours(), night=hr>=20||hr<6;
-  const blob=(cx,cy,rx,ry,sd)=>{let r=sd*99;const rnd=()=>{r=(r*9301+49297)%233280;return r/233280;};
-    const pts=[];for(let a2=0;a2<8;a2++){const a=a2/8*Math.PI*2,jit=0.9+rnd()*0.2;
-      pts.push([cx+Math.cos(a)*rx*jit, cy+Math.sin(a)*ry*jit]);}
-    let pth="M"+((pts[7][0]+pts[0][0])/2).toFixed(1)+" "+((pts[7][1]+pts[0][1])/2).toFixed(1);
-    for(let k=0;k<8;k++){const nn=pts[(k+1)%8];pth+=` Q${pts[k][0].toFixed(1)} ${pts[k][1].toFixed(1)} ${((pts[k][0]+nn[0])/2).toFixed(1)} ${((pts[k][1]+nn[1])/2).toFixed(1)}`;}
-    return pth+" Z";};
-  // clean anatomical grid — one district per cell, never overlapping (upper body top → legs bottom)
-  const COLX=[80,214,348,482], ROWY=[122,252,382];
-  const POS={chest:[COLX[0],ROWY[0]],back:[COLX[1],ROWY[0]],shoulders:[COLX[2],ROWY[0]],traps:[COLX[3],ROWY[0]],
-             biceps:[COLX[0],ROWY[1]],triceps:[COLX[1],ROWY[1]],forearms:[COLX[2],ROWY[1]],abs:[COLX[3],ROWY[1]],
-             quads:[COLX[0],ROWY[2]],hamstrings:[COLX[1],ROWY[2]],glutes:[COLX[2],ROWY[2]],calves:[COLX[3],ROWY[2]]};
-  const land=blob(281,252,272,200,4);
-  let s="";
-  // nautical grid over the water
-  for(let gx=0;gx<=560;gx+=56)s+=`<line x1="${gx}" y1="0" x2="${gx}" y2="510" stroke="rgba(120,155,205,.055)" stroke-width="1"/>`;
-  for(let gy=0;gy<=510;gy+=56)s+=`<line x1="0" y1="${gy}" x2="560" y2="${gy}" stroke="rgba(120,155,205,.055)" stroke-width="1"/>`;
-  // depth contours + the Gotham landmass with clipped street texture and avenue grid
-  s+=`<path d="${blob(281,252,292,220,5)}" fill="none" stroke="rgba(110,150,205,.10)" stroke-width="1" stroke-dasharray="3 7"/>
-      <path d="${blob(281,252,282,210,4)}" fill="#0b1120" opacity=".85"/>
-      <path d="${land}" fill="#141d31" stroke="rgba(150,180,225,.26)" stroke-width="1.6"/>
-      <g clip-path="url(#gmland)">
-        <rect x="8" y="40" width="546" height="430" fill="url(#gmstreet)"/>
-        <g stroke="rgba(195,210,240,.16)" stroke-width="4" stroke-linecap="round">
-          <line x1="147" y1="60" x2="147" y2="446"/><line x1="281" y1="60" x2="281" y2="446"/><line x1="415" y1="60" x2="415" y2="446"/>
-          <line x1="20" y1="187" x2="544" y2="187"/><line x1="20" y1="317" x2="544" y2="317"/></g>
-        <g stroke="rgba(195,210,240,.07)" stroke-width="2"><line x1="80" y1="60" x2="80" y2="446"/><line x1="214" y1="60" x2="214" y2="446"/><line x1="348" y1="60" x2="348" y2="446"/><line x1="482" y1="60" x2="482" y2="446"/></g>
-      </g>`;
-  // Gotham River — a channel down the middle avenue, with two bridges
-  s+=`<path d="M281 58 Q262 160 281 258 Q300 356 281 448" fill="none" stroke="rgba(26,52,82,.6)" stroke-width="12" stroke-linecap="round"/>
-      <path d="M281 58 Q262 160 281 258 Q300 356 281 448" fill="none" stroke="rgba(90,140,200,.18)" stroke-width="12" stroke-linecap="round" stroke-dasharray="2 9"/>
-      <g stroke="rgba(210,220,245,.5)" stroke-width="4" stroke-dasharray="7 4"><line x1="258" y1="187" x2="304" y2="187"/><line x1="258" y1="317" x2="304" y2="317"/></g>`;
-  // Robinson Park — green patch tucked under the legs row
-  s+=`<path d="${blob(96,432,34,17,6)}" fill="rgba(46,150,86,.4)" stroke="rgba(90,210,130,.4)" stroke-width="1"/>
-      <text x="96" y="435" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" letter-spacing="1.5" fill="rgba(150,230,180,.75)">PARK</text>`;
-  // harbor boats + lighthouse
-  s+=`<g fill="rgba(200,215,240,.3)" stroke="rgba(200,215,240,.4)" stroke-width=".6"><path d="M60 476 l14 0 l-3 6 l-8 0 z"/><path d="M498 474 l12 0 l-3 5 l-6 0 z"/></g>
-      <g transform="translate(538,450)"><path d="M-3 8 L-2 -6 L2 -6 L3 8 Z" fill="rgba(220,225,240,.5)"/><circle cy="-8" r="3" fill="#FFD86A" style="filter:drop-shadow(0 0 6px #FFD86A)"><animate attributeName="opacity" values="1;.3;1" dur="2.4s" repeatCount="indefinite"/></circle></g>`;
-  if(night)s+=`<circle cx="80" cy="122" r="110" fill="url(#gmsig)"/>`;
-  // DISTRICTS — one clear card per cell: city name, muscle, its villain + control state
-  const RW=126,RH=74;
-  M12.forEach((m,i)=>{
-    const[mx,my]=POS[m], x=mx-RW/2, y=my-RH/2;
-    const dc=districtCrime(m), b=districtBand(dc.crime), held=dc.crime<45;
-    const vil=(NEMESIS_MAP[m]||{}).villain||"the Rogues", col=b[1];
-    const fill=held?"rgba(255,208,72,.14)":dc.crime>=70?"rgba(255,54,34,.19)":"rgba(255,140,34,.15)";
-    s+=`<g style="cursor:pointer" onclick="muscleDrill('${m}')">
-      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="11" fill="rgba(8,13,22,.82)"/>
-      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="11" fill="${fill}" stroke="${col}" stroke-opacity="${held?'.6':'.95'}" stroke-width="1.5"/>
-      <rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="11" fill="url(#gmblock)" opacity=".5"/>
-      <text x="${x+11}" y="${y+16}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="700" letter-spacing=".8" fill="rgba(215,225,245,.62)">${esc((MUSCLE_DISTRICT[m]||'').toUpperCase())}</text>
-      <text x="${x+11}" y="${y+40}" font-family="Bebas Neue,sans-serif" font-size="21" letter-spacing="1.3" fill="${held?'#FFD048':col}" style="text-shadow:0 0 10px ${col}">${MNAME[m].toUpperCase()}</text>
-      <circle cx="${x+RW-16}" cy="${y+16}" r="11" fill="rgba(4,8,15,.95)" stroke="${col}" stroke-width="1.4"${held?'':' class="gc-beacon"'} style="animation-delay:${((i*0.3)%1.7)}s;filter:drop-shadow(0 0 5px ${col})"/>
-      <text x="${x+RW-16}" y="${y+20}" text-anchor="middle" font-size="12">${held?'🦇':'☠️'}</text>
-      <text x="${x+11}" y="${y+RH-19}" font-family="DM Sans,sans-serif" font-size="9.5" font-weight="800" letter-spacing=".3" fill="${held?'#FFD048':col}">${held?'DEFENDED BY YOU':esc(vil.toUpperCase())}</text>
-      <text x="${x+11}" y="${y+RH-7}" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="700" letter-spacing=".8" fill="${held?'rgba(255,208,72,.7)':'rgba(215,225,245,.6)'}">${held?'🦇 SECURED':'☠ VILLAIN · '+b[0]}</text>
-    </g>`;
-  });
-  // map furniture
-  s+=`<text x="26" y="330" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="4" fill="rgba(140,170,215,.42)" transform="rotate(-90 26 330)">GOTHAM RIVER</text>
-      <text x="281" y="500" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="6" fill="rgba(140,170,215,.42)">GOTHAM HARBOR</text>
-      <g transform="translate(24,30)"><text font-family="Bebas Neue,sans-serif" font-size="21" letter-spacing="3" fill="rgba(255,208,72,.92)" style="text-shadow:0 0 12px rgba(255,208,72,.4)">GOTHAM CITY</text><text y="14" font-family="DM Sans,sans-serif" font-size="8" letter-spacing="2.5" fill="rgba(200,215,240,.5)">TACTICAL PATROL MAP · 12 DISTRICTS</text></g>
-      <g transform="translate(482,60)" opacity=".62"><circle r="15" fill="rgba(5,9,16,.55)" stroke="rgba(200,215,240,.4)"/><path d="M0 -12 L4 0 L0 12 L-4 0 Z" fill="#FFD048"/><path d="M-12 0 L0 4 L12 0 L0 -4 Z" fill="rgba(200,215,240,.5)"/><text y="-18" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(200,215,240,.75)">N</text></g>
-      <g transform="translate(28,486)"><rect width="64" height="4" fill="none" stroke="rgba(200,215,240,.4)"/><rect width="32" height="4" fill="rgba(200,215,240,.28)"/><text y="-4" font-family="DM Sans,sans-serif" font-size="7.5" fill="rgba(200,215,240,.5)">2 KM</text></g>`;
-  const trouble=M12.filter(m=>districtCrime(m).crime>=45).length;
-  const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
-  return `<div class="card gcity" style="border-color:${band[1]}55;margin-bottom:12px;padding:0;overflow:hidden">
-    <svg viewBox="0 0 560 510" style="width:100%;display:block">
-      <defs>
-        <radialGradient id="gmsea" cx="50%" cy="34%" r="80%"><stop offset="0" stop-color="#0e1a2c"/><stop offset=".6" stop-color="#0a1120"/><stop offset="1" stop-color="#070c17"/></radialGradient>
-        <pattern id="gmwave" width="34" height="17" patternUnits="userSpaceOnUse"><path d="M0 13 Q8.5 7 17 13 T34 13" stroke="rgba(110,150,205,.09)" fill="none" stroke-width="1"/></pattern>
-        <pattern id="gmstreet" width="17" height="17" patternUnits="userSpaceOnUse"><path d="M0 0 H17 M0 0 V17" stroke="rgba(150,175,215,.1)" stroke-width="1"/></pattern>
-        <pattern id="gmblock" width="13" height="11" patternUnits="userSpaceOnUse"><rect x="2" y="2" width="6" height="5" fill="rgba(210,222,248,.05)"/></pattern>
-        <radialGradient id="gmsig" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="rgba(255,241,196,.13)"/><stop offset="1" stop-color="rgba(255,241,196,0)"/></radialGradient>
-        <clipPath id="gmland"><path d="${land}"/></clipPath>
-      </defs>
-      <rect width="560" height="510" fill="url(#gmsea)"/>
-      <rect width="560" height="510" fill="url(#gmwave)"/>
-      ${s}
-    </svg>
-    <div class="gc-strip">
-      <div style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:var(--disp);font-size:12px;letter-spacing:.16em;color:var(--gold2)">GOTHAM LIVE</span>
-        <span style="font-size:11px;color:${band[1]};font-weight:800;margin-left:7px">${band[0]}</span>
-        <span style="font-size:11px;color:var(--text3);margin-left:7px">${trouble?trouble+" district"+(trouble===1?"":"s")+" in enemy hands":"all districts secured"}</span></div>
-      <span style="display:flex;gap:9px;flex:none;align-items:center">${leg("#FFD048","yours")}${leg("#FF8C22","contested")}${leg("#FF3622","villain-held")}</span>
-    </div>
-  </div>`;
-}
 /* 🗺️ TERRITORY WAR — the full living map, front and center on the Gotham tab. */
 function territoryWarCard(){
   try{
@@ -12101,7 +12011,7 @@ function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.ses
   }catch(e){}
   render();}
 
-function focusEx(ei){if(!state.session)return;state.session._focusEi=ei;try{haptic('tap');}catch(e){}render();window.scrollTo(0,0);}
+function focusEx(ei){if(!state.session)return;const ex0=state.session.exercises[ei];if(ex0&&ex0._skip){delete ex0._skip;toast("Back in the plan, sir.");}state.session._focusEi=ei;try{haptic('tap');}catch(e){}render();window.scrollTo(0,0);}
 
 function stepW(ei,si,delta){try{sfx("clank");}catch(e){}
   const ses=state.session;if(!ses||!ses.exercises[ei])return;
@@ -12122,6 +12032,23 @@ function markFail(ei,si){
   s.type=s.type==='F'?'NRM':'F';saveSessionSoon();render();
 }
 function saveFocusedSet(ei,si){toggleDone(ei,si);}
+/* ⏭ Skip an exercise — no forcing, no guilt. Reason optional, noted in tonight's log. */
+function openSkipEx(ei){
+  const e=state.session&&state.session.exercises[ei];if(!e)return;
+  openSheet(`<div class="ttl">⏭ Skip ${esc(e.name)} tonight?</div>
+    <p class="mini" style="color:var(--text2);line-height:1.5;margin:5px 0 12px">No forcing, sir. Pick a reason — it goes in tonight's log and the night moves on.</p>
+    ${["🏃 Cardio instead","⏰ Short on time","🩹 Not feeling it","🗓 Schedule","🤫 No reason"].map(r=>`<button class="btn ghost" style="margin-bottom:7px;text-align:left" onclick="skipExercise(${ei},this.textContent)">${r}</button>`).join("")}
+    <button class="btn ghost sm" onclick="closeSheet()">← Back to it</button>`);
+}
+function skipExercise(ei,reason){
+  const ses=state.session;const e=ses&&ses.exercises[ei];if(!e)return;
+  e._skip=String(reason||"skipped").trim();e._open=false;
+  let nxt=null;const N=ses.exercises;
+  for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){nxt=j;break;}}
+  ses._focusEi=nxt;
+  closeSheet();haptic("tap");toast("⏭ "+e.name+" skipped — logged, not judged.");
+  saveSession();render();
+}
 
 /* Override renderLogging with the Wave 9 cinematic layout. */
 
@@ -12260,7 +12187,7 @@ function initSwipeExercises(){
 /* Finish guard — if working sets are still open, ask before ending the night (one accidental tap must never cost a session). */
 function confirmFinish(){
   const ses=state.session;if(!ses)return;
-  const open=(ses.exercises||[]).reduce((a,e)=>a+(e.sets||[]).filter(s=>s.type!=="W"&&!s.done&&!(parseFloat(s.r)>0)).length,0);
+  const open=(ses.exercises||[]).reduce((a,e)=>a+(e._skip?0:(e.sets||[]).filter(s=>s.type!=="W"&&!s.done&&!(parseFloat(s.r)>0)).length),0);
   if(!open)return finishWorkout();
   try{haptic("warn");}catch(e){}
   openSheet(`<div class="ttl">Leave the field?</div>
@@ -12295,8 +12222,8 @@ function quickRamp(fei){const wu=warmupSuggest(fei);if(wu){addWarmups(fei);try{h
 function renderLogging(){
   const ses=state.session;if(!ses){try{go('gotham');}catch(e){}return;}
   const metric=state.data.u.metric;
-  const wsTotal=(ses.exercises||[]).reduce((a,e)=>a+(e.sets||[]).filter(s=>s.type!=="W").length,0);
-  const wsDone=(ses.exercises||[]).reduce((a,e)=>a+(e.sets||[]).filter(s=>s.type!=="W"&&s.done).length,0);
+  const wsTotal=(ses.exercises||[]).reduce((a,e)=>a+(e._skip?0:(e.sets||[]).filter(s=>s.type!=="W").length),0);
+  const wsDone=(ses.exercises||[]).reduce((a,e)=>a+(e._skip?0:(e.sets||[]).filter(s=>s.type!=="W"&&s.done).length),0);
 
   // Fixed timer bar — rest lives HERE (draining bar + control strip), never a full-screen takeover
   let restStripHtml='';
@@ -12342,9 +12269,9 @@ function renderLogging(){
     h+=`<div class="log-ex-strip">`;
     ses.exercises.forEach(function(e,ei){
       const pr=exProgress(e);const isFocus=ei===curFei;
-      const cls=pr.allDone?'ex-done':isFocus?'ex-active':'';
+      const cls=e._skip?'ex-skip':pr.allDone?'ex-done':isFocus?'ex-active':'';
       const nm=e.name.length>21?e.name.slice(0,20)+'…':e.name;
-      h+=`<div class="log-ex-pill ${cls}" onclick="focusEx(${ei})">${pr.allDone?'✓ ':''}${esc(nm)}</div>`;
+      h+=`<div class="log-ex-pill ${cls}" onclick="focusEx(${ei})">${e._skip?'⏭ ':pr.allDone?'✓ ':''}${esc(nm)}</div>`;
     });
     h+=`</div>`;
   }
@@ -12373,7 +12300,7 @@ function renderLogging(){
           ${(()=>{try{if(e._title&&!e._titleWon)return `<div class="prwin" style="border-color:rgba(255,140,34,.6);color:#FF8C22">🏆 TITLE FIGHT LIVE — beat the record, take the belt.</div>`;if(titleFightEligible(e.name))return `<button class="chip" style="font-size:10.5px;padding:4px 10px;margin-top:5px;align-self:flex-start;border-color:rgba(255,140,34,.55);color:#FF8C22;box-shadow:0 0 12px -4px rgba(255,140,34,.8)" onclick="openTitleFight(${fei})">🏆 TITLE FIGHT AVAILABLE</button>`;}catch(_){}return '';})()}
           <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
           ${liberationTicker(fei)}
-          <button class="chip" style="font-size:10.5px;padding:3px 9px;margin-top:5px;align-self:flex-start" onclick="quickRamp(${fei})">🪜 Warm-up ramp</button>
+          <div class="row" style="gap:6px;margin-top:5px;align-self:flex-start"><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="quickRamp(${fei})">🪜 Warm-up ramp</button><button class="chip" style="font-size:10.5px;padding:3px 9px;color:var(--text3)" onclick="openSkipEx(${fei})">⏭ Skip tonight</button></div>
           ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
         </div>
         <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove">✕</button>
