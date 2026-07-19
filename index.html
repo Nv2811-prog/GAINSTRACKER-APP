@@ -308,6 +308,7 @@ border:1px solid rgba(255,54,34,.32);flex:none;overflow:hidden;
 box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6px 20px -8px rgba(255,54,34,.35),0 2px 8px -4px #000}
 .exwrap::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 90% 50% at 50% 0%,rgba(255,255,255,.06),transparent 60%);pointer-events:none;z-index:1}
 .exwrap.sm{width:74px;height:74px;border-radius:12px}
+.exwrap.xs{width:46px;height:46px;border-radius:10px}
 .exwrap svg{pointer-events:none;width:100%;height:100%;position:relative;z-index:2}
 .exwrap img.eximg{width:100%;height:100%;object-fit:contain;display:block;background:#f4f4f4;pointer-events:none}
 .exwrap .exfig{display:none;width:100%;height:100%}
@@ -1726,7 +1727,32 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"Barbell Straight Leg Deadlift","id":"","eq":"barbell","p":["hamstrings"],"s":[],"c":["Push the hips back, keep the spine long","Feel the hamstrings load in the stretch","Stand tall by squeezing the glutes \u2014 don't hyperextend"],"tgt":"Hamstrings"},
 {"n":"Power Clean","id":"","eq":"barbell","p":["hamstrings"],"s":[],"c":["Control the weight through the full range","Quality reps over ego","Squeeze the target muscle every rep"],"tgt":"Hamstrings"},
 {"n":"Smith Back Shrug","id":"","eq":"smith","p":["traps"],"s":[],"c":["Control the weight through the full range","Quality reps over ego","Squeeze the target muscle every rep"],"tgt":"Traps"},
-{"n":"Smith Shrug","id":"","eq":"smith","p":["traps"],"s":[],"c":["Control the weight through the full range","Quality reps over ego","Squeeze the target muscle every rep"],"tgt":"Traps"}];
+{"n":"Smith Shrug","id":"","eq":"smith","p":["traps"],"s":[],"c":["Control the weight through the full range","Quality reps over ego","Squeeze the target muscle every rep"],"tgt":"Traps"},
+{"n":"Single-Arm Cable Pushdown","id":"","eq":"cable","p":["triceps"],"s":[],"c":["Elbow pinned to your side — only the forearm moves","Press to full lockout and squeeze for a beat","No leaning or shrugging — the arm does the work, not bodyweight"],"tgt":"Triceps — lateral head (the horseshoe) · one arm, no side hiding","sub":{"triceps":["lat","med"]}},
+{"n":"Single-Arm Dumbbell Overhead Extension","id":"","eq":"dumbbell","p":["triceps"],"s":[],"c":["Elbow points at the ceiling, upper arm still","Deep stretch behind the head — that's where the long head grows","Lock out without flaring the elbow"],"tgt":"Triceps — long head in its stretched position · one arm at a time","sub":{"triceps":["long"]}},
+{"n":"Diamond Push-Up","id":"","eq":"bodyweight","bw":1,"p":["triceps"],"s":["chest","shoulders"],"c":["Hands close, thumbs and index fingers touching","Elbows track back along the ribs, not out","Full lockout — squeeze the triceps at the top"],"tgt":"Triceps — all three heads · inner chest assists","sub":{"triceps":["lat","med"]}},
+{"n":"Push-Up","id":"","eq":"bodyweight","bw":1,"p":["chest"],"s":["triceps","shoulders"],"c":["Body one straight line — glutes and abs braced","Chest to the floor, elbows ~45° from the ribs","Push the floor away and protract at the top"],"tgt":"Chest — sternal (mid) · front delts and triceps assist","sub":{"chest":["mid","lo"]}},
+{"n":"Weighted Push-Up","id":"","eq":"bodyweight","bw":1,"p":["chest"],"s":["triceps","shoulders"],"c":["Plate high on the upper back, core rock solid","Same strict range as the unloaded rep","Progress load like any press — this is a bench in disguise"],"tgt":"Chest — sternal (mid), loaded for progression","sub":{"chest":["mid","lo"]}},
+{"n":"Deficit Push-Up","id":"","eq":"bodyweight","bw":1,"p":["chest"],"s":["triceps","shoulders"],"c":["Hands on handles or plates — chest sinks BELOW them","The deep stretch at the bottom is the whole point","Pause in the stretch, then drive up"],"tgt":"Chest — deep stretch emphasis, mid & lower pec","sub":{"chest":["mid","lo"]}},
+{"n":"Single-Arm Cable Fly","id":"","eq":"cable","p":["chest"],"s":["shoulders"],"c":["Slight elbow bend, locked through the rep","Sweep across the body — squeeze the inner chest","Control the negative back to a deep stretch"],"tgt":"Chest — sternal fibres through a full sweep · one side at a time","sub":{"chest":["mid"]}},
+{"n":"Single-Arm Machine Chest Press","id":"","eq":"machine","p":["chest"],"s":["triceps","shoulders"],"c":["Brace the torso — don't rotate with the press","Full stretch at the back, full squeeze at the front","Match reps and load on both sides"],"tgt":"Chest — pressing one side fixes left/right gaps","sub":{"chest":["mid"]}},
+{"n":"Single-Arm Lat Pulldown","id":"","eq":"cable","p":["back"],"s":["biceps"],"c":["Drive the elbow down into your back pocket","Let the lat stretch fully at the top","No torso twist — the lat pulls, not momentum"],"tgt":"Lats — one side at a time, huge stretch and mind-muscle","sub":{"back":["ulat","llat"]}},
+{"n":"Single-Arm Seated Cable Row","id":"","eq":"cable","p":["back"],"s":["biceps","shoulders"],"c":["Row the elbow low and tight past the ribs","Rotate nothing — shoulders stay square","Pause the squeeze, slow the return"],"tgt":"Mid-back & lats — unilateral row, no strong side takeover","sub":{"back":["mid","llat"]}},
+{"n":"Smith Machine Romanian Deadlift","id":"","eq":"smith","p":["hamstrings"],"s":["glutes","back"],"c":["Hips back until the hamstrings scream, bar sliding the thighs","Soft knees, long spine, lats locked","Stand up by squeezing the glutes through"],"tgt":"Hamstrings — hip-hinge (long head) · glutes finish the rep","sub":{"hamstrings":["hip"]}},
+{"n":"Single-Arm Cable Rear Delt Fly","id":"","eq":"cable","p":["shoulders"],"s":["traps"],"c":["Pull across the body, arm nearly straight","Lead with the pinky — rear delt, not triceps","Stop when the shoulder blade starts to pinch — delt only"],"tgt":"Rear delt — constant cable tension, one side at a time","sub":{"shoulders":["rear"]}},
+{"n":"Plate Front Raise","id":"","eq":"other","p":["shoulders"],"s":[],"c":["Hold the plate at 3 and 9 o'clock","Raise to eye level, arms long","Lower slow — no swinging from the hips"],"tgt":"Front delts — simple, brutal, effective","sub":{"shoulders":["front"]}},
+{"n":"Pike Push-Up","id":"pikepushup","eq":"bodyweight","bw":1,"p":["shoulders"],"s":["triceps"],"c":["Hips high — torso as vertical as you can get","Head travels forward of the hands as you descend","Press back up like an overhead press"],"tgt":"Front & side delts — bodyweight overhead pressing","sub":{"shoulders":["front"]}},
+{"n":"Single-Leg Leg Extension","id":"","eq":"machine","p":["quads"],"s":[],"c":["One leg — no strong-side carrying the rep","Squeeze hard at full lockout, one second hold","Lower slow, keep tension off the knee snap"],"tgt":"Quads — rectus femoris & sweep, side by side honesty","sub":{"quads":["rec","vas"]}},
+{"n":"Single-Leg Lying Leg Curl","id":"","eq":"machine","p":["hamstrings"],"s":[],"c":["Hips pinned to the pad — no lifting to cheat","Curl to full contraction, pause","Fight the negative all the way long"],"tgt":"Hamstrings — knee-flexion, one leg at a time","sub":{"hamstrings":["knee"]}},
+{"n":"Single-Leg Seated Leg Curl","id":"","eq":"machine","p":["hamstrings"],"s":[],"c":["Torso pinned, thighs clamped","One leg curls — match reps on both sides","Seated = long-head stretch: use the full range"],"tgt":"Hamstrings — seated stretch position, unilateral","sub":{"hamstrings":["knee"]}},
+{"n":"Smith Machine Split Squat","id":"","eq":"smith","p":["quads"],"s":["glutes"],"c":["Front foot far enough forward that the knee tracks the toe","Straight down the rail — balance is handled, just push","Drive through the whole front foot"],"tgt":"Quads — front leg does the work, machine handles balance","sub":{"quads":["vas"]}},
+{"n":"Smith Machine Hip Thrust","id":"","eq":"smith","p":["glutes"],"s":["hamstrings"],"c":["Upper back on the bench, bar padded over the hips","Chin tucked, ribs down — thrust to a full glute squeeze","The rail keeps the path honest: pause every top"],"tgt":"Glute max — locked bar path, maximum squeeze","sub":{"glutes":["max"]}},
+{"n":"Reverse Hack Squat","id":"","eq":"machine","p":["glutes"],"s":["quads","hamstrings"],"c":["Face the pad — hips push back into the sled","Deep knee and hip bend, chest supported","Drive through the heels, squeeze the glutes at lockout"],"tgt":"Glutes & posterior chain — the hack squat flipped","sub":{"glutes":["max"]}},
+{"n":"Single-Leg Seated Calf Raise","id":"","eq":"machine","p":["calves"],"s":[],"c":["One knee under the pad — full stretch at the bottom","Pause the stretch two seconds","Rise to a hard squeeze, no bouncing"],"tgt":"Soleus — bent-knee, one calf at a time","sub":{"calves":["sol"]}},
+{"n":"Smith Machine Calf Raise","id":"","eq":"smith","p":["calves"],"s":[],"c":["Balls of the feet on a block, heels free","Deep stretch at the bottom — pause it","Full height at the top, control down"],"tgt":"Gastrocnemius — straight-leg, heavy and stable","sub":{"calves":["gas"]}},
+{"n":"Machine Rotary Torso","id":"","eq":"machine","p":["abs"],"s":[],"c":["Rotate from the waist, hips locked","Slow and controlled both directions","Resist the return — that's half the set"],"tgt":"Obliques — loaded rotation, both directions","sub":{"abs":["obl"]}},
+{"n":"Copenhagen Plank","id":"","eq":"bodyweight","p":["abs"],"s":["quads"],"c":["Top foot on the bench, body one straight line","Squeeze the inner thigh to hold the line","Shorten the lever (knee on bench) to scale down"],"tgt":"Obliques & adductors — side-plank with teeth","sub":{"abs":["obl"]}},
+{"n":"Dead Hang","id":"deadhang","eq":"bodyweight","bw":1,"p":["forearms"],"s":["back"],"c":["Full grip, shoulders slightly packed","Hang for time — add weight when a minute is easy","Breathe. Let the spine decompress"],"tgt":"Grip & forearms — timed hangs build crushing strength","sub":{"forearms":["flex"]}}];
 
 /* ========================= CONSTANTS ========================= */
 const M12=["chest","back","shoulders","biceps","triceps","forearms","quads","hamstrings","glutes","calves","abs","traps"];
@@ -2360,7 +2386,8 @@ const FIGMAP={
  plank:'ab-plank',sideplank:'ab-plank',hollowbody:'ab-plank',
  facepull2:'face-pull',reardeltcab:'face-pull',reardeltfly:'rear-delt-fly',
  bentoverflyb:'rear-delt-fly',inclinereard:'rear-delt-fly',machinerear:'rear-delt-fly',
- backextensio:'back-extension',romanianext:'back-extension',hyperextens:'back-extension'
+ backextensio:'back-extension',romanianext:'back-extension',hyperextens:'back-extension',
+ pikepushup:'overhead-press',deadhang:'pull-up'
 };
 function exFigKey(ex){
  if(!ex)return null;
@@ -2965,6 +2992,7 @@ function startWorkout(splitId,dayIdx){
   const sp=state.data.splits.find(s=>s.id===splitId);
   const day=sp?sp.days[dayIdx]:null;
   state.session={split:sp?sp.name:"Free Session",day:day?day.name:"Workout",readiness:null,startedAt:now(),
+    srcSplit:(sp&&day)?splitId:null,srcDay:(sp&&day)?dayIdx:null,
     exercises:(day?day.exercises:[]).map(n=>({name:n,sets:seedSets(n)}))};
   state.workoutTimer=0;state.restTimer=0;state.restRunning=false;
   state.step="readiness";render();playEntrance(state.session.day);villainIntroForDay();try{maybeContextualVillainTaunt();}catch(e){}
@@ -3163,7 +3191,53 @@ function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.set
 function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;render();}
 function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
 function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;e._open=true;state.session._focusEi=ei;closeSheet();render();}
-function moveExercise(ei,dir){const arr=state.session.exercises;const j=ei+dir;if(j<0||j>=arr.length)return;const t=arr[ei];arr[ei]=arr[j];arr[j]=t;render();}
+function moveExercise(ei,dir){const arr=state.session.exercises;const j=ei+dir;if(j<0||j>=arr.length)return;const t=arr[ei];arr[ei]=arr[j];arr[j]=t;saveSession();syncSessionToSplit();render();}
+/* 📌 LIVE PLAN SYNC — anything you change about tonight's line-up (order, swaps, adds, removes)
+   is written straight back to the split day it came from, so next time the plan IS how you left it. */
+function syncSessionToSplit(){
+  try{
+    const ses=state.session;if(!ses||!ses.srcSplit)return;
+    const sp=state.data.splits.find(s=>s.id===ses.srcSplit);if(!sp)return;
+    const day=sp.days[ses.srcDay];if(!day||day.rest)return;
+    const names=(ses.exercises||[]).map(e=>e.name);
+    const cur=day.exercises||[];
+    if(names.length===cur.length&&names.every((n,i)=>n===cur[i]))return;
+    day.exercises=names.slice();
+    save();
+    if(!ses._syncToast){ses._syncToast=true;toast("📌 Plan updated — saved to "+sp.name+" · "+day.name+", sir.");}
+  }catch(e){}
+}
+/* ↕ Running order — reorder tonight's lifts from a sheet; every move persists to the split. */
+function openReorder(){
+  const ses=state.session;if(!ses||!(ses.exercises||[]).length)return;
+  try{haptic("tap");}catch(e){}
+  openSheet(`<div class="ttl">↕ Running order</div>
+    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">Move tonight's lifts — the new order is saved to your split automatically.</div>
+    <div id="reorder-list"></div>
+    <button class="btn gold" style="margin-top:12px" onclick="closeSheet();render()">Done ✓</button>`);
+  drawReorder();
+}
+function drawReorder(){
+  const ses=state.session;if(!ses)return;const el=$("reorder-list");if(!el)return;
+  el.innerHTML=ses.exercises.map((e,ei)=>{const ex=exFor(e.name);const pr=exProgress(e);
+    return `<div class="exrow" style="padding:7px 9px;margin-bottom:6px;gap:9px">
+      <b class="num" style="color:var(--gold2);width:18px;text-align:center;flex:none;font-size:15px">${ei+1}</b>
+      ${thumb(ex,true)}
+      <div class="g" style="min-width:0"><div class="exname" style="font-size:13.5px;${e._skip?'text-decoration:line-through;opacity:.55':''}">${esc(e.name)}</div>
+        <div class="exmeta">${pr.allDone?'<span style="color:var(--green)">✓ all done</span>':pr.doneN+'/'+pr.total+' sets'}</div></div>
+      <div class="row" style="gap:4px;flex:none">
+        <button class="btn ghost sm" style="width:40px;padding:9px 0;${ei===0?'opacity:.25;pointer-events:none':''}" onclick="reorderMove(${ei},-1)">↑</button>
+        <button class="btn ghost sm" style="width:40px;padding:9px 0;${ei===ses.exercises.length-1?'opacity:.25;pointer-events:none':''}" onclick="reorderMove(${ei},1)">↓</button>
+      </div></div>`;}).join("");
+}
+function reorderMove(ei,dir){
+  const ses=state.session;if(!ses)return;const arr=ses.exercises;const j=ei+dir;if(j<0||j>=arr.length)return;
+  const focusEx=(ses._focusEi!=null)?arr[ses._focusEi]:null;
+  const t=arr[ei];arr[ei]=arr[j];arr[j]=t;
+  if(focusEx)ses._focusEi=arr.indexOf(focusEx);
+  try{haptic("tap");}catch(e){}
+  saveSession();syncSessionToSplit();drawReorder();
+}
 // ---- Collapsible exercises: only the one you're actively on stays expanded; others fold like a list. ----
 function activeExIdx(){const ses=state.session;if(ses&&ses._focusEi!=null&&ses.exercises[ses._focusEi])return ses._focusEi;const o=findOpenSet();return o?o.ei:-1;}
 function isExOpen(ei){const e=state.session.exercises[ei];if(!e)return false;const active=activeExIdx();if(ei===active)return e._open!==false;return e._open===true;}
@@ -3301,13 +3375,14 @@ function openSetSheet(ei,si){
     <button class="btn ghost sm" style="width:100%;color:var(--red);border-color:rgba(232,69,60,.4)" onclick="delSet(${ei},${si});closeSheet()">✕ Delete set</button>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
 }
-function removeExercise(ei){appConfirm({title:"Remove exercise",body:"Remove this exercise from the session?",ok:"Remove",danger:true}).then(ok=>{if(ok){state.session.exercises.splice(ei,1);render();saveSession();}});}
+function removeExercise(ei){appConfirm({title:"Remove exercise",body:"Remove this exercise from the session? It also leaves tonight's split day.",ok:"Remove",danger:true}).then(ok=>{if(ok){state.session.exercises.splice(ei,1);syncSessionToSplit();render();saveSession();}});}
 // Supersets/circuits: link this exercise with the next into one back-to-back group.
-function addExerciseToSession(name){if(!state.session.exercises.some(e=>e.name===name))state.session.exercises.push({name,sets:seedSets(name)});closeSheet();render();saveSession();}
+function addExerciseToSession(name){if(!state.session.exercises.some(e=>e.name===name))state.session.exercises.push({name,sets:seedSets(name)});closeSheet();syncSessionToSplit();render();saveSession();}
 
 /* ========================= COMMIT WORKOUT ========================= */
 function finishWorkout(){
   if(typeof stopVoice==="function")stopVoice();
+  try{syncSessionToSplit();}catch(e){}
   const ses=state.session;const dur=Math.round((now()-ses.startedAt)/1000);
   const done=ses.exercises.map(e=>({name:e.name,sets:(e.sets||[]).filter(s=>s.done&&(s.w!==""||exFor(e.name).bw)&&s.r!=="")})).filter(e=>e.sets.length);
   if(!done.length){appConfirm({title:"No sets logged",body:"You haven't completed any sets. Discard this session?",ok:"Discard",cancel:"Keep going",danger:true}).then(ok=>{if(ok)endSession();});return;}
@@ -3784,8 +3859,8 @@ function cloudDetectAllyWorkout(id,c){
     state.data.allySeen[id]={w,boss,lifts:liftMap};save();
   }catch(e){}
 }
-function openSheet(html){$("sheet").innerHTML=html;$("sheet").classList.add("on");$("sheetbg").classList.add("on");state.pickerOpen=false;}
-function closeSheet(){$("sheet").classList.remove("on");$("sheetbg").classList.remove("on");state.pickerOpen=false;state._chatOpen=null;if(state.pickerMulti){state.pickerMulti=null;render();}}
+function openSheet(html){state._sheetKind=null;$("sheet").innerHTML=html;$("sheet").classList.add("on");$("sheetbg").classList.add("on");state.pickerOpen=false;}
+function closeSheet(){$("sheet").classList.remove("on");$("sheetbg").classList.remove("on");state.pickerOpen=false;state._sheetKind=null;state._chatOpen=null;if(state.pickerMulti){state.pickerMulti=null;render();}}
 
 /* ===== in-app modal: mobile-safe replacements for confirm/alert/prompt ===== */
 function _normOpts(o,def){if(typeof o==="string")o={body:o};o=o||{};if(o.title==null)o.title=def;return o;}
@@ -4054,7 +4129,7 @@ function swapExercise(ei,name){
   const e=state.session.exercises[ei];if(!e)return;e.name=name;
   const lb=lastBestSet(name);
   (e.sets||[]).forEach(s=>{s.prevW=lb?lb.w:null;s.prevR=lb?lb.r:null;s.prevType=lb?"NRM":null;});
-  haptic("done");closeSheet();toast("Swapped to "+name);render();
+  haptic("done");closeSheet();toast("Swapped to "+name);saveSession();syncSessionToSplit();render();
 }
 /* Antagonist / forearm pairing — the only superset-style tool, kept purposeful:
    pair a lift with its true antagonist (or the other forearm side) and run them back-to-back. */
@@ -4084,7 +4159,7 @@ function addPair(ei,name){
   const ses=state.session;const e=ses.exercises[ei];if(!e)return;
   const grp=e.group||("pair"+now());e.group=grp;
   ses.exercises.splice(ei+1,0,{name,group:grp,sets:seedSets(name)});
-  haptic("done");closeSheet();toast("Paired with "+name);render();saveSession();
+  haptic("done");closeSheet();toast("Paired with "+name);syncSessionToSplit();render();saveSession();
 }
 /* 1RM Test Day — a guided warm-up-to-max ramp built from your current estimated max. */
 function testRamp(name){
@@ -4385,6 +4460,7 @@ function openGym(gymName){
 function toggleGymEq(k){state._gymTmp=state._gymTmp||{};state._gymTmp[k]=state._gymTmp[k]===false?true:false;document.querySelectorAll(".gymeq").forEach(b=>{const kk=b.getAttribute("data-k");b.classList.toggle("on",state._gymTmp[kk]!==false);});}
 function saveGym(){const gn=state._gymEditName||state.data.u.activeGym||"";state.data.gymEquipment=state.data.gymEquipment||{};const eqNew=Object.assign({},state._gymTmp||{});state.data.gymEquipment[gn]={equip:eqNew};state.gymFilter=true;save();haptic("done");closeSheet();toast("Equipment saved for "+gn);render();}
 function openPicker(multi){
+  state._sheetKind=null;
   state.pickerMulti=multi||null;
   state.pickerOpen=true;state.pickerQuery="";state.pickerMuscle="all";
   const gymNm=state.data.u.activeGym||"";
@@ -4438,7 +4514,9 @@ function omniList(){
   const box=$("omni-res");if(box)box.innerHTML=h||`<div class="mini" style="color:var(--text3);padding:10px">Nothing in the files matching "${esc(q)}", sir.</div>`;
 }
 /* Exercise detail sheet — shows big figure + cues, lets you add from there */
+function exDetClose(){const r=state._exdetReturn;state._exdetReturn=null;closeSheet();if(r==="splits")openSplitSheet();}
 function openExDetail(exName){
+  state._exdetReturn=(state._sheetKind==="splits")?"splits":null;  // came from the split editor → go back there on close
   const ex=exFor(exName);
   const fi=exFigImg(ex);
   const priCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',
@@ -4466,8 +4544,11 @@ function openExDetail(exName){
       </div>`).join('')}
     </div>`:''}
     ${ex.s&&ex.s.length?`<div style="font-size:12px;color:var(--text3);margin-bottom:14px">Also trains: ${ex.s.map(m=>`<span style="color:var(--text2)">${MNAME[m]||m}</span>`).join(', ')}</div>`:''}
-    <button class="btn gold" style="margin-bottom:8px" onclick="pickAdd('${ex.n.replace(/'/g,"\\'")}');closeSheet()">＋ Add to session</button>
-    <button class="btn ghost" onclick="closeSheet()">Close</button>
+    ${state._exdetReturn?'':`<button class="btn gold" style="margin-bottom:8px" onclick="pickAdd('${ex.n.replace(/'/g,"\\'")}');exDetClose()">＋ Add to session</button>`}
+    <div class="row" style="gap:7px">
+      <button class="btn ghost sm" style="flex:1;color:var(--text2)" onclick="fixExPic('${ex.n.replace(/'/g,"\\'")}','exdet-fig')">🖼 Picture wrong? Try next</button>
+      <button class="btn ghost sm" style="flex:1" onclick="exDetClose()">${state._exdetReturn?'← Back to editor':'Close'}</button>
+    </div>
   `);
   try{attachExGif("exdet-fig",ex.n,360);}catch(e){}
 }
@@ -4529,7 +4610,7 @@ function saveCustomEx(){
 }
 // exercises already in the split-day being edited (multi-add highlight)
 function pickerAddedList(){if(!state.pickerMulti)return null;const s=state.data.splits.find(x=>x.id===state.pickerMulti.id);return (s&&s.days[state.pickerMulti.i])?s.days[state.pickerMulti.i].exercises:[];}
-function finishMultiAdd(){state.pickerMulti=null;closeSheet();render();}
+function finishMultiAdd(){const ret=state._pickerReturn;state._pickerReturn=null;state.pickerMulti=null;closeSheet();render();if(ret==="splits")openSplitSheet();/* land back in the editor, not on the tab */}
 function pickMuscle(m){state.pickerMuscle=m;document.querySelectorAll("#ex-musc .chip").forEach(c=>c.classList.toggle("on",c.dataset.m===m));updateExList();}
 function updateExList(){
   const q=($("ex-search")?$("ex-search").value:"").toLowerCase().trim();
@@ -5206,8 +5287,8 @@ function openDayBriefing(splitId,dayIdx){
   const secList=Object.keys(sec).filter(m=>!prim[m]);
   const chips=primList.map(m=>`<span class="chip on" style="font-size:12px">${mIcon(m,16)} ${MNAME[m]} <b class="mini" style="color:var(--gold2)">×${prim[m]}</b></span>`).join("")
     +secList.map(m=>`<span class="chip" style="font-size:12px;opacity:.75">${mIcon(m,16)} ${MNAME[m]} <span class="mini">assist</span></span>`).join("");
-  const exList=(day.exercises||[]).map(n=>{const ex=exFor(n);return `<div class="row" style="gap:9px;padding:7px 0;border-top:1px solid var(--border)">
-    ${thumb(ex,true)}<div class="g"><div class="exname" style="font-size:14px">${esc(n)}</div><div class="exmeta">${exTarget(ex)}${ex.bw?" · bodyweight":""}</div></div></div>`;}).join("");
+  const exList=(day.exercises||[]).map(n=>{const ex=exFor(n);const safe=esc(n).replace(/'/g,"");return `<div class="row" style="gap:9px;padding:7px 0;border-top:1px solid var(--border);cursor:pointer" onclick="openExDetail('${safe}')">
+    ${thumb(ex,true)}<div class="g"><div class="exname" style="font-size:14px">${esc(n)}</div><div class="exmeta">${exTarget(ex)}${ex.bw?" · bodyweight":""}</div>${splitExHint(n)}</div><span style="color:var(--text3)">›</span></div>`;}).join("");
   openSheet(`<div class="row sp"><div><div class="tag">${esc(sp.name)}</div><div class="ttl" style="margin:0;font-size:22px">${esc(day.name)}</div></div><span class="chip">${(day.exercises||[]).length} exercises</span></div>
     <div class="card" style="margin:10px 0;padding:8px">${dayHeatFigure(day)}
       <div class="row" style="justify-content:center;gap:14px;margin-top:2px">
@@ -6878,14 +6959,25 @@ function splitCompactTileHtml(){
     ${activeSp?`<div class="row" style="gap:5px;flex-wrap:wrap;margin-top:9px;pointer-events:none">${(activeSp.days||[]).slice(0,6).map(dy=>`<span class="chip" style="font-size:10px;padding:3px 8px;${isRest(dy)?'opacity:.5;border-color:var(--text3)':''}">${isRest(dy)?'🛌 ':''}${esc(dy.name)}</span>`).join("")}${activeSp.days.length>6?`<span class="chip" style="font-size:10px;padding:3px 8px;opacity:.5">+${activeSp.days.length-6} more</span>`:""}</div>`:""}
   </div>`;
 }
-function openSplitSheet(){
-  $("sheet").innerHTML=`<div class="row sp" style="margin-bottom:12px">
+function _splitSheetInner(){
+  return `<div class="row sp" style="margin-bottom:12px">
     <div class="ttl" style="margin:0;font-size:18px">🗂️ Splits &amp; schedule</div>
     <button class="btn ghost sm" style="width:auto;border-color:var(--gold-dim);color:var(--gold2)" onclick="closeSheet();render()">Done ✓</button>
   </div>
   ${splitsEditorHtml()}`;
+}
+function openSplitSheet(){
+  state._sheetKind="splits";
+  $("sheet").innerHTML=_splitSheetInner();
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
 }
+/* The editor lives in a bottom sheet, and render() only repaints the tab UNDER it — so every
+   split mutation refreshes the sheet in place (scroll preserved) or the edit looks like it did nothing. */
+function refreshSplitSheet(){
+  const sh=$("sheet");
+  if(state._sheetKind==="splits"&&sh&&sh.classList.contains("on")){const sc=sh.scrollTop;sh.innerHTML=_splitSheetInner();sh.scrollTop=sc;}
+}
+function splitsChanged(){save();try{refreshSplitSheet();}catch(e){}render();}
 
 /* ========================= MISSION TAB ========================= */
 function renderMission(){
@@ -6910,7 +7002,7 @@ function renderMission(){
         const tn=i===ni?`<span class="chip on" style="font-size:9px;padding:1px 7px;margin-left:7px;vertical-align:middle">TONIGHT</span>`:"";
         return isRest(day)
         ? `<div class="splitday rest${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${restIcon(15)} ${esc(day.name)}${tn}</b><span>Planned recovery — protects your streak</span></div></div><button class="splitday-start rest" onclick="logRestDay()">REST ✓</button></div>`
-        : `<div class="splitday${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><span>${day.exercises.length} exercises · tap to preview</span></div></div><button class="splitday-start" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`;
+        : `<div class="splitday${i===ni?' tonight':''}" style="${i===ni?'flex-wrap:wrap':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><span>${day.exercises.length} exercises · tap to preview</span></div></div><button class="splitday-start" onclick="startWorkout('${sp.id}',${i})">START ▶</button>${i===ni&&day.exercises.length?`<div class="row" style="gap:5px;flex-basis:100%;margin-top:7px;overflow:hidden" onclick="openDayBriefing('${sp.id}',${i})">${day.exercises.slice(0,5).map(n=>thumb(exFor(n),2)).join("")}${day.exercises.length>5?`<span class="mini" style="color:var(--text3);flex:none">+${day.exercises.length-5}</span>`:""}</div>`:""}</div>`;
       }).join("")}</div></div>`;
   };
   // compact one-row tile for benched (non-active) splits — tap to expand, no wall of START buttons
@@ -7616,7 +7708,7 @@ function openRaid(){
     <button class="btn ghost sm" style="margin-top:12px;color:var(--text3)" onclick="endRaid()">Abandon raid</button>
     <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
 }
-function setActiveSplit(id){const d=state.data;d.activeSplitId=id;d._nextDay=0;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;save();render();}
+function setActiveSplit(id){const d=state.data;d.activeSplitId=id;d._nextDay=0;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;splitsChanged();}
 function open1RM(){openSheet(`<div class="ttl">1RM calculator (Epley)</div>
   <label class="mini">Weight (kg)</label><input id="o-w" inputmode="decimal" oninput="calc1rm()" style="margin-bottom:8px"/>
   <label class="mini">Reps</label><input id="o-r" inputmode="numeric" oninput="calc1rm()" style="margin-bottom:8px"/>
@@ -7904,25 +7996,52 @@ function scheduleEditorHtml(){
 function splitsEditorHtml(){
   const d=state.data;let html="";
   d.splits.forEach(sp=>{
-    html+=`<div class="card"><div class="row sp"><input value="${esc(sp.name)}" onchange="renameSplit('${sp.id}',this.value)" style="font-weight:700;border:none;background:transparent;padding:4px 0;font-size:16px"/>
-      <div class="row" style="gap:4px;flex:none"><button class="btn ghost sm" style="width:auto;color:var(--gold2)" title="Share this split" onclick="shareSplit('${sp.id}')">📤</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delSplit('${sp.id}')">🗑</button></div></div>`;
+    const isActive=d.activeSplitId===sp.id;
+    html+=`<div class="card" style="${isActive?'border-color:rgba(242,208,121,.4);box-shadow:0 0 24px -14px rgba(242,208,121,.6)':''}">
+      <div class="row sp">
+        <input value="${esc(sp.name)}" onchange="renameSplit('${sp.id}',this.value)" style="font-weight:700;border:none;background:transparent;padding:4px 0;font-size:16px;min-width:0;flex:1"/>
+        <div class="row" style="gap:4px;flex:none">
+          ${isActive?'<span class="chip on" style="font-size:9px;padding:2px 7px">ACTIVE</span>':`<button class="btn ghost sm" style="width:auto;font-size:10px" onclick="setActiveSplit('${sp.id}')">Use ✓</button>`}
+          <button class="btn ghost sm" style="width:auto;color:var(--gold2)" title="Share this split" onclick="shareSplit('${sp.id}')">📤</button>
+          <button class="btn ghost sm" style="width:auto;color:var(--text2)" title="Duplicate split" onclick="dupSplit('${sp.id}')">⧉</button>
+          <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delSplit('${sp.id}')">🗑</button>
+        </div></div>`;
     sp.days.forEach((day,i)=>{
+      const dayMv=`<div class="row" style="gap:2px;flex:none">
+        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3);${i===0?'opacity:.25;pointer-events:none':''}" title="Move day up" onclick="moveDay('${sp.id}',${i},-1)">↑</button>
+        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3);${i===sp.days.length-1?'opacity:.25;pointer-events:none':''}" title="Move day down" onclick="moveDay('${sp.id}',${i},1)">↓</button>
+        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text2)" title="Duplicate day" onclick="dupDay('${sp.id}',${i})">⧉</button>
+        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Delete day" onclick="delDay('${sp.id}',${i})">🗑</button>
+      </div>`;
       if(isRest(day)){
-        html+=`<div style="border-top:1px solid var(--border);padding:9px 0;background:linear-gradient(90deg,rgba(124,150,255,.06),transparent)">
-          <div class="row sp"><div class="row" style="gap:7px;align-items:center"><span style="line-height:1">${restIcon(15)}</span><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0"/></div>
-          <div class="row" style="gap:4px"><button class="btn ghost sm" style="width:auto;font-size:11px" onclick="toggleRestDay('${sp.id}',${i})">Make training</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delDay('${sp.id}',${i})">🗑</button></div></div>
-          <div class="mini" style="margin-top:4px;color:#7c96ff">Planned recovery — growth happens here. Not counted against your streak.</div></div>`;
+        html+=`<div style="border-top:1px solid var(--border);padding:9px 0 10px;background:linear-gradient(90deg,rgba(124,150,255,.06),transparent)">
+          <div class="row sp"><div class="row" style="gap:7px;align-items:center;min-width:0;flex:1"><span style="line-height:1">${restIcon(15)}</span><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0;min-width:0;flex:1"/></div>${dayMv}</div>
+          <div class="row sp" style="margin-top:4px"><span class="mini" style="color:#7c96ff">Planned recovery — growth happens here.</span><button class="btn ghost sm" style="width:auto;font-size:11px;flex:none" onclick="toggleRestDay('${sp.id}',${i})">Make training</button></div></div>`;
       }else{
-        html+=`<div style="border-top:1px solid var(--border);padding:9px 0">
-          <div class="row sp"><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0;width:52%"/>
-          <div class="row" style="gap:4px"><button class="btn ghost sm" style="width:auto" onclick="addDayExercise('${sp.id}',${i})">+ ex</button><button class="btn ghost sm" style="width:auto;font-size:11px" onclick="toggleRestDay('${sp.id}',${i})">Make rest</button><button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delDay('${sp.id}',${i})">🗑</button></div></div>
-          <div style="margin-top:6px">${day.exercises.length?day.exercises.map((n,j)=>`<div class="row sp" style="gap:6px;padding:4px 0;border-top:1px solid rgba(255,255,255,.04)">
-            <span style="flex:1;min-width:0"><span style="font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</span>${splitExHint(n)}</span>
+        let chips="";
+        try{const dm=dayMuscles(day);const tops=Object.keys(dm.prim).sort((a,b)=>dm.prim[b]-dm.prim[a]).slice(0,4);
+          chips=tops.map(m=>`<span class="chip" style="font-size:10px;padding:2px 8px">${mIcon(m,13)} ${MNAME[m]}</span>`).join("");}catch(e){}
+        html+=`<div style="border-top:1px solid var(--border);padding:9px 0 11px">
+          <div class="row sp"><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:700;padding:2px 0;min-width:0;flex:1;font-size:15px"/>${dayMv}</div>
+          ${chips?`<div class="row" style="gap:4px;flex-wrap:wrap;margin:5px 0 2px">${chips}</div>`:""}
+          <div style="margin-top:6px">${day.exercises.length?day.exercises.map((n,j)=>{const ex=exFor(n);const safe=esc(n).replace(/'/g,"");
+            return `<div class="exrow" style="padding:6px 8px;margin-bottom:6px;gap:9px">
+            <div style="display:flex;gap:9px;align-items:center;flex:1;min-width:0;cursor:pointer" onclick="openExDetail('${safe}')">
+              ${thumb(ex,2)}
+              <div style="min-width:0">
+                <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</div>
+                <div class="mini" style="color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(exTarget(ex).split('·')[0].trim())} · ${esc(ex.eq||'—')}</div>
+                ${splitExHint(n)}
+              </div></div>
             <div class="row" style="gap:2px;flex:none">
-              <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Move up" ${j===0?'disabled style="opacity:.25;width:auto;padding:5px 8px"':''} onclick="moveDayEx('${sp.id}',${i},${j},-1)">↑</button>
-              <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Move down" ${j===day.exercises.length-1?'disabled style="opacity:.25;width:auto;padding:5px 8px"':''} onclick="moveDayEx('${sp.id}',${i},${j},1)">↓</button>
-              <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Remove" onclick="rmDayEx('${sp.id}',${i},${j})">×</button>
-            </div></div>`).join(""):'<span class="mini">No exercises yet</span>'}</div></div>`;
+              <button class="btn ghost sm" style="width:auto;padding:6px 9px;color:var(--text3);${j===0?'opacity:.25;pointer-events:none':''}" title="Move up" onclick="moveDayEx('${sp.id}',${i},${j},-1)">↑</button>
+              <button class="btn ghost sm" style="width:auto;padding:6px 9px;color:var(--text3);${j===day.exercises.length-1?'opacity:.25;pointer-events:none':''}" title="Move down" onclick="moveDayEx('${sp.id}',${i},${j},1)">↓</button>
+              <button class="btn ghost sm" style="width:auto;padding:6px 9px;color:var(--text3)" title="Remove" onclick="rmDayEx('${sp.id}',${i},${j})">×</button>
+            </div></div>`;}).join(""):'<span class="mini">No exercises yet — add the first weapon ↓</span>'}</div>
+          <div class="row" style="gap:6px;margin-top:7px">
+            <button class="btn ghost sm g" style="border-color:rgba(242,208,121,.35);color:var(--gold2)" onclick="addDayExercise('${sp.id}',${i})">＋ Add exercises</button>
+            <button class="btn ghost sm" style="width:auto;font-size:11px" onclick="toggleRestDay('${sp.id}',${i})">Make rest</button>
+          </div></div>`;
       }
     });
     html+=`<div class="row" style="gap:6px;margin-top:8px"><button class="btn ghost sm" onclick="addDay('${sp.id}')">+ Training day</button><button class="btn ghost sm" onclick="addRestDay('${sp.id}')">+ Rest day</button></div></div>`;
@@ -7942,9 +8061,9 @@ function setDaysPerWeek(n){
   const on=patterns[n]||[0,2,4];const ws={};for(let i=0;i<7;i++)ws[i]=on.includes(i);
   state.data.u.weekSchedule=ws;syncWeeklyGoal();save();render();}
 function toggleDay(i){const ws=state.data.u.weekSchedule;ws[i]=ws[i]===false?true:false;syncWeeklyGoal();save();render();}
-function newSplit(){const d=state.data;const id="s"+now();d.splits.push({id,name:"New Split",days:[{name:"Day 1",exercises:[]}]});if(!d.activeSplitId){d.activeSplitId=id;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;}save();render();}
+function newSplit(){const d=state.data;const id="s"+now();d.splits.push({id,name:"New Split",days:[{name:"Day 1",exercises:[]}]});if(!d.activeSplitId){d.activeSplitId=id;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;}splitsChanged();}
 function renameSplit(id,v){const s=state.data.splits.find(x=>x.id===id);if(s)s.name=v;save();}
-function delSplit(id){appConfirm({title:"Delete split",body:"Delete this split permanently?",ok:"Delete",danger:true}).then(ok=>{if(!ok)return;state.data.splits=state.data.splits.filter(x=>x.id!==id);if(state.data.activeSplitId===id)state.data.activeSplitId=state.data.splits[0]?.id||null;save();render();});}
+function delSplit(id){appConfirm({title:"Delete split",body:"Delete this split permanently?",ok:"Delete",danger:true}).then(ok=>{if(!ok)return;state.data.splits=state.data.splits.filter(x=>x.id!==id);if(state.data.activeSplitId===id)state.data.activeSplitId=state.data.splits[0]?.id||null;splitsChanged();});}
 /* ===== SHAREABLE SPLITS — "Split Card" codes (cousin-proof: one tap to copy, one paste to import) ===== */
 // Same url-safe base64 trick as Patrol Cards so codes survive messaging apps. We share only the routine
 // (name + days + exercise names) — no personal data. Imported splits get a fresh id so nothing collides.
@@ -8008,12 +8127,12 @@ function doImportSplit(){
   save();haptic("done");closeSheet();render();
   toast(`"${sp.name}" imported — ${sp.days.length} days ready to train.`);
 }
-function addDay(id){const s=state.data.splits.find(x=>x.id===id);s.days.push({name:"Day "+(s.days.length+1),exercises:[]});save();render();}
+function addDay(id){const s=state.data.splits.find(x=>x.id===id);s.days.push({name:"Day "+(s.days.length+1),exercises:[]});splitsChanged();}
 function renameDay(id,i,v){const s=state.data.splits.find(x=>x.id===id);s.days[i].name=v;save();}
 // Removing an exercise only edits the split list. Your logged sets, PRs and history stay in
 // state.data.workouts / state.data.prs forever — re-add it later and seedSets() pulls your last
 // weights straight back. So removal is always lossless; we just confirm it so the user trusts it.
-function rmDayEx(id,i,j){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const nm=s.days[i].exercises[j];s.days[i].exercises.splice(j,1);save();render();
+function rmDayEx(id,i,j){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const nm=s.days[i].exercises[j];s.days[i].exercises.splice(j,1);splitsChanged();
   if(nm&&lastSetFor(nm))toast("Removed from split — your "+nm+" history & weights are kept.");}
 // Compact "last time" hint for the split editor so retained memory is visible at a glance.
 function splitExHint(name){
@@ -8023,9 +8142,12 @@ function splitExHint(name){
   const ago=da<=0?"today":da===1?"yesterday":da<7?da+"d ago":da<30?Math.round(da/7)+"w ago":Math.round(da/30)+"mo ago";
   return `<span class="mini" style="color:var(--text3);display:block;margin-top:1px">last: <b style="color:var(--gold2)">${b.w}${ex&&ex.bw?"+":""}kg × ${b.r}</b> · ${ago}</span>`;
 }
-function moveDayEx(id,i,j,dir){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const arr=s.days[i].exercises;const k=j+dir;if(k<0||k>=arr.length)return;const t=arr[j];arr[j]=arr[k];arr[k]=t;save();render();}
+function moveDayEx(id,i,j,dir){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const arr=s.days[i].exercises;const k=j+dir;if(k<0||k>=arr.length)return;const t=arr[j];arr[j]=arr[k];arr[k]=t;try{haptic("tap");}catch(e){}splitsChanged();}
+function moveDay(id,i,dir){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const j=i+dir;if(j<0||j>=s.days.length)return;const t=s.days[i];s.days[i]=s.days[j];s.days[j]=t;try{haptic("tap");}catch(e){}splitsChanged();}
+function dupDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const day=s.days[i];if(!day)return;s.days.splice(i+1,0,{name:(day.name||"Day")+" copy",rest:!!day.rest,exercises:(day.exercises||[]).slice()});try{haptic("done");}catch(e){}splitsChanged();}
+function dupSplit(id){const s=state.data.splits.find(x=>x.id===id);if(!s)return;state.data.splits.push({id:"s"+now(),name:(s.name||"Split")+" copy",days:(s.days||[]).map(dd=>({name:dd.name,rest:!!dd.rest,exercises:(dd.exercises||[]).slice()}))});try{haptic("done");}catch(e){}toast("Split duplicated — sharpen the copy, sir.");splitsChanged();}
 function addDayExercise(id,i){
-  state._addTo={id,i};openPicker({id,i});   // multi-add: pick several at once, list stays open
+  state._addTo={id,i};state._pickerReturn="splits";openPicker({id,i});   // multi-add: pick several at once, list stays open
 }
 
 /* ----- Rest days: a split is a case-file of nested days, recovery INCLUDED. Never force-locked. ----- */
@@ -8038,12 +8160,12 @@ const REST_LINES=[
 ];
 function restLine(){return REST_LINES[Math.floor(Math.random()*REST_LINES.length)];}
 function isRest(day){return !!(day&&day.rest);}
-function addRestDay(id){const s=state.data.splits.find(x=>x.id===id);if(s){s.days.push({name:"Rest & Recover",rest:true,exercises:[]});save();render();}}
+function addRestDay(id){const s=state.data.splits.find(x=>x.id===id);if(s){s.days.push({name:"Rest & Recover",rest:true,exercises:[]});splitsChanged();}}
 function toggleRestDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s)return;const day=s.days[i];
   if(!day.rest){day.rest=true;day._rn=day.name;day.name="Rest & Recover";}
   else{day.rest=false;day.name=day._rn||"Training day";delete day._rn;}
-  save();render();}
-function delDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s||s.days.length<=1)return;s.days.splice(i,1);if((state.data._nextDay||0)>=s.days.length)state.data._nextDay=0;save();render();}
+  splitsChanged();}
+function delDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s||s.days.length<=1)return;s.days.splice(i,1);if((state.data._nextDay||0)>=s.days.length)state.data._nextDay=0;splitsChanged();}
 function advanceDay(){const sp=state.data.splits.find(s=>s.id===state.data.activeSplitId)||state.data.splits[0];if(sp&&sp.days.length)state.data._nextDay=((state.data._nextDay||0)+1)%sp.days.length;}
 // Tonight's day follows your SPLIT PROGRESSION (self-healing from real history), never the calendar
 // weekday: it's the day right after the most recent split-day you actually completed — Upper→Lower→Rest→…
@@ -9060,11 +9182,12 @@ function geminiKey(){return localStorage.getItem("gt_gemini")||"";}
 function exdbKey(){return localStorage.getItem("gt_exdb")||"e12fa8029emsh858fad4f1bed933p168227jsn9692e318753d";}
 function exGifUrl(id,res){return "https://exercisedb.p.rapidapi.com/image?exerciseId="+encodeURIComponent(id)+"&resolution="+(res||180)+"&rapidapi-key="+encodeURIComponent(exdbKey());}
 /* Curated exercise->ExerciseDB demo map — built offline against the full catalogue, hand-reviewed. */
-const EX_GIF_IDS={"pec deck fly":"0596","plate-loaded row":"0581","single-leg rdl":"2806","4-way hip machine":"0597","barbell hip thrust":"0058","bulgarian split squat":"0410","cable woodchopper":"0243","close-grip lat pulldown":"0197","ez bar overhead extension":"1748","lat pulldown (wide grip)":"0197","plank":"3665","plate-loaded lat pulldown":"0673","prone trap y-raise":"3541","machine rear delt row":"0076","reverse wrist curl (machine)":"0082","assisted dip machine":"0009","cable cross-body extension":"0149","chest-supported dumbbell row":"0327","chest-supported machine row":"0581","plate-loaded chest press":"0576","plate-loaded leg press":"2287","plate-loaded preacher curl":"0592","plate-loaded shoulder press":"0603","stiff-leg deadlift":"0116","ab wheel rollout":"0857","sissy squat machine":"1489","single-arm cable overhead extension":"1727","hack squat machine":"0743","walking lunge":"1460","barbell back squat":"0026","cable rear delt fly":"0202","cable rope crunch":"0175","cable y-raise":"0161","chest-supported t-bar row":"0606","crunch":"0274","dumbbell overhead extension":"1729","ez bar curl":"0447","ez bar preacher curl":"0452","hack squat calf raise":"1383","horizontal leg press":"2287","jm press":"0052","leg press (45\u00b0)":"2287","leg press calf raise":"1385","machine glute-ham raise":"3193","machine low row":"0581","machine oblique crunch":"1452","machine triceps pushdown":"0607","side plank":"3544","single-leg press":"2287","single-leg standing calf raise":"1373","smith machine row":"0761","smith machine squat":"0750","spider curl":"1675","standing leg curl":"0795","underhand barbell row":"0049","cable leg curl":"3235","cable pull-through":"0196","high-to-low cable fly":"0179","low-to-high cable fly":"0179","seated dumbbell overhead extension":"0389","smith machine incline press":"0757","standing barbell overhead press":"0091","arnold press":"2137","barbell skullcrusher":"1721","bayesian cable curl":"0868","cable rope pushdown":"0201","cable triceps kickback":"0860","concentration curl":"0297","dumbbell curl":"0285","dumbbell row":"0327","flat dumbbell fly":"0308","goblet squat":"1760","leg extension":"0585","machine crunch":"1452","machine dip":"1451","pendlay row":"3017","reverse hyperextension":"0593","split squat":"0809","sumo deadlift":"0117","weighted chest dip":"0251","barbell deadlift":"0032","barbell lunge":"0054","barbell romanian deadlift":"0085","dumbbell romanian deadlift":"1459","assisted pull-up machine":"0017","barbell front squat":"0024","barbell reverse curl":"0082","cable chest press":"2144","cable overhead triceps extension":"0149","cable rope row":"1323","close-grip bench press":"0030","donkey calf raise":"0284","dumbbell rear delt fly":"0378","dumbbell shoulder press":"0405","dumbbell step-up":"2795","dumbbell wrist curl":"0385","hanging knee raise":"1761","hip abduction machine":"0597","hip adduction machine":"0598","incline cable press":"0169","leaning cable lateral raise":"0178","lying leg curl":"0586","lying leg raise":"0865","machine hammer curl":"1615","machine overhead triceps extension":"0607","seated cable row (close grip)":"0861","seated calf raise":"0594","seated leg curl":"0599","smith machine bench press":"0748","smith machine shoulder press":"0766","standing calf raise":"0605","t-bar row":"0606","v-bar triceps pushdown":"0241","weighted pull-up":"0841","cable rope hammer curl":"0165","captain's chair leg raise":"2963","barbell bench press":"0025","barbell bent-over row":"0027","barbell curl":"0031","barbell glute bridge":"1409","barbell good morning":"0044","barbell incline bench press":"0047","barbell preacher curl":"0070","barbell reverse wrist curl":"0082","barbell shrug":"0095","barbell standing calf raise":"1372","barbell step-up":"0114","barbell wrist curl":"0126","cable curl":"0868","cable hip adduction":"0168","cable kneeling crunch":"0175","cable lateral raise":"0178","cable reverse crunch":"0873","cable reverse wrist curl":"0210","cable shrug":"0220","cable side bend":"0222","cable straight-arm pulldown":"0238","cable upright row":"0246","cable wrist curl":"0247","chest dip":"0251","chin-up":"1326","dead bug":"0276","decline barbell bench press":"0033","decline machine chest press":"1300","decline sit-up":"0282","dumbbell bench press":"0289","dumbbell front raise":"0310","dumbbell hammer curl":"0313","dumbbell incline bench press":"0314","dumbbell lateral raise":"0334","dumbbell lying triceps extension":"0351","dumbbell preacher curl":"0372","dumbbell pullover":"0375","dumbbell reverse wrist curl":"0385","dumbbell shrug":"0406","dumbbell side bend":"0407","glute-ham raise":"3193","hanging leg raise":"0472","incline dumbbell curl":"0318","incline dumbbell fly":"0319","incline machine chest press":"1299","inverted row":"0499","machine bicep curl":"0575","machine chest press":"0576","machine high row":"0581","machine lateral raise":"0584","machine preacher curl":"0592","machine pullover":"2285","machine shoulder press":"0603","machine shrug":"0604","pull-up":"0652","reverse crunch":"0872","seated barbell overhead press":"0091","seated dumbbell curl":"0391","seated dumbbell lateral raise":"0396","sissy squat":"1489","standing cable crunch":"0226","trap bar deadlift":"0811","triceps dip":"0814","wide-grip seated cable row":"0218","nordic curl":"0496","cable crossover":"0188","cable pallof press":"0979","glute kickback machine":"0228","cable glute kickback":"0228","machine hip thrust":"0058","plate-loaded hip thrust":"0058","reverse lunge":"0381","toes to bar":"0473","ez bar skullcrusher":"0060","straight-bar pushdown":"0201","trap bar shrug":"0095","45\u00b0 back extension":"0489","farmer's carry":"2133","reverse pec deck":"0602","ez bar reverse curl":"0451","rack pull":"0074","hammer strength incline press":"1299","pendulum squat":"0743","v-squat machine":"0743","belt squat":"0743","cable face pull":"0225","curtsey lunge":"0381","cable high pull":"0167","cable hip abduction":"0597","dumbbell floor press":"0289","landmine press":"0025","dumbbell decline bench press":"0301","cable decline press":"1261","seated cable chest fly":"2144","cable squeeze fly":"0158","machine inner chest press":"1301","reverse-grip bench press":"1256","wide-grip bench press":"1258","barbell floor press":"0025","low-incline dumbbell press":"0314","machine decline fly":"0596","cable fly (flat bench)":"0151","reverse-grip dumbbell press":"1622","dumbbell pullover (cross-bench)":"0375","neutral-grip lat pulldown":"0818","reverse-grip lat pulldown":"0673","v-bar lat pulldown":"0197","cable lat prayer":"0197","wide-grip pull-up":"1429","seal row":"0327","meadows row":"0049","standing cable row":"0234","machine seated row":"1350","neutral-grip machine row":"0588","machine reverse-grip row":"1348","yates row":"0049","kroc row":"0327","high-to-low cable row":"0167","low-to-high cable row":"0167","wide-grip cable row":"0218","rope lat pulldown":"0197","neutral-grip pull-up":"0651","feet-elevated inverted row":"0499","neutral wide cable row":"0218","z press":"0091","viking press":"0587","behind-the-back cable lateral raise":"0178","lu raise":"0376","cable front raise":"0162","barbell front raise":"0041","cable rear delt row":"0202","cable scarecrow":"0161","barbell upright row":"0120","dumbbell upright row":"0437","cable cuban press":"0219","seated dumbbell shoulder press":"0405","push press":"1700","cable lateral raise (high pulley)":"0178","bent-over dumbbell rear delt row":"0377","incline prone rear delt raise":"2292","seated cable face pull":"0215","machine front raise":"0584","dumbbell w-raise":"0376","cable rear delt cross":"0202","standing dumbbell arnold press":"2137","barbell cuban press":"0091","standing cable y-raise":"0161","leaning dumbbell lateral raise":"0334","21s barbell curl":"0031","drag curl":"0038","cable incline curl":"0868","cable preacher curl":"0195","high cable curl":"0868","cross-body hammer curl":"0298","incline hammer curl":"0320","zottman curl":"0439","wide-grip barbell curl":"0113","close-grip barbell curl":"0106","cable rope curl":"0868","single-arm preacher curl":"1414","waiter curl":"5201","cable drag curl":"1632","hammer preacher curl":"0370","reverse-grip cable curl":"0206","cable incline pushdown":"0172","cable reverse-grip pushdown":"0207","cable skullcrusher":"0201","bench dip":"1753","dumbbell kickback":"0333","dumbbell tate press":"0436","decline ez bar skullcrusher":"1749","reverse-grip single-arm pushdown":"0207","weighted bench dip":"0830","ez bar tate press":"1749","california press":"0052","behind-the-back wrist curl":"0104","cable wrist extension":"0247","hammer wrist curl":"0385","heels-elevated goblet squat":"1760","landmine squat":"0786","narrow-stance leg press":"2287","wide-stance leg press":"2287","cyclist squat":"0786","box squat":"0786","front-foot-elevated split squat":"0410","weighted sissy squat":"0851","dumbbell stiff-leg deadlift":"0432","slider leg curl":"0795","razor curl":"0582","seated good morning":"0044","eccentric leg curl":"0582","single-leg hip thrust":"1427","frog pump":"2571","seated hip abduction":"0597","cable fire hydrant":"0157","kas glute bridge":"1409","step-up (high box)":"0431","standing cable abduction":"0228","glute bridge march":"3561","single-leg rdl (glute focus)":"0411","dumbbell curtsey lunge":"0336","cable hip thrust":"0228","dumbbell standing calf raise":"0417","dumbbell seated calf raise":"1379","bent-knee calf raise":"0594","single-leg dumbbell calf raise":"0409","barbell seated calf raise":"0088","seated tibialis raise":"0284","bicycle crunch":"0972","cable twist":"0243","russian twist":"0687","weighted decline crunch":"0277","hanging oblique raise":"1761","v-up":"0735","dragon flag":"3303","weighted plank":"2135","hollow body hold":"0262","standing oblique cable crunch":"0226","weighted sit-up":"0282","flutter kicks":"0459","behind-the-back shrug":"0095","incline dumbbell shrug":"0329","power shrug":"0095","kelso shrug":"0406","cable upface pull":"0220","dumbbell behind-the-back shrug":"0406","snatch-grip shrug":"0095","cable rope shrug":"0220","machine alternating narrow grip seated row":"0571","machine back extension":"0573","machine deadlift":"0578","machine front pulldown":"0579","machine gripless shrug":"0580","machine kneeling leg curl":"0582","machine kneeling twist":"0583","machine leg extension":"0585","machine lying leg curl":"0586","machine military press":"0587","machine narrow grip seated row":"0588","machine one arm shoulder press":"0590","machine overhand triceps dip":"0591","machine reverse hyperextension":"0593","machine seated calf raise":"0594","machine seated crunch (chest pad)":"0595","machine seated fly":"0596","machine seated hip abduction":"0597","machine seated hip adduction":"0598","machine seated leg curl":"0599","machine seated leg raise crunch":"0600","machine seated reverse fly (parallel grip)":"0601","machine seated reverse fly":"0602","machine standing calf raise":"0605","machine t bar row":"0606","machine triceps extension":"0607","reverse grip machine lat pulldown":"0673","machine 45\u00b0 calf press":"0738","machine 45\u00b0 leg press":"0739","machine 45\u00b0 leg wide press":"0740","machine closer hack squat":"0741","machine forward angled calf raise":"0742","machine lying squat":"0744","machine donkey calf raise":"1253","machine unilateral row":"1313","machine one arm lateral wide pulldown":"1347","hack calf raise":"1383","hack one leg calf raise":"1384","machine seated squat calf raise on leg press machine":"1385","machine 45 degrees one leg press":"1425","machine seated dip":"1451","machine seated crunch":"1452","machine hammer grip preacher curl":"1615","machine reverse grip preacher curl":"1616","machine alternate leg press":"2287","machine gripper hands":"2288","dumbbell supported squat":"2804","machine lying two-one leg curl":"3195","machine standing chest press":"3758","cable alternate shoulder press":"0148","cable alternate triceps extension":"0149","cable bench press":"0151","cable concentration extension (on knee)":"0152","cable cross-over reverse fly":"0154","cable cross-over variation":"0155","cable decline fly":"0158","cable forward raise":"0161","cable front shoulder raise":"0164","cable hammer curl (with rope)":"0165","cable incline bench press":"0169","cable incline fly (on stability ball)":"0170","cable incline fly":"0171","cable incline triceps extension":"0173","cable judo flip":"0174","cable kneeling triceps extension":"0176","cable lying close-grip curl":"0182","cable one arm curl":"0190","cable overhead triceps extension (rope attachment)":"0194","cable reverse curl":"0206","cable reverse preacher curl":"0209","cable russian twists (on stability ball)":"0211","cable seated crunch":"0212","cable side crunch":"0223","cable standing back wrist curl":"0224","cable standing inner curl":"0229","dumbbell decline shrug":"0305","dumbbell lying femoral":"0339","dumbbell lying pronation":"0347","dumbbell lying supination":"0349","dumbbell one arm reverse wrist curl":"0358","dumbbell one arm wrist curl":"0364","dumbbell over bench one arm wrist curl":"0367","dumbbell over bench reverse wrist curl":"0368","dumbbell single leg split squat":"0410","dumbbell goblet squat":"1760","dumbbell step up lunge":"2795","dumbbell single leg deadlift with stepbox support":"2806","dumbbell step-up split squat":"2812","barbell straight leg deadlift":"0116","power clean":"0648","smith back shrug":"0746","smith shrug":"0767"};
-function exGifCached(name,res){const k=(name||"").toLowerCase().trim();if(EX_GIF_IDS[k])return exGifUrl(EX_GIF_IDS[k],res);const c=(state.data.exGifCache||{})[(name||"").toLowerCase().trim()];return (c&&c.id)?exGifUrl(c.id,res):null;}
+const EX_GIF_IDS={"pec deck fly":"0596","plate-loaded row":"0581","single-leg rdl":"2806","4-way hip machine":"0597","barbell hip thrust":"0058","bulgarian split squat":"0410","cable woodchopper":"0243","close-grip lat pulldown":"0197","ez bar overhead extension":"1748","lat pulldown (wide grip)":"0197","plank":"3665","plate-loaded lat pulldown":"0673","prone trap y-raise":"3541","machine rear delt row":"0076","reverse wrist curl (machine)":"0082","assisted dip machine":"0009","cable cross-body extension":"0149","chest-supported dumbbell row":"0327","chest-supported machine row":"0581","plate-loaded chest press":"0576","plate-loaded leg press":"2287","plate-loaded preacher curl":"0592","plate-loaded shoulder press":"0587","stiff-leg deadlift":"0116","ab wheel rollout":"0857","sissy squat machine":"1489","single-arm cable overhead extension":"1727","hack squat machine":"0743","walking lunge":"1460","barbell back squat":"0026","cable rear delt fly":"0202","cable rope crunch":"0175","cable y-raise":"0161","chest-supported t-bar row":"0606","crunch":"0274","dumbbell overhead extension":"1729","ez bar curl":"0447","ez bar preacher curl":"0452","hack squat calf raise":"1383","horizontal leg press":"2287","jm press":"0052","leg press (45\u00b0)":"2287","leg press calf raise":"1385","machine glute-ham raise":"3193","machine low row":"0581","machine oblique crunch":"1452","machine triceps pushdown":"0607","side plank":"3544","single-leg press":"2287","single-leg standing calf raise":"1373","smith machine row":"0761","smith machine squat":"0750","spider curl":"1675","standing leg curl":"0795","underhand barbell row":"0049","cable leg curl":"3235","cable pull-through":"0196","high-to-low cable fly":"0179","low-to-high cable fly":"0179","seated dumbbell overhead extension":"0389","smith machine incline press":"0757","standing barbell overhead press":"0091","arnold press":"2137","barbell skullcrusher":"1721","bayesian cable curl":"0868","cable rope pushdown":"0201","cable triceps kickback":"0860","concentration curl":"0297","dumbbell curl":"0285","dumbbell row":"0327","flat dumbbell fly":"0308","goblet squat":"1760","leg extension":"0585","machine crunch":"1452","machine dip":"1451","pendlay row":"3017","reverse hyperextension":"0593","split squat":"0809","sumo deadlift":"0117","weighted chest dip":"0251","barbell deadlift":"0032","barbell lunge":"0054","barbell romanian deadlift":"0085","dumbbell romanian deadlift":"1459","assisted pull-up machine":"0017","barbell front squat":"0024","barbell reverse curl":"0082","cable chest press":"2144","cable overhead triceps extension":"0149","cable rope row":"1323","close-grip bench press":"0030","donkey calf raise":"0284","dumbbell rear delt fly":"0378","dumbbell shoulder press":"0405","dumbbell step-up":"2795","dumbbell wrist curl":"0385","hanging knee raise":"1761","hip abduction machine":"0597","hip adduction machine":"0598","incline cable press":"0169","leaning cable lateral raise":"0178","lying leg curl":"0586","lying leg raise":"0865","machine hammer curl":"1615","machine overhead triceps extension":"0607","seated cable row (close grip)":"0861","seated calf raise":"0594","seated leg curl":"0599","smith machine bench press":"0748","smith machine shoulder press":"0766","standing calf raise":"0605","t-bar row":"0606","v-bar triceps pushdown":"0241","weighted pull-up":"0841","cable rope hammer curl":"0165","captain's chair leg raise":"2963","barbell bench press":"0025","barbell bent-over row":"0027","barbell curl":"0031","barbell glute bridge":"1409","barbell good morning":"0044","barbell incline bench press":"0047","barbell preacher curl":"0070","barbell reverse wrist curl":"0082","barbell shrug":"0095","barbell standing calf raise":"1372","barbell step-up":"0114","barbell wrist curl":"0126","cable curl":"0868","cable hip adduction":"0168","cable kneeling crunch":"0175","cable lateral raise":"0178","cable reverse crunch":"0873","cable reverse wrist curl":"0210","cable shrug":"0220","cable side bend":"0222","cable straight-arm pulldown":"0238","cable upright row":"0246","cable wrist curl":"0247","chest dip":"0251","chin-up":"1326","dead bug":"0276","decline barbell bench press":"0033","decline machine chest press":"1300","decline sit-up":"0282","dumbbell bench press":"0289","dumbbell front raise":"0310","dumbbell hammer curl":"0313","dumbbell incline bench press":"0314","dumbbell lateral raise":"0334","dumbbell lying triceps extension":"0351","dumbbell preacher curl":"0372","dumbbell pullover":"0375","dumbbell reverse wrist curl":"0385","dumbbell shrug":"0406","dumbbell side bend":"0407","glute-ham raise":"3193","hanging leg raise":"0472","incline dumbbell curl":"0318","incline dumbbell fly":"0319","incline machine chest press":"1299","inverted row":"0499","machine bicep curl":"0575","machine chest press":"0576","machine high row":"0581","machine lateral raise":"0584","machine preacher curl":"0592","machine pullover":"2285","machine shoulder press":"0587","machine shrug":"0604","pull-up":"0652","reverse crunch":"0872","seated barbell overhead press":"0091","seated dumbbell curl":"0391","seated dumbbell lateral raise":"0396","sissy squat":"1489","standing cable crunch":"0226","trap bar deadlift":"0811","triceps dip":"0814","wide-grip seated cable row":"0218","nordic curl":"0496","cable crossover":"0188","cable pallof press":"0979","glute kickback machine":"0228","cable glute kickback":"0228","machine hip thrust":"0058","plate-loaded hip thrust":"0058","reverse lunge":"0381","toes to bar":"0473","ez bar skullcrusher":"0060","straight-bar pushdown":"0201","trap bar shrug":"0095","45\u00b0 back extension":"0489","farmer's carry":"2133","reverse pec deck":"0602","ez bar reverse curl":"0451","rack pull":"0074","hammer strength incline press":"1299","pendulum squat":"0743","v-squat machine":"0743","belt squat":"0743","cable face pull":"0225","curtsey lunge":"0381","cable high pull":"0167","cable hip abduction":"0597","dumbbell floor press":"0289","landmine press":"0025","dumbbell decline bench press":"0301","cable decline press":"1261","seated cable chest fly":"2144","cable squeeze fly":"0158","machine inner chest press":"1301","reverse-grip bench press":"1256","wide-grip bench press":"1258","barbell floor press":"0025","low-incline dumbbell press":"0314","machine decline fly":"0596","cable fly (flat bench)":"0151","reverse-grip dumbbell press":"1622","dumbbell pullover (cross-bench)":"0375","neutral-grip lat pulldown":"0818","reverse-grip lat pulldown":"0673","v-bar lat pulldown":"0197","cable lat prayer":"0197","wide-grip pull-up":"1429","seal row":"0327","meadows row":"0049","standing cable row":"0234","machine seated row":"1350","neutral-grip machine row":"0588","machine reverse-grip row":"1348","yates row":"0049","kroc row":"0327","high-to-low cable row":"0167","low-to-high cable row":"0167","wide-grip cable row":"0218","rope lat pulldown":"0197","neutral-grip pull-up":"0651","feet-elevated inverted row":"0499","neutral wide cable row":"0218","z press":"0091","viking press":"0587","behind-the-back cable lateral raise":"0178","lu raise":"0376","cable front raise":"0162","barbell front raise":"0041","cable rear delt row":"0202","cable scarecrow":"0161","barbell upright row":"0120","dumbbell upright row":"0437","cable cuban press":"0219","seated dumbbell shoulder press":"0405","push press":"1700","cable lateral raise (high pulley)":"0178","bent-over dumbbell rear delt row":"0377","incline prone rear delt raise":"2292","seated cable face pull":"0215","machine front raise":"0584","dumbbell w-raise":"0376","cable rear delt cross":"0202","standing dumbbell arnold press":"2137","barbell cuban press":"0091","standing cable y-raise":"0161","leaning dumbbell lateral raise":"0334","21s barbell curl":"0031","drag curl":"0038","cable incline curl":"0868","cable preacher curl":"0195","high cable curl":"0868","cross-body hammer curl":"0298","incline hammer curl":"0320","zottman curl":"0439","wide-grip barbell curl":"0113","close-grip barbell curl":"0106","cable rope curl":"0868","single-arm preacher curl":"1414","waiter curl":"5201","cable drag curl":"1632","hammer preacher curl":"0370","reverse-grip cable curl":"0206","cable incline pushdown":"0172","cable reverse-grip pushdown":"0207","cable skullcrusher":"0201","bench dip":"1753","dumbbell kickback":"0333","dumbbell tate press":"0436","decline ez bar skullcrusher":"1749","reverse-grip single-arm pushdown":"0207","weighted bench dip":"0830","ez bar tate press":"1749","california press":"0052","behind-the-back wrist curl":"0104","cable wrist extension":"0247","hammer wrist curl":"0385","heels-elevated goblet squat":"1760","landmine squat":"0786","narrow-stance leg press":"2287","wide-stance leg press":"2287","cyclist squat":"0786","box squat":"0786","front-foot-elevated split squat":"0410","weighted sissy squat":"0851","dumbbell stiff-leg deadlift":"0432","slider leg curl":"0795","razor curl":"0582","seated good morning":"0044","eccentric leg curl":"0582","single-leg hip thrust":"1427","frog pump":"2571","seated hip abduction":"0597","cable fire hydrant":"0157","kas glute bridge":"1409","step-up (high box)":"0431","standing cable abduction":"0228","glute bridge march":"3561","single-leg rdl (glute focus)":"0411","dumbbell curtsey lunge":"0336","cable hip thrust":"0228","dumbbell standing calf raise":"0417","dumbbell seated calf raise":"1379","bent-knee calf raise":"0594","single-leg dumbbell calf raise":"0409","barbell seated calf raise":"0088","seated tibialis raise":"0284","bicycle crunch":"0972","cable twist":"0243","russian twist":"0687","weighted decline crunch":"0277","hanging oblique raise":"1761","v-up":"0735","dragon flag":"3303","weighted plank":"2135","hollow body hold":"0262","standing oblique cable crunch":"0226","weighted sit-up":"0282","flutter kicks":"0459","behind-the-back shrug":"0095","incline dumbbell shrug":"0329","power shrug":"0095","kelso shrug":"0406","cable upface pull":"0220","dumbbell behind-the-back shrug":"0406","snatch-grip shrug":"0095","cable rope shrug":"0220","machine alternating narrow grip seated row":"0571","machine back extension":"0573","machine deadlift":"0578","machine front pulldown":"0579","machine gripless shrug":"0580","machine kneeling leg curl":"0582","machine kneeling twist":"0583","machine leg extension":"0585","machine lying leg curl":"0586","machine military press":"0587","machine narrow grip seated row":"0588","machine one arm shoulder press":"0590","machine overhand triceps dip":"0591","machine reverse hyperextension":"0593","machine seated calf raise":"0594","machine seated crunch (chest pad)":"0595","machine seated fly":"0596","machine seated hip abduction":"0597","machine seated hip adduction":"0598","machine seated leg curl":"0599","machine seated leg raise crunch":"0600","machine seated reverse fly (parallel grip)":"0601","machine seated reverse fly":"0602","machine standing calf raise":"0605","machine t bar row":"0606","machine triceps extension":"0607","reverse grip machine lat pulldown":"0673","machine 45\u00b0 calf press":"0738","machine 45\u00b0 leg press":"0739","machine 45\u00b0 leg wide press":"0740","machine closer hack squat":"0741","machine forward angled calf raise":"0742","machine lying squat":"0744","machine donkey calf raise":"1253","machine unilateral row":"1313","machine one arm lateral wide pulldown":"1347","hack calf raise":"1383","hack one leg calf raise":"1384","machine seated squat calf raise on leg press machine":"1385","machine 45 degrees one leg press":"1425","machine seated dip":"1451","machine seated crunch":"1452","machine hammer grip preacher curl":"1615","machine reverse grip preacher curl":"1616","machine alternate leg press":"2287","machine gripper hands":"2288","dumbbell supported squat":"2804","machine lying two-one leg curl":"3195","machine standing chest press":"3758","cable alternate shoulder press":"0148","cable alternate triceps extension":"0149","cable bench press":"0151","cable concentration extension (on knee)":"0152","cable cross-over reverse fly":"0154","cable cross-over variation":"0155","cable decline fly":"0158","cable forward raise":"0161","cable front shoulder raise":"0164","cable hammer curl (with rope)":"0165","cable incline bench press":"0169","cable incline fly (on stability ball)":"0170","cable incline fly":"0171","cable incline triceps extension":"0173","cable judo flip":"0174","cable kneeling triceps extension":"0176","cable lying close-grip curl":"0182","cable one arm curl":"0190","cable overhead triceps extension (rope attachment)":"0194","cable reverse curl":"0206","cable reverse preacher curl":"0209","cable russian twists (on stability ball)":"0211","cable seated crunch":"0212","cable side crunch":"0223","cable standing back wrist curl":"0224","cable standing inner curl":"0229","dumbbell decline shrug":"0305","dumbbell lying femoral":"0339","dumbbell lying pronation":"0347","dumbbell lying supination":"0349","dumbbell one arm reverse wrist curl":"0358","dumbbell one arm wrist curl":"0364","dumbbell over bench one arm wrist curl":"0367","dumbbell over bench reverse wrist curl":"0368","dumbbell single leg split squat":"0410","dumbbell goblet squat":"1760","dumbbell step up lunge":"2795","dumbbell single leg deadlift with stepbox support":"2806","dumbbell step-up split squat":"2812","barbell straight leg deadlift":"0116","power clean":"0648","smith back shrug":"0746","smith shrug":"0767","single-arm cable pushdown":"1723","single-arm lat pulldown":"3563","diamond push-up":"0283","push-up":"0662","weighted push-up":"0662","deficit push-up":"1274","pike push-up":"1296","single-arm cable fly":"0188","single-arm machine chest press":"0576","single-arm seated cable row":"0861","smith machine romanian deadlift":"0752","single-arm cable rear delt fly":"0191","single-leg leg extension":"0585","single-leg lying leg curl":"0586","single-leg seated leg curl":"0599","smith machine split squat":"0768","smith machine hip thrust":"0756","reverse hack squat":"0743","single-leg seated calf raise":"0594"};
+function exGifCached(name,res){const k=(name||"").toLowerCase().trim();const c=(state.data.exGifCache||{})[k];if(c&&c.man)return c.id?exGifUrl(c.id,res):null;/* manual pick beats everything */if(EX_GIF_IDS[k])return exGifUrl(EX_GIF_IDS[k],res);return (c&&c.id)?exGifUrl(c.id,res):null;}
 async function exdbGif(name,res){
   const d=state.data;d.exGifCache=d.exGifCache||{};
   const k=(name||"").toLowerCase().trim();if(!k)return null;
+  const c0=d.exGifCache[k];if(c0&&c0.man)return c0.id?exGifUrl(c0.id,res):null;
   if(EX_GIF_IDS[k])return exGifUrl(EX_GIF_IDS[k],res);
   const c=d.exGifCache[k];
   if(c&&(Date.now()-(c.t||0))<(c.id?30:7)*864e5)return c.id?exGifUrl(c.id,res):null;
@@ -9099,7 +9222,44 @@ function attachExGif(elId,name,res){
   if(cached)return put(cached);
   exdbGif(name,res).then(put).catch(()=>{});
 }
-function exGifBad(name){const d=state.data;d.exGifCache=d.exGifCache||{};d.exGifCache[(name||"").toLowerCase().trim()]={id:null,t:Date.now()};save();}
+function exGifBad(name){const d=state.data;d.exGifCache=d.exGifCache||{};const k=(name||"").toLowerCase().trim();d.exGifCache[k]=Object.assign(d.exGifCache[k]||{},{id:null,t:Date.now()});save();}
+/* 🖼 WRONG PICTURE? — cycle through every candidate demo the Batcomputer can find for this lift.
+   Each tap tries the next one; past the last it hides the demo (anatomy figure only); the choice
+   sticks (man=1 beats the hard map and the auto-search) so a bad demo is never forced on you again. */
+async function fixExPic(name,elId){
+  const d=state.data;d.exGifCache=d.exGifCache||{};
+  const k=(name||"").toLowerCase().trim();if(!k)return;
+  let c=d.exGifCache[k]||{};
+  if(!Array.isArray(c.alts)||!c.alts.length){
+    toast("🎩 Pulling alternative footage from the Batcomputer…");
+    let alts=[];
+    try{
+      const q=k.replace(/\(.*?\)/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
+      const rsp=await fetch("https://exercisedb.p.rapidapi.com/exercises/name/"+encodeURIComponent(q)+"?limit=20",
+        {headers:{"X-RapidAPI-Key":exdbKey(),"X-RapidAPI-Host":"exercisedb.p.rapidapi.com"}});
+      if(rsp.ok){const arr=await rsp.json();alts=(Array.isArray(arr)?arr:[]).map(e=>e&&e.id).filter(Boolean);}
+    }catch(e){}
+    const cur=(c.man?c.id:null)||EX_GIF_IDS[k]||c.id||null;
+    if(cur&&!alts.includes(cur))alts.unshift(cur);
+    if(!alts.length){toast("No alternative demos in the files, sir — anatomy figure it is.");c={id:null,man:1,alts:[],t:Date.now()};d.exGifCache[k]=c;save();_fixPicApply(name,elId);return;}
+    c=Object.assign(c,{alts,t:Date.now()});
+    c.ptr=cur?alts.indexOf(cur):-1;
+  }
+  // advance: next candidate → … → null (no demo) → wrap to first
+  c.ptr=(c.ptr==null?-1:c.ptr)+1;
+  if(c.ptr>=c.alts.length){c.ptr=-1;c.id=null;}
+  else c.id=c.alts[c.ptr];
+  c.man=1;c.t=Date.now();d.exGifCache[k]=c;save();
+  try{haptic("tap");}catch(e){}
+  _fixPicApply(name,elId);
+  toast(c.id?("🖼 Demo "+(c.ptr+1)+" of "+c.alts.length+" — tap again if it's still wrong."):"🖼 Demo hidden — clean anatomy figure only.");
+}
+function _fixPicApply(name,elId){
+  const el=elId&&document.getElementById(elId);if(!el)return;
+  el.querySelectorAll(".exgif").forEach(n=>n.remove());el.classList.remove("hasgif");
+  const u=exGifCached(name,360);
+  if(u)el.insertAdjacentHTML("beforeend",`<img class="exgif" src="${u}" alt="" onload="this.parentElement.classList.add('hasgif')" onerror="this.parentElement.classList.remove('hasgif');this.remove()">`);
+}
 function alfredContext(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
   const expMap={RECRUIT:"beginner (<1yr — lower MEV, large newbie gains available)",VIGILANTE:"intermediate (1–3yr — more precise volume needed, slower gains)",DARK_KNIGHT:"advanced (3+yr — near MRV often required, recovery management critical)"};
@@ -11754,6 +11914,7 @@ function pickAdd(name){
     return;
   }
   if(state.pickerCb){const cb=state.pickerCb;state.pickerCb=null;cb(name);return;}
+  if(!state.session){toast("No active session, sir — start a mission first, or add it to a split from the editor.");return;}
   addExerciseToSession(name);
 }
 
@@ -12091,7 +12252,7 @@ function playEntrance(name){
 /* Always anatomy SVG — the grey bodybuilder with red worked muscles. Never demo images. */
 function thumb(ex,small){
   const g=exGifCached(ex.n);   // cached-only in lists — no fetch storm while scrolling
-  return `<span class="exwrap${small?' sm':''}">${figureSVG(ex)}${g?`<img class="exgif" src="${g}" alt="" loading="lazy" onload="this.parentElement.classList.add('hasgif')" onerror="this.parentElement.classList.remove('hasgif');this.remove()">`:''}</span>`;
+  return `<span class="exwrap${small===2?' xs':small?' sm':''}">${figureSVG(ex)}${g?`<img class="exgif" src="${g}" alt="" loading="lazy" onload="this.parentElement.classList.add('hasgif')" onerror="this.parentElement.classList.remove('hasgif');this.remove()">`:''}</span>`;
 }
 
 /* Remove the yellow dashed divider + FRONT/BACK labels — clean symmetrical figure */
@@ -12286,7 +12447,7 @@ function renderLogging(){
     const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
 
     // Figure — anatomy SVG, with the animated ExerciseDB demo layered on top once fetched.
-    const figHtml=`<span class="exwrap" id="logfig" style="width:88px;height:88px;flex:0 0 88px;border-radius:16px;border-color:${col}44;box-shadow:0 0 0 1px ${col}18,0 8px 28px -8px ${col}40">${figureSVG(ex)}</span>`;
+    const figHtml=`<span class="exwrap" id="logfig" onclick="openExDetail('${esc(e.name).replace(/'/g,"")}')" style="width:88px;height:88px;flex:0 0 88px;border-radius:16px;border-color:${col}44;box-shadow:0 0 0 1px ${col}18,0 8px 28px -8px ${col}40;cursor:pointer">${figureSVG(ex)}</span>`;
 
     h+=`<div class="log-focus">
       <div class="log-focus-head">
@@ -12300,7 +12461,7 @@ function renderLogging(){
           ${(()=>{try{if(e._title&&!e._titleWon)return `<div class="prwin" style="border-color:rgba(255,140,34,.6);color:#FF8C22">🏆 TITLE FIGHT LIVE — beat the record, take the belt.</div>`;if(titleFightEligible(e.name))return `<button class="chip" style="font-size:10.5px;padding:4px 10px;margin-top:5px;align-self:flex-start;border-color:rgba(255,140,34,.55);color:#FF8C22;box-shadow:0 0 12px -4px rgba(255,140,34,.8)" onclick="openTitleFight(${fei})">🏆 TITLE FIGHT AVAILABLE</button>`;}catch(_){}return '';})()}
           <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
           ${liberationTicker(fei)}
-          <div class="row" style="gap:6px;margin-top:5px;align-self:flex-start"><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="quickRamp(${fei})">🪜 Warm-up ramp</button><button class="chip" style="font-size:10.5px;padding:3px 9px;color:var(--text3)" onclick="openSkipEx(${fei})">⏭ Skip tonight</button></div>
+          <div class="row" style="gap:6px;margin-top:5px;align-self:flex-start;flex-wrap:wrap"><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="quickRamp(${fei})">🪜 Warm-up ramp</button><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="openReorder()">↕ Order</button><button class="chip" style="font-size:10.5px;padding:3px 9px;color:var(--text3)" onclick="openSkipEx(${fei})">⏭ Skip tonight</button></div>
           ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
         </div>
         <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove">✕</button>
@@ -12430,7 +12591,7 @@ function renderLogging(){
 
   // Other exercises — swipable rows
   if(ses.exercises.length>1){
-    h+=`<div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin:6px 0 8px">OTHER EXERCISES <span style="font-size:9px;opacity:.6">· swipe ← delete · swipe → swap</span></div>`;
+    h+=`<div class="row sp" style="margin:6px 0 8px"><span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)">OTHER EXERCISES <span style="font-size:9px;opacity:.6">· swipe ← delete · swipe → swap</span></span><button class="chip" style="font-size:10px;padding:3px 9px;flex:none" onclick="openReorder()">↕ Reorder</button></div>`;
     const gCount={};ses.exercises.forEach(function(e){if(e.group)gCount[e.group]=(gCount[e.group]||0)+1;});
     let curG=null,gLetters={},gSeq=0;
     ses.exercises.forEach(function(e,ei){
