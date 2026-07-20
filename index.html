@@ -11535,9 +11535,11 @@ function gtv2ScorePanel(){
   const patrolClr=w>=goal?"var(--green)":"var(--gold)";
   return `<div class="gtv2-grid">
     <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score}</div><div class="gtv2-note">${esc(r.label)} — ${esc(r.line)}</div><div class="gtv2-meter"><i style="width:${r.score}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
-    ${(()=>{let worstM=null,wcr=-1;M12.forEach(m=>{const c=districtCrime(m).crime;if(c>wcr){wcr=c;worstM=m;}});
+    ${(()=>{let worstM=null,wcr=-1;M12.forEach(m=>{const dc=districtCrime(m);if(!dc.untrained&&dc.crime>wcr){wcr=dc.crime;worstM=m;}});
+      // worstM stays null when nothing has ever been trained — don't invent a villain narrative
+      // ("Bane rising in The Narrows") from a district you've never even set foot in.
       const vil=worstM?((NEMESIS_MAP[worstM]||{}).villain||"the Rogues"):"",dist=worstM?(MUSCLE_DISTRICT[worstM]||MNAME[worstM]):"";
-      const crit=t.score>=72,hot=t.score>=50,note=(hot&&vil)?`<b style="color:${t.color}">${esc(vil)}</b> ${crit?"holds":"rising in"} ${esc(dist)}`:esc(t.desc);
+      const crit=t.score>=72,hot=t.score>=50,note=(worstM&&hot&&vil)?`<b style="color:${t.color}">${esc(vil)}</b> ${crit?"holds":"rising in"} ${esc(dist)}`:esc(t.desc);
       return `<div class="gtv2-panel gtv2-threat${crit?" crit":""}" style="border-color:${t.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${t.color}" onclick="openThreatInfo()"><i class="thz"></i>
       <div class="gtv2-label">Threat <span class="threat-skull" style="color:${t.color}">${hot?"☠️":"🦇"}</span></div>
       <div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div>
@@ -11917,16 +11919,24 @@ function gothamCampaignMap(){
   let s="",defs="";
   M12.forEach((m,i)=>{
     const[x,y]=POS[m];
-    const dc=districtCrime(m), b=districtBand(dc.crime);
-    const held=dc.crime<45, lost=dc.crime>=70;
+    const dc=districtCrime(m);
+    // A never-trained muscle is UNCLAIMED territory, not a villain conquest — you can't lose ground
+    // you never held. Rendering it "HELD BY [VILLAIN]" (the old behaviour) contradicted the card's
+    // own header, which already excludes untrained muscles from "lost" — every brand-new player
+    // opened the app to a map where every single district showed a villain mugshot despite the
+    // header saying "the city is yours, sir" right above it.
+    const unclaimed=dc.untrained;
+    const held=!unclaimed&&dc.crime<45, lost=!unclaimed&&dc.crime>=70;
     const villain=(NEMESIS_MAP[m]||{}).villain||"the Rogues";
     const vimg=lost?villainImgUrl(villain):"";
-    const col=held?"#FFD048":lost?"#FF3622":"#FF8C22";
-    const plateFill=lost?"rgba(28,4,2,.88)":held?"rgba(26,19,4,.86)":"rgba(28,15,3,.86)";
+    const col=unclaimed?"#7a8290":held?"#FFD048":lost?"#FF3622":"#FF8C22";
+    const plateFill=unclaimed?"rgba(16,18,24,.82)":lost?"rgba(28,4,2,.88)":held?"rgba(26,19,4,.86)":"rgba(28,15,3,.86)";
     if(vimg||held)defs+=`<clipPath id="gwv${i}"><circle cx="${x-58}" cy="${y}" r="19"/></clipPath>`;
-    s+=`<g style="cursor:pointer" onclick="closeOverlay();muscleDrill('${m}')">
-      <rect x="${x-52}" y="${y-21}" width="122" height="42" rx="11" fill="${plateFill}" stroke="${col}" stroke-opacity="${held?'.8':'.95'}" stroke-width="1.8" style="filter:drop-shadow(0 0 ${lost?'11':'6'}px ${col}${lost?'':'66'})"/>
-      ${lost?(vimg
+    s+=`<g style="cursor:pointer${unclaimed?';opacity:.72':''}" onclick="closeOverlay();muscleDrill('${m}')">
+      <rect x="${x-52}" y="${y-21}" width="122" height="42" rx="11" fill="${plateFill}" stroke="${col}" stroke-opacity="${held?'.8':unclaimed?'.55':'.95'}" stroke-width="1.8" stroke-dasharray="${unclaimed?'3,3':'none'}" style="filter:drop-shadow(0 0 ${lost?'11':'6'}px ${col}${lost?'':'66'})"/>
+      ${unclaimed
+        ?`<circle cx="${x-58}" cy="${y}" r="17" fill="#14161c" stroke="${col}" stroke-width="1.6" stroke-dasharray="2,2"/><text x="${x-58}" y="${y+6}" text-anchor="middle" font-size="15" fill="${col}" font-family="Bebas Neue,sans-serif">?</text>`
+      :lost?(vimg
         ?`<circle cx="${x-58}" cy="${y}" r="21" fill="#1a0300" stroke="#FF3622" stroke-width="2.2" style="filter:drop-shadow(0 0 8px rgba(255,54,34,.9))"/>
           <image href="${esc(vimg)}" x="${x-79}" y="${y-21}" width="42" height="42" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
         :`<circle cx="${x-58}" cy="${y}" r="17" fill="#2a0602" stroke="#FF3622" stroke-width="2"/><text x="${x-58}" y="${y+6}" text-anchor="middle" font-size="18">🦹</text>`)
@@ -11935,11 +11945,12 @@ function gothamCampaignMap(){
           <image href="assets/batman-medal.jpg" x="${x-79}" y="${y-21}" width="42" height="42" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
         :`<circle class="gc-beacon" cx="${x+56}" cy="${y-12}" r="4.5" fill="${col}" style="animation-delay:${(i*0.3)%1.7}s"/>`}
       <text x="${x-31}" y="${y-2}" font-family="Bebas Neue,sans-serif" font-size="19" letter-spacing="1.2" fill="${held?'#FFD048':col}">${MNAME[m].toUpperCase()}</text>
-      <text x="${x-31}" y="${y+14}" font-family="DM Sans,sans-serif" font-size="9" font-weight="800" letter-spacing=".7" fill="${lost?'rgba(255,140,120,.95)':held?'rgba(255,208,72,.7)':'rgba(255,190,120,.85)'}">${lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
+      <text x="${x-31}" y="${y+14}" font-family="DM Sans,sans-serif" font-size="9" font-weight="800" letter-spacing=".7" fill="${unclaimed?'rgba(170,178,192,.85)':lost?'rgba(255,140,120,.95)':held?'rgba(255,208,72,.7)':'rgba(255,190,120,.85)'}">${unclaimed?"UNCLAIMED · NO PATROL YET":lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
     </g>`;
   });
   const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
-  return `<div class="row" style="gap:13px;justify-content:center;margin-bottom:7px">${leg("#FFD048","yours")}${leg("#FF8C22","contested")}${leg("#FF3622","villain-held")}</div>
+  const anyUnclaimed=M12.some(m=>districtCrime(m).untrained);
+  return `<div class="row" style="gap:13px;justify-content:center;margin-bottom:7px;flex-wrap:wrap">${leg("#FFD048","yours")}${leg("#FF8C22","contested")}${leg("#FF3622","villain-held")}${anyUnclaimed?leg("#7a8290","unclaimed"):""}</div>
   <svg viewBox="0 0 560 430" style="width:100%;display:block;border-radius:16px;border:1px solid rgba(120,155,205,.22);box-shadow:0 18px 50px -20px rgba(0,0,0,.95),0 0 34px -16px rgba(90,140,200,.5)">
     <defs>
       <radialGradient id="gwvig" cx="50%" cy="42%" r="72%"><stop offset="55%" stop-color="rgba(2,4,8,0)"/><stop offset="100%" stop-color="rgba(2,4,8,.72)"/></radialGradient>
@@ -11954,8 +11965,10 @@ function gothamCampaignMap(){
 /* 🗺️ TERRITORY WAR — the full living map, front and center on the Gotham tab. */
 function territoryWarCard(){
   try{
-    const held=M12.filter(m=>districtCrime(m).crime<45).length;
-    const lost=M12.filter(m=>districtCrime(m).crime>=70&&(state.data.muscleVol[m]||0)>0);
+    const dcAll=M12.map(m=>({m,dc:districtCrime(m)}));
+    const held=dcAll.filter(x=>!x.dc.untrained&&x.dc.crime<45).length;
+    const lost=dcAll.filter(x=>!x.dc.untrained&&x.dc.crime>=70).map(x=>x.m);
+    const neverTrained=dcAll.every(x=>x.dc.untrained);   // brand-new player — nothing claimed, nothing lost either
     const band=districtBand(cityCrime());
     const worst=lost[0]?((NEMESIS_MAP[lost[0]]||{}).villain||"the Rogues"):null;
     // holding the whole city stamps the gold-leaf card frame — permanent honor
@@ -11964,7 +11977,9 @@ function territoryWarCard(){
       <div class="row sp" style="align-items:center;margin-bottom:9px">
         <div><div class="gtv2-label">🗺️ Territory War</div>
           <div style="font-family:var(--disp);font-size:22px;line-height:1.1;color:${band[1]};text-shadow:0 0 16px ${band[1]}66">${held}<span style="font-size:13px;color:var(--text3)">/12</span> <span style="font-size:13px;letter-spacing:.08em">${band[0]}</span></div>
-          ${worst?`<div class="mini" style="color:#ff8a7a;font-weight:800;letter-spacing:.06em;margin-top:1px">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</div>`:`<div class="mini" style="color:var(--text3);margin-top:1px">the city is yours, sir</div>`}
+          ${worst?`<div class="mini" style="color:#ff8a7a;font-weight:800;letter-spacing:.06em;margin-top:1px">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</div>`
+            :neverTrained?`<div class="mini" style="color:var(--text3);margin-top:1px">no districts patrolled yet, sir — pick your first fight</div>`
+            :`<div class="mini" style="color:var(--text3);margin-top:1px">the city is yours, sir</div>`}
         </div>
         <button class="chip g" style="font-size:11px;padding:5px 11px" onclick="openDistricts()">⚙️ priorities ›</button>
       </div>
