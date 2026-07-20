@@ -40,15 +40,30 @@ If a decision isn't answerable here, add it here FIRST, then build.
   visual layer (curated photo `.exfigimg` OR the anatomy `<svg>`) plus an optional animated `.exgif`
   demo layered on top; `.hasgif` on the wrapper hides the base layer. Build the base layer with
   `figLayerHtml(ex, fi)` — never hand-roll the img/svg pair, it's what makes "one layer only" hold.
-- `.figframe` — the HERO picture banner (exercise dossier + the active lift's focus card during
-  logging). Full-bleed image, muscle-colour ambient glow (`--fg`), tactical corner brackets
-  (`.figframe-c.tl/tr/bl/br`, same HUD language as the garage-entrance cinematic), a bottom gradient
-  caption plate (`.figframe-cap`) carrying name + target muscle, and optional floating tool buttons
-  (`.figframe-tool.left/right`, e.g. the ✕ remove control). Content: `.figframe-glow` + a `.figlayer`
-  div holding `figLayerHtml(ex)` + the corner/caption markup. Same single-layer contract as `.exwrap`.
+- `.scanpanel` — the "Batcomputer target-scan" HERO picture (exercise dossier + the active lift's
+  focus card during logging). Built by `scanPanelHtml(o)` — never hand-roll the markup. A physical
+  instrument, not a flat photo crop: brushed-metal bezel (`.scanpanel` outer, gradient + padding),
+  a glass `.scanpanel-screen` (holds the id used by `attachExGif`/pickers), a faint blueprint
+  `.scanpanel-grid`, a slow ambient `.scanpanel-scan` sweep, gold `.scanpanel-c.tl/tr/bl/br` corner
+  reticles, and a `.scanpanel-cap` HUD readout (pulsing-dot tag + name + muscle/equipment line).
+  Same single-layer contract as `.exwrap` (`figLayerHtml`). ExerciseDB demo GIFs ship on a flat
+  WHITE background that clashes badly with this dark UI — do NOT try to fix that with a dark
+  overlay/vignette (tried, doesn't work: the white is the image's *center*, not just its edges).
+  The real fix is the shared `.exgif` filter: `grayscale→brightness→contrast→sepia→hue-rotate→
+  saturate` retints the whole plate into a cool steel-blue "scan" tone (the standard CSS-filter
+  duotone recipe). This loses the source's red muscle-highlight, but the panel's own muscle-coloured
+  glow (`--fg`) and the caption text already carry that information, so nothing is actually lost.
+  `.scanpanel img.exfigimg` (the curated PNGs, which already look great on their own black bg) only
+  gets a mild contrast/saturate bump, no retint.
+- `.mission-briefing` (`missionBriefingHero()`) — the Mission tab's hero: tonight's operation pulled
+  OUT of the day list into its own dramatic card (blueprint grid, pulsing "TONIGHT'S OPERATION" tag,
+  big title, muscle chips, exercise thumbnail strip, one huge glowing `.mb-start` DEPLOY button).
+  The day-list row for tonight stays a plain compact row (chip only, no duplicate thumbnail strip —
+  that would just repeat the hero) since the hero above already owns that spotlight.
 - `.picp-grid` / `.picp-tile` — the picture-picker gallery (`openPicPicker`): a searchable, filterable
   grid of every candidate demo the Batcomputer can find, plus an "Anatomy figure" tile. Never fall
-  back to a blind "cycle to next" control — always let the user see and choose.
+  back to a blind "cycle to next" control — always let the user see and choose. Tiles intentionally
+  show the RAW un-retinted image (functions as a contact sheet for picking, not the in-app display).
 - Sheets: `openSheet(html)` bottom sheet; `openSheetTall` for full content. Toast: `toast(msg)`.
 - Cinematics: `playStinger(title, sub, accent)` 1.5s full-screen bat-slam (rewards only), `prFlash()` flashbulb, `sfx(kind)` WebAudio, `haptic(kind)`.
 - Nav: barbell bottom bar (`.nav-bar` knurled steel, active tab = loaded gold plate).

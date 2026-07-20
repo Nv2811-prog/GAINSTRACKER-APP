@@ -321,33 +321,51 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
    painted). The animated demo (.exgif), when present, sits on top and hides every .figlayer. */
 .exwrap .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2}
 .exwrap .figlayer svg{width:100%;height:100%;display:block}
-/* 🖼 FIGFRAME — cinematic hero picture banner (exercise dossier + the active lift's focus card).
-   Full-bleed image + gradient caption plate, same language as the app's other hero screens
-   (mission hero, patrol briefing). Exactly ONE base layer shows — photo or anatomy svg, never
-   both — the animated demo (.exgif, shared rule above) layers on top and hides it via .hasgif. */
-.figframe{position:relative;overflow:hidden;background:radial-gradient(ellipse 100% 85% at 50% 26%,#181c2c,#05060a 86%);border:1px solid var(--fg,rgba(242,208,121,.3));cursor:pointer}
-.figframe-glow{position:absolute;inset:-25%;z-index:1;pointer-events:none;background:radial-gradient(ellipse 50% 42% at 50% 38%,var(--fg,rgba(242,208,121,.35)),transparent 72%);opacity:.6;filter:blur(1px)}
-.figframe .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:flex;align-items:center;justify-content:center}
-.figframe .figlayer svg{height:94%;width:auto;display:block;filter:drop-shadow(0 12px 22px rgba(0,0,0,.65))}
-.figframe img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;pointer-events:none}
-.figframe.hasgif .figlayer{visibility:hidden}
-/* ExerciseDB demo GIFs ship on a flat white background — glaring against this dark, gothic UI.
-   A multiply-blended dark wash neutralises the white toward the palette while leaving the demo's
-   grey/red linework readable, so a picked demo never looks like a pasted-in foreign asset. */
-.figframe-tint{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 92% 82% at 50% 34%,rgba(8,9,15,.9),rgba(3,4,7,.97));mix-blend-mode:multiply;opacity:0;transition:opacity .2s ease}
-.figframe.hasgif .figframe-tint{opacity:1}
-.figframe-c{position:absolute;width:16px;height:16px;border:0 solid rgba(242,208,121,.5);z-index:5;pointer-events:none}
-.figframe-c.tl{top:9px;left:9px;border-top-width:2px;border-left-width:2px;border-radius:5px 0 0 0}
-.figframe-c.tr{top:9px;right:9px;border-top-width:2px;border-right-width:2px;border-radius:0 5px 0 0}
-.figframe-c.bl{bottom:9px;left:9px;border-bottom-width:2px;border-left-width:2px;border-radius:0 0 0 5px}
-.figframe-c.br{bottom:9px;right:9px;border-bottom-width:2px;border-right-width:2px;border-radius:0 0 5px 0}
-.figframe-cap{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:26px 14px 10px;background:linear-gradient(180deg,transparent,rgba(4,5,9,.6) 42%,rgba(4,5,9,.95) 100%);pointer-events:none}
-.figframe-cap b{display:block;font-family:var(--disp);font-size:18px;letter-spacing:.02em;line-height:1.15;color:var(--text);text-shadow:0 2px 10px rgba(0,0,0,.75)}
-.figframe-cap span{display:block;font-size:10px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;margin-top:2px}
-.figframe-tool{position:absolute;top:8px;z-index:7;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(6,8,13,.68);border:1px solid rgba(255,255,255,.14);color:var(--text2);backdrop-filter:blur(3px);cursor:pointer;transition:transform .12s ease}
-.figframe-tool:active{transform:scale(.9)}
-.figframe-tool.right{right:8px}
-.figframe-tool.left{left:8px}
+/* 🦇 SCANPANEL — "Batcomputer target-scan" hero picture (exercise dossier + the active lift's
+   focus card during logging). A physical instrument, not a flat photo crop: brushed-metal bezel,
+   glass screen with a faint blueprint grid, a slow ambient scan sweep, gold targeting-reticle
+   corners and a HUD readout caption — ties into lore already in this app (Batcomputer, dossiers,
+   case files) instead of a generic dark-mode overlay. Exactly ONE base layer ever shows — photo or
+   anatomy svg, never both (figlayer, shared rule above) — the animated demo (.exgif) layers on top.
+   Demo GIFs ship on a flat white background from ExerciseDB; the fix is NOT to crush it black —
+   .exgif carries a moderate filter (shared rule) that tones the white to a warm off-white and
+   keeps the red muscle-highlight legible, and the glass/vignette/grid do the rest of the work. */
+.scanpanel{position:relative;border-radius:17px;padding:5px;cursor:pointer;
+  background:linear-gradient(155deg,#3a4152 0%,#171b26 42%,#08090d 100%);
+  border:1px solid rgba(242,208,121,.22);
+  box-shadow:0 22px 50px -26px rgba(0,0,0,.92),0 0 44px -20px var(--fg,rgba(242,208,121,.4)),inset 0 1px 0 rgba(255,255,255,.1)}
+.scanpanel-screen{position:relative;height:100%;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse 120% 100% at 50% 16%,#141a28 0%,#05060a 75%);box-shadow:inset 0 2px 16px rgba(0,0,0,.8),inset 0 0 0 1px rgba(0,0,0,.65)}
+.scanpanel-grid{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.55;
+  background-image:linear-gradient(rgba(242,208,121,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.06) 1px,transparent 1px);
+  background-size:17px 17px;
+  -webkit-mask-image:radial-gradient(ellipse 88% 78% at 50% 40%,#000 40%,transparent 88%);mask-image:radial-gradient(ellipse 88% 78% at 50% 40%,#000 40%,transparent 88%)}
+.scanpanel .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:flex;align-items:center;justify-content:center}
+.scanpanel .figlayer svg{height:92%;width:auto;display:block;filter:drop-shadow(0 12px 22px rgba(0,0,0,.65))}
+.scanpanel img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;pointer-events:none;filter:contrast(1.08) saturate(1.1)}
+.scanpanel-screen.hasgif .figlayer{visibility:hidden}
+.scanpanel-scan{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+.scanpanel-scan::after{content:"";position:absolute;left:0;right:0;height:46%;top:-46%;
+  background:linear-gradient(180deg,transparent,rgba(242,208,121,.1) 46%,rgba(242,208,121,.16) 50%,rgba(242,208,121,.1) 54%,transparent);
+  filter:blur(2px);animation:spScan 7s ease-in-out infinite}
+@keyframes spScan{0%,100%{top:-46%}50%{top:100%}}
+.scanpanel-vig{position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse 102% 92% at 50% 40%,transparent 52%,rgba(3,4,7,.58) 100%)}
+.scanpanel-c{position:absolute;width:13px;height:13px;border:0 solid rgba(242,208,121,.7);z-index:6;pointer-events:none;filter:drop-shadow(0 0 5px rgba(242,208,121,.55))}
+.scanpanel.entrance .scanpanel-c{animation:spCorner .4s ease both}
+.scanpanel-c.tl{top:8px;left:8px;border-top-width:2px;border-left-width:2px}
+.scanpanel-c.tr{top:8px;right:8px;border-top-width:2px;border-right-width:2px}
+.scanpanel-c.bl{bottom:8px;left:8px;border-bottom-width:2px;border-left-width:2px}
+.scanpanel-c.br{bottom:8px;right:8px;border-bottom-width:2px;border-right-width:2px}
+@keyframes spCorner{from{opacity:0;transform:scale(1.6)}to{opacity:1;transform:scale(1)}}
+.scanpanel-cap{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:24px 14px 10px;background:linear-gradient(180deg,transparent,rgba(4,5,9,.62) 40%,rgba(4,5,9,.96) 100%);pointer-events:none}
+.scanpanel-tag{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;font-weight:800;margin-bottom:3px;opacity:.92}
+.scanpanel-tag i{width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor;flex:none;animation:spDot 1.8s ease-in-out infinite}
+@keyframes spDot{0%,100%{opacity:1}50%{opacity:.3}}
+.scanpanel-cap b{display:block;font-family:var(--disp);font-size:18px;letter-spacing:.02em;line-height:1.15;color:var(--text);text-shadow:0 2px 10px rgba(0,0,0,.75)}
+.scanpanel-cap span{display:block;font-size:10px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;margin-top:2px}
+.scanpanel-tool{position:absolute;top:8px;z-index:8;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(6,8,13,.72);border:1px solid rgba(255,255,255,.15);color:var(--text2);backdrop-filter:blur(3px);cursor:pointer;transition:transform .12s ease}
+.scanpanel-tool:active{transform:scale(.9)}
+.scanpanel-tool.right{right:8px}
+.scanpanel-tool.left{left:8px}
 /* 🖼 picture picker grid — filterable gallery of candidate demos, tap to choose */
 .picp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px}
 .picp-tile{cursor:pointer;border-radius:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);padding:6px 6px 8px;text-align:center;transition:border-color .12s,box-shadow .12s,background .12s}
@@ -390,13 +408,18 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .resumebar .rb-go{font-size:12px;font-weight:800;letter-spacing:.05em;color:#0b0a06;background:var(--gold2);border-radius:8px;padding:6px 9px;flex:none}
 /* Always-on top bar: position:fixed (not sticky — iOS Safari/PWA refuses to pin sticky here),
    so the timers stay glued to the top of the screen no matter how far you scroll. */
-.timers{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;z-index:30;display:flex;align-items:stretch;gap:8px;background:rgba(6,6,8,.94);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);padding:calc(8px + env(safe-area-inset-top)) 14px 9px;box-shadow:0 6px 20px -9px rgba(0,0,0,.65)}
-.tbox{flex:1;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:7px;background:var(--bg2)}
-.tbox .num{font-size:26px;color:var(--gold2);display:block}
-.tbox.rest .num{color:var(--blue)}
-.tbox small{font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
+.timers{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;z-index:30;display:flex;align-items:stretch;gap:8px;background:linear-gradient(180deg,rgba(10,11,15,.97),rgba(6,6,8,.94));backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);padding:calc(8px + env(safe-area-inset-top)) 14px 9px;box-shadow:0 6px 20px -9px rgba(0,0,0,.65),inset 0 -1px 0 rgba(242,208,121,.14)}
+/* Instrument-gauge treatment — brushed metal bezel + recessed glass, same material language as
+   .scanpanel, so the timer readout reads as part of the same Batcomputer instrument, not a plain box. */
+.tbox{flex:1;text-align:center;border-radius:12px;padding:8px 7px 7px;position:relative;overflow:hidden;
+  background:linear-gradient(165deg,#20242f 0%,#0e1016 55%,#07080b 100%);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 2px 9px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08),0 4px 14px -8px rgba(0,0,0,.7)}
+.tbox .num{font-size:26px;color:var(--gold2);display:block;text-shadow:0 0 14px rgba(255,208,72,.5);position:relative;z-index:1}
+.tbox.rest .num{color:var(--blue);text-shadow:0 0 14px rgba(60,150,255,.5)}
+.tbox small{font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;position:relative;z-index:1}
 /* Minimalist minimise control — just a down-arrow. */
-.minbtn{flex:none;width:36px;border:1px solid var(--border2);border-radius:11px;background:var(--bg2);color:var(--text3);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s,color .12s,background .12s}
+.minbtn{flex:none;width:36px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:linear-gradient(165deg,#20242f 0%,#0e1016 55%,#07080b 100%);box-shadow:inset 0 2px 9px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08);color:var(--text3);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s,color .12s,background .12s}
 .minbtn:active{transform:scale(.94);color:var(--gold2);background:rgba(232,197,106,.12)}
 
 /* recovery bars / mev */
@@ -515,7 +538,13 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .prribbon{background:linear-gradient(135deg,rgba(255,208,72,.16),rgba(46,204,113,.10));border:1px solid rgba(255,208,72,.5);box-shadow:0 0 26px -10px rgba(255,208,72,.7)}
 .es-title{color:var(--gold2);text-shadow:0 0 18px rgba(255,208,72,.4)}
 /* Animated exercise demo (ExerciseDB) — REPLACES the SVG figure inside any .exwrap (never both) */
-.exgif{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;background:#fff;z-index:3;animation:viewFade .3s var(--ease-out) both}
+/* ExerciseDB demos ship on a flat WHITE background — the actual problem is the white IS the
+   center of the image, not just its edges, so no vignette can hide it. Real fix: a true CSS
+   duotone (grayscale → sepia → hue-rotate is the standard filter-only recipe for retinting any
+   image to an arbitrary hue) recolours the whole plate into a cool steel-blue "scan" tone — reads
+   as an intentional Batcomputer readout, not a pasted-in white screenshot. Loses the source's red
+   muscle highlight, but the caption + the panel's own muscle-coloured glow already carry that. */
+.exgif{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;background:#fff;z-index:3;animation:viewFade .3s var(--ease-out) both;filter:grayscale(1) brightness(.4) contrast(1.15) sepia(1) hue-rotate(184deg) saturate(1.05)}
 .exwrap.hasgif>svg,.exwrap.hasgif>.figlayer{visibility:hidden}
 .restbtn{padding:13px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));color:#e9eef6;font-family:var(--disp);letter-spacing:.06em;font-size:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .restbtn.go{background:linear-gradient(180deg,rgba(201,168,76,.34),rgba(201,168,76,.12));border-color:rgba(201,168,76,.5);color:var(--gold2)}
@@ -1059,6 +1088,31 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .freq2-row{display:flex;flex-wrap:wrap;gap:6px}
 .freq2-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer;transition:transform .12s ease}
 .freq2-chip:active{transform:scale(.94)}
+/* 🎯 MISSION BRIEFING — the dominant hero moment on the Mission tab: tonight's operation pulled
+   out of the day list into its own Batcomputer-grid card, muscle chips, exercise strip, one huge
+   DEPLOY button. Replaces "just another highlighted row" with an actual mission-control feeling. */
+.mission-briefing{position:relative;overflow:hidden;border-radius:20px;margin-bottom:13px;padding:20px 18px 18px;cursor:pointer;
+  background:linear-gradient(165deg,#241a08 0%,#130e04 45%,#07090d 100%);
+  border:1px solid rgba(242,208,121,.32);
+  box-shadow:0 26px 60px -30px rgba(0,0,0,.95),0 0 56px -26px rgba(242,208,121,.4),inset 0 1px 0 rgba(255,255,255,.08)}
+.mb-grid{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(242,208,121,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.055) 1px,transparent 1px);
+  background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(ellipse 95% 80% at 22% 12%,#000 0%,transparent 78%);mask-image:radial-gradient(ellipse 95% 80% at 22% 12%,#000 0%,transparent 78%)}
+.mb-eyebrow{position:relative;z-index:1;display:flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.16em;font-weight:800;color:var(--gold2)}
+.mb-eyebrow i{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor;flex:none;animation:spDot 1.8s ease-in-out infinite}
+.mb-title{position:relative;z-index:1;font-family:var(--disp);font-size:30px;letter-spacing:.02em;line-height:1.08;color:var(--text);text-shadow:0 0 28px rgba(255,208,72,.32);margin-top:6px}
+.mb-sub{position:relative;z-index:1;font-size:12px;color:var(--text2);margin-top:4px}
+.mb-chips{position:relative;z-index:1;display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 2px}
+.mb-chip{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 10px 4px 8px;border-radius:999px;border:1px solid}
+.mb-strip{position:relative;z-index:1;display:flex;gap:8px;overflow-x:auto;margin:14px -2px 16px;padding:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mb-strip::-webkit-scrollbar{display:none}
+.mb-thumb-more{flex:none;width:74px;height:74px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:var(--text3);font-family:var(--disp);font-size:13px}
+.mb-start{position:relative;z-index:1;width:100%;padding:16px 0;border-radius:14px;border:none;cursor:pointer;font-family:var(--disp);font-size:16px;letter-spacing:.08em;color:#150f02;
+  background:linear-gradient(180deg,var(--gold3,#ffe08a),var(--gold,#e8a820));
+  box-shadow:0 10px 30px -10px rgba(242,208,121,.7),inset 0 1px 0 rgba(255,255,255,.5);
+  transition:transform .12s ease}
+.mb-start:active{transform:scale(.97)}
 .splitday{display:flex;align-items:center;gap:10px;padding:9px 10px;margin:5px 0;border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008));border:1px solid var(--border)}
 .splitday.tonight{border-color:rgba(242,208,121,.42);background:linear-gradient(180deg,rgba(242,208,121,.1),rgba(12,15,21,.3));box-shadow:inset 0 0 22px -12px rgba(242,208,121,.5)}
 .splitday-main{display:flex;align-items:center;gap:10px;flex:1;min-width:0;cursor:pointer}
@@ -2489,6 +2543,29 @@ function figLayerHtml(ex,fi){
  if(!fi)return figureSVG(ex);
  return `<img class="exfigimg" src="${fi}" alt="" style="display:block" onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='flex'"/>`
    +`<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${figureSVG(ex)}</span>`;
+}
+/* 🦇 SCANPANEL builder — the single source of truth for the Batcomputer target-scan picture used
+   by both the exercise dossier and the active lift's focus card during logging. o: {ex, fi, id,
+   height, name, tag, meta, col, tool, entrance, onclick}. */
+function scanPanelHtml(o){
+  const ex=o.ex;
+  const col=o.col||'var(--gold2)';
+  const name=o.name!=null?o.name:ex.n;
+  return `<div class="scanpanel${o.entrance?' entrance':''}" style="--fg:${col}4d;height:${o.height}px" ${o.onclick?`onclick="${o.onclick}"`:''}>
+    <div class="scanpanel-screen" id="${o.id||''}">
+      <div class="scanpanel-grid"></div>
+      <div class="figlayer">${figLayerHtml(ex,o.fi)}</div>
+      <div class="scanpanel-scan"></div>
+      <div class="scanpanel-vig"></div>
+      <div class="scanpanel-c tl"></div><div class="scanpanel-c tr"></div><div class="scanpanel-c bl"></div><div class="scanpanel-c br"></div>
+      ${o.tool||''}
+      <div class="scanpanel-cap">
+        <div class="scanpanel-tag" style="color:${col}"><i></i>${esc(o.tag||'TARGET ANALYSIS')}</div>
+        <b>${esc(name)}</b>
+        <span style="color:${col}">${esc(o.meta||'')}</span>
+      </div>
+    </div>
+  </div>`;
 }
 
 function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x[0])r=x;return{name:r[1],emoji:r[2]};}
@@ -4567,20 +4644,12 @@ function exDetClose(){const r=state._exdetReturn;state._exdetReturn=null;closeSh
 function openExDetail(exName){
   state._exdetReturn=(state._sheetKind==="splits")?"splits":null;  // came from the split editor → go back there on close
   const ex=exFor(exName);
-  const fi=exFigImg(ex);
-  const priCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',
-    quads:'#FFD200',hamstrings:'#FF3622',glutes:'#9840F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
-  const col=priCols[(ex.p||[])[0]]||'var(--gold2)';
+  const col=MCOL[(ex.p||[])[0]]||'var(--gold2)';
   const tgt=exTarget(ex);
   const safe=ex.n.replace(/'/g,"\\'");
   openSheet(`
-    <div class="figframe" id="exdet-fig" style="--fg:${col}55;height:196px;border-radius:18px;margin:-3px -2px 14px;box-shadow:0 0 0 1px ${col}22,0 18px 40px -20px #000">
-      <div class="figframe-glow"></div>
-      <div class="figlayer">${figLayerHtml(ex,fi)}</div>
-      <div class="figframe-tint"></div>
-      <div class="figframe-c tl"></div><div class="figframe-c tr"></div><div class="figframe-c bl"></div><div class="figframe-c br"></div>
-      <div class="figframe-cap"><b>${esc(ex.n)}</b><span style="color:${col}">${esc(tgt.split('·')[0].trim())} · ${esc(ex.eq)}</span></div>
-    </div>
+    <div style="margin:-3px -2px 14px">${scanPanelHtml({ex,id:'exdet-fig',height:200,col,entrance:true,
+      tag:'BATCOMPUTER · TARGET ANALYSIS',meta:tgt.split('·')[0].trim()+' · '+ex.eq})}</div>
     ${(ex.c&&ex.c.length)?`
     <div style="margin-bottom:14px">
       <div style="font-family:var(--disp);font-size:11px;letter-spacing:.14em;color:var(--gold2);margin-bottom:7px">FORM CUES</div>
@@ -7026,6 +7095,32 @@ function refreshSplitSheet(){
 function splitsChanged(){save();try{refreshSplitSheet();}catch(e){}render();}
 
 /* ========================= MISSION TAB ========================= */
+/* The hero moment of the Mission tab: tonight's operation as its own Batcomputer-grid card,
+   not just a highlighted row buried in the split's day list. */
+function missionBriefingHero(sp,dayIdx){
+  const day=sp.days[dayIdx];
+  if(!day||isRest(day))return '';
+  let chips='';
+  try{
+    const {prim}=dayMuscles(day);
+    chips=Object.keys(prim).sort((a,b)=>prim[b]-prim[a]).slice(0,5).map(m=>{
+      const c=MCOL[m]||'#E8C56A';
+      return `<span class="mb-chip" style="color:${c};background:${c}22;border-color:${c}55">${mIcon(m,13,c)} ${MNAME[m]}</span>`;
+    }).join("");
+  }catch(e){}
+  const exList=day.exercises||[];
+  const strip=exList.slice(0,6).map(n=>`<div onclick="event.stopPropagation();openExDetail('${esc(n).replace(/'/g,"")}')">${thumb(exFor(n),1)}</div>`).join("")
+    +(exList.length>6?`<div class="mb-thumb-more">+${exList.length-6}</div>`:"");
+  return `<div class="mission-briefing" onclick="openDayBriefing('${sp.id}',${dayIdx})">
+    <div class="mb-grid"></div>
+    <div class="mb-eyebrow"><i></i>TONIGHT'S OPERATION</div>
+    <div class="mb-title">${esc(day.name)}</div>
+    <div class="mb-sub">${esc(sp.name)} · ${exList.length} exercise${exList.length===1?'':'s'}</div>
+    ${chips?`<div class="mb-chips">${chips}</div>`:''}
+    ${strip?`<div class="mb-strip">${strip}</div>`:''}
+    <button class="mb-start" onclick="event.stopPropagation();startWorkout('${sp.id}',${dayIdx})">DEPLOY TO THE FIELD ▶</button>
+  </div>`;
+}
 function renderMission(){
   const d=state.data;
   let html=`<div style="position:relative;overflow:hidden;border-radius:18px;border:1px solid rgba(242,208,121,.24);margin-bottom:13px;min-height:134px;background:#07090d;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 16px 40px -22px #000">
@@ -7048,7 +7143,7 @@ function renderMission(){
         const tn=i===ni?`<span class="chip on" style="font-size:9px;padding:1px 7px;margin-left:7px;vertical-align:middle">TONIGHT</span>`:"";
         return isRest(day)
         ? `<div class="splitday rest${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${restIcon(15)} ${esc(day.name)}${tn}</b><span>Planned recovery — protects your streak</span></div></div><button class="splitday-start rest" onclick="logRestDay()">REST ✓</button></div>`
-        : `<div class="splitday${i===ni?' tonight':''}" style="${i===ni?'flex-wrap:wrap':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><span>${day.exercises.length} exercises · tap to preview</span></div></div><button class="splitday-start" onclick="startWorkout('${sp.id}',${i})">START ▶</button>${i===ni&&day.exercises.length?`<div class="row" style="gap:5px;flex-basis:100%;margin-top:7px;overflow:hidden" onclick="openDayBriefing('${sp.id}',${i})">${day.exercises.slice(0,5).map(n=>thumb(exFor(n),2)).join("")}${day.exercises.length>5?`<span class="mini" style="color:var(--text3);flex:none">+${day.exercises.length-5}</span>`:""}</div>`:""}</div>`;
+        : `<div class="splitday${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><span>${day.exercises.length} exercises · tap to preview</span></div></div><button class="splitday-start" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`;
       }).join("")}</div></div>`;
   };
   // compact one-row tile for benched (non-active) splits — tap to expand, no wall of START buttons
@@ -7060,6 +7155,7 @@ function renderMission(){
       <button class="splitday-start" onclick="setActiveSplit('${sp.id}')">USE ✓</button></div>`;
   };
   const act=d.splits.find(sp=>d.activeSplitId===sp.id);
+  if(act){const ni0=computeNextDay(act);html+=missionBriefingHero(act,ni0);}
   if(act)html+=splitFull(act);
   // ===== 2) the weekly contract + body coach directly under tonight =====
   html+=contractCard();
@@ -12555,21 +12651,15 @@ function renderLogging(){
   if(fei>=0&&ses.exercises[fei]){
     const e=ses.exercises[fei];const ex=exFor(e.name);
     const sug=suggestionFor(e.name);const nt=nextTarget(e.name);
-    const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
-    const col=pCols[(ex.p||[])[0]]||'var(--gold2)';
+    const col=MCOL[(ex.p||[])[0]]||'var(--gold2)';
     const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
 
-    // Figure — hero banner: curated photo or anatomy figure, muscle-glow, tactical corner brackets;
+    // Figure — Batcomputer target-scan: curated photo or anatomy figure, muscle-glow, HUD readout;
     // the animated ExerciseDB demo layers on top once fetched (attachExGif, below).
     const safeName=esc(e.name).replace(/'/g,"");
-    const figHtml=`<div class="figframe" id="logfig" onclick="openExDetail('${safeName}')" style="--fg:${col}55;height:158px">
-        <div class="figframe-glow"></div>
-        <div class="figlayer">${figLayerHtml(ex)}</div>
-        <div class="figframe-tint"></div>
-        <div class="figframe-c tl"></div><div class="figframe-c tr"></div><div class="figframe-c bl"></div><div class="figframe-c br"></div>
-        <button class="figframe-tool right" onclick="event.stopPropagation();removeExercise(${fei})" title="Remove">✕</button>
-        <div class="figframe-cap"><b>${esc(e.name)}</b><span style="color:${col}">${esc(exTarget(ex).split('·')[0].trim())}</span></div>
-      </div>`;
+    const figHtml=scanPanelHtml({ex,id:'logfig',height:160,col,name:e.name,
+      onclick:`openExDetail('${safeName}')`,tag:'LIVE ANALYSIS',meta:exTarget(ex).split('·')[0].trim(),
+      tool:`<button class="scanpanel-tool right" onclick="event.stopPropagation();removeExercise(${fei})" title="Remove">✕</button>`});
 
     h+=`<div class="log-focus">
       ${figHtml}
