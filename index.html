@@ -6929,7 +6929,12 @@ function relStrengthCard(){
   if(tops.length<2)return "";
   const cutoff=Date.now()-28*864e5;
   let nowT=0,thenT=0;
-  tops.forEach(([n])=>{let a=0,b=0;exerciseRows(n).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});nowT+=a;thenT+=b;});
+  // Floor "a" at the PR's own recorded orm — exerciseRows() reads state.data.workouts, which can
+  // legitimately have no matching entry for a real PR (per-gym PR pointer, a restored/imported
+  // record, an exercise that's since been renamed). Without the floor, the headline number silently
+  // dropped that lift to 0 while the subtitle line right below it — which reads p.orm directly —
+  // kept showing the real value, so the two halves of the same card visibly disagreed.
+  tops.forEach(([n,p])=>{let a=0,b=0;exerciseRows(n).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});nowT+=Math.max(a,p.orm||0);thenT+=b;});
   if(!nowT)return "";
   const dPct=thenT>0?Math.round((nowT-thenT)/thenT*100):null;
   return `<div class="card" style="padding:13px">
@@ -7552,7 +7557,13 @@ function myPatrolCard(){
   });
   const prTot=(d.workouts||[]).reduce((n,w)=>n+((w.prs||[]).length),0); // cumulative PR events ever — lets Fight Night score progress, not tonnage
   let ssn=null;try{const ss=seasonState();if(ss.week<SEASON_CHAPTERS.length)ssn={n:ss.n,w:ss.week+1,st:seasonChapterEval(ss.week).stars};}catch(e){}
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(u.totalVolume||0),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent,ssn};
+  // u.totalVolume is a running cache finishWorkout() maintains alongside d.workouts — the two
+  // should always agree, but a restore/import/edge case can leave the cache stale while the
+  // session log itself is accurate. w (session count) is trusted live from d.workouts.length, so
+  // vol must be at least as consistent with it — otherwise the card reads "20 sessions, 0kg moved",
+  // which looks broken. Floor at what the actual logged sessions sum to.
+  const loggedVol=(d.workouts||[]).reduce((s,w)=>s+(+w.totalVol||0),0);
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(Math.max(u.totalVolume||0,loggedVol)),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent,ssn};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
