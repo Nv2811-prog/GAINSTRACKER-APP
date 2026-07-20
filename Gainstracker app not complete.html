@@ -316,6 +316,48 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .exwrap.noimg .exfig{display:block}
 .exwrap img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;z-index:2;pointer-events:none;background:#07080e}
 .exwrap img.exfigimg.hidden{display:none}
+/* Exactly ONE base layer is ever visible at a time — photo OR svg, controlled by inline
+   display on the wrapping .figlayer spans (not by CSS visibility tricks that can leave both
+   painted). The animated demo (.exgif), when present, sits on top and hides every .figlayer. */
+.exwrap .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.exwrap .figlayer svg{width:100%;height:100%;display:block}
+/* 🖼 FIGFRAME — cinematic hero picture banner (exercise dossier + the active lift's focus card).
+   Full-bleed image + gradient caption plate, same language as the app's other hero screens
+   (mission hero, patrol briefing). Exactly ONE base layer shows — photo or anatomy svg, never
+   both — the animated demo (.exgif, shared rule above) layers on top and hides it via .hasgif. */
+.figframe{position:relative;overflow:hidden;background:radial-gradient(ellipse 100% 85% at 50% 26%,#181c2c,#05060a 86%);border:1px solid var(--fg,rgba(242,208,121,.3));cursor:pointer}
+.figframe-glow{position:absolute;inset:-25%;z-index:1;pointer-events:none;background:radial-gradient(ellipse 50% 42% at 50% 38%,var(--fg,rgba(242,208,121,.35)),transparent 72%);opacity:.6;filter:blur(1px)}
+.figframe .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:flex;align-items:center;justify-content:center}
+.figframe .figlayer svg{height:94%;width:auto;display:block;filter:drop-shadow(0 12px 22px rgba(0,0,0,.65))}
+.figframe img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;pointer-events:none}
+.figframe.hasgif .figlayer{visibility:hidden}
+/* ExerciseDB demo GIFs ship on a flat white background — glaring against this dark, gothic UI.
+   A multiply-blended dark wash neutralises the white toward the palette while leaving the demo's
+   grey/red linework readable, so a picked demo never looks like a pasted-in foreign asset. */
+.figframe-tint{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 92% 82% at 50% 34%,rgba(8,9,15,.9),rgba(3,4,7,.97));mix-blend-mode:multiply;opacity:0;transition:opacity .2s ease}
+.figframe.hasgif .figframe-tint{opacity:1}
+.figframe-c{position:absolute;width:16px;height:16px;border:0 solid rgba(242,208,121,.5);z-index:5;pointer-events:none}
+.figframe-c.tl{top:9px;left:9px;border-top-width:2px;border-left-width:2px;border-radius:5px 0 0 0}
+.figframe-c.tr{top:9px;right:9px;border-top-width:2px;border-right-width:2px;border-radius:0 5px 0 0}
+.figframe-c.bl{bottom:9px;left:9px;border-bottom-width:2px;border-left-width:2px;border-radius:0 0 0 5px}
+.figframe-c.br{bottom:9px;right:9px;border-bottom-width:2px;border-right-width:2px;border-radius:0 0 5px 0}
+.figframe-cap{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:26px 14px 10px;background:linear-gradient(180deg,transparent,rgba(4,5,9,.6) 42%,rgba(4,5,9,.95) 100%);pointer-events:none}
+.figframe-cap b{display:block;font-family:var(--disp);font-size:18px;letter-spacing:.02em;line-height:1.15;color:var(--text);text-shadow:0 2px 10px rgba(0,0,0,.75)}
+.figframe-cap span{display:block;font-size:10px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;margin-top:2px}
+.figframe-tool{position:absolute;top:8px;z-index:7;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(6,8,13,.68);border:1px solid rgba(255,255,255,.14);color:var(--text2);backdrop-filter:blur(3px);cursor:pointer;transition:transform .12s ease}
+.figframe-tool:active{transform:scale(.9)}
+.figframe-tool.right{right:8px}
+.figframe-tool.left{left:8px}
+/* 🖼 picture picker grid — filterable gallery of candidate demos, tap to choose */
+.picp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px}
+.picp-tile{cursor:pointer;border-radius:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);padding:6px 6px 8px;text-align:center;transition:border-color .12s,box-shadow .12s,background .12s}
+.picp-tile.on{border-color:rgba(255,208,72,.6);background:rgba(255,208,72,.08);box-shadow:0 0 0 1px rgba(255,208,72,.3),0 6px 18px -8px rgba(255,208,72,.5)}
+.picp-thumb{width:100%;aspect-ratio:1;border-radius:9px;overflow:hidden;background:#0a0c12;display:flex;align-items:center;justify-content:center;margin-bottom:5px}
+.picp-thumb img{width:100%;height:100%;object-fit:contain;background:#fff}
+.picp-thumb.picp-anat{background:radial-gradient(ellipse 80% 70% at 50% 30%,#181c2c,#05060a 90%);padding:8px}
+.picp-thumb.picp-anat svg{width:100%;height:100%}
+.picp-lbl{font-size:10px;line-height:1.25;color:var(--text2);text-transform:capitalize;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.picp-tile.on .picp-lbl{color:var(--gold2);font-weight:700}
 .exname{font-weight:700;font-size:15px;line-height:1.2;letter-spacing:-.01em;color:var(--text)}
 .exmeta{font-size:12px;color:var(--text3);margin-top:3px;text-transform:capitalize;letter-spacing:.04em;font-family:var(--disp)}
 
@@ -474,7 +516,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .es-title{color:var(--gold2);text-shadow:0 0 18px rgba(255,208,72,.4)}
 /* Animated exercise demo (ExerciseDB) — REPLACES the SVG figure inside any .exwrap (never both) */
 .exgif{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;background:#fff;z-index:3;animation:viewFade .3s var(--ease-out) both}
-.exwrap.hasgif svg,.exwrap.hasgif .exfigimg{visibility:hidden}
+.exwrap.hasgif>svg,.exwrap.hasgif>.figlayer{visibility:hidden}
 .restbtn{padding:13px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));color:#e9eef6;font-family:var(--disp);letter-spacing:.06em;font-size:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .restbtn.go{background:linear-gradient(180deg,rgba(201,168,76,.34),rgba(201,168,76,.12));border-color:rgba(201,168,76,.5);color:var(--gold2)}
 /* ===== MMA Round Timer overlay ===== */
@@ -1043,11 +1085,8 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .patrol-begin{font-family:var(--disp);font-size:18px;letter-spacing:.12em;padding:18px 0;border-radius:16px;background:linear-gradient(180deg,var(--gold3,#d4a828),var(--gold,#b8902e));color:#100c00;box-shadow:0 0 36px -6px rgba(242,208,121,.65),inset 0 1px 0 rgba(255,255,255,.38);border:none;cursor:pointer;width:100%;max-width:380px;transition:transform .12s ease;display:block}
 .patrol-begin:active{transform:scale(.97)}
 .log-focus{border-radius:20px;overflow:hidden;margin-bottom:10px;background:linear-gradient(180deg,#0d1020,#080b12);border:1px solid rgba(242,208,121,.22);box-shadow:0 20px 60px -28px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07)}
-.log-focus-head{display:flex;align-items:stretch;gap:14px;padding:14px 16px 12px}
-.log-fig-wrap{flex:0 0 88px;width:88px;height:88px;border-radius:14px;overflow:hidden;background:#04050a;border:1px solid rgba(255,255,255,.07);position:relative}
-.log-exname{font-family:var(--disp);font-size:18px;letter-spacing:.03em;color:var(--text);line-height:1.1;margin-bottom:5px}
+.log-focus-body{padding:12px 16px 4px}
 .log-target{font-size:12px;color:var(--green,#2ecc71);line-height:1.4;margin-bottom:3px}
-.log-muscle-tag{font-size:10px;letter-spacing:.13em;text-transform:uppercase}
 .log-setbar{display:flex;align-items:center;gap:6px;padding:7px 16px;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.22)}
 .log-setdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.13);transition:all .2s;flex:0 0 8px}
 .log-setdot.done{background:var(--green,#2ecc71);box-shadow:0 0 5px rgba(46,204,113,.6)}
@@ -1082,9 +1121,11 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .log-set-badge.pend{background:rgba(255,255,255,.07);color:var(--text3)}
 .log-ex-strip{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:10px}
 .log-ex-strip::-webkit-scrollbar{display:none}
-.log-ex-pill{flex:0 0 auto;padding:7px 12px;border-radius:10px;font-family:var(--disp);font-size:11.5px;letter-spacing:.05em;cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:var(--text3);transition:all .15s;-webkit-tap-highlight-color:transparent}
+.log-ex-pill{display:flex;align-items:center;gap:6px;flex:0 0 auto;padding:5px 12px 5px 6px;border-radius:10px;font-family:var(--disp);font-size:11.5px;letter-spacing:.05em;cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:var(--text3);transition:all .15s;-webkit-tap-highlight-color:transparent}
 .log-ex-pill.ex-active{background:rgba(242,208,121,.11);border-color:rgba(242,208,121,.38);color:var(--gold2)}
 .log-ex-pill.ex-done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.28);color:var(--green,#2ecc71)}
+.log-ex-pill-ic{width:22px;height:22px;border-radius:50%;background:radial-gradient(ellipse 90% 80% at 50% 30%,#181c28,#050609);display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.log-ex-pill-ic svg{width:82%;height:82%}
 /* ===== Wave 9 v3: Cinematic entrance (g9-entr) ===== */
 .g9-entr{position:fixed;inset:0;z-index:9000;background:#04060a;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;animation:g9in .38s cubic-bezier(.2,0,.1,1) both}
 .g9-entr.g9-out{animation:g9out .42s cubic-bezier(.9,0,.8,1) both}
@@ -2440,6 +2481,14 @@ function exFigKey(ex){
 function exFigImg(ex){
  const k=exFigKey(ex);
  return k?`assets/exfig/${k}.png`:'';
+}
+/* Content of a .figlayer: the curated photo if we have one, with the anatomy SVG as a real
+   sibling fallback (not a re-injected string) — if the PNG 404s, the SVG is simply revealed. */
+function figLayerHtml(ex,fi){
+ fi=fi==null?exFigImg(ex):fi;
+ if(!fi)return figureSVG(ex);
+ return `<img class="exfigimg" src="${fi}" alt="" style="display:block" onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='flex'"/>`
+   +`<span style="display:none;width:100%;height:100%;align-items:center;justify-content:center">${figureSVG(ex)}</span>`;
 }
 
 function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x[0])r=x;return{name:r[1],emoji:r[2]};}
@@ -4523,17 +4572,14 @@ function openExDetail(exName){
     quads:'#FFD200',hamstrings:'#FF3622',glutes:'#9840F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
   const col=priCols[(ex.p||[])[0]]||'var(--gold2)';
   const tgt=exTarget(ex);
+  const safe=ex.n.replace(/'/g,"\\'");
   openSheet(`
-    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px">
-      <span class="exwrap" id="exdet-fig" style="width:100px;height:100px;border-radius:18px;border-color:${col}40;box-shadow:0 0 0 1px ${col}20,0 8px 28px -8px ${col}50,0 0 40px -12px ${col}30">
-        ${fi?`<img class="exfigimg" src="${fi}" alt="" onerror="this.classList.add('hidden')"/>`:''}
-        ${figureSVG(ex)}
-      </span>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:var(--disp);font-size:22px;line-height:1.1;color:var(--text);margin-bottom:4px">${esc(ex.n)}</div>
-        <div style="font-size:12px;letter-spacing:.05em;color:${col};text-transform:uppercase;font-weight:700;margin-bottom:4px">${esc(tgt.split('·')[0].trim())}</div>
-        <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">${esc(ex.eq)}</div>
-      </div>
+    <div class="figframe" id="exdet-fig" style="--fg:${col}55;height:196px;border-radius:18px;margin:-3px -2px 14px;box-shadow:0 0 0 1px ${col}22,0 18px 40px -20px #000">
+      <div class="figframe-glow"></div>
+      <div class="figlayer">${figLayerHtml(ex,fi)}</div>
+      <div class="figframe-tint"></div>
+      <div class="figframe-c tl"></div><div class="figframe-c tr"></div><div class="figframe-c bl"></div><div class="figframe-c br"></div>
+      <div class="figframe-cap"><b>${esc(ex.n)}</b><span style="color:${col}">${esc(tgt.split('·')[0].trim())} · ${esc(ex.eq)}</span></div>
     </div>
     ${(ex.c&&ex.c.length)?`
     <div style="margin-bottom:14px">
@@ -4544,9 +4590,9 @@ function openExDetail(exName){
       </div>`).join('')}
     </div>`:''}
     ${ex.s&&ex.s.length?`<div style="font-size:12px;color:var(--text3);margin-bottom:14px">Also trains: ${ex.s.map(m=>`<span style="color:var(--text2)">${MNAME[m]||m}</span>`).join(', ')}</div>`:''}
-    ${state._exdetReturn?'':`<button class="btn gold" style="margin-bottom:8px" onclick="pickAdd('${ex.n.replace(/'/g,"\\'")}');exDetClose()">＋ Add to session</button>`}
+    ${state._exdetReturn?'':`<button class="btn gold" style="margin-bottom:8px" onclick="pickAdd('${safe}');exDetClose()">＋ Add to session</button>`}
     <div class="row" style="gap:7px">
-      <button class="btn ghost sm" style="flex:1;color:var(--text2)" onclick="fixExPic('${ex.n.replace(/'/g,"\\'")}','exdet-fig')">🖼 Picture wrong? Try next</button>
+      <button class="btn ghost sm" style="flex:1;color:var(--text2)" onclick="openPicPicker('${safe}','exdet-fig')">🖼 Choose picture</button>
       <button class="btn ghost sm" style="flex:1" onclick="exDetClose()">${state._exdetReturn?'← Back to editor':'Close'}</button>
     </div>
   `);
@@ -8024,8 +8070,8 @@ function splitsEditorHtml(){
         html+=`<div style="border-top:1px solid var(--border);padding:9px 0 11px">
           <div class="row sp"><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:700;padding:2px 0;min-width:0;flex:1;font-size:15px"/>${dayMv}</div>
           ${chips?`<div class="row" style="gap:4px;flex-wrap:wrap;margin:5px 0 2px">${chips}</div>`:""}
-          <div style="margin-top:6px">${day.exercises.length?day.exercises.map((n,j)=>{const ex=exFor(n);const safe=esc(n).replace(/'/g,"");
-            return `<div class="exrow" style="padding:6px 8px;margin-bottom:6px;gap:9px">
+          <div style="margin-top:6px">${day.exercises.length?day.exercises.map((n,j)=>{const ex=exFor(n);const safe=esc(n).replace(/'/g,"");const mc=MCOL[(ex.p||[])[0]]||'var(--gold-dim)';
+            return `<div class="exrow" style="padding:6px 8px 6px 6px;margin-bottom:6px;gap:9px;border-left:3px solid ${mc}77">
             <div style="display:flex;gap:9px;align-items:center;flex:1;min-width:0;cursor:pointer" onclick="openExDetail('${safe}')">
               ${thumb(ex,2)}
               <div style="min-width:0">
@@ -9217,48 +9263,100 @@ async function exdbGif(name,res){
 // Drop the animated demo into a container once it arrives — direct DOM injection, never re-render (typing focus survives).
 function attachExGif(elId,name,res){
   const put=u=>{const el=document.getElementById(elId);if(!el||!u||el.querySelector(".exgif"))return;
-    el.insertAdjacentHTML("beforeend",`<img class="exgif" src="${u}" alt="" onload="this.parentElement.classList.add('hasgif')" onerror="this.parentElement.classList.remove('hasgif');this.remove();exGifBad('${esc(name).replace(/'/g,"")}')">`);};
+    el.insertAdjacentHTML("beforeend",`<img class="exgif" src="${u}" alt="" onload="this.parentElement&&this.parentElement.classList.add('hasgif')" onerror="this.parentElement&&this.parentElement.classList.remove('hasgif');this.remove();exGifBad('${esc(name).replace(/'/g,"")}')">`);};
   const cached=exGifCached(name,res);
   if(cached)return put(cached);
   exdbGif(name,res).then(put).catch(()=>{});
 }
 function exGifBad(name){const d=state.data;d.exGifCache=d.exGifCache||{};const k=(name||"").toLowerCase().trim();d.exGifCache[k]=Object.assign(d.exGifCache[k]||{},{id:null,t:Date.now()});save();}
-/* 🖼 WRONG PICTURE? — cycle through every candidate demo the Batcomputer can find for this lift.
-   Each tap tries the next one; past the last it hides the demo (anatomy figure only); the choice
-   sticks (man=1 beats the hard map and the auto-search) so a bad demo is never forced on you again. */
-async function fixExPic(name,elId){
-  const d=state.data;d.exGifCache=d.exGifCache||{};
-  const k=(name||"").toLowerCase().trim();if(!k)return;
-  let c=d.exGifCache[k]||{};
-  if(!Array.isArray(c.alts)||!c.alts.length){
-    toast("🎩 Pulling alternative footage from the Batcomputer…");
-    let alts=[];
-    try{
-      const q=k.replace(/\(.*?\)/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
-      const rsp=await fetch("https://exercisedb.p.rapidapi.com/exercises/name/"+encodeURIComponent(q)+"?limit=20",
-        {headers:{"X-RapidAPI-Key":exdbKey(),"X-RapidAPI-Host":"exercisedb.p.rapidapi.com"}});
-      if(rsp.ok){const arr=await rsp.json();alts=(Array.isArray(arr)?arr:[]).map(e=>e&&e.id).filter(Boolean);}
-    }catch(e){}
-    const cur=(c.man?c.id:null)||EX_GIF_IDS[k]||c.id||null;
-    if(cur&&!alts.includes(cur))alts.unshift(cur);
-    if(!alts.length){toast("No alternative demos in the files, sir — anatomy figure it is.");c={id:null,man:1,alts:[],t:Date.now()};d.exGifCache[k]=c;save();_fixPicApply(name,elId);return;}
-    c=Object.assign(c,{alts,t:Date.now()});
-    c.ptr=cur?alts.indexOf(cur):-1;
-  }
-  // advance: next candidate → … → null (no demo) → wrap to first
-  c.ptr=(c.ptr==null?-1:c.ptr)+1;
-  if(c.ptr>=c.alts.length){c.ptr=-1;c.id=null;}
-  else c.id=c.alts[c.ptr];
-  c.man=1;c.t=Date.now();d.exGifCache[k]=c;save();
-  try{haptic("tap");}catch(e){}
-  _fixPicApply(name,elId);
-  toast(c.id?("🖼 Demo "+(c.ptr+1)+" of "+c.alts.length+" — tap again if it's still wrong."):"🖼 Demo hidden — clean anatomy figure only.");
-}
-function _fixPicApply(name,elId){
+/* 🖼 PICTURE PICKER — browse EVERY candidate demo the Batcomputer has for this lift as a filterable
+   gallery, or keep the clean anatomy figure. Replaces the old blind "cycle" (nobody could see what
+   they were choosing between). The pick sticks (man=1 beats the hard map and auto-search) so a bad
+   demo is never forced on you again. */
+function _figApply(name,elId){
   const el=elId&&document.getElementById(elId);if(!el)return;
   el.querySelectorAll(".exgif").forEach(n=>n.remove());el.classList.remove("hasgif");
   const u=exGifCached(name,360);
-  if(u)el.insertAdjacentHTML("beforeend",`<img class="exgif" src="${u}" alt="" onload="this.parentElement.classList.add('hasgif')" onerror="this.parentElement.classList.remove('hasgif');this.remove()">`);
+  if(u)el.insertAdjacentHTML("beforeend",`<img class="exgif" src="${u}" alt="" onload="this.parentElement&&this.parentElement.classList.add('hasgif')" onerror="this.parentElement&&this.parentElement.classList.remove('hasgif');this.remove()">`);
+}
+let _picPickT=null,_picPickToken=0;
+function openPicPicker(name,elId){
+  state._picPickName=name;state._picPickEl=elId;
+  state._picPickPrevHtml=$("sheet").innerHTML;   // snapshot so Cancel/Choose returns to exactly this view
+  const k=(name||"").toLowerCase().trim();
+  const seedQ=k.replace(/\(.*?\)/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
+  try{haptic("tap");}catch(e){}
+  openSheet(`<div class="ttl">🖼 Choose a picture</div>
+    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">Browse the Batcomputer's demo library for <b style="color:var(--gold2)">${esc(name)}</b> — or filter with your own words if the match is off.</div>
+    <div style="position:relative;margin-bottom:10px">
+      <input id="picp-q" value="${esc(seedQ)}" placeholder="Filter — try a different phrase…" autocomplete="off" oninput="picPickDebounce()"/>
+      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5">🔍</span>
+    </div>
+    <div id="picp-grid" class="picp-grid"></div>
+    <button class="btn ghost" style="margin-top:10px" onclick="closePicPicker()">Cancel</button>`);
+  const inp=$("picp-q");if(inp)inp.style.paddingLeft="36px";
+  drawPicPicker(seedQ);
+}
+function closePicPicker(){
+  const prev=state._picPickPrevHtml;state._picPickPrevHtml=null;
+  if(prev!=null){$("sheet").innerHTML=prev;}else closeSheet();
+}
+function picPickDebounce(){
+  clearTimeout(_picPickT);
+  const q=($("picp-q")?$("picp-q").value:"")||"";
+  _picPickT=setTimeout(()=>drawPicPicker(q.trim()),320);
+}
+async function _picpFetch(q){
+  try{
+    const rsp=await fetch("https://exercisedb.p.rapidapi.com/exercises/name/"+encodeURIComponent(q)+"?limit=30",
+      {headers:{"X-RapidAPI-Key":exdbKey(),"X-RapidAPI-Host":"exercisedb.p.rapidapi.com"}});
+    if(!rsp.ok)return [];
+    const arr=await rsp.json();
+    return (Array.isArray(arr)?arr:[]).filter(e=>e&&e.id);
+  }catch(e){return [];}
+}
+async function drawPicPicker(q){
+  const grid=$("picp-grid");if(!grid)return;
+  const myToken=++_picPickToken;
+  const name=state._picPickName;
+  const k=(name||"").toLowerCase().trim();
+  const cache=(state.data.exGifCache||{})[k];
+  const curId=(cache&&cache.man)?cache.id:(EX_GIF_IDS[k]||(cache&&cache.id)||null);
+  const anatOn=!curId;
+  const anatTile=`<div class="picp-tile${anatOn?' on':''}" onclick="picPickChoose(null)">
+      <div class="picp-thumb picp-anat">${figureSVG(exFor(name))}</div>
+      <div class="picp-lbl">Anatomy figure</div>
+    </div>`;
+  grid.innerHTML=anatTile+`<div class="mini center" style="grid-column:1/-1;padding:16px;color:var(--text3)">Searching "${esc(q)}"…</div>`;
+  // ExerciseDB's search is a literal substring match — a specific query like "machine shoulder
+  // press" often returns nothing even though "shoulder press" alone has plenty. Progressively drop
+  // the leading (usually equipment) word until something turns up, so the grid is never just empty.
+  let items=await _picpFetch(q);
+  let usedQ=q;
+  const words=q.split(/\s+/).filter(Boolean);
+  for(let cut=1;!items.length&&words.length-cut>=1;cut++){
+    usedQ=words.slice(cut).join(" ");
+    items=await _picpFetch(usedQ);
+  }
+  if(myToken!==_picPickToken)return; // a newer search superseded this response — drop it
+  const broadened=usedQ!==q&&items.length>0;
+  const tiles=items.map(e=>`<div class="picp-tile${curId===e.id?' on':''}" onclick="picPickChoose('${e.id}')">
+      <div class="picp-thumb"><img src="${exGifUrl(e.id,180)}" alt="" loading="lazy"></div>
+      <div class="picp-lbl">${esc(e.name)}</div>
+    </div>`).join("");
+  const note=broadened?`<div class="mini" style="grid-column:1/-1;padding:0 2px 6px;color:var(--text3)">No exact match for "${esc(q)}" — showing results for "<b style="color:var(--gold2)">${esc(usedQ)}</b>" instead.</div>`:"";
+  grid.innerHTML=note+anatTile+tiles+(items.length?"":`<div class="mini center" style="grid-column:1/-1;padding:16px;color:var(--text3)">No matches for "${esc(q)}" — try a broader or different word.</div>`);
+}
+function picPickChoose(id){
+  const name=state._picPickName,elId=state._picPickEl;
+  const d=state.data;d.exGifCache=d.exGifCache||{};
+  const k=(name||"").toLowerCase().trim();
+  d.exGifCache[k]={id:id||null,man:1,t:Date.now()};
+  save();
+  try{haptic("done");}catch(e){}
+  closePicPicker();
+  _figApply(name,elId);
+  toast(id?"🖼 Picture updated, sir.":"🖼 Anatomy figure only — clean and simple.");
 }
 function alfredContext(){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
@@ -12172,7 +12270,22 @@ function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.ses
   }catch(e){}
   render();}
 
-function focusEx(ei){if(!state.session)return;const ex0=state.session.exercises[ei];if(ex0&&ex0._skip){delete ex0._skip;toast("Back in the plan, sir.");}state.session._focusEi=ei;try{haptic('tap');}catch(e){}render();window.scrollTo(0,0);}
+function focusEx(ei){
+  if(!state.session)return;
+  const ex0=state.session.exercises[ei];
+  if(ex0&&ex0._skip){delete ex0._skip;toast("Back in the plan, sir.");}
+  state.session._focusEi=ei;
+  try{haptic('tap');}catch(e){}
+  render();
+  // Bring the newly-focused card into view, clear of the sticky timer bar — never a hard
+  // jump to page top (that was the "keeps returning to the top" bug mid-workout).
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const card=document.querySelector('.log-focus');if(!card)return;
+    const tb=document.getElementById('timerbar');const barH=tb?tb.offsetHeight:0;
+    const y=card.getBoundingClientRect().top+window.scrollY-barH-10;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+  }));
+}
 
 function stepW(ei,si,delta){try{sfx("clank");}catch(e){}
   const ses=state.session;if(!ses||!ses.exercises[ei])return;
@@ -12252,7 +12365,7 @@ function playEntrance(name){
 /* Always anatomy SVG — the grey bodybuilder with red worked muscles. Never demo images. */
 function thumb(ex,small){
   const g=exGifCached(ex.n);   // cached-only in lists — no fetch storm while scrolling
-  return `<span class="exwrap${small===2?' xs':small?' sm':''}">${figureSVG(ex)}${g?`<img class="exgif" src="${g}" alt="" loading="lazy" onload="this.parentElement.classList.add('hasgif')" onerror="this.parentElement.classList.remove('hasgif');this.remove()">`:''}</span>`;
+  return `<span class="exwrap${small===2?' xs':small?' sm':''}">${figureSVG(ex)}${g?`<img class="exgif" src="${g}" alt="" loading="lazy" onload="this.parentElement&&this.parentElement.classList.add('hasgif')" onerror="this.parentElement&&this.parentElement.classList.remove('hasgif');this.remove()">`:''}</span>`;
 }
 
 /* Remove the yellow dashed divider + FRONT/BACK labels — clean symmetrical figure */
@@ -12427,12 +12540,12 @@ function renderLogging(){
   // Exercise nav strip
   if(ses.exercises.length){
     const curFei=activeExIdx();
-    h+=`<div class="log-ex-strip">`;
+    h+=`<div class="log-ex-strip" id="logexstrip">`;
     ses.exercises.forEach(function(e,ei){
       const pr=exProgress(e);const isFocus=ei===curFei;
       const cls=e._skip?'ex-skip':pr.allDone?'ex-done':isFocus?'ex-active':'';
-      const nm=e.name.length>21?e.name.slice(0,20)+'…':e.name;
-      h+=`<div class="log-ex-pill ${cls}" onclick="focusEx(${ei})">${e._skip?'⏭ ':pr.allDone?'✓ ':''}${esc(nm)}</div>`;
+      const nm=e.name.length>17?e.name.slice(0,16)+'…':e.name;
+      h+=`<div class="log-ex-pill ${cls}" onclick="focusEx(${ei})"><span class="log-ex-pill-ic">${figureSVG(exFor(e.name))}</span><span>${e._skip?'⏭ ':pr.allDone?'✓ ':''}${esc(nm)}</span></div>`;
     });
     h+=`</div>`;
   }
@@ -12446,25 +12559,29 @@ function renderLogging(){
     const col=pCols[(ex.p||[])[0]]||'var(--gold2)';
     const isBarbell=['barbell','smith','ez bar','trap bar'].includes((ex.eq||'').toLowerCase());
 
-    // Figure — anatomy SVG, with the animated ExerciseDB demo layered on top once fetched.
-    const figHtml=`<span class="exwrap" id="logfig" onclick="openExDetail('${esc(e.name).replace(/'/g,"")}')" style="width:88px;height:88px;flex:0 0 88px;border-radius:16px;border-color:${col}44;box-shadow:0 0 0 1px ${col}18,0 8px 28px -8px ${col}40;cursor:pointer">${figureSVG(ex)}</span>`;
+    // Figure — hero banner: curated photo or anatomy figure, muscle-glow, tactical corner brackets;
+    // the animated ExerciseDB demo layers on top once fetched (attachExGif, below).
+    const safeName=esc(e.name).replace(/'/g,"");
+    const figHtml=`<div class="figframe" id="logfig" onclick="openExDetail('${safeName}')" style="--fg:${col}55;height:158px">
+        <div class="figframe-glow"></div>
+        <div class="figlayer">${figLayerHtml(ex)}</div>
+        <div class="figframe-tint"></div>
+        <div class="figframe-c tl"></div><div class="figframe-c tr"></div><div class="figframe-c bl"></div><div class="figframe-c br"></div>
+        <button class="figframe-tool right" onclick="event.stopPropagation();removeExercise(${fei})" title="Remove">✕</button>
+        <div class="figframe-cap"><b>${esc(e.name)}</b><span style="color:${col}">${esc(exTarget(ex).split('·')[0].trim())}</span></div>
+      </div>`;
 
     h+=`<div class="log-focus">
-      <div class="log-focus-head">
-        ${figHtml}
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">
-          <div class="log-exname">${esc(e.name)}</div>
+      ${figHtml}
+      <div class="log-focus-body">
           ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
           ${(()=>{try{const pr=state.data.prs[e.name],lb=lastBestSet(e.name),m0=(ex.p||[])[0];
             if(pr&&pr.orm>0&&lb&&lb.e1>=pr.orm*0.97&&(!m0||getRecovery(m0)>=80)&&ses.readiness!=="tired")
               return `<div class="prwin">🔥 PR WINDOW: HIGH — fresh + trending at ${Math.round(lb.e1/pr.orm*100)}% of your record. Send it.</div>`;}catch(_){}return '';})()}
           ${(()=>{try{if(e._title&&!e._titleWon)return `<div class="prwin" style="border-color:rgba(255,140,34,.6);color:#FF8C22">🏆 TITLE FIGHT LIVE — beat the record, take the belt.</div>`;if(titleFightEligible(e.name))return `<button class="chip" style="font-size:10.5px;padding:4px 10px;margin-top:5px;align-self:flex-start;border-color:rgba(255,140,34,.55);color:#FF8C22;box-shadow:0 0 12px -4px rgba(255,140,34,.8)" onclick="openTitleFight(${fei})">🏆 TITLE FIGHT AVAILABLE</button>`;}catch(_){}return '';})()}
-          <div class="log-muscle-tag" style="color:${col}">${exTarget(ex).split('·')[0].trim()}</div>
           ${liberationTicker(fei)}
-          <div class="row" style="gap:6px;margin-top:5px;align-self:flex-start;flex-wrap:wrap"><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="quickRamp(${fei})">🪜 Warm-up ramp</button><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="openReorder()">↕ Order</button><button class="chip" style="font-size:10.5px;padding:3px 9px;color:var(--text3)" onclick="openSkipEx(${fei})">⏭ Skip tonight</button></div>
-          ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:3px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
-        </div>
-        <button class="btn ghost sm" style="width:auto;padding:7px 9px;align-self:flex-start;color:var(--text3)" onclick="removeExercise(${fei})" title="Remove">✕</button>
+          <div class="row" style="gap:6px;margin-top:5px;flex-wrap:wrap"><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="quickRamp(${fei})">🪜 Warm-up ramp</button><button class="chip" style="font-size:10.5px;padding:3px 9px" onclick="openReorder()">↕ Order</button><button class="chip" style="font-size:10.5px;padding:3px 9px;color:var(--text3)" onclick="openSkipEx(${fei})">⏭ Skip tonight</button></div>
+          ${ex.c&&ex.c[0]?`<div style="font-size:10.5px;color:var(--text3);margin-top:5px;line-height:1.35">🧪 ${esc(ex.c[0])}</div>`:''}
       </div>`;
 
     // Set table — exact previous values shown left, direct inputs for weight+reps
@@ -12631,6 +12748,9 @@ function renderLogging(){
   $('app').innerHTML=h;
   {const _tb=$('timerbar'),_sp=$('timerspace');if(_tb&&_sp)_sp.style.height=_tb.offsetHeight+'px';}
   try{const _fe=activeExIdx();if(_fe>=0&&ses.exercises[_fe])attachExGif("logfig",ses.exercises[_fe].name);}catch(e){}
+  // Keep the active pill in view on the nav strip — no reason to hunt for where you are.
+  try{const strip=$('logexstrip'),act=strip&&strip.querySelector('.ex-active');
+    if(strip&&act)strip.scrollTo({left:Math.max(0,act.offsetLeft-strip.clientWidth/2+act.clientWidth/2),behavior:'smooth'});}catch(e){}
   ensureTimers();
   if(!state.wtInt)startTimers();
   initDragReorder();

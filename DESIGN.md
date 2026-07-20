@@ -36,9 +36,31 @@ If a decision isn't answerable here, add it here FIRST, then build.
 - `.tbox` — fixed timer boxes in workout header (`.timers` bar).
 - `.stype` / `.sdone` — 36px set-type + check tiles (44px+ effective touch with padding).
 - gtv2 home tokens: `.gtv2-tonight` focal plate, `.gtv2-track/step` stepper, `.gtv2-idrow` identity row.
+- `.exwrap` — small/list exercise thumbnail (`.sm` 74px, `.xs` 46px, default 86px). Exactly one base
+  visual layer (curated photo `.exfigimg` OR the anatomy `<svg>`) plus an optional animated `.exgif`
+  demo layered on top; `.hasgif` on the wrapper hides the base layer. Build the base layer with
+  `figLayerHtml(ex, fi)` — never hand-roll the img/svg pair, it's what makes "one layer only" hold.
+- `.figframe` — the HERO picture banner (exercise dossier + the active lift's focus card during
+  logging). Full-bleed image, muscle-colour ambient glow (`--fg`), tactical corner brackets
+  (`.figframe-c.tl/tr/bl/br`, same HUD language as the garage-entrance cinematic), a bottom gradient
+  caption plate (`.figframe-cap`) carrying name + target muscle, and optional floating tool buttons
+  (`.figframe-tool.left/right`, e.g. the ✕ remove control). Content: `.figframe-glow` + a `.figlayer`
+  div holding `figLayerHtml(ex)` + the corner/caption markup. Same single-layer contract as `.exwrap`.
+- `.picp-grid` / `.picp-tile` — the picture-picker gallery (`openPicPicker`): a searchable, filterable
+  grid of every candidate demo the Batcomputer can find, plus an "Anatomy figure" tile. Never fall
+  back to a blind "cycle to next" control — always let the user see and choose.
 - Sheets: `openSheet(html)` bottom sheet; `openSheetTall` for full content. Toast: `toast(msg)`.
 - Cinematics: `playStinger(title, sub, accent)` 1.5s full-screen bat-slam (rewards only), `prFlash()` flashbulb, `sfx(kind)` WebAudio, `haptic(kind)`.
 - Nav: barbell bottom bar (`.nav-bar` knurled steel, active tab = loaded gold plate).
+
+## Scroll discipline
+`render()` preserves scroll position automatically when the view key (`state._vk`) hasn't changed —
+never call `window.scrollTo(0,0)` from an in-place action (set toggles, exercise focus, sheet edits).
+Reserve hard scroll-to-top for genuine navigation (tab switch, opening a subpage, minimising/resuming
+a workout). If a focused element needs to be brought into view, scroll THAT element into view (account
+for the fixed `#timerbar` height), never the whole page. Bottom sheets (`#sheet`) scroll independently
+via their own `scrollTop` — mutating sheet content must repaint the sheet in place and restore its
+`scrollTop`, since `render()` only repaints `#app` underneath it.
 
 ## Motion
 - Durations 120-350ms UI, easings `--ease-out` / `--ease-spring`. View transitions via `#app.view-enter*`.
