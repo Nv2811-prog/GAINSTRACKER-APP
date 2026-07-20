@@ -10908,8 +10908,13 @@ function skinUnlocked(s){
   if(s.ev)return Object.keys(state.data.eventWins||{}).some(k=>k.indexOf(s.ev)===0);
   if(s.prestige)return (state.data.prestige||0)>=s.prestige;
   return strengthLevel()>=s.lvl;}
+// One source of truth for "why is this locked" — the vault's event/prestige suits all carry
+// lvl:0 (irrelevant placeholder), so a naive "Level N" label reads as a bug ("I'm above level 0,
+// why is this still locked?"). Used by both the wardrobe card label and the tap-to-select toast,
+// which had drifted out of sync (toast was correct, card label always showed level regardless).
+function skinLockReason(s){return s.ev?"Seasonal event — "+s.d:s.prestige?"Forge Prestige to claim":"Level "+s.lvl;}
 function activeSkin(){const s=SKINS.find(x=>x.id===state.data.suitSkin&&skinUnlocked(x));if(s)return s;const un=SKINS.filter(skinUnlocked);return un[un.length-1]||SKINS[0];}
-function selectSkin(id){const s=SKINS.find(x=>x.id===id);if(!s)return;if(!skinUnlocked(s)){haptic("warn");toast("🔒 "+(s.ev?"Clear its seasonal event first: "+s.d:s.prestige?"Forge Prestige to claim this.":"Reach strength level "+s.lvl));return;}state.data.suitSkin=id;save();haptic("success");toast(s.e+" "+s.n+" equipped");openSkins();}
+function selectSkin(id){const s=SKINS.find(x=>x.id===id);if(!s)return;if(!skinUnlocked(s)){haptic("warn");toast("🔒 "+skinLockReason(s));return;}state.data.suitSkin=id;save();haptic("success");toast(s.e+" "+s.n+" equipped");openSkins();}
 const BELTS=[
   {id:"iron",n:"Iron Belt",e:"🥉",stat:"totalWorkouts",need:25},
   {id:"steel",n:"Steel Belt",e:"🥈",stat:"totalWorkouts",need:100},
@@ -10928,7 +10933,7 @@ function openSkins(){
   const cards=SKINS.map(s=>{const un=skinUnlocked(s);const on=act.id===s.id;
     return `<button class="card" style="padding:13px;text-align:center;cursor:pointer;border-color:${on?'var(--gold2)':un?'var(--gold-dim)':'var(--border)'};opacity:${un?1:.6}" onclick="selectSkin('${s.id}')">
       <div style="font-size:28px;filter:${un?'none':'grayscale(1)'}">${s.e}</div><div class="ttl" style="font-size:13px;margin:5px 0 1px;color:${on?'var(--gold2)':'var(--text)'}">${esc(s.n)}</div>
-      <div class="mini" style="color:var(--text3)">${un?esc(s.d):'🔒 Level '+s.lvl}</div>${on?'<div class="mini" style="color:var(--gold2);margin-top:3px">● EQUIPPED</div>':un?'<div class="mini" style="color:var(--text3);margin-top:3px">tap to equip</div>':''}</button>`;}).join("");
+      <div class="mini" style="color:var(--text3)">${un?esc(s.d):'🔒 '+esc(skinLockReason(s))}</div>${on?'<div class="mini" style="color:var(--gold2);margin-top:3px">● EQUIPPED</div>':un?'<div class="mini" style="color:var(--text3);margin-top:3px">tap to equip</div>':''}</button>`;}).join("");
   openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">💠 Wardrobe & Titles</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 12px">Earn the cowl. Suit skins unlock with your strength level; belts with your milestones.</div>
     <div class="grid2">${cards}</div>
