@@ -2973,7 +2973,7 @@ function unlockToast(x){
     else if(x.kind==="vehicle"){openGarage();}};
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add("on"));
-  setTimeout(()=>{el.classList.remove("on");setTimeout(()=>el.remove(),420);},4200);
+  setTimeout(()=>{el.classList.remove("on");setTimeout(()=>el.remove(),420);},2600);
 }
 function checkUnlocks(){
   const u=state.data.u;
@@ -3026,7 +3026,7 @@ function alfredPingAI(ctx){try{
     if(!txt)return;const line=txt.trim().replace(/^["“]|["”]$/g,"").slice(0,180);
     try{ALFRED_MSGS.push({role:"alfred",text:line});}catch(e){}
     toast("🎩 "+line);
-    if(state.data.u.coachVoice)setTimeout(()=>{try{alfredSpeak(line);}catch(e){}},500);
+    setTimeout(()=>{try{alfredVoiceLine(line);}catch(e){}},200);
   }).catch(()=>{});
   return true;
 }catch(e){return false;}}
@@ -3287,7 +3287,7 @@ function showPRToast(name,hits,info){
     </div>
     <div class="prtap">tap to dismiss</div>`;
   p.classList.remove("on");void p.offsetWidth;p.classList.add("on");
-  clearTimeout(p._t);p._t=setTimeout(()=>{p.classList.remove("on");},5200);
+  clearTimeout(p._t);p._t=setTimeout(()=>{p.classList.remove("on");},2800);
   haptic("pr");
 }
 // PR KILL-CAM — full-screen slow-mo cinematic when a record falls. Reuses the #cine overlay
@@ -3802,7 +3802,7 @@ function confettiBurst(){
     p.style.animationDuration=(1.5+Math.random()*1.3).toFixed(2)+"s";
     layer.appendChild(p);}
   host.appendChild(layer);
-  setTimeout(()=>layer.remove(),3400);
+  setTimeout(()=>layer.remove(),2200);
 }
 /* KO CAM — slow-mo replay of the finish: villain face drops through frame, K.O. slams in. */
 function showKOCam(boss,fin,then){
@@ -4840,7 +4840,7 @@ function saveSessionNote(v){if(state.lastResult){state.lastResult.wk.notes=v;sav
 function setSessionFeel(v){if(!state.lastResult)return;const wk=state.lastResult.wk;wk.feel=(wk.feel===v?"":v);save();haptic("tap");document.querySelectorAll(".feelchip").forEach(c=>c.classList.toggle("on",c.getAttribute("data-feel")===wk.feel));}
 function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";try{playOutro(state.lastResult);}catch(e){try{playStinger('PATROL COMPLETE','','#22E87A');}catch(_){}}
   // Alfred speaks his verdict over the debrief (mixes with music — never pauses it)
-  setTimeout(()=>{try{if(state.step==="summary")alfredVoiceLine(alfredSessionVerdict());}catch(e){}},5600);
+  setTimeout(()=>{try{if(state.step==="summary")alfredVoiceLine(alfredSessionVerdict());}catch(e){}},3200);
   render();}
 /* ===== OUTRO — the mirror of the garage-door entrance. Vehicle returns, doors slam shut on the
    night, the emblem is stamped with the night's numbers, then it lifts to reveal the debrief. ===== */
@@ -4873,7 +4873,7 @@ function playOutro(R){
   setTimeout(()=>{try{sfx("pop");}catch(e){}},1650);
   const leave=()=>{if(el._done)return;el._done=true;el.classList.add('leaving');setTimeout(()=>{try{el.remove();}catch(_){}},560);};
   el.onclick=leave;
-  setTimeout(leave,5200);
+  setTimeout(leave,2800);
 }
 /* "You lifted ≈ 2.8 Batmobiles" — session tonnage drawn as Gotham hardware, not just a number. */
 const BAT_PATH="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
@@ -10531,13 +10531,28 @@ function alfredSpeak(text){
     haptic("tap");synth.speak(_alfredUtter(text,0.92,0.95));
   }catch(e){toast("Couldn't start voice.");}
 }
+/* Fires after EVERY logged set — the most-repeated moment in the whole app, so it has to be
+   quick. The full dramatic line still shows on screen (Alfred banner / toast) at its own pace to
+   read; only the SPOKEN clip is capped short, so a long PR monologue never turns into a 5-8s wait
+   between sets. Cut at the first clause break, hard cap as a fallback. */
+function _alfredVoiceClip(text){
+  text=(text||"").trim();
+  if(text.length<=48)return text;
+  const cut=text.search(/[.!?—](?=\s|$)/);
+  if(cut>0&&cut<=64){
+    let clip=text.slice(0,cut+1);
+    if(/—$/.test(clip))clip=clip.slice(0,-1).trim()+"."; // an em-dash is a mid-thought connector, not a real stop — swap for a clean period so the clip doesn't trail off
+    return clip;
+  }
+  return text.slice(0,48).replace(/\s+\S*$/,"");
+}
 /* Auto-coaching voice — fires after a logged set. Cancels any in-flight line, never toggles. Silent if disabled/unsupported. */
 function alfredVoiceLine(text){
   try{
     if(!state.data.u.coachVoice)return;
     if(!("speechSynthesis" in window))return;
     const synth=window.speechSynthesis;synth.cancel();
-    synth.speak(_alfredUtter(text,0.92,0.95)); // measured pace, near-natural pitch (deep pitch sounded robotic)
+    synth.speak(_alfredUtter(_alfredVoiceClip(text),1.12,0.97)); // quick, punchy delivery — not a monologue between sets
   }catch(e){}
 }
 function previewAlfredVoice(){
@@ -12019,7 +12034,14 @@ function renderGotham(){
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${territoryWarCard()}${(()=>{try{return crateCard()+seasonEventCard()+chronicleCard();}catch(e){return "";}})()}${(()=>{try{return caveReviewCard()+siegeCard();}catch(e){return "";}})()}${mm.season}${gtv2ScorePanel()}`;
+  // The week's story, events, crate, siege and season status used to stack as six separate
+  // always-open cards before you ever reached your actual readiness stats — a wall of lore on the
+  // one screen that's supposed to answer "what do I do tonight?" first. Folded into one collapsed
+  // accordion (same pattern Profile already uses) — nothing lost, just not fighting for attention
+  // by default. Territory War stays visible: it's the one narrative card that's also a direct,
+  // glanceable readout of your actual muscle data, not pure flavor.
+  const loreHtml=(()=>{try{return crateCard()+seasonEventCard()+chronicleCard()+caveReviewCard()+siegeCard()+mm.season;}catch(e){return "";}})();
+  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${territoryWarCard()}${loreHtml.trim()?acc('gotham-lore','🦹','Gotham Chronicle',loreHtml,false,"this week's story, events & siege"):''}${gtv2ScorePanel()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
@@ -12486,7 +12508,7 @@ function playEntrance(name){
     <div class="g9-door-right" style="z-index:8"></div>`;
   document.body.appendChild(ov);
   const close=()=>{if(ov._done)return;ov._done=true;state._entrLock=false;ov.classList.add('closing');setTimeout(()=>{try{ov.remove();}catch(_){}},520);};
-  setTimeout(close,6000);
+  setTimeout(close,3500); // title text finishes fading in ~3.1s in; this gives it a short beat, not a lingering wait
 }
 
 /* Always anatomy SVG — the grey bodybuilder with red worked muscles. Never demo images. */
