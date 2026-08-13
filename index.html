@@ -3121,9 +3121,9 @@ function startWorkout(splitId,dayIdx){
     srcSplit:(sp&&day)?splitId:null,srcDay:(sp&&day)?dayIdx:null,
     exercises:(day?day.exercises:[]).map(n=>({name:n,sets:seedSets(n)}))};
   state.workoutTimer=0;state.restTimer=0;state.restRunning=false;
-  state.step="readiness";render();playEntrance(state.session.day);villainIntroForDay();try{maybeContextualVillainTaunt();}catch(e){}
+  state.step="readiness";render();playEntrance(state.session.day);
 }
-function freeWorkout(){try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");try{maybeContextualVillainTaunt();}catch(e){}}
+function freeWorkout(){try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
 const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
 function seedSets(name){
@@ -3150,7 +3150,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else setTimeout(()=>{try{playStinger('CLEARED',exx.name.toUpperCase(),'#22E87A');}catch(_){}},380);}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else{haptic("tap");toast("✓ "+exx.name+" cleared");}}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3167,7 +3167,7 @@ function checkLiberation(ei){
     if(districtCrime(m).crime<45)return;
     if(sessionSetsOn(m)<3)return;
     ses._liberated.push(m);
-    playStinger("DISTRICT LIBERATED",esc((MUSCLE_DISTRICT[m]||"")+" — "+MNAME[m]+" retaken"),"#FFD048");
+    toast("🏅 "+MNAME[m]+" — MEV hit tonight");
     try{haptic("ko");}catch(e){}
   });
 }
@@ -3186,8 +3186,7 @@ function tonnageQuip(){
   const ses=state.session;if(!ses)return;
   let vol=0;(ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{if(s.done)vol+=setVolume(ex,s);});});
   const cars=Math.floor(vol/2300);
-  if(cars>0&&cars>(ses._quipCars||0)){ses._quipCars=cars;
-    if(state.data.u.coachVoice)try{alfredSpeak(cars===1?"That's a Batmobile's worth of iron moved, sir.":"That's "+cars+" Batmobiles lifted tonight, sir.");}catch(e){}}
+  if(cars>0&&cars>(ses._quipCars||0))ses._quipCars=cars;
 }
 // Real-time PR + boss: the moment a working set is completed and beats your record,
 // fire a toast and (first time per exercise this session) the villain boss fight.
@@ -6575,20 +6574,19 @@ function mostWantedCard(){
   const m=weakestMuscle();if(!m)return "";
   const lm=VL[m]||{mev:8,mav:14};const target=lm.mev;const cur=weeklySets(m);
   const done=cur>=target;const pct=clamp(cur/Math.max(1,target)*100,0,100);
-  const nm=NEMESIS_MAP[m];const villain=nm?nm.villain:"The Rogues";
   const bc=done?"#2ECC71":"#E8453C";
   return `<div class="gtv2-panel wide" style="border-color:${bc}55;margin-bottom:8px;padding:10px 12px">
     <div class="row sp" style="align-items:center;gap:8px">
       <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
         ${mIcon(m,26,bc)}
         <div style="min-width:0">
-          <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:var(--disp)">MOST WANTED · ${esc(villain)}</div>
+          <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:var(--disp)">FURTHEST BEHIND MEV</div>
           <div style="font-size:15px;font-weight:800;color:${bc};font-family:var(--disp)">${MNAME[m]}</div>
         </div>
       </div>
       <div style="text-align:right;flex:none">
-        <div style="font-size:12px;color:${bc};font-weight:700">${done?'✓ SECURED':cur+'/'+target}</div>
-        <div style="font-size:10px;color:var(--text3)">${done?'bounty claimed':'sets this week'}</div>
+        <div style="font-size:12px;color:${bc};font-weight:700">${done?'✓ MEV MET':cur+'/'+target}</div>
+        <div style="font-size:10px;color:var(--text3)">${done?'minimum hit':'sets this week'}</div>
       </div>
     </div>
     <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${pct}%;background:${done?'#2ECC71':'linear-gradient(90deg,#E8453C,#E8A52A)'};border-radius:999px;box-shadow:0 0 8px ${bc}"></i></div>
@@ -12040,7 +12038,7 @@ function renderGotham(){
   // accordion (same pattern Profile already uses) — nothing lost, just not fighting for attention
   // by default. Territory War stays visible: it's the one narrative card that's also a direct,
   // glanceable readout of your actual muscle data, not pure flavor.
-  const loreHtml=(()=>{try{return crateCard()+seasonEventCard()+chronicleCard()+caveReviewCard()+siegeCard()+mm.season;}catch(e){return "";}})();
+  const loreHtml=(()=>{try{return crateCard()+seasonEventCard()+chronicleCard()+caveReviewCard()+siegeCard()+mm.season+garageCard();}catch(e){return "";}})();
   let html=`<div class="gtv2-shell">${gtv2MissionHero()}${territoryWarCard()}${loreHtml.trim()?acc('gotham-lore','🦹','Gotham Chronicle',loreHtml,false,"this week's story, events & siege"):''}${gtv2ScorePanel()}`;
   const stalled=typeof stalledLifts==="function"?stalledLifts():[];
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
@@ -12054,7 +12052,7 @@ function renderGotham(){
   const skC=ws>0?"var(--orange)":"var(--gold)";
   html+=`<div class="gtv2-grid"><div class="gtv2-panel" style="border-color:${skC};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${skC}" onclick="go('case')"><div class="gtv2-label">Streak</div><div class="gtv2-value" style="color:${skC};text-shadow:0 0 18px currentColor">${ws>0?"🔥":""}${ws}<span style="font-size:15px;font-family:var(--disp);color:var(--text3);margin-left:3px">wk</span></div><div class="gtv2-note">${ws===0?"Hit your weekly goal to start the chain":ws+" week"+(ws===1?"":"s")+" hitting goal"} · ${dop} day${dop===1?"":"s"} unbroken<br><span style="color:var(--text3);font-size:10px">rest never breaks it</span></div></div>
     <div class="gtv2-panel" style="border-color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px var(--gold)" onclick="openIronLedger()"><div class="gtv2-label">Iron Ledger</div><div class="gtv2-value" style="color:var(--gold2);text-shadow:0 0 18px currentColor">${fmtNum(Math.round((typeof ironLedger==="function"?ironLedger().vol:u.totalVolume)||0))}</div><div class="gtv2-note">kg lifetime volume</div></div></div>`;
-  html+=garageCard()+`</div>`;
+  html+=`</div>`;
   $("app").innerHTML=html;
 }
 function overloadSuggestions(wk){

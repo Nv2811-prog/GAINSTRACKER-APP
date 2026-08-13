@@ -29,9 +29,9 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
   may time out — if so, verify via the DOM and ask the user to eyeball on iPhone.
 
 ## ARCHITECTURE FACTS
-- Live home = `renderGotham()` @ ~line 9201 (the **gtv2** build: gtv2MissionHero, gtv2ScorePanel,
-  gtv2MuscleGrid; CSS ~605–650). There is a DEAD duplicate `renderGotham` @ ~5514 — delete it; edits
-  there do nothing.
+- Live home = `renderGotham()` (the **gtv2** build: gtv2MissionHero, gtv2ScorePanel, gtv2ScorePanel).
+  Only one definition exists — a prior dead duplicate was already removed. If you ever find two
+  `function renderGotham` again, that's new drift, not a known issue — delete the unused one.
 - 5 tabs: **GOTHAM, MISSION, SUIT, PROFILE, ALLIES** (case key → renderProfile).
 - Per-gym PRs: `d.prsByGym[gym]`; `d.prs` re-points to the active gym each load. `u.gyms`,
   `u.activeGym`, `switchGym()`. Machine settings: `d.machineSettings[gym][exName]`.
@@ -62,12 +62,39 @@ spread to the WHOLE app. The plain flat boxes are what they hate.
 
 ## REQUIRED UX BEHAVIORS (the user asked for these specifically)
 - **Compact-by-default + tap-to-expand.** Big bloated sections (splits, split generator, maps,
-  records) should be COMPACT cards by default; tapping opens the full detail in a tab/sheet.
-- **No launch pop-up pile-up.** Nothing should throw pop-ups the moment the app opens (the user just
-  hits "skip"). Surface coaching/notifications CONTEXTUALLY — while using a feature or during a
-  workout — not all on launch.
+  records) should be COMPACT cards by default; tapping opens the full detail in a tab/sheet. Gotham
+  home applies this to the whole narrative/gamification layer, not just splits — see SCIENCE > FLAVOR
+  below.
+- **No pop-up pile-up, launch OR mid-workout.** Nothing should throw an unprompted full-screen
+  takeover just from opening the app or finishing a set/exercise. Reserve `cinePush`/`playStinger`
+  for things the user actually earned and will want to see (a PR, a session finishing) — acknowledge
+  everything else with a toast/haptic instead. If you're about to add a new auto-triggered popup, the
+  default answer is no — make it a toast.
 - **Spread content across tabs / into small bites.** Don't bury important things (e.g. the calendar
   is stuck at the bottom of a tab and never gets used). Put each thing where it's reachable.
+
+## SCIENCE > FLAVOR (user direction, 2026-07-22 — supersedes anything below that conflicts)
+The user still likes the Batman theme (branding, nav tabs, Alfred, dark gold aesthetic — don't strip
+that), but wants the app **simpler, quicker, and more science-first**: less time in narrative
+gamification, more of what's actually backed by training science (RIR/RPE, MEV/MAV/MRV volume
+landmarks, per-muscle recovery windows, progressive overload, muscle-head bias), surfaced passively
+(inline cards, ambient labels) rather than through pop-ups.
+- **Keep:** the core theme/branding, Alfred as coach, all real training-science systems (recovery
+  model, volume landmarks, RIR intel, progressive-overload suggestions, strength standards) — these
+  ARE the product, don't touch their logic.
+- **Dial back, don't delete:** pure-narrative gamification layers (Territory War, Season Chronicle,
+  GCPD Crate, Siege, Wraith, Title Belts/Fight Night, Garage/vehicles, Wardrobe skins) — fold them
+  behind collapsed accordions or move them out of the primary flow instead of ripping them out. The
+  user explicitly does not want them gone, just not in the way.
+- **Cut outright** anything that's 100% flavor with zero informational value and fires automatically
+  (e.g. a voice line comparing tonnage to a fictional car's weight) — those add nothing and just cost
+  time.
+- **Relabel toward plain science language where a villain/narrative label was standing in for a real
+  metric** (e.g. "Most Wanted · [Villain]" → "Furthest behind MEV") — keep the underlying mechanic,
+  drop the narrative wrapper when it obscures rather than adds.
+- **Animations:** keep them short everywhere — this is a standing preference, not a one-time ask. When
+  in doubt, cut a one-shot animation/timeout duration down, don't leave it "as designed." Full-screen
+  moments belong to PRs and session completion, nothing else.
 
 ## IMAGE GENERATION (works — paid Gemini, funded). Use it automatically.
 When the app needs any image (muscle figures, icons, textures, backgrounds), generate it — don't
