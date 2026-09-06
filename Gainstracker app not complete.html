@@ -2679,10 +2679,26 @@ function setE1RM(ex,s){const load=setLoad(ex,s.w),reps=+s.r||0;if(!reps)return 0
 /* Workouts of the ACTIVE gym only — a split reused across gyms must never show another gym's
    numbers (machine weights differ). Legacy entries with no gym stamp belong to the first gym. */
 function gymWs(){const d=state.data,g=d.u.activeGym||((d.u.gyms||[])[0]||"");const home=(d.u.gyms||[])[0]||g;return (d.workouts||[]).filter(w=>(w.gym||home)===g);}
+// Per-exercise "reset point": new equipment (different weights, different feel) shouldn't make
+// the app compare tonight's first lift against numbers set on a machine that no longer exists.
+// Nothing is deleted — old sets stay in the workout record forever — this just tells every
+// "last time" lookup to ignore anything logged before the reset date for that exercise.
+function exResetAt(name){return (state.data.exReset||{})[(name||"").toLowerCase().trim()]||0;}
+function archiveExercise(name){
+  const key=(name||"").toLowerCase().trim();if(!key)return;
+  state.data.exReset=state.data.exReset||{};state.data.exReset[key]=new Date().toISOString();
+  save();
+}
+function unarchiveExercise(name){
+  const key=(name||"").toLowerCase().trim();if(!key||!state.data.exReset)return;
+  delete state.data.exReset[key];save();
+}
 function lastSetFor(name){
   const key=(name||"").toLowerCase().trim();
+  const cut=exResetAt(name);
   const ws=gymWs();
   for(let i=0;i<ws.length;i++){
+    if(cut&&new Date(ws[i].date).getTime()<new Date(cut).getTime())break; // newest-first — once we hit the cutoff, everything after is pre-reset too
     const e=(ws[i].exercises||[]).find(x=>(x.name||"").toLowerCase().trim()===key);
     if(e&&e.sets&&e.sets.length)return e.sets;
   }
@@ -3150,7 +3166,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else{haptic("tap");toast("✓ "+exx.name+" cleared");}}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else{haptic("tap");toast("✓ "+exx.name+" cleared");}}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3560,7 +3576,11 @@ function finishWorkout(){
   u.totalWorkouts++;u.totalVolume+=totalVol;u.totalDuration+=dur;u.xp+=xpGain;u.failureSets+=fails;
   // weakest muscle for taunt memory
   let weak=M12[0],wl=999;M12.forEach(m=>{const l=muscleLevel(m);if((state.data.muscleVol[m]||0)>0&&l<wl){wl=l;weak=m;}});u.lastMissedMuscle=weak;
-  const wk={id:"w"+now(),date:t,name:ses.day,split:ses.split,muscles:Object.keys(musclesHit),exercises:done,xp:xpGain,totalVol:Math.round(totalVol),duration:dur,readiness:ses.readiness,gym:(ses.gym||state.data.u.activeGym||""),prs:prsThis.map(p=>p.name),notes:(ses.notes||"").trim()};
+  // splitId/dayIdx (when this session came from a real split day) are the STABLE identity for
+  // "which day was this" — renaming a day, or a Free Session with no split at all, must never make
+  // computeNextDay() blind to a session that actually happened. Name-string matching (name/split
+  // below) is kept only as a fallback for history logged before this field existed.
+  const wk={id:"w"+now(),date:t,name:ses.day,split:ses.split,splitId:ses.srcSplit||null,dayIdx:ses.srcDay!=null?ses.srcDay:null,muscles:Object.keys(musclesHit),exercises:done,xp:xpGain,totalVol:Math.round(totalVol),duration:dur,readiness:ses.readiness,gym:(ses.gym||state.data.u.activeGym||""),prs:prsThis.map(p=>p.name),notes:(ses.notes||"").trim()};
   state.data.workouts.unshift(wk);
   // log your own session + records into the Patrol Feed (your League timeline)
   try{
@@ -4131,9 +4151,48 @@ function suggestionFor(name){
   return Math.round(pr.w*mult);
 }
 // Most recent logged top working set for a lift (scans workout history, newest first).
+/* 🔧 REAL-TIME WEIGHT CHECK — fires the instant a set is logged, not after the workout. A weight
+   that's way up, way down, or been dead-flat for ages next to the exercise's own recent history is
+   worth a direct question RIGHT NOW ("new machine?" / "feeling off?") while the reason is still on
+   the lifter's mind — not a paragraph, four tap targets. The answer gets stored as a note on the
+   exercise, same bucket the user's own manual notes live in. */
+function checkWeightAnomaly(ei,si){
+  const ses=state.session;const e=ses.exercises[ei];const s=e&&e.sets[si];
+  if(!s||!s.done||s.type==="W")return;
+  const w=parseFloat(s.w);if(!w||w<=0)return;
+  ses._anomalyAsked=ses._anomalyAsked||{};if(ses._anomalyAsked[e.name])return; // once per exercise per session
+  const ex=exFor(e.name);
+  const lb=lastBestSet(e.name);if(!lb||!lb.w)return;
+  const cut=exResetAt(e.name);
+  if(cut&&lb.date&&new Date(lb.date).getTime()<new Date(cut).getTime())return; // archived — no fair baseline to compare against yet
+  const lw=setLoad(ex,lb.w),cw=setLoad(ex,w);
+  if(!lw||!cw)return;
+  const pct=(cw-lw)/lw*100;
+  const bigJump=Math.abs(pct)>=25&&Math.abs(cw-lw)>=(ex.bw?5:2.5);
+  if(!bigJump)return;
+  ses._anomalyAsked[e.name]=true;
+  setTimeout(()=>openWeightCheck(ei,si,pct>0),250);
+}
+function openWeightCheck(ei,si,isUp){
+  const e=state.session&&state.session.exercises[ei];if(!e)return;
+  const safe=esc(e.name).replace(/'/g,"");
+  const opts=isUp
+    ?[["💪","Felt strong"],["🔧","New machine"],["📉","Old weight was light"]]
+    :[["😵","Feeling off"],["🔧","New machine"],["🩹","Managing an ache"]];
+  openSheet(`<div class="ttl" style="margin-bottom:2px">${isUp?"Big jump up, sir":"Well down tonight, sir"}</div>
+    <div class="mini" style="color:var(--text2);margin-bottom:12px">${esc(e.name)} — what's the story?</div>
+    <div class="row wrap" style="gap:8px">${opts.map(([ic,lb])=>`<button class="btn ghost sm g" style="flex:1;min-width:110px" onclick="answerWeightCheck('${safe}','${lb.replace(/'/g,"")}')">${ic} ${lb}</button>`).join("")}</div>
+    <button class="btn ghost sm" style="margin-top:8px;color:var(--text3)" onclick="closeSheet()">Skip</button>`);
+}
+function answerWeightCheck(name,answer){
+  state.data.exNotes=state.data.exNotes||{};
+  (state.data.exNotes[name]=state.data.exNotes[name]||[]).unshift({date:new Date().toISOString(),note:answer});
+  save();haptic("tap");closeSheet();toast("Noted, sir.");
+}
 function lastBestSet(name){
-  const ws=gymWs();const ex=exFor(name);
+  const ws=gymWs();const ex=exFor(name);const cut=exResetAt(name);
   for(const w of ws){
+    if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())break; // newest-first — archived, stop here
     const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;
     let best=null,bv=-1;
     (e.sets||[]).forEach(s=>{if(s.type==="W")return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
@@ -5718,7 +5777,9 @@ function trendChart(vals,opts){
 }
 function exerciseRows(name){
   const key=(name||"").toLowerCase().trim(),ex=exFor(name),rows=[];
+  const cut=exResetAt(name);
   state.data.workouts.slice().reverse().forEach(w=>{            // oldest first
+    if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())return; // archived — old equipment, don't count toward "last time"/trend
     const e=(w.exercises||[]).find(x=>(x.name||"").toLowerCase().trim()===key);if(!e)return;
     let bestE=0,topW=0,vol=0,bset=null;
     (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;const e1=setE1RM(ex,s);if(e1>bestE){bestE=e1;bset=s;}const ld=setLoad(ex,s.w);if(ld>topW)topW=ld;vol+=setVolume(ex,s);});
@@ -8328,6 +8389,12 @@ function computeNextDay(sp){
   sp.days.forEach((dy,i)=>{const k=((dy&&dy.name)||"").toLowerCase().trim();if(k&&idxByName[k]==null)idxByName[k]=i;});
   let lastWoTime=-1,lastWoIdx=null;
   for(const w of (state.data.workouts||[])){            // newest-first (unshift order)
+    // Stable identity first: a session tagged with THIS split's id + day index is unambiguous,
+    // even if the day's since been renamed. Only fall back to name-matching for older history
+    // logged before this field existed — that fallback is what let a rename (or a Free Session
+    // breaking the streak) skip straight past a real recent session to an older name-match,
+    // making "last time you did this day" show weeks-old data the day after you actually trained.
+    if(w&&w.splitId===sp.id&&w.dayIdx!=null&&w.dayIdx<len){lastWoTime=new Date(w.date).getTime();lastWoIdx=w.dayIdx;break;}
     const k=((w&&w.name)||"").toLowerCase().trim();
     if(idxByName[k]!=null){lastWoTime=new Date(w.date).getTime();lastWoIdx=idxByName[k];break;}
   }
@@ -9472,9 +9539,12 @@ function alfredContext(){
   const prStr=prs.slice(0,25).map(([n,p])=>`${n}: ${Math.round(p.orm)}kg e1RM (${p.w}kg×${p.r})`).join(', ')||'none yet';
   // Recovery % per muscle + weekly sets
   const muscleStr=M12.map(m=>{const trained=(d.muscleVol[m]||0)>0;const rec=trained?getRecovery(m)+'% recovered':'untrained';const sets=weeklySets(m)||0;return `${MNAME[m]}: Lv${muscleLevel(m)}, ${rec}, ${sets} sets/wk`;}).join('\n  ');
-  // Active split + today's day
+  // Active split + today's day + EVERY split with its real id, so an ACTIVATE_SPLIT action always
+  // has a valid target instead of guessing/hallucinating an id it was never given.
   let planStr='';
-  try{const sp=d.splits&&d.splits.find(s=>s.id===d.activeSplitId);if(sp){const ni=computeNextDay(sp);const nd=sp.days[ni]||sp.days[0];planStr=`\nACTIVE SPLIT: ${sp.name} | TODAY: ${nd?nd.name+' — '+((nd.exercises||[]).slice(0,10).join(', ')+(nd.exercises.length>10?' + '+(nd.exercises.length-10)+' more':'')):''}`; }}catch(e){}
+  try{const sp=d.splits&&d.splits.find(s=>s.id===d.activeSplitId);if(sp){const ni=computeNextDay(sp);const nd=sp.days[ni]||sp.days[0];planStr=`\nACTIVE SPLIT: ${sp.name} (id:${sp.id}) | TODAY: ${nd?nd.name+' — '+((nd.exercises||[]).slice(0,10).join(', ')+(nd.exercises.length>10?' + '+(nd.exercises.length-10)+' more':'')):''}`; }}catch(e){}
+  let allSplitsStr='';
+  try{allSplitsStr=(d.splits||[]).map(sp=>`  ${sp.name} (id:${sp.id})${sp.id===d.activeSplitId?' [ACTIVE]':''}: `+(sp.days||[]).map(dy=>dy.rest?dy.name+' (rest)':dy.name+' — '+(dy.exercises||[]).slice(0,6).join(', ')+((dy.exercises||[]).length>6?' +'+((dy.exercises||[]).length-6)+' more':'')).join(' | ')).join('\n');}catch(e){}
   // Current active workout
   let sessionStr='';
   if(state.session&&state.step==='logging'){
@@ -9499,7 +9569,10 @@ ACTIONS: When the user asks you to DO something in the app (create a split, acti
 [ACTION:CREATE_SPLIT:SplitName:Day1Name:ex1,ex2,ex3|Day2Name:ex1,ex2]
 [ACTION:ACTIVATE_SPLIT:splitId]
 [ACTION:GO:tabname]
-Only emit an action when the user explicitly asks you to create/change something. Normal questions get no action tag.
+Use the exact id shown in parentheses next to a split's name in ALL SPLITS below — never invent or
+guess an id. If the user names a split that doesn't appear there, say so rather than emitting an
+action with a made-up id. Only emit an action when the user explicitly asks you to create/change
+something. Normal questions get no action tag.
 
 USER: ${u.name||'sir'} | BW: ${u.bodyweight}kg | Goal: ${u.goal} | ${u.natty&&u.natty!=='maybe'?u.natty+' | ':''}Rank: ${r.emoji} ${r.name} Lv${sl}
 EXPERIENCE: ${exp}
@@ -9511,6 +9584,9 @@ MUSCLE STATUS (level / recovery / weekly sets):
 
 TOP PRs (est 1RM):
   ${prStr}
+
+ALL SPLITS:
+${allSplitsStr||'  none yet'}
 ${planStr}${lastStr}${sessionStr}${inj?'\nFLAGGED INJURIES: '+inj:''}`;
 }
 // Current free-tier models, in preference order (verified Jun 2026). 2.0 was retired Jun 1 2026.
@@ -12093,16 +12169,67 @@ function openSettings(){
     <input value="${esc(geminiKey())}" placeholder="Paste key to activate Alfred" oninput="setGemKey(this.value)" style="margin-bottom:14px"/>
     <div class="hr"></div>
     <div class="tgrid">
+      <div class="ttile gold" onclick="openDataControl()"><span class="ti">🗄️</span><span class="tl">Data control</span></div>
       <div class="ttile gold" onclick="exportRival()"><span class="ti">👥</span><span class="tl">Sparring code</span></div>
       <div class="ttile" onclick="importRival()"><span class="ti">📥</span><span class="tl">Import rival</span></div>
       <div class="ttile" onclick="state.showOnboarding=true;state.obStep=0;state.obTmp={};closeOverlay();render()"><span class="ti">🦇</span><span class="tl">Edit hero</span></div>
+    </div>
+    <button class="btn" style="margin-top:10px" onclick="closeOverlay();render()">Done</button>
+    <div class="mini center" style="margin-top:10px;color:var(--text3)">Build: ${esc(document.lastModified)} · if this date looks old, close the app fully and reopen on wifi</div>`;
+}
+/* ========================= DATA CONTROL ========================= */
+/* One home for "do something to my data" — new equipment means old weights on an exercise are no
+   longer a fair comparison, but they're real training history and shouldn't be thrown away. Archive
+   marks a cutoff date per exercise; everything before it stops feeding "last time"/suggestions but
+   stays in the record forever (exResetAt/exerciseRows/lastSetFor). Backup/restore/export/wipe live
+   here too — one place for "control my data", not scattered tiles. */
+function openDataControl(){
+  state._dcQ="";
+  openSheet(dataControlHtml());
+}
+function dataControlHtml(){
+  const q=(state._dcQ||"").toLowerCase().trim();
+  const reset=state.data.exReset||{};
+  const archivedKeys=Object.keys(reset);
+  const names=loggedExerciseNamesByRecency().filter(n=>!q||n.toLowerCase().includes(q));
+  const rows=names.slice(0,60).map(n=>{
+    const key=n.toLowerCase().trim();const at=reset[key];
+    const last=exerciseRows(n).slice(-1)[0];
+    const lastTxt=last?new Date(last.date).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'—';
+    return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)">
+      <div style="min-width:0"><div style="font-size:13.5px;font-weight:600;${at?'color:var(--text3);text-decoration:line-through':''}">${esc(n)}</div>
+        <div class="mini" style="color:var(--text3)">${at?'archived '+new Date(at).toLocaleDateString(undefined,{month:'short',day:'numeric'}):'last: '+lastTxt}</div></div>
+      ${at?`<button class="btn ghost sm" style="width:auto;flex:none" onclick="unarchiveExercise('${esc(n).replace(/'/g,"\\'")}');refreshDataControl()">Restore</button>`
+          :`<button class="btn ghost sm" style="width:auto;flex:none;color:var(--orange)" onclick="confirmArchiveExercise('${esc(n).replace(/'/g,"\\'")}')">Archive</button>`}
+    </div>`;
+  }).join("")||`<p class="muted center" style="padding:16px 0">No exercises logged yet.</p>`;
+  return `<div class="row sp" style="margin-bottom:4px"><div class="ttl" style="margin:0">🗄️ Data control</div><button class="btn ghost sm" style="width:auto" onclick="closeSheet()">Done</button></div>
+    <div class="mini" style="color:var(--text2);line-height:1.5;margin-bottom:10px">New equipment, different weights? Archive an exercise to stop comparing tonight's lift to numbers from the old machine — nothing is deleted, it's just set aside.</div>
+    ${archivedKeys.length?`<div class="mini" style="color:var(--gold2);margin-bottom:8px">${archivedKeys.length} exercise${archivedKeys.length===1?'':'s'} archived</div>`:''}
+    <input id="dc-search" placeholder="🔍 Search your exercises…" autocomplete="off" value="${esc(state._dcQ||"")}" oninput="state._dcQ=this.value;refreshDataControl()" style="margin-bottom:6px"/>
+    <div id="dc-list" style="max-height:38vh;overflow-y:auto;margin-bottom:6px">${rows}</div>
+    <div class="hr"></div>
+    <div class="mini" style="color:var(--text3);letter-spacing:.1em;margin-bottom:6px">BACKUP &amp; EXPORT</div>
+    <div class="tgrid">
       <div class="ttile" onclick="backupData()"><span class="ti">💾</span><span class="tl">Backup</span></div>
       <div class="ttile" onclick="restoreData()"><span class="ti">📂</span><span class="tl">Restore</span></div>
       <div class="ttile" onclick="exportCSV()"><span class="ti">📊</span><span class="tl">Export CSV</span></div>
     </div>
-    <button class="btn danger" onclick="wipeData()">Wipe everything</button>
-    <button class="btn" style="margin-top:10px" onclick="closeOverlay();render()">Done</button>
-    <div class="mini center" style="margin-top:10px;color:var(--text3)">Build: ${esc(document.lastModified)} · if this date looks old, close the app fully and reopen on wifi</div>`;
+    <button class="btn danger" style="margin-top:10px" onclick="wipeData()">Wipe everything</button>`;
+}
+function refreshDataControl(){
+  const sheet=$("sheet");if(!sheet||!sheet.classList.contains("on"))return;
+  const st=sheet.scrollTop;
+  const active=document.activeElement;const wasSearch=active&&active.id==="dc-search";
+  const selStart=wasSearch?active.selectionStart:null;
+  sheet.innerHTML=dataControlHtml();
+  sheet.scrollTop=st;
+  if(wasSearch){const el=$("dc-search");if(el){el.focus();try{el.setSelectionRange(selStart,selStart);}catch(e){}}}
+}
+function confirmArchiveExercise(name){
+  appConfirm({title:"Archive "+name+"?",body:"Tonight's first set won't be compared to old numbers, and \"last time\" starts fresh from here. Every set you've already logged stays in your record — nothing is deleted.",ok:"Archive",danger:false}).then(ok=>{
+    if(!ok)return;archiveExercise(name);haptic("done");toast("🗄️ "+name+" archived — starting fresh next time");refreshDataControl();
+  });
 }
 function u_set(k,v){state.data.u[k]=v;save();}
 function setGemKey(v){if(v.trim())localStorage.setItem("gt_gemini",v.trim());else localStorage.removeItem("gt_gemini");state.data.u.aiKeySet=!!v.trim();save();}
