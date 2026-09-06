@@ -1385,7 +1385,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 {"n":"High-to-Low Cable Fly","id":"hightolowcab","eq":"cable","p":["chest"],"s":["shoulders"],"c":["Pulleys high, sweep your hands down and together at your hips","Soft fixed elbows, squeeze the lower chest at the bottom","This downward angle targets the lower chest"],"tgt":"Chest \u2014 lower (costal) head, constant tension \u00b7 a little front delt","sub":{"chest":["lo"]}},
 {"n":"Dumbbell Pullover","id":"dumbbellpull","eq":"dumbbell","p":["chest"],"s":["back","triceps"],"c":["Big overhead stretch, pull the dumbbell over with the chest","Slight elbow bend, feel the stretch across the chest and ribs","Keep your hips down to maximize the stretch"],"tgt":"Chest \u2014 lower & ribcage \u00b7 also lats","sub":{"chest":["lo"]}},
 {"n":"Decline Barbell Bench Press","id":"declinebarbe","eq":"barbell","p":["chest"],"s":["triceps","shoulders"],"c":["Lower to your lower chest, press up and in","Squeeze the lower chest at the top","Controlled descent, no bouncing"],"tgt":"Chest \u2014 lower (costal) head \u00b7 front delts and triceps","sub":{"chest":["lo"]}},
-{"n":"Hammer Strength Incline Press","id":"hammerstreng","eq":"machine","p":["chest"],"s":["shoulders","triceps"],"c":["Bar to your upper chest, drive up and slightly back","Bench ~30\u00b0, elbows tucked ~45\u00b0","Don't over-incline into a shoulder press"],"tgt":"Chest \u2014 upper (clavicular) head, plate-loaded \u00b7 triceps","sub":{"chest":["up"]}},
 {"n":"Lat Pulldown (Wide Grip)","id":"latpulldownw","eq":"cable","p":["back"],"s":["biceps","shoulders"],"c":["Wide grip, drive your elbows down and back to your ribs","Pull the bar to your collarbone, chest up, no leaning back","Picture snapping a pencil between your shoulder blades"],"tgt":"Back \u2014 upper lats, builds width \u00b7 biceps and rear delts","sub":{"back":["ulat"]}},
 {"n":"Close-Grip Lat Pulldown","id":"closegriplat","eq":"cable","p":["back"],"s":["biceps"],"c":["Close grip, pull the handle to your lower chest","Drive your elbows straight down by your sides","Squeeze the lats hard at the bottom"],"tgt":"Back \u2014 lower lats, builds thickness \u00b7 biceps","sub":{"back":["llat"]}},
 {"n":"Plate-Loaded Lat Pulldown","id":"plateloadedl","eq":"machine","p":["back"],"s":["biceps"],"c":["Pull the handles down and back, elbows to your ribs","Independent arms let each lat work through full range","Squeeze at the bottom, control the stretch up top"],"tgt":"Back \u2014 upper lats, builds width \u00b7 biceps","sub":{"back":["ulat"]}},
@@ -2408,7 +2407,7 @@ const FIGMAP={
  cableflyflat:'chest-fly',
  barbellincli:'incline-press',dumbbellincl:'incline-press',inclinemachi:'incline-press',
  smithmachin2:'incline-press',inclinecable:'incline-press',landminepres:'incline-press',
- lowinclinedu:'incline-press',hammerstreng:'incline-press',reversegripb:'incline-press',
+ lowinclinedu:'incline-press',reversegripb:'incline-press',
  reversegripd:'incline-press',
  dumbbelldecl:'decline-press',declinemachi:'decline-press',cabledecline:'decline-press',
  declinebarbe:'decline-press',smithmachin7:'decline-press',
@@ -4729,13 +4728,19 @@ function openExDetail(exName){
 /* ===== CUSTOM EXERCISE CREATOR ===== */
 function openCustomCreator(){
   state.cxReturnMulti=state.pickerMulti||null;   // remember multi-add context to restore after saving
-  state.cxDraft={n:"",eq:"dumbbell",p:[],s:[],bw:0,c:[]};
+  state.cxDraft={n:"",eq:"dumbbell",p:[],s:[],bw:0,c:[],note:"",picId:undefined};
   state.pickerOpen=false;
   renderCustomCreator();
 }
 function cxSyncInputs(){
   const n=$("cx-name");if(n)state.cxDraft.n=n.value;
   const c=$("cx-cues");if(c)state.cxDraft.c=c.value.split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,4);
+  const note=$("cx-note");if(note)state.cxDraft.note=note.value;
+}
+function cxChoosePic(){
+  cxSyncInputs();const name=(state.cxDraft.n||"").trim();
+  if(!name){toast("Name it first, sir — the picture is filed under the name.");return;}
+  openPicPicker(name,"cx-pic");
 }
 function cxToggleMuscle(which,m){
   cxSyncInputs();const d=state.cxDraft;const other=which==="p"?"s":"p";
@@ -4748,11 +4753,17 @@ function cxToggleBw(){cxSyncInputs();state.cxDraft.bw=state.cxDraft.bw?0:1;rende
 function renderCustomCreator(){
   const d=state.cxDraft;
   const chip=(m,on,which)=>`<button class="chip ${on?'on':''}" onclick="cxToggleMuscle('${which}','${m}')">${MNAME[m]}</button>`;
+  const previewName=(d.n||"").trim();
   $("sheet").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🛠️ Custom exercise</div>
       <button class="btn sm" style="width:auto" onclick="closeCustomCreator()">← Back</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 8px">Build a movement that isn't in the library. It saves to your collection and shows up in the picker.</div>
     <label class="lbl">Name</label>
     <input id="cx-name" placeholder="e.g. Cable Y-Raise" autocomplete="off" value="${esc(d.n||"")}"/>
+    <label class="lbl" style="margin-top:10px">Picture</label>
+    <div class="row" style="gap:10px;align-items:center;margin:4px 0">
+      <span class="exwrap sm" id="cx-pic">${figureSVG(previewName?exFor(previewName):{p:d.p,s:d.s})}</span>
+      <button class="btn ghost sm" style="width:auto;flex:1" onclick="cxChoosePic()">🖼 Choose from database</button>
+    </div>
     <label class="lbl" style="margin-top:10px">Equipment</label>
     <div class="scroll-x" style="margin:4px 0">${GYM_EQUIP.map(g=>`<button class="chip ${d.eq===g[0]?'on':''}" onclick="cxSetEq('${g[0]}')">${g[1]}</button>`).join("")}</div>
     <label class="lbl" style="margin-top:10px">Primary muscle(s) <span class="muted">— what it mainly hits</span></label>
@@ -4760,10 +4771,13 @@ function renderCustomCreator(){
     <label class="lbl" style="margin-top:8px">Secondary muscle(s) <span class="muted">— optional assist</span></label>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin:4px 0">${M12.map(m=>chip(m,d.s.includes(m),"s")).join("")}</div>
     <button class="chip ${d.bw?'on':''}" style="margin:8px 0" onclick="cxToggleBw()">${d.bw?'✓ ':''}Bodyweight movement</button>
-    <label class="lbl" style="margin-top:6px">Form cues <span class="muted">— optional, one per line</span></label>
+    <label class="lbl" style="margin-top:6px">Form cues <span class="muted">— optional, one per line, shown as coaching tips</span></label>
     <textarea id="cx-cues" rows="3" placeholder="Squeeze at the top\nControl the negative" style="width:100%">${esc((d.c||[]).join("\n"))}</textarea>
+    <label class="lbl" style="margin-top:8px">Your notes <span class="muted">— optional, private, stored with any others you add later</span></label>
+    <textarea id="cx-note" rows="2" placeholder="e.g. Seat on 4, wide grip feels best" style="width:100%">${esc(d.note||"")}</textarea>
     <button class="btn gold" style="width:100%;margin-top:12px" onclick="saveCustomEx()">Save exercise</button>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
+  if(previewName)_figApply(previewName,"cx-pic");
 }
 function closeCustomCreator(){const m=state.cxReturnMulti;state.cxReturnMulti=null;openPicker(m);}
 function saveCustomEx(){
@@ -4776,6 +4790,8 @@ function saveCustomEx(){
   if(d.bw)ex.bw=1;
   if(!Array.isArray(state.data.customEx))state.data.customEx=[];
   state.data.customEx.push(ex);
+  const note=(d.note||"").trim();
+  if(note){state.data.exNotes=state.data.exNotes||{};(state.data.exNotes[name]=state.data.exNotes[name]||[]).unshift({date:new Date().toISOString(),note});}
   mergeCustomEx();save();
   toast&&toast("“"+name+"” added to your library");
   const m=state.cxReturnMulti;state.cxReturnMulti=null;state.cxDraft=null;
@@ -12203,9 +12219,16 @@ function dataControlHtml(){
           :`<button class="btn ghost sm" style="width:auto;flex:none;color:var(--orange)" onclick="confirmArchiveExercise('${esc(n).replace(/'/g,"\\'")}')">Archive</button>`}
     </div>`;
   }).join("")||`<p class="muted center" style="padding:16px 0">No exercises logged yet.</p>`;
+  const total=loggedExerciseNamesByRecency().length;
+  const allArchived=total>0&&archivedKeys.length>=total;
   return `<div class="row sp" style="margin-bottom:4px"><div class="ttl" style="margin:0">🗄️ Data control</div><button class="btn ghost sm" style="width:auto" onclick="closeSheet()">Done</button></div>
     <div class="mini" style="color:var(--text2);line-height:1.5;margin-bottom:10px">New equipment, different weights? Archive an exercise to stop comparing tonight's lift to numbers from the old machine — nothing is deleted, it's just set aside.</div>
     ${archivedKeys.length?`<div class="mini" style="color:var(--gold2);margin-bottom:8px">${archivedKeys.length} exercise${archivedKeys.length===1?'':'s'} archived</div>`:''}
+    <div class="row" style="gap:7px;margin-bottom:10px">
+      ${allArchived
+        ?`<button class="btn ghost sm g" style="border-color:rgba(255,208,72,.4);color:var(--gold2)" onclick="confirmUnarchiveAll()">↺ Restore all — go back to full history</button>`
+        :`<button class="btn ghost sm g" style="border-color:rgba(255,144,0,.4);color:var(--orange)" onclick="confirmArchiveAll()">🗄️ Archive everything — fresh start on new equipment</button>`}
+    </div>
     <input id="dc-search" placeholder="🔍 Search your exercises…" autocomplete="off" value="${esc(state._dcQ||"")}" oninput="state._dcQ=this.value;refreshDataControl()" style="margin-bottom:6px"/>
     <div id="dc-list" style="max-height:38vh;overflow-y:auto;margin-bottom:6px">${rows}</div>
     <div class="hr"></div>
@@ -12225,6 +12248,23 @@ function refreshDataControl(){
   sheet.innerHTML=dataControlHtml();
   sheet.scrollTop=st;
   if(wasSearch){const el=$("dc-search");if(el){el.focus();try{el.setSelectionRange(selStart,selStart);}catch(e){}}}
+}
+function confirmArchiveAll(){
+  const names=loggedExerciseNamesByRecency();
+  if(!names.length){toast("Nothing logged yet, sir.");return;}
+  appConfirm({title:"Archive every exercise?",body:"All "+names.length+" exercises with history start fresh from tonight — every past set stays in your record, sir, just no longer used as the comparison. Use this for a full equipment change. Reversible any time.",ok:"Archive all",danger:true}).then(ok=>{
+    if(!ok)return;
+    const now=new Date().toISOString();
+    state.data.exReset=state.data.exReset||{};
+    names.forEach(n=>{state.data.exReset[n.toLowerCase().trim()]=now;});
+    save();haptic("done");toast("🗄️ Fresh start — "+names.length+" exercises archived");refreshDataControl();
+  });
+}
+function confirmUnarchiveAll(){
+  appConfirm({title:"Restore all history?",body:"Every archived exercise goes back to comparing against its full history, sir.",ok:"Restore all"}).then(ok=>{
+    if(!ok)return;
+    state.data.exReset={};save();haptic("tap");toast("↺ Full history restored");refreshDataControl();
+  });
 }
 function confirmArchiveExercise(name){
   appConfirm({title:"Archive "+name+"?",body:"Tonight's first set won't be compared to old numbers, and \"last time\" starts fresh from here. Every set you've already logged stays in your record — nothing is deleted.",ok:"Archive",danger:false}).then(ok=>{
