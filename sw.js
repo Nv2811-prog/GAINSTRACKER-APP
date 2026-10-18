@@ -9,7 +9,7 @@
 
    IMPORTANT: this only manages the Cache Storage of fetched files. It NEVER touches
    localStorage, where all your workouts, PRs, splits and progress live — your data is safe. */
-const RUNTIME = 'gt-runtime-v3';
+const RUNTIME = 'gt-runtime-v4';
 const GIFS = 'gt-exgifs-v1';
 
 self.addEventListener('install', () => {
