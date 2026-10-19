@@ -3139,7 +3139,7 @@ function countUpEl(id,target,suffix){const el=document.getElementById(id);if(!el
   requestAnimationFrame(step);}
 /* once-a-day arrival ritual — an 900ms signal sweep, never twice, never blocking */
 function signalSweep(){try{const el=document.createElement("div");el.className="gsweep";document.body.appendChild(el);setTimeout(()=>el.remove(),1000);}catch(e){}}
-/* Alfred, live: a REAL AI message (Gemini) — throttled, silent without a key */
+/* Alfred, live: a REAL AI message (Gemini) — throttled, silent without a key, text-only (he speaks on records + session finish only) */
 function alfredPingAI(ctx){try{
   if(!geminiKey())return false;
   if(Date.now()-(state._aiPingT||0)<8*60000)return true;
@@ -3148,7 +3148,6 @@ function alfredPingAI(ctx){try{
     if(!txt)return;const line=txt.trim().replace(/^["“]|["”]$/g,"").slice(0,180);
     try{ALFRED_MSGS.push({role:"alfred",text:line});}catch(e){}
     toast("🎩 "+line);
-    setTimeout(()=>{try{alfredVoiceLine(line);}catch(e){}},200);
   }).catch(()=>{});
   return true;
 }catch(e){return false;}}
@@ -7509,8 +7508,7 @@ function showBatSignal(n){
     bodyHtml:`<div style="font-size:42px;line-height:1">🦇</div><div class="mini" style="margin-top:9px;font-style:italic;color:var(--text);font-size:14px">"${esc(msg)}"</div>`,
     btn:"ON MY WAY"});
   try{pushPatrolFeed({icon:"🦇",accent:"var(--gold2)",name:nm,kind:"nudge",html:`<b>${esc(nm)}</b> lit the <span style="color:var(--gold2)">Bat-Signal</span> for you — "${esc(msg)}"`});}catch(e){}
-  // mid-workout hype gets READ ALOUD by Alfred, over your music
-  try{if(state.session&&state.data.u.coachVoice)alfredVoiceLine("Message from "+nm+", sir: "+msg);}catch(e){}
+  // text-only (modal + patrol feed above) — Alfred speaks aloud on records + session finish only
   try{haptic("pr");}catch(e){}
 }
 // Inbound mission recap — an ally tapped "Share with allies" after finishing. Lands quietly in the
@@ -8836,7 +8834,6 @@ function acceptTitleFight(ei){
   const ses=state.session;if(!ses||!ses.exercises[ei])return;
   ses.exercises[ei]._title=true;saveSession();
   playStinger("TITLE FIGHT","THE BELT IS ON THE LINE — "+ses.exercises[ei].name.toUpperCase(),"#FF8C22");
-  try{if(state.data.u.coachVoice)alfredVoiceLine("Title fight accepted, sir. One clean maximal effort — I'll be watching.");}catch(e){}
   render();
 }
 function titleNoteCrown(name,e1){
@@ -12580,7 +12577,7 @@ function maybeShowRankUp(){
     const q=RANK_QUOTES[ri%RANK_QUOTES.length];
     // Ceremony 2.0: bat-slam stinger → Alfred speaks → full case-file → rank accent bleeds into the app
     setTimeout(()=>{try{playStinger(curRank[2]+" RANK UP",String(curRank[1]).toUpperCase(),"#FFD048");}catch(e){}},400);
-    try{if(state.data.u.coachVoice&&typeof alfredSpeak==="function")alfredSpeak("Rank up, sir. "+q);}catch(e){}
+    try{if(state.data.u.coachVoice&&window.speechSynthesis){window.speechSynthesis.cancel();window.speechSynthesis.speak(_alfredUtter("Rank up, sir. "+q,0.92,0.95));}}catch(e){}
     setTimeout(()=>{try{haptic("pr");cinePush({eye:"RANK UP · GOTHAM IRON PROTOCOL",icon:curRank[2],accent:"var(--gold2)",title:`${curRank[2]} ${curRank[1]}`,titleHtml:`<span style="color:var(--gold2);font-size:1.12em">${curRank[2]} ${esc(curRank[1])}</span>`,bodyHtml:`<div style="font-size:15px;line-height:1.6;color:var(--text);margin-bottom:8px">"${esc(q)}"</div><div class="mini" style="color:var(--gold2)">Strength Level ${sl} · Rank ${ri+1}/${RANKS.length}</div>`,btn:"THE ASCENT CONTINUES"});}catch(e){}},2100);
     applyRankAccent();
   }catch(e){}
@@ -12722,12 +12719,7 @@ function playStinger(title,sub,accent){
 }
 function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.session.day)||''));state.step='logging';startTimers();try{haptic('done');}catch(e){}
   try{cloudPresence(true);}catch(e){}
-  // spoken mission brief — Alfred reads tonight's plan as the doors open
-  try{const ses=state.session;
-    if(state.data.u.coachVoice&&ses&&!ses._briefSpoken){ses._briefSpoken=true;
-      const mus=[];const seen=new Set();(ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);mus.push(MNAME[m]);}});});
-      alfredSpeak(`Tonight: ${ses.day}. ${(ses.exercises||[]).length} exercises${mus.length?", targeting "+mus.slice(0,3).join(", "):""}. Gotham is watching, sir.`);}
-  }catch(e){}
+  // the mission brief is text-only now (Alfred speaks aloud on records + session finish only)
   render();}
 
 function focusEx(ei){
