@@ -12,10 +12,9 @@
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-180.png"/>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet"/>
 <style>
+/* Bebas Neue (latin) embedded as a data URI: no network, works offline, never blocks first paint. */
+@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,d09GMgABAAAAACGUAA4AAAAAVRQAACE9AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGm4bnwAciT4GYACEfhEICt8My1MLhBwAATYCJAOIJgQgBYQEB4hAG0hIJeyYJbgdKHoZ9xE0EmEr9qhjR1FBORT8/7cEOsbw6jhoVSAJRNqmsl14wKdcguTeCj+0y5GFzHds4vv3a12/OpULzi5vHO7IhJk56B4QuaQnkkXJpJEe0RmksKPG+0l2PPqTwGSvO0Jjn+QSRWtUkdWLcAjynhQQokL1Cti9BEZ1c0Bu1uzSF8VWQEVYiopK6ypWFBEQG0mMUTRgFI2gaca0bkz6J5/L3Xm1x0TTm2ndKz3VeHdpqtyK8tb2/Zz4I1UJ/zQG8/0zNVO1CILJ0KyWamliC2txbQyWtt2SmyHBwmGi7bZ1Gf+r3z8C/P+cvr0H+i7ulRxzHBik+d84bT79tqKF2jEGhEO19fY/AH1AcI6No2XlKUYbALBKYAH8/59Ns9XXPx3wHEEShaG3L4DU56XcnVlrd3Z23lqyD1Z7oGPpULICchRYWT4KoX0BglqRDgCqIFZ5qYBboA6LLkWXpkqarkuZMjwQ9yr/e5kDt44FuCgW07U6FgW4C/Rbc94rQgGsVnj+/9TjGcsCFhDLfzdzWHaH1SJW7ClRHStAxZqt1OzS3DRGJ0QJLq+8qu9G+fU5UHvJjuvP2tSflVSCiJTZ+9hky4N9X3wV6mhSAd/+pQqwDGAE4hUqFCgoQEGhghCxIBKlQ2TKhJCSQShkQeRohWjTBtHBD9FpAcQrrxC8MQ6EVBoCBBii1gHdfEuLExIfUwI+YCACunEECALSMmNQiMjHHdHhA2mgd9oGRM2ntTbhR4AIA6CiljeWOHptnbEShlwgqJB6ykRI3SxIkGJ58hipSUmJSPGxxUO8aPXAPjSgHWoFBAFcCYBdokFeNU73xdOb/gxkMEMZjpUhHWSVnIKJREcD+Ubxz8qzf5C3sy0b05vlWWh5N3kXa7enOe7UphrcgVRLCpIdLXYqT0aE4YTFo6E4IlSmIZYe+S+ijd74N82e+quq7pmfUj79F39BHLXI3T1DFNT6T0cyO2nlB9zT8cShHu3+WpbHq+JqMY5iM54XOwpwh6iTwDqsE8PAo2IXxH4u7sfLeBgPiv3VcAk/+X6aYB/a/bUq5oeiIwoGxrFgc4KxKMQUSMsuoVSqVc60YD02PPFGJGBW7CJAx1SksZoLFBVx6Ml6qg/jBqKvDM4lh6KAbsyzVuHuSeLXh7QT41FPPFU+FkNAJ3iSIiQKgjA4ZEbWRpkUITCDEHUSxNzXj6zHfCjEEwgEmjUQQU2kWZAgYAiG1N3xq5eRuuthALSoo/EjAWkCCL+k+DmSl87JsSvEkLNCZENiep3gru60X339I7sX3gRy0C7yrzvyCdIv+LzbBYCg5clp/WUwZb8+wBfBSz7tjjDtutpBYJkjuZbduYpWjZOiy1m9+I9YMH3nez/YZcCQvfY76LCjjjvplNPOOO+Ci4ZdctkVV11z3Q0oJiIMgo4OFYwBEyMGJkkSAoEMGAkJjIICkZIWnY4OiZ4emYEBhVEWqhw5aEyKIMzMUCUsMBUqYKbywUw3HaZTJ6Ius9HNMQdJt25kc81F0WM+qgUWoEF8h4+ICNADwBASMAgMAy2WvXutyCWjuI4IlFO5ILR3bUTQ90pvh2iJpSlM+ubrwyb+06fOGSYcNFUnHpJ0Ljx9i4+89KXx9t9+uVS+Wp3Ofx+jci9Svuxm4zDHeUazf0KteOm6c43hCLwcoy4ZTR3v3yOVz22IzkrPu75kEaVGHXlWba4kf/b9mDyro2Mv3a29+ZRZd6bMWPc9/l+Zcdaac+6vy6KPGesvpWzurTFqJyDyVelv2PBH2EeMyFaPvH7Ey12RMhj8f2aVadfkzFcU03KxD4ejjjRUNFPYnQMQl3VHv2xU9jHWiPV7pm06+x83ho1mxzco24tvX6QX+3Uu7/jKKs23YjaJXRxL+2jCGho/9tyR8eq6C/gVL1HLpn2Cy2m8z8P301MsmbHWIJ5sVgKDxGki1B8x9lA1LzT8hPf0XUiIl7GGQ/76X5bN2p8ArreX34vxQqllA7758CkNxYoOFl3Uxaj7t7KQcrb1OicfG9RjJdughkt2OlkD1c9ZR7cpRS7w2jtvAmfvv+pOORh1hG2suPSZQKEhigGbROlIyTiiCMjEvG0C+De/QqYp6uWZqk2B6RYog1JtOEhAArKQECSQkan/O62QkIwUpCINsT7TkYAEJIwn8PO/9SFImw+SkYJUpCGWTrfQIqHbqwj3PKjwAY8PKhJvL4mwn8Q6SJiOkDDHSJgTOw1z0hkRzpNwF0ikiyTKMIl0iUS5TBiukBBXCcM1EbJJO9GegMR5mkjw3JiQf/yzOgi6GQgQKBQGQ8CpiUhgt/3AABooP5QgoIuSiwYJBsaEYKuhwoSLOBWYASaPBnDZ6AjAHiFDRD/E+zy+8D8oEGKIg3snFBUhxzskCKoaEXicGxFt0zGGhlc1RotL4GOF7OreXJwZmnsQrbPBRpuhMGsVoeojBBsIaiMh2yyQ0UEKkgRlFASltwkixLoNQgCrCSiobETgZBOREc0yfTuwyi5CngzyK+VyFw3XswvRdwbAWKaTnHcJuSrQO/ahECqdQNG0CkSlhRQzJ5BxRRQJiEpCC3X2Ag/KwPvhnV/UUOBmwT0om+ybz/bBKcdpyPqTo1vPJcfVrflqyYtU3vLdTDdHycplgG4cBVWYeMlSyehzSplZqDhsKaR0mDlZiFhJhCS0u5mTMMRIJCCm2c2cKFi0BHyZ1LuZEwSJwsKTQbUrjaKLxIRLp9yVIkNgInCJ3gKW4H6IgkHhONLIGe4Nre3IUHIGPdzX1or84P3HlA5S5LNtHN/W0IJ8gG/jNtyIvbj8jLrwxM7WDqSbn5yuV6QL/tP30vZtAMFAKtKQhEREkIBkRIGihE3oggQjNjsw3XBWpyjyaGVZYQT8HMN7VuvhpiSEVD834rMdi0imJ0JFwnSMbYDaSwS4E1Ec9RLZKAyKrY7RNUntfZGcDqkFZIVBxFpbSR8Yz4chzCDJAC6YYpP/eZdygFU+nPT7DDLtV3XsR5McyjXkiCQPGSnRJcNEyRK9OXlCgsgqrYgHQYmUiDCZhEgOQ8Rnp46H2JvIeikUNkTEtkQmICLJXZp4FtYOqkFWKQiQbOOmB8Y//sGRsqMqtQi5LDMigbq2qoHt0sI5kK33QA339VV1pr0VoN9LsvnZUQrZgpfNJCxe+TZoz6d2CbgNUC/UELCkdQFukxkIEEKsY5dubWxEsYJl0ugxjmjKn/BOHaubdbshracNLCn2MHsGO56dyOaw+WwtO4/9VHLJCedEjY8Do9jEtN5OEseuMxDaJtPsWDarnObPUvdPYA9AJwArN5pTi715Pf7699+/f/H+AACfv+6vv7/jfsvnfi+/e+nuOUCANYFd3QS503I6uTzLrW+z23UH3PPYUzccdsR+P/neSd85uGn+r/QPv/ndoCeIggQLESZajFhxkiTjwPEIZJKQklFQ0tEzMMpx3CEnPHQ2GpNiJUqVcapQqUqtKeq5NZqqzXQd/Dp1maPbXD0WOOo/x/zllj3ueOCuES+Mhuq5hS772yljwfzrT1/4MpJHntkb2ecWueIbX/vWECoSMgwFDR1DlHARIiWKx8QSii+NUIp0qX4hoqWippFFLKBArjxF8hUysyhnY+cwSQ2XCayaTOPh1arZr1rMNsNMs8zTbr4MPsMuOeeCi85DIN24EEBGATUP+ByMLAPjDbS3QHsDoBeA6hAWqxJJv91n01krkZcv4yzGe8Ra0vQI6fyC/2TyFKbRptVKJtwoiynKy8+fy21dN1Uryi3UIx16qhd48eRpFEjo9XWhQC8NElx5Bpm6uxEOWy2BBDoYiPGNqKoEUwImg+dBJyq6JWYiwTQ3DyPsQ9EUdRUxkhbDYDm1s12GPEYheYy6PFDKVnr3QrofASBAzPnYPgVwiBa3U227LEURbgEBeVVqlzGZ98EHorQrl0QPeUEFVPGrTbL+JboeX2uEKOqEnDS24s0thOD3oP4RFrg6s1b6NzKFo5gtCAUGtobr2IpAGEfKmgM/m1ku6t8myou5AS57qJpcAKSanXXgQVreiJ8UBRnQBKmsfo+q8saLc69INpLdll6dxZvTR9nObKcmJwBtPBt77eaqOjY7Oxx/BvD+z9T0ofQZeE2zuphzByHq2nhQZ8EXiunRZwk+PKo28/pg3c7sojZBY+3MMaqiZoTKsyTiSDtVus30JjRjI0oA367VDt3HoEL9+lX/nD+dJZ0+crm9cG3KtDHLIndg7qyP9jPTTMDbUKX1hZ9KVadpi5/jwRW/GjK0xZeV+/4XHkOq5yIjtx8nBY3frapwGzWu0+P2d8OePaG1vSjTB4uTEn0Xw43V2QMpv5DGlq/K8/egipjW9FOeImrxiUErYtWvhoHLTy/pKFe2UMtmVhMVqSGCqzGgxd8JYYQBPibyYJ3LYhGl/OtJNClsWMWuLs2N2WcZensJX/votVunrdJQ8OuL+VUpof4JT5sUU0C1XEevh6k+PeiuV6xfAAvF0Ozlw4wl2LmBtihQqAZYaF4/9qdvUMq4KYAHgpDqVvp0sr4ni7NQR48CgfqI3LA2Jwu4iiDJq+ZaNz053eCc0JGFLet0tCLNRobCnaF32FDUrdtWzX7ZPwQ5vYjgUhY1Va/dxefgavJ5OWh2twc9LEiKOQ+vZoIKCZthfZt7rt0RgR/WWChb2KBzjdLUzw2Uk814gRplFcaJXrS09F0Uj81YK9lJIuhMJ0+bB1IiowYz9M6w3Kmy++kdtC7I6f59cA7pE3NvDC5NgVLTeE+4va7og9szxZ4vmsR7XbEnismJxl73y43554A516NisEi7HoW1qlVgQ79jzqd3AQOxETESeJO79Zin9jnCuuW7pNnEoDSdtJGPvun8ROFcU0WNzoKLV9umi6LdcJEJZ0MbhDQHwygjFBeWv1vRtDJoActdOOc//BMx/5qL+lHmf9Ux5wCCvr41siRWLkKhkl/tXPWl2DBrGKOuDFmRN2CKz4UQi6pPAEKUmuFNS6IVcsP8ipR/g0iiqH3MuP2GuFp5sbGOt5K7MCiAZTYJGRhO7SThmA9RNWUv7o9DwtiFAn2xCPElmPPzHLvhjCYj1m9Yd5bZMLPR2tPS0Kz1p5AOX1ucTRHzVB/72xcLaSR5sm2FXLEPPTV5XLVQlkkXyt8VhYTH4SgotW2LKCXF3i006bw1nQsXjmyH/FyKj+pFQTJnrt0V3is2sJBPE6E2nY5FcdhVdorZcENg15lgbWjCws2oOqAOF224ta+gm2WT061iArFUP5y39bv6kdnxYaePMzs7ZtWld0hPDD9zAumpkX+UtbJbmR5Csx02cvxzHajPzGXmGFbktJLiaTi0i0/BgDGGR2FmVUqS0Ln06sjp5quupV7FVl6G+Ve87DLnwGXsFrcqBsxKlnOy38f01Qh/0NO13176YNgBpFQi9tkAdo2LYOlQpg6asPKqndsKTbsIFgvx+XGkxb5itsJd/DfhqNprjvJwNez+erOjZhHlewqDFQ+uDkwjSov2ghJKlGRfBURLmX4AeXmdLmA+hMs8OL8I3v96ZBy2edthjO1h/YiQKUJ3WeyQMxaFj2jXOPWvpSMnpWNz6GRogkKsjdNLzp7LxOySV8wJJzvBYcPuDs+mDS9g/d4GzP5y/zX6ftSmTOnONH821DJ6sxnr7GIv78Mlj+eFFINdQ12cFRd+5Yn1AEa74MIECj4IMHdw0/RBX8RKdG7E8qbff91r0MwaODLode/bvcW95do+t2hFC2e5959fS1G7BYSDH1SUWh0sJSfXiNqZXXq70+n4fOtbyYhQwH8nQbHbqE3YxzeIiXzJNQjQHDWOmY6PcFnZJbPYY89RqXKWZWNY9jRPQ3VjeH3++gsoya/OISdyeHG8GHlGHBsrpmKvaYw7wYweESRxLrmgyuK1AAgHP3LYqyrqK8JiHR+938A8j7fg55nqUZAN/pzHKK4Vsz9SfHhJGVLXqm+q59UnTCUapOrOmev+/nCvu1figwCt3FXRXnEI22yNTL0nN1+jyZ+Xhxp5K1TunT8rqHvFfAldCb4hn65L5xMqzjwhN9f9LDL5MSfOF11pLbdL5yNYxfcthMV7/BNVadX3DEZVf+/msgM+W99cqc3YjvxRVHa0Y8gTjpaFTXTQ8Lrhkq1sfhftrx+avugNOl6vi1YxwdnulH52O2eYuiG/p4sqx8KEAE9T+Zj6WbTdrAJu0u8bfGFbRMvV05ez/cCPkN0ExPgmTcOoGkSV5rvY+vPnIU/wvTOf+Tlejn/OlF/r/pUa5Eq+PWUSHj85O9T0Z6q9vR+h4K+aqLAwd8K0bW2OCgf70+h9mtZayELnsM3GOYny6e02g2C++Gc+X+TbtDYZESr57yRIT8BUmt1VIfSI8zSsAzyRwFSbq1PUGcrLXbYym6siwYPjXzFVuXxhTm2eTjbFVOmcAP95rPWWocr4pWVddZhuZoZJc2NOKvo+UO2Dniq/2+n2O+bMgMejfYn4+amx5/HE5ugQJ9EH2woT0XpOjd7B9cAYbBbHobK4mTKjnJMnFwyukFxDWXg9rGicWREwP0BLHniwBD2NgbJnqP2ZB9akLF7XWQwojGkolOqD8Cmnnz9xq+vNm/jObYI8y5QMoiFXa0YVvMTwZzHBJlpboyROQdJlooGMtQ2FOaIEGj+5qeNy3mWosXgV2xVemYyUzkrrT8PDI2L6YyLCvYrfS8JnvskaOfM+Xu4bdct/T0iK/b8vXdbkUJTfmrk28lDxkA/4JSWZzYZsfXbGBGn6IRYGl3jysl8Zvm9nFVsJydm8kItuI/hpjhqnxmPM17AOiTTiWD7PLUxGhDL8YpwiJ8PDczpqrGX2amechpfXg37JK1QbnY5qO9zvGXYfv/5/Q+6Wz/P9GIZOC4VZ2EdVnqxxZe7o3PzJnoilHPcB6gfoSLbeYLe+FQxzVn+izT981KWiwZ7IfE3SFfFS9EyhpjW3dy3zupt3563puP3UXVz36YR2CNCqq51GeXJBOcphm+QJzspqu10nOxPcuTy0vF9cbnRWV5drPipQFWi1j60a8spyy4xGOth61WrZWxXRNL1MTQtmANW0GuVjZY1cTtcwil6IcPz8HoZFjmJJ2rJ7GUMFYBcn5Hmn3uLGkiNwUYqJpyySyQrlaTzL0wfVcUFLsk5BJc2s5JlSRXh4NEuYVBQbm8VMFSewosNxEdMUrTTLZGZlBHf2SpS4lOcOgO1l2+vUI7KkJ2cl2wqg90s07wtw0czKOFNCGo6nuVszT5op6M1A1hziNJSdwndLml4ZE2he5d/+abKNZSSb6CI8UpA0EY1K5zdIypRemTGtrFizsjQcvuruzRo2+HoKoJq2UsHN+xD9MDtGsVIub7aIyW6Rx63JD83kZAoEVJx/UZopvdGCDSlfI0LWgQj+x8vEG7y5UP0cw+vIk5C9+/mefb7XPt9rn+/p5xSqMl/vyb690BnrGyxg1FEQeleoylJcYpOVC2Vt+IVHaE0Q4XYrgN5M1Lffp4qBZAvuw4PvOuhWYVg2GMJIuihnZfwCQWCEF236UxpnTsG/YjK/wi2e/Aq7q8zmcFVksJ2BF8uZ/DqigxYv7JeVaFYFwo30MRv/MJnE4t9zAMMcb9tWNtPZmxuxwxWVu9JS2kovVii3LFUFIPu4hFIqCf9BamLS0LerTqKwMGRtQ9al5YDI41UnXojKPVEdo5AbAWtwckQ1UOnUOZKC/PKH5TmT42IyZ+MP8dm4rYsDAq5drvobDesk11QD3K08F28rd0B1TaJ2hTLfEm4uOIgeLNgsfIsZ6lLDsqo6jUuC9u8fXEUtRa4fQECvPPsHiF17230bVolcIlg16hoFTGQTQWmU+u6d8XJAqDZmCr/fhlrBTQSLXd+rNQcIrrG02tStar+t0F/C9qpW1UYQ+rPKb9j8ISX+vEI3YYqKMdRQ/GIWP/AG2+Mf6GY9KCu4w4A0KNj9+elzzPFo8nWV2y2u0lXaivxX+Yf4qlyXaXtvlfPZkPjzRhZfwNwIxcM83nAxbGQK+CzhhLX+M7Gx3280bGNs11fkZngUBo0mS9BTY5IrJmhztOWrDS7Ddp0zN9LDNKpUerzbZVIoJurz9JXbC1ywiGZzVXSwVKfKmopm2GbrlEz2CHlfMplf8uq2qcrIbPw5DDd5tKpLCJxJRySl6WEZEyuK17S9FhaWV1lt9s8PTPGIk3YJBVH5KSOzK6bKmfZFJ92F0NdWk19j1smOnpmdJUQ0GtMa8cr8SeZJTG73QeqgM4614W3lUuvSZdZlZglWWCF+scvqAsEjb6unJc/bkpSMrUnNrbA+tbkKz9BNhmfonVTArxRYC5w6DgricHWO2SSLipMDArURtopCwH3S7eu2dndYO0AFX68A6Fk/WXlht95+u5geNrNj5W3OkKwMsrquWeGdweLeYFfNxyrdBdXKGuWX8zejI68XzxnD5J2i3cugerjqm3l6tlHhQwY/6Hbs6Z/nOP1B14yNC3YubTesqtaL7KQc9OHtIp2hCYrC3KEbphr16PJJrOiQiEiBcHl5/ZT2xsUrD3/RHVge0NclRFEmP5wSqxdxfbRaenRnZNyQhOpkxHuiYDLNYLeaVTzz22gbXqAOPvy993vc3czzeJoQSU6ztliT3Em/JMqn+zpD0dBH3IkNve+m8mPFhdy9cfC5ONWUxi+VyBwNLudQguOs/qwDupqd1myhJy7xp4SEBwlME5Szsku1adx8N1p8Pi2nstxunzzsRE9Iz0bUtS8rxXqdxdk09x8mE4JpBybV9Dc1aUWu3NAgyrDmzzUXLC4vp8Irl5WVy6LL79Ud0q9Vq9fq8aJUsUAgPrN6PKP1RWpdr9rvq976T0DbpKEVKNHB6UKZYJFVi7NknDnM+M8tzU+ju1jB8cJo3A+OOebs69lmvGCgwSt8gAoeeN2mEHQSQ1l/RLTNLFh/3GxWKEhSVPHf0dEP4bubfScagi6xXb+5Pk6f6wSXBjB7anPz5ExfOlB+tNc31f+vMS0BELh2d5MbqNzamfkd5QD9Fpo3IuTWeuwF+Pxy4N3j8HicwphtXg4PDQ1nML4eUL+lpA6wwj/+bTGFWm63sezzCQFFZvrF+gso1v99HFgoUfyvXIxFAMsQgWYcTsIh9xX79qrcm30ngYKwkZXeN/dMGF8OhOW4wBuIG13G69w+Yp9eZR597c1NUjN24JXLVYIf43DCzcSsV2NvsqmvSrvGlePKceXJiPlxOOrVpQSEBIcnEEmQjFCoNDqDyWJzuDz+aCAUiSXS0UyuRDIOLhwPn4BQilRpRNJlyCQmISUjp6CkoqahpaNnYJQlWw5n8JLU0o/Usq/U8u/Uik2t/Emt+kut/kyt+f8zvb9gmfeA5b4qHmi255eN7pj2waWcROr7bhYPy/FFqKTH+Bn94hUib7Jp0QT1G/R/vr5x4WgevDy++levbHw+OBksAwL6/wdGQK5otbhmX6J9xXophz3GIe7OjiYOfPmpuxn4FsHI+VPevbuQ7O4e7l9/Dd1XS5IZvrTVS96xtYW5a3a6WI8XtIbgzo43Gsgl2LbzvTXUbicGarUaOlzAVs6OramOaV3mgzMW69lcKQd7TIpNDLA9bUt65eA8tnjSyWbnqH6cIeTaK2/TdXHbu8AfeKm3DyonqR9nj9lfNquu0ur+SFAr5KY6KVUxaH9Wtgnn82jIWlpe0hd+sGX9Y6h/f5njp64nQkAtCkE6yHWSJltn/yEC9gi1lwgH/vJFbH1yTCSfaCXDDs7iVO4yVhf25PGBd5Cm4EloQR0DCjgTOQqeu7hEnqdP6i63UbOUrfNn1L75M92t1pZtnYQh4MN83s3gzGY3kyuxPMtmtNZm8s7cT3nr0za/juNbhwAFvjhmRk4O0f9DDWnfA959D3wAwAfPj552mZ26pbY+oB8KEPBli3yHJV9mY4jV1tNXX1KyHj6eoNwiqGRtDsvtUpqHE/PNHv9wBMfV6aB6l8sk954UB3x4i71pjdBpe3c0oZBvlSWqpEy8lZ+6w+uTDDHtkyenRwulsDzfwGBAdFueeIug3IrnFtcjqFYVkjvRcy1a/Hc8VkT79bfgr8OGi8ZKLB63TfXBFhBACPA5roEDLJEIwhU+t9i6RNaLkQuxWhFS3YJyvXhPxMsrGrTAB46McZLHAfbllczXuRdQswtrDW18So4hKTvnNirJMGn3pokwIzHfRLh9ICT3C20JGsgMCuBCFMQJHe0yxKGmCORvkNbygtRsuDBToNVldJCRnYQBA8I4H8DXZg04N0vVkAQ4xAAX6BAWYEphCjyppAGHIIg2I3o2zynFnQFxvYPTQfGyw2dEVOxUwjDG3Kiz6A6607AQzkEPHIHZ8CF0whpz62Pr57JFQLeZlnlHGwRklAVFHRLEauUaAjCgCQHSMwg85yG1GSLSzc1QDGc2I1DbuBkRrn0zkniVm5FxyDkjJ8DRAirYTisz1a9BB6/PA4Fk8PMWy9uGL/xUmcoUsDBpVG8KP6tGnRqlc2g0VacWU3So1KhDpFQbHzapDOLIc7HZrg9sb5HQfVHvw3UopaueS+avmJ6rTbtZrZpTLWAaE2ISGoc7B9BYD63ctp3eplmjBu/k6LSmxyJWYAstlX7vTuVlOp3qyRs20ltlcvPo5K3GCZi1xxuzp3az9ME9BfoNS+9sVn9oRkEKigB30nH1PtfgC314+NwEfifU6IRTTkuRKo3IGWed88J56RFkyIxITKKJ1AUXTXXJOl/6iszf5BSUkaioXXaFx1UaWjp6fxpkkMdrmhbNfFq9LV+BNoX+UKRdB7/pzIqVsLgmoMuMyDqVRskAq7JobOxmcphljm6zvWOur5V7yKlCpRWqVOsx3wLz1HCZYKKV/OWOFjscSBab86XvfNn4D0jOSEYzlvFMGKZlO67nB2EUJ2mWF2VVN23XD+Mkd0NGPTcmTIgEiT5F1I/jXYctE4wsXBa6ILXqGGULTeQb3zI54uiPGAg+9ol9X0+CZdVkJNNie1GyhiU2J8HwyGMD2JIl2WCK9+QkRcVFs9xSq6y02iKT/ZYs8iiijCrqaKKNLnpr3HVdr1w33XHjbWCtsFjonT6vGOkwaLO42wKUzlly1xVvxncvTU5HyfkupsUt3kijJWxOtSl/4NfpP3Kbr/HlITCDLKk/NEeVgvKzdEhHbxfP93tn8jOD5MwPAJLz6PM+U0mTle/NKqiBJ5SAEguEkhYgCPAlAAIosRCdJYAoyHdaAZ5QABEIAAIAAacIhAgAQGDTilqpQd3cPPLzsGLawFDt99hxWKn9Zq3PrO1Ww0xfQ/55k+fG/yTkQZvS0BnwMaem+5AS8La4L7oPDA==) format('woff2')}
 :root{
 --bg:#030508;--bg2:#0b1018;--bg3:#121826;--bg4:#1b2234;
 --gold:#E8A820;--gold2:#FFD048;--gold3:#FFF09A;--gold-dim:#A06E14;--gold-bg:#180F00;
@@ -23,7 +22,7 @@
 --text:#F6F2E6;--text2:#98A4B4;--text3:#606872;
 --border:#181D28;--border2:#282F42;
 --disp:'Bebas Neue','Oswald','Arial Narrow',sans-serif;
---body:'DM Sans','Segoe UI',system-ui,sans-serif;
+--body:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
@@ -203,6 +202,8 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(38,42,54,.5),rgba(20,24,32,.4));backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:600;width:auto;flex:none;white-space:nowrap;transition:transform .12s,filter .12s}
 .chip:active{transform:scale(.95)}
 .chip.on{background:linear-gradient(180deg,rgba(50,32,4,.75),rgba(32,20,2,.65));border-color:rgba(255,208,72,.6);color:var(--gold2);box-shadow:0 0 18px -3px rgba(255,208,72,.6)}
+/* TAPTIC: invisible real <input switch> over a tappable — iOS buzzes only for a FINGER tap on one (see hxHost) */
+.hx{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:.01;z-index:6;cursor:pointer;-webkit-tap-highlight-color:transparent}
 /* press ripple */
 .ripple{position:absolute;border-radius:50%;transform:scale(0);pointer-events:none;background:radial-gradient(circle,rgba(247,221,147,.55),rgba(247,221,147,0) 70%);animation:rippleAnim .6s ease-out forwards;mix-blend-mode:screen}
 @keyframes rippleAnim{to{transform:scale(2.6);opacity:0}}
@@ -399,6 +400,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 /* timer bars */
 .minbar{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);border-radius:10px;padding:7px 10px;margin:0 0 10px;font-size:12.5px;font-weight:700;letter-spacing:.03em;cursor:pointer}
 .minbar:active{transform:scale(.99)}
+#savefail{position:fixed;left:0;right:0;top:0;z-index:2147483000;padding:calc(env(safe-area-inset-top,0px) + 8px) calc(14px + env(safe-area-inset-right,0px)) 9px calc(14px + env(safe-area-inset-left,0px));background:#D4170A;color:#fff;font:700 12.5px/1.35 var(--body);text-align:center;letter-spacing:.01em;box-shadow:0 6px 22px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.18) inset;pointer-events:none}
 .resumebar{position:fixed;left:10px;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:41;display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:14px;border:1px solid var(--gold2);background:linear-gradient(180deg,#1a1407,#0e0b05);box-shadow:0 10px 30px rgba(0,0,0,.55);cursor:pointer;animation:rbIn .25s ease}
 @keyframes rbIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .resumebar .rb-pulse{font-size:20px;animation:rbPulse 1.4s ease-in-out infinite}
@@ -733,47 +735,67 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 #alfred-fab.lift{bottom:calc(146px + env(safe-area-inset-bottom))}
 @keyframes fabGlow{0%,100%{box-shadow:0 0 14px rgba(255,208,72,.28),0 4px 14px rgba(0,0,0,.7)}50%{box-shadow:0 0 26px rgba(255,208,72,.55),0 4px 14px rgba(0,0,0,.7)}}
 #alfred-fab:not(.hide){animation:fabGlow 3.2s ease-in-out infinite}
-/* Alfred chat sheet bubbles */
-.alf-msg{margin-bottom:11px;display:flex;flex-direction:column;gap:3px}
-.alf-msg.user{align-items:flex-end}
-.alf-msg.alfred{align-items:flex-start}
-.alf-label{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--text3);text-transform:uppercase}
-.alf-msg.alfred .alf-label{color:var(--gold2)}
-.alf-bubble{max-width:90%;padding:10px 13px;border-radius:16px;font-size:14px;line-height:1.55}
-.alf-msg.user .alf-bubble{background:rgba(255,208,72,.1);border:1px solid rgba(255,208,72,.22);color:var(--text);border-bottom-right-radius:4px}
-.alf-msg.alfred .alf-bubble{background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-bottom-left-radius:4px}
-.alf-thinking .alf-bubble{opacity:.55;font-style:italic}
-/* ── Alfred Voice Overlay ── */
-#alf-voice-ov{position:fixed;inset:0;z-index:202;background:linear-gradient(170deg,#030206 0%,#07050f 50%,#030206 100%);display:flex;flex-direction:column;align-items:center;opacity:0;pointer-events:none;transition:opacity .28s;overflow:hidden}
-#alf-voice-ov.on{opacity:1;pointer-events:all}
-.alf-orb-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;flex:none;padding:6px 0 10px}
-.alf-orb{width:176px;height:176px;border-radius:50%;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
-.alf-orb:active .alf-orb-core{transform:scale(.94)}
-.alf-orb-core{width:128px;height:128px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#1e1400,#060408);border:2px solid rgba(255,208,72,.32);box-shadow:0 0 40px rgba(255,208,72,.12),0 0 80px rgba(255,208,72,.05);display:flex;align-items:center;justify-content:center;font-size:54px;position:relative;z-index:2;overflow:hidden;transition:border-color .4s,box-shadow .4s,transform .15s}
+/* ── Alfred chat (.ac-*): one text-first conversation. Closed = visibility:hidden, so nothing animates while it is shut. ── */
 .alf-face{width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;border-radius:50%}
-.alf-orb-r{position:absolute;border-radius:50%;border:1.5px solid rgba(255,208,72,.13);animation:avRing 2.8s ease-in-out infinite}
-.alf-orb-r:nth-child(1){inset:-16px;animation-delay:0s}
-.alf-orb-r:nth-child(2){inset:-32px;animation-delay:.7s;border-color:rgba(255,208,72,.07)}
-.alf-orb-r:nth-child(3){inset:-50px;animation-delay:1.4s;border-color:rgba(255,208,72,.04)}
-@keyframes avRing{0%,100%{opacity:.5;transform:scale(.97)}50%{opacity:1;transform:scale(1.03)}}
-/* Listening */
-#alf-voice-ov.av-listen .alf-orb-core{border-color:rgba(72,170,255,.85);box-shadow:0 0 55px rgba(72,170,255,.38),0 0 110px rgba(72,170,255,.12)}
-#alf-voice-ov.av-listen .alf-orb-r{border-color:rgba(72,170,255,.22);animation-duration:.65s}
-/* Thinking */
-#alf-voice-ov.av-think .alf-orb-core{animation:avThink 1.15s ease-in-out infinite}
-@keyframes avThink{0%,100%{box-shadow:0 0 30px rgba(255,208,72,.1)}50%{box-shadow:0 0 80px rgba(255,208,72,.5),0 0 140px rgba(255,208,72,.18)}}
-/* Speaking */
-#alf-voice-ov.av-speak .alf-orb-core{border-color:rgba(255,208,72,.9);box-shadow:0 0 65px rgba(255,208,72,.45),0 0 130px rgba(255,208,72,.2);animation:avSpeak .5s ease-in-out infinite alternate}
-@keyframes avSpeak{from{transform:scale(.984)}to{transform:scale(1.016)}}
-/* Transcript */
-#av-transcript{flex:1;width:100%;overflow-y:auto;padding:8px 20px 4px;display:flex;flex-direction:column;gap:8px;justify-content:flex-end;-webkit-overflow-scrolling:touch}
-.av-msg{display:flex;animation:avMsgIn .22s ease both}
-.av-msg.user{justify-content:flex-end}
-.av-msg.alfred{justify-content:flex-start}
-.av-bub{max-width:80%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.58}
-.av-msg.user .av-bub{background:rgba(255,208,72,.1);border:1px solid rgba(255,208,72,.2);color:var(--text);border-bottom-right-radius:4px}
-.av-msg.alfred .av-bub{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);color:var(--text2);border-bottom-left-radius:4px}
-@keyframes avMsgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ac-panel{position:fixed;left:0;right:0;top:0;height:100vh;height:100dvh;max-width:560px;margin:0 auto;z-index:202;display:flex;flex-direction:column;color:#f1efe8;background:radial-gradient(120% 46% at 50% -8%,rgba(255,208,72,.075),transparent 62%),#07090d;visibility:hidden;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s;overscroll-behavior:contain}
+.ac-panel.on{visibility:visible;opacity:1;transform:none;pointer-events:auto;transition-delay:0s}
+.ac-panel,.ac-panel *{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;box-sizing:border-box}
+.ac-head{flex:none;display:flex;align-items:center;gap:11px;padding:calc(10px + env(safe-area-inset-top)) 10px 10px 16px;background:rgba(9,11,15,.86);-webkit-backdrop-filter:saturate(1.5) blur(18px);backdrop-filter:saturate(1.5) blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
+.ac-av{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:50% 26%;border:1px solid rgba(255,208,72,.42);box-shadow:0 0 0 3px rgba(255,208,72,.06)}
+.ac-ht{flex:1;min-width:0}
+.ac-name{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.15}
+.ac-sub{font-size:12px;color:#8e97a6;display:flex;align-items:center;gap:6px;margin-top:2px}
+.ac-dot{width:6px;height:6px;border-radius:50%;background:#5b6472;display:inline-block}.ac-dot.on{background:#30d158}
+.ac-ib{flex:none;min-width:38px;height:38px;padding:0;border-radius:19px;border:0;background:transparent;color:#a3acba;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s}
+.ac-ib:active{background:rgba(255,255,255,.1)}
+.ac-ib span{display:none;font-size:13px;font-weight:600}
+#ac-clear.arm{padding:0 13px;background:rgba(255,69,58,.15);color:#ff7a70}#ac-clear.arm span{display:inline}
+.ac-ib.rec{color:#ff453a;background:rgba(255,69,58,.14);animation:acPulse 1.2s ease-in-out infinite}
+@keyframes acPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,69,58,.35)}50%{box-shadow:0 0 0 7px rgba(255,69,58,0)}}
+.ac-log{flex:1;min-height:0;position:relative;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 16px 10px;display:flex;flex-direction:column;gap:11px}
+.ac-row{display:flex;gap:8px;align-items:flex-start}
+.ac-row.ac-new{animation:acIn .22s ease backwards}
+.ac-row.u{justify-content:flex-end}
+@keyframes acIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ac-mini{flex:none;width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:50% 26%;border:1px solid rgba(255,208,72,.3);margin-top:2px}
+.ac-col{min-width:0;max-width:87%;display:flex;flex-direction:column;gap:8px}
+.ac-row.u .ac-col{align-items:flex-end}
+.ac-b{padding:10px 14px;border-radius:19px;font-size:15.5px;line-height:1.48;letter-spacing:-.005em;overflow-wrap:anywhere}
+.ac-row.a .ac-b{background:#11151d;border:1px solid rgba(255,255,255,.075);border-bottom-left-radius:6px;color:#ece9e1}
+.ac-row.u .ac-b{background:#252d3d;border:1px solid rgba(255,255,255,.08);border-bottom-right-radius:6px;color:#f6f4ee}
+.ac-b p{margin:0}.ac-b p+p,.ac-b p+ul,.ac-b p+ol,.ac-b ul+p,.ac-b ol+p{margin-top:8px}
+.ac-b ul,.ac-b ol{margin:0;padding-left:20px}.ac-b li{margin:3px 0}.ac-b li::marker{color:#9aa3b2}
+.ac-b b{font-weight:600;color:#fff}
+.ac-img{display:block;max-width:150px;border-radius:12px;margin:0 0 8px}
+.ac-typing{display:flex;gap:5px;align-items:center;padding:14px 16px}
+.ac-typing i{width:7px;height:7px;border-radius:50%;background:#7d8696;animation:acDot 1.1s ease-in-out infinite}
+.ac-typing i:nth-child(2){animation-delay:.15s}.ac-typing i:nth-child(3){animation-delay:.3s}
+@keyframes acDot{0%,70%,100%{opacity:.3;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
+.ac-fu,.ac-acts,.ac-chips{display:flex;flex-wrap:wrap;gap:7px}
+.ac-chip{border:1px solid rgba(255,255,255,.11);background:#10141c;color:#dde1e9;font-size:14px;line-height:1.25;padding:9px 13px;border-radius:17px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.ac-chip:active{background:#1a202c}
+.ac-fu .ac-chip{border-color:rgba(255,208,72,.3);background:rgba(255,208,72,.06);color:#f3d57a}
+.ac-act{border:1px solid rgba(255,208,72,.4);background:rgba(255,208,72,.08);color:#ffd048;font-size:13.5px;font-weight:600;padding:8px 14px;border-radius:17px;cursor:pointer}
+.ac-act.on{background:#ffd048;color:#17120a;border-color:#ffd048}
+.ac-empty{margin:auto 0;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:flex-start}
+.ac-big{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:50% 26%;border:1px solid rgba(255,208,72,.42);box-shadow:0 0 0 5px rgba(255,208,72,.055),0 10px 30px -10px rgba(0,0,0,.8);margin-bottom:14px}
+.ac-et{font-size:25px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.ac-es{font-size:15px;color:#8e97a6;margin:6px 0 10px;line-height:1.4}
+.ac-gl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#7d8696;margin:14px 0 8px}
+.ac-note{font-size:13px;color:#8e97a6;margin-top:20px;line-height:1.5}
+.ac-link{border:0;background:none;padding:0;color:#ffd048;font-size:13px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ac-foot{flex:none;padding:6px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(7,9,13,0),#07090d 30%)}
+.ac-panel.kb .ac-foot{padding-bottom:10px}
+.ac-pv{position:relative;display:inline-block;margin:0 0 8px 4px}
+.ac-pv img{display:block;width:52px;height:52px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,208,72,.5)}
+.ac-pv button{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;border:0;background:#3a4252;color:#fff;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ac-bar{display:flex;align-items:flex-end;gap:2px;background:#10141c;border:1px solid rgba(255,255,255,.1);border-radius:25px;padding:4px 4px 4px 3px;transition:border-color .15s,box-shadow .15s}
+.ac-bar:focus-within{border-color:rgba(255,208,72,.45);box-shadow:0 0 0 3px rgba(255,208,72,.08)}
+#ac-in{flex:1;min-width:0;width:auto;max-height:112px;resize:none;border:0;outline:0;box-shadow:none;background:transparent;color:#f4f1ea;font-size:16px;line-height:1.4;padding:9px 6px;margin:0;border-radius:0;-webkit-appearance:none;appearance:none}
+#ac-in:focus{border:0;outline:0;box-shadow:none;background:transparent}
+#ac-in::placeholder{color:#6f7888}
+.ac-send{flex:none;width:36px;height:36px;margin:1px;border-radius:50%;border:0;background:linear-gradient(180deg,#ffd75e,#e7a91c);color:#1b1304;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s}
+.ac-send:active{transform:scale(.92)}
 /* Rank-up ceremony glow */
 .rankup-glow{animation:rankGlow 1.1s ease-out;border-color:var(--gold2)!important;box-shadow:0 0 32px rgba(255,208,72,.35)!important}
 @keyframes rankGlow{0%{box-shadow:0 0 0 rgba(255,208,72,0)}60%{box-shadow:0 0 48px rgba(255,208,72,.5)}100%{box-shadow:0 0 32px rgba(255,208,72,.25)}}
@@ -1309,30 +1331,22 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 <div id="app"></div>
 <nav id="nav" class="hide"></nav>
 <div id="alfred-fab" class="hide" onclick="openAlfredChat()" title="Ask Alfred"><img class="alf-face" src="assets/alfred.png" alt="Alfred"/></div>
-<div id="alf-voice-ov">
-  <div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:54px 20px 0;flex:none">
-    <div style="font-family:var(--disp);font-size:11px;color:var(--gold2);letter-spacing:.22em;opacity:.75">ALFRED · BATCOMPUTER</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="ALFRED_MSGS=[];ALFRED_PIC=null;_avRenderTranscript();_avRenderChips();_avRenderPicPreview();" title="Clear conversation" style="background:none;border:none;color:var(--text3);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:6px">Clear</button>
-      <button onclick="closeAlfredVoice()" title="Close" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--text3);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button>
-    </div>
+<div id="ac-panel" class="ac-panel" role="dialog" aria-modal="true" aria-label="Chat with Alfred" aria-hidden="true">
+  <div class="ac-head">
+    <img class="ac-av" src="assets/alfred.png" alt=""/>
+    <div class="ac-ht"><div class="ac-name">Alfred</div><div class="ac-sub" id="ac-sub"></div></div>
+    <button class="ac-ib" id="ac-clear" onclick="alfClear()" aria-label="Clear conversation"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg><span>Clear?</span></button>
+    <button class="ac-ib" onclick="closeAlfredChat()" aria-label="Close chat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
-  <div id="av-transcript"></div>
-  <div class="alf-orb-wrap">
-    <div class="alf-orb" onclick="_alfOrbTap()">
-      <div class="alf-orb-r"></div><div class="alf-orb-r"></div><div class="alf-orb-r"></div>
-      <div class="alf-orb-core"><img class="alf-face" src="assets/alfred.png" alt="Alfred"/></div>
-    </div>
-    <div id="av-status" style="font-size:11px;letter-spacing:.14em;color:var(--text3);text-transform:uppercase;max-width:280px;text-align:center;line-height:1.5">Tap to speak</div>
-  </div>
-  <div style="width:100%;padding:2px 16px 44px;flex:none">
-    <div id="av-chips" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px"></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="document.getElementById('av-pic-in').click()" title="Attach physique photo" style="flex:none;width:38px;height:38px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">📎</button>
-      <input type="file" accept="image/*" id="av-pic-in" style="display:none" onchange="_alfredAttachPic(this)"/>
-      <div id="av-pic-preview"></div>
-      <input id="av-in" placeholder="Or type here…" style="flex:1;padding:11px 14px;border-radius:14px;font-size:15px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)" onkeydown="if(event.key==='Enter'){event.preventDefault();_avSendText();}" autocomplete="off" autocapitalize="sentences"/>
-      <button class="btn gold sm" style="width:auto;padding:11px 16px;border-radius:14px;flex:none" onclick="_avSendText()">→</button>
+  <div class="ac-log" id="ac-log" role="log" aria-live="polite"></div>
+  <div class="ac-foot">
+    <div id="ac-pic"></div>
+    <div class="ac-bar">
+      <button class="ac-ib" onclick="$('ac-file').click()" aria-label="Attach photo"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/></svg></button>
+      <input type="file" accept="image/*" id="ac-file" style="display:none" onchange="_alfredAttachPic(this)"/>
+      <textarea id="ac-in" rows="1" placeholder="Ask Alfred…" enterkeyhint="send" autocomplete="off" autocapitalize="sentences" aria-label="Message Alfred" onkeydown="alfKey(event)" oninput="alfGrow(this)"></textarea>
+      <button class="ac-ib" id="ac-mic" onclick="alfMic()" aria-label="Speak to Alfred"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21"/></svg></button>
+      <button class="ac-send" onmousedown="event.preventDefault()" onclick="alfSubmit()" aria-label="Send message"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></button>
     </div>
   </div>
 </div>
@@ -1979,7 +1993,7 @@ const SCIENCE_FACTS=[
 "Rest 2–3 min on compounds. Cutting rest short drops your reps and total volume, which blunts growth.",
 "Soreness is not a measure of a good session. Tension and progression matter; DOMS just means novelty or damage.",
 "Sleep is anabolic. Under ~7 h chronically lowers recovery, performance, and testosterone — train your sleep too.",
-"Deload roughly every 4–8 weeks if fatigue accumulates: drop volume ~50% for a week to let strength rebound.",
+"When fatigue piles up, cut junk sets before you cut intensity: keep the heavy work, trim the filler, and leave 1–3 reps in reserve.",
 "Creatine monohydrate, 3–5 g daily, is the most evidence-backed legal supplement for strength and size.",
 "Junk volume is real: once a session's later sets lose reps and quality, more sets add fatigue, not stimulus.",
 "For strength, heavy low-rep work matters; for size, anything from ~5–30 reps grows muscle if taken near failure."];
@@ -2000,7 +2014,7 @@ const SCIENCE_LIBRARY=[
    "Muscle is built during recovery, not during the session. Train a muscle again only once it's recovered, usually 48–72h for a hard session.",
    "Sleep is the strongest recovery tool you have. Chronically under ~7h lowers performance, recovery, and testosterone — and blunts the gains you just earned.",
    "Soreness (DOMS) is not a scorecard. It reflects novelty and damage, not how much you grew. Chasing soreness is chasing the wrong target.",
-   "A deload every 4–8 weeks (volume cut ~50% for a week) lets accumulated fatigue clear so strength rebounds — it's when adaptation surfaces, not lost time."]},
+   "Fatigue hides fitness. When you feel flat, cut the junk sets and keep 1–3 reps in reserve on the rest — recovery is when adaptation surfaces, not lost time."]},
  {cat:"Technique",icon:"🎯",items:[
    "Full range of motion, especially the stretched position, drives more growth than partials. Lengthened-position work is a strong stimulus.",
    "Control the eccentric (2–3s lowering) for tension; the lifting phase can be fast and intentful. You don't need to grind every concentric slowly.",
@@ -2010,7 +2024,7 @@ const SCIENCE_LIBRARY=[
  {cat:"Progression",icon:"📈",items:[
    "Progressive overload is the actual driver: over weeks you must add reps, load, or quality. The same stimulus stops adapting after a few weeks.",
    "Double progression is simple and works: stay at a weight until you hit the top of your rep range on all sets, then add the smallest increment.",
-   "If a lift stalls 2–3 sessions, change one variable — add a feeler set, swap to a close variation, or deload that movement and rebuild.",
+   "If a lift stalls 2–3 sessions, change one variable — add a feeler set, swap to a close variation, or change the angle, grip or rep range.",
    "Track estimated 1RM, not just top weight. Rising e1RM at the same RIR means real strength gain even if the bar weight looks flat."]},
  {cat:"Nutrition",icon:"🍽️",items:[
    "Protein around 1.6–2.2 g per kg of bodyweight per day maximises muscle protein synthesis for most lifters. Spreading it across meals helps.",
@@ -2119,7 +2133,14 @@ activeGymSplits:{}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
 
-function save(){try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){}try{if(typeof cloud!=="undefined"&&cloud.ready)cloudPublish(false);}catch(e){}}
+/* save() reports the truth: true = persisted, false = NOT persisted (quota / blocked storage). While writes fail a
+   persistent red bar stays up (never silently lose a session); the next successful save clears it. In-memory data is never touched. */
+const SAVE_FAIL_MSG="Storage full — recent changes are NOT saved. Settings → Data control → back up, then delete old progress photos.";
+function saveFailBanner(on){const b=$("savefail");if(!on){if(b)b.remove();return;}if(b||!document.body)return;const d=document.createElement("div");d.id="savefail";d.setAttribute("role","alert");d.textContent=SAVE_FAIL_MSG;document.body.appendChild(d);}
+function save(){let ok=true;try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){ok=false;}
+  try{if(ok===!!state._saveFail||(!ok&&!document.getElementById("savefail"))){state._saveFail=!ok;saveFailBanner(!ok);}}catch(e){}
+  try{if(typeof cloud!=="undefined"&&cloud.ready)cloudPublish(false);}catch(e){}
+  return ok;}
 function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.parse(r);const d=Object.assign(blankData(),p);if(p&&p.u)d.u=Object.assign(blankData().u,p.u);
   // Migration: older builds seeded muscleVol from experience at onboarding, inflating the level.
   // Real volume only ever comes from logged workouts, so volume with zero workouts = seeded -> clear.
@@ -2685,7 +2706,7 @@ function openTips(cat){
 function askAlfredAbout(topic){
   closeSheet();
   if(!geminiKey()){openSettings();return;}
-  openAlfredVoice();
+  openAlfredChat();
   const q="Give me a deeper, evidence-based breakdown of "+topic+" for my training specifically — cite the reasoning.";
   _alfSend(q,null);
 }
@@ -3127,7 +3148,7 @@ function countUpEl(id,target,suffix){const el=document.getElementById(id);if(!el
   requestAnimationFrame(step);}
 /* once-a-day arrival ritual — an 900ms signal sweep, never twice, never blocking */
 function signalSweep(){try{const el=document.createElement("div");el.className="gsweep";document.body.appendChild(el);setTimeout(()=>el.remove(),1000);}catch(e){}}
-/* Alfred, live: a REAL AI message (Gemini) — throttled, silent without a key */
+/* Alfred, live: a REAL AI message (Gemini) — throttled, silent without a key, text-only (he speaks on records + session finish only) */
 function alfredPingAI(ctx){try{
   if(!geminiKey())return false;
   if(Date.now()-(state._aiPingT||0)<8*60000)return true;
@@ -3136,12 +3157,11 @@ function alfredPingAI(ctx){try{
     if(!txt)return;const line=txt.trim().replace(/^["“]|["”]$/g,"").slice(0,180);
     try{ALFRED_MSGS.push({role:"alfred",text:line});}catch(e){}
     toast("🎩 "+line);
-    setTimeout(()=>{try{alfredVoiceLine(line);}catch(e){}},200);
   }).catch(()=>{});
   return true;
 }catch(e){return false;}}
 /* Centralized haptics — one place to tune feel. Silently no-ops where unsupported (iOS Safari). */
-const HAPTIC={tap:14,toggle:[12,18,26],done:[18,24,40],pr:[30,30,60],hit:38,ko:[60,40,120,40,200],rest:200,success:[40,30,80],warn:[80,40,80]};
+const HAPTIC={light:8,tap:14,toggle:[12,18,26],done:[18,24,40],pr:[30,30,60],hit:38,ko:[60,40,120,40,200],rest:200,success:[40,30,80],warn:[80,40,80]};
 function haptic(kind){try{if(navigator.vibrate)navigator.vibrate(HAPTIC[kind]||kind||14);}catch(e){}}
 function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInterval(state.wtInt);state.wtInt=null;}return;}const el=$("wt-display");const secs=Math.floor((Date.now()-state.session.startedAt)/1000);state.workoutTimer=secs;if(el)el.textContent=fmtTime(secs);}
 function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");sfx("go");beep(880);document.body.classList.remove("rest-final");try{const gf=document.createElement("div");gf.className="goflash";gf.textContent="GO";document.body.appendChild(gf);setTimeout(()=>gf.remove(),700);}catch(e){}if(el){el.textContent="GO";el.parentElement.style.borderColor="var(--green)";}hideRestStrip();return;}if(rem<=5){document.body.classList.add("rest-final");haptic([16,50]);}else document.body.classList.remove("rest-final");state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const rb=$("restbar");if(rb)rb.style.width=(clamp(rem/(state._restTotal||1),0,1)*100).toFixed(1)+"%";}
@@ -3155,6 +3175,16 @@ function nextTargetSet(name){
   if(r<9)return {w:lb.w||0,r:r+1};
   if(ex.bw)return lb.w?{w:lb.w+2.5,r:6}:{w:0,r:r+1};
   return {w:lb.w+(lb.w>=60?5:2.5),r:6};
+}
+/* Tapping the tick on an empty working set must never create an empty "done" set: accept the numbers the row
+   is already hinting at (last time's prevW/prevR, else the progression target) — or refuse if there is nothing. */
+function fillEmptySet(e,s){
+  if(s.type==="W"||setFilled(e.name,s))return true;
+  const has=v=>v!==""&&v!=null;
+  const tg=nextTargetSet(e.name);
+  if(!has(s.w)){const w=has(s.prevW)?s.prevW:(tg&&tg.w?tg.w:"");if(has(w))s.w=String(w);}
+  if(!has(s.r)){const r=has(s.prevR)?s.prevR:(tg&&tg.r?tg.r:"");if(has(r))s.r=String(r);}
+  return setFilled(e.name,s);
 }
 // Load the computed progression target straight into the next unlogged set — progressive overload, no math.
 function restApplyTarget(){
@@ -3223,7 +3253,19 @@ function restStart(defer){const dur=state.data.u.restTime||120;state.restEnd=Dat
 // Rest lives in the sticky header now — no fullscreen takeover. Tapping the REST box opens a compact controls sheet.
 
 /* ========================= START WORKOUT (Rule 6: unbroken path) ========================= */
+/* A live/minimised session must never be silently overwritten by START / FREE SESSION. */
+function sessionCounts(ses){const w=((ses&&ses.exercises)||[]).filter(e=>!e._skip).flatMap(e=>(e.sets||[]).filter(s=>s.type!=="W"));return {done:w.filter(s=>s.done).length,total:w.length};}
+function sessionHasData(ses){return !!ses&&(ses.exercises||[]).some(e=>(e.sets||[]).some(s=>s.done||String(s.w==null?"":s.w).trim()||String(s.r==null?"":s.r).trim()));}
+function guardLiveSession(go){ // true = intercepted (modal asks); Resume is the safe default (cancel / backdrop)
+  const ses=state.session;if(!sessionHasData(ses))return false;
+  const c=sessionCounts(ses);
+  appConfirm({title:"Workout in progress",body:`${ses.day||"Your session"} is still live (${c.done}/${c.total} sets done). Starting a new one erases it.`,ok:"Discard & start new",cancel:"Resume current",danger:true}).then(ok=>{
+    if(!ok){if(state.step!=="logging")resumeWorkout();return;}
+    stopTimers();state.session=null;state.minimized=false;clearSavedSession();go();});
+  return true;
+}
 function startWorkout(splitId,dayIdx){
+  if(guardLiveSession(()=>startWorkout(splitId,dayIdx)))return;
   try{closeSheet();}catch(e){}   // dismiss any open sheet (e.g. raid) so it can't linger over the session
   const sp=state.data.splits.find(s=>s.id===splitId);
   const day=sp?sp.days[dayIdx]:null;
@@ -3233,7 +3275,7 @@ function startWorkout(splitId,dayIdx){
   state.workoutTimer=0;state.restTimer=0;state.restRunning=false;
   state.step="readiness";render();playEntrance(state.session.day);
 }
-function freeWorkout(){try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
+function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
 const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
 // planned = the split day's target for this lift ({s:sets, r:"5–8"}). With a plan, seed exactly that
@@ -3268,7 +3310,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;alfredVoiceLine(line);if(ev!=="pr"&&ev!=="boss")toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else{haptic("tap");toast("✓ "+exx.name+" cleared");}}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr"||ev==="boss")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else{haptic("tap");toast("✓ "+exx.name+" cleared");}}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3485,7 +3527,11 @@ function reorderMove(ei,dir){
 function activeExIdx(){const ses=state.session;if(ses&&ses._focusEi!=null&&ses.exercises[ses._focusEi])return ses._focusEi;const o=findOpenSet();return o?o.ei:-1;}
 function isExOpen(ei){const e=state.session.exercises[ei];if(!e)return false;const active=activeExIdx();if(ei===active)return e._open!==false;return e._open===true;}
 function toggleExCollapse(ei){const e=state.session.exercises[ei];if(!e)return;const open=isExOpen(ei);e._open=!open;state.session._focusEi=null;haptic("tap");render();}
-function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>s.done||parseFloat(s.r)>0).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
+/* ONE definition of "logged": ticked AND carrying numbers (exProgress, confirmFinish and finishWorkout all use it).
+   setFilled = numbers present (bodyweight lifts may leave weight empty); a typed-but-unticked set is filled but not logged. */
+function setFilled(name,s){return !!s&&((s.w!==""&&s.w!=null)||!!exFor(name).bw)&&s.r!==""&&s.r!=null;}
+function setLogged(name,s){return !!s&&!!s.done&&setFilled(name,s);}
+function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>setLogged(e.name,s)).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
 // ---- Hold-to-drag exercise reordering (touch + mouse). Reorders DOM live, commits to the array once on drop — no re-render mid-drag, so it stays smooth. ----
 function initDragReorder(){
   if(window._dragInit)return;window._dragInit=true;
@@ -3627,7 +3673,7 @@ function finishWorkout(){
   if(typeof stopVoice==="function")stopVoice();
   try{syncSessionToSplit();}catch(e){}
   const ses=state.session;const dur=Math.round((now()-ses.startedAt)/1000);
-  const done=ses.exercises.map(e=>({name:e.name,sets:(e.sets||[]).filter(s=>s.done&&(s.w!==""||exFor(e.name).bw)&&s.r!=="")})).filter(e=>e.sets.length);
+  const done=ses.exercises.map(e=>({name:e.name,sets:(e.sets||[]).filter(s=>setLogged(e.name,s))})).filter(e=>e.sets.length);
   if(!done.length){appConfirm({title:"No sets logged",body:"You haven't completed any sets. Discard this session?",ok:"Discard",cancel:"Keep going",danger:true}).then(ok=>{if(ok)endSession();});return;}
   let totalVol=0,fails=0,sessFails={},sessVol={},musclesHit={};const prsThis=[];
   done.forEach(e=>{
@@ -4043,20 +4089,6 @@ function cineDismiss(){
 function cineHide(){const el=$("cine");if(el)el.classList.remove("on","out");state._cineOn=false;}
 // Daily Wayne Wisdom — one cinematic on the first open of each day, instead of an inline card you scroll past.
 // maybeShowDailyWisdom() was here — moved to maybeContextualDailyWisdom() (fires on Alfred tab open, not launch)
-// Two-Face's daily coin — fires ONCE per day as a cinematic bulletin (not an inline Gotham card you scroll past).
-function maybeShowTwoFaceCall(){
-  try{const today=new Date().toDateString();
-    if(state.data.lastTwoFaceDay===today)return;
-    state.data.lastTwoFaceDay=today;save();
-    const heads=twoFaceSide()===0;
-    const col=heads?"var(--gold2)":"#E8453C";
-    const title=heads?"HEADS — Go Heavy":"TAILS — Chase Volume";
-    const dir=heads
-      ? "Tonight is about <b style='color:var(--gold2)'>top-end strength</b>. Work up to a heavy top single or triple on your first compound, then back off. Move real iron."
-      : "Tonight is about <b style='color:#ff6a5e'>accumulation</b>. Keep 1–2 reps in reserve, add a back-off set, chase 2 extra reps on everything. Bury the muscle in volume.";
-    cinePush({eye:"Two-Face's Call",icon:heads?"🪙":"🩸",accent:col,title:title,titleHtml:`<span style="color:${col}">${esc(title)}</span>`,bodyHtml:dir,btn:"NO CHOOSING"});
-  }catch(e){}
-}
 // Live Patrol Feed — a running log of League activity so you never miss an ally's session,
 // even if you weren't on the app when the live pop fired. Capped, newest first, persisted.
 function pushPatrolFeed(entry){
@@ -4583,7 +4615,7 @@ function stretchRedundancyNotes(){
   return notes.slice(0,2);
 }
 /* "Fill last" — copy last session's weight×reps into tonight's sets so you only nudge what changes. */
-function fillLast(ei){const ses=state.session;if(!ses)return;const e=ses.exercises[ei];if(!e)return;let n=0;(e.sets||[]).forEach(s=>{if(s.type==="W")return;if(s.prevW!=null&&s.prevW!==""){s.w=s.prevW;n++;}if(s.prevR!=null&&s.prevR!=="")s.r=s.prevR;});if(typeof saveSession==="function")saveSession();try{haptic("tap");}catch(_){}render();toast(n?`Filled ${n} set${n===1?"":"s"} from last time — now beat it.`:"No previous numbers for this lift yet.");}
+function fillLast(ei){const ses=state.session;if(!ses)return;const e=ses.exercises[ei];if(!e)return;let n=0,kept=0;(e.sets||[]).forEach(s=>{if(s.type==="W")return;if(s.done){kept++;return;}/* never overwrite a logged set */if(s.prevW!=null&&s.prevW!==""){s.w=s.prevW;n++;}if(s.prevR!=null&&s.prevR!=="")s.r=s.prevR;});if(typeof saveSession==="function")saveSession();try{haptic("tap");}catch(_){}render();toast(n?`Filled ${n} set${n===1?"":"s"} from last time — now beat it.`:kept?"Sets you already logged stay untouched.":"No previous numbers for this lift yet.");}
 /* Per-gym machine settings — remember seat height / pin / pad for this machine AT THIS GYM. */
 function machineSetting(name){const d=state.data;return ((d.machineSettings||{})[d.u.activeGym]||{})[name]||"";}
 function setMachineSetting(name){const d=state.data;appPrompt({title:"Machine setup · "+(d.u.activeGym||"gym"),body:"Save your settings for this machine (seat height, pin, pad position…). Stored per gym.",ok:"Save",value:machineSetting(name)}).then(v=>{if(v===null)return;d.machineSettings=d.machineSettings||{};d.machineSettings[d.u.activeGym]=d.machineSettings[d.u.activeGym]||{};v=(v||"").trim();if(v)d.machineSettings[d.u.activeGym][name]=v;else delete d.machineSettings[d.u.activeGym][name];save();render();});}
@@ -5337,7 +5369,7 @@ function populateAlfredRead(R){
   const facts=`SESSION JUST FINISHED — give the user your post-workout read as Alfred (wild but sharp, praise when earned, sting+fix when not). Under 90 words.\n`+
     `Workout: ${R.wk.name}. Lifts: ${R.wk.exercises.length}. Duration: ${Math.round((R.dur||0)/60)}min. Total volume: ${Math.round(R.totalVol)}kg. New PRs: ${(R.prsThis||[]).length}. Readiness: ${R.readiness||"n/a"}.\n`+
     `Exercises: ${R.wk.exercises.map(e=>e.name).join(", ")}.`+
-    ((R.notes||"").trim()?`\nThe user left a note explaining their choices this session: "${R.notes.trim()}". Take it at face value — if it's a sound reason (soreness, injury, time, deload), respect it and do NOT lecture them for skipping or changing things.`:"");
+    ((R.notes||"").trim()?`\nThe user left a note explaining their choices this session: "${R.notes.trim()}". Take it at face value — if it's a sound reason (soreness, injury, time, fatigue), respect it and do NOT lecture them for skipping or changing things.`:"");
   box.setAttribute("data-loading","1");
   geminiCall([{text:alfredContext()+"\n\n"+facts}]).then(txt=>{
     const b=document.getElementById("ai-out");if(!b||!txt)return;
@@ -5798,8 +5830,8 @@ function addProgress(input){
       let img;try{img=cv.toDataURL("image/jpeg",0.72);}catch(err){img=e.target.result;}
       state.data.photos=state.data.photos||[];
       state.data.photos.push({id:"ph"+now(),date:new Date().toISOString(),img,bw:Math.round(state.data.u.bodyweight)||null,note:""});
-      try{save();checkAchievements();haptic("done");toast("Progress photo saved");}
-      catch(err){state.data.photos.pop();toast("Storage full — delete an old photo first.");}
+      if(save()){try{checkAchievements();}catch(err){}haptic("done");toast("Progress photo saved");}
+      else{state.data.photos.pop();haptic("warn");toast("Photo NOT saved — storage is full. Delete an old photo first.");} // banner stays up until a save succeeds again
       render();
     };
     im.onerror=()=>toast("Couldn't read that image.");
@@ -5926,7 +5958,7 @@ function exerciseHistory(name){
   const verdict=intel?liftVerdict(intel):"";
   const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
   const tgtBlock=(intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"")
-    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Drop the load 5% and own 9 clean reps before adding weight again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
+    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Hold the weight, change the rep range, and own 9 clean reps before adding load again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
   // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
   const recordE1=Math.max(...e1s);
   const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
@@ -6030,7 +6062,7 @@ function liftIntel(name){
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
 function liftVerdict(intel){
   if(!intel)return "";
-  if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change the stimulus or deload — repeating it won't move it.`;
+  if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change one variable — angle, grip or rep range. Repeating it won't move it.`;
   if(intel.trend==="up")return `Climbing — +${intel.d}kg (${intel.pct>0?"+":""}${intel.pct}%) of late. Keep the pressure on, sir.`;
   if(intel.trend==="down")return `Going BACKWARDS, sir — ${intel.d}kg down (${intel.pct}%). I won't sugar-coat it: you were stronger than this. Eat, sleep, and reclaim that weight.`;
   return `Holding steady. Steady isn't growth, Master — go and take the next rep.`;
@@ -6211,7 +6243,7 @@ function fatigueDebt(){
   if(pct<25){status="Recovered — the bank is in credit. Push hard.";color="var(--green)";}
   else if(pct<55){status="Manageable load. Train as planned.";color="var(--gold2)";}
   else if(pct<80){status="High fatigue debt. Favour quality over junk volume.";color="var(--orange)";}
-  else {status="Deep in the red. A deload would pay dividends.";color="var(--red)";}
+  else {status="Deep in the red. Cut junk sets, keep 1–3 reps in reserve.";color="var(--red)";}
   return {pct,status,color};
 }
 function openFatigueInfo(){const f=fatigueDebt();
@@ -6448,8 +6480,6 @@ function stalledLifts(){
   });
   return out;
 }
-/* ===== Two-Face daily coin (#13): a deterministic 50/50 directive for tonight ===== */
-function twoFaceSide(){const now=new Date();const start=new Date(now.getFullYear(),0,0);const doy=Math.floor((now-start)/864e5);return doy%2;}
 /* ========================================================================
    THE INFIRMARY (Wave 5) — one recovery hub: sleep, soreness, conditioning,
    supplements and an injury board. Sleep already feeds Patrol Readiness.
@@ -7363,7 +7393,7 @@ function missionSubTabs(){
     body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Build your splits and set which nights you patrol.</div>`
       +scheduleEditorHtml()+splitCompactTileHtml();
   }else{
-    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, deload & every quick tool — all in one place.</div>`
+    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, plateaus & every quick tool — all in one place.</div>`
       +scienceCardsHtml()
       +`<div class="ttl" style="font-size:14px;margin:18px 0 9px;display:flex;align-items:center;gap:7px">🔧 Utility belt</div>
         <div class="tgrid">
@@ -7497,8 +7527,7 @@ function showBatSignal(n){
     bodyHtml:`<div style="font-size:42px;line-height:1">🦇</div><div class="mini" style="margin-top:9px;font-style:italic;color:var(--text);font-size:14px">"${esc(msg)}"</div>`,
     btn:"ON MY WAY"});
   try{pushPatrolFeed({icon:"🦇",accent:"var(--gold2)",name:nm,kind:"nudge",html:`<b>${esc(nm)}</b> lit the <span style="color:var(--gold2)">Bat-Signal</span> for you — "${esc(msg)}"`});}catch(e){}
-  // mid-workout hype gets READ ALOUD by Alfred, over your music
-  try{if(state.session&&state.data.u.coachVoice)alfredVoiceLine("Message from "+nm+", sir: "+msg);}catch(e){}
+  // text-only (modal + patrol feed above) — Alfred speaks aloud on records + session finish only
   try{haptic("pr");}catch(e){}
 }
 // Inbound mission recap — an ally tapped "Share with allies" after finishing. Lands quietly in the
@@ -8070,7 +8099,7 @@ function defaultSplits(){
 
 /* ========================= STRATEGY TAB ========================= */
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-/* ===== Wave 2: Strategy = weekly volume map (MEV/MAV/MRV), balance & deload readiness ===== */
+/* ===== Wave 2: Strategy = weekly volume map (MEV/MAV/MRV), balance & plateau tools ===== */
 // Full-body heat map: every muscle tinted by its weekly working-set volume.
 function volMapBodies(){
   const col=m=>{const s=weeklySets(m);return s>0?{fill:heatColor(m),op:".95"}:{fill:"#E8C56A",op:".06"};};
@@ -8083,7 +8112,6 @@ function secIcon(key,c){
   const P={
     volume:'<path d="M5 19V12M12 19V5M19 19V15"/>',
     balance:'<path d="M12 4v16M6 8l-2.4 6.4a3 3 0 005.8 0L7 8M18 8l-2.4 6.4a3 3 0 005.8 0L19 8M6 8h12"/>',
-    deload:'<path d="M20 12a8 8 0 11-2.4-5.7M20 4.5V8h-3.5"/>',
     plateau:'<path d="M3.5 16.5h17M12 16V5M8 9l4-4 4 4"/>',
     strength:'<path d="M6.5 6.5v11M3.5 9v5M17.5 6.5v11M20.5 9v5M6.5 12h11"/>',
     schedule:'<rect x="3.5" y="5.5" width="17" height="15" rx="2.2"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/>',
@@ -8206,24 +8234,6 @@ function weeklyBalanceCard(){
     ${rowR("Push : Pull sets",push,pull)}${rowR("Quad : Hamstring sets",quad,ham)}
     ${flags.map(([k,t])=>`<div class="banner" style="margin-top:6px;${k==="ok"?"background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)":""}"><span>${k==="warn"?"⚠️":"✓"}</span><div class="mini">${esc(t)}</div></div>`).join("")}</div>`;
 }
-function deloadCard(){
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  if(trained.length<3)return "";
-  const fried=trained.filter(m=>getRecovery(m)<50);
-  const overMrv=M12.filter(m=>weeklySets(m)>effectiveMRV(m));
-  const need=fried.length>=4||overMrv.length>=3;
-  const snoozed=state.data.dismissed&&state.data.dismissed.deload&&(now()-state.data.dismissed.deload)<5*864e5;
-  if(need){
-    const names=[...new Set([...fried,...overMrv])].slice(0,5).map(m=>MNAME[m]).join(", ");
-    if(snoozed)return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('deload')}Deload readiness</div><div class="banner" style="background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)"><span>👍</span><div class="mini">Deload suggestion snoozed — your call, sir. Fatigue (${names}) is still elevated, so push smart. <a onclick="unsnoozeDeload()" style="color:var(--gold2);cursor:pointer">Show it again</a></div></div></div>`;
-    return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center;margin:0">${secIcon('deload')}Deload readiness</div><span class="mini" style="color:var(--text3)">optional</span></div>
-      <div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩹</span><div class="mini">Fatigue is stacking up (${names}). A lighter week — same lifts, ~2 fewer sets each and a couple more reps in reserve — would let it all rebuild. Deloading is strategy, not weakness.</div></div>
-      <div class="mini" style="margin-top:8px;color:var(--text3);text-align:center;cursor:pointer" onclick="snoozeDeload()">Not now — dismiss for 5 days</div></div>`;
-  }
-  return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('deload')}Deload readiness</div><div class="banner" style="background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)"><span>✓</span><div class="mini">Recovery looks managed — no deload needed yet. Keep progressing.</div></div></div>`;
-}
-function snoozeDeload(){state.data.dismissed=state.data.dismissed||{};state.data.dismissed.deload=now();save();haptic("tap");toast("Deload suggestion snoozed for 5 days");render();}
-function unsnoozeDeload(){if(state.data.dismissed)delete state.data.dismissed.deload;save();render();}
 // Plateau breaker: per-lift e1RM history; flag lifts with no new best across their last 3 outings (≥10d span).
 function plateauCard(){
   const ws=(state.data.workouts||[]);if(ws.length<4)return "";
@@ -8233,7 +8243,7 @@ function plateauCard(){
       (e.sets||[]).forEach(s=>{if(s.type==="W")return;const v=setE1RM(ex,s);if(v>best)best=v;});
       if(best>0)(byEx[e.name]=byEx[e.name]||[]).push({date:ex0,e1:best});});
   }
-  const PROTO=["Back off ~10% and rebuild over 2 weeks — fresh runway beats grinding.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: go heavier for 4–6 reps and let the nervous system adapt.","Reset the weight, then add a single rep every set until you own the top of the range.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
+  const PROTO=["Change one variable — swap the grip, angle or machine for 3 weeks, then return to the lift.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: go heavier for 4–6 reps and let the nervous system adapt.","Reset the weight, then add a single rep every set until you own the top of the range.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
   const stalled=[];
   Object.keys(byEx).forEach(name=>{const arr=byEx[name];if(arr.length<4)return;
     const last3=arr.slice(-3),prior=arr.slice(0,-3);
@@ -8311,7 +8321,7 @@ function scienceLabCard(){
     ${dist}${junkHtml}${sfrBlock}</div>`;
 }
 function scienceCardsHtml(){
-  return volMapCard()+timeLapseCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+deloadCard()+plateauCard();
+  return volMapCard()+timeLapseCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+plateauCard();
 }
 function scheduleEditorHtml(){
   const d=state.data;
@@ -8537,7 +8547,7 @@ function logRestDay(){
   state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();
   const AFFIRM=[["Recovery is resistance","The muscle grows when you rest. Today you're not skipping — you're building.","🛡️"],["Strategic withdrawal","Batman doesn't fight every night. Tonight you recharge for tomorrow's heavier iron.","🦇"],["Earned rest","You've put in the work. The body needs this. Come back stronger.","💎"],["The forge cools","Iron needs time to cool and harden. So do you.","⚔️"]];
   const a=AFFIRM[(state.data.workouts||[]).length%AFFIRM.length];
-  try{cinePush({eye:"REST DAY · RECOVERY PROTOCOL",icon:a[2],accent:"var(--green)",title:a[0],bodyHtml:`<div style="font-size:15px;line-height:1.6;color:var(--text)">${esc(a[1])}</div>`,btn:"RECHARGE"});}catch(e){toast(restLine());}
+  toast(a[2]+" "+a[0]+" — "+a[1]);
   try{checkStreakMilestone();}catch(e){}
   render();
 }
@@ -8780,9 +8790,9 @@ function wraithShowdownCheck(){
   const pm=new Date(nowD.getFullYear(),nowD.getMonth()-1,1);
   let prN=0;(d.workouts||[]).forEach(x=>{const dt=new Date(x.date);if(dt.getFullYear()===pm.getFullYear()&&dt.getMonth()===pm.getMonth())prN+=((x.prs||[]).length);});
   if(prN>=3){w.wins=(w.wins||0)+1;d.u.xp=(d.u.xp||0)+300;
-    cinePush({killcam:true,hold:true,icon:"🩶",eye:"MONTHLY SHOWDOWN — WON",title:"The Wraith kneels",titleHtml:`The Wraith <span style="color:#22E87A">kneels</span>`,bodyHtml:`<div style="font-size:15px">${prN} records last month. He couldn't match one of them.</div><div class="mini" style="margin-top:8px;color:var(--gold2)">+300 XP · he returns stronger</div>`,btn:"STAY SHARP",accent:"#22E87A"});}
+    toast("🩶 Monthly showdown WON — "+prN+" records last month, the Wraith couldn't match one. +300 XP");}
   else{w.losses=(w.losses||0)+1;
-    cinePush({icon:"🩶",eye:"MONTHLY SHOWDOWN — LOST",title:"The Wraith laughs",titleHtml:`The Wraith <span style="color:#FF5545">laughs</span>`,bodyHtml:`<div style="font-size:14px">${prN} record${prN===1?"":"s"} last month. He needed three to even notice you.</div><div class="mini" style="margin-top:8px;color:var(--text3)">“${WRAITH_TAUNTS[(w.losses||0)%WRAITH_TAUNTS.length]}”</div>`,btn:"AVENGE IT",accent:"#FF5545"});}
+    toast("🩶 Monthly showdown lost — "+prN+" record"+(prN===1?"":"s")+" last month. The Wraith needs three to notice you.");}
   d.wraithMk=mk;save();
 }
 /* ═══════════ 🏆 TITLE FIGHTS — championship belts on the big lifts ═══════════ */
@@ -8824,7 +8834,6 @@ function acceptTitleFight(ei){
   const ses=state.session;if(!ses||!ses.exercises[ei])return;
   ses.exercises[ei]._title=true;saveSession();
   playStinger("TITLE FIGHT","THE BELT IS ON THE LINE — "+ses.exercises[ei].name.toUpperCase(),"#FF8C22");
-  try{if(state.data.u.coachVoice)alfredVoiceLine("Title fight accepted, sir. One clean maximal effort — I'll be watching.");}catch(e){}
   render();
 }
 function titleNoteCrown(name,e1){
@@ -9659,7 +9668,64 @@ function picPickChoose(id){
   _figApply(name,elId);
   toast(id?"🖼 Picture updated, sir.":"🖼 Anatomy figure only — clean and simple.");
 }
-function alfredContext(){
+/* ===== ALFRED PERSONA + APP GUIDE (one place to tune him). The guide below is Alfred's whole knowledge of THIS app —
+   every label in it is real (grep the code before changing one). Update ALFRED_APP_GUIDE when a screen or rule changes.
+   "## " headings double as the keyword-searchable sections for the offline/no-key answers. ===== */
+const ALFRED_PERSONA=`You are Alfred Pennyworth — former MI6 field officer, battlefield medic and Batman's handler for twenty years — now this lifter's strength coach and the voice of this app. You studied under Israetel, Schoenfeld and Helms, and you hold every data point about this man's training, recovery, records and physique (below).
+
+VOICE: Still Alfred — dry British wit, economical, calm authority, warm underneath. Be APPROACHABLE and easy to talk to: he should feel he can ask you anything about training or the app and get a straight, human answer. Harsh only when the effort or the data genuinely warrants it, and then constructive: name the problem and the one fix. Never cruel, never a cheerleader, no filler, no preamble, don't restate the question.
+CLARITY: Plain language first, then the precise term in brackets — e.g. "how close you got to failure (reps in reserve, RIR)". When he asks why or how, actually explain it. If a question is ambiguous, ask ONE short clarifying question instead of guessing. If you are unsure, or the data doesn't show it, say so plainly. Cite a study (author + year) only when it genuinely adds weight, never as decoration. Lean on HIS numbers — lifts, sets, recovery — not generalities.
+EQUIPMENT: He trains machines and cables on purpose. Never push free weights as superior; honour what he uses.
+NEVER suggest a deload, a deload week or a planned light week. Manage fatigue with set volume (MEV/MAV/MRV), exercise choice, rest days and the firm progression rule.
+LENGTH: casual or simple question = 1–3 sentences. Explain / why / how = up to about 150 words, bullets welcome. App how-to = at most 5 numbered steps using the real button labels.
+PHYSIQUE PHOTOS: If an image is attached to the user's message, that IS his current physique — look at it directly and assess development, symmetry, weak points, and the single highest-leverage training priority. Never claim you cannot view or rate a photo that has been attached — you can see it.
+ACTIONS: When the user explicitly asks you to DO something in the app, end your reply with ONE action tag on its own line, in this exact format — nothing else on that line:
+[ACTION:CREATE_SPLIT:SplitName:Day1Name:ex1,ex2,ex3|Day2Name:ex1,ex2]
+[ACTION:ACTIVATE_SPLIT:splitId]
+[ACTION:GO:tabname]
+[ACTION:OPEN:target]
+GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN targets: settings, datacontrol, splits (the split editor), muscle:<key> (key is one of ${M12.join(", ")}), exercise:<exact exercise name>. Use the exact id shown in parentheses next to a split's name in ALL SPLITS below — never invent or guess an id; if he names a split that isn't listed, say so instead of emitting an action. Normal questions get no action tag.`;
+const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
+FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
+const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
+Five tabs along the bottom. GOTHAM is home: tonight's mission card (next plan day with a start button; on a rest day REST LOGGED, or Train for a free session), Territory War (a muscle-by-muscle freshness map) and the score panel: Readiness, Threat, Fatigue Debt, Weekly Patrols (sessions this week against your goal). MISSION holds your plan: PLAN lists the active split day by day (tonight is marked) plus other plans under The bench; LAB & TOOLS has the plate calculator and 1RM test. SUIT is the muscle map: tap a muscle for its dossier (recovery, weekly sets against the landmarks, what to train next), plus the Effort Dossier (average RIR), measurements and progress photos. PROFILE holds Records & Ranks, Strength Analysis, Bases & Tools (splits, gyms), history and the training calendar. ALLIES is your friends. Settings and Search sit in the top bar; the round Alfred button opens this chat.
+
+## A SESSION FROM START TO FINISH
+Tap start on the Gotham mission card (or a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen, one card per exercise. Tick each set as you finish it; the rest timer runs between sets (length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary shows volume, records, my verdict, notes and how-it-felt chips. Minimising a session keeps it alive while you browse.
+
+## LOGGING SETS: THE SET TABLE, RIR TILE AND SET TYPES
+A set row has the set-number badge (tap to cycle the set type), last time's numbers, kilos, reps, the RIR tile and the tick. RIR is reps in reserve: how many clean reps you had left; tap the tile to cycle it (0 = nothing left). Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). The ⋮ menu changes type, moves, duplicates or deletes a set. A weight far off that lift's history triggers a quick "new machine?" check.
+
+## PLAN TARGETS AND THE PROGRESSION RULE (WHEN TO ADD WEIGHT)
+A plan day shows each lift's target as sets × rep range, e.g. "Plan: 2 × 5–8" (some are optional tonight). The progression rule is firm: at 8 reps or fewer never add weight — build reps to 9 first. At 9 or more, add weight (2.5 kg, or 5 kg from 60 kg up) and drop back to about 6 reps. Each lift shows a hint like "80kg × 9+ — build reps to 9, then we add weight".
+
+## RECORDS: E1RM AND PR CROWNS (PER GYM)
+Each set becomes an estimated one-rep max (e1RM, Epley: weight × (1 + reps/30)), so 100 kg × 8 compares with 110 kg × 5. A new best e1RM earns the crown, the top record tier; smaller tiers such as heaviest weight exist. Records are kept per gym because machines differ. Find them in PROFILE → Records & Ranks.
+
+## RECOVERY, READINESS AND WEEKLY VOLUME (MEV, MAV, MRV)
+Recovery %: each muscle has its own window (72 h for back and legs, 48 h for chest, shoulders and arms, less for small muscles). Hard sets from the last seven days create fatigue that fades across that window; recovery % = 100 minus the fatigue left. Green 80+, yellow 50–79, red below 50; a muscle's dossier shows the hours until ready. Fatigue Debt is the average unrecovered share across trained muscles. Gotham's Readiness = muscle recovery 45% + sleep 30% (latest sleep log, neutral if none) + freshness 25% (falls with consecutive training days): PRIMED 80+, READY 60+, GUARDED 40+, DEPLETED below. Weekly sets count working sets in the last seven days (secondary muscles count half) against MEV (minimum effective volume — below it a muscle won't grow), MAV (maximum adaptive volume — the productive range) and MRV (maximum recoverable volume — beyond it sets turn to junk). Chest: MEV 8, MAV 16, MRV 22.
+
+## THE 8-DAY CYCLE AND LOGGING A REST DAY
+The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did, not the calendar: tonight is the day after the last plan day you completed. Logging a rest day (REST LOGGED on Gotham) moves it on; a Free Session doesn't. Miss a day and the cycle waits for you.
+
+## TOOLS DURING A SESSION: SKIP, REORDER, SWAP, WARM-UP RAMP, PLATE MATHS
+Each exercise card offers Swap (another lift for the same muscle; sets carry over), Pair (superset), Cues, the plate icon (plates per side for a target weight, using the bar weight in Settings), ↕ Order (reorder tonight's lifts) and ⏭ Skip tonight (pick a reason: logged, not judged). When a lift trains a muscle not yet warm, an Add warm-up banner builds a ramp from your working weight (about 40/60/80% on the first lift of the night, two lighter steps later), or Skip.
+
+## DATA CONTROL: ARCHIVING OLD MACHINE WEIGHTS, BACKUP, RESTORE AND CSV EXPORT
+Settings → Data control. Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Backup, Restore, Export CSV and Wipe everything (back up first).
+
+## PICTURES AND CUSTOM EXERCISES
+In an exercise's detail, Choose picture browses the demo library (filter with your own words) or picks the plain anatomy figure. For a missing lift, use the dashed custom-exercise button in the exercise picker: name, equipment, muscles, bodyweight or not, cues, picture.
+
+## ALLIES AND FRIEND CODES
+ALLIES shows your friend code (starts with GTUID:) with a Copy button — send it to a friend, paste theirs into the "paste theirs here" box and tap Add; their card then updates live. You can send callouts (challenge an ally to beat a lift).
+
+## SETTINGS
+Top-bar Settings: name, bodyweight, weekly goal, rest timer, bar weight, current gym, Autoregulation metric (RPE or RIR), Alfred's voice, the Gemini API key behind my live chat (kept on this device only), and Data control.
+
+## WHAT ALFRED CAN DO
+Answer from your live data (recovery, volume, records, plan, last session); explain the science and the app; build or activate a split; open Settings, Data control, the split editor, a muscle's dossier or an exercise; jump to any tab. Typed commands like "start push day", "add face pull to push" or "set weekly goal to 5" work too, and split edits ask to confirm. Attach a photo with the image button for a physique assessment. I speak aloud only for records, the end-of-session verdict, or after you use the microphone. Live chat needs internet and the free Gemini key; the rest of the app works offline.`;
+function alfredContext(chat){
   const d=state.data,u=d.u;const sl=strengthLevel();const r=rankFor(sl);
   const expMap={RECRUIT:"beginner (<1yr — lower MEV, large newbie gains available)",VIGILANTE:"intermediate (1–3yr — more precise volume needed, slower gains)",DARK_KNIGHT:"advanced (3+yr — near MRV often required, recovery management critical)"};
   const exp=expMap[d.experienceLevel]||"unknown training age";
@@ -9688,21 +9754,7 @@ function alfredContext(){
   // Physique
   const pa=u.physiqueAnalysis||{};
   const lpa=u.lastPhysiqueAnalysis;
-  return `You are Alfred Pennyworth — former MI6 field officer, battlefield medic, and Batman's personal handler for 20 years. You are also a certified strength coach who has studied under Israetel, Schoenfeld, and Helms personally. You are the Batcomputer made human: you have complete access to every data point about this man's training history, recovery, PRs, and physique.
-
-PERSONA: Jarvis precision meets British blade. Calm, authoritative, zero fluff. You cite real peer-reviewed studies by author + year when making evidence claims (e.g. "Schoenfeld et al., 2017 demonstrated..." or "as Helms confirmed in the MASS series"). You are not a cheerleader. You will be harsh when the data or effort warrants it — but surgical, never emotional.
-LENGTH: Match reply to question. Simple = 1–3 sentences. Detailed request = max 120 words, bullet if listing. NO preamble. NO restatement. NO filler. Cut everything that doesn't add information.
-EXERCISE BIAS: User trains machines/cables deliberately. Never push free weights as superior. Honour the equipment he uses.
-PHYSIQUE PHOTOS: If an image is attached to the user's message, that IS his current physique — look at it directly and assess development, symmetry, weak points, and the single highest-leverage training priority. Never claim you cannot view or rate a photo that has been attached — you can see it.
-ACTIONS: When the user asks you to DO something in the app (create a split, activate a split, add exercise), output ONE action tag at the end of your reply in this exact format — nothing else on that line:
-[ACTION:CREATE_SPLIT:SplitName:Day1Name:ex1,ex2,ex3|Day2Name:ex1,ex2]
-[ACTION:ACTIVATE_SPLIT:splitId]
-[ACTION:GO:tabname]
-Use the exact id shown in parentheses next to a split's name in ALL SPLITS below — never invent or
-guess an id. If the user names a split that doesn't appear there, say so rather than emitting an
-action with a made-up id. Only emit an action when the user explicitly asks you to create/change
-something. Normal questions get no action tag.
-
+  return ALFRED_PERSONA+(chat?"\n"+ALFRED_CHAT_RULES+"\n\nAPP GUIDE (authoritative — answer app questions from this):\n"+ALFRED_APP_GUIDE+"\n":"")+`
 USER: ${u.name||'sir'} | BW: ${u.bodyweight}kg | Goal: ${u.goal} | ${u.natty&&u.natty!=='maybe'?u.natty+' | ':''}Rank: ${r.emoji} ${r.name} Lv${sl}
 EXPERIENCE: ${exp}
 WEEK: ${weekCount()}/${u.weeklyGoal} sessions | Daily streak: ${u.streakDays}d | Weekly streak: ${weeklyStreak()} weeks
@@ -9759,7 +9811,7 @@ async function geminiConvCall(contents){
     let r,j;
     try{r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(key),
       {method:"POST",headers:{"Content-Type":"application/json"},
-       body:JSON.stringify({contents,generationConfig:{maxOutputTokens:600,temperature:0.75}})});}
+       body:JSON.stringify({contents,generationConfig:{maxOutputTokens:1000,temperature:0.75}})});}
     catch(e){throw new Error("No connection. Check your internet.");}
     try{j=await r.json();}catch(e){j={};}
     if(r.ok){if(model!==gemModel())localStorage.setItem("gt_gem_model",model);return(j.candidates?.[0]?.content?.parts?.[0]?.text)||"";}
@@ -9774,30 +9826,27 @@ async function geminiConvCall(contents){
   throw new Error(lastErr?("Alfred unavailable: "+lastErr):"Alfred couldn't reach any Gemini model.");
 }
 
-let ALFRED_MSGS=[];
 let ALFRED_PIC=null;
 function fileB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});}
 let ALFRED_VOICE="";
 
-/* ========================= ALFRED EVERYWHERE — FAB + bottom sheet chat ========================= */
-function openAlfredChat(){haptic("tap");openAlfredVoice();}
+/* ========================= ALFRED CHAT — one text-first conversation =========================
+   The FAB, the Alfred tab and "Ask Alfred about…" all land here. Panel markup is #ac-panel in <body> (.ac-* CSS);
+   it is visibility:hidden until opened, so nothing animates while closed. History = ALFRED_MSGS in memory plus a
+   text-only copy (last 40, never images) in localStorage "gt_alfred_chat". Alfred speaks a reply only when the
+   question came from the mic. Persona + app knowledge: ALFRED_PERSONA / ALFRED_APP_GUIDE (above alfredContext). */
+const ALF_KEY="gt_alfred_chat",ALF_KEEP=40;
+let ALFRED_MSGS=[],_alfSeen=0,_alfLoaded=false,_alfBusy=false,_alfChips=[],_alfRec=null,_alfListening=false,_alfClearAt=0;
 /* Butler etiquette: Alfred steps aside while you scroll so he never blocks what you're reading. */
 (function(){let t=null;window.addEventListener("scroll",()=>{
   const fab=document.getElementById("alfred-fab");if(!fab||fab.classList.contains("hide"))return;
   fab.classList.add("dodge");clearTimeout(t);t=setTimeout(()=>fab.classList.remove("dodge"),420);
 },{passive:true});})();
-
-/* ── Alfred Voice Conversation — Jarvis-style orb overlay ── */
-let _AV_STATE='idle'; // idle | listen | think | speak
-let _AV_CONTINUOUS=false; // true once the user taps to start talking — keeps listening after each reply
-
 let _AV_SPEECH_UNLOCKED=false;
 function _avUnlockSpeech(){
-  // iOS Safari only allows speechSynthesis.speak() to start audio if the very first call
-  // happens inside a user-gesture call stack. Our real replies are spoken after an async
-  // Gemini fetch, by which point the gesture has expired and speak() silently no-ops.
-  // Priming with a throwaway utterance here (synchronously, inside the tap handler) unlocks
-  // audio for the rest of the page session.
+  // iOS Safari only lets speechSynthesis.speak() start audio if the first call happens inside a user gesture; our replies
+  // are spoken after an async fetch, when the gesture has expired. Priming with a throwaway utterance inside the mic tap
+  // (synchronously) unlocks audio for the rest of the page session.
   if(_AV_SPEECH_UNLOCKED)return;
   try{
     if(!window.speechSynthesis)return;
@@ -9806,188 +9855,274 @@ function _avUnlockSpeech(){
     _AV_SPEECH_UNLOCKED=true;
   }catch(e){}
 }
-function openAlfredVoice(){
-  const ov=document.getElementById('alf-voice-ov');if(!ov)return;
-  ov.classList.add('on');haptic('tap');
+function _alfLoad(){
+  try{
+    const a=JSON.parse(localStorage.getItem(ALF_KEY)||"[]");
+    if(Array.isArray(a))return a.filter(m=>m&&(m.role==="user"||m.role==="alfred")&&typeof m.text==="string"&&m.text).slice(-ALF_KEEP)
+      .map(m=>({role:m.role,text:m.text,follow:Array.isArray(m.follow)?m.follow.slice(0,3).map(String):[]}));
+  }catch(e){}
+  return [];
+}
+function _alfPersist(){
+  try{
+    const rows=ALFRED_MSGS.filter(m=>m&&m.text&&!m.pending).slice(-ALF_KEEP)
+      .map(m=>({role:m.role,text:String(m.text).replace(/data:[\w\/+.-]+;base64,[A-Za-z0-9+\/=]+/g,""),follow:m.follow||[]}));
+    localStorage.setItem(ALF_KEY,JSON.stringify(rows));
+  }catch(e){}
+}
+function _alfEnsureLoaded(){if(!_alfLoaded){_alfLoaded=true;ALFRED_MSGS=_alfLoad().concat(ALFRED_MSGS);}}
+function openAlfredChat(){
+  const p=$("ac-panel");if(!p)return;
+  haptic("tap");_alfEnsureLoaded();_alfSeen=ALFRED_MSGS.length;
+  p.classList.add("on");p.setAttribute("aria-hidden","false");
+  _alfFit();_alfRender();_alfPicPrev();_alfSub();
+}
+function openAlfredVoice(){openAlfredChat();} /* legacy name — any older caller still lands in the one chat */
+function closeAlfredChat(){
+  const p=$("ac-panel");const was=p&&p.classList.contains("on");
+  if(p){p.classList.remove("on");p.setAttribute("aria-hidden","true");}
+  if(_alfRec){try{_alfRec.abort();}catch(e){}}
+  _alfListening=false;_alfMicUi();ALFRED_PIC=null;
+  if(was){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+  const i=$("ac-in");if(i)i.blur();
+}
+/* keyboard-safe: size the panel to the visual viewport so the input row rides above the iOS keyboard */
+function _alfFit(){
+  const p=$("ac-panel");if(!p)return;const v=window.visualViewport;
+  if(v){p.style.height=v.height+"px";p.style.top=v.offsetTop+"px";p.classList.toggle("kb",window.innerHeight-v.height>120);}
+  else{p.style.height="";p.style.top="";}
+  _alfScroll();
+}
+if(window.visualViewport){["resize","scroll"].forEach(ev=>window.visualViewport.addEventListener(ev,()=>{const p=$("ac-panel");if(p&&p.classList.contains("on"))_alfFit();}));}
+function _alfScroll(top){
+  const l=$("ac-log");if(!l)return;
+  requestAnimationFrame(()=>{
+    const rows=l.querySelectorAll(".ac-row.a"),r=rows[rows.length-1];
+    // a long answer starts at its first line; short ones (and your own message) sit at the bottom
+    l.scrollTop=(top&&r&&r.offsetHeight>l.clientHeight*.7)?Math.max(0,r.offsetTop-12):l.scrollHeight;
+  });
+}
+function _alfSub(){
+  const s=$("ac-sub");if(!s)return;const k=!!geminiKey();
+  s.innerHTML=_alfListening?"Listening…":`<i class="ac-dot${k?" on":""}"></i>${k?"Training coach":"Offline mode · app help"}`;
+}
+function _alfMicUi(){const b=$("ac-mic");if(b)b.classList.toggle("rec",_alfListening);_alfSub();}
+/* tiny markdown: **bold**, "- " bullets and "1." steps */
+function _alfFmt(t){
+  const inl=s=>esc(s).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
+  const out=[];let list=null;
+  const flush=()=>{if(list){out.push("<"+list.t+">"+list.i.map(x=>"<li>"+inl(x)+"</li>").join("")+"</"+list.t+">");list=null;}};
+  String(t||"").split("\n").forEach(raw=>{
+    const l=raw.trim();if(!l){flush();return;}
+    let ty="ul",m=l.match(/^[-•*–]\s+(.*)$/);
+    if(!m){ty="ol";m=l.match(/^\d+[.)]\s+(.*)$/);}
+    if(m){if(!list||list.t!==ty){flush();list={t:ty,i:[]};}list.i.push(m[1]);return;}
+    flush();out.push("<p>"+inl(l)+"</p>");
+  });
+  flush();return out.join("");
+}
+function _alfTxt(h){return String(h||"").replace(/<div[^>]*>/gi,"\n").replace(/<\/?b>/gi,"**").replace(/<[^>]+>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&").trim();}
+function _alfCurLift(){
+  const s=state.session;
+  if(!s||!(s.exercises||[]).length||!(state.step==="logging"||state.minimized))return "";
+  let e=s.exercises[s._focusEi];
+  if(!e||e._skip)e=s.exercises.find(x=>!x._skip&&(x.sets||[]).some(t=>t.type!=="W"&&!t.done));
+  return e?e.name:"";
+}
+function _alfCurMuscle(n){const p=((exFor(n)||{}).p||[])[0];return (MNAME[p]||"that muscle").toLowerCase();}
+function _alfChip(q){_alfChips.push(q);return `<button class="ac-chip" onclick="alfChip(${_alfChips.length-1})">${esc(q)}</button>`;}
+function _alfEmpty(){
+  const cur=_alfCurLift();
+  const tr=cur?["What weight next on "+cur+"?","Is "+cur+" progressing?","How many sets for "+_alfCurMuscle(cur)+"?"]:["What should I hit tonight?","Why is my press stalling?","How many sets for chest?"];
+  const ap=["What does readiness mean?","How do I archive old machine weights?","How does my 8-day cycle advance?"];
+  const grp=(t,a)=>`<div class="ac-gl">${t}</div><div class="ac-chips">${a.map(q=>_alfChip(q)).join("")}</div>`;
+  const hr=new Date().getHours(),hi=hr<5?"Burning the midnight oil":hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
+  return `<div class="ac-empty"><img class="ac-big" src="assets/alfred.png" alt=""/><div class="ac-et">${hi}.</div><div class="ac-es">Ask me about your training, your numbers, or how the app works.</div>${grp("Training",tr)}${grp("The app",ap)}${geminiKey()?"":`<div class="ac-note">Live training answers need a free Gemini key. <button class="ac-link" onclick="_alfOpen('settings')">Open Settings</button> Until then I can still explain the app.</div>`}</div>`;
+}
+function _alfActLabel(a){
+  const g=a.args||[],cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+  if(a.type==="CREATE_SPLIT")return 'Create "'+((g[0]||"Split").trim())+'"';
+  if(a.type==="ACTIVATE_SPLIT"){const sp=(state.data.splits||[]).find(s=>s.id===(g[0]||"").trim());return "Activate "+(sp?sp.name:"split");}
+  if(a.type==="GO"){const t=_alfTab(g[0]);return "Open "+(t==="case"?"Profile":cap(t||"Gotham"));}
+  if(a.type==="OPEN"){const t=(g[0]||"").trim().toLowerCase(),r=g.slice(1).join(":").trim();
+    return "Open "+(({settings:"Settings",datacontrol:"Data control",splits:"split editor"})[t]||(t==="muscle"?cap(r)+" dossier":t==="exercise"?r:cap(t)));}
+  return "Apply";
+}
+function _alfMsgHtml(m,i,last){
+  const u=m.role==="user";
+  const acts=(!u&&m.actions&&m.actions.length)?`<div class="ac-acts">${m.actions.map((a,k)=>`<button class="ac-act" onclick="alfAct(${i},${k})">${esc(_alfActLabel(a))}</button>`).join("")}</div>`:"";
+  const pend=(!u&&m.pending&&state._alfredPending)?`<div class="ac-acts"><button class="ac-act on" onclick="alfPend(1)">Do it</button><button class="ac-act" onclick="alfPend(0)">Cancel</button></div>`:"";
+  const fu=(!u&&last&&!_alfBusy&&m.follow&&m.follow.length)?`<div class="ac-fu">${m.follow.map(q=>_alfChip(q)).join("")}</div>`:"";
+  return `<div class="ac-row ${u?"u":"a"}${i>=_alfSeen?" ac-new":""}">${u?"":`<img class="ac-mini" src="assets/alfred.png" alt=""/>`}<div class="ac-col"><div class="ac-b">${m.img?`<img class="ac-img" src="${esc(m.img)}" alt="Attached photo"/>`:""}${_alfFmt(m.text)}</div>${acts}${pend}${fu}</div></div>`;
+}
+function _alfRender(top){
+  const el=$("ac-log");if(!el)return;
+  _alfChips=[];
+  let h=ALFRED_MSGS.length?ALFRED_MSGS.map((m,i)=>_alfMsgHtml(m,i,i===ALFRED_MSGS.length-1)).join(""):_alfEmpty();
+  if(_alfBusy)h+=`<div class="ac-row a"><img class="ac-mini" src="assets/alfred.png" alt=""/><div class="ac-b ac-typing" aria-label="Alfred is typing"><i></i><i></i><i></i></div></div>`;
+  el.innerHTML=h;_alfSeen=ALFRED_MSGS.length;_alfScroll(top);
+}
+function _alfPicPrev(){
+  const c=$("ac-pic");if(!c)return;
+  c.innerHTML=ALFRED_PIC?`<div class="ac-pv"><img src="${esc(ALFRED_PIC.url)}" alt="Attached photo"/><button onclick="ALFRED_PIC=null;_alfPicPrev()" aria-label="Remove photo">×</button></div>`:"";
+}
+/* ---- input row ---- */
+function alfKey(e){if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();alfSubmit();}}
+function alfGrow(t){t.style.height="auto";t.style.height=Math.min(t.scrollHeight,112)+"px";}
+function alfSubmit(){
+  const i=$("ac-in");if(!i)return;
+  if(_alfBusy){haptic("tap");return;}
+  const q=i.value.trim(),pic=ALFRED_PIC;if(!q&&!pic)return;
+  i.value="";alfGrow(i);ALFRED_PIC=null;_alfPicPrev();
+  _alfSend(q,pic,false);
+}
+function alfChip(i){const q=_alfChips[i];if(q){haptic("tap");_alfSend(q,null,false);}}
+function alfAct(i,k){const m=ALFRED_MSGS[i],a=m&&m.actions&&m.actions[k];if(a){haptic("tap");_alfExecAction(a.type,a.args);}}
+function alfClear(){
+  const b=$("ac-clear");if(!ALFRED_MSGS.length&&!_alfBusy)return;
+  if(Date.now()-_alfClearAt>3000){ // first tap arms ("Clear?"), second tap within 3s wipes
+    _alfClearAt=Date.now();if(b)b.classList.add("arm");haptic("tap");
+    setTimeout(()=>{const x=$("ac-clear");if(x)x.classList.remove("arm");},3000);return;
+  }
+  _alfClearAt=0;ALFRED_MSGS=[];_alfSeen=0;ALFRED_PIC=null;state._alfredPending=null;
+  try{localStorage.removeItem(ALF_KEY);}catch(e){}
+  if(b)b.classList.remove("arm");_alfRender();_alfPicPrev();haptic("done");
+}
+async function _alfredAttachPic(input){
+  const f=input.files&&input.files[0];if(!f)return;
+  if(f.size>6e6){toast("Photo's too large — try a smaller one.");input.value="";return;}
+  try{const b64=await fileB64(f);ALFRED_PIC={b64,mime:f.type,url:"data:"+f.type+";base64,"+b64};_alfPicPrev();}
+  catch(e){toast("Couldn't read that photo.");}
+  input.value="";
+}
+function alfMic(){
   _avUnlockSpeech();
-  _AV_CONTINUOUS=false;
-  _avRenderTranscript();_avRenderChips();_avRenderPicPreview();_avSetState('idle');
-}
-function closeAlfredVoice(){
-  const ov=document.getElementById('alf-voice-ov');if(ov)ov.classList.remove('on');
-  if(_alfRec){try{_alfRec.stop();}catch(e){}}
-  _alfListening=false;_AV_CONTINUOUS=false;ALFRED_PIC=null;
-  try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
-  _avSetState('idle');
-}
-function _avRenderPicPreview(){
-  const c=document.getElementById('av-pic-preview');if(!c)return;
-  c.innerHTML=ALFRED_PIC?`<div style="position:relative;flex:none"><img src="${esc(ALFRED_PIC.url)}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;border:1px solid var(--gold2)"/><button onclick="ALFRED_PIC=null;_avRenderPicPreview()" style="position:absolute;top:-5px;right:-5px;background:#333;border-radius:50%;width:15px;height:15px;font-size:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;border:none">✕</button></div>`:'';
-}
-function _avSetState(s){
-  _AV_STATE=s;
-  const ov=document.getElementById('alf-voice-ov');if(!ov)return;
-  ov.classList.remove('av-listen','av-think','av-speak');
-  if(s==='listen')ov.classList.add('av-listen');
-  else if(s==='think')ov.classList.add('av-think');
-  else if(s==='speak')ov.classList.add('av-speak');
-  const st=document.getElementById('av-status');
-  if(st)st.textContent={idle:'Tap to speak',listen:'Listening…',think:'Thinking…',speak:'Speaking…'}[s]||'';
-}
-function _avEndTurn(){
-  _avSetState('idle');
-  if(!_AV_CONTINUOUS)return;
-  const ov=document.getElementById('alf-voice-ov');
-  if(!ov||!ov.classList.contains('on'))return;
-  setTimeout(()=>{if(_AV_CONTINUOUS&&_AV_STATE==='idle')_avStartListen();},450);
-}
-function _avRenderTranscript(){
-  const t=document.getElementById('av-transcript');if(!t)return;
-  const msgs=ALFRED_MSGS.slice(-8);
-  t.innerHTML=msgs.map(m=>{
-    const isThink=m.text==='…thinking…';
-    return `<div class="av-msg ${m.role}"><div class="av-bub">${isThink?'<span style="opacity:.5;font-style:italic">…</span>':esc(m.text).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div></div>`;
-  }).join('');
-  requestAnimationFrame(()=>{t.scrollTop=t.scrollHeight;});
-}
-function _avRenderChips(){
-  const c=document.getElementById('av-chips');if(!c)return;
-  if(ALFRED_MSGS.length){c.innerHTML='';return;}
-  const qs=["What should I train today?","How's my recovery?","Build me a Push Pull Legs split","What's my weakest point?","Am I overtraining?"];
-  c.innerHTML=qs.map(q=>`<button class="chip" style="font-size:12px;width:auto" onclick="_avQuickAsk('${q.replace(/'/g,"\\'")}')">${q}</button>`).join('');
-}
-function _avQuickAsk(q){const i=document.getElementById('av-in');if(i)i.value=q;_avSendText();}
-async function _avSendText(){
-  const i=document.getElementById('av-in');if(!i)return;
-  const q=i.value.trim();const pic=ALFRED_PIC;
-  if(!q&&!pic)return;
-  i.value='';ALFRED_PIC=null;_avRenderPicPreview();
-  const c=document.getElementById('av-chips');if(c)c.innerHTML='';
-  _avSetState('think');
-  await _alfSend(q,pic);
-}
-function _alfOrbTap(){
-  _avUnlockSpeech();
-  if(_AV_STATE==='listen'){_AV_CONTINUOUS=false;if(_alfRec){try{_alfRec.stop();}catch(e){}}_avSetState('idle');return;}
-  if(_AV_STATE==='speak'){_AV_CONTINUOUS=false;try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}_avSetState('idle');return;}
-  if(_AV_STATE==='think')return;
-  _AV_CONTINUOUS=true;
-  _avStartListen();
-}
-function _avStartListen(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){const i=document.getElementById('av-in');if(i)i.focus();toast('Voice input not supported here — type below.');return;}
-  if(_alfRec){try{_alfRec.stop();}catch(e){}}
-  _alfRec=new SR();_alfRec.continuous=false;_alfRec.interimResults=true;_alfRec.lang='en-US';
-  _avSetState('listen');_alfListening=true;
-  let gotFinal=false;
-  _alfRec.onresult=e=>{
-    let interim='',final='';
-    for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}
-    const st=document.getElementById('av-status');
-    if(st&&(interim||final))st.textContent='"'+(final||interim)+'"';
-    if(final){gotFinal=true;_alfListening=false;const pic=ALFRED_PIC;ALFRED_PIC=null;_avRenderPicPreview();const c=document.getElementById('av-chips');if(c)c.innerHTML='';_avSetState('think');_alfSend(final.trim(),pic);}
-  };
-  _alfRec.onerror=e=>{_alfListening=false;if(e.error==='not-allowed'){_AV_CONTINUOUS=false;toast('Mic permission blocked — enable it in browser settings.');}_avSetState('idle');};
-  _alfRec.onend=()=>{_alfListening=false;if(!gotFinal&&_AV_STATE==='listen'){_AV_CONTINUOUS=false;_avSetState('idle');}};
-  try{_alfRec.start();haptic('tap');}catch(e){_avSetState('idle');}
+  if(!SR){toast("Voice input isn't available here — type instead.");return;}
+  if(_alfListening){try{_alfRec.stop();}catch(e){}return;}
+  try{
+    const r=_alfRec=new SR();r.continuous=false;r.interimResults=true;r.lang="en-US";
+    let fin="";
+    r.onresult=e=>{
+      let it="";fin="";
+      for(let k=0;k<e.results.length;k++){const t=e.results[k][0].transcript;if(e.results[k].isFinal)fin+=t;else it+=t;}
+      const i=$("ac-in");if(i){i.value=(fin+it).trim();alfGrow(i);}
+    };
+    r.onerror=e=>{if(e&&e.error==="not-allowed")toast("Mic access is blocked — allow it in the browser settings.");};
+    r.onend=()=>{
+      _alfListening=false;_alfMicUi();
+      const q=fin.trim(),i=$("ac-in");
+      if(q&&!_alfBusy){if(i){i.value="";alfGrow(i);}_alfSend(q,null,true);}
+    };
+    _alfListening=true;_alfMicUi();r.start();haptic("tap");
+  }catch(e){_alfListening=false;_alfMicUi();toast("Couldn't start the mic.");}
 }
-
-function _alfredMsgsHtml(){
-  if(!ALFRED_MSGS.length)return `<div style="text-align:center;padding:28px 14px 16px">
-    <div style="font-size:44px;margin-bottom:12px;filter:drop-shadow(0 0 16px rgba(255,208,72,.55))">🦇</div>
-    <div style="font-family:var(--disp);font-size:22px;color:var(--gold2);letter-spacing:.04em;margin-bottom:6px">ALFRED ONLINE</div>
-    <div class="mini" style="color:var(--text2);max-width:270px;margin:0 auto;line-height:1.65">Full access to your data. Ask anything — or tell him to do something.</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;justify-content:center">
-      ${["What should I train today?","Build me a Push Pull Legs split","How's my recovery looking?","What's my weakest muscle?","Am I overtraining?","What should I eat today?"].map(q=>`<button class="chip" style="font-size:12px;width:auto" onclick="_alfredQuickAsk('${q.replace(/'/g,"\\'")}')">${q}</button>`).join("")}
-    </div>
-  </div>`;
-  return ALFRED_MSGS.map(m=>{
-    const isThinking=m.text==='…thinking…';
-    const actionBtns=(m.role==='alfred'&&m.actions&&m.actions.length&&!isThinking)
-      ?m.actions.map((a,i)=>{
-        const label=a.type==='CREATE_SPLIT'?`✅ Create "${(a.args[0]||'Split').trim()}"`:a.type==='ACTIVATE_SPLIT'?'✅ Activate Split':a.type==='GO'?'→ Go there':'Apply';
-        return `<button class="chip on" style="font-size:11px;width:auto;margin-top:7px" onclick="_alfExecAction('${a.type}',${JSON.stringify(a.args)})">${label}</button>`;
-      }).join('')
-      :'';
-    return `<div class="alf-msg ${m.role} ${isThinking?'alf-thinking':''}">
-      <div class="alf-label">${m.role==='user'?'You':'Alfred'}</div>
-      <div class="alf-bubble">${m.img?`<img src="${esc(m.img)}" style="max-width:110px;border-radius:8px;margin-bottom:5px;display:block"/>`:''}${esc(m.text).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}${actionBtns?`<div>${actionBtns}</div>`:''}</div>
-    </div>`;
-  }).join('');
+function _alfSpeak(t){
+  try{
+    if(!window.speechSynthesis)return;
+    let s=String(t||"").replace(/\*\*/g,"").replace(/\n+/g,". ");
+    if(s.length>320){const c=s.lastIndexOf(". ",320);s=s.slice(0,c>80?c+1:320);}
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(_alfredUtter(s,0.92,0.95));
+  }catch(e){}
 }
-
-function _renderAlfredSheet(){
-  const has=!!geminiKey();
-  const micBtn=`<button id="alf-mic-btn" style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:${_alfListening?'rgba(255,54,34,.35)':_ALF_VOICE?'rgba(255,208,72,.18)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer" onclick="_alfMicStart()" title="${_alfListening?'Listening…':_ALF_VOICE?'Voice on — tap to speak':'Tap to speak'}">${_alfListening?'⏹':'🎙'}</button>`;
-  const voiceBtn=`<button style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid ${_ALF_VOICE?'rgba(255,208,72,.5)':'var(--border2)'};background:${_ALF_VOICE?'rgba(255,208,72,.12)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer" onclick="_alfVoiceToggle()" title="${_ALF_VOICE?'Voice on — tap to mute':'Tap to hear Alfred speak'}">${_ALF_VOICE?'🔊':'🔇'}</button>`;
-  const inputArea=has
-    ?`<div style="display:flex;gap:6px;align-items:center;padding-top:10px;border-top:1px solid var(--border)">
-        <button style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer" onclick="document.getElementById('alf-pic-in').click()" title="Attach photo">📎</button>
-        <input type="file" accept="image/*" id="alf-pic-in" style="display:none" onchange="_alfredAttachPic(this)"/>
-        ${ALFRED_PIC?`<div style="position:relative;flex:none"><img src="${esc(ALFRED_PIC.url)}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid var(--gold2)"/><button onclick="ALFRED_PIC=null;_renderAlfredSheet()" style="position:absolute;top:-5px;right:-5px;background:#333;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</button></div>`:''}
-        ${micBtn}${voiceBtn}
-        <input id="alf-in" placeholder="${_alfListening?'Listening…':'Ask Alfred anything…'}" style="flex:1;padding:10px 12px;border-radius:12px;font-size:15px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_sendAlfredSheet();}" autocomplete="off" autocapitalize="sentences"/>
-        <button class="btn gold sm" style="width:auto;padding:10px 14px;flex:none;border-radius:12px" onclick="_sendAlfredSheet()">→</button>
-      </div>`
-    :`<div style="padding-top:10px;border-top:1px solid var(--border);text-align:center">
-        <div class="mini" style="color:var(--text2);margin-bottom:8px">Add a free Gemini API key to activate Alfred</div>
-        <input value="${esc(geminiKey())}" placeholder="Paste Gemini key here…" oninput="setGemKey(this.value)" style="margin-bottom:6px;font-size:14px"/>
-        <div class="mini" style="color:var(--text3)">Free key → aistudio.google.com/apikey</div>
-      </div>`;
-  openSheet(`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div class="row" style="gap:9px"><div style="font-size:20px">🦇</div><div><div style="font-family:var(--disp);font-size:17px;color:var(--gold2);line-height:1">ALFRED</div><div style="font-size:10px;color:var(--text3);letter-spacing:.1em">EVIDENCE-BASED COACH</div></div></div>
-    <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="ALFRED_MSGS=[];ALFRED_PIC=null;_renderAlfredSheet()">Clear</button>
-  </div>
-  <div id="alf-chat" style="max-height:46vh;min-height:120px;overflow-y:auto;padding-bottom:6px">${_alfredMsgsHtml()}</div>
-  ${inputArea}`);
-  requestAnimationFrame(()=>{const c=document.getElementById('alf-chat');if(c)c.scrollTop=c.scrollHeight;const i=document.getElementById('alf-in');if(i)i.focus();});
+/* ---- sending ---- */
+async function _alfSend(q,pic,viaMic){
+  if(_alfBusy)return;
+  q=(q||"").trim();
+  if(!pic&&q&&/\bphysique\b|progress (photo|pic)|\bmy (photo|pic|picture)\b|rate (my|me) (body|look|photo|pic)|how (i|my body) look/i.test(q)){
+    const lp=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    if(lp&&lp.img){const m=lp.img.match(/^data:([^;]+);base64,(.+)$/);if(m)pic={url:lp.img,b64:m[2],mime:m[1]};}
+  }
+  const text=q||(pic?"What do you make of this physique, Alfred?":"");
+  if(!text)return;
+  _alfEnsureLoaded();
+  ALFRED_MSGS.push({role:"user",text,img:pic?pic.url:null});
+  _alfBusy=true;_alfRender();
+  let r;
+  try{r=await _alfReply(text,pic);}catch(e){r=_alfFail(e,text);}
+  _alfBusy=false;
+  ALFRED_MSGS.push(Object.assign({role:"alfred"},r));
+  save();_alfPersist();_alfRender(true);
+  if(viaMic&&r.text)_alfSpeak(r.text);
+  if(r.run)setTimeout(()=>{try{closeAlfredChat();r.run();}catch(e){}},450);
+  else if(r.auto&&r.actions&&r.actions.length)setTimeout(()=>{try{_alfExecAction(r.actions[0].type,r.actions[0].args);}catch(e){}},600);
 }
-
-function _alfredQuickAsk(q){const i=document.getElementById('alf-in');if(i){i.value=q;i.focus();}else{_alfSend(q,null);}}
-
-async function _sendAlfredSheet(){
-  const i=document.getElementById('alf-in');if(!i)return;
-  const q=i.value.trim();const pic=ALFRED_PIC;
-  if(!q&&!pic)return;
-  i.value='';ALFRED_PIC=null;
-  await _alfSend(q,pic);
+async function _alfReply(q,pic){
+  const loc=_alfLocal(q,pic);if(loc)return loc;
+  if(!geminiKey())return _alfOffline(q);
+  const raw=await geminiConvCall(_alfContents(q,pic));
+  state.data.u.aiUses=(state.data.u.aiUses||0)+1;try{checkAchievements();}catch(e){}
+  return _alfParseReply(raw);
 }
-
-/* ---- Alfred voice mode + mic input ---- */
-let _ALF_VOICE=false;
-let _alfRec=null;
-let _alfListening=false;
-
-function _alfVoiceToggle(){
-  _ALF_VOICE=!_ALF_VOICE;
-  if(!_ALF_VOICE){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
-  haptic('tap');
-  toast(_ALF_VOICE?'🔊 Alfred will speak responses':'🔇 Alfred voice off');
-  _renderAlfredSheet();
+function _alfContents(q,pic){
+  const c=[{role:"user",parts:[{text:alfredContext(true)+"\n\nYou have been briefed. You are ready."}]},{role:"model",parts:[{text:"Understood. What do you need?"}]}];
+  ALFRED_MSGS.slice(0,-1).slice(-16).forEach(m=>{if(m.text&&!m.loc)c.push({role:m.role==="user"?"user":"model",parts:[{text:m.text}]});});
+  const fp=[{text:q}];
+  if(pic&&pic.b64)fp.push({inline_data:{mime_type:pic.mime||"image/jpeg",data:pic.b64}});
+  c.push({role:"user",parts:fp});
+  return c;
 }
-
-function _alfMicStart(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast('Voice input not supported on this browser.');return;}
-  if(_alfListening){try{if(_alfRec)_alfRec.stop();}catch(e){}return;}
-  if(_alfRec){try{_alfRec.stop();}catch(e){}}
-  _alfRec=new SR();
-  _alfRec.continuous=false;_alfRec.interimResults=false;_alfRec.lang='en-US';
-  _alfRec.onstart=()=>{_alfListening=true;const b=document.getElementById('alf-mic-btn');if(b){b.textContent='⏹';b.style.background='rgba(255,54,34,.35)';}};
-  _alfRec.onresult=e=>{
-    _alfListening=false;
-    const b=document.getElementById('alf-mic-btn');if(b){b.textContent='🎙';b.style.background='';}
-    const text=(e.results[0][0].transcript||'').trim();
-    if(!text)return;
-    const inp=document.getElementById('alf-in')||document.getElementById('alf-tab-in');
-    if(inp)inp.value=text;
-    _alfSend(text,null);
-  };
-  _alfRec.onerror=()=>{_alfListening=false;const b=document.getElementById('alf-mic-btn');if(b){b.textContent='🎙';b.style.background='';}};
-  _alfRec.onend=()=>{_alfListening=false;const b=document.getElementById('alf-mic-btn');if(b){b.textContent='🎙';b.style.background='';}};
-  try{_alfRec.start();haptic('tap');}catch(e){toast('Mic error: '+e.message);}
+/* Pull the optional [FOLLOWUPS: a | b | c] line and [ACTION:…] tags out of a reply */
+function _alfParseReply(raw){
+  const follow=[];
+  const t=String(raw||"").replace(/\[FOLLOW-?UPS?:([^\]]*)(?:\]|$)/gi,(_,b)=>{
+    b.split("|").forEach(x=>{x=x.trim().replace(/^["“]|["”]$/g,"");if(x&&follow.length<3)follow.push(x.slice(0,80));});return "";
+  });
+  const {clean,actions}=_alfParseActions(t);
+  return {text:clean||"I've nothing to add to that, sir.",actions,follow,auto:true};
 }
+function _alfFail(e,q){
+  const m=String((e&&e.message)||"");
+  if(/limit/i.test(m))return {text:"I've hit the free-tier limit for the minute, sir. Give me about a minute and ask again.",loc:true};
+  if(/valid|rejected/i.test(m))return {text:"That Gemini key isn't being accepted. Check it under Settings → Gemini API key and I'll be back in business.",actions:[{type:"OPEN",args:["settings"]}],loc:true};
+  return _alfOffline(q);
+}
+/* No key / offline: app questions come from the best-matching guide section; training questions get a friendly note */
+const ALF_STOP=new Set("the and for you your are can how what why when where does did not with from that this have has about mean means work works tell give show please explain which would should could into onto than then them they there their some any all out off over just like".split(" "));
+let _alfSecs=null;
+function _alfSections(){
+  return _alfSecs||(_alfSecs=ALFRED_APP_GUIDE.split(/^## /m).map(s=>s.trim()).filter(Boolean).map(s=>{
+    const n=s.indexOf("\n"),title=(n<0?s:s.slice(0,n)).trim();
+    return {title,t:title.toLowerCase(),b:s.toLowerCase(),body:(n<0?"":s.slice(n+1)).trim()};
+  }));
+}
+function _alfGuide(q){
+  const w=(String(q).toLowerCase().match(/[a-z0-9]+/g)||[]).filter(x=>x.length>2&&!ALF_STOP.has(x)).map(x=>x.length>=6?x.slice(0,-2):x);
+  if(!w.length)return null;
+  let best=null;
+  _alfSections().forEach(s=>{let sc=0,ti=0;w.forEach(x=>{if(s.t.includes(x)){sc+=2;ti++;}sc+=Math.min(3,s.b.split(x).length-1);});if(!best||sc>best.sc)best={s,sc,ti};});
+  return best&&best.sc>=4?best:null;
+}
+function _alfOffline(q){
+  const g=_alfGuide(q);
+  if(g){const lab=g.s.title.replace(/[:(].*$/,"").trim().toLowerCase();return {text:"Straight from the manual — **"+lab.charAt(0).toUpperCase()+lab.slice(1)+"**\n"+g.s.body,loc:true};}
+  if(geminiKey())return {text:"I can't reach my sources just now, so I can't think that one through properly. Ask me again once you're back online — I can still explain how the app works in the meantime.",loc:true};
+  return {text:"That one needs my live line, sir, and there's no Gemini key on this device yet. Add the free key under Settings → Gemini API key and I can talk training properly. Until then I'm still good for questions about how the app works.",actions:[{type:"OPEN",args:["settings"]}],loc:true};
+}
+/* Typed commands the old console understood (open…, start…, add … to …, set weekly goal…) — local, instant, edits confirm first.
+   With a key, only short imperative messages are tried; offline, short questions without numbers are too. */
+function _alfLocal(q,pic){
+  if(pic)return null;
+  const words=q.split(/\s+/).length;
+  const cmd=words<=9&&!/\?\s*$/.test(q)&&/^(open|show|go to|goto|take me|launch|view|pull up|jump to|bring up|navigate|start|begin|fire up|add|remove|delete|set|switch to|activate|use|change to|copy|move)\b/i.test(q);
+  if(!cmd){
+    if(geminiKey()||/\d/.test(q)||words>7||/^(why|how come)\b/i.test(q))return null;
+    if(/\b(what does|what is|what's|what are|how does|how do i|how do you|how can i|where do i|where is|explain)\b/i.test(q)){const g=_alfGuide(q);if(g&&g.ti)return null;}
+  }
+  state._alfredPending=null;
+  let r;try{r=alfredAsk(q);}catch(e){return null;}
+  if(!r||r.__fallback)return null;
+  if(r.__nav)return {text:_alfTxt(r.msg||"Right away, sir."),loc:true,run:()=>{(typeof r.run==="function")?r.run():(new Function(r.run))();}};
+  return {text:_alfTxt(r),loc:true,pending:!!state._alfredPending};
+}
+function alfPend(yes){
+  const p=state._alfredPending;state._alfredPending=null;
+  ALFRED_MSGS.forEach(m=>{m.pending=false;});
+  if(yes&&p){try{p.fn();}catch(e){}save();haptic("done");try{render();}catch(e){}_alfNote(_alfTxt(p.done||"Done, sir."));}
+  else _alfNote("As you wish, sir. Nothing changed.");
+}
+function _alfNote(text){ALFRED_MSGS.push({role:"alfred",text,loc:true});_alfPersist();_alfRender(true);}
 
 /* ---- Action parser — strips [ACTION:...] tags, returns clean text + actions array ---- */
 function _alfParseActions(text){
@@ -9999,7 +10134,23 @@ function _alfParseActions(text){
   }).replace(/\n{3,}/g,'\n\n').trim();
   return {clean,actions};
 }
-
+function _alfTab(t){return ({gotham:"gotham",home:"gotham",mission:"mission",suit:"suit",case:"case",profile:"case",allies:"allies",alfred:"alfred",tech:"tech",fuel:"fuel"})[String(t||"").trim().toLowerCase()]||null;}
+/* [ACTION:OPEN:target] — only targets that map to a real opener; anything else is a no-op with a short note */
+function _alfOpen(t,arg){
+  t=String(t||"").trim().toLowerCase();arg=String(arg||"").trim();
+  if(t==="settings"){closeAlfredChat();openSettings();return;}
+  if(t==="datacontrol"||t==="data control"){closeAlfredChat();openDataControl();return;}
+  if(t==="splits"||t==="split"){closeAlfredChat();openSplitSheet();return;}
+  if(t==="muscle"){
+    const k=M12.find(x=>x===arg.toLowerCase()||(MNAME[x]||"").toLowerCase()===arg.toLowerCase());
+    if(k){closeAlfredChat();muscleDrill(k);return;}
+  }
+  if(t==="exercise"){
+    const n=_alfredFindEx(arg);
+    if(n){closeAlfredChat();openExDetail(n);return;}
+  }
+  _alfNote("I can't open that one from here, sir. I can take you to a tab, or open Settings, Data control, the split editor, a muscle or an exercise.");
+}
 function _alfExecAction(type,argsRaw){
   const args=argsRaw||[];
   if(type==='CREATE_SPLIT'){
@@ -10019,104 +10170,24 @@ function _alfExecAction(type,argsRaw){
     const gym=state.data.u.activeGym;
     if(gym){state.data.activeGymSplits=state.data.activeGymSplits||{};state.data.activeGymSplits[gym]=sp.id;}
     save();haptic('done');
-    toast('✅ Split "'+name+'" created and activated');
-    go('mission');
+    try{render();}catch(e){}
+    _alfNote('Done — "'+name+'" is created and active. You will find it under MISSION.');
   } else if(type==='ACTIVATE_SPLIT'){
     const id=(args[0]||'').trim();
     const sp=(state.data.splits||[]).find(s=>s.id===id);
-    if(!sp){toast('Split not found.');return;}
+    if(!sp){_alfNote("I couldn't find that split, sir.");return;}
     state.data.activeSplitId=id;
     const gym=state.data.u.activeGym;
     if(gym){state.data.activeGymSplits=state.data.activeGymSplits||{};state.data.activeGymSplits[gym]=id;}
-    save();haptic('done');toast('✅ Split activated');render();
+    save();haptic('done');try{render();}catch(e){}
+    _alfNote('"'+sp.name+'" is now your active split.');
   } else if(type==='GO'){
-    go((args[0]||'gotham').trim());
+    const t=_alfTab(args[0]);
+    if(!t){_alfNote("I can't take you to that screen, sir. The tabs are Gotham, Mission, Suit, Profile and Allies.");return;}
+    closeAlfredChat();go(t);
+  } else if(type==='OPEN'){
+    _alfOpen(args[0],args.slice(1).join(':'));
   }
-}
-
-function _alfUiSync(){
-  const ov=document.getElementById('alf-voice-ov');
-  if(ov&&ov.classList.contains('on')){_avRenderTranscript();return;}
-  const tabChat=document.getElementById('alfred-tab-chat');
-  if(tabChat){tabChat.innerHTML=_alfredMsgsHtml();requestAnimationFrame(()=>{tabChat.scrollTop=tabChat.scrollHeight;});return;}
-  _renderAlfredSheet();
-}
-async function _alfSend(q,pic){
-  if(!pic&&q&&/\bphysique\b|\bphoto\b|\bpicture\b|\bpic\b|rate (my|me)|how.*(look|looking)|progress photo|my body\b/i.test(q)){
-    const lp=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
-    if(lp&&lp.img){const m=lp.img.match(/^data:([^;]+);base64,(.+)$/);if(m)pic={url:lp.img,b64:m[2],mime:m[1]};}
-  }
-  const displayQ=q||(pic?'What do you make of this physique, Alfred?':'');
-  ALFRED_MSGS.push({role:'user',text:displayQ,img:pic?pic.url:null});
-  ALFRED_MSGS.push({role:'alfred',text:'…thinking…'});
-  const ov0=document.getElementById('alf-voice-ov');
-  if(ov0&&ov0.classList.contains('on'))_avSetState('think');
-  _alfUiSync();
-  try{
-    // Build multi-turn contents: system context as first user turn, then full conversation history
-    const ctx=alfredContext();
-    const contents=[];
-    // Seed: Alfred acknowledges the briefing (keeps multi-turn format valid)
-    contents.push({role:'user',parts:[{text:ctx+'\n\nYou have been briefed. You are ready.'}]});
-    contents.push({role:'model',parts:[{text:'Understood, sir. What do you need?'}]});
-    // Add conversation history (last 16 messages = 8 exchanges)
-    const hist=ALFRED_MSGS.slice(0,-1).slice(-16);
-    for(const m of hist){
-      if(m.role==='user'){
-        const p=[{text:m.text||''}];
-        if(m.img&&m.img.startsWith('data:')){try{const[,mime,b64]=m.img.match(/^data:([^;]+);base64,(.+)$/)||[];if(b64)p.push({inline_data:{mime_type:mime,data:b64}});}catch(e){}}
-        contents.push({role:'user',parts:p});
-      }else if(m.text&&m.text!=='…thinking…'){
-        contents.push({role:'model',parts:[{text:m.text}]});
-      }
-    }
-    // Final user message
-    const finalParts=[{text:displayQ}];
-    if(pic){try{const[,mime,b64]=pic.url.match(/^data:([^;]+);base64,(.+)$/)||[];if(b64)finalParts.push({inline_data:{mime_type:mime,data:pic.b64}});}catch(e){}}
-    contents.push({role:'user',parts:finalParts});
-    const raw=await geminiConvCall(contents);
-    const {clean,actions}=_alfParseActions(raw||'I have nothing to add, sir.');
-    const last=ALFRED_MSGS[ALFRED_MSGS.length-1];
-    last.text=clean||'I have nothing to add, sir.';
-    last.actions=actions;
-    state.data.u.aiUses++;try{checkAchievements();}catch(e){}save();
-    // Voice overlay always speaks; old sheet/tab only speak if voice toggle is on
-    const ovOn=document.getElementById('alf-voice-ov')?.classList.contains('on');
-    if((ovOn||_ALF_VOICE)&&clean){
-      try{
-        if(window.speechSynthesis){
-          window.speechSynthesis.cancel();
-          setTimeout(()=>{
-            try{
-              const utt=_alfredUtter(clean.replace(/\*\*/g,'').replace(/\*/g,'').slice(0,280),0.92,0.95);
-              if(ovOn){
-                utt.onstart=()=>_avSetState('speak');
-                utt.onend=()=>_avEndTurn();
-                utt.onerror=()=>_avEndTurn();
-              }
-              window.speechSynthesis.speak(utt);
-            }catch(e){if(ovOn)_avEndTurn();}
-          },120);
-        }else if(ovOn){_avEndTurn();}
-      }catch(e){if(ovOn)_avEndTurn();}
-    }else if(ovOn){_avEndTurn();}
-    // Auto-execute any actions
-    if(actions.length){setTimeout(()=>{try{_alfExecAction(actions[0].type,actions[0].args);}catch(e){}},600);}
-  }catch(e){
-    if(document.getElementById('alf-voice-ov')?.classList.contains('on'))_avEndTurn();
-    ALFRED_MSGS[ALFRED_MSGS.length-1].text="The line to the Batcomputer is down, sir. ("+e.message+")";
-  }
-  _alfUiSync();
-}
-
-async function _alfredAttachPic(input){
-  const f=input.files[0];if(!f)return;
-  if(f.size>6e6){toast("Photo's too large — try a smaller one.");return;}
-  try{
-    const b64=await fileB64(f);ALFRED_PIC={b64,mime:f.type,url:"data:"+f.type+";base64,"+b64};
-    const ov=document.getElementById('alf-voice-ov');
-    if(ov&&ov.classList.contains('on'))_avRenderPicPreview();else _alfUiSync();
-  }catch(e){toast("Couldn't read that photo.");}
 }
 
 /* ---- Alfred LOCAL coaching (works with NO API key) — pre-session briefing,
@@ -10199,7 +10270,6 @@ function alfredMusclePicker(){
 /* ===== ALFRED CONSOLE — he sees the whole training picture and can act on your word.
    Reads (status, weakest, stalled, PRs, volume) need no permission; edits to your split are
    ALWAYS gated behind an explicit confirm. Offline keyword-intent parser, no server. ===== */
-function alfredConsoleExamples(){return ["What should I train today?","Am I recovered?","What's my weakest muscle?","How strong am I?","PR for bench press","Set leg press to a hard resistance profile","Volume for chest","Open leaderboard","Start push day","Set weekly goal to 5","Add face pull to push","Switch to PPL split","How's my streak?"];}
 function _alfredFindEx(q){
   q=(q||"").toLowerCase().trim();if(!q)return null;
   const names=(typeof EXDB!=="undefined"?EXDB:CORE_EX).map(e=>e.n);
@@ -10442,7 +10512,7 @@ function alfredAsk(q){
     return `Your weakest link is <b>${MNAME[wk.x]}</b> — level ${wk.l}, ${wk.sets} hard sets this week. Give it priority, Master.`;}
   // READ: stalled
   if(/stall|plateau|stuck/.test(s)){const out=[];loggedExerciseNamesByRecency().forEach(n=>{const it=liftIntel(n);if(it&&it.stalled)out.push(n);});
-    return out.length?`Stalled, sir: <b>${out.slice(0,5).map(esc).join(", ")}</b>. Change the angle, rep range or deload.`:"Nothing's stalled right now, Master. Keep the pressure on.";}
+    return out.length?`Stalled, sir: <b>${out.slice(0,5).map(esc).join(", ")}</b>. Change the angle, grip or rep range.`:"Nothing's stalled right now, Master. Keep the pressure on.";}
   // READ: how strong / standing
   if(/how strong|standing|percentile|how good|world/.test(s)){const c=myPatrolCard();if(!c.opt)return "Log your big lifts and I'll place you against the world, sir.";return `Across your big lifts you're in roughly the <b>top ${Math.max(1,100-c.opt)}%</b> of trained lifters, Master. Strength level ${c.sl}.`;}
   // READ: what to train today
@@ -10471,48 +10541,7 @@ function alfredAsk(q){
     return `<b>${MNAME[mm]}</b>: ${ws} hard sets this week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). You're ${zone}, Master.`;}
   return {__fallback:true,text:`I can answer or act, Master. Try: <b>what should I train</b>, <b>weakest muscle</b>, <b>how strong am I</b>, <b>PR for bench</b>, <b>volume for chest</b>, <b>am I recovered</b> — or commands like <b>open leaderboard</b>, <b>start push day</b>, <b>add face pull to push</b>, <b>set weekly goal to 5</b>.`};
 }
-function openAlfredConsole(){
-  state._alfredLog=state._alfredLog||[];
-  const log=state._alfredLog.slice(-6).map(t=>`<div style="margin-bottom:9px"><div class="mini" style="color:var(--text3)">You: ${esc(t.q)}</div><div class="banner" style="margin-top:3px"><span>🎩</span><div class="mini">${t.a}</div></div></div>`).join("");
-  const pend=state._alfredPending?`<div class="card" style="border-color:var(--gold-dim);margin-top:6px"><div class="mini" style="margin-bottom:7px">${state._alfredPending.label}</div><div class="row" style="gap:6px"><button class="btn gold sm g" onclick="alfredConfirm()">✓ Do it</button><button class="btn ghost sm" style="width:auto" onclick="alfredCancelPending()">Cancel</button></div></div>`:"";
-  const ex=alfredConsoleExamples().map((e,i)=>`<button class="chip g" style="margin:0 4px 5px 0" onclick="alfredAskExample(${i})">${esc(e)}</button>`).join("");
-  openSheet(`<div class="ttl">🎩 Ask Alfred</div>
-    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">I see your whole training picture, Master — recovery, volume, every lift and record. Ask me anything, tell me to <b>open</b> any screen, <b>start</b> a session, or edit your split — I'll drive the app on your word.</div>
-    <div class="row" style="gap:6px"><input id="alfred-q" placeholder="Ask or command…" autocomplete="off" autocapitalize="off" onkeydown="if(event.key==='Enter')alfredAskGo()" style="flex:1"/><button class="btn gold sm" style="width:auto" onclick="alfredAskGo()">Ask</button></div>
-    <div class="row wrap" style="margin-top:9px">${ex}</div>
-    ${pend}
-    <div style="margin-top:11px">${log}</div>
-    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
-  setTimeout(()=>{const i=$("alfred-q");if(i)i.focus();},60);
-}
-function alfredAskGo(){const i=$("alfred-q");if(!i)return;const q=i.value.trim();if(!q)return;_alfredHandle(q);}
-function alfredAskExample(i){const q=alfredConsoleExamples()[i];if(!q)return;_alfredHandle(q);}
-// Route Alfred's answer: a string is shown verbatim; a {__nav} object navigates the app;
-// a {__fallback} object is handed to Gemini (when a key is set) so Alfred can answer anything.
-function _alfredHandle(q){
-  state._alfredLog=state._alfredLog||[];
-  let r;try{r=alfredAsk(q);}catch(e){r="Something went wrong parsing that, sir.";}
-  if(r&&r.__nav){
-    state._alfredLog.push({q,a:r.msg||"Right away, sir."});
-    closeSheet();
-    try{(typeof r.run==="function")?r.run():(new Function(r.run))();}catch(e){}
-    return;
-  }
-  if(r&&r.__fallback){
-    if(typeof geminiKey==="function"&&geminiKey()){
-      const entry={q,a:"…thinking…"};state._alfredLog.push(entry);openAlfredConsole();
-      const prompt=alfredContext()+"\n\nThe user said: \""+q+"\"\n\nAnswer as Alfred in under 80 words. If they're asking for an app action you can't take, tell them the exact phrase to type (e.g. \"open leaderboard\", \"start push day\", \"add face pull to push\", \"set weekly goal to 5\").";
-      geminiCall([{text:prompt}])
-        .then(txt=>{entry.a=esc(txt||r.text);state.data.u.aiUses=(state.data.u.aiUses||0)+1;try{checkAchievements();}catch(e){}save();if($("sheet")&&$("sheet").classList.contains("on"))openAlfredConsole();})
-        .catch(()=>{entry.a=r.text;if($("sheet")&&$("sheet").classList.contains("on"))openAlfredConsole();});
-      return;
-    }
-    state._alfredLog.push({q,a:r.text});openAlfredConsole();return;
-  }
-  state._alfredLog.push({q,a:r});openAlfredConsole();
-}
-function alfredConfirm(){const p=state._alfredPending;if(!p)return;try{p.fn();}catch(e){}state._alfredPending=null;save();state._alfredLog.push({q:"✓ confirmed",a:p.done||"Done, Master."});openAlfredConsole();}
-function alfredCancelPending(){state._alfredPending=null;state._alfredLog.push({q:"✕ cancelled",a:"As you wish, sir. Nothing changed."});openAlfredConsole();}
+function openAlfredConsole(){openAlfredChat();} /* the old command console now lives in the one Alfred chat (typed commands still work there) */
 function caveStat(v,l){return `<div style="flex:1;min-width:64px;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:8px 4px;background:var(--bg2)"><div style="font-family:var(--disp);font-size:22px;color:var(--gold2);line-height:1.05">${v}</div><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">${l}</div></div>`;}
 /* Alfred's weekly "Cave review" — fight-camp recap of the last 7 days with proactive flags. */
 function alfredCaveReview(){
@@ -10534,7 +10563,7 @@ function alfredCaveReview(){
   else if(pl>ps*1.35)flags+=`<div class="mini" style="margin-bottom:5px">⚖️ Pull (${pl}) is ahead of push (${ps}) — balance it with pressing.</div>`;
   under.slice(0,2).forEach(m=>flags+=`<div class="mini" style="margin-bottom:5px">📉 <b>${MNAME[m]}</b> is below MEV — a couple more sets or it stalls.</div>`);
   over.slice(0,2).forEach(m=>flags+=`<div class="mini" style="margin-bottom:5px">🔥 <b>${MNAME[m]}</b> is over MRV — past the point of return, ease back.</div>`);
-  if(fried.length>=4)flags+=`<div class="mini" style="margin-bottom:5px">🩹 ${fried.length} groups under 50% recovered — a deload week would pay off, sir.</div>`;
+  if(fried.length>=4)flags+=`<div class="mini" style="margin-bottom:5px">🩹 ${fried.length} groups under 50% recovered — cut the junk sets and keep 1–3 reps in reserve, sir.</div>`;
   if(!flags)flags=`<div class="mini" style="color:var(--green)">✓ Balanced week. Volume's where it should be and recovery's holding. Keep the standard.</div>`;
   const verdict=ws.length>=goal?`Target hit — ${ws.length}/${goal} sessions. Disciplined work.`:`${ws.length}/${goal} sessions logged — ${goal-ws.length} more to hit your week.`;
   return `<div class="card glow"><div class="ttl">🦇 The Cave — week in review</div>
@@ -11647,8 +11676,8 @@ function renderAlfred(){
     ?`<div class="card" style="padding:18px;margin-bottom:14px;text-align:center">
         <div style="font-size:36px;margin-bottom:8px">🦇</div>
         <div style="font-family:var(--disp);font-size:17px;color:var(--gold2);margin-bottom:4px">TALK TO ALFRED</div>
-        <div class="mini" style="color:var(--text3);margin-bottom:14px">Voice or text · full data access · attach physique photos</div>
-        <button class="btn gold" style="width:auto;padding:11px 24px" onclick="openAlfredVoice()">Open Alfred →</button>
+        <div class="mini" style="color:var(--text3);margin-bottom:14px">Text or mic · full data access · attach physique photos</div>
+        <button class="btn gold" style="width:auto;padding:11px 24px" onclick="openAlfredChat()">Open Alfred →</button>
       </div>`
     :`<div class="card" style="margin-bottom:14px;padding:16px">
         <div class="row" style="gap:12px;margin-bottom:12px"><div style="font-size:30px">🦇</div><div><div style="font-family:var(--disp);font-size:18px;color:var(--gold2)">ACTIVATE ALFRED</div><div class="mini" style="color:var(--text2);margin-top:2px">Add a free Gemini key for live chat, programming advice, and physique analysis.</div></div></div>
@@ -11743,6 +11772,10 @@ function gtv2MissionHero(){
   }else{
     focal=`<div class="gtv2-tonight empty"><div class="gtv2-tonight-tag"><i></i>No active split</div><div class="gtv2-tonight-day">FREE SESSION</div><div class="gtv2-tonight-meta">Start a session now, or build your plan in Mission.</div></div>`;
     btn=`<button class="btn gold" onclick="freeWorkout()">FREE SESSION</button><button class="btn ghost sm" style="width:auto" onclick="goPlan()">Plan</button>`;
+  }
+  if(state.session){ // a live/minimised workout always wins the hero: RESUME, never START over it
+    const c=sessionCounts(state.session),nm=String(state.session.day||"Session").split(/\s+[·—-]\s+/)[0];
+    btn=btn.replace(/<button class="btn gold"[^>]*>[^<]*<\/button>/,()=>`<button class="btn gold" style="flex-direction:column;gap:1px;line-height:1.2" onclick="resumeWorkout()">RESUME<span style="font-size:11px;letter-spacing:.05em;opacity:.78">${esc(nm)} · ${c.done}/${c.total} sets</span></button>`);
   }
   return `<section class="gtv2-hero">
     <img class="gtv2-hero-img" src="Batman.jpg" alt="">
@@ -12022,7 +12055,7 @@ function claimContract(){
   render();
 }
 /* ⚔️ SIEGE WEEK — every 3rd week a pictured villain lays siege to Gotham: break a record on 3
-   different lifts before the week ends. Structured intensity with a face — NEVER a deload. */
+   different lifts before the week ends. Structured intensity with a face — never a rest-week gimmick. */
 function siegeInfo(){
   const now=new Date();const mon=new Date(now);mon.setHours(0,0,0,0);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
   const wkN=Math.floor(mon.getTime()/(7*864e5));
@@ -12179,7 +12212,7 @@ function gothamCampaignMap(){
           <image href="assets/batman-medal.jpg" x="${x-79}" y="${y-21}" width="42" height="42" clip-path="url(#gwv${i})" preserveAspectRatio="xMidYMid slice"/>`
         :`<circle class="gc-beacon" cx="${x+56}" cy="${y-12}" r="4.5" fill="${col}" style="animation-delay:${(i*0.3)%1.7}s"/>`}
       <text x="${x-31}" y="${y-2}" font-family="Bebas Neue,sans-serif" font-size="19" letter-spacing="1.2" fill="${held?'#FFD048':col}">${MNAME[m].toUpperCase()}</text>
-      <text x="${x-31}" y="${y+14}" font-family="DM Sans,sans-serif" font-size="9" font-weight="800" letter-spacing=".7" fill="${unclaimed?'rgba(170,178,192,.85)':lost?'rgba(255,140,120,.95)':held?'rgba(255,208,72,.7)':'rgba(255,190,120,.85)'}">${unclaimed?"UNCLAIMED · NO PATROL YET":lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
+      <text x="${x-31}" y="${y+14}" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" font-weight="800" letter-spacing=".7" fill="${unclaimed?'rgba(170,178,192,.85)':lost?'rgba(255,140,120,.95)':held?'rgba(255,208,72,.7)':'rgba(255,190,120,.85)'}">${unclaimed?"UNCLAIMED · NO PATROL YET":lost?("HELD BY "+villain.toUpperCase()):held?esc(MUSCLE_DISTRICT[m].toUpperCase()):"CONTESTED · "+esc(MUSCLE_DISTRICT[m].toUpperCase())}</text>
     </g>`;
   });
   const leg=(c,t)=>`<span class="mini" style="display:inline-flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:3px;background:${c};box-shadow:0 0 6px ${c}"></i>${t}</span>`;
@@ -12548,7 +12581,7 @@ function maybeShowRankUp(){
     const q=RANK_QUOTES[ri%RANK_QUOTES.length];
     // Ceremony 2.0: bat-slam stinger → Alfred speaks → full case-file → rank accent bleeds into the app
     setTimeout(()=>{try{playStinger(curRank[2]+" RANK UP",String(curRank[1]).toUpperCase(),"#FFD048");}catch(e){}},400);
-    try{if(state.data.u.coachVoice&&typeof alfredSpeak==="function")alfredSpeak("Rank up, sir. "+q);}catch(e){}
+    try{if(state.data.u.coachVoice&&window.speechSynthesis){window.speechSynthesis.cancel();window.speechSynthesis.speak(_alfredUtter("Rank up, sir. "+q,0.92,0.95));}}catch(e){}
     setTimeout(()=>{try{haptic("pr");cinePush({eye:"RANK UP · GOTHAM IRON PROTOCOL",icon:curRank[2],accent:"var(--gold2)",title:`${curRank[2]} ${curRank[1]}`,titleHtml:`<span style="color:var(--gold2);font-size:1.12em">${curRank[2]} ${esc(curRank[1])}</span>`,bodyHtml:`<div style="font-size:15px;line-height:1.6;color:var(--text);margin-bottom:8px">"${esc(q)}"</div><div class="mini" style="color:var(--gold2)">Strength Level ${sl} · Rank ${ri+1}/${RANKS.length}</div>`,btn:"THE ASCENT CONTINUES"});}catch(e){}},2100);
     applyRankAccent();
   }catch(e){}
@@ -12614,7 +12647,6 @@ function boot(){
   if(state._restored){state._restored=false;try{toast("🦇 Workout recovered — your logged sets are safe. Tap the bar to resume.");}catch(e){}}
   if(state.data.onboardingDone){
     checkUnlocks(); // unlock toasts are minor notifications, always fine
-    maybeShowTwoFaceCall(); // ONE launch cinematic: tonight's training direction
     applyRankAccent(); // shift accent based on current rank
     // villain taunt + daily wisdom are now contextual: see maybeContextualVillainTaunt / maybeContextualDailyWisdom
   }
@@ -12645,6 +12677,31 @@ function boot(){
     t.appendChild(s);setTimeout(()=>s.remove(),600);
   },{passive:true});
 }
+/* ===== TAPTIC — real iPhone haptics =====
+   iOS Safari has no navigator.vibrate (haptic() above only serves Android), and since iOS 26.5 a script can no longer
+   toggle a switch into a buzz. What still works is a FINGER tap on a real <input type="checkbox" switch>. So key
+   tappables carry an invisible switch over their own face (.hx): the tap toggles it (native Taptic tick) and the click
+   is handed to the host on the next tick, after the native toggle finished, so the host's own onclick runs exactly as
+   before. Hosts with nested controls are skipped. Hosts are found by a MutationObserver, so every render() is covered. */
+const HX_SEL=".btn,.chip,.sdone,.stype,#nav button,[data-hx],.rs-btn,.log-ex-pill,.gtv2-panel,.splitday-start,.mb-start,.restbtn";
+function hxHost(el,isStatic){
+  el._hx=1;
+  if(isStatic)el.style.position="relative";
+  const i=document.createElement("input");
+  i.type="checkbox";i.setAttribute("switch","");i.className="hx";i.tabIndex=-1;i.setAttribute("aria-hidden","true");
+  i.addEventListener("click",e=>{e.stopPropagation();if(!el.disabled)setTimeout(()=>el.click(),0);});
+  el.prepend(i);
+}
+function hxScan(n){
+  if(n.nodeType!==1||n.classList.contains("hx"))return;
+  const hs=n.matches(HX_SEL)?[n]:[];n.querySelectorAll(HX_SEL).forEach(e=>hs.push(e));
+  const ok=hs.filter(el=>!el._hx&&!el.disabled&&!el.querySelector("button,a,input,select,textarea,[onclick]"));
+  const st=ok.map(el=>getComputedStyle(el).position==="static"); // read every position first, then write: one style recalc, not one per host
+  ok.forEach((el,k)=>hxHost(el,st[k]));
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(hxScan))).observe(document.body,{childList:true,subtree:true});
+hxScan(document.body);
+document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 boot();
 
 
@@ -12690,12 +12747,7 @@ function playStinger(title,sub,accent){
 }
 function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.session.day)||''));state.step='logging';startTimers();try{haptic('done');}catch(e){}
   try{cloudPresence(true);}catch(e){}
-  // spoken mission brief — Alfred reads tonight's plan as the doors open
-  try{const ses=state.session;
-    if(state.data.u.coachVoice&&ses&&!ses._briefSpoken){ses._briefSpoken=true;
-      const mus=[];const seen=new Set();(ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);mus.push(MNAME[m]);}});});
-      alfredSpeak(`Tonight: ${ses.day}. ${(ses.exercises||[]).length} exercises${mus.length?", targeting "+mus.slice(0,3).join(", "):""}. Gotham is watching, sir.`);}
-  }catch(e){}
+  // the mission brief is text-only now (Alfred speaks aloud on records + session finish only)
   render();}
 
 function focusEx(ei){
@@ -12887,11 +12939,21 @@ function initSwipeExercises(){
 
 /* Full logging screen — exercise focus card with input table + swipable list. */
 /* Finish guard — if working sets are still open, ask before ending the night (one accidental tap must never cost a session). */
+function saveTypedAndFinish(){closeSheet();const ses=state.session;if(!ses)return;ses.exercises.forEach(e=>{if(e._skip)return;(e.sets||[]).forEach(s=>{if(s.type!=="W"&&!s.done&&setFilled(e.name,s))s.done=true;});});finishWorkout();}
 function confirmFinish(){
   const ses=state.session;if(!ses)return;
-  const open=(ses.exercises||[]).reduce((a,e)=>a+(e._skip?0:(e.sets||[]).filter(s=>s.type!=="W"&&!s.done&&!(parseFloat(s.r)>0)).length),0);
+  const work=[];(ses.exercises||[]).forEach(e=>{if(!e._skip)(e.sets||[]).forEach(s=>{if(s.type!=="W")work.push([e.name,s]);});});
+  const open=work.filter(([n,s])=>!setLogged(n,s)).length;
   if(!open)return finishWorkout();
+  const typed=work.filter(([n,s])=>!s.done&&setFilled(n,s)).length,rest=open-typed;
   try{haptic("warn");}catch(e){}
+  if(typed){ // numbers typed but never ticked would silently vanish at finish — ask first
+    openSheet(`<div class="ttl">${typed} set${typed===1?" has":"s have"} numbers but ${typed===1?"isn't":"aren't"} ticked</div>
+    <p class="mini" style="color:var(--text2);line-height:1.55;margin:6px 0 12px">Unticked sets are not saved. Save them to the record, or leave them out.${rest?` ${rest} other set${rest===1?" is":"s are"} empty and will be left behind.`:""}</p>
+    <button class="btn gold" onclick="saveTypedAndFinish()">✓ SAVE THEM &amp; FINISH</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="closeSheet();finishWorkout()">Discard them &amp; finish</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">← Keep going</button>`);
+    return;}
   openSheet(`<div class="ttl">Leave the field?</div>
     <p class="mini" style="color:var(--text2);line-height:1.55;margin:6px 0 12px">${open} working set${open===1?"":"s"} still unlogged, sir. Finish anyway — or go back and close the job.</p>
     <button class="btn gold" onclick="closeSheet();finishWorkout()">🏁 FINISH — LEAVE ${open} BEHIND</button>
@@ -13118,7 +13180,7 @@ function renderLogging(){
 
   // Damage report
   {const hitM=[];ses.exercises.forEach(function(e){
-     const anyDone=(e.sets||[]).some(function(s){return s.type!=='W'&&(s.done||parseFloat(s.r)>0);});
+     const anyDone=(e.sets||[]).some(function(s){return s.type!=='W'&&setLogged(e.name,s);});
      if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(function(m){hitM.push(m);});}});
    if(hitM.length){const dmgOpen=state._dmgOpen===true;
      h+=`<div class="card glow" style="padding:11px;margin-bottom:8px">
