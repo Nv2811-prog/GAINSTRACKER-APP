@@ -2852,7 +2852,7 @@ function setStim(s){
   else if(s.type==="D")prox=1.4;       // drop set
   else if(s.type==="RP")prox=1.5;      // rest-pause — repeated failure
   else if(s.type==="M")prox=1.45;      // myo-reps — near-failure mini-sets
-  else{const rpe=+s.rpe; if(rpe>=5&&rpe<=10)prox=0.6+(rpe-5)*0.18;} // RPE5→.6 … RPE10→1.5
+  else{const rir=rirOfSet(s);if(rir!=null)prox=1.5-rir*0.225;}     // logged RIR: 0 → 1.5 … 4+ → 0.6 (legacy RPE values are converted by rirOfSet)
   return prox;
 }
 // live fatigue for a muscle. Each recent session owes a fatigue debt that recovers LINEARLY over
@@ -2916,7 +2916,7 @@ function strengthLevel(){
   // Read from the authoritative workouts array AND the lifetime counters, take the max.
   // (Counters can desync from the array after imports/migrations; the array is truth.)
   let vol=0,n=0;(d.workouts||[]).forEach(w=>{vol+=+w.totalVol||0;n++;});
-  vol=Math.max(vol,u.totalVolume||0); n=Math.max(n,u.totalWorkouts||0);
+  vol=lifetimeVolume(); n=Math.max(n,u.totalWorkouts||0);
   const pts=vol/1000 + n*8;   // ~1pt/1000kg + 8pts/session
   // ~5 sessions → Gotham Cop (Lv3), ~20 → Vigilante (Lv6), ~55 → Robin (Lv10); elite ranks take years.
   return Math.max(1,Math.min(45,Math.round(0.30*Math.sqrt(pts))));
@@ -6222,7 +6222,8 @@ function gothamThreat(){
   if(!d.workouts.length)return {score:55,level:"UNKNOWN",color:"var(--text2)",desc:"No patrols logged. Gotham waits to see who you are."};
   const dsl=d.u.lastTrainedDate?daysSince(d.u.lastTrainedDate):14;
   const wc=weekCount(),goal=d.u.weeklyGoal||4,streak=d.u.streakDays||0;
-  let s=dsl*8+Math.max(0,goal-wc)*7-streak*1.2-(wc>=goal?12:0);
+  const pace=goal*clamp((now()-weekStartK(0))/(7*864e5),0,1);   // sessions you should have by now this calendar week (Monday morning owes none)
+  let s=dsl*8+Math.max(0,pace-wc)*7-streak*1.2-(wc>=goal?12:0);
   s=clamp(Math.round(s),0,100);
   const bands=[[0,"SECURE","var(--green)","Gotham sleeps safe. The Bat is on patrol."],
     [25,"UNEASY","var(--gold2)","Whispers in the alleys. Stay sharp, stay consistent."],
@@ -6355,11 +6356,14 @@ function villainNemesis(){
   const last=w.filter(b=>b.villain===top).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
   return {villain:top,emoji:em[top]||SP[top]||"😈",count:tc,last,total:w.length};
 }
+// ONE source for lifetime tonnage (Iron Ledger, Batcomputer, rank, milestones, Alfred): the logged sessions, floored by the running
+// counter — a restore/import can leave either one stale, so the larger is the truth.
+function lifetimeVolume(){const d=state.data;return Math.max((d.workouts||[]).reduce((a,w)=>a+(+w.totalVol||0),0),(d.u&&+d.u.totalVolume)||0);}
 // Iron Ledger — lifetime stats
 function ironLedger(){
   const ws=state.data.workouts;let vol=0,sets=0,reps=0,dur=0;
   ws.forEach(w=>{vol+=w.totalVol||0;dur+=w.duration||0;(w.exercises||[]).forEach(e=>{(e.sets||[]).forEach(s=>{if(s.type==="W")return;const r=+s.r||0;if(s.done&&r){sets++;reps+=r;}});});});
-  vol=Math.max(vol,state.data.u.totalVolume||0);
+  vol=lifetimeVolume();
   const everest=8849; // metres; ~0.5 m of bar travel per rep
   return {vol,sets,reps,dur,workouts:ws.length||state.data.u.totalWorkouts||0,
     climbs:(reps*0.5)/everest, batmobiles:vol/1600, elephants:vol/6000,
@@ -6707,7 +6711,7 @@ function drawIndex(){
 
 /* ===== Shared milestone stats for garage/most-wanted ===== */
 function gothamStats(){const d=state.data,a=(typeof trainingAge==="function"?trainingAge():null);
-  return {w:d.workouts.length,vol:d.u.totalVolume||0,boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0,prs:Object.keys(d.prs).length};}
+  return {w:d.workouts.length,vol:lifetimeVolume(),boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0,prs:Object.keys(d.prs).length};}
 
 /* ===== THE BATMOBILE GARAGE (#11): a fleet that unlocks with real milestones ===== */
 const GARAGE=[
@@ -6866,15 +6870,11 @@ const WAYNE_TOWER_KG=20000;
 /* Streak that respects rest: a WEEKLY streak (weeks that hit your goal) + days-on-protocol
    (consecutive days where you trained OR took a planned rest — only an unplanned skipped
    session breaks it). Rest never breaks these; rest is part of the plan. */
-function weeklyStreak(){
+function weeklyStreak(){   // consecutive calendar weeks (weekDays) that hit the goal; the in-progress week never breaks it, counts once met
   const goal=Math.max(1,state.data.u.weeklyGoal||4);
-  const ws=state.data.workouts||[];if(!ws.length)return 0;
-  const WEEK=7*864e5,byWeek={};
-  ws.forEach(w=>{const k=fnWeekStart(new Date(w.date).getTime());(byWeek[k]=byWeek[k]||new Set()).add(new Date(w.date).toDateString());});
-  const met=k=>(byWeek[k]?byWeek[k].size:0)>=goal;
-  const thisWk=fnWeekStart(now());let streak=0,k;
-  if(met(thisWk)){streak++;k=thisWk-WEEK;}else{k=thisWk-WEEK;}   // in-progress week never breaks it; counts only once met
-  while(met(k)){streak++;k-=WEEK;}
+  if(!(state.data.workouts||[]).length)return 0;
+  let streak=weekDays(0)>=goal?1:0;
+  for(let k=1;k<520&&weekDays(k)>=goal;k++)streak++;
   return streak;
 }
 function daysOnProtocol(){
@@ -7171,28 +7171,28 @@ function profileRecordsHtml(d){
   return html;
 }
 
-/* ⚖️ Relative strength — top-3 e1RM total vs bodyweight, with a 4-week delta. */
+/* ⚖️ Relative strength — the SAME barbell-equivalent big-3 the Strength standards card uses (liftEstimate converts machine/Smith/variation
+   lifts), total vs bodyweight, with a 4-week delta. Needs 2 of the 3 lifts; the card says which are in the total. */
 function relStrengthCard(){
   const d=state.data,bw=bodyW();if(!bw)return "";
-  const tops=Object.entries(d.prs||{}).filter(([,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm).slice(0,3);
+  const tops=["Bench Press","Squat","Deadlift"].map(l=>({l,e:liftEstimate(l)})).filter(x=>x.e);
   if(tops.length<2)return "";
   const cutoff=Date.now()-28*864e5;
-  let nowT=0,thenT=0;
-  // Floor "a" at the PR's own recorded orm — exerciseRows() reads state.data.workouts, which can
-  // legitimately have no matching entry for a real PR (per-gym PR pointer, a restored/imported
-  // record, an exercise that's since been renamed). Without the floor, the headline number silently
-  // dropped that lift to 0 while the subtitle line right below it — which reads p.orm directly —
-  // kept showing the real value, so the two halves of the same card visibly disagreed.
-  tops.forEach(([n,p])=>{let a=0,b=0;exerciseRows(n).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});nowT+=Math.max(a,p.orm||0);thenT+=b;});
+  let nowT=0,nowC=0,thenT=0;
+  // f = converter from the underlying PR lift to its barbell-equivalent (1 for the real barbell lift). Floor the lift at its own
+  // recorded PR — exerciseRows() reads state.data.workouts, which can have no matching entry for a real PR (per-gym pointer, import).
+  tops.forEach(({e})=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;let a=0,b=0;
+    exerciseRows(e.name).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});
+    const now1=Math.max(a*f,e.orm);nowT+=now1;if(b>0){nowC+=now1;thenT+=b*f;}});   // delta only over lifts that existed 4 weeks ago
   if(!nowT)return "";
-  const dPct=thenT>0?Math.round((nowT-thenT)/thenT*100):null;
+  const dPct=thenT>0?Math.round((nowC-thenT)/thenT*100):null;
   return `<div class="card" style="padding:13px">
-    <div class="ttl" style="font-size:13px;margin-bottom:6px">⚖️ Relative strength <span class="mini" style="color:var(--text3);letter-spacing:0">— big-3 e1RM total vs bodyweight</span></div>
+    <div class="ttl" style="font-size:13px;margin-bottom:6px">⚖️ Relative strength <span class="mini" style="color:var(--text3);letter-spacing:0">— ${tops.length===3?"big-3":"big-3 ("+tops.length+" of 3 logged)"}, barbell-equivalent e1RM vs bodyweight</span></div>
     <div class="row" style="gap:14px;align-items:flex-end">
       <div><div class="big" style="font-size:34px;color:var(--gold2)">${(nowT/bw).toFixed(2)}×</div><div class="mini">bodyweight — ${fmtNum(Math.round(nowT))}kg ÷ ${bw}kg</div></div>
       ${dPct!==null&&dPct!==0?`<div class="mini num" style="font-weight:800;color:${dPct>=0?'var(--green)':'#ff7a6e'}">${dPct>=0?'▲ +':'▼ '}${dPct}% / 4 wk</div>`:''}
     </div>
-    <div class="mini" style="margin-top:6px;color:var(--text3)">${tops.map(([n,p])=>esc(n)+" "+Math.round(p.orm)+"kg").join(" · ")}</div>
+    <div class="mini" style="margin-top:6px;color:var(--text3)">${tops.map(({l,e})=>esc(l)+" "+Math.round(e.orm)+"kg"+(e.est?" (est. from "+esc(e.via)+")":"")).join(" · ")}</div>
   </div>`;
 }
 function profileStrengthHtml(){
@@ -7239,7 +7239,14 @@ function renderProfile(){
   html+=acc('prf-bases','🏛️','Bases & Tools',profileBasesToolsHtml(d,u),false,(u.gyms||[]).length+' gym'+(((u.gyms||[]).length)===1?'':'s')+' · tools');
   $("app").innerHTML=html;
 }
-function weekCount(){const wk=now()-7*864e5;return new Set(state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk).map(w=>new Date(w.date).toDateString())).size;}
+/* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, Threat/consistency, the Evidence Crate, Alfred and the weekly streak.
+   Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
+function weekStartK(k){const d=new Date(fnWeekStart(now()));d.setDate(d.getDate()-7*(k||0));return d.getTime();}
+function weekDays(k){   // distinct training days in the calendar week k weeks back (0 = this week)
+  const s=weekStartK(k),e=weekStartK((k||0)-1);
+  return new Set((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).map(w=>new Date(w.date).toDateString())).size;
+}
+function weekCount(){return weekDays(0);}
 function avgWeekVol(){const wk=now()-7*864e5;const ws=state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk);return ws.length?ws.reduce((a,w)=>a+w.totalVol,0)/ws.length:0;}
 function weakestMuscle(){let weak=null,wl=999;M12.forEach(m=>{if((state.data.muscleVol[m]||0)>0){const l=muscleLevel(m);if(l<wl){wl=l;weak=m;}}});return weak;}
 function sparkline(){
@@ -7810,8 +7817,7 @@ function myPatrolCard(){
   // session log itself is accurate. w (session count) is trusted live from d.workouts.length, so
   // vol must be at least as consistent with it — otherwise the card reads "20 sessions, 0kg moved",
   // which looks broken. Floor at what the actual logged sessions sum to.
-  const loggedVol=(d.workouts||[]).reduce((s,w)=>s+(+w.totalVol||0),0);
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(Math.max(u.totalVolume||0,loggedVol)),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent,ssn};
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(lifetimeVolume()),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent,ssn};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
@@ -8743,7 +8749,7 @@ function openBatcomputer(){
     return `<div style="margin-bottom:6px"><div class="row sp" style="margin-bottom:2px"><span class="mini">${MNAME[x.m]}</span><span class="mini" style="color:${col}">${x.s} set${x.s===1?'':'s'}</span></div><div class="bar" style="height:7px;background:var(--bg4)"><i style="width:${(x.s/mmx*100).toFixed(0)}%;background:${col}"></i></div></div>`;};
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('radar')}Batcomputer</div>
     <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Every patrol, crunched. The full picture of your war on weakness.</div>
-    <div class="row" style="gap:7px;flex-wrap:wrap;margin-bottom:13px">${caveStat(fmtNum(Math.round(u.totalVolume||0))+"kg","lifted")}${caveStat(sessions,"sessions")}${caveStat(hrs+"h","under iron")}${caveStat(prc,"records")}</div>
+    <div class="row" style="gap:7px;flex-wrap:wrap;margin-bottom:13px">${caveStat(fmtNum(Math.round(lifetimeVolume()))+"kg","lifted")}${caveStat(sessions,"sessions")}${caveStat(hrs+"h","under iron")}${caveStat(prc,"records")}</div>
     <div class="ttl" style="font-size:14px">Weekly tonnage · 10 wk</div>
     ${trendChart(ton,{color:"#7FC8FF",unit:"kg"})}
     <div class="ttl" style="font-size:14px;margin-top:10px">Sessions per week</div>
@@ -10524,7 +10530,7 @@ function alfredAsk(q){
   if(/streak|consecutive|chain/.test(s))return `Current streak: <b>${d.u.streakDays||0} day${(d.u.streakDays||0)===1?"":"s"}</b>, sir. Don't break the chain.`;
   // READ: sessions this week  (must precede the broad train/today read)
   if(/this week|how many.*sessions?|sessions? (?:this|so far)|trained this week/.test(s)){
-    const wk=now()-7*864e5,c=(d.workouts||[]).filter(w=>new Date(w.date).getTime()>=wk).length,g=d.u.weeklyGoal||4;
+    const c=weekCount(),g=d.u.weeklyGoal||4;
     return `<b>${c}</b> session${c===1?"":"s"} this week against a goal of <b>${g}</b>, Master.${c>=g?" Target met — excellent.":" "+(g-c)+" to go."}`;}
   // READ: bodyweight
   if(/body\s?weight|how much do i weigh|my weight|weigh/.test(s)){const bw=bodyW();return bw?`You're <b>${bw}kg</b> on record, sir.`:"No bodyweight logged yet, Master — set it in Settings or the Infirmary.";}
@@ -11594,8 +11600,8 @@ function termRespond(cmd){
   const d=state.data,u=d.u,c=(cmd||"").trim().toLowerCase();
   if(!c)return "";
   if(c==="help"||c==="?")return "COMMANDS:\\n  status   — overview\\n  volume   — weekly tonnage\\n  weak     — weakest muscle\\n  prs      — recent personal records\\n  rank     — current rank & level\\n  villains — bosses defeated\\n  streak   — current streak\\n  clear    — wipe the console";
-  if(c==="status")return `OPERATIVE STATUS\\n  Workouts: ${u.totalWorkouts}\\n  Volume:   ${fmtNum(Math.round(u.totalVolume))}kg lifetime\\n  Streak:   ${u.streakDays} days\\n  Rank:     ${rankFor(strengthLevel()).name}`;
-  if(c==="volume")return `WEEKLY TONNAGE\\n  Avg/week: ${fmtNum(Math.round(avgWeekVol()))}kg\\n  Lifetime: ${fmtNum(Math.round(u.totalVolume))}kg`;
+  if(c==="status")return `OPERATIVE STATUS\\n  Workouts: ${u.totalWorkouts}\\n  Volume:   ${fmtNum(Math.round(lifetimeVolume()))}kg lifetime\\n  Streak:   ${u.streakDays} days\\n  Rank:     ${rankFor(strengthLevel()).name}`;
+  if(c==="volume")return `WEEKLY TONNAGE\\n  Avg/week: ${fmtNum(Math.round(avgWeekVol()))}kg\\n  Lifetime: ${fmtNum(Math.round(lifetimeVolume()))}kg`;
   if(c==="weak"){const m=weakestMuscle();return m?`WEAKEST LINK\\n  ${MNAME[m]} — level ${muscleLevel(m)}\\n  Prioritise it next session.`:"Not enough data — train more muscles.";}
   if(c==="prs"){const prs=Object.entries(d.prs).slice(-6);return prs.length?"RECENT PRs\\n"+prs.map(([k,p])=>`  ${k}: ${Math.round(p.orm||0)}kg`).join("\\n"):"No PRs logged yet.";}
   if(c==="rank"){const l=strengthLevel(),r=rankFor(l);return `RANK\\n  ${r.emoji} ${r.name}\\n  Strength level ${l}`;}
@@ -11666,7 +11672,7 @@ const STORY=[
 const STORY_TITLES={vow:"The Initiate",first:"Recruit of the Cave",cave:"Cave-Dweller",iron:"Iron-Forged",rogues:"Rogue-Hunter",night:"Watcher of Gotham",becoming:"The Becoming",knight:"The Dark Knight",legend:"Legend of Gotham",war:"Warlord of the Cave",order:"Unbreakable",immortal:"The Immortal"};
 function earnedTitle(){const s=storyStats();let t="";STORY.forEach(c=>{if(c.req(s))t=STORY_TITLES[c.id]||t;});return t;}
 function storyStats(){const d=state.data,a=(typeof trainingAge==="function"?trainingAge():null);
-  return {w:d.workouts.length,vol:d.u.totalVolume||0,boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0};}
+  return {w:d.workouts.length,vol:lifetimeVolume(),boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0};}
 function storyCampaignCard(){
   const s=storyStats();
   const states=STORY.map(c=>c.req(s));
