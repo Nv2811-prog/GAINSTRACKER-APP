@@ -87,6 +87,35 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
  ok(d.splits.filter(s=>/8-Day Cycle/.test(s.name)).length===1,'imported-by-code copy reused, no duplicate');
  ok(d.activeSplitId==='s123'&&d.splits.find(s=>s.id==='s123').days[0].plan['Plate-Loaded Chest Press'].s===2,'imported copy activated and given its set targets');}
 
+// ===== The real v2 migration: plan reps "5–8" → "5–10" (exact matches only; history untouched) =====
+{const {ctx:c0}=sandbox(RAW,{real:true});
+ const rewind=sp=>{sp.days.forEach(x=>{if(x.plan)Object.keys(x.plan).forEach(n=>{if(x.plan[n].r==='5–10')x.plan[n].r='5–8';});});return sp;};
+ const rs=sp=>sp.days.flatMap(x=>x.plan?Object.values(x.plan).map(v=>v.r):[]);
+ const noR=sp=>JSON.stringify(sp.days.map(x=>x.plan?Object.fromEntries(Object.entries(x.plan).map(([n,v])=>[n,Object.assign({},v,{r:0})])):null));
+ const cyc=rewind(vm.runInContext('cycle8Split()',c0));                          // the pre-v2 plan, as installed by v1 before today
+ cyc.days[0].plan['Cable Lateral Raise'].r='8–12';                                // custom range → untouched
+ cyc.days[0].plan['Lat Pulldown (Wide Grip)'].r='5-8';                            // ASCII hyphen = not exactly "5–8" → untouched
+ const imp=rewind(vm.runInContext('cycle8Split()',c0));imp.id='s123';             // imported-by-code copy (same name, other id)
+ const mine={id:'mine2',name:'Mine',days:[{name:'A',exercises:['T-Bar Row'],plan:{'T-Bar Row':{s:2,r:'5–8'}}}]};
+ const v1=JSON.parse(RAW);v1.dataVersion=1;v1.splits=v1.splits.concat([cyc,imp,mine]);v1.activeSplitId='cycle8';
+ const RAW1=JSON.stringify(v1),expected=rs(cyc).filter(r=>r==='5–8').length;
+ ok(expected>=10&&rs(cyc).every(r=>r!=='5–10'),'fixture is a faithful pre-v2 plan ('+expected+' lifts at "5–8", none at "5–10")');
+ const {ctx,store}=sandbox(RAW1,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts);ctx.runMigrations();
+ const d=ctx.state.data,c2=d.splits.find(s=>s.id==='cycle8'),i2=d.splits.find(s=>s.id==='s123'),m2=d.splits.find(s=>s.id==='mine2');
+ ok(d.dataVersion===2,'dataVersion bumped 1 → 2');
+ ok(rs(c2).every(r=>r!=='5–8')&&rs(c2).filter(r=>r==='5–10').length===expected,'every exact "5–8" in the 8-day cycle is now "5–10"');
+ ok(c2.days[0].plan['Cable Lateral Raise'].r==='8–12'&&c2.days[0].plan['Lat Pulldown (Wide Grip)'].r==='5-8','custom ranges (8–12, 5-8) untouched');
+ ok(rs(c2).filter(r=>r==='6–10').length===rs(cyc).filter(r=>r==='6–10').length,'existing 6–10 targets untouched');
+ ok(noR(c2)===noR(cyc),'only the rep strings changed (set counts, optional flags, order intact)');
+ ok(rs(i2).every(r=>r!=='5–8')&&rs(i2).includes('5–10'),'imported copy of the 8-day split (same name) updated too');
+ ok(m2.days[0].plan['T-Bar Row'].r==='5–8','your own split keeps its "5–8"');
+ ok(JSON.stringify(d.workouts)===wBefore,'workouts byte-identical after v2');
+ ok(store.get('gt_data_backup')===RAW1,'backup taken before v2');
+ const after=JSON.stringify(d.splits);d.dataVersion=1;ctx.runMigrations();ok(JSON.stringify(ctx.state.data.splits)===after,'idempotent: forced re-run changes nothing');
+ // brand-new install path: v1 installs the (already 5–10) plan, v2 is a no-op
+ const {ctx:cf}=sandbox(RAW,{real:true});cf.load();cf.runMigrations();const f=cf.state.data;
+ ok(f.dataVersion===2&&new Set(rs(f.splits.find(s=>s.id==='cycle8'))).size===2&&rs(f.splits.find(s=>s.id==='cycle8')).every(r=>r==='5–10'||r==='6–10'),'fresh v0 → v2: plan only holds 5–10 / 6–10');}
+
 // ===== seedSets honours the plan's set count =====
 {const fn=js.slice(js.indexOf('function seedSets('),js.indexOf('function setReadiness('));
  const c={};vm.createContext(c);vm.runInContext('function lastSetFor(){return [{w:20,r:10,type:"W"},{w:80,r:7,type:"NRM"},{w:80,r:6,type:"NRM"},{w:75,r:8,type:"NRM"}];}\n'+fn,c);

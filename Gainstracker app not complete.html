@@ -2196,13 +2196,13 @@ const MIGRATION_BACKUP_META_KEY="gt_data_backup_meta";
 const MIGRATION_ERROR_KEY="gt_migration_error";
 // The 8-day cycle: 5 sessions + 3 rest days. [lift, sets, reps, optional?]
 const CYCLE8={id:"cycle8",name:"8-Day Cycle · Upper / Lower",days:[
-  ["Upper A · Wingspan",[["Plate-Loaded Chest Press",2,"5–8"],["Lat Pulldown (Wide Grip)",2,"5–8"],["Incline Machine Chest Press",2,"5–8"],["Chest-Supported T-Bar Row",2,"5–8"],["High-to-Low Cable Row",1,"5–8"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
-  ["Lower A · Foundation",[["Leg Extension",2,"6–10"],["Machine Seated Leg Curl",2,"6–10"],["Leg Press (45°)",2,"5–8"],["Hip Adduction Machine",2,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",2,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
+  ["Upper A · Wingspan",[["Plate-Loaded Chest Press",2,"5–10"],["Lat Pulldown (Wide Grip)",2,"5–10"],["Incline Machine Chest Press",2,"5–10"],["Chest-Supported T-Bar Row",2,"5–10"],["High-to-Low Cable Row",1,"5–10"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
+  ["Lower A · Foundation",[["Leg Extension",2,"6–10"],["Machine Seated Leg Curl",2,"6–10"],["Leg Press (45°)",2,"5–10"],["Hip Adduction Machine",2,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",2,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
   ["Rest & Recover"],
-  ["Upper B · Shoulder Armor",[["High-to-Low Cable Row",2,"5–8"],["Plate-Loaded Chest Press",2,"5–8"],["Chest-Supported T-Bar Row",2,"5–8"],["Incline Machine Chest Press",2,"5–8"],["Reverse Pec Deck",2,"6–10"],["Machine Shoulder Press",2,"5–8"],["Cable Lateral Raise",1,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",1,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
-  ["Lower B · Backbone",[["Leg Extension",2,"6–10"],["Hip Hinge (Erectors)",2,"6–10"],["Leg Press (45°)",2,"5–8"],["Machine Seated Leg Curl",2,"6–10"],["Hip Adduction Machine",1,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",1,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
+  ["Upper B · Shoulder Armor",[["High-to-Low Cable Row",2,"5–10"],["Plate-Loaded Chest Press",2,"5–10"],["Chest-Supported T-Bar Row",2,"5–10"],["Incline Machine Chest Press",2,"5–10"],["Reverse Pec Deck",2,"6–10"],["Machine Shoulder Press",2,"5–10"],["Cable Lateral Raise",1,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",1,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
+  ["Lower B · Backbone",[["Leg Extension",2,"6–10"],["Hip Hinge (Erectors)",2,"6–10"],["Leg Press (45°)",2,"5–10"],["Machine Seated Leg Curl",2,"6–10"],["Hip Adduction Machine",1,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",1,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
   ["Rest & Recover"],
-  ["Upper C · Chest Plate",[["Plate-Loaded Chest Press",2,"5–8"],["Lat Pulldown (Wide Grip)",2,"5–8"],["Incline Machine Chest Press",2,"5–8"],["Chest-Supported T-Bar Row",2,"5–8"],["Pec Deck Fly",1,"6–10",1],["Machine Shoulder Press",1,"5–8"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"]]],
+  ["Upper C · Chest Plate",[["Plate-Loaded Chest Press",2,"5–10"],["Lat Pulldown (Wide Grip)",2,"5–10"],["Incline Machine Chest Press",2,"5–10"],["Chest-Supported T-Bar Row",2,"5–10"],["Pec Deck Fly",1,"6–10",1],["Machine Shoulder Press",1,"5–10"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"]]],
   ["Rest & Recover"]
 ]};
 function cycle8Split(){
@@ -2228,6 +2228,15 @@ const MIGRATIONS=[
     const id=existing?existing.id:fresh.id,gym=d.u&&d.u.activeGym;
     return Object.assign({},d,{splits:nextSplits,activeSplitId:id,_nextDay:0,
       activeGymSplits:Object.assign({},d.activeGymSplits||{},gym?{[gym]:id}:{})});
+  }},
+  // v2 — plan rep ranges are 5–10 (user decision 2026-10-19). In the 8-day cycle (by id, or by name for an imported copy)
+  // every plan target that is EXACTLY "5–8" becomes "5–10". Custom ranges and all logged workouts are never touched.
+  {v:2,name:"plan reps 5–10",run:d=>{
+    const lc=x=>String(x||"").toLowerCase().trim();
+    const isCycle=sp=>sp&&(sp.id===CYCLE8.id||lc(sp.name)===lc(CYCLE8.name));
+    const fix=pl=>pl&&pl.r==="5–8"?Object.assign({},pl,{r:"5–10"}):pl;
+    return Object.assign({},d,{splits:(d.splits||[]).map(sp=>!isCycle(sp)?sp:Object.assign({},sp,{days:(sp.days||[]).map(day=>
+      !day.plan?day:Object.assign({},day,{plan:Object.fromEntries(Object.entries(day.plan).map(([n,pl])=>[n,fix(pl)]))}))}))});
   }}
 ];
 function migrateData(data){
