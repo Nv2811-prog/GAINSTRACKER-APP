@@ -1465,9 +1465,9 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 /* Home = header (date · cycle in the top bar, greeting under it) → Tonight (the one S3 hero) → Readiness → This week + volume map → Progress → Stalled → Lore fold.
    Everything is scoped under .gh so the other tabs keep their look; the primitives GP.* emit (ring, lmk, wk, seg, spark) are styled here. */
 .topbar.tb-home{margin-bottom:6px}
-.topbar.tb-home .tb-r{gap:8px}
-.topbar.tb-home .tbtn{width:38px;height:38px}
-.gh-eb{flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--gold-ink);font:650 11px/1 var(--body);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.topbar.tb-home .tb-r{gap:6px}
+.topbar.tb-home .tbtn{width:36px;height:36px}
+.gh-eb{flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--gold-ink);font:650 11px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
 .gh-eb .gi{width:16px;height:16px;flex:none}
 .gh-eb .gh-cy{color:var(--tx3);overflow:hidden;text-overflow:ellipsis}
 @media(max-width:389px){.gh-cyw{display:none}}
@@ -1518,6 +1518,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh-tmc b{display:block;font:600 13px/1.15 var(--body);color:var(--tx1)}
 .gh-tmc span{font:500 12px/1.2 var(--body);color:var(--tx2);white-space:nowrap}
 .gh-tmc.warn span{color:var(--warn);font-weight:600}
+.gh-tm2{display:grid;grid-template-columns:1fr 1fr}
 @media(max-width:389px){.gh-tm{display:grid;grid-template-columns:1fr 1fr}}
 .gh-cta{display:flex;gap:10px}
 .gh-cta .btn{width:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 18px;border:0;flex:none}
@@ -1531,6 +1532,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh-ring{position:relative;width:92px;height:92px;flex:none}
 .gh-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .gh-rc .num{font-size:38px;margin-top:4px}
+.gh-rc .eyebrow{letter-spacing:.04em}
 .gh-rd{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
 .gh-rd-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .gh-drv{position:relative;display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:8px;font-size:13px;color:var(--tx2);min-height:20px}
@@ -12737,7 +12739,7 @@ function ghTip(vol,day,rest){
   if(!(state.data.workouts||[]).length)return "Log your first session and I will start reading your recovery, volume and load.";
   const trained=vol.filter(t=>t.trained).sort((a,b)=>a.rec-b.rec);
   if(rest){const t=trained[0];
-    return t&&t.rec<GH_FRESH?`${MNAME[t.m]} is ${t.rec}% recovered${t.hrs?` and needs about ${t.hrs}h`:""}. Rest now and it is ready for the next session.`:"Every muscle is above 85%. Resting now keeps it that way.";}
+    return t&&t.rec<GH_FRESH?`${MNAME[t.m]} at ${t.rec}%${t.hrs?`: about ${t.hrs}h to full recovery`:""}. Rest now.`:"Every muscle is above 85%. Resting now keeps it that way.";}
   const prim=day?Object.keys(dayMuscles(day).prim):[],low=trained.filter(t=>!prim.length||prim.includes(t.m))[0];
   if(low&&low.rec<60)return `${MNAME[low.m]} at ${low.rec}%: keep its sets at 2 RIR tonight.`;
   const a=acwrInfo();
@@ -12754,6 +12756,7 @@ function ghTip(vol,day,rest){
 }
 
 /* ---- TONIGHT hero (the one S3 surface) ---- */
+const ghTwo=list=>list.filter(x=>x.rec<GH_FRESH&&x.hrs).length>1?" gh-tm2":"";   // two chips carrying hours would overflow one row
 function ghRings(list){   // [{m,rec,hrs}] → recovery rings; warn text + hours when below GH_FRESH
   return list.map(x=>{const low=x.rec<GH_FRESH;
     return `<div class="gh-tmc${low?" warn":""}">${GP.muscleRing(x.rec,30)}<div><b>${ghName(x.m)}</b><span>${x.rec}%${low&&x.hrs?" · "+x.hrs+"h":""}</span></div></div>`;}).join("");
@@ -12779,7 +12782,7 @@ function ghHeroTonight(cur){
   return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">${esc(day.name)}</h2>
     <div class="gh-meta"><span><b>${st.lifts}</b> lifts</span><span><b>${st.sets}</b> sets</span><span>~<b>${st.min}</b> min</span>${st.up?`<span class="up">${GP.icon("up")}${st.up} ready for +kg</span>`:""}</div>
-    ${top.length?`<div class="gh-tm" aria-label="Recovery of tonight's muscles">${ghRings(top)}</div>`:`<div style="height:14px"></div>`}
+    ${top.length?`<div class="gh-tm${ghTwo(top)}" aria-label="Recovery of tonight's muscles">${ghRings(top)}</div>`:`<div style="height:14px"></div>`}
     <div class="gh-cta"><button class="btn btn-1" onclick="startWorkout('${cur.sp.id}',${cur.i})">${GP.icon("play")}Start Patrol</button><button class="btn" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Preview</button></div></section>`;
 }
 function ghHeroRest(cur,vol){
@@ -12789,7 +12792,7 @@ function ghHeroRest(cur,vol){
   return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">Rest day</h2>
     <div class="gh-meta">${nd?`<button class="gh-next" data-hx onclick="openDayBriefing('${cur.sp.id}',${ni})">Next: <b>${esc(nd.name)}</b>${GP.icon("chevR")}</button>`:"<span>Recovery is part of the plan</span>"}</div>
-    ${low.length?`<div class="gh-tm" aria-label="Recovery outlook">${ghRings(low)}</div>`:`<div style="height:14px"></div>`}
+    ${low.length?`<div class="gh-tm${ghTwo(low)}" aria-label="Recovery outlook">${ghRings(low)}</div>`:`<div style="height:14px"></div>`}
     <div class="gh-cta">${logged?`<button class="btn gh-done" disabled>${GP.icon("check")}Rest day logged</button><button class="btn" onclick="undoRestDay()">Undo</button>`
       :`<button class="btn btn-1" onclick="logRestDay()">Log rest day</button><button class="btn" onclick="freeWorkout()">Train anyway</button>`}</div></section>`;
 }
