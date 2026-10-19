@@ -12281,16 +12281,10 @@ function gothamSeasonCard(){
   }
   const ev=seasonChapterEval(ss.week);const ch=ev.ch;
   const daysLeft=Math.max(0,Math.ceil((ev.t1-now())/864e5));
-  // chapter-intro cinematic — once per week, contextual (only when idle on home, never mid-session)
+  // chapter intro — once per week, a toast (no full-screen takeover on opening the app); the story itself lives in the season card
   if(state.data.season._introW!==ss.week&&!state.session&&!state.showOnboarding){
     state.data.season._introW=ss.week;try{save();}catch(e){}
-    setTimeout(()=>{try{cinePush({eye:`SEASON ${ss.n} · WEEK ${ss.week+1}`,icon:"🦹",accent:ch.c,
-      title:ch.v+" moves on Gotham",
-      titleHtml:`<span style="color:${ch.c}">${esc(ch.v)}</span>: ${esc(ch.t)}`,
-      bodyHtml:`<div class="vintro-face" style="--bc:${ch.c}">${villainFace({v:ch.v,e:"🦹"})}</div>
-        <div class="mini" style="margin-top:11px;font-style:italic;color:var(--text);font-size:14px">${esc(ch.lore)}</div>
-        ${ch.m.length?`<div class="mini" style="margin-top:9px;color:var(--text2)">He's taken <b style="color:${ch.c}">${ch.m.map(m=>MUSCLE_DISTRICT[m]).join(" & ")}</b>. Train ${ch.m.map(m=>MNAME[m]).join(" and ")} this week to drive him out.</div>`:`<div class="mini" style="margin-top:9px;color:var(--text2)">The finale. Records are the only language he understands.</div>`}`,
-      btn:"ACCEPT THE CHAPTER"});}catch(e){}},1400);
+    setTimeout(()=>toast(`Season ${ss.n}, week ${ss.week+1}: ${ch.v}. ${ch.m.length?"Train "+ch.m.map(m=>MNAME[m]).join(" and ")+" to clear the chapter.":"Finale: set new records."}`),1400);
   }
   const totSt=SEASON_CHAPTERS.reduce((a,_,i)=>a+(i<ss.week?seasonChapterEval(i).stars:i===ss.week?ev.stars:0),0);
   const track=SEASON_CHAPTERS.map((cc,i)=>{
