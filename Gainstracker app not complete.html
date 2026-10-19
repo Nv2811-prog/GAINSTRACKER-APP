@@ -215,23 +215,6 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 /* premium static sheen across primary gold CTAs */
 .btn.gold::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(118deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 26%,rgba(255,255,255,0) 70%,rgba(255,255,255,.16) 100%);mix-blend-mode:overlay}
 
-/* nav */
-/* ===== Barbell bottom nav: knurled bar + weight-plate end-caps, active tab = loaded gold plate ===== */
-#nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;gap:0;max-width:560px;margin:0 auto;
-padding:7px 9px calc(9px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(8,9,12,.66),rgba(8,9,12,.95));backdrop-filter:blur(16px) saturate(1.25)}
-#nav::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(235,199,107,.32),transparent)}
-.nav-plate{flex:0 0 auto;width:13px;height:50px;border-radius:5px;position:relative;z-index:2;
-  background:linear-gradient(90deg,#090a0d,#2c2f35 38%,#42464e 50%,#23262c 62%,#090a0d);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),inset 0 8px 10px -8px rgba(255,255,255,.4),0 7px 16px -7px #000}
-.nav-plate::after{content:"";position:absolute;inset:15px 3.5px;border-radius:3px;background:linear-gradient(90deg,rgba(242,208,121,.55),rgba(242,208,121,.12));opacity:.7}
-.nav-bar{flex:1;display:flex;align-items:stretch;min-width:0;margin:0 -3px;position:relative;z-index:1;overflow:hidden;
-  border-radius:10px;padding:3px 5px;border:1px solid #0a0b0e;
-  background:linear-gradient(180deg,#42464e,#262a31 46%,#181b20 55%,#0e1014);
-  box-shadow:inset 0 2px 2px rgba(255,255,255,.22),inset 0 -3px 6px rgba(0,0,0,.55),0 6px 18px -8px #000}
-.nav-bar::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(0,0,0,.24) 0 2px,rgba(255,255,255,.05) 2px 4px);opacity:.32;pointer-events:none}
-#nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 1px;color:var(--text3);border-radius:9px;position:relative;z-index:1;transition:color .15s ease}
-#nav button .ic{font-size:21px;filter:grayscale(1) opacity(.5);transition:filter .15s ease,transform .15s ease}
-#nav button .lb{font-family:var(--disp);font-weight:650;font-size:10px;letter-spacing:.03em}
 /* Top utility bar (Command Center quick-reach) */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .tbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:38px;height:34px;padding:0 11px;border:1px solid var(--border);border-radius:11px;background:linear-gradient(160deg,#15151a,#0e0e12);color:var(--text2);font-size:15px;transition:.15s}
@@ -716,14 +699,6 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .ob-goal-card .ob-gtx .gt{font-family:var(--disp);font-weight:650;font-size:22px;color:var(--text);letter-spacing:.03em}
 .ob-goal-card .ob-gtx .mini{color:var(--text2);font-size:12.5px;margin-top:2px}
 /* Alfred FAB — floating butler, visible on all tabs */
-#alfred-fab{position:fixed;bottom:calc(78px + env(safe-area-inset-bottom));right:12px;z-index:50;width:46px;height:46px;border-radius:50%;background:linear-gradient(145deg,#1c1200,#0a0800);border:1.5px solid var(--gold2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;overflow:hidden;box-shadow:0 0 16px rgba(255,208,72,.30),0 4px 18px rgba(0,0,0,.7);transition:transform .22s ease,opacity .22s ease,bottom .22s ease}
-#alfred-fab.hide{opacity:0;pointer-events:none}
-/* Butler steps aside: while you scroll he slides half off-screen so he never covers content;
-   he steps back in the moment you stop. Lift = resume bar is docked below him. */
-#alfred-fab.dodge{transform:translateX(30px);opacity:.38}
-#alfred-fab.lift{bottom:calc(146px + env(safe-area-inset-bottom))}
-@keyframes fabGlow{0%,100%{box-shadow:0 0 14px rgba(255,208,72,.28),0 4px 14px rgba(0,0,0,.7)}50%{box-shadow:0 0 26px rgba(255,208,72,.55),0 4px 14px rgba(0,0,0,.7)}}
-#alfred-fab:not(.hide){animation:fabGlow 3.2s ease-in-out infinite}
 /* ── Alfred chat (.ac-*): one text-first conversation. Closed = visibility:hidden, so nothing animates while it is shut. ── */
 .alf-face{width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;border-radius:50%}
 .ac-panel{position:fixed;left:0;right:0;top:0;height:100vh;height:100dvh;max-width:560px;margin:0 auto;z-index:202;display:flex;flex-direction:column;color:#f1efe8;background:radial-gradient(120% 46% at 50% -8%,rgba(255,208,72,.075),transparent 62%),#07090d;visibility:hidden;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s;overscroll-behavior:contain}
@@ -1424,6 +1399,31 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 /* ---- icons: one inline-SVG set (GP.icon), 24px grid, currentColor strokes ---- */
 .gi{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
 .gi-t,.gi-sec{width:15px;height:15px;margin-right:7px;vertical-align:-2px;color:var(--tx2)}
+/* ---- 5 · NAV + HEADER: knurled-bar tab bar with line icons (gold plate = active), icon buttons + Alfred avatar in the header ---- */
+.btn.gold:active{transform:scale(.97);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 0 rgba(110,64,0,.3),0 6px 14px -10px rgba(242,180,60,.6)}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:40;max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch;padding:9px 6px calc(10px + env(safe-area-inset-bottom));background:rgba(6,9,15,.82);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border:0;box-shadow:none;view-transition-name:nav}
+#nav::before{content:"";position:absolute;left:10px;right:10px;top:0;height:3px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(190,206,232,.20) 0 1px,rgba(190,206,232,.06) 1px 3px)}
+#nav::after{content:"";position:absolute;left:4px;right:4px;top:-3px;height:9px;pointer-events:none;border-radius:2px;background:linear-gradient(90deg,rgba(190,206,232,.35) 0 4px,transparent 4px calc(100% - 4px),rgba(190,206,232,.35) calc(100% - 4px))}
+#nav button{position:relative;z-index:1;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:50px;padding:0;border-radius:12px;color:var(--tx3);overflow:visible}
+#nav button .gi{width:24px;height:24px;stroke-width:1.7}
+#nav button .lb{font:650 10.5px/1 var(--body);letter-spacing:.06em}
+#nav button.on{color:var(--gold-ink)}
+#nav button.on::before{content:"";position:absolute;top:-9px;left:50%;margin-left:-17px;width:34px;height:5px;border-radius:0 0 4px 4px;background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:0 0 12px rgba(242,193,78,.5)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:0;border:0}
+.tb-brand{display:flex;align-items:center;gap:8px;min-width:0;color:var(--tx2);font:650 11.5px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.tb-brand .gi{width:28px;height:28px;color:var(--gold-ink)}
+.tb-r{display:flex;align-items:center;gap:10px}
+.tbtn{position:relative;width:40px;height:40px;min-width:0;padding:0;border:0;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(150,178,222,.08);box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx1)}
+.tbtn::after{content:"";position:absolute;inset:-4px}
+.tbtn.tb-alf{background:#0B0F16;box-shadow:0 0 0 1.5px rgba(242,193,78,.75)}
+.tbtn.tb-alf img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 26%;display:block}
+/* tab switch = View Transition: old view fades in 90ms, new one fades up 6px over 200ms; the tab bar stays put */
+@keyframes vtOut{to{opacity:0}}
+@keyframes vtIn{from{opacity:0;transform:translateY(6px)}}
+::view-transition-old(root){animation:vtOut 90ms linear both}
+::view-transition-new(root){animation:vtIn 200ms var(--ease-out) both}
+::view-transition-group(nav){animation-duration:.01s}
+
 /* ===== GP:HOME (wave 2) ===== */
 
 
@@ -1439,7 +1439,6 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 <body>
 <div id="app"></div>
 <nav id="nav" class="hide"></nav>
-<div id="alfred-fab" class="hide" onclick="openAlfredChat()" title="Ask Alfred"><img class="alf-face" src="assets/alfred.png" alt="Alfred"/></div>
 <div id="ac-panel" class="ac-panel" role="dialog" aria-modal="true" aria-label="Chat with Alfred" aria-hidden="true">
   <div class="ac-head">
     <img class="ac-av" src="assets/alfred.png" alt=""/>
@@ -4373,21 +4372,26 @@ const GP=(()=>{
 
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
-const TABS=[["gotham","🦇","GOTHAM"],["mission","⚔️","MISSION"],["suit","💪","SUIT"],["case","👤","PROFILE"],["allies","🤝","ALLIES"]];
+const TABS=[["gotham","🦇","GOTHAM","gotham"],["mission","⚔️","MISSION","mission"],["suit","💪","SUIT","suit"],["case","👤","PROFILE","profile"],["allies","🤝","ALLIES","allies"]];
 const MORE_TABS=[["alfred","🤖","ALFRED","Your evidence-based AI coach — chat & physique photo critiques"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.step==="summary"||state.showOnboarding){$("nav").classList.add("hide");return;}
   $("nav").classList.remove("hide");
-  const tabs=TABS.map(t=>`<button class="${state.tab===t[0]?"on":""}" onclick="go('${t[0]}')"><span class="ic">${t[1]}</span><span class="lb">${t[2]}</span></button>`).join("");
-  $("nav").innerHTML=`<i class="nav-plate"></i><div class="nav-bar">${tabs}</div><i class="nav-plate"></i>`;
+  const tabs=TABS.map(t=>`<button class="${state.tab===t[0]?"on":""}" onclick="go('${t[0]}',1)" aria-label="${t[2]}"${state.tab===t[0]?' aria-current="page"':""}>${GP.icon(t[3])}<span class="lb">${t[2]}</span></button>`).join("");
+  $("nav").innerHTML=tabs;
 }
-/* Slim utility bar — settings left, search right. */
+/* Header: brand mark left; search, settings and the Alfred avatar (gold hairline ring) right. Replaces the old floating Alfred button. */
 function topBar(){
   return `<div class="topbar">
-    <button class="tbtn" onclick="openSettings()" style="gap:4px"><span style="font-size:15px;line-height:1">⚙️</span><span class="tbl">SETTINGS</span></button>
-    <button class="tbtn" onclick="openIndex()" style="gap:5px;background:linear-gradient(160deg,rgba(242,208,121,.13),rgba(14,14,18,.92));border-color:rgba(242,208,121,.4);color:var(--gold2)"><span style="font-size:12px;font-weight:900">⌘</span><span class="tbl">SEARCH</span></button>
+    <div class="tb-brand">${GP.icon("bat")}<span>GainsTracker</span></div>
+    <div class="tb-r">
+      <button class="tbtn" onclick="openIndex()" aria-label="Search">${GP.icon("search")}</button>
+      <button class="tbtn" onclick="openSettings()" aria-label="Settings">${GP.icon("sliders")}</button>
+      <button class="tbtn tb-alf" onclick="openAlfredChat()" aria-label="Ask Alfred"><img src="assets/alfred.png" alt=""/></button>
+    </div>
   </div>`;
 }
+function subTop(){const a=$("app");if(a)a.insertAdjacentHTML("afterbegin",topBar());}
 /* ===================== ACCORDION (expand/collapse for dense sections) ===================== */
 function accIsOpen(id,def){state.accOpen=state.accOpen||{};return state.accOpen[id]!==undefined?state.accOpen[id]:!!def;}
 function acc(id,icon,title,inner,def,sub){
@@ -4408,7 +4412,7 @@ function toggleAcc(id){
 function goPlan(){state.mSub="plan";go("mission");}
 /* ===================== COMMAND CENTER (the ☰ MORE menu) ===================== */
 const _TAB_ORDER=["gotham","mission","suit","case","allies"];
-function go(tab){
+function go(tab,vt){
   // A tab tap must ALWAYS land on that tab — leave any open subpage, sheet or overlay first,
   // otherwise the router (which checks subpage before tab) would keep you stuck. This is the
   // root of the "can't switch tabs" bug on phone.
@@ -4420,7 +4424,9 @@ function go(tab){
   // Track horizontal direction for the slide-in animation
   const fi=_TAB_ORDER.indexOf(prevTab),ti=_TAB_ORDER.indexOf(tab);
   state._tabDir=(fi>=0&&ti>=0&&fi!==ti)?(ti>fi?"right":"left"):null;
-  state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}render();window.scrollTo(0,0);}
+  const swap=q=>{state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}state._noEnter=q?1:0;render();state._noEnter=0;window.scrollTo(0,0);};
+  if(vt&&prevTab!==tab&&document.startViewTransition&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)){try{document.startViewTransition(()=>swap(1));return;}catch(e){}}
+  swap(0);}
 
 /* ========================= ROUTER ========================= */
 function render(){
@@ -4442,22 +4448,20 @@ function render(){
   else if(state.step==="readiness"){renderReadiness();renderNav();}
   else if(state.step==="patrol-intro"){renderPatrolIntro();renderNav();}
   else if(state.step==="logging"){renderLogging();renderNav();}
-  else if(state.subpage==="archive"){renderArchive();renderNav();}
-  else if(state.subpage==="garage"){renderGarage();renderNav();}
-  else if(state.subpage==="infirmary"){renderInfirmary();renderNav();}
+  else if(state.subpage==="archive"){renderArchive();subTop();renderNav();}
+  else if(state.subpage==="garage"){renderGarage();subTop();renderNav();}
+  else if(state.subpage==="infirmary"){renderInfirmary();subTop();renderNav();}
   else{
     const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderProfile,allies:renderAllies,history:renderProfile,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
     fn();
     const app=$("app");if(app){app.insertAdjacentHTML("afterbegin",topBar());const rb=resumeBar();if(rb)app.insertAdjacentHTML("beforeend",rb);}
     renderNav();
   }
-  // Show/hide Alfred FAB — hide during active workout, summary, onboarding, subpages
-  try{const fab=document.getElementById('alfred-fab');if(fab){const hideFab=state.showOnboarding||state.step==='logging'||state.step==='summary'||state.step==='readiness'||state.step==='patrol-intro'||!!state.subpage;fab.classList.toggle('hide',hideFab);fab.classList.toggle('lift',!hideFab&&!!document.querySelector('.resumebar'));}}catch(e){}
   const restore=()=>{window.scrollTo(0,sy);if(fId){const el=document.querySelector('input[data-fid="'+fId+'"]');if(el&&document.activeElement!==el){const v=el.value;el.focus();try{el.setSelectionRange(v.length,v.length);}catch(e){}}}};
   restore();requestAnimationFrame(restore);
   // One-shot view-enter animation — fires only when actually moving to a different view,
   // never on in-place re-renders (set toggles, card flips), so logging stays jank-free.
-  if(!same){const _a=$("app");if(_a){
+  if(!same&&!state._noEnter){const _a=$("app");if(_a){
     // If a position:fixed element lives inside #app, a transform/will-change on #app turns #app
     // into its containing block — the fixed element then scrolls away with the page and never
     // returns. The logging view's pinned timer bar AND the floating resume bar both hit this, so
@@ -6913,7 +6917,7 @@ function crateCard(){
     const goal=Math.max(1,state.data.u.weeklyGoal||4);
     if(weekCount()<goal)return "";
     if(state.data.crateWk===crateWeekKey())return "";
-    return `<div class="card" onclick="openCrate()" style="cursor:pointer;border:1.5px solid rgba(255,208,72,.55);background:linear-gradient(165deg,rgba(30,22,5,.98),rgba(9,7,2,1));box-shadow:0 0 30px -10px rgba(255,208,72,.9);animation:fabGlow 2.6s ease-in-out infinite">
+    return `<div class="card" onclick="openCrate()" style="cursor:pointer">
       <div class="row" style="gap:12px;align-items:center">
         <span style="font-size:30px;filter:drop-shadow(0 0 12px rgba(255,208,72,.9))">📦</span>
         <div style="flex:1;min-width:0">
@@ -10041,17 +10045,12 @@ function fileB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.on
 let ALFRED_VOICE="";
 
 /* ========================= ALFRED CHAT — one text-first conversation =========================
-   The FAB, the Alfred tab and "Ask Alfred about…" all land here. Panel markup is #ac-panel in <body> (.ac-* CSS);
+   The header avatar, the Alfred tab and "Ask Alfred about…" all land here. Panel markup is #ac-panel in <body> (.ac-* CSS);
    it is visibility:hidden until opened, so nothing animates while closed. History = ALFRED_MSGS in memory plus a
    text-only copy (last 40, never images) in localStorage "gt_alfred_chat". Alfred speaks a reply only when the
    question came from the mic. Persona + app knowledge: ALFRED_PERSONA / ALFRED_APP_GUIDE (above alfredContext). */
 const ALF_KEY="gt_alfred_chat",ALF_KEEP=40;
 let ALFRED_MSGS=[],_alfSeen=0,_alfLoaded=false,_alfBusy=false,_alfChips=[],_alfRec=null,_alfListening=false,_alfClearAt=0;
-/* Butler etiquette: Alfred steps aside while you scroll so he never blocks what you're reading. */
-(function(){let t=null;window.addEventListener("scroll",()=>{
-  const fab=document.getElementById("alfred-fab");if(!fab||fab.classList.contains("hide"))return;
-  fab.classList.add("dodge");clearTimeout(t);t=setTimeout(()=>fab.classList.remove("dodge"),420);
-},{passive:true});})();
 let _AV_SPEECH_UNLOCKED=false;
 function _avUnlockSpeech(){
   // iOS Safari only lets speechSynthesis.speak() start audio if the first call happens inside a user gesture; our replies
