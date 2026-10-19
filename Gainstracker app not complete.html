@@ -1442,7 +1442,7 @@ input::placeholder,textarea::placeholder{color:var(--tx3);opacity:1}
 .ac-head{background:rgba(12,18,28,.96)}
 
 /* ---- 7 · MOTION: no ambient loops. Only live/recording dots and the rest timer keep moving; full-screen moments are PRs and the session finish. ---- */
-.gc-star,.gc-cloud,.gc-rain line,.gc-signal,.gc-wf,.gc-beacon,.gc-bat,.gc-light,.gc-bm,.gar-v,.gtv2-hero-img,.gtv2-tonight-tag i,.gtv2-threat.crit,.gtv2-threat.crit .thz,.threat-skull,.scanpanel-scan::after,.scanpanel-tag i,.mb-eyebrow i,.suit-breathe,.suit-stage-glow::after,.suit-halo,.vmed.cur,.batlogo,.brandlogo,.ob-bat-aura::before,.ob-bat-aura .bat-em,.fighter.hero,.fighter.boss,.patrol2-grid,.btn.gold::after,[style*="calpulse"],[style*="suitGlowPulse"]{animation:none!important}
+.gc-star,.gc-cloud,.gc-rain line,.gc-signal,.gc-wf,.gc-beacon,.gc-bat,.gc-light,.gc-bm,.gar-v,.gtv2-hero-img,.gtv2-tonight-tag i,.gtv2-threat.crit,.gtv2-threat.crit .thz,.threat-skull,.scanpanel-scan::after,.scanpanel-tag i,.mb-eyebrow i,.suit-breathe,.suit-stage-glow::after,.suit-halo,.vmed.cur,.batlogo,.brandlogo,.ob-bat-aura::before,.ob-bat-aura .bat-em,.fighter.hero,.fighter.boss,.patrol2-grid,.btn.gold::after,[style*="calpulse"],[style*="suitGlowPulse"],[style*="hsBreathe"]{animation:none!important}
 body.rest-final::after{animation:none;box-shadow:inset 0 0 90px 12px rgba(255,90,78,.18)}
 
 .acc-ttl .gi-t{width:18px;height:18px;margin:0;vertical-align:0;color:var(--gold-ink)}
@@ -7228,7 +7228,7 @@ function profileCalendarHtml(d){
         <button class="btn ghost sm" style="width:auto;border-color:rgba(232,197,106,.3);color:var(--gold2);font-size:11px;height:34px" onclick="exportICS()">Export</button>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">${cells}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px">${cells}</div>
   </div>`;
 }
 
