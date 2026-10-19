@@ -4914,7 +4914,7 @@ function rirSuitCard(){
     <div class="row sp" style="align-items:center">
       <div class="row" style="gap:11px;align-items:center">
         <div style="width:52px;height:52px;border-radius:13px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,${B.c}2e,${B.c}0a);border:1px solid ${B.c}55;box-shadow:0 0 18px -6px ${B.c}">
-          <div style="font-family:var(--disp);font-weight:650;font-size:20px;color:${B.c};text-shadow:0 0 12px ${B.c}">${avgTxt}</div>
+          <div style="font-family:var(--num);font-weight:400;font-size:20px;color:${B.c};text-shadow:0 0 12px ${B.c}">${avgTxt}</div>
           <div style="font-size:7.5px;letter-spacing:.14em;color:var(--text3)">AVG RIR</div>
         </div>
         <div>
@@ -4958,8 +4958,8 @@ function openRirDossier(){
       <div class="mini" style="color:var(--text2);margin-top:6px;line-height:1.5;max-width:330px;margin-left:auto;margin-right:auto">${B.d}</div>
     </div>
     <div class="row" style="gap:8px;margin-bottom:12px">
-      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--disp);font-weight:650;font-size:20px;color:var(--gold2)">${I30.rate==null?"—":Math.round(I30.rate*100)+"%"}</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">EFFECTIVE SETS<br>(0–3 RIR)</div></div>
-      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--disp);font-weight:650;font-size:20px;color:var(--text)">${I30.n}</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">SETS WITH<br>EFFORT LOGGED</div></div>
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--num);font-weight:400;font-size:20px;color:var(--gold2)">${I30.rate==null?"—":Math.round(I30.rate*100)+"%"}</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">EFFECTIVE SETS<br>(0–3 RIR)</div></div>
+      <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--num);font-weight:400;font-size:20px;color:var(--text)">${I30.n}</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">SETS WITH<br>EFFORT LOGGED</div></div>
       <div style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--bg2);border:1px solid var(--border)"><div style="font-family:var(--disp);font-weight:650;font-size:20px;color:${logPct>=60?'var(--green)':logPct>=30?'var(--gold2)':'#ff8a7a'}">${logPct}%</div><div style="font-size:9px;letter-spacing:.1em;color:var(--text3)">LOGGING<br>COVERAGE</div></div>
     </div>
     ${drift}
@@ -5547,7 +5547,7 @@ function summaryCard3(R){
   const gn=gothamNote();
   const tile=(ic,k,v,sub,ac)=>`<div style="position:relative;text-align:center;padding:14px 8px 12px;border-radius:14px;background:linear-gradient(165deg,${ac}10,rgba(255,255,255,.015));border:1px solid ${ac}38;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 20px -12px ${ac};overflow:hidden">
     <div style="font-size:15px;margin-bottom:4px">${ic}</div>
-    <div style="font-family:var(--disp);font-weight:650;font-size:23px;line-height:1;color:${ac};text-shadow:0 0 14px ${ac}66;text-transform:capitalize">${v}</div>
+    <div style="font-family:var(--num);font-weight:400;font-size:23px;line-height:1;color:${ac};text-shadow:0 0 14px ${ac}66;text-transform:capitalize">${v}</div>
     <div style="font-size:8.5px;letter-spacing:.18em;color:var(--text3);text-transform:uppercase;margin-top:5px">${k}</div>
     ${sub?`<div class="mini" style="color:var(--text2);margin-top:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>`:""}
   </div>`;
@@ -7006,7 +7006,7 @@ function garageCard(){
         <div style="font-size:10px;letter-spacing:.06em;color:var(--text3);font-family:var(--disp);font-weight:650">🏎 THE GARAGE — YOUR CURRENT RIDE</div>
         <div style="font-size:22px;color:var(--gold2);font-family:var(--disp);font-weight:650;line-height:1.05;text-shadow:0 0 16px rgba(255,208,72,.5)">${esc(top.n)}</div>
       </div>
-      <div style="text-align:center;flex:none"><div style="font-family:var(--disp);font-weight:650;font-size:21px;color:var(--gold2)">${owned.length}/${GARAGE.length}</div><div class="mini" style="color:var(--text3);font-size:9px;letter-spacing:.1em">UNLOCKED</div></div>
+      <div style="text-align:center;flex:none"><div style="font-family:var(--num);font-weight:400;font-size:21px;color:var(--gold2)">${owned.length}/${GARAGE.length}</div><div class="mini" style="color:var(--text3);font-size:9px;letter-spacing:.1em">UNLOCKED</div></div>
     </div>
     <div style="height:6px;background:rgba(255,255,255,.07)"><i style="display:block;height:100%;width:${(owned.length/GARAGE.length*100).toFixed(0)}%;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 10px rgba(255,208,72,.7)"></i></div>
     ${next?`<div class="row" style="gap:9px;padding:9px 14px;background:rgba(0,0,0,.28)"><span style="font-size:20px;filter:grayscale(1) brightness(.7)">${next.e}</span><span class="mini" style="flex:1;color:var(--text2)"><b style="color:var(--text)">NEXT: ${esc(next.n)}</b> — ${esc(next.how)}</span><span style="color:var(--gold2);font-size:16px">›</span></div>`:`<div class="mini" style="padding:9px 14px;color:var(--green)">Full fleet earned. Legend of the cave.</div>`}
@@ -7491,7 +7491,7 @@ function gymCampaignsCard(){
           <button class="btn ghost sm" style="width:auto;font-size:11px;border-color:var(--gold-dim);color:var(--gold2)" onclick="openGym('${esc(g).replace(/'/g,"\\'")}')">⚙️ Equipment</button>
         </div>
         <div class="row" style="gap:0;border:1px solid rgba(232,197,106,.2);border-radius:10px;overflow:hidden;margin-bottom:7px">
-          ${[['🎯',st.sessions,'sessions'],['🏋️',fmtNum(st.vol)+'kg','volume'],['🏆',prCount,'PRs set']].map(([ic,v,l],i)=>`<div class="center" style="flex:1;padding:9px 4px;border-left:${i?'1px solid rgba(232,197,106,.15)':'none'}"><div style="font-family:var(--disp);font-weight:650;font-size:20px;color:var(--gold2)">${v}</div><div class="mini" style="color:var(--text3)">${l}</div></div>`).join("")}
+          ${[['🎯',st.sessions,'sessions'],['🏋️',fmtNum(st.vol)+'kg','volume'],['🏆',prCount,'PRs set']].map(([ic,v,l],i)=>`<div class="center" style="flex:1;padding:9px 4px;border-left:${i?'1px solid rgba(232,197,106,.15)':'none'}"><div style="font-family:var(--num);font-weight:400;font-size:20px;color:var(--gold2)">${v}</div><div class="mini" style="color:var(--text3)">${l}</div></div>`).join("")}
         </div>
         ${range?`<div class="mini" style="color:var(--text3)">📅 ${range}</div>`:""}
         ${boundSplit?`<div class="mini" style="color:var(--gold2);margin-top:4px">🗂️ <b>${esc(boundSplit.name)}</b> · ${boundSplit.days.length}d split</div>`:`<div class="mini" style="color:var(--text3);margin-top:4px">🗂️ No split bound — set one active on the Mission tab</div>`}
@@ -9083,7 +9083,7 @@ function titleBeltsCard(){
   const T=titleBelts();const ks=Object.keys(T);if(!ks.length)return "";
   const rows=ks.sort((a,b)=>(T[b].w||0)-(T[a].w||0)).map(k=>`<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)">
     <div><b style="font-size:13.5px">🏆 ${esc(k)}</b><div class="mini" style="color:var(--text3)">${T[k].n||1} reign${(T[k].n||1)>1?"s":""} · claimed ${new Date(T[k].t).toLocaleDateString()}</div></div>
-    <div style="font-family:var(--disp);font-weight:650;font-size:19px;color:var(--gold2);text-shadow:0 0 10px rgba(255,208,72,.5)">${T[k].w}<span style="font-size:11px;color:var(--text3)">kg</span></div></div>`).join("");
+    <div style="font-family:var(--num);font-weight:400;font-size:19px;color:var(--gold2);text-shadow:0 0 10px rgba(255,208,72,.5)">${T[k].w}<span style="font-size:11px;color:var(--text3)">kg</span></div></div>`).join("");
   return `<div class="card" style="border:1.5px solid rgba(255,208,72,.4);background:linear-gradient(165deg,rgba(26,19,4,.98),rgba(8,6,2,1));box-shadow:0 0 26px -12px rgba(255,208,72,.8)">
     <div class="ttl" style="color:var(--gold2)">🏆 Title Belts</div>
     <div class="mini" style="color:var(--text3);margin-bottom:2px">Won in title fights — one max attempt, belt on the line.</div>${rows}</div>`;
@@ -9185,7 +9185,7 @@ function openChronicle(){
     ${sumHero("Special edition",mn+" WRAPPED","📰","#FFD048")}
     <div class="row" style="gap:8px;margin-bottom:9px">${stat(fmtNum(vol),"kg moved")}${stat(ws.length,"patrols","#3C96FF")}${stat(prN,"records","#22E87A")}</div>
     <div class="row" style="gap:8px;margin-bottom:12px">${stat(sets,"working sets","#FF8C22")}${stat(cars,"batmobiles","#9840F8")}${topM?stat(MNAME[topM],"most-hit","#FF3622"):""}</div>
-    ${best?`<div class="card" style="border-color:rgba(255,208,72,.4)"><div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:4px">⚔️ LIFT OF THE MONTH</div><div class="row sp" style="align-items:baseline"><b style="font-size:15px">${esc(best.n)}</b><span style="font-family:var(--disp);font-weight:650;font-size:22px;color:var(--gold2)">${Math.round(best.w)}kg × ${best.r}</span></div><div class="mini" style="color:var(--text3)">≈ ${Math.round(bestE)}kg estimated 1RM</div></div>`:""}
+    ${best?`<div class="card" style="border-color:rgba(255,208,72,.4)"><div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:4px">⚔️ LIFT OF THE MONTH</div><div class="row sp" style="align-items:baseline"><b style="font-size:15px">${esc(best.n)}</b><span style="font-family:var(--num);font-weight:400;font-size:22px;color:var(--gold2)">${Math.round(best.w)}kg × ${best.r}</span></div><div class="mini" style="color:var(--text3)">≈ ${Math.round(bestE)}kg estimated 1RM</div></div>`:""}
     ${prNames.length?`<div class="card"><div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:6px">🏆 RECORDS SET</div><div style="display:flex;flex-wrap:wrap;gap:6px">${prNames.slice(0,10).map(n=>`<span class="chip" style="font-size:10.5px;color:var(--gold2);border-color:rgba(255,208,72,.4)">${esc(String(n))}</span>`).join("")}${prNames.length>10?`<span class="chip" style="font-size:10.5px">+${prNames.length-10} more</span>`:""}</div></div>`:""}
     <div class="mini center" style="color:var(--text3);margin-top:4px;font-style:italic">"Gotham sleeps safer when you don't." — The Chronicle</div>
     <button class="btn gold" style="margin-top:12px" onclick="closeOverlay()">FILE IT</button>`;
@@ -10771,7 +10771,7 @@ function alfredAsk(q){
   return {__fallback:true,text:`I can answer or act, Master. Try: <b>what should I train</b>, <b>weakest muscle</b>, <b>how strong am I</b>, <b>PR for bench</b>, <b>volume for chest</b>, <b>am I recovered</b> — or commands like <b>open leaderboard</b>, <b>start push day</b>, <b>add face pull to push</b>, <b>set weekly goal to 5</b>.`};
 }
 function openAlfredConsole(){openAlfredChat();} /* the old command console now lives in the one Alfred chat (typed commands still work there) */
-function caveStat(v,l){return `<div style="flex:1;min-width:64px;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:8px 4px;background:var(--bg2)"><div style="font-family:var(--disp);font-weight:650;font-size:22px;color:var(--gold2);line-height:1.05">${v}</div><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">${l}</div></div>`;}
+function caveStat(v,l){return `<div style="flex:1;min-width:64px;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:8px 4px;background:var(--bg2)"><div style="font-family:var(--num);font-weight:400;font-size:22px;color:var(--gold2);line-height:1.05">${v}</div><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">${l}</div></div>`;}
 /* Alfred's weekly "Cave review" — fight-camp recap of the last 7 days with proactive flags. */
 function alfredCaveReview(){
   const wk=now()-7*864e5;
@@ -10838,7 +10838,7 @@ function fuelProtocolCard(){
     return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><button class="btn gold sm" style="width:auto" onclick="openFuel()">Set up</button></div>
       <div class="mini" style="color:var(--text2)">Let Alfred calculate the exact calories and macros to match your goal — build, lean gain, maintain or cut. Two minutes, sir.</div></div>`;
   }
-  const macro=(v,l,c)=>`<div style="flex:1;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:9px 4px;background:var(--bg2)"><div style="font-family:var(--disp);font-weight:650;font-size:21px;color:${c}">${v}<span style="font-size:12px">g</span></div><div class="mini" style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase">${l}</div></div>`;
+  const macro=(v,l,c)=>`<div style="flex:1;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:9px 4px;background:var(--bg2)"><div style="font-family:var(--num);font-weight:400;font-size:21px;color:${c}">${v}<span style="font-size:12px">g</span></div><div class="mini" style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase">${l}</div></div>`;
   const _day=foodDay();const _tot=foodTotals(_day);const _train=isTrainingToday();const _tgt=cycledTargets(n,_train?"train":"rest");const _left=_tgt.cals-_tot.k;const _logged=(_day.items||[]).length;
   return `<div class="card glow"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><span class="chip ${_train?'on':''}" style="font-size:10.5px">${_train?trainIcon(12):restIcon(12)} ${_train?'Training':'Rest'}</span></div>
     <div class="center" style="margin:2px 0 4px"><span class="chip on">${esc(n.goalLabel)} · ${n.goalAdj} maintenance</span></div>
@@ -12213,7 +12213,7 @@ function openGazette(){
       City control stands at <b>${held}/12 districts</b>.`:`No confirmed sightings this month. The rogues grow bold.`}
     </div>
     <div style="display:flex;gap:6px;margin-top:10px;border-top:1px solid #a99e86;padding-top:8px">
-      ${[["PATROLS",ws.length],["TONNAGE",fmtNum(Math.round(ton))],["RECORDS",prN],["KOs",kos.length]].map(([l,v])=>`<div style="flex:1;text-align:center"><div style="font-family:var(--disp);font-weight:650;font-size:19px;color:#141210">${v}</div><div style="font-size:8.5px;letter-spacing:.14em;color:#5a5040">${l}</div></div>`).join("")}
+      ${[["PATROLS",ws.length],["TONNAGE",fmtNum(Math.round(ton))],["RECORDS",prN],["KOs",kos.length]].map(([l,v])=>`<div style="flex:1;text-align:center"><div style="font-family:var(--num);font-weight:400;font-size:19px;color:#141210">${v}</div><div style="font-size:8.5px;letter-spacing:.14em;color:#5a5040">${l}</div></div>`).join("")}
     </div>
   </div>
   <button class="btn" style="margin-top:12px" onclick="closeSheet()">Fold the paper</button>`);
@@ -12472,7 +12472,7 @@ function territoryWarCard(){
     return `<div class="gtv2-panel wide" style="margin-bottom:12px;padding:12px 12px 10px;border-color:${band[1]}44;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 18px 44px -20px rgba(0,0,0,.94),0 0 26px -12px ${band[1]}">
       <div class="row sp" style="align-items:center;margin-bottom:9px">
         <div><div class="gtv2-label">🗺️ Territory War</div>
-          <div style="font-family:var(--disp);font-weight:650;font-size:22px;line-height:1.1;color:${band[1]};text-shadow:0 0 16px ${band[1]}66">${held}<span style="font-size:13px;color:var(--text3)">/12</span> <span style="font-size:13px;letter-spacing:.08em">${band[0]}</span></div>
+          <div style="font-family:var(--num);font-weight:400;font-size:22px;line-height:1.1;color:${band[1]};text-shadow:0 0 16px ${band[1]}66">${held}<span style="font-size:13px;color:var(--text3)">/12</span> <span style="font-size:13px;letter-spacing:.08em">${band[0]}</span></div>
           ${worst?`<div class="mini" style="color:#ff8a7a;font-weight:800;letter-spacing:.06em;margin-top:1px">${esc(String(worst).toUpperCase())} HOLDS ${lost.length} DISTRICT${lost.length>1?"S":""}</div>`
             :neverTrained?`<div class="mini" style="color:var(--text3);margin-top:1px">no districts patrolled yet, sir — pick your first fight</div>`
             :`<div class="mini" style="color:var(--text3);margin-top:1px">the city is yours, sir</div>`}
