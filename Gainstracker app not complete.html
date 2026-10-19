@@ -1462,6 +1462,201 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .cal-pr .gi{width:11px;height:11px}
 
 /* ===== GP:HOME (wave 2) ===== */
+/* Home = header (date · cycle in the top bar, greeting under it) → Tonight (the one S3 hero) → Readiness → This week + volume map → Progress → Stalled → Lore fold.
+   Everything is scoped under .gh so the other tabs keep their look; the primitives GP.* emit (ring, lmk, wk, seg, spark) are styled here. */
+.topbar.tb-home{margin-bottom:6px}
+.topbar.tb-home .tb-r{gap:6px}
+.topbar.tb-home .tbtn{width:36px;height:36px}
+.gh-eb{flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--gold-ink);font:650 11px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.gh-eb .gi{width:16px;height:16px;flex:none}
+.gh-eb .gh-cy{color:var(--tx3);overflow:hidden;text-overflow:ellipsis}
+@media(max-width:389px){.gh-cyw{display:none}}
+.gh-hi{margin:0 2px 14px;font:700 27px/1.1 var(--body);letter-spacing:-.028em;color:var(--tx1);text-wrap:balance}
+
+/* type + colour helpers */
+.gh .eyebrow{font:600 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx2)}
+.gh .t-s{font-size:13px;line-height:18px;color:var(--tx2)}
+.gh .t-xs{font-size:11px;line-height:14px;color:var(--tx3)}
+.gh .num{line-height:.88}
+.gh .c-ok{color:var(--ok)}.gh .c-warn{color:var(--warn)}.gh .c-bad{color:#FF786D}.gh .c-rest{color:var(--rest)}.gh .c-gold{color:var(--gold-ink)}.gh .c-2{color:var(--tx2)}.gh .c-3{color:var(--tx3)}
+.gh .tag{display:inline-flex;align-items:center;height:17px;padding:0 5px;border-radius:5px;font:700 11px/1 var(--body);letter-spacing:.04em;text-transform:uppercase}
+.gh .tag.bad{background:var(--tint-bad);color:#FF786D}.gh .tag.warn{background:var(--tint-warn);color:var(--warn)}.gh .tag.ok{background:var(--tint-ok);color:var(--ok)}
+
+/* surfaces: S1 row/tile, S2 card, S3 hero (one per screen) */
+.gh .s1{background:var(--g1);border-radius:var(--r-m);box-shadow:var(--hl)}
+.gh .s2{background:linear-gradient(180deg,#131B29 0%,#0F1621 100%);border:1px solid var(--hair);border-radius:var(--r-l);box-shadow:var(--hl),var(--sh2)}
+.gh .s3{position:relative;isolation:isolate;overflow:hidden;border-radius:var(--r-l);background:radial-gradient(120% 85% at 100% 0%,rgba(242,193,78,.17),transparent 56%),radial-gradient(90% 70% at 0% 100%,rgba(91,180,255,.07),transparent 60%),linear-gradient(180deg,#1B2638 0%,#111927 100%);border:1px solid rgba(242,193,78,.22);box-shadow:inset 0 1px 0 rgba(255,226,150,.16),0 26px 50px -22px rgba(0,0,0,.95)}
+.gh .s3::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,221,138,.9) 28%,rgba(255,221,138,.9) 72%,transparent)}
+.gh .s3::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.35;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+.gh .s3.is-live{box-shadow:inset 0 1px 0 rgba(255,226,150,.16),0 0 0 1.5px var(--gold),0 26px 50px -22px rgba(0,0,0,.95)}
+
+/* TONIGHT hero */
+.gh-hero{padding:15px 16px 16px}
+.gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
+.gh-live{display:inline-flex;align-items:center;gap:7px;color:var(--gold-ink)}
+.gh-live::before{content:"";width:7px;height:7px;border-radius:9px;background:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.2)}
+.is-live .gh-live::before{animation:ghPulse 1.8s ease-in-out infinite}
+@keyframes ghPulse{50%{opacity:.3}}
+.gh-el,.gh-rt{font-variant-numeric:tabular-nums}
+.gh-cnt{font-size:13px;color:var(--tx2)}
+.gh-cnt .num{font-size:20px;color:var(--tx1);margin-right:2px}
+.gh-cyc{position:relative;display:flex;align-items:center;gap:4px;padding:8px 0}
+.gh-cyc i{width:13px;height:4px;border-radius:2px;background:rgba(150,178,222,.17)}
+.gh-cyc i.d{background:rgba(242,193,78,.45)}
+.gh-cyc i.t{width:20px;background:var(--gold)}
+.gh .gh-title{margin:6px 0 6px;font-size:clamp(30px,9.6vw,37px);color:#FBF7EC;line-height:.95;text-wrap:balance}
+.gh-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:13px;line-height:18px;color:var(--tx2)}
+.gh-meta b{color:var(--tx1);font-weight:600}
+.gh-meta .up{color:var(--gold-ink);font-weight:600;display:inline-flex;align-items:center;gap:3px}
+.gh-meta .up .gi{width:14px;height:14px;stroke-width:2.2}
+.gh-next{display:inline-flex;align-items:center;gap:2px;position:relative;color:var(--tx2);font:inherit;text-align:left;padding:4px 0}
+.gh-next .gi{width:15px;height:15px;color:var(--tx3)}
+.gh-seg{margin:14px 0 16px}
+.gh-tm{display:flex;justify-content:space-between;gap:10px 8px;margin:15px 0 16px;padding-top:13px;border-top:1px solid rgba(242,193,78,.14)}
+.gh-tmc{display:flex;align-items:center;gap:7px;min-width:0}
+.gh-tmc .ring{flex:none}
+.gh-tmc b{display:block;font:600 13px/1.15 var(--body);color:var(--tx1)}
+.gh-tmc span{font:500 12px/1.2 var(--body);color:var(--tx2);white-space:nowrap}
+.gh-tmc.warn span{color:var(--warn);font-weight:600}
+.gh-tm2{display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:389px){.gh-tm{display:grid;grid-template-columns:1fr 1fr}}
+.gh-cta{display:flex;gap:10px}
+.gh-cta .btn{width:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 18px;border:0;flex:none}
+.gh-cta .btn-1{flex:1;padding:0 22px}
+.gh-cta .btn .gi{width:18px;height:18px}
+.gh-cta .btn.gh-done{flex:1;background:var(--tint-ok);color:var(--ok);box-shadow:inset 0 0 0 1px rgba(52,210,127,.28);opacity:1;filter:none}
+
+/* READINESS */
+.gh-ready{margin-top:12px;padding:13px 16px 11px}
+.gh-rd-main{display:flex;gap:16px;align-items:center}
+.gh-ring{position:relative;width:92px;height:92px;flex:none}
+.gh-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.gh-rc .num{font-size:38px;margin-top:4px}
+.gh-rc .eyebrow{letter-spacing:.04em}
+.gh-rd{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.gh-rd-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.gh-drv{position:relative;display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:8px;font-size:13px;color:var(--tx2);min-height:20px}
+.gh-drv .bar{height:5px;border-radius:3px;background:rgba(150,178,222,.12);overflow:hidden}
+.gh-drv .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,rgba(243,240,232,.55),#F3F0E8)}
+.gh-drv .num{font-size:19px;color:var(--tx1);min-width:22px;text-align:right}
+.gh-nl{font-size:12.5px;color:var(--warn);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-lr{grid-column:2/4;color:var(--tx1);white-space:nowrap}
+.gh-lr span{font-weight:600}
+.gh-log{position:relative;display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 9px;border-radius:7px;font:650 12.5px/1 var(--body);background:var(--tint-gold);color:var(--gold-ink)}
+.gh-log .gi{width:13px;height:13px;stroke-width:2.4}
+.gh-hint{font-size:13px;line-height:18px;color:var(--tx2)}
+.gh-coach{position:relative;display:flex;align-items:center;gap:9px;width:100%;margin-top:11px;padding:10px 0 2px;border-top:1px solid var(--hair);font-size:13px;line-height:17px;color:var(--tx2);text-align:left}
+.gh-coach .av{width:24px;height:24px;border-radius:99px;flex:none;overflow:hidden;box-shadow:0 0 0 1px rgba(242,193,78,.7)}
+.gh-coach .av img{width:100%;height:100%;object-fit:cover;object-position:50% 26%}
+.gh-coach b{color:var(--tx1);font-weight:600}
+
+/* THIS WEEK + volume map */
+.gh-week{margin-top:12px;padding:14px 14px 10px}
+.gh-wk-h{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.gh-wk-l{position:relative;min-width:0}
+.gh-wk-t{display:flex;align-items:baseline;gap:6px;margin-top:5px}
+.gh-wk-t .num{font-size:30px}
+.gh-wk-t span:last-child{font-size:13px;color:var(--tx2)}
+.gh-stk{display:flex;align-items:center;gap:4px;margin-top:6px;font:600 12px/1 var(--body);color:var(--gold-ink)}
+.gh-stk.off{color:var(--tx3)}
+.gh-stk .gi{width:14px;height:14px}
+.gh-wk-r{position:relative;width:178px;flex:none}
+.gh .wk{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.gh .wk .d{display:flex;flex-direction:column;align-items:center;gap:4px;font:600 11px/1 var(--body);color:var(--tx3)}
+.gh .wk .dot{width:20px;height:20px;border-radius:999px;display:grid;place-items:center;background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair)}
+.gh .wk .dot.done{background:var(--ok);box-shadow:none;color:#04210F}
+.gh .wk .dot.done .gi{width:12px;height:12px;stroke-width:3}
+.gh .wk .dot.rest{background:transparent}
+.gh .wk .dot.rest::after{content:"";width:8px;height:2px;border-radius:1px;background:var(--tx3)}
+.gh .wk .dot.today{box-shadow:inset 0 0 0 2px var(--gold);background:var(--tint-gold)}
+.gh .wk .d.is-today{color:var(--gold-ink)}
+.gh-lgd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 10px;padding-top:12px;border-top:1px solid var(--hair)}
+.gh-lgd .k{display:flex;gap:10px;font:600 11px/1 var(--body);color:var(--tx3);white-space:nowrap}
+.gh-lgd .k span{display:inline-flex;align-items:center;gap:4px}
+.gh-rd-h .eyebrow{white-space:nowrap}
+.gh-wk-f .btn.btn-3{white-space:nowrap;flex:none}
+.gh-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:44px}
+.gh-col i{font-style:normal}
+.gh-lgd .sw{width:12px;height:5px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(243,240,232,.75) 0 2px,rgba(243,240,232,.25) 2px 4px)}
+.gh-mgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.gh-mt{position:relative;min-width:0;padding:4px 2px 8px;border-radius:10px}
+.gh-mt-t{display:flex;align-items:center;gap:6px;height:19px;margin-bottom:6px}
+.gh-mt-t .ring{flex:none}
+.gh-mt-n{min-width:0;font:600 13px/1 var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-mt-h{flex:none;font:600 11px/1 var(--body);color:var(--rest);white-space:nowrap}
+.gh-mt-v{margin-left:auto;flex:none;display:flex;align-items:center;gap:5px}
+.gh-mt-v .num{font-size:21px;line-height:1;margin-top:2px}
+.gh-wk-f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;padding-top:6px;border-top:1px solid var(--hair)}
+.gh .btn.btn-3{width:auto;min-height:36px;height:36px;padding:0 6px;border:0;background:none;box-shadow:none;color:var(--gold-ink);font-size:14px;gap:6px}
+.gh .btn.btn-3 .gi{width:17px;height:17px}
+.gh-empty{margin:14px 0 6px;padding-top:12px;border-top:1px solid var(--hair);font-size:13px;line-height:18px;color:var(--tx2)}
+/* landmark bar (GP.landmark) */
+.gh .lmk{position:relative;height:6px;border-radius:3px;background:rgba(150,178,222,.11)}
+.gh .lmk .band{position:absolute;top:0;bottom:0;left:var(--mev);width:calc(var(--mav) - var(--mev));background:rgba(52,210,127,.20)}
+.gh .lmk .over{position:absolute;top:0;bottom:0;left:var(--mrv);right:0;border-radius:0 3px 3px 0;background:repeating-linear-gradient(135deg,rgba(255,90,78,.30) 0 2px,transparent 2px 4.5px)}
+.gh .lmk .fill{position:absolute;left:0;top:0;bottom:0;width:var(--v);border-radius:3px;background:var(--c,var(--ok))}
+.gh .lmk .tk{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:#D7DFEC;opacity:.55}
+.gh .lmk .tk.mrv{background:#FF8A80;opacity:.9}
+.gh .lmk .ghost{position:absolute;top:0;bottom:0;border-radius:0 3px 3px 0;background:repeating-linear-gradient(90deg,rgba(243,240,232,.6) 0 2px,rgba(243,240,232,.16) 2px 4px)}
+.gh .seg{display:flex;gap:3px;height:5px}
+.gh .seg i{flex:var(--n,1);border-radius:3px;background:rgba(150,178,222,.14);position:relative;overflow:hidden}
+.gh .seg i::after{content:"";position:absolute;inset:0;width:var(--p,0%);background:var(--ok);border-radius:inherit}
+.gh .seg i.cur::after{background:var(--gold)}
+.gh svg.spark,.gh svg.bars{display:block;height:auto;gap:0;align-items:initial}
+.gh svg.ring{display:block}
+
+/* PROGRESS tiles, record + stalled lists */
+.gh-sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 4px 10px}
+.gh-sec h2{margin:0;font:700 20px/1.2 var(--body);letter-spacing:-.02em}
+.gh-more{position:relative;padding:6px 0 6px 12px;font:600 15px/1 var(--body);color:var(--gold-ink)}
+.gh-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gh-tile{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0;padding:12px 14px}
+.gh-v{display:flex;align-items:baseline;gap:5px}
+.gh-v .num{font-size:34px}
+.gh-v .u{font-size:13px;font-weight:600;color:var(--tx2)}
+.gh-dl{display:flex;align-items:center;gap:6px;font:600 13px/1 var(--body)}
+.gh-dl .gi{width:15px;height:15px}
+.gh-dl.up{color:var(--ok)}.gh-dl.flat{color:var(--tx3)}
+.gh-tile .spark,.gh-tile .bars{width:100%;margin-top:2px}
+.gh-list{overflow:hidden;margin-top:12px}
+.gh-lh{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 14px 4px}
+.gh-lh h3{margin:0;display:flex;align-items:center;gap:8px;font:650 17px/1.2 var(--body);letter-spacing:-.015em}
+.gh-row{position:relative;display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px}
+.gh-row+.gh-row{border-top:1px solid var(--hair)}
+.gh-row .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:rgba(150,178,222,.08);color:var(--tx2)}
+.gh-row .lead.gold{background:var(--tint-gold);color:var(--gold-ink)}
+.gh-row .lead.warn{background:var(--tint-warn);color:var(--warn)}
+.gh-row .main{flex:1;min-width:0}
+.gh-t1{margin:0;font:600 15px/20px var(--body);letter-spacing:-.005em;text-transform:none;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-t2{font-size:13px;line-height:17px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-row .trail{display:flex;align-items:center;gap:6px;flex:none;color:var(--tx3)}
+.gh-row .trail .gi{width:16px;height:16px}
+.gh-row .trail .d{font:600 13px/1 var(--body);color:var(--ok)}
+.gh-row:active,.gh-lh:active{background:rgba(150,178,222,.05)}
+
+/* LORE fold: one row; the district map, chronicle, season, crate, siege and garage open under it */
+.gh-lore{position:relative;display:flex;align-items:center;gap:12px;min-height:58px;margin-top:12px;padding:10px 14px;border-radius:var(--r-m);overflow:hidden}
+.gh-lore>:not(.sky):not(.hx){position:relative;z-index:1}
+.gh-fc{display:inline-flex;color:var(--warn)}
+.gh-fc .gi{width:15px;height:15px}
+.gh-lore .sky{position:absolute;right:0;bottom:0;width:230px;height:62px;z-index:0;pointer-events:none}
+.gh-lore .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--tint-gold);color:var(--gold-ink)}
+.gh-lore .main{flex:1;min-width:0}
+.gh-lore .trail{flex:none;color:var(--tx3)}
+.gh-lore .trail .gi{width:16px;height:16px;transition:transform .28s var(--spring)}
+.gh-lore.open .trail .gi{transform:rotate(90deg)}
+.gh-lore-body{margin-top:12px}
+.gh-lore-body .gh-list{margin-top:0}
+
+/* motion: first paint of the view only (the stagger stays under 200ms), reduced motion is handled globally */
+@keyframes ghIn{from{opacity:0;transform:translateY(8px)}}
+@keyframes ghRing{from{stroke-dasharray:0 999}}
+@keyframes ghFill{from{clip-path:inset(0 100% 0 0)}}
+.gh-anim .gh-c{animation:ghIn .3s var(--ease-out) both;animation-delay:calc(var(--i,0)*40ms)}
+.gh-anim .ring-v{animation:ghRing .7s var(--ease-out) both}
+.gh-anim .lmk .fill{animation:ghFill .5s var(--ease-out) both;animation-delay:calc(var(--k,0)*30ms)}
+.toast .tundo{min-height:28px;height:28px;margin-left:12px;padding:0 10px;color:var(--gold-ink)}
+.gh-ring.empty .ring-v{display:none}
 
 
 
@@ -2668,6 +2863,16 @@ function _drainToasts(){
     t.classList.remove("on");
     setTimeout(()=>{_toastBusy=false;_drainToasts();},420);   // fade-out + breath before the next
   },dur);
+}
+/* a toast with one action (Undo): own slot, bypasses the queue, replaced by the next normal toast */
+function toastUndo(msg,fn,label){
+  const t=$("toast");if(!t)return;
+  clearTimeout(t._t);_toastQ.length=0;_toastBusy=true;
+  t.innerHTML=`<span>${esc(msg)}</span><button class="chip tundo" type="button">${esc(label||"Undo")}</button>`;
+  t.classList.add("on");t.style.pointerEvents="auto";
+  const done=()=>{clearTimeout(t._t);t.classList.remove("on");t.style.pointerEvents="";setTimeout(()=>{_toastBusy=false;t.textContent="";_drainToasts();},420);};
+  t.querySelector("button").onclick=()=>{done();fn();};
+  t._t=setTimeout(done,6000);
 }
 function epley(w,r){return w*(1+r/30);}
 /* ========================= MOVEMENT-POSE FIGURES =========================
@@ -4609,9 +4814,9 @@ function renderNav(){
   $("nav").innerHTML=tabs;
 }
 /* Header: brand mark left; search, settings and the Alfred avatar (gold hairline ring) right. Replaces the old floating Alfred button. */
-function topBar(){
-  return `<div class="topbar">
-    <div class="tb-brand">${GP.icon("bat")}<span>GainsTracker</span></div>
+function topBar(left){
+  return `<div class="topbar${left?" tb-home":""}">
+    ${left||`<div class="tb-brand">${GP.icon("bat")}<span>GainsTracker</span></div>`}
     <div class="tb-r">
       <button class="tbtn" onclick="openIndex()" aria-label="Search">${GP.icon("search")}</button>
       <button class="tbtn" onclick="openSettings()" aria-label="Settings">${GP.icon("sliders")}</button>
@@ -4666,7 +4871,7 @@ function render(){
   // sumNav→renderSummary on every later swipe/scroll — the "bounce back to Gotham" bug.
   const _app0=$("app");if(_app0){_app0.ontouchstart=null;_app0.ontouchend=null;}
   const vk=state.showOnboarding?"onb":state.step==="summary"?"sum":state.step==="readiness"?"rdy":state.step==="patrol-intro"?"patrol":state.step==="logging"?"log":state.subpage?("sub:"+state.subpage):("tab:"+state.tab);
-  const same=(vk===state._vk);
+  const same=(vk===state._vk);state._same=same;
   const sy=same?(window.scrollY||window.pageYOffset||0):0;
   const af=document.activeElement;
   const fId=(same&&af&&af.tagName==="INPUT")?af.getAttribute("data-fid"):null;
@@ -4682,7 +4887,7 @@ function render(){
   else{
     const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderProfile,allies:renderAllies,history:renderProfile,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
     fn();
-    const app=$("app");if(app){app.insertAdjacentHTML("afterbegin",topBar());const rb=resumeBar();if(rb)app.insertAdjacentHTML("beforeend",rb);}
+    const app=$("app");if(app){app.insertAdjacentHTML("afterbegin",topBar(state.tab==="gotham"?ghEyebrow():""));const rb=state.tab==="gotham"?"":resumeBar();if(rb)app.insertAdjacentHTML("beforeend",rb);}
     renderNav();
   }
   const restore=()=>{window.scrollTo(0,sy);if(fId){const el=document.querySelector('input[data-fid="'+fId+'"]');if(el&&document.activeElement!==el){const v=el.value;el.focus();try{el.setSelectionRange(v.length,v.length);}catch(e){}}}};
@@ -6047,7 +6252,7 @@ function openDayBriefing(splitId,dayIdx){
   const day=sp.days[dayIdx];if(!day)return;
   if(isRest(day)){openSheet(`<div class="row sp"><div class="ttl" style="display:flex;align-items:center;gap:7px">${restIcon(20)} ${esc(day.name)}</div><span class="chip">recovery</span></div>
     <p class="muted" style="font-size:13.5px;line-height:1.5;margin:8px 0 14px">${esc(restLine())}</p>
-    <button class="btn gold" onclick="logRestDay();closeSheet()">REST ✓ — log recovery</button>
+    ${(()=>{const c=gtv2CurrentPlanDay();return c&&c.sp.id===splitId&&c.i===dayIdx&&!restLoggedToday();})()?'<button class="btn gold" onclick="logRestDay();closeSheet()">Log rest day</button>':''}
     <button class="btn ghost" style="margin-top:8px" onclick="freeWorkout()">Feeling fresh? Train anyway</button>`);return;}
   const {prim,sec}=dayMuscles(day);
   const primList=Object.keys(prim).sort((a,b)=>prim[b]-prim[a]);
@@ -8989,13 +9194,19 @@ function computeNextDay(sp){
   if(lastRestTime>lastWoTime)return (state.data._nextDay||0)%len;           // last thing was a rest → pointer already moved past it
   return (lastWoIdx+1)%len;                                                 // the day after the last split-day you trained
 }
-function logRestDay(){
+function restLoggedToday(){return (state.data.restLog||[]).some(r=>new Date(r).toDateString()===new Date().toDateString());}
+function logRestDay(){   // guarded: only on tonight's rest day, once per calendar day; the toast carries Undo
+  const cur=gtv2CurrentPlanDay();
+  if(!cur||!isRest(cur.day)){toast("Tonight is a training day");return;}
+  if(restLoggedToday()){toast("Rest day already logged");return;}
   state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();
-  const AFFIRM=[["Recovery is resistance","The muscle grows when you rest. Today you're not skipping — you're building.","🛡️"],["Strategic withdrawal","Batman doesn't fight every night. Tonight you recharge for tomorrow's heavier iron.","🦇"],["Earned rest","You've put in the work. The body needs this. Come back stronger.","💎"],["The forge cools","Iron needs time to cool and harden. So do you.","⚔️"]];
-  const a=AFFIRM[(state.data.workouts||[]).length%AFFIRM.length];
-  toast(a[2]+" "+a[0]+" — "+a[1]);
   try{checkStreakMilestone();}catch(e){}
-  render();
+  render();toastUndo("Rest day logged",undoRestDay);
+}
+function undoRestDay(){   // reverses today's log: drops the entry and steps the day pointer back
+  const d=state.data,r=d.restLog||[],sp=(d.splits||[]).find(s=>s.id===d.activeSplitId)||(d.splits||[])[0];
+  if(!r.length||!restLoggedToday()||!sp||!sp.days.length)return;
+  r.shift();const n=sp.days.length;d._nextDay=((d._nextDay||0)-1+n)%n;save();render();toast("Rest day undone");
 }
 
 /* ========================= CASE FILE TAB ========================= */
@@ -12182,68 +12393,6 @@ function gtv2BalanceAudit(){
   if(quad>=8&&quad>post*1.6)return {kind:"gold",icon:"🦵",title:"Posterior chain lag",copy:`Quads have ${quad} sets while hamstrings + glutes have ${post}. Add curls, RDLs, hip thrusts or back extensions.`};
   return null;
 }
-function gtv2MissionHero(){
-  const d=state.data,u=d.u,cur=gtv2CurrentPlanDay(),title=u.name?u.name.toUpperCase():"GOTHAM";
-  const dateStr=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-  let focal="",btn="",track="";
-  if(cur&&cur.day){
-    const day=cur.day,rest=isRest(day);
-    track=`<div class="gtv2-track">${cur.sp.days.map((dy,i)=>`<button class="gtv2-step${i===cur.i?' on':''}" onclick="openDayBriefing('${cur.sp.id}',${i})"><span class="gtv2-step-dot"></span>${isRest(dy)?'😴 ':''}${esc((dy.name||'').toUpperCase())}</button>`).join('')}</div>`;
-    if(rest){
-      focal=`<div class="gtv2-tonight rest"><div class="gtv2-tonight-tag"><i></i>Tonight · recovery</div><div class="gtv2-tonight-day">${esc(day.name)}</div><div class="gtv2-tonight-meta">Recovery is where the adaptation gets paid · ${esc(cur.sp.name)}</div></div>`;
-      btn=`<button class="btn gold" onclick="logRestDay()">REST LOGGED</button><button class="btn ghost sm" style="width:auto" onclick="freeWorkout()">Train</button>`;
-    }else{
-      const prime=(day.exercises||[]).slice(0,3).map(n=>exFor(n).p&&exFor(n).p[0]).filter(Boolean).map(m=>MNAME[m]).filter((v,i,a)=>a.indexOf(v)===i).join(" / ");
-      focal=`<div class="gtv2-tonight"><div class="gtv2-tonight-tag"><i></i>Tonight's patrol · selected</div><div class="gtv2-tonight-day">${esc(day.name)}</div><div class="gtv2-tonight-meta">${prime?esc(prime)+" · ":""}${(day.exercises||[]).length} exercises · ${esc(cur.sp.name)}</div></div>`;
-      btn=`<button class="btn gold" onclick="startWorkout('${cur.sp.id}',${cur.i})">START PATROL</button><button class="btn ghost sm" style="width:auto" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Intel</button>`;
-    }
-  }else{
-    focal=`<div class="gtv2-tonight empty"><div class="gtv2-tonight-tag"><i></i>No active split</div><div class="gtv2-tonight-day">FREE SESSION</div><div class="gtv2-tonight-meta">Start a session now, or build your plan in Mission.</div></div>`;
-    btn=`<button class="btn gold" onclick="freeWorkout()">FREE SESSION</button><button class="btn ghost sm" style="width:auto" onclick="goPlan()">Plan</button>`;
-  }
-  if(state.session){ // a live/minimised workout always wins the hero: RESUME, never START over it
-    const c=sessionCounts(state.session),nm=String(state.session.day||"Session").split(/\s+[·—-]\s+/)[0];
-    btn=btn.replace(/<button class="btn gold"[^>]*>[^<]*<\/button>/,()=>`<button class="btn gold" style="flex-direction:column;gap:1px;line-height:1.2" onclick="resumeWorkout()">RESUME<span style="font-size:11px;letter-spacing:.05em;opacity:.78">${esc(nm)} · ${c.done}/${c.total} sets</span></button>`);
-  }
-  return `<section class="gtv2-hero">
-    <img class="gtv2-hero-img" src="Batman.jpg" alt="">
-    <div class="gtv2-hero-body">
-      <div class="gtv2-idrow"><img class="gtv2-idlogo" src="logo_t.png" alt=""><div class="gtv2-idtext"><span class="gtv2-idname">${esc(title)}</span><span class="gtv2-iddate">${dateStr}</span></div>
-      ${(()=>{const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);const cur=RANKS[ri],next=RANKS[ri+1];const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,hi-lo)*100,0,100):100;const C=2*Math.PI*24;
-      return `<div style="margin-left:auto;flex:none;display:flex;align-items:center;gap:9px;cursor:pointer;background:rgba(0,0,0,.4);border:1px solid var(--hair2);border-radius:var(--r-m);padding:6px 11px 6px 7px" onclick="openRankLadder()">
-        <svg width="58" height="58" viewBox="0 0 58 58" style="flex:none"><circle cx="29" cy="29" r="24" fill="rgba(0,0,0,.5)" stroke="rgba(255,255,255,.14)" stroke-width="4"/><circle cx="29" cy="29" r="24" fill="none" stroke="#FFD048" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(C*pct/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 29 29)" style="filter:drop-shadow(0 0 6px rgba(255,208,72,.9))"/><text x="29" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="10" fill="#A06E14">LV</text><text x="29" y="42" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="20" fill="#FFD048">${sl}</text></svg>
-        <div style="text-align:left;line-height:1.15">
-          <div style="font-family:var(--disp);font-weight:650;font-size:14px;color:#FFD048;letter-spacing:.05em;text-shadow:0 0 10px rgba(255,208,72,.5)">${cur[2]} ${esc(cur[1]).toUpperCase()}</div>
-          <div style="font-size:9px;color:var(--text3)">RANK ${ri+1}/${RANKS.length}</div>
-          <div style="font-size:9px;color:${next?'var(--gold-dim)':'var(--green)'}">${next?`${Math.max(0,hi-sl)} lv → ${esc(next[1])}`:"MAX RANK"}</div>
-        </div></div>`;})()}
-      <button class="tbtn" onclick="openOmni()" aria-label="Find anything" style="flex:none;margin-left:7px">${GP.icon("search")}</button>
-    </div>
-      ${focal}
-      ${track}
-      <div class="gtv2-hero-actions">${btn}</div>
-    </div>
-  </section>`;
-}
-function gtv2ScorePanel(){
-  const r=patrolReadiness(),t=gothamThreat(),f=fatigueDebt(),w=weekCount(),goal=state.data.u.weeklyGoal||4;
-  const patrolClr=w>=goal?"var(--green)":"var(--gold)";
-  return `<div class="gtv2-grid">
-    <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score==null?"—":r.score}</div><div class="gtv2-note">${r.unlock?esc(r.line):esc(r.label)+" — "+esc(r.line)}${r.unlock||r.sleepKnown?"":` <span style="color:var(--text3)">· sleep not logged</span> <span class="chip" style="font-size:10px;padding:2px 8px" onclick="event.stopPropagation();openSleepLog()">Log sleep</span>`}</div><div class="gtv2-meter"><i style="width:${r.score||0}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
-    ${(()=>{let worstM=null,wcr=-1;M12.forEach(m=>{const dc=districtCrime(m);if(!dc.untrained&&dc.crime>wcr){wcr=dc.crime;worstM=m;}});
-      // worstM stays null when nothing has ever been trained — don't invent a villain narrative
-      // ("Bane rising in The Narrows") from a district you've never even set foot in.
-      const vil=worstM?((NEMESIS_MAP[worstM]||{}).villain||"the Rogues"):"",dist=worstM?(MUSCLE_DISTRICT[worstM]||MNAME[worstM]):"";
-      const crit=t.score>=72,hot=t.score>=50,note=(worstM&&hot&&vil)?`<b style="color:${t.color}">${esc(vil)}</b> ${crit?"holds":"rising in"} ${esc(dist)}`:esc(t.desc);
-      return `<div class="gtv2-panel gtv2-threat${crit?" crit":""}" style="border-color:${t.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${t.color}" onclick="openThreatInfo()"><i class="thz"></i>
-      <div class="gtv2-label">Threat <span class="threat-skull" style="color:${t.color}">${hot?"☠️":"🦇"}</span></div>
-      <div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div>
-      <div class="gtv2-note">${note}</div>
-      <div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color};box-shadow:0 0 10px currentColor"></i></div></div>`;})()}
-    <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.n?f.pct+"%":"—"}</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
-    <div class="gtv2-panel" style="border-color:${patrolClr};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${patrolClr}" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"};text-shadow:0 0 18px currentColor">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
-  </div>`;
-}
 /* ===== SEASON — THE LONG NIGHT: an 8-week story campaign. One villain per chapter seizes
    districts (muscles); you clear the chapter by training them, the bounty is a real PR.
    Stars are PURE — always recomputed from workout/PR history, nothing stored but {n,start}. ===== */
@@ -12312,16 +12461,10 @@ function gothamSeasonCard(){
   }
   const ev=seasonChapterEval(ss.week);const ch=ev.ch;
   const daysLeft=Math.max(0,Math.ceil((ev.t1-now())/864e5));
-  // chapter-intro cinematic — once per week, contextual (only when idle on home, never mid-session)
+  // chapter intro — once per week, a toast (no full-screen takeover on opening the app); the story itself lives in the season card
   if(state.data.season._introW!==ss.week&&!state.session&&!state.showOnboarding){
     state.data.season._introW=ss.week;try{save();}catch(e){}
-    setTimeout(()=>{try{cinePush({eye:`SEASON ${ss.n} · WEEK ${ss.week+1}`,icon:"🦹",accent:ch.c,
-      title:ch.v+" moves on Gotham",
-      titleHtml:`<span style="color:${ch.c}">${esc(ch.v)}</span>: ${esc(ch.t)}`,
-      bodyHtml:`<div class="vintro-face" style="--bc:${ch.c}">${villainFace({v:ch.v,e:"🦹"})}</div>
-        <div class="mini" style="margin-top:11px;font-style:italic;color:var(--text);font-size:14px">${esc(ch.lore)}</div>
-        ${ch.m.length?`<div class="mini" style="margin-top:9px;color:var(--text2)">He's taken <b style="color:${ch.c}">${ch.m.map(m=>MUSCLE_DISTRICT[m]).join(" & ")}</b>. Train ${ch.m.map(m=>MNAME[m]).join(" and ")} this week to drive him out.</div>`:`<div class="mini" style="margin-top:9px;color:var(--text2)">The finale. Records are the only language he understands.</div>`}`,
-      btn:"ACCEPT THE CHAPTER"});}catch(e){}},1400);
+    setTimeout(()=>toast(`New chapter: ${ch.v}. ${ch.m.length?"Train "+ch.m.map(m=>MNAME[m]).join(" and ")+".":"Set new records."}`),1400);
   }
   const totSt=SEASON_CHAPTERS.reduce((a,_,i)=>a+(i<ss.week?seasonChapterEval(i).stars:i===ss.week?ev.stars:0),0);
   const track=SEASON_CHAPTERS.map((cc,i)=>{
@@ -12682,9 +12825,262 @@ function territoryWarCard(){
     </div>`;
   }catch(e){return "";}
 }
+/* ========================= GOTHAM HOME (wave 2) =========================
+   Header → Tonight (the one hero) → Readiness → This week + volume map → Progress → Stalled lifts → Lore fold.
+   Read-only over the science helpers (progressionFor, getRecovery, weeklySets, zoneOf, patrolReadiness, acwrInfo, stalledLifts);
+   the only write on Home is logging a rest day (guarded to tonight's rest, once a day, with Undo). */
+const GH_MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],GH_DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const GH_FRESH=85;                                   // a muscle at or above this recovery % reads as ready
+const GH_SET_SEC=45,GH_LIFT_SEC=60,GH_MIN_STEP=5;    // session length estimate: work per set, setup per lift, rounding (min)
+const GH_SHORT={shoulders:"Delts",hamstrings:"Hams"};
+const ghName=m=>GH_SHORT[m]||MNAME[m]||m;
+const ghSameDay=(a,b)=>new Date(a).toDateString()===new Date(b).toDateString();
+const ghJs=s=>esc(JSON.stringify(s));                // a string as a JS literal inside a double-quoted onclick
+function ghAgo(d){
+  const k=Math.round((new Date(new Date().toDateString())-new Date(new Date(d).toDateString()))/864e5),t=new Date(d);
+  return k<=0?"today":k===1?"yesterday":k<7?GH_DOW[t.getDay()]:t.getDate()+" "+GH_MON[t.getMonth()];
+}
+/* number roll-up: rAF easeOutCubic from the previous value; reduced motion (or no change) sets the value directly */
+function rollUp(el,to,o={}){
+  const ms=o.ms||600,dec=o.dec||0,from=o.from==null?0:o.from,fmt=v=>dec?v.toFixed(dec):String(Math.round(v));
+  if(from===to||!el.isConnected||(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)){el.textContent=fmt(to);return;}
+  const t0=performance.now();el.textContent=fmt(from);
+  const step=t=>{const p=Math.min(1,(t-t0)/ms);el.textContent=fmt(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1&&el.isConnected)requestAnimationFrame(step);else el.textContent=fmt(to);};
+  requestAnimationFrame(step);
+}
+/* first view of the day (or a changed value) counts up; revisiting the tab with the same numbers leaves them alone */
+function ghRoll(){
+  const day=new Date().toDateString(),st=state._ghRoll=state._ghRoll&&state._ghRoll.day===day?state._ghRoll:{day,v:{}};
+  document.querySelectorAll("#app [data-roll]").forEach(el=>{
+    const to=+el.dataset.roll,k=el.dataset.k,had=st.v[k];st.v[k]=to;
+    if(had!==to)rollUp(el,to,{dec:+el.dataset.dec||0,from:had==null?0:had});
+  });
+}
+/* live session on Home: elapsed time and rest countdown tick while the hero is on screen, then the timer retires itself */
+function ghTick(){
+  clearInterval(state._ghTick);
+  if(!state.session||!document.querySelector(".gh-el"))return;
+  state._ghTick=setInterval(()=>{
+    const el=document.querySelector(".gh-el");
+    if(!el||!state.session||state.step){clearInterval(state._ghTick);return;}
+    el.textContent=fmtTime(Math.floor((now()-state.session.startedAt)/1000));
+    const rt=document.querySelector(".gh-rt");
+    if(rt){const rem=Math.ceil((state.restEnd-now())/1000);if(state.restRunning&&rem>0)rt.textContent=fmtTime(rem);else if(rt.parentElement)rt.parentElement.remove();}
+  },1000);
+}
+
+/* ---- header ---- */
+function ghGreeting(){
+  const h=new Date().getHours(),n=String(state.data.u.name||"").trim();
+  return (h>=5&&h<12?"Good morning":h>=12&&h<17?"Good afternoon":"Good evening")+(n?", "+esc(n):"");
+}
+function ghEyebrow(){   // the top bar's left slot on Home
+  const t=new Date(),cur=gtv2CurrentPlanDay();
+  return `<div class="gh-eb">${GP.icon("bat")}<span>${GH_DOW[t.getDay()]} ${t.getDate()} ${GH_MON[t.getMonth()]}</span>${cur?`<span class="gh-cy">· <span class="gh-cyw">Cycle </span>day ${cur.i+1} of ${cur.sp.days.length}</span>`:""}</div>`;
+}
+
+/* ---- tonight's numbers ---- */
+function ghSetsOf(day,n){
+  const pl=day.plan&&day.plan[n],s=pl&&+pl.s>0?Math.round(+pl.s):(lastSetFor(n)||[]).filter(x=>x.type!=="W").length;
+  return s||3;
+}
+function ghDayStats(day){
+  const ex=day.exercises||[],sets=ex.reduce((a,n)=>a+ghSetsOf(day,n),0),rest=state.data.u.restTime||120;
+  return {lifts:ex.length,sets,min:Math.round((sets*(GH_SET_SEC+rest)+ex.length*GH_LIFT_SEC)/60/GH_MIN_STEP)*GH_MIN_STEP,
+    up:ex.filter(n=>{const p=progressionFor(n);return p&&p.add;}).length};
+}
+function ghPlanSets(day){   // tonight's planned working sets per muscle, same credit rule as weeklySets (secondary = half)
+  const out={};
+  (day.exercises||[]).forEach(n=>{const ex=exFor(n),s=ghSetsOf(day,n);
+    (ex.p||[]).forEach(m=>{out[m]=(out[m]||0)+s;});(ex.s||[]).forEach(m=>{out[m]=(out[m]||0)+s*.5;});});
+  return out;
+}
+function ghVol(day){   // one row per muscle: sets this cycle-week, landmarks, recovery, tonight's plan (normalised per week like weeklySets)
+  const plan=day?ghPlanSets(day):{};
+  return M12.map(m=>{
+    const sets=weeklySets(m),z=zoneOf(m,sets),L={mev:z.mev,mav:z.mav,mrv:z.mrv},rec=getRecovery(m);
+    return {m,sets,L,zone:GP.zone(sets,L),rec,hrs:rec<GH_FRESH?hoursToReady(m):0,plan:Math.round(perWeek(plan[m]||0)*10)/10,trained:(state.data.muscleVol[m]||0)>0};
+  });
+}
+function ghAttention(vol){   // over MRV (worst first), under MEV (furthest first), then the rest by lowest recovery
+  const k=t=>t.zone==="bad"?0:t.zone==="warn"?1:2;
+  return vol.slice().sort((a,b)=>k(a)-k(b)||(k(a)===0?(b.sets-b.L.mrv)-(a.sets-a.L.mrv):k(a)===1?(b.L.mev-b.sets)-(a.L.mev-a.sets):a.rec-b.rec));
+}
+function ghRestLoggedToday(){return (state.data.restLog||[]).some(r=>ghSameDay(r,now()));}
+
+/* ---- deterministic Alfred tip: one line, first rule that matches the current data ---- */
+function ghTip(vol,day,rest){
+  if(!(state.data.workouts||[]).length)return "Log your first session and I will start reading your recovery, volume and load.";
+  const trained=vol.filter(t=>t.trained).sort((a,b)=>a.rec-b.rec);
+  if(rest){const t=trained[0];
+    return t&&t.rec<GH_FRESH?`${MNAME[t.m]} at ${t.rec}%${t.hrs?`: about ${t.hrs}h to full recovery`:""}. Rest now.`:"Every muscle is above 85%. Resting now keeps it that way.";}
+  const prim=day?Object.keys(dayMuscles(day).prim):[],low=trained.filter(t=>!prim.length||prim.includes(t.m))[0];
+  if(low&&low.rec<60)return `${MNAME[low.m]} at ${low.rec}%: keep its sets at 2 RIR tonight.`;
+  const a=acwrInfo();
+  if(a.zone==="spike"||a.zone==="high")return `Load is ${a.ratio.toFixed(2)}x your 4-week average. Hold volume steady this week.`;
+  const over=vol.filter(t=>t.zone==="bad").sort((x,y)=>(y.sets-y.L.mrv)-(x.sets-x.L.mrv))[0];
+  if(over)return `${MNAME[over.m]} is at ${over.sets} sets, past its ${over.L.mrv}-set limit. Skip extra ${MNAME[over.m].toLowerCase()} work.`;
+  const ready=day?(day.exercises||[]).filter(n=>{const p=progressionFor(n);return p&&p.add;}):[];
+  if(ready.length)return `${ready.length} lift${ready.length===1?"":"s"} hit the top of the range last time. Add weight on ${ready[0]}${ready.length>1?" and the others":""}.`;
+  const under=trained.filter(t=>t.zone==="warn").sort((x,y)=>(y.L.mev-y.sets)-(x.L.mev-x.sets))[0];
+  if(under)return `${MNAME[under.m]} has ${under.sets} of ${under.L.mev} minimum sets this week. Add ${under.L.mev-under.sets} more.`;
+  const st=stalledLifts()[0];
+  if(st)return `${st.n} has been flat for ${st.sessions} sessions. Change the angle or rep range.`;
+  return patrolReadiness().sleepKnown?"Recovery and load look good. Train as planned.":"Log last night's sleep and readiness will count it.";
+}
+
+/* ---- TONIGHT hero (the one S3 surface) ---- */
+const ghTwo=list=>list.filter(x=>x.rec<GH_FRESH&&x.hrs).length>1?" gh-tm2":"";   // two chips carrying hours would overflow one row
+function ghRings(list){   // [{m,rec,hrs}] → recovery rings; warn text + hours when below GH_FRESH
+  return list.map(x=>{const low=x.rec<GH_FRESH;
+    return `<div class="gh-tmc${low?" warn":""}">${GP.muscleRing(x.rec,30)}<div><b>${ghName(x.m)}</b><span>${x.rec}%${low&&x.hrs?" · "+x.hrs+"h":""}</span></div></div>`;}).join("");
+}
+function ghRail(cur){   // cycle position: one segment per day, tonight long and gold
+  return `<button class="gh-cyc" data-hx onclick="goPlan()" aria-label="Cycle day ${cur.i+1} of ${cur.sp.days.length}. Open the plan">${cur.sp.days.map((_,i)=>`<i class="${i<cur.i?"d":i===cur.i?"t":""}"></i>`).join("")}</button>`;
+}
+function ghHeroLive(ses){   // a live or minimised session always wins the hero: RESUME, never START over it
+  const exs=(ses.exercises||[]).filter(e=>!e._skip),c=sessionCounts(ses);
+  const ci=exs.findIndex(e=>(e.sets||[]).some(s=>s.type!=="W"&&!s.done)),cur=exs[ci];
+  const si=cur?(cur.sets||[]).filter(s=>s.type!=="W").findIndex(s=>!s.done)+1:0;
+  const rem=state.restRunning&&state.restEnd?Math.ceil((state.restEnd-now())/1000):0;
+  const seg=GP.seg(exs.map((e,i)=>{const w=(e.sets||[]).filter(s=>s.type!=="W");return {n:Math.max(1,w.length),done:w.filter(s=>s.done).length,cur:i===ci};}));
+  return `<section class="s3 gh-hero is-live gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Live · <span class="gh-el">${fmtTime(Math.floor((now()-ses.startedAt)/1000))}</span></span><span class="gh-cnt"><b class="num">${c.done}</b> / ${c.total} sets</span></div>
+    <h2 class="num gh-title">${esc(ses.day||"Session")}</h2>
+    <div class="gh-meta"><span>${cur?`${esc(cur.name)} · set ${si} next`:"All sets logged · ready to finish"}</span>${rem>0?`<span>Rest <b class="gh-rt">${fmtTime(rem)}</b></span>`:""}</div>
+    <div class="gh-seg">${seg}</div>
+    <div class="gh-cta"><button class="btn btn-1" onclick="resumeWorkout()">${GP.icon("play")}Resume workout</button><button class="btn" onclick="discardSession()">End</button></div></section>`;
+}
+function ghHeroTonight(cur){
+  const day=cur.day,st=ghDayStats(day),prim=dayMuscles(day).prim;
+  const top=Object.keys(prim).map(m=>({m,n:prim[m],rec:getRecovery(m),hrs:hoursToReady(m)})).sort((a,b)=>b.n-a.n||a.rec-b.rec).slice(0,4);
+  return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight</span>${ghRail(cur)}</div>
+    <h2 class="num gh-title">${esc(day.name)}</h2>
+    <div class="gh-meta"><span><b>${st.lifts}</b> lifts</span><span><b>${st.sets}</b> sets</span><span>~<b>${st.min}</b> min</span>${st.up?`<span class="up">${GP.icon("up")}${st.up} ready for +kg</span>`:""}</div>
+    ${top.length?`<div class="gh-tm${ghTwo(top)}" aria-label="Recovery of tonight's muscles">${ghRings(top)}</div>`:`<div style="height:14px"></div>`}
+    <div class="gh-cta"><button class="btn btn-1" onclick="startWorkout('${cur.sp.id}',${cur.i})">${GP.icon("play")}Start Patrol</button><button class="btn" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Preview</button></div></section>`;
+}
+function ghHeroRest(cur,vol){
+  const n=cur.sp.days.length,logged=ghRestLoggedToday();
+  let ni=-1;for(let j=1;j<n;j++){const k=(cur.i+j)%n;if(!isRest(cur.sp.days[k])){ni=k;break;}}
+  const nd=ni>=0?cur.sp.days[ni]:null,low=vol.filter(t=>t.trained).sort((a,b)=>a.rec-b.rec).slice(0,4);
+  return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
+    <h2 class="num gh-title">Rest day</h2>
+    <div class="gh-meta">${nd?`<button class="gh-next" data-hx onclick="openDayBriefing('${cur.sp.id}',${ni})">Next: <b>${esc(nd.name)}</b>${GP.icon("chevR")}</button>`:"<span>Recovery is part of the plan</span>"}</div>
+    ${low.length?`<div class="gh-tm${ghTwo(low)}" aria-label="Recovery outlook">${ghRings(low)}</div>`:`<div style="height:14px"></div>`}
+    <div class="gh-cta">${logged?`<button class="btn gh-done" disabled>${GP.icon("check")}Rest day logged</button><button class="btn" onclick="undoRestDay()">Undo</button>`
+      :`<button class="btn btn-1" onclick="logRestDay()">Log rest day</button><button class="btn" onclick="freeWorkout()">Train anyway</button>`}</div></section>`;
+}
+function ghHeroFree(){
+  return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight</span></div>
+    <h2 class="num gh-title">Free session</h2><div class="gh-meta"><span>No active split. Start a session now, or build a plan in Mission.</span></div><div style="height:16px"></div>
+    <div class="gh-cta"><button class="btn btn-1" onclick="freeWorkout()">${GP.icon("play")}Start session</button><button class="btn" onclick="goPlan()">Plan</button></div></section>`;
+}
+
+/* ---- READINESS: score ring, honest drivers, one Alfred line ---- */
+function ghReadiness(vol,day,rest){
+  const r=patrolReadiness(),a=acwrInfo(),has=r.score!=null,tone=!has?"":r.score>=60?"ok":r.score>=40?"warn":"bad";
+  const col={ok:["#7BF0B0","#22B86A"],warn:["#FFD27A","#E39A12"],bad:["#FF9A90","#E0463B"]}[tone]||["#7F8BA1","#7F8BA1"];
+  const drv=(lab,v,fn)=>`<div class="gh-drv"${fn?` data-hx onclick="${fn}"`:""}><span>${lab}</span><b class="bar"><i style="width:${v}%"></i></b><b class="num">${v}</b></div>`;
+  const lrTxt={sweet:["sweet spot","c-ok"],high:["climbing","c-warn"],spike:["spike","c-bad"],detrain:["low","c-2"]}[a.zone],
+    lr=lrTxt?`${a.ratio.toFixed(2)} <span class="${lrTxt[1]}">· ${lrTxt[0]}</span>`:`<span class="c-3">Building</span>`;
+  const sleepRow=r.sleepKnown?drv("Sleep",r.sleep,"event.stopPropagation();openSleepLog()")
+    :`<div class="gh-drv"><span>Sleep</span><span class="gh-nl">Not logged</span><button class="gh-log" data-hx onclick="event.stopPropagation();openSleepLog()">${GP.icon("plus")}Log</button></div>`;
+  const drivers=has?drv("Recovery",r.rec,"event.stopPropagation();openFatigueInfo()")+drv("Freshness",r.fresh)+sleepRow+`<div class="gh-drv"><span>Load ratio</span><span class="gh-lr">${lr}</span></div>`
+    :`<div class="gh-hint">${esc(r.line)} Recovery, freshness and load ratio appear once there is history.</div>`;
+  return `<section class="s2 gh-ready gh-c" style="--i:1"><div class="gh-rd-main" onclick="openInfirmary()">
+      <div class="gh-ring${has?"":" empty"}">${GP.ring(has?r.score:0,100,{size:92,stroke:9,c1:col[0],c2:col[1]})}<div class="gh-rc">${has?`<span class="num" data-roll="${r.score}" data-k="ready">${r.score}</span><span class="eyebrow c-${tone}">${esc(r.label)}</span>`:`<span class="num c-3">—</span><span class="eyebrow">No data</span>`}</div></div>
+      <div class="gh-rd"><div class="gh-rd-h"><span class="eyebrow">Readiness drivers</span></div>${drivers}</div></div>
+    <button class="gh-coach" data-hx onclick="openAlfredChat()"><span class="av"><img src="assets/alfred.png" alt=""></span><span><b>Alfred</b> · ${esc(ghTip(vol,day,rest))}</span></button></section>`;
+}
+
+/* ---- THIS WEEK + the pro muscle map ---- */
+function ghWeekDots(){
+  const ws=state.data.workouts||[],trained=new Set(ws.map(w=>new Date(w.date).toDateString())),rested=new Set((state.data.restLog||[]).map(r=>new Date(r).toDateString())),
+    t0=new Date(weekStartK(0)),today=new Date().toDateString();
+  return ["M","T","W","T","F","S","S"].map((l,i)=>{const dt=new Date(t0);dt.setDate(t0.getDate()+i);const k=dt.toDateString();
+    return {d:l,s:trained.has(k)?"done":k===today?"today":rested.has(k)?"rest":"plan"};});
+}
+function ghTile(t,i){
+  const fz=GP.zone(t.sets+t.plan,t.L),tag=t.zone==="bad"?'<span class="tag bad">over</span>':t.zone==="warn"?'<span class="tag warn">under</span>':fz==="bad"?`<span class="gh-fc" title="Tonight's plan takes this past MRV">${GP.icon("alert")}</span>`:"";
+  return `<div class="gh-mt" style="--k:${i}" data-hx onclick="muscleDrill('${t.m}')"><div class="gh-mt-t">${GP.recRing(t.rec)}<span class="gh-mt-n">${MNAME[t.m]}</span>${t.hrs?`<span class="gh-mt-h">${t.hrs} h</span>`:""}<span class="gh-mt-v">${tag}<b class="num${t.zone==="ok"?"":" c-"+t.zone}">${t.sets}</b></span></div>${GP.landmark(t.sets,t.L,t.plan)}</div>`;
+}
+function ghWeek(vol){
+  const goal=state.data.u.weeklyGoal||4,w=weekCount(),ws=weeklyStreak(),has=(state.data.workouts||[]).length>0;
+  const streak=ws>0?`<div class="gh-stk">${GP.icon("flame")}${ws}-week streak</div>`:`<div class="gh-stk off">${w>=goal?"Goal met":(goal-w)+" more to hit your goal"}</div>`;
+  let map;
+  if(!has)map=`<div class="gh-empty">Weekly volume for every muscle appears after your first session: sets against the minimum, productive and maximum landmarks.</div>`;
+  else{
+    const over=vol.filter(t=>t.zone==="bad").length,under=vol.filter(t=>t.zone==="warn").length;
+    map=`<div class="gh-lgd"><span class="eyebrow">Sets vs MEV · MAV · MRV</span><span class="k"><span>${GP.recRing(70,11)}recovery</span>${vol.some(t=>t.plan>0)?`<span><i class="sw"></i>tonight</span>`:""}</span></div>
+      <div class="gh-mgrid">${ghAttention(vol).map(ghTile).join("")}</div>
+      <div class="gh-wk-f"><span class="t-xs">${over} over · ${under} under · ${12-over-under} in range</span><button class="btn btn-3" onclick="ghOpenLore()">${GP.icon("map")}Gotham map</button></div>`;
+  }
+  return `<section class="s2 gh-week gh-c" style="--i:2"><div class="gh-wk-h"><div class="gh-wk-l" data-hx onclick="goPlan()"><div class="eyebrow">This week</div><div class="gh-wk-t"><span class="num" data-roll="${w}" data-k="wk">${w}</span><span>/ ${goal} sessions</span></div>${streak}</div>
+    <div class="gh-wk-r" data-hx onclick="go('case',1)" aria-label="Open the training calendar">${GP.weekDots(ghWeekDots())}</div></div>${map}</section>`;
+}
+
+/* ---- PROGRESS tiles, recent records, stalled lifts ---- */
+function ghRecentPRs(max){
+  const out=[],seen=new Set();
+  for(const w of (state.data.workouts||[])){   // newest first
+    for(const name of (w.prs||[])){
+      if(out.length>=max)return out;
+      if(seen.has(name))continue;seen.add(name);
+      const e=(w.exercises||[]).find(x=>x.name===name),ex=exFor(name);if(!e)continue;
+      let best=null,bv=0;(e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;const v=setE1RM(ex,s);if(v>bv){bv=v;best=s;}});
+      if(!best)continue;
+      const rows=exerciseRows(name),i=rows.findIndex(r=>r.date===w.date),prev=i>0?Math.max(...rows.slice(0,i).map(r=>r.e1rm)):0;
+      out.push({name,w:+best.w||0,r:+best.r||0,e1:bv,d:prev?Math.round((bv-prev)*10)/10:0,spark:i>=0?rows.slice(Math.max(0,i-7),i+1).map(r=>r.e1rm):[],ago:ghAgo(w.date)});
+    }
+  }
+  return out;
+}
+function ghProgress(){
+  const ws=state.data.workouts||[];if(!ws.length)return "";
+  const a=acwrInfo(),vols=[7,6,5,4,3,2,1,0].map(k=>weeklyLoad(k)/1000),t=vols[7],pv=prVelocity();
+  const prWk=[7,6,5,4,3,2,1,0].map(k=>{const s=weekStartK(k),e=weekStartK(k-1);return ws.reduce((n,w)=>{const x=new Date(w.date).getTime();return x>=s&&x<e?n+((w.prs||[]).length):n;},0);});
+  const pct=a.zone!=="building"&&a.chronic>0?Math.round((a.acute/a.chronic-1)*100):null,dp=pv.recent-pv.prior;
+  const volDelta=pct==null?`<div class="gh-dl flat">Building history</div>`:`<div class="gh-dl ${pct>=0?"up":"flat"}">${pct>=0?GP.icon("up")+"+":"−"}${Math.abs(pct)}% <span class="t-xs">vs 4-wk avg</span></div>`;
+  return `<div class="gh-sec gh-c" style="--i:3"><h2>Progress</h2><button class="gh-more" data-hx onclick="go('case',1)">All lifts</button></div>
+    <div class="gh-tiles gh-c" style="--i:3">
+      <div class="s1 gh-tile" data-hx onclick="go('case',1)"><span class="eyebrow">Volume · week</span><div class="gh-v"><span class="num" data-roll="${t.toFixed(1)}" data-dec="1" data-k="vol">${t.toFixed(1)}</span><span class="u">t</span></div>${volDelta}${GP.spark(vols,{w:150,h:34})}</div>
+      <div class="s1 gh-tile" data-hx onclick="go('case',1)"><span class="eyebrow">PRs · 30 days</span><div class="gh-v"><span class="num" data-roll="${pv.recent}" data-k="pr">${pv.recent}</span><span class="u">records</span></div><div class="gh-dl ${dp>0?"up":"flat"}">${dp>0?GP.icon("up")+"+"+dp:dp<0?"−"+Math.abs(dp):"Steady"} <span class="t-xs">vs prior 30 d</span></div>${GP.bars(prWk,{w:150,h:34})}</div>
+    </div>`;
+}
+function ghRecents(){
+  const rows=ghRecentPRs(3);if(!rows.length)return "";
+  return `<section class="s2 gh-list gh-c"><div class="gh-lh"><h3>Recent records</h3><span class="t-xs">e1RM trend</span></div>${rows.map(r=>`<div class="gh-row" data-hx onclick="exerciseHistory(${ghJs(r.name)})"><span class="lead gold">${GP.icon("trophy")}</span><div class="main"><div class="gh-t1">${esc(r.name)}</div><div class="gh-t2">${fmtKg(r.w)} kg × ${r.r} · e1RM ${Math.round(r.e1)}</div></div><span class="trail">${r.spark.length>1?GP.spark(r.spark,{w:44,h:22,area:false}):""}<span class="gh-col">${r.d>0?`<b class="d">+${fmtKg(r.d)}</b>`:""}<i class="t-xs">${r.ago}</i></span></span></div>`).join("")}</section>`;
+}
+function ghStalled(){
+  const L=stalledLifts();if(!L.length)return "";
+  return `<section class="s2 gh-list gh-c"><div class="gh-lh" data-hx onclick="openStalledLifts()"><h3>Stalled lifts <span class="tag warn">${L.length}</span></h3><span class="t-xs">3+ sessions flat${L.length>4?" · +"+(L.length-4)+" more":""}</span></div>${L.slice(0,4).map(s=>{
+    const p=exerciseRows(s.n).slice(-6).map(r=>r.e1rm),b=p[0]||1;
+    return `<div class="gh-row" data-hx onclick="openStalledLifts()"><span class="lead warn">${GP.icon("flat")}</span><div class="main"><div class="gh-t1">${esc(s.n)}</div><div class="gh-t2">e1RM ${Math.round(s.best)} · flat ${s.sessions} session${s.sessions===1?"":"s"}</div></div><span class="trail">${p.length>1?GP.spark(p,{w:44,h:22,color:"var(--warn)",area:false,min:b*.9,max:b*1.1}):""}${GP.icon("chevR")}</span></div>`;}).join("")}</section>`;
+}
+
+/* ---- LORE fold: nothing deleted, all of it one tap away and off the main flow ---- */
+const GH_SKY='<svg class="sky" viewBox="0 0 230 62" preserveAspectRatio="xMaxYMax slice" aria-hidden="true"><defs><linearGradient id="ghsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFDD8A" stop-opacity=".13"/><stop offset="1" stop-color="#FFDD8A" stop-opacity="0"/></linearGradient></defs><path fill="url(#ghsky)" d="M0 62V48h10V38h8v10h8V30h4l3-10 3 10h4v24h8V36h10v10h6V24h4V16l2-8 2 8v8h4v22h10V38h10v14h8V28h8v-6h8v20h8V32h8v16h8V18h3l3-12 3 12h3v26h10V34h10v16h8V26h10v12h8v8h10V30h8v12h12v20z"/></svg>';
+function ghToggleLore(force){
+  const b=$("gotham-lore"),r=$("gh-lore-row");if(!b)return;
+  const open=force!=null?force:b.classList.contains("hide");
+  b.classList.toggle("hide",!open);if(r)r.classList.toggle("open",open);
+  state.accOpen=state.accOpen||{};state.accOpen["gotham-lore"]=open;
+  if(open)setTimeout(()=>{try{b.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}},60);
+}
+function ghOpenLore(){ghToggleLore(true);}
+function ghLore(loreHtml){
+  const d=state.data,open=accIsOpen("gotham-lore",false),cb=(d.bossReturns||[]).find(b=>!b.defeated);
+  let held=null;try{held=M12.filter(m=>{const dc=districtCrime(m);return !dc.untrained&&dc.crime<45;}).length;}catch(e){}
+  const boss=cb?`<div class="gtv2-panel wide" style="margin-bottom:12px"><div class="gtv2-label">Active case files</div><div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ff887f">👁️</div><div><div class="gtv2-action-title">${esc(cb.villain)} has returned</div><div class="gtv2-action-copy">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-book the case.</div></div><span class="gtv2-chip red">boss</span></div></div>`:"";
+  const links=[["scale","Iron Ledger","Lifetime volume","openIronLedger()"],["alert","Threat level","City crime and districts","openThreatInfo()"],["crown","Rank ladder","Level "+strengthLevel(),"openRankLadder()"],["pulse","Infirmary","Sleep, soreness, supplements","openInfirmary()"]];
+  const rows=`<section class="s2 gh-list gh-c">${links.map(l=>`<div class="gh-row" data-hx onclick="${l[3]}"><span class="lead">${GP.icon(l[0])}</span><div class="main"><div class="gh-t1">${l[1]}</div><div class="gh-t2">${l[2]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section>`;
+  return `<div class="s1 gh-lore gh-c${open?" open":""}" id="gh-lore-row" data-hx onclick="ghToggleLore()">${GH_SKY}<span class="lead">${GP.icon("bat")}</span><div class="main"><div class="gh-t1">Gotham</div><div class="gh-t2">Districts${held!=null?" "+held+"/12":""} · chronicle · events</div></div><span class="trail">${GP.icon("chevR")}</span></div>
+    <div id="gotham-lore" class="gh-lore-body${open?"":" hide"}"><div class="gtv2-shell">${territoryWarCard()}${mostWantedCard()}${boss}${loreHtml}</div>${rows}</div>`;
+}
+
 function renderGotham(){
   const d=state.data,u=d.u;
-  const ws=weeklyStreak(),dop=daysOnProtocol();
+  const ws=weeklyStreak();
   // once-a-day arrival ritual + Alfred noticing you
   try{const today=new Date().toDateString();
     if(u._ritualDay!==today&&!state.showOnboarding){u._ritualDay=today;save();
@@ -12694,32 +13090,16 @@ function renderGotham(){
       else if(new Date().getDay()===1){alfredPingAI("It's Monday — a new training week begins. One-line marching order for the week based on the training data above.");}
       try{wraithShowdownCheck();}catch(e){}
     }}catch(e){}
-  // Memoize the two heaviest cards (SVG city + season eval) — rebuilt at most once/min or when data changes
+  // Memoize the heaviest lore card (season eval) — rebuilt at most once/min or when data changes
   const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
   const mm=state._gcMemo=state._gcMemo||{};
   if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  // The week's story, events, crate, siege and season status used to stack as six separate
-  // always-open cards before you ever reached your actual readiness stats — a wall of lore on the
-  // one screen that's supposed to answer "what do I do tonight?" first. Folded into one collapsed
-  // accordion (same pattern Profile already uses) — nothing lost, just not fighting for attention
-  // by default. Territory War stays visible: it's the one narrative card that's also a direct,
-  // glanceable readout of your actual muscle data, not pure flavor.
+  // The story layer (crate, events, chronicle, cave review, siege, season, garage, territory map) lives behind ONE collapsed row at the bottom.
   const loreHtml=(()=>{try{return crateCard()+seasonEventCard()+chronicleCard()+caveReviewCard()+siegeCard()+mm.season+garageCard();}catch(e){return "";}})();
-  let html=`<div class="gtv2-shell">${gtv2MissionHero()}${territoryWarCard()}${loreHtml.trim()?acc('gotham-lore','🦹','Gotham Chronicle',loreHtml,false,"this week's story, events & siege"):''}${gtv2ScorePanel()}`;
-  const stalled=typeof stalledLifts==="function"?stalledLifts():[];
-  const cb=(d.bossReturns||[]).find(b=>!b.defeated);
-  if(stalled.length||cb){
-    html+=`<div class="gtv2-panel wide" style="margin-bottom:14px"><div class="gtv2-label">Active case files</div>`;
-    if(stalled.length)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ffb15c">🩺</div><div><div class="gtv2-action-title">${stalled.length} stalled lift${stalled.length===1?"":"s"}</div><div class="gtv2-action-copy">${stalled.slice(0,3).map(s=>esc(s.n)).join(", ")}${stalled.length>3?` +${stalled.length-3} more`:""} - best e1RM flat for 3+ sessions. Change one variable (angle, grip or rep range).</div></div><button class="btn ghost sm" style="width:auto" onclick="openStalledLifts()">Open</button></div>`;
-    if(cb)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ff887f">👁️</div><div><div class="gtv2-action-title">${esc(cb.villain)} has returned</div><div class="gtv2-action-copy">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-book the case.</div></div><span class="gtv2-chip red">boss</span></div>`;
-    html+=`</div>`;
-  }
-  html+=mostWantedCard();
-  const skC=ws>0?"var(--orange)":"var(--gold)";
-  html+=`<div class="gtv2-grid"><div class="gtv2-panel" style="border-color:${skC};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${skC}" onclick="go('case')"><div class="gtv2-label">Streak</div><div class="gtv2-value" style="color:${skC};text-shadow:0 0 18px currentColor">${ws>0?"🔥":""}${ws}<span style="font-size:15px;font-family:var(--disp);font-weight:650;color:var(--text3);margin-left:3px">wk</span></div><div class="gtv2-note">${ws===0?"Hit your weekly goal to start the chain":ws+" week"+(ws===1?"":"s")+" hitting goal"} · ${dop} day${dop===1?"":"s"} unbroken<br><span style="color:var(--text3);font-size:10px">rest never breaks it</span></div></div>
-    <div class="gtv2-panel" style="border-color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px var(--gold)" onclick="openIronLedger()"><div class="gtv2-label">Iron Ledger</div><div class="gtv2-value" style="color:var(--gold2);text-shadow:0 0 18px currentColor">${fmtNum(Math.round((typeof ironLedger==="function"?ironLedger().vol:u.totalVolume)||0))}</div><div class="gtv2-note">kg lifetime volume</div></div></div>`;
-  html+=`</div>`;
-  $("app").innerHTML=html;
+  const cur=gtv2CurrentPlanDay(),day=cur&&cur.day,rest=!!(day&&isRest(day)),vol=ghVol(day&&!rest?day:null);
+  const hero=state.session?ghHeroLive(state.session):!cur?ghHeroFree():rest?ghHeroRest(cur,vol):ghHeroTonight(cur);
+  $("app").innerHTML=`<div class="gh${state._same?"":" gh-anim"}"><h1 class="gh-hi">${ghGreeting()}</h1>${hero}${ghReadiness(vol,day&&!rest?day:null,rest)}${ghWeek(vol)}${ghProgress()}${ghRecents()}${ghStalled()}${ghLore(loreHtml)}</div>`;
+  ghRoll();ghTick();
 }
 function overloadSuggestions(wk){
   const out=[];
