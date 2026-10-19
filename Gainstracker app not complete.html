@@ -1593,12 +1593,12 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .lg2-sr.pr{background:rgba(242,193,78,.08);box-shadow:inset 0 0 0 1px rgba(242,193,78,.4)}
 .lg2-sr.pr .lg2-sn{background:var(--tint-gold);color:var(--gold-ink)}
 .lg2-sr.pr-fresh::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(100deg,transparent 30%,rgba(255,221,138,.55) 50%,transparent 70%) 100% 0/250% 100% no-repeat;animation:lg2-sweep .6s var(--ease-out) 1 both}
-@keyframes lg2-sweep{from{background-position:100% 0}to{background-position:-60% 0}}
+@keyframes lg2-sweep{from{background-position:100% 0;opacity:1}to{background-position:-60% 0;opacity:0}}
 .lg2-sx{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:2px 6px 8px 52px;animation:lg2-in .22s var(--ease-out) 1 both}
 @keyframes lg2-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .lg2-sx .lbl{font:600 11px/1 var(--body);letter-spacing:.08em;color:var(--tx3)}
-.lg2-sx .rir{display:flex;gap:4px}
-.lg2-sx .rir button{width:32px;height:30px;padding:0;border-radius:8px;font:650 13px/1 var(--body);color:var(--tx2);background:rgba(150,178,222,.07)}
+.lg2-sx .rir{display:flex;gap:3px}
+.lg2-sx .rir button{width:30px;height:30px;padding:0;border-radius:8px;font:650 13px/1 var(--body);color:var(--tx2);background:rgba(150,178,222,.07)}
 .lg2-sx .rir button.on{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.5)}
 .lg2-prchip,.lg2-rchip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:999px;font:650 12px/1 var(--body);white-space:nowrap}
 .lg2-prchip{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.4);animation:lg2-chip .3s var(--spring) 1 both}
@@ -3659,7 +3659,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(ev==="boss");if(ev==="pr"||ev==="boss"){prFlash();sfx("pop");}if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr"||ev==="boss")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}if(exx._title&&!exx._titleWon){setTimeout(()=>{try{playStinger('CHAMPION RETAINS',exx.name.toUpperCase()+' — THE RECORD STANDS','#c9d2e2');}catch(_){}},380);}else{haptic("tap");toast("✓ "+exx.name+" cleared");}}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;const fv=sessionFoe(state.session);setTimeout(()=>{try{playStinger(fv.toUpperCase()+" DOWN","EVERY SET CLEARED — FINISH THE NIGHT","#FF3622");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{if(!state.session._rirNudged){const dws=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W").length,0),withR=state.session.exercises.reduce((a,x2)=>a+x2.sets.filter(x=>x.done&&x.type!=="W"&&rirOfSet(x)!=null).length,0);if(dws>=4&&withR===0){state.session._rirNudged=true;toast("🎩 Tap the RIR tile after each set — effort is intel, sir.");}}}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(false);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr"||ev==="boss")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast(exx._title&&!exx._titleWon?"Title fight over: the record stands":"✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3730,33 +3730,13 @@ function liveCheckPR(ei,si){
     }}catch(e){}
   // Co-op raid: an e1RM crown is a "record landed" — pool it toward the shared boss.
   if(hits.some(h=>h.t==="e1rm")){try{raidNotePR(1);}catch(e){}try{resolveCallouts(exObj.name);}catch(e){}try{wraithNotePR(exObj.name,e1);}catch(e){}try{titleNoteCrown(exObj.name,e1);}catch(e){}}
-  const willBoss=hits.some(h=>h.t==="e1rm")&&!state.session.bossed[exObj.name];
+  /* PR during the session = an in-row moment (gold sweep, crown, chime). No full-screen takeover: the big celebration is the finish summary. */
   if(hits.length){
-    if(willBoss){
-      // Hold the PR pop back — the boss fight takes the screen first, then we replay the pop on top
-      // of the victory so you clearly see exactly which record you just broke.
-      state._pendingPRpop={name:exObj.name,hits:hits.slice(),info:{w,r,e1,vol}};
-    }else{
-      // A record broken AFTER an earlier record tonight is a bigger story, not a smaller one.
-      // Set 1 crowned it, set 3 raised it — full stinger + kill cam every time, with escalation copy.
-      const again=state.session.bossed[exObj.name]||(state.session._prCount&&state.session._prCount[exObj.name]);
-      if(again){
-        try{playStinger("RECORD RAISED — AGAIN","SAME NIGHT · SAME LIFT · HIGHER","#FFD048");}catch(e){}
-        setTimeout(()=>{try{prKillCam(exObj.name,hits,{w,r,e1,vol},true);}catch(e){}},950);
-      }else{
-        prKillCam(exObj.name,hits,{w,r,e1,vol});
-      }
-    }
     state.session._prCount=state.session._prCount||{};
     state.session._prCount[exObj.name]=(state.session._prCount[exObj.name]||0)+1;
+    const top=hits.slice().sort((a,b)=>PR_TIER[b.t].rank-PR_TIER[a.t].rank)[0];
+    (state.session._prRows=state.session._prRows||{})[ei+":"+si]={t:top.t,val:top.val,prev:top.prev,n:hits.length};
     fired="pr";
-  }
-  // Boss fires once per exercise per session, only on an e1RM crown — the ultimate tier.
-  if(willBoss){
-    state.session.bossed[exObj.name]=true;
-    const pr={name:exObj.name,orm:e1,prevOrm:cOrm,improve:cOrm?((e1-cOrm)/cOrm*100):0,first:!cOrm,w,r,ex};
-    const boss=pickBoss([pr]);
-    if(boss){showBossFight(boss,()=>render());fired="boss";} // boss takes over the screen; rest overlay defers until it's dismissed
   }
   return fired;
 }
@@ -13197,6 +13177,8 @@ function lgGhosts(e){
   });
   return out;
 }
+function lgPrMoment(ei,si){state._lgPrFresh=ei+":"+si;try{sfx("pop");}catch(e){}haptic("pr");}
+function lgUndo(ei,si){const ses=state.session,e=ses.exercises[ei],s=e.sets[si];delete s.t;delete s.rest;delete s.rx;if(ses._prRows&&ses._prRows[ei+":"+si]){delete ses._prRows[ei+":"+si];if(ses.liveBest)delete ses.liveBest[e.name];}}
 function lgRirSet(e,s,v){const rir=state.data.u.metric==="rir";s.rpe=rir?(v>=4?"4+":String(v)):String(v>=4?6:10-v);}
 function lgRir(ei,si,v){const s=state.session.exercises[ei].sets[si];if(rirOfSet(s)===v)s.rpe="";else lgRirSet(null,s,v);haptic("tap");saveSessionSoon();render();}
 function lgToggleRir(ei,si){const k=ei+":"+si;state.session._rirOpen=state.session._rirOpen===k?null:k;render();}
@@ -13291,12 +13273,12 @@ function lgRows(e,ei,ex){
     if(g&&g.why&&!s.done)h+=`<div class="lg2-why">${GP.icon("alert")}<span>${esc(g.why)}</span></div>`;
     if(s.done&&!isW&&(si===lastDone||ses._rirOpen===ei+":"+si)){
       const cur=rirOfSet(s);
-      h+=`<div class="lg2-sx"><span class="lbl">RIR</span><div class="rir">${[0,1,2,3,4].map(v=>`<button class="${cur===v?"on":""}" data-hx onclick="lgRir(${ei},${si},${v})">${v===4?"4+":v}</button>`).join("")}</div>${pr?`<span class="lg2-prchip">${GP.icon("trophy")}PR · ${lgPrText(pr)}</span>`:""}${lgRestChip(s)}</div>`;
+      h+=`<div class="lg2-sx"><span class="lbl">RIR</span><div class="rir">${[0,1,2,3,4].map(v=>`<button class="${cur===v?"on":""}" data-hx onclick="lgRir(${ei},${si},${v})">${v===4?"4+":v}</button>`).join("")}</div>${pr?`<span class="lg2-prchip">${GP.icon("trophy")}PR${lgPrText(pr)?" · "+lgPrText(pr):""}</span>`:""}${lgRestChip(s)}</div>`;
     }
   });
   return h;
 }
-const lgPrText=pr=>pr.t==="e1rm"?"e1RM "+Math.round(pr.val):pr.t==="weight"?fmtKg(pr.val)+" kg":pr.t==="vol"?"volume "+Math.round(pr.val):pr.val+" reps";
+const lgPrText=pr=>pr.t==="e1rm"?"":pr.t==="weight"?"weight":pr.t==="vol"?"volume":"reps";
 function lgRestChip(s){return "";}
 function lgFocus(ses,fei){
   const e=ses.exercises[fei],ex=exFor(e.name),m=lgMuscle(e),eq=(ex.eq||"").toLowerCase(),isBar=["barbell","smith","ez bar","trap bar"].includes(eq);
