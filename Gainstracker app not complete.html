@@ -202,6 +202,8 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(38,42,54,.5),rgba(20,24,32,.4));backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:600;width:auto;flex:none;white-space:nowrap;transition:transform .12s,filter .12s}
 .chip:active{transform:scale(.95)}
 .chip.on{background:linear-gradient(180deg,rgba(50,32,4,.75),rgba(32,20,2,.65));border-color:rgba(255,208,72,.6);color:var(--gold2);box-shadow:0 0 18px -3px rgba(255,208,72,.6)}
+/* TAPTIC: invisible real <input switch> over a tappable — iOS buzzes only for a FINGER tap on one (see hxHost) */
+.hx{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:.01;z-index:6;cursor:pointer;-webkit-tap-highlight-color:transparent}
 /* press ripple */
 .ripple{position:absolute;border-radius:50%;transform:scale(0);pointer-events:none;background:radial-gradient(circle,rgba(247,221,147,.55),rgba(247,221,147,0) 70%);animation:rippleAnim .6s ease-out forwards;mix-blend-mode:screen}
 @keyframes rippleAnim{to{transform:scale(2.6);opacity:0}}
@@ -3148,7 +3150,7 @@ function alfredPingAI(ctx){try{
   return true;
 }catch(e){return false;}}
 /* Centralized haptics — one place to tune feel. Silently no-ops where unsupported (iOS Safari). */
-const HAPTIC={tap:14,toggle:[12,18,26],done:[18,24,40],pr:[30,30,60],hit:38,ko:[60,40,120,40,200],rest:200,success:[40,30,80],warn:[80,40,80]};
+const HAPTIC={light:8,tap:14,toggle:[12,18,26],done:[18,24,40],pr:[30,30,60],hit:38,ko:[60,40,120,40,200],rest:200,success:[40,30,80],warn:[80,40,80]};
 function haptic(kind){try{if(navigator.vibrate)navigator.vibrate(HAPTIC[kind]||kind||14);}catch(e){}}
 function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInterval(state.wtInt);state.wtInt=null;}return;}const el=$("wt-display");const secs=Math.floor((Date.now()-state.session.startedAt)/1000);state.workoutTimer=secs;if(el)el.textContent=fmtTime(secs);}
 function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");sfx("go");beep(880);document.body.classList.remove("rest-final");try{const gf=document.createElement("div");gf.className="goflash";gf.textContent="GO";document.body.appendChild(gf);setTimeout(()=>gf.remove(),700);}catch(e){}if(el){el.textContent="GO";el.parentElement.style.borderColor="var(--green)";}hideRestStrip();return;}if(rem<=5){document.body.classList.add("rest-final");haptic([16,50]);}else document.body.classList.remove("rest-final");state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const rb=$("restbar");if(rb)rb.style.width=(clamp(rem/(state._restTotal||1),0,1)*100).toFixed(1)+"%";}
@@ -5818,7 +5820,7 @@ function addProgress(input){
       state.data.photos=state.data.photos||[];
       state.data.photos.push({id:"ph"+now(),date:new Date().toISOString(),img,bw:Math.round(state.data.u.bodyweight)||null,note:""});
       if(save()){try{checkAchievements();}catch(err){}haptic("done");toast("Progress photo saved");}
-      else{state.data.photos.pop();save();haptic("warn");toast("Photo NOT saved — storage is full. Delete an old photo first.");}
+      else{state.data.photos.pop();haptic("warn");toast("Photo NOT saved — storage is full. Delete an old photo first.");} // banner stays up until a save succeeds again
       render();
     };
     im.onerror=()=>toast("Couldn't read that image.");
@@ -12646,6 +12648,31 @@ function boot(){
     t.appendChild(s);setTimeout(()=>s.remove(),600);
   },{passive:true});
 }
+/* ===== TAPTIC — real iPhone haptics =====
+   iOS Safari has no navigator.vibrate (haptic() above only serves Android), and since iOS 26.5 a script can no longer
+   toggle a switch into a buzz. What still works is a FINGER tap on a real <input type="checkbox" switch>. So key
+   tappables carry an invisible switch over their own face (.hx): the tap toggles it (native Taptic tick) and the click
+   is handed to the host on the next tick, after the native toggle finished, so the host's own onclick runs exactly as
+   before. Hosts with nested controls are skipped. Hosts are found by a MutationObserver, so every render() is covered. */
+const HX_SEL=".btn,.chip,.sdone,.stype,#nav button,[data-hx],.rs-btn,.log-ex-pill,.gtv2-panel,.splitday-start,.mb-start,.restbtn";
+function hxHost(el,isStatic){
+  el._hx=1;
+  if(isStatic)el.style.position="relative";
+  const i=document.createElement("input");
+  i.type="checkbox";i.setAttribute("switch","");i.className="hx";i.tabIndex=-1;i.setAttribute("aria-hidden","true");
+  i.addEventListener("click",e=>{e.stopPropagation();if(!el.disabled)setTimeout(()=>el.click(),0);});
+  el.prepend(i);
+}
+function hxScan(n){
+  if(n.nodeType!==1||n.classList.contains("hx"))return;
+  const hs=n.matches(HX_SEL)?[n]:[];n.querySelectorAll(HX_SEL).forEach(e=>hs.push(e));
+  const ok=hs.filter(el=>!el._hx&&!el.disabled&&!el.querySelector("button,a,input,select,textarea,[onclick]"));
+  const st=ok.map(el=>getComputedStyle(el).position==="static"); // read every position first, then write: one style recalc, not one per host
+  ok.forEach((el,k)=>hxHost(el,st[k]));
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(hxScan))).observe(document.body,{childList:true,subtree:true});
+hxScan(document.body);
+document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 boot();
 
 
