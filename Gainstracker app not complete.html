@@ -2299,6 +2299,7 @@ const now=()=>Date.now();
 const fmtTime=s=>{s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return (m<10?"0":"")+m+":"+((s%60)<10?"0":"")+(s%60);};
 const fmtVol=v=>Math.round(v).toLocaleString("en-US")+"kg";
 const fmtNum=n=>Math.round(n).toLocaleString("en-US");
+const fmtKg=n=>String(Math.round((+n||0)*10)/10);   // suggestion weights keep one decimal: 72.5, not 73
 const hoursSince=t=>t?(now()-new Date(t).getTime())/3600000:99999;
 const daysSince=t=>hoursSince(t)/24;
 // Toasts queue and play ONE AT A TIME so a burst (coach line + PR + tip) can all be read,
@@ -3167,15 +3168,8 @@ function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInt
 function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");sfx("go");beep(880);document.body.classList.remove("rest-final");try{const gf=document.createElement("div");gf.className="goflash";gf.textContent="GO";document.body.appendChild(gf);setTimeout(()=>gf.remove(),700);}catch(e){}if(el){el.textContent="GO";el.parentElement.style.borderColor="var(--green)";}hideRestStrip();return;}if(rem<=5){document.body.classList.add("rest-final");haptic([16,50]);}else document.body.classList.remove("rest-final");state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const rb=$("restbar");if(rb)rb.style.width=(clamp(rem/(state._restTotal||1),0,1)*100).toFixed(1)+"%";}
 /* ----- Rest lives in the sticky top bar: draining bar in the REST box + a compact control strip. No full-screen takeover. ----- */
 function hideRestStrip(){const rb=$("restbar");if(rb)rb.style.width="0%";const rs=$("reststrip");if(rs){rs.style.display="none";const tb=$("timerbar"),sp=$("timerspace");if(tb&&sp)sp.style.height=tb.offsetHeight+"px";}}
-// Concrete numeric next-set target for the one-tap ⚡ chip. FIRM RULE: <9 reps → +1 rep, same weight; 9+ → +weight, reset to 6.
-function nextTargetSet(name){
-  const ex=exFor(name),lb=lastBestSet(name);
-  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
-  const r=lb.r;
-  if(r<9)return {w:lb.w||0,r:r+1};
-  if(ex.bw)return lb.w?{w:lb.w+2.5,r:6}:{w:0,r:r+1};
-  return {w:lb.w+(lb.w>=60?5:2.5),r:6};
-}
+// Concrete numeric next-set target for the one-tap ⚡ chip — the ONE progression rule (progressionFor).
+function nextTargetSet(name){const p=progressionFor(name);return p?{w:p.w,r:p.r}:null;}
 /* Tapping the tick on an empty working set must never create an empty "done" set: accept the numbers the row
    is already hinting at (last time's prevW/prevR, else the progression target) — or refuse if there is nothing. */
 function fillEmptySet(e,s){
@@ -3278,7 +3272,7 @@ function startWorkout(splitId,dayIdx){
 function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
 const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
-// planned = the split day's target for this lift ({s:sets, r:"5–8"}). With a plan, seed exactly that
+// planned = the split day's target for this lift ({s:sets, r:"5–10"}). With a plan, seed exactly that
 // many working sets (last session's numbers shown per set where they exist) instead of copying last
 // session's set count — otherwise every session starts with the old plan's sets to delete by hand.
 function seedSets(name,planned){
@@ -4279,10 +4273,12 @@ function renderReadiness(){
 }
 
 /* ========================= LOGGING ========================= */
+// Working-weight estimate (warm-up base, "Intel" fallback): the progression rule decides; with no history in this gym it
+// falls back to the record weight and never goes above it — only reps earn weight.
 function suggestionFor(name){
-  const pr=state.data.prs[name];if(!pr)return null;
-  const r=state.session.readiness;const mult=r==="fresh"?1.025:r==="tired"?0.97:1.0;
-  return Math.round(pr.w*mult);
+  const p=progressionFor(name);if(p&&p.w)return p.w;
+  const pr=state.data.prs[name];if(!pr||!pr.w)return null;
+  return Math.round(pr.w*(state.session&&state.session.readiness==="tired"?0.97:1)*2)/2;
 }
 // Most recent logged top working set for a lift (scans workout history, newest first).
 /* 🔧 REAL-TIME WEIGHT CHECK — fires the instant a set is logged, not after the workout. A weight
@@ -4334,20 +4330,32 @@ function lastBestSet(name){
   }
   return null;
 }
-// Double-progression coach: read last performance, tell the lifter exactly what to chase.
-/* FIRM RULE: at 8 reps or under NEVER suggest more weight — build reps to 9 first. At 9+ → load up, reset to 6. */
-function nextTarget(name){
-  const ex=exFor(name);const lb=lastBestSet(name);
-  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
-  const r=lb.r;
-  if(ex.bw){
-    if(r<9)return `last ${r} reps${lb.w?" +"+lb.w+"kg":""} → chase <b>${r+1}+ reps</b>`;
-    return lb.w?`${r} reps at +${lb.w}kg → <b>add 2.5kg</b>, reset to 6`:`${r} clean reps → <b>add a vest/belt</b> or keep climbing`;
-  }
-  if(r<9)return `<b>${lb.w}kg × ${r+1}+</b> — build reps to 9, then we add weight`;
-  const inc=lb.w>=60?5:2.5;
-  return `${r} reps banked → <b>+${inc}kg to ${fmtNum(lb.w+inc)}kg × 6</b>`;
+/* ===== ONE PROGRESSION RULE (user decision 2026-10-19) — every suggestion path reads progressionFor/progressionFrom =====
+   Plan ranges are 5–10. A WORKING set (warm-ups never count) that reaches the top of the range (10+) earns more weight
+   (+5kg from 60kg up, else +2.5) and reps restart at 6 (or the plan's bottom if higher). 5–9 reps = same load, +1 rep.
+   A custom plan with a higher top (e.g. 12–15) moves the threshold up with it. Returns {w,r,add,top,reason,text(html)}. */
+const REP_TOP=10,REP_RESTART=6;
+function planReps(name){            // [low,high] of the plan range — live session first, else the active split; null if none
+  const ses=state.session,d=state.data;
+  let pl=ses&&(ses.exercises.find(e=>e.name===name)||{}).plan;
+  if(!pl){const sp=(d.splits||[]).find(s=>s.id===d.activeSplitId);for(const day of (sp&&sp.days)||[])if(day.plan&&day.plan[name]){pl=day.plan[name];break;}}
+  const m=pl&&String(pl.r||"").match(/(\d+)\D+(\d+)/);
+  return m?[+m[1],+m[2]]:null;
 }
+const repTop=name=>Math.max(REP_TOP,(planReps(name)||[0,0])[1]);
+function progressionFrom(name,lb){   // lb = {w,r} = the best WORKING set of the last outing
+  const ex=exFor(name);
+  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
+  const w=+lb.w||0,r=+lb.r,top=repTop(name),pr=planReps(name),restart=Math.max(REP_RESTART,pr?pr[0]:0);
+  if(r<top)return {w,r:r+1,add:false,top,reason:`${r} reps is under ${top} — same load, +1 rep`,
+    text:ex.bw?`last ${r} reps${w?" +"+fmtKg(w)+"kg":""} → chase <b>${r+1}+ reps</b>`:`<b>${fmtKg(w)}kg × ${r+1}+</b> — ${r+1>=top?`hit ${top} and we add weight`:`build reps to ${top}, then we add weight`}`};
+  if(ex.bw&&!w)return {w:0,r:r+1,add:false,top,reason:`${r} clean reps — add a vest/belt or keep climbing`,text:`${r} clean reps → <b>add a vest/belt</b> or keep climbing`};
+  const inc=ex.bw?2.5:(w>=60?5:2.5),nw=Math.round((w+inc)*10)/10;
+  return {w:nw,r:restart,add:true,top,inc,reason:`${r} reps hit the top of the range (${top}+) — add ${fmtKg(inc)}kg`,
+    text:ex.bw?`${r} reps at +${fmtKg(w)}kg → <b>add ${fmtKg(inc)}kg</b>, reset to ${restart}`:`${r} reps banked → <b>+${fmtKg(inc)}kg to ${fmtKg(nw)}kg × ${restart}</b>`};
+}
+function progressionFor(name){return progressionFrom(name,lastBestSet(name));}
+function nextTarget(name){const p=progressionFor(name);return p?p.text:null;}
 // Stale-lift radar: established lifts (have a record) that haven't set a PR in 3+ weeks but are
 // still in active rotation — surfaced as revival targets. Pairs with PR Fight Night.
 function staleLifts(maxDays){
@@ -5958,7 +5966,7 @@ function exerciseHistory(name){
   const verdict=intel?liftVerdict(intel):"";
   const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
   const tgtBlock=(intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"")
-    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Hold the weight, change the rep range, and own 9 clean reps before adding load again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
+    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Hold the weight, change the rep range, and own 10 clean reps before adding load again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
   // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
   const recordE1=Math.max(...e1s);
   const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
@@ -6051,12 +6059,10 @@ function liftIntel(name){
   const win=rows.slice(-5),d=win.length>1?win[win.length-1].e1rm-win[0].e1rm:0;
   const pct=win.length>1&&win[0].e1rm?Math.round(d/win[0].e1rm*100):0;
   const trend=d>1?"up":d<-1?"down":"flat";
-  // next target: beat last top working set — same weight +1 rep, or if reps high, +load
-  let tgt=null;
-  if(last.bset){const w=+last.bset.w||0,r=+last.bset.r||0;
-    if(r>=12)tgt={type:"load",w:Math.round((w+(w>=60?5:2.5))*10)/10,r:Math.max(6,r-3),txt:`${Math.round((w+(w>=60?5:2.5))*10)/10}kg — drop to ~${Math.max(6,r-3)} reps and climb again`};
-    else tgt={type:"rep",w,r:r+1,txt:`${w}${ex&&ex.bw?"+":""}kg × ${r+1} reps (beat last by one rep)`};
-  }
+  // next target: the ONE progression rule — same load +1 rep until the top of the range, then +load
+  const pg=progressionFor(name)||(last.bset?progressionFrom(name,{w:+last.bset.w||0,r:+last.bset.r||0}):null);
+  const ld=pg&&(pg.w?`${ex&&ex.bw?"+":""}${fmtKg(pg.w)}kg`:"bodyweight");
+  const tgt=pg?{type:pg.add?"load":"rep",w:pg.w,r:pg.r,reason:pg.reason,txt:`${ld} × ${pg.r}${pg.add?"":"+"} — ${pg.add?"weight goes up, reps restart":"same load, beat last by one rep"}`}:null;
   return {bestE,last,daysAgo,stalled,sinceImprove,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
 }
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
@@ -8243,7 +8249,7 @@ function plateauCard(){
       (e.sets||[]).forEach(s=>{if(s.type==="W")return;const v=setE1RM(ex,s);if(v>best)best=v;});
       if(best>0)(byEx[e.name]=byEx[e.name]||[]).push({date:ex0,e1:best});});
   }
-  const PROTO=["Change one variable — swap the grip, angle or machine for 3 weeks, then return to the lift.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: go heavier for 4–6 reps and let the nervous system adapt.","Reset the weight, then add a single rep every set until you own the top of the range.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
+  const PROTO=["Change one variable — swap the grip, angle or machine for 3 weeks, then return to the lift.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: work the 5–7 end for two weeks, then build back up to 10 reps.","Hold the weight and add a single rep every set until you own 10 reps.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
   const stalled=[];
   Object.keys(byEx).forEach(name=>{const arr=byEx[name];if(arr.length<4)return;
     const last3=arr.slice(-3),prior=arr.slice(0,-3);
@@ -10900,9 +10906,12 @@ function alfredRirCallout(ei,si){
     const working=(e.sets||[]).filter(x=>x.type!=="W");
     const isLast=working.length>0&&working.filter(x=>x.done).length>=working.length;
     if(r>=4){state.session._coachTone="bad";
-      return _pickLine(["Four in reserve, sir? That was a handshake, not a fight — add weight.",
-        "The bar barely noticed you. 4+ RIR builds nothing but patience — load it.",
-        "Plenty left in the tank. Next set, bring the tank."],"rir4");}
+      if((+s.r||0)>=repTop(e.name))return _pickLine(["Four in reserve at the top of the range, sir? That was a handshake. Add weight.",
+        "The bar barely noticed you. Top-of-range reps with 4+ in reserve — load it.",
+        "Plenty left in the tank at "+s.r+" reps. Next set, bring the tank — and the weight."],"rir4");
+      return _pickLine(["Four in reserve, sir? That was a handshake. Same weight — take it closer to failure.",
+        "The bar barely noticed you. 4+ RIR builds nothing; grind out more reps at this load.",
+        "Plenty left in the tank. Reps first: chase "+repTop(e.name)+", then the weight moves."],"rir4r");}
     if(r===0&&isLast){state.session._coachTone="good";
       return _pickLine(["Emptied the tank on the final set — textbook. That's where growth lives.",
         "Zero left in reserve to close the lift. Gotham approves, sir.",
@@ -11743,17 +11752,6 @@ function gtv2BalanceAudit(){
   if(quad>=8&&quad>post*1.6)return {kind:"gold",icon:"🦵",title:"Posterior chain lag",copy:`Quads have ${quad} sets while hamstrings + glutes have ${post}. Add curls, RDLs, hip thrusts or back extensions.`};
   return null;
 }
-function gtv2ProgressionFor(name){
-  const rows=exerciseRows(name);if(!rows.length)return null;
-  const last=rows[rows.length-1],set=last.bset;if(!set)return null;
-  const ex=exFor(name),w=+set.w||0,r=+set.r||0,load=setLoad(ex,w),profile=typeof prProfileTag==="function"?prProfileTag(name):"";
-  if(r>=9){
-    const step=ex.bw?"small added load":"2.5kg";
-    return {kind:"green",icon:"📈",title:"Progression order",copy:`${name}${profile}: last top set was ${load}kg x ${r}. Since it cleared 9+ reps, add ${step} next time and keep reps clean.`};
-  }
-  if(r>=6)return {kind:"blue",icon:"🎯",title:"Progression order",copy:`${name}${profile}: hold ${load}kg and beat ${r} reps first. No weight jump until the last set reaches 9+ reps.`};
-  return {kind:"gold",icon:"🛠️",title:"Progression order",copy:`${name}${profile}: ${load}kg x ${r} is still heavy. Repeat the load, own technique, and build reps before adding weight.`};
-}
 function gtv2MissionHero(){
   const d=state.data,u=d.u,cur=gtv2CurrentPlanDay(),title=u.name?u.name.toUpperCase():"GOTHAM";
   const dateStr=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
@@ -12296,15 +12294,16 @@ function renderGotham(){
 function overloadSuggestions(wk){
   const out=[];
   (wk.exercises||[]).forEach(e=>{
-    const working=(e.sets||[]).filter(s=>s.done&&s.type!=="W"&&+s.r>0);
+    const ex=exFor(e.name),working=(e.sets||[]).filter(s=>s.done&&s.type!=="W"&&+s.r>0);
     if(!working.length)return;
-    const last=working[working.length-1],top=working.reduce((a,s)=>(+s.w||0)>(+a.w||0)?s:a,working[0]);
-    const reps=+last.r||0,ex=exFor(e.name),load=setLoad(ex,top.w);
-    let text,tone;
-    if(reps>=9){text=`Last working set hit ${reps} reps, so weight may rise next time: ${ex.bw?"add the smallest load you can":"try +2.5kg"} and keep form strict.`;tone="up";}
-    else if(reps>=6){text=`Do not add weight yet. Hold ${load}kg and push the last set from ${reps} toward 9+ clean reps first.`;tone="ok";}
-    else{text=`Hold or reduce the load. Last set was only ${reps} reps; earn 6-8 clean reps before chasing load.`;tone="hold";}
-    out.push({name:e.name,text,tone});
+    const best=working.reduce((a,s)=>setE1RM(ex,s)>setE1RM(ex,a)?s:a,working[0]);   // best working set, not the last one
+    const pg=progressionFrom(e.name,{w:+best.w||0,r:+best.r||0});if(!pg)return;
+    const reps=+best.r||0,lo=(planReps(e.name)||[5])[0],up=reps>=pg.top;
+    const ld=+best.w?`${fmtKg(best.w)}kg${ex.bw?" added":""}`:"bodyweight";
+    const text=up?(pg.add?`Best set hit ${reps} reps, the top of the range. Weight goes up next time: ${fmtKg(pg.w)}kg × ${pg.r}, form strict.`:`${reps} clean bodyweight reps. Add a vest or belt, or keep climbing.`)
+      :reps>=lo?`Same load next time. Hold ${ld} and push the best set from ${reps} to ${pg.top} reps first.`
+      :`Same load next time. Earn ${lo}+ clean reps at ${ld} first; the best set was ${reps}.`;
+    out.push({name:e.name,text,tone:up?"up":reps>=lo?"ok":"hold"});
   });
   return out;
 }
@@ -13000,7 +12999,7 @@ function renderLogging(){
         intel=hasNext?`NEXT · ${nIsW?'WARM-UP':'SET '+nWnum} — <b>${esc(e0.name)}</b>`:'ALL SETS IN — <b>next exercise</b>';}}catch(e){}
     restStripHtml=`<div class="reststrip" id="reststrip">
       <div class="rs-int">${intel}</div>
-      ${tg?`<button class="rs-btn gold" id="restapply" onclick="restApplyTarget()">⚡ ${tg.w?fmtNum(tg.w)+'kg × ':''}${tg.r}</button>`:''}
+      ${tg?`<button class="rs-btn gold" id="restapply" onclick="restApplyTarget()">⚡ ${tg.w?fmtKg(tg.w)+'kg × ':''}${tg.r}</button>`:''}
       <button class="rs-btn" onclick="addRest(30)">+30s</button>
       <button class="rs-btn" onclick="skipRest()">SKIP</button>
     </div>`;
@@ -13059,7 +13058,7 @@ function renderLogging(){
       ${figHtml}
       <div class="log-focus-body">
           ${e.plan?`<div class="log-target" style="color:var(--gold2)">📋 Plan: ${+e.plan.s||0} × ${esc(e.plan.r||'')}${e.plan.opt?' · optional tonight':''}</div>`:''}
-          ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
+          ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${fmtKg(sug)}kg</div>`:''}
           ${(()=>{try{const pr=state.data.prs[e.name],lb=lastBestSet(e.name),m0=(ex.p||[])[0];
             if(pr&&pr.orm>0&&lb&&lb.e1>=pr.orm*0.97&&(!m0||getRecovery(m0)>=80)&&ses.readiness!=="tired")
               return `<div class="prwin">🔥 PR WINDOW: HIGH — fresh + trending at ${Math.round(lb.e1/pr.orm*100)}% of your record. Send it.</div>`;}catch(_){}return '';})()}
