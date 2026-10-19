@@ -11746,7 +11746,7 @@ function gtv2MissionHero(){
   }
   if(state.session){ // a live/minimised workout always wins the hero: RESUME, never START over it
     const c=sessionCounts(state.session),nm=String(state.session.day||"Session").split(/\s+[·—-]\s+/)[0];
-    btn=btn.replace(/<button class="btn gold"[^>]*>[^<]*<\/button>/,`<button class="btn gold" onclick="resumeWorkout()">RESUME · ${esc(nm)} · ${c.done}/${c.total} sets</button>`);
+    btn=btn.replace(/<button class="btn gold"[^>]*>[^<]*<\/button>/,()=>`<button class="btn gold" style="flex-direction:column;gap:1px;line-height:1.2" onclick="resumeWorkout()">RESUME<span style="font-size:11px;letter-spacing:.05em;opacity:.78">${esc(nm)} · ${c.done}/${c.total} sets</span></button>`);
   }
   return `<section class="gtv2-hero">
     <img class="gtv2-hero-img" src="Batman.jpg" alt="">
