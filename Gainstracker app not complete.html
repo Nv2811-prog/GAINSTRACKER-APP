@@ -1424,6 +1424,25 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 ::view-transition-new(root){animation:vtIn 200ms var(--ease-out) both}
 ::view-transition-group(nav){animation-duration:.01s}
 
+/* ---- 6 · SHEETS, TOASTS, INPUTS: S2 sheet with grabber + spring, blur only on the sheet backdrop, compact pill toast, clean fields with a gold focus ring ---- */
+.sheet{background:linear-gradient(180deg,#172131,#0F1621);border-top:1px solid var(--hair2);border-radius:var(--r-l) var(--r-l) 0 0;padding:8px 16px calc(18px + env(safe-area-inset-bottom));max-height:92dvh;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 -20px 40px -10px rgba(0,0,0,.8),0 90px 0 0 #0F1621;transition:transform .42s var(--spring)}
+.sheet:not(.on){transition:transform .22s cubic-bezier(.4,0,1,1)}
+.sheet::before{content:"";display:block;width:38px;height:5px;border-radius:3px;margin:2px auto 14px;background:rgba(190,206,232,.28);box-shadow:none}
+.sheetbg{background:rgba(2,4,8,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .2s}
+.ovcard,#modal .mcard{background:linear-gradient(180deg,#172131,#0F1621);border:1px solid var(--hair2);border-radius:var(--r-l);box-shadow:var(--sh2)}
+.ovbg,#modal .mbg{background:rgba(2,4,8,.72);-webkit-backdrop-filter:none;backdrop-filter:none}
+.toast{bottom:calc(92px + env(safe-area-inset-bottom));max-width:min(92vw,420px);padding:11px 18px;border:0;border-radius:999px;background:rgba(26,36,54,.96);box-shadow:inset 0 0 0 1px var(--hair2),0 14px 30px -10px rgba(0,0,0,.9);color:var(--tx1);font:600 14px/1.3 var(--body);transform:translateX(-50%) translateY(8px);transition:opacity .18s,transform .18s var(--ease-out)}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.prpop{background:linear-gradient(180deg,#1B2638,#111927);border:1px solid rgba(242,193,78,.3);box-shadow:0 20px 44px -16px rgba(0,0,0,.8)}
+input,select,textarea{background:var(--g4);border:1px solid var(--hair2);border-radius:12px;font-size:16px;color:var(--tx1)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.22)}
+input::placeholder,textarea::placeholder{color:var(--tx3);opacity:1}
+.log-settbl input{font-size:16px}
+.log-settbl input:focus{border-color:var(--gold);background:var(--tint-gold)}
+/* blur lives on the tab bar, the top timer bar and the sheet backdrop only */
+.btn,.btn.ghost,.btn.gold,.chip,.card,.scanpanel-tool,.restbtn,#mmaov,.ac-head{-webkit-backdrop-filter:none;backdrop-filter:none}
+.ac-head{background:rgba(12,18,28,.96)}
+
 /* ===== GP:HOME (wave 2) ===== */
 
 
