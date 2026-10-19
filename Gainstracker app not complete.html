@@ -1980,7 +1980,7 @@ const SCIENCE_FACTS=[
 "Rest 2–3 min on compounds. Cutting rest short drops your reps and total volume, which blunts growth.",
 "Soreness is not a measure of a good session. Tension and progression matter; DOMS just means novelty or damage.",
 "Sleep is anabolic. Under ~7 h chronically lowers recovery, performance, and testosterone — train your sleep too.",
-"Deload roughly every 4–8 weeks if fatigue accumulates: drop volume ~50% for a week to let strength rebound.",
+"When fatigue piles up, cut junk sets before you cut intensity: keep the heavy work, trim the filler, and leave 1–3 reps in reserve.",
 "Creatine monohydrate, 3–5 g daily, is the most evidence-backed legal supplement for strength and size.",
 "Junk volume is real: once a session's later sets lose reps and quality, more sets add fatigue, not stimulus.",
 "For strength, heavy low-rep work matters; for size, anything from ~5–30 reps grows muscle if taken near failure."];
@@ -2001,7 +2001,7 @@ const SCIENCE_LIBRARY=[
    "Muscle is built during recovery, not during the session. Train a muscle again only once it's recovered, usually 48–72h for a hard session.",
    "Sleep is the strongest recovery tool you have. Chronically under ~7h lowers performance, recovery, and testosterone — and blunts the gains you just earned.",
    "Soreness (DOMS) is not a scorecard. It reflects novelty and damage, not how much you grew. Chasing soreness is chasing the wrong target.",
-   "A deload every 4–8 weeks (volume cut ~50% for a week) lets accumulated fatigue clear so strength rebounds — it's when adaptation surfaces, not lost time."]},
+   "Fatigue hides fitness. When you feel flat, cut the junk sets and keep 1–3 reps in reserve on the rest — recovery is when adaptation surfaces, not lost time."]},
  {cat:"Technique",icon:"🎯",items:[
    "Full range of motion, especially the stretched position, drives more growth than partials. Lengthened-position work is a strong stimulus.",
    "Control the eccentric (2–3s lowering) for tension; the lifting phase can be fast and intentful. You don't need to grind every concentric slowly.",
@@ -2011,7 +2011,7 @@ const SCIENCE_LIBRARY=[
  {cat:"Progression",icon:"📈",items:[
    "Progressive overload is the actual driver: over weeks you must add reps, load, or quality. The same stimulus stops adapting after a few weeks.",
    "Double progression is simple and works: stay at a weight until you hit the top of your rep range on all sets, then add the smallest increment.",
-   "If a lift stalls 2–3 sessions, change one variable — add a feeler set, swap to a close variation, or deload that movement and rebuild.",
+   "If a lift stalls 2–3 sessions, change one variable — add a feeler set, swap to a close variation, or change the angle, grip or rep range.",
    "Track estimated 1RM, not just top weight. Rising e1RM at the same RIR means real strength gain even if the bar weight looks flat."]},
  {cat:"Nutrition",icon:"🍽️",items:[
    "Protein around 1.6–2.2 g per kg of bodyweight per day maximises muscle protein synthesis for most lifters. Spreading it across meals helps.",
@@ -5371,7 +5371,7 @@ function populateAlfredRead(R){
   const facts=`SESSION JUST FINISHED — give the user your post-workout read as Alfred (wild but sharp, praise when earned, sting+fix when not). Under 90 words.\n`+
     `Workout: ${R.wk.name}. Lifts: ${R.wk.exercises.length}. Duration: ${Math.round((R.dur||0)/60)}min. Total volume: ${Math.round(R.totalVol)}kg. New PRs: ${(R.prsThis||[]).length}. Readiness: ${R.readiness||"n/a"}.\n`+
     `Exercises: ${R.wk.exercises.map(e=>e.name).join(", ")}.`+
-    ((R.notes||"").trim()?`\nThe user left a note explaining their choices this session: "${R.notes.trim()}". Take it at face value — if it's a sound reason (soreness, injury, time, deload), respect it and do NOT lecture them for skipping or changing things.`:"");
+    ((R.notes||"").trim()?`\nThe user left a note explaining their choices this session: "${R.notes.trim()}". Take it at face value — if it's a sound reason (soreness, injury, time, fatigue), respect it and do NOT lecture them for skipping or changing things.`:"");
   box.setAttribute("data-loading","1");
   geminiCall([{text:alfredContext()+"\n\n"+facts}]).then(txt=>{
     const b=document.getElementById("ai-out");if(!b||!txt)return;
@@ -5960,7 +5960,7 @@ function exerciseHistory(name){
   const verdict=intel?liftVerdict(intel):"";
   const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
   const tgtBlock=(intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"")
-    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Drop the load 5% and own 9 clean reps before adding weight again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
+    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Hold the weight, change the rep range, and own 9 clean reps before adding load again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
   // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
   const recordE1=Math.max(...e1s);
   const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
@@ -6064,7 +6064,7 @@ function liftIntel(name){
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
 function liftVerdict(intel){
   if(!intel)return "";
-  if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change the stimulus or deload — repeating it won't move it.`;
+  if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change one variable — angle, grip or rep range. Repeating it won't move it.`;
   if(intel.trend==="up")return `Climbing — +${intel.d}kg (${intel.pct>0?"+":""}${intel.pct}%) of late. Keep the pressure on, sir.`;
   if(intel.trend==="down")return `Going BACKWARDS, sir — ${intel.d}kg down (${intel.pct}%). I won't sugar-coat it: you were stronger than this. Eat, sleep, and reclaim that weight.`;
   return `Holding steady. Steady isn't growth, Master — go and take the next rep.`;
@@ -6245,7 +6245,7 @@ function fatigueDebt(){
   if(pct<25){status="Recovered — the bank is in credit. Push hard.";color="var(--green)";}
   else if(pct<55){status="Manageable load. Train as planned.";color="var(--gold2)";}
   else if(pct<80){status="High fatigue debt. Favour quality over junk volume.";color="var(--orange)";}
-  else {status="Deep in the red. A deload would pay dividends.";color="var(--red)";}
+  else {status="Deep in the red. Cut junk sets, keep 1–3 reps in reserve.";color="var(--red)";}
   return {pct,status,color};
 }
 function openFatigueInfo(){const f=fatigueDebt();
@@ -7397,7 +7397,7 @@ function missionSubTabs(){
     body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Build your splits and set which nights you patrol.</div>`
       +scheduleEditorHtml()+splitCompactTileHtml();
   }else{
-    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, deload & every quick tool — all in one place.</div>`
+    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, plateaus & every quick tool — all in one place.</div>`
       +scienceCardsHtml()
       +`<div class="ttl" style="font-size:14px;margin:18px 0 9px;display:flex;align-items:center;gap:7px">🔧 Utility belt</div>
         <div class="tgrid">
@@ -8104,7 +8104,7 @@ function defaultSplits(){
 
 /* ========================= STRATEGY TAB ========================= */
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-/* ===== Wave 2: Strategy = weekly volume map (MEV/MAV/MRV), balance & deload readiness ===== */
+/* ===== Wave 2: Strategy = weekly volume map (MEV/MAV/MRV), balance & plateau tools ===== */
 // Full-body heat map: every muscle tinted by its weekly working-set volume.
 function volMapBodies(){
   const col=m=>{const s=weeklySets(m);return s>0?{fill:heatColor(m),op:".95"}:{fill:"#E8C56A",op:".06"};};
@@ -8117,7 +8117,6 @@ function secIcon(key,c){
   const P={
     volume:'<path d="M5 19V12M12 19V5M19 19V15"/>',
     balance:'<path d="M12 4v16M6 8l-2.4 6.4a3 3 0 005.8 0L7 8M18 8l-2.4 6.4a3 3 0 005.8 0L19 8M6 8h12"/>',
-    deload:'<path d="M20 12a8 8 0 11-2.4-5.7M20 4.5V8h-3.5"/>',
     plateau:'<path d="M3.5 16.5h17M12 16V5M8 9l4-4 4 4"/>',
     strength:'<path d="M6.5 6.5v11M3.5 9v5M17.5 6.5v11M20.5 9v5M6.5 12h11"/>',
     schedule:'<rect x="3.5" y="5.5" width="17" height="15" rx="2.2"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/>',
@@ -8240,24 +8239,6 @@ function weeklyBalanceCard(){
     ${rowR("Push : Pull sets",push,pull)}${rowR("Quad : Hamstring sets",quad,ham)}
     ${flags.map(([k,t])=>`<div class="banner" style="margin-top:6px;${k==="ok"?"background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)":""}"><span>${k==="warn"?"⚠️":"✓"}</span><div class="mini">${esc(t)}</div></div>`).join("")}</div>`;
 }
-function deloadCard(){
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  if(trained.length<3)return "";
-  const fried=trained.filter(m=>getRecovery(m)<50);
-  const overMrv=M12.filter(m=>weeklySets(m)>effectiveMRV(m));
-  const need=fried.length>=4||overMrv.length>=3;
-  const snoozed=state.data.dismissed&&state.data.dismissed.deload&&(now()-state.data.dismissed.deload)<5*864e5;
-  if(need){
-    const names=[...new Set([...fried,...overMrv])].slice(0,5).map(m=>MNAME[m]).join(", ");
-    if(snoozed)return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('deload')}Deload readiness</div><div class="banner" style="background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)"><span>👍</span><div class="mini">Deload suggestion snoozed — your call, sir. Fatigue (${names}) is still elevated, so push smart. <a onclick="unsnoozeDeload()" style="color:var(--gold2);cursor:pointer">Show it again</a></div></div></div>`;
-    return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center;margin:0">${secIcon('deload')}Deload readiness</div><span class="mini" style="color:var(--text3)">optional</span></div>
-      <div class="banner" style="background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.5)"><span>🩹</span><div class="mini">Fatigue is stacking up (${names}). A lighter week — same lifts, ~2 fewer sets each and a couple more reps in reserve — would let it all rebuild. Deloading is strategy, not weakness.</div></div>
-      <div class="mini" style="margin-top:8px;color:var(--text3);text-align:center;cursor:pointer" onclick="snoozeDeload()">Not now — dismiss for 5 days</div></div>`;
-  }
-  return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('deload')}Deload readiness</div><div class="banner" style="background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)"><span>✓</span><div class="mini">Recovery looks managed — no deload needed yet. Keep progressing.</div></div></div>`;
-}
-function snoozeDeload(){state.data.dismissed=state.data.dismissed||{};state.data.dismissed.deload=now();save();haptic("tap");toast("Deload suggestion snoozed for 5 days");render();}
-function unsnoozeDeload(){if(state.data.dismissed)delete state.data.dismissed.deload;save();render();}
 // Plateau breaker: per-lift e1RM history; flag lifts with no new best across their last 3 outings (≥10d span).
 function plateauCard(){
   const ws=(state.data.workouts||[]);if(ws.length<4)return "";
@@ -8267,7 +8248,7 @@ function plateauCard(){
       (e.sets||[]).forEach(s=>{if(s.type==="W")return;const v=setE1RM(ex,s);if(v>best)best=v;});
       if(best>0)(byEx[e.name]=byEx[e.name]||[]).push({date:ex0,e1:best});});
   }
-  const PROTO=["Back off ~10% and rebuild over 2 weeks — fresh runway beats grinding.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: go heavier for 4–6 reps and let the nervous system adapt.","Reset the weight, then add a single rep every set until you own the top of the range.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
+  const PROTO=["Change one variable — swap the grip, angle or machine for 3 weeks, then return to the lift.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: go heavier for 4–6 reps and let the nervous system adapt.","Reset the weight, then add a single rep every set until you own the top of the range.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
   const stalled=[];
   Object.keys(byEx).forEach(name=>{const arr=byEx[name];if(arr.length<4)return;
     const last3=arr.slice(-3),prior=arr.slice(0,-3);
@@ -8345,7 +8326,7 @@ function scienceLabCard(){
     ${dist}${junkHtml}${sfrBlock}</div>`;
 }
 function scienceCardsHtml(){
-  return volMapCard()+timeLapseCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+deloadCard()+plateauCard();
+  return volMapCard()+timeLapseCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+plateauCard();
 }
 function scheduleEditorHtml(){
   const d=state.data;
@@ -10476,7 +10457,7 @@ function alfredAsk(q){
     return `Your weakest link is <b>${MNAME[wk.x]}</b> — level ${wk.l}, ${wk.sets} hard sets this week. Give it priority, Master.`;}
   // READ: stalled
   if(/stall|plateau|stuck/.test(s)){const out=[];loggedExerciseNamesByRecency().forEach(n=>{const it=liftIntel(n);if(it&&it.stalled)out.push(n);});
-    return out.length?`Stalled, sir: <b>${out.slice(0,5).map(esc).join(", ")}</b>. Change the angle, rep range or deload.`:"Nothing's stalled right now, Master. Keep the pressure on.";}
+    return out.length?`Stalled, sir: <b>${out.slice(0,5).map(esc).join(", ")}</b>. Change the angle, grip or rep range.`:"Nothing's stalled right now, Master. Keep the pressure on.";}
   // READ: how strong / standing
   if(/how strong|standing|percentile|how good|world/.test(s)){const c=myPatrolCard();if(!c.opt)return "Log your big lifts and I'll place you against the world, sir.";return `Across your big lifts you're in roughly the <b>top ${Math.max(1,100-c.opt)}%</b> of trained lifters, Master. Strength level ${c.sl}.`;}
   // READ: what to train today
@@ -10568,7 +10549,7 @@ function alfredCaveReview(){
   else if(pl>ps*1.35)flags+=`<div class="mini" style="margin-bottom:5px">⚖️ Pull (${pl}) is ahead of push (${ps}) — balance it with pressing.</div>`;
   under.slice(0,2).forEach(m=>flags+=`<div class="mini" style="margin-bottom:5px">📉 <b>${MNAME[m]}</b> is below MEV — a couple more sets or it stalls.</div>`);
   over.slice(0,2).forEach(m=>flags+=`<div class="mini" style="margin-bottom:5px">🔥 <b>${MNAME[m]}</b> is over MRV — past the point of return, ease back.</div>`);
-  if(fried.length>=4)flags+=`<div class="mini" style="margin-bottom:5px">🩹 ${fried.length} groups under 50% recovered — a deload week would pay off, sir.</div>`;
+  if(fried.length>=4)flags+=`<div class="mini" style="margin-bottom:5px">🩹 ${fried.length} groups under 50% recovered — cut the junk sets and keep 1–3 reps in reserve, sir.</div>`;
   if(!flags)flags=`<div class="mini" style="color:var(--green)">✓ Balanced week. Volume's where it should be and recovery's holding. Keep the standard.</div>`;
   const verdict=ws.length>=goal?`Target hit — ${ws.length}/${goal} sessions. Disciplined work.`:`${ws.length}/${goal} sessions logged — ${goal-ws.length} more to hit your week.`;
   return `<div class="card glow"><div class="ttl">🦇 The Cave — week in review</div>
@@ -12060,7 +12041,7 @@ function claimContract(){
   render();
 }
 /* ⚔️ SIEGE WEEK — every 3rd week a pictured villain lays siege to Gotham: break a record on 3
-   different lifts before the week ends. Structured intensity with a face — NEVER a deload. */
+   different lifts before the week ends. Structured intensity with a face — never a rest-week gimmick. */
 function siegeInfo(){
   const now=new Date();const mon=new Date(now);mon.setHours(0,0,0,0);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
   const wkN=Math.floor(mon.getTime()/(7*864e5));
