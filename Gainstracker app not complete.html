@@ -1527,6 +1527,11 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .lg2-tag{display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:5px;font:700 12px/1 var(--body);background:var(--tint-gold);color:var(--gold-ink);flex:none;white-space:nowrap}
 /* completed lifts: one compact row */
 .lg2-done{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;margin-bottom:10px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl);cursor:pointer}
+.lg2-done{flex-wrap:wrap}
+.lg2-dsx{flex:0 0 100%;display:flex;align-items:center;gap:8px;padding:2px 0 0 46px}
+.lg2-dsx .lbl{font:600 11px/1 var(--body);letter-spacing:.08em;color:var(--tx3);text-transform:uppercase}
+.lg2-dsx .rir{display:flex;gap:3px}
+.lg2-dsx .rir button{width:30px;height:30px;padding:0;border-radius:8px;font:650 13px/1 var(--body);color:var(--tx2);background:rgba(150,178,222,.07)}
 .lg2-done .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--ok);color:#04210F}
 .lg2-done .lead .gi{width:20px;height:20px;stroke-width:3}
 .lg2-done .mn,.lg2-nx .mn,.lg2-lr .mn{flex:1;min-width:0}
@@ -1600,6 +1605,8 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .lg2-sx .rir{display:flex;gap:3px}
 .lg2-sx .rir button{width:30px;height:30px;padding:0;border-radius:8px;font:650 13px/1 var(--body);color:var(--tx2);background:rgba(150,178,222,.07)}
 .lg2-sx .rir button.on{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.5)}
+.lg2-sumrest{display:flex;align-items:center;gap:10px;margin:2px 0 10px;padding:10px 13px;border-radius:13px;background:var(--g1);box-shadow:var(--hl);font:400 13px/1.4 var(--body);color:var(--tx2)}
+.lg2-sumrest .gi{width:18px;height:18px;color:var(--rest);flex:none}.lg2-sumrest b{color:var(--tx1);font-weight:600}
 .lg2-prchip,.lg2-rchip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:999px;font:650 12px/1 var(--body);white-space:nowrap}
 .lg2-prchip{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.4);animation:lg2-chip .3s var(--spring) 1 both}
 @keyframes lg2-chip{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
@@ -3516,9 +3523,9 @@ function tickRest(){
   const rem=Math.ceil((state.restEnd-Date.now())/1000);
   if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");sfx("go");document.body.classList.remove("rest-final");state._restGo={until:Date.now()+8000,tgt:lgNextLine()};lgRestSwap();lgTitle(null);return;}
   if(rem<=5)document.body.classList.add("rest-final");else document.body.classList.remove("rest-final");
-  state.restTimer=rem;const el=$("rest-display");if(el)el.textContent=fmtTime(rem);
+  state.restTimer=rem;const el=$("rest-display");if(el)el.textContent=lgM(rem);
   const rg=$("lgring");if(rg)rg.style.strokeDashoffset=(94.25*(1-clamp(rem/(state._restTotal||1),0,1))).toFixed(1);
-  lgTitle(fmtTime(rem)+" · Rest");
+  lgTitle(lgM(rem)+" · Rest");
 }
 /* ----- Rest lives in the sticky top bar: draining bar in the REST box + a compact control strip. No full-screen takeover. ----- */
 function hideRestStrip(){lgRestSwap();}
@@ -3546,7 +3553,7 @@ function restApplyTarget(){
   haptic("light");saveSession();
   try{render();}catch(_){}
 }
-function addRest(delta){if(!state.restRunning)return;state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();return;}haptic("tap");tickRest();const l=$("lgrl");if(l&&!state._restRx)l.textContent="of "+fmtTime(state._restTotal);}
+function addRest(delta){if(!state.restRunning)return;state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();return;}haptic("tap");tickRest();const l=$("lgrl");if(l&&!state._restRx)l.textContent="of "+lgM(state._restTotal);}
 function skipRest(){state.restRunning=false;state.restTimer=0;state._restGo=null;haptic("tap");document.body.classList.remove("rest-final");lgRestSwap();lgTitle(null);}
 /* ===== MMA Round Timer — combat-conditioning interval timer ===== */
 const MMA_PRESETS=[
@@ -3659,7 +3666,7 @@ function setSessionNotes(v){if(state.session)state.session.notes=v;} // no rende
 function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";const ev=liveCheckPR(ei,si);restStart(false);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr"||ev==="boss")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast(exx._title&&!exx._titleWon?"Title fight over: the record stands":"✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr"||ev==="boss")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast(exx._title&&!exx._titleWon?"Title fight over: the record stands":"✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkLiberation(ei);}catch(e){}try{tonnageQuip();}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();saveSession();}
 /* ── DISTRICT LIBERATION — 3 working sets on a contested/lost district retakes it, live ── */
 function sessionSetsOn(m){
   let c=0;(state.session.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -4087,8 +4094,8 @@ function finishWorkout(){
 function endSession(){stopTimers();try{cloudPresence(false);}catch(e){}state.session=null;state.step=null;state.minimized=false;clearSavedSession();state.tab="gotham";render();}
 // Minimise the live workout: keep the session + timers running, drop back to the tabs so you can
 // check history, fuel, etc. A floating resume bar lets you jump straight back into logging.
-function minimizeWorkout(){if(!state.session)return;state.minimized=true;state.step=null;haptic("tap");if(!state.tab)state.tab="gotham";render();window.scrollTo(0,0);saveSession();}
-function resumeWorkout(){if(!state.session)return;state.minimized=false;state.step="logging";haptic("tap");render();window.scrollTo(0,0);saveSession();}
+function minimizeWorkout(){if(!state.session)return;state.minimized=true;releaseWakeLock();state.step=null;haptic("tap");if(!state.tab)state.tab="gotham";render();window.scrollTo(0,0);saveSession();}
+function resumeWorkout(){if(!state.session)return;state.minimized=false;state.step="logging";requestWakeLock();haptic("tap");render();window.scrollTo(0,0);saveSession();}
 function resumeBar(){
   if(!state.session||state.step||state.showOnboarding)return"";
   const t=fmtTime(Math.floor((Date.now()-state.session.startedAt)/1000));
@@ -5467,7 +5474,7 @@ function summaryCardRecap(R){
       <div class="row sp"><b style="font-size:14.5px">${esc(e.name)}</b>${delta}</div>
       <div class="row sp" style="margin-top:5px;align-items:baseline"><span style="font-family:var(--disp);font-weight:650;font-size:18px;color:var(--text)">${Math.round(topW)}<span style="font-size:11px;color:var(--text3)">kg</span> × ${topR}</span><span class="mini" style="color:var(--text3)">${e.sets.length} sets · ${fmtNum(Math.round(vol))}kg moved</span></div></div>`;
   }).join("");
-  return sumHero("Exercise breakdown","LIFT BY LIFT","🏋️","#FFD048")+rows+
+  return sumHero("Exercise breakdown","LIFT BY LIFT","🏋️","#FFD048")+rows+lgRestSummary(R.wk)+
     `<div class="mini center" style="color:var(--text3);margin-top:2px">▲ = beat your last estimated 1RM on that lift.</div>`;
 }
 function sessionNoteBlock(R){
@@ -13145,6 +13152,7 @@ document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only appli
 const LG_RX={iso:{lo:60,hi:90,tgt:75},cmp:{lo:120,hi:180,tgt:150},low:{lo:150,hi:180,tgt:180}};
 const LG_ISO=/curl|extension|pushdown|push-down|pressdown|raise|fly|flye|pec deck|kickback|shrug|calf|crunch|pullover|face pull|abduct|adduct|wrist|forearm|rear delt/i;
 const lgHas=v=>v!==""&&v!=null;
+const lgM=t=>{t=Math.max(0,Math.round(t));return Math.floor(t/60)+":"+String(t%60).padStart(2,"0");};
 const lgNum=(w,ex)=>ex&&ex.bw&&!(+w)?"BW":fmtKg(w);
 const lgMuscle=e=>MM_NORM((exFor(e.name).p||[])[0]||"");
 function lgRx(name){if(LG_ISO.test(name))return LG_RX.iso;return["quads","hamstrings","glutes"].includes(MM_NORM((exFor(name).p||[])[0]||""))?LG_RX.low:LG_RX.cmp;}
@@ -13180,7 +13188,7 @@ function lgGhosts(e){
 function lgPrMoment(ei,si){state._lgPrFresh=ei+":"+si;try{sfx("pop");}catch(e){}haptic("pr");}
 function lgUndo(ei,si){const ses=state.session,e=ses.exercises[ei],s=e.sets[si];delete s.t;delete s.rest;delete s.rx;if(ses._prRows&&ses._prRows[ei+":"+si]){delete ses._prRows[ei+":"+si];if(ses.liveBest)delete ses.liveBest[e.name];}}
 function lgRirSet(e,s,v){const rir=state.data.u.metric==="rir";s.rpe=rir?(v>=4?"4+":String(v)):String(v>=4?6:10-v);}
-function lgRir(ei,si,v){const s=state.session.exercises[ei].sets[si];if(rirOfSet(s)===v)s.rpe="";else lgRirSet(null,s,v);haptic("tap");saveSessionSoon();render();}
+function lgRir(ei,si,v){try{event.stopPropagation();}catch(_){}const s=state.session.exercises[ei].sets[si];if(rirOfSet(s)===v)s.rpe="";else lgRirSet(null,s,v);haptic("tap");saveSessionSoon();render();}
 function lgToggleRir(ei,si){const k=ei+":"+si;state.session._rirOpen=state.session._rirOpen===k?null:k;render();}
 function lgDetail(ei){const e=state.session&&state.session.exercises[ei];if(e)openExDetail(e.name);}
 function lgPic(ei){const e=state.session&&state.session.exercises[ei];if(e)openPicPicker(e.name,"lgfig");}
@@ -13194,10 +13202,10 @@ function lgRestInner(){
   const ses=state.session,fei=ses?activeExIdx():-1,e=fei>=0?ses.exercises[fei]:null;
   if(state.restRunning){const rem=Math.max(0,Math.ceil((state.restEnd-Date.now())/1000)),tot=state._restTotal||1;
     return `<svg class="lg2-rring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" class="trk"/><circle id="lgring" cx="18" cy="18" r="15" class="val" stroke-dasharray="94.25" stroke-dashoffset="${(94.25*(1-clamp(rem/tot,0,1))).toFixed(1)}" transform="rotate(-90 18 18)"/></svg>
-      <div class="rt"><b id="rest-display">${fmtTime(rem)}</b><span id="lgrl">${state._restRx?"rx "+fmtTime(state._restRx):"of "+fmtTime(tot)}</span></div>
+      <div class="rt"><b id="rest-display">${lgM(rem)}</b><span id="lgrl">${state._restRx?"rx "+lgM(state._restRx):"of "+lgM(tot)}</span></div>
       <button class="lg2-rb" data-hx onclick="addRest(30)" aria-label="Add 30 seconds">+30</button><button class="lg2-rb" data-hx onclick="skipRest()" aria-label="Skip rest">${GP.icon("skip")}</button>`;}
   if(state._restGo)return `<svg class="lg2-rring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" class="trk"/><circle cx="18" cy="18" r="15" class="val" stroke-dasharray="94.25" stroke-dashoffset="0" transform="rotate(-90 18 18)"/></svg><div class="rt"><b id="rest-display">GO</b><span>${esc(state._restGo.tgt)}</span></div>`;
-  return `<button class="lg2-ridle" data-hx onclick="lgRestManual()" aria-label="Start rest timer">${GP.icon("timer")}<span><b id="rest-display">${fmtTime(e?lgRestSecs(e,null):(+state.data.u.restTime||120))}</b><i>REST</i></span></button>`;
+  return `<button class="lg2-ridle" data-hx onclick="lgRestManual()" aria-label="Start rest timer">${GP.icon("timer")}<span><b id="rest-display">${lgM(e?lgRestSecs(e,null):(+state.data.u.restTime||120))}</b><i>REST</i></span></button>`;
 }
 function lgRestSwap(){const w=$("lgrest");if(!w)return;w.className="lg2-restwrap "+(state.restRunning?"is-run":state._restGo?"is-go":"is-idle");w.innerHTML=lgRestInner();}
 function lgRestManual(){const ses=state.session,fei=ses?activeExIdx():-1,e=fei>=0?ses.exercises[fei]:null;restStart(false,e?lgRestSecs(e,null):0);haptic("tap");}
@@ -13228,9 +13236,10 @@ function lgDoneRow(e,ei){
   sets.forEach(s=>{if(!top||setE1RM(ex,s)>setE1RM(ex,top))top=s;});
   let d="";if(lb&&top){const tw=+top.w||0,tr=+top.r||0;d=tw>lb.w?`+${fmtKg(tw-lb.w)} kg`:tr>lb.r?`+${tr-lb.r} rep${tr-lb.r>1?"s":""}`:(tw===lb.w&&tr===lb.r)?"=":"";}
   const hit=sets.some(s=>(+s.r||0)>=repTop(e.name)),inc=ex.bw?2.5:((top&&+top.w>=60)?5:2.5);
+  let dsx="";if(state.session._lastCleared===ei){const li=e.sets.map((s,i)=>s.type!=="W"&&s.done?i:-1).filter(i=>i>=0).pop();if(li!=null&&rirOfSet(e.sets[li])==null)dsx=`<div class="lg2-dsx"><span class="lbl">RIR on last set</span><div class="rir">${[0,1,2,3,4].map(v=>`<button data-hx onclick="lgRir(${ei},${li},${v})">${v===4?"4+":v}</button>`).join("")}</div></div>`;}
   return `<div class="lg2-done tap" onclick="focusEx(${ei})"><span class="lead">${GP.icon("check")}</span>
     <div class="mn"><div class="nm">${esc(e.name)}</div><div class="sub">${sets.map(s=>`${lgNum(s.w,ex)} × ${esc(s.r)}`).join(" · ")}${d?` · <b>${d}</b>`:""}</div></div>
-    ${hit?`<span class="lg2-tag">+${fmtKg(inc)} kg next</span>`:""}</div>`;
+    ${hit?`<span class="lg2-tag">+${fmtKg(inc)} kg next</span>`:""}${dsx}</div>`;
 }
 /* ---- focus card ---- */
 function lgChips(e,ex,m,p){
@@ -13279,7 +13288,24 @@ function lgRows(e,ei,ex){
   return h;
 }
 const lgPrText=pr=>pr.t==="e1rm"?"":pr.t==="weight"?"weight":pr.t==="vol"?"volume":"reps";
-function lgRestChip(s){return "";}
+function lgRestChip(s){if(!(s.rest>0)||!s.rx||s.rest>900)return"";const sh=s.rest<s.rx*.8;return `<span class="lg2-rchip${sh?" warn":""}">${GP.icon("timer")}${lgM(s.rest)} / ${lgM(s.rx)}${sh?" short":""}</span>`;}
+/* per-set bookkeeping when a set is ticked: completion time, actual rest since the previous working set of the SAME lift, prescribed rest; under the recovery cap the RIR picker starts on 2 */
+function lgNoteDone(ei,si){
+  const e=state.session.exercises[ei],s=e.sets[si];s.t=Date.now();if(s.type==="W")return;
+  let p=null;for(let k=si-1;k>=0;k--){const q=e.sets[k];if(q.type!=="W"&&q.done&&q.t){p=q;break;}}
+  s.rx=lgRx(e.name).tgt;if(p)s.rest=Math.round((s.t-p.t)/1000);else delete s.rest;
+  if(!s.rpe&&lgCap(e))lgRirSet(e,s,2);
+}
+function lgRest(ei,si){const e=state.session.exercises[ei],s=e.sets[si];restStart(false,lgRestSecs(e,s),s.type==="W"?0:lgRx(e.name).tgt);}
+/* finish summary: average actual rest vs prescribed, and how many short-rest sets lost reps against the set before */
+function lgRestSummary(wk){
+  let n=0,sum=0,rx=0,sh=0,lost=0;
+  (wk.exercises||[]).forEach(e=>{let prev=null;(e.sets||[]).forEach(s=>{if(s.type==="W")return;
+    if(s.rest>0&&s.rest<=900&&s.rx){n++;sum+=s.rest;rx+=s.rx;if(s.rest<s.rx*.8){sh++;if(prev&&(+s.r||0)<(+prev.r||0)&&(+s.w||0)>=(+prev.w||0))lost++;}}
+    prev=s;});});
+  if(n<2)return"";
+  return `<div class="lg2-sumrest">${GP.icon("timer")}<span>Rest: <b>avg ${lgM(sum/n)}</b> vs ${lgM(rx/n)} prescribed${sh?` · ${sh} set${sh>1?"s":""} after short rest${lost?`, <b>${lost} lost reps</b>`:", no reps lost"}`:" · right on target"}</span></div>`;
+}
 function lgFocus(ses,fei){
   const e=ses.exercises[fei],ex=exFor(e.name),m=lgMuscle(e),eq=(ex.eq||"").toLowerCase(),isBar=["barbell","smith","ez bar","trap bar"].includes(eq);
   const wu=warmupSuggest(fei),wk=(e.sets.filter(s=>s.type!=="W"&&parseFloat(s.w)>0).map(s=>parseFloat(s.w)))[0]||0,pl=isBar&&wk?lgPlates(wk):"";
