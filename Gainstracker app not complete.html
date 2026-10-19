@@ -1445,6 +1445,9 @@ input::placeholder,textarea::placeholder{color:var(--tx3);opacity:1}
 .gc-star,.gc-cloud,.gc-rain line,.gc-signal,.gc-wf,.gc-beacon,.gc-bat,.gc-light,.gc-bm,.gar-v,.gtv2-hero-img,.gtv2-tonight-tag i,.gtv2-threat.crit,.gtv2-threat.crit .thz,.threat-skull,.scanpanel-scan::after,.scanpanel-tag i,.mb-eyebrow i,.suit-breathe,.suit-stage-glow::after,.suit-halo,.vmed.cur,.batlogo,.brandlogo,.ob-bat-aura::before,.ob-bat-aura .bat-em,.fighter.hero,.fighter.boss,.patrol2-grid,.btn.gold::after,[style*="calpulse"],[style*="suitGlowPulse"]{animation:none!important}
 body.rest-final::after{animation:none;box-shadow:inset 0 0 90px 12px rgba(255,90,78,.18)}
 
+.acc-ttl .gi-t{width:18px;height:18px;margin:0;vertical-align:0;color:var(--gold-ink)}
+#offline-pill .gi{width:14px;height:14px;vertical-align:-2px}
+
 /* ===== GP:HOME (wave 2) ===== */
 
 
@@ -1502,7 +1505,7 @@ body.rest-final::after{animation:none;box-shadow:inset 0 0 90px 12px rgba(255,90
   </div>
   <button class="restbtn" style="margin-top:2px;min-width:120px" onclick="closeRoundTimer()">END SESSION</button>
 </div>
-<div id="offline-pill">⚡ Offline · all data saved on this device</div>
+<div id="offline-pill"><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.2 2.8L5.4 13.4h6l-.8 7.8 7.9-10.8h-6.1z"/></svg> Offline · all data saved on this device</div>
 <div id="modal"><div class="mbg"></div><div class="mcard" id="mcard"></div></div>
 <script>
 const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","p":["chest"],"s":["triceps","shoulders"],"c":["Bar to your lower chest, drive it straight up and meet it with your chest","Elbows tucked ~45-75\u00b0, never flared flat to 90\u00b0","Shoulder blades pinned back and down, feet planted"],"tgt":"Chest \u2014 sternal (mid) & lower, the main mass \u00b7 front delts and triceps","sub":{"chest":["mid","lo"]}},
@@ -8339,25 +8342,9 @@ function volMapBodies(){
   const col=m=>{const s=weeklySets(m);return s>0?{fill:heatColor(m),op:".95"}:{fill:"#E8C56A",op:".06"};};
   return `<div class="stage" style="border-radius:14px;overflow:hidden;padding:6px 6px 2px">${suitFigureFB(col)}</div>`;
 }
-/* Unified section-header icons — one crisp stroked-gold visual language, replaces the
-   grab-bag of coloured emoji in card titles so the whole app reads pro, not homemade. */
-function secIcon(key,c){
-  const col=c||"#E8C56A";
-  const P={
-    volume:'<path d="M5 19V12M12 19V5M19 19V15"/>',
-    balance:'<path d="M12 4v16M6 8l-2.4 6.4a3 3 0 005.8 0L7 8M18 8l-2.4 6.4a3 3 0 005.8 0L19 8M6 8h12"/>',
-    plateau:'<path d="M3.5 16.5h17M12 16V5M8 9l4-4 4 4"/>',
-    strength:'<path d="M6.5 6.5v11M3.5 9v5M17.5 6.5v11M20.5 9v5M6.5 12h11"/>',
-    schedule:'<rect x="3.5" y="5.5" width="17" height="15" rx="2.2"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/>',
-    suit:'<path d="M12 3.5l6 2.4v5.1c0 4-2.6 7-6 9.5-3.4-2.5-6-5.5-6-9.5V5.9z"/>',
-    radar:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 3.5v17M3.5 12h17"/>',
-    plate:'<rect x="2.5" y="7" width="3" height="10" rx="1"/><rect x="6.5" y="9" width="2.6" height="6" rx="1"/><path d="M9.1 12h5.8"/><rect x="14.9" y="9" width="2.6" height="6" rx="1"/><rect x="18.5" y="7" width="3" height="10" rx="1"/>',
-    link:'<path d="M9.5 14.5l5-5M10.5 6.8l1.7-1.7a3.4 3.4 0 014.9 4.9l-2.2 2.2M13.5 17.2l-1.7 1.7a3.4 3.4 0 01-4.9-4.9l2.2-2.2"/>',
-    bolt:'<path d="M13 2.5L5.5 13.5H11l-1 8 8.5-11.5H13z"/>',
-    flame:'<path d="M12 3.5c.6 3 3.5 4.2 3.5 7.5a3.5 3.5 0 01-7 0c0-1 .4-1.7.9-2.4C10.8 9.6 12 8 12 3.5z"/><path d="M8.6 13a5 5 0 109.6 1.8c0-3.4-2.4-5-3.4-7"/>'
-  };
-  return `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;flex:none;filter:drop-shadow(0 1px 4px rgba(201,168,76,.35))">${P[key]||''}</svg>`;
-}
+/* Section-title icons: thin line glyphs from the shared GP icon set (no coloured glow, no emoji). */
+const SEC_ICON={volume:"chart",balance:"scale",plateau:"plateau",strength:"dumbbell",schedule:"calendar",suit:"suit",radar:"scan",plate:"dumbbell",link:"link",bolt:"bolt",flame:"flame"};
+function secIcon(key){return GP.icon(SEC_ICON[key]||key,"gi-sec");}
 /* ===== Muscle-map TIME-LAPSE: scrub a 7-day muscle-heat window across your whole training history ===== */
 // Pure read of state.data.workouts — never writes. Each slider tick = one week; the body re-tints to that window.
 function tlBuildWeeks(){
@@ -12918,8 +12905,22 @@ function hxScan(n){
   const st=ok.map(el=>getComputedStyle(el).position==="static"); // read every position first, then write: one style recalc, not one per host
   ok.forEach((el,k)=>hxHost(el,st[k]));
 }
-new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(hxScan))).observe(document.body,{childList:true,subtree:true});
-hxScan(document.body);
+/* Section titles still carry a leading emoji in ~170 templates; swap it for a GP line icon the moment the node lands (before paint). */
+const EMO_ICON={"🗺":"map","⚙":"sliders","🎩":"chat","🤖":"chat","⚡":"bolt","🦇":"bat","🥊":"flag","🧤":"flag","🎯":"target","🧘":"target","🎞":"film","🪜":"ramp","🩻":"pulse","🩹":"cross","🩸":"cross","🚑":"cross","💊":"cross","🧭":"search","🔍":"search","🧪":"flask","🧠":"bulb","🛠":"wrench","🔧":"wrench","🚨":"alert","⚠":"alert","😴":"moon","🌒":"moon","😤":"bolt","🗓":"calendar","🗄":"note","🗂":"note","📝":"note","📜":"note","📋":"note","🖼":"image","🕸":"scan","🔮":"scan","📡":"scan","🔥":"flame","🔗":"link","🔒":"lock","📰":"news","📥":"down","📤":"share","📚":"book","🏛":"book","📈":"up","💻":"chart","📊":"chart","💧":"drop","💠":"suit","👑":"crown","🏆":"trophy","🎖":"trophy","🦹":"bat","⚖":"scale","🏋":"dumbbell","💪":"dumbbell","⏭":"skip","↕":"swap","⇄":"swap","🃏":"star","🎲":"star","\u{1FA7B}":"pulse"};
+const EMO_RE=/^\s*(?:\p{Extended_Pictographic}|\u21C4)[\uFE0F\u200D]*(?:\p{Extended_Pictographic}\uFE0F*)*\s*/u;
+function iconize(n){
+  if(n.nodeType!==1)return;
+  const hs=n.matches(".ttl,.acc-ttl")?[n]:[];n.querySelectorAll(".ttl,.acc-ttl").forEach(e=>hs.push(e));
+  hs.forEach(el=>{
+    const t=el.firstChild;if(!t||t.nodeType!==3)return;
+    const m=EMO_RE.exec(t.nodeValue);if(!m)return;
+    const nm=EMO_ICON[String.fromCodePoint(m[0].trim().codePointAt(0))];
+    t.nodeValue=t.nodeValue.slice(m[0].length);
+    if(nm)el.insertAdjacentHTML("afterbegin",GP.icon(nm,"gi-t"));
+  });
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);}))).observe(document.body,{childList:true,subtree:true});
+hxScan(document.body);iconize(document.body);
 document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 boot();
 
