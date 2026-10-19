@@ -1529,7 +1529,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .lg2-done{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px;margin-bottom:10px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl);cursor:pointer}
 .lg2-done{flex-wrap:wrap}
 .lg2-dsx{flex:0 0 100%;display:flex;align-items:center;gap:8px;padding:2px 0 0 46px}
-.lg2-dsx .lbl{font:600 11px/1 var(--body);letter-spacing:.08em;color:var(--tx3);text-transform:uppercase}
+.lg2-dsx .lbl{font:600 11px/1 var(--body);letter-spacing:.08em;color:var(--tx3);text-transform:uppercase;white-space:nowrap}
 .lg2-dsx .rir{display:flex;gap:3px}
 .lg2-dsx .rir button{width:30px;height:30px;padding:0;border-radius:8px;font:650 13px/1 var(--body);color:var(--tx2);background:rgba(150,178,222,.07)}
 .lg2-done .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--ok);color:#04210F}
@@ -13177,10 +13177,10 @@ function lgGhosts(e){
     let fresh=false;
     if(last&&last.done&&tg&&rirOfSet(last)===0&&(+last.r||0)<=tg.r-2){const lw=+last.w||0;fresh=true;adj=(ex.bw||lw<30)?{dr:-1,why:`RIR 0 at ${last.r} of ${tg.r} reps`}:{w:Math.round((lw-2.5)*2)/2,why:`RIR 0 at ${last.r} of ${tg.r} reps`};}
     let g=null;
-    if(s.type!=="NRM"&&lgHas(s.prevW)&&lgHas(s.prevR))g={w:String(s.prevW),r:String(s.prevR)};
+    if((s.type||"NRM")!=="NRM"&&lgHas(s.prevW)&&lgHas(s.prevR))g={w:String(s.prevW),r:String(s.prevR)};
     else if(tg)g={w:tg.w?fmtKg(tg.w):(ex.bw?"0":""),r:String(tg.r)};
     else if(lgHas(s.prevW)||lgHas(s.prevR))g={w:lgHas(s.prevW)?String(s.prevW):"",r:lgHas(s.prevR)?String(s.prevR):""};
-    if(g&&adj&&s.type==="NRM"&&!s.done){if(adj.w!=null)g.w=fmtKg(adj.w);else g.r=String(Math.max(1,(+g.r||1)+adj.dr));if(fresh)g.why=`${adj.why} → ${adj.w!=null?"−2.5 kg":"−1 rep"} on this set`;}
+    if(g&&adj&&(s.type||"NRM")==="NRM"&&!s.done){if(adj.w!=null)g.w=fmtKg(adj.w);else g.r=String(Math.max(1,(+g.r||1)+adj.dr));if(fresh)g.why=`${adj.why} → ${adj.w!=null?"−2.5 kg":"−1 rep"} on this set`;}
     out.push(g);last=s;
   });
   return out;
@@ -13236,7 +13236,7 @@ function lgDoneRow(e,ei){
   sets.forEach(s=>{if(!top||setE1RM(ex,s)>setE1RM(ex,top))top=s;});
   let d="";if(lb&&top){const tw=+top.w||0,tr=+top.r||0;d=tw>lb.w?`+${fmtKg(tw-lb.w)} kg`:tr>lb.r?`+${tr-lb.r} rep${tr-lb.r>1?"s":""}`:(tw===lb.w&&tr===lb.r)?"=":"";}
   const hit=sets.some(s=>(+s.r||0)>=repTop(e.name)),inc=ex.bw?2.5:((top&&+top.w>=60)?5:2.5);
-  let dsx="";if(state.session._lastCleared===ei){const li=e.sets.map((s,i)=>s.type!=="W"&&s.done?i:-1).filter(i=>i>=0).pop();if(li!=null&&rirOfSet(e.sets[li])==null)dsx=`<div class="lg2-dsx"><span class="lbl">RIR on last set</span><div class="rir">${[0,1,2,3,4].map(v=>`<button data-hx onclick="lgRir(${ei},${li},${v})">${v===4?"4+":v}</button>`).join("")}</div></div>`;}
+  let dsx="";if(state.session._lastCleared===ei){const li=e.sets.map((s,i)=>s.type!=="W"&&s.done?i:-1).filter(i=>i>=0).pop();if(li!=null&&rirOfSet(e.sets[li])==null)dsx=`<div class="lg2-dsx"><span class="lbl">Last set RIR</span><div class="rir">${[0,1,2,3,4].map(v=>`<button data-hx onclick="lgRir(${ei},${li},${v})">${v===4?"4+":v}</button>`).join("")}</div></div>`;}
   return `<div class="lg2-done tap" onclick="focusEx(${ei})"><span class="lead">${GP.icon("check")}</span>
     <div class="mn"><div class="nm">${esc(e.name)}</div><div class="sub">${sets.map(s=>`${lgNum(s.w,ex)} × ${esc(s.r)}`).join(" · ")}${d?` · <b>${d}</b>`:""}</div></div>
     ${hit?`<span class="lg2-tag">+${fmtKg(inc)} kg next</span>`:""}${dsx}</div>`;
@@ -13273,7 +13273,7 @@ function lgRows(e,ei,ex){
     const g=gs[si],pr=(ses._prRows||{})[ei+":"+si],fresh=state._lgPrFresh===ei+":"+si,dl=s.done&&!isW?lgDelta(s):null;
     const cls=`lg2-sr ${s.done?"dn":si===act?"act":"up"}${isW?" w":""}${pr?" pr":""}${fresh?" pr-fresh":""}`;
     const dchip=k=>dl&&dl.k===k?`<i class="lg2-dlt ${dl.c}" onclick="lgToggleRir(${ei},${si})">${dl.t}</i>`:"";
-    const tag=isW?"W":s.type==="NRM"?String(wn):s.type;
+    const ty=s.type||"NRM",tag=isW?"W":ty==="NRM"?String(wn):ty;
     h+=`<div class="${cls}">
       <button class="lg2-sn" onclick="openSetSheet(${ei},${si})" aria-label="Set options">${pr?GP.icon("crown"):tag}</button>
       <div class="lg2-cell"><input data-fid="${ei}-${si}-w" inputmode="decimal" value="${esc(lgHas(s.w)?s.w:"")}" placeholder="${esc(g?g.w:"")}" oninput="setField(${ei},${si},'w',this.value)" aria-label="Set ${wn} kilograms"/>${dchip("w")}</div>
@@ -13336,7 +13336,7 @@ function lgTip(ses,fei){
 function lgLastStr(name,n){const L=lgLast(name);return L?L.sets.slice(0,n).map(s=>fmtKg(s.w)+" × "+s.r).join(", "):"";}
 function lgUpNext(e,ei,total){
   const ex=exFor(e.name),m=lgMuscle(e),gs=lgGhosts(e),ls=lgLastStr(e.name,2),rec=Math.round(getRecovery(m));let n=0;
-  const rows=e.sets.slice(0,4).map((s,si)=>{const g=gs[si];if(s.type!=="W")n++;return `<div class="lg2-sr up"><i class="lg2-sn">${s.type==="W"?"W":s.type==="NRM"?n:s.type}</i><div class="lg2-cell ghost">${g&&g.w!==""?esc(g.w):lgHas(s.w)?esc(s.w):"–"}</div><div class="lg2-cell ghost">${g&&g.r!==""?esc(g.r):lgHas(s.r)?esc(s.r):"–"}</div><div class="lg2-ck">${GP.icon("check")}</div></div>`;}).join("");
+  const rows=e.sets.slice(0,4).map((s,si)=>{const g=gs[si];if(s.type!=="W")n++;return `<div class="lg2-sr up"><i class="lg2-sn">${s.type==="W"?"W":(s.type||"NRM")==="NRM"?n:s.type}</i><div class="lg2-cell ghost">${g&&g.w!==""?esc(g.w):lgHas(s.w)?esc(s.w):"–"}</div><div class="lg2-cell ghost">${g&&g.r!==""?esc(g.r):lgHas(s.r)?esc(s.r):"–"}</div><div class="lg2-ck">${GP.icon("check")}</div></div>`;}).join("");
   return `<section class="lg2-nx tap big" onclick="focusEx(${ei})"><div class="lg2-nxh">${thumb(ex,2)}<div class="mn"><div class="eb">Up next · ${ei+1} of ${total}</div><div class="nm">${esc(e.name)}</div><div class="sub">${esc(lgPlan(e))}${ls?" · last "+esc(ls):""} · ${esc(MNAME[m]||"")} ${rec}%</div></div></div>${rows}${e.sets.length>4?`<div class="lg2-more">+${e.sets.length-4} more sets</div>`:""}</section>`;
 }
 function lgLater(list,ses){
