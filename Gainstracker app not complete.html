@@ -6259,15 +6259,16 @@ function openThreatInfo(){const t=gothamThreat();const d=state.data;
     <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 // Fatigue Debt — accumulated fatigue vs recovery across trained muscles
-function fatigueDebt(){
-  let debt=0,n=0;M12.forEach(m=>{if(!(state.data.muscleVol[m]||0))return;n++;debt+=Math.max(0,100-getRecovery(m));});
-  const pct=n?clamp(Math.round(debt/(n*100)*100),0,100):0;
+function fatigueDebt(){   // judged on the MOST fatigued muscles (mean of the 4 worst) — an all-muscle mean lets fresh muscles hide tired legs
+  const debts=M12.filter(m=>(state.data.muscleVol[m]||0)>0).map(m=>Math.max(0,100-getRecovery(m))).sort((a,b)=>b-a),n=debts.length;
+  const top=debts.slice(0,4),pct=n?clamp(Math.round(top.reduce((a,b)=>a+b,0)/top.length),0,100):0;
+  const low=debts.filter(x=>x>50).length,cnt=`${low} of ${n} muscle${n===1?"":"s"} under 50% recovered`;
   let status,color;
-  if(pct<25){status="Recovered — the bank is in credit. Push hard.";color="var(--green)";}
-  else if(pct<55){status="Manageable load. Train as planned.";color="var(--gold2)";}
-  else if(pct<80){status="High fatigue debt. Favour quality over junk volume.";color="var(--orange)";}
-  else {status="Deep in the red. Cut junk sets, keep 1–3 reps in reserve.";color="var(--red)";}
-  return {pct,status,color};
+  if(pct<25){status=low?`${cnt} — train the rest hard.`:"Every muscle is close to ready. Push hard.";color="var(--green)";}
+  else if(pct<55){status=`${low?cnt+". ":""}Manageable load. Train as planned.`;color="var(--gold2)";}
+  else if(pct<80){status=`${cnt}. Favour quality over junk volume.`;color="var(--orange)";}
+  else {status=`${cnt}. Cut junk sets, keep 1–3 reps in reserve.`;color="var(--red)";}
+  return {pct,status,color,low,n};
 }
 function openFatigueInfo(){const f=fatigueDebt();
   const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0).sort((a,b)=>getRecovery(a)-getRecovery(b));
@@ -6275,7 +6276,7 @@ function openFatigueInfo(){const f=fatigueDebt();
     return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px">${mIcon(m,17,col)}<b style="font-size:13px;color:var(--text2)">${MNAME[m]}</b></span><div class="row g" style="gap:10px;align-items:center"><span class="mini" style="color:var(--text3)">${hrs>0?hrs+"h to ready":"ready"}</span><div class="bar" style="width:64px;margin:0"><i style="width:${debt}%;background:${col}"></i></div><b style="color:${col};min-width:34px;text-align:right">${debt}%</b></div></div>`;
   }).join(""):`<div class="empty-state" style="padding:28px 14px 16px"><div class="es-icon">💪</div><div class="es-title">SUIT UNACTIVATED</div><div class="es-body">Log a session and your fatigue map illuminates the Suit with live recovery data.</div></div>`;
   openSheet(`<div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="font-size:22px;color:${f.color}">${f.pct}%</b></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 6px">Your average fatigue across every trained muscle — the running tab between how hard you've hit them and how much they've recovered. Higher = more accumulated fatigue to clear.</div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 6px">The average fatigue of your 4 most fatigued muscles — fresh muscles can't hide tired ones. Higher = more accumulated fatigue still to clear.</div>
     <div class="bar" style="margin:8px 0"><i style="width:${f.pct}%;background:${f.color}"></i></div>
     <div class="mini" style="font-style:italic;color:${f.color};margin-bottom:6px">${esc(f.status)}</div>
     <div class="ttl" style="font-size:13px;margin:12px 0 0">Per-muscle debt <span class="mini" style="font-weight:400;color:var(--text3)">— most fatigued first</span></div>
@@ -6824,26 +6825,18 @@ function renderGarage(){
 }
 
 /* ===== WEEKLY MOST WANTED (#12): the weakest sector as a bounty with a target ===== */
-function mostWantedCard(){
-  const m=weakestMuscle();if(!m)return "";
-  const lm=VL[m]||{mev:8,mav:14};const target=lm.mev;const cur=weeklySets(m);
-  const done=cur>=target;const pct=clamp(cur/Math.max(1,target)*100,0,100);
-  const bc=done?"#2ECC71":"#E8453C";
+function mostWantedCard(){   // FURTHEST BEHIND MEV = argmax(MEV − weekly sets) over trained muscles (top two) + a flag for anything over MRV
+  const tr=M12.filter(m=>(state.data.muscleVol[m]||0)>0).map(m=>{const cur=weeklySets(m),z=zoneOf(m,cur);return {m,cur,z,gap:z.mev-cur};});
+  if(!tr.length)return "";
+  const behind=tr.filter(r=>r.gap>0).sort((a,b)=>b.gap-a.gap||a.cur/a.z.mev-b.cur/b.z.mev).slice(0,2),over=tr.filter(r=>r.z.key==="over");
+  const row=r=>{const pct=clamp(r.cur/Math.max(1,r.z.mev)*100,0,100);
+    return `<div style="margin-top:8px"><div class="row sp" style="align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:8px;min-width:0">${mIcon(r.m,22,"#E8453C")}<b style="font-size:14px;color:#E8453C;font-family:var(--disp)">${MNAME[r.m]}</b></div><div style="text-align:right;flex:none"><b style="font-size:12px;color:#E8453C">${r.cur}/${r.z.mev}</b> <span style="font-size:10px;color:var(--text3)">sets this week · ${r.gap} short</span></div></div>
+      <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px"><i style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#E8453C,#E8A52A);border-radius:999px"></i></div></div>`;};
+  const bc=behind.length?"#E8453C":"#2ECC71";
   return `<div class="gtv2-panel wide" style="border-color:${bc}55;margin-bottom:8px;padding:10px 12px">
-    <div class="row sp" style="align-items:center;gap:8px">
-      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-        ${mIcon(m,26,bc)}
-        <div style="min-width:0">
-          <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:var(--disp)">FURTHEST BEHIND MEV</div>
-          <div style="font-size:15px;font-weight:800;color:${bc};font-family:var(--disp)">${MNAME[m]}</div>
-        </div>
-      </div>
-      <div style="text-align:right;flex:none">
-        <div style="font-size:12px;color:${bc};font-weight:700">${done?'✓ MEV MET':cur+'/'+target}</div>
-        <div style="font-size:10px;color:var(--text3)">${done?'minimum hit':'sets this week'}</div>
-      </div>
-    </div>
-    <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${pct}%;background:${done?'#2ECC71':'linear-gradient(90deg,#E8453C,#E8A52A)'};border-radius:999px;box-shadow:0 0 8px ${bc}"></i></div>
+    <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:var(--disp)">FURTHEST BEHIND MEV</div>
+    ${behind.length?behind.map(row).join(""):`<div style="margin-top:6px;font-size:13px;font-weight:700;color:#2ECC71">✓ MEV met on every trained muscle</div>`}
+    ${over.length?`<div style="margin-top:8px;font-size:11px;color:#E8453C"><b>Over MRV</b> · ${over.map(r=>`${MNAME[r.m]} ${r.cur}/${r.z.mrv}`).join(" · ")} — extra sets here are junk volume</div>`:""}
   </div>`;
 }
 
