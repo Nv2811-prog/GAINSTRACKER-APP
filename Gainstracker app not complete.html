@@ -4077,20 +4077,6 @@ function cineDismiss(){
 function cineHide(){const el=$("cine");if(el)el.classList.remove("on","out");state._cineOn=false;}
 // Daily Wayne Wisdom — one cinematic on the first open of each day, instead of an inline card you scroll past.
 // maybeShowDailyWisdom() was here — moved to maybeContextualDailyWisdom() (fires on Alfred tab open, not launch)
-// Two-Face's daily coin — fires ONCE per day as a cinematic bulletin (not an inline Gotham card you scroll past).
-function maybeShowTwoFaceCall(){
-  try{const today=new Date().toDateString();
-    if(state.data.lastTwoFaceDay===today)return;
-    state.data.lastTwoFaceDay=today;save();
-    const heads=twoFaceSide()===0;
-    const col=heads?"var(--gold2)":"#E8453C";
-    const title=heads?"HEADS — Go Heavy":"TAILS — Chase Volume";
-    const dir=heads
-      ? "Tonight is about <b style='color:var(--gold2)'>top-end strength</b>. Work up to a heavy top single or triple on your first compound, then back off. Move real iron."
-      : "Tonight is about <b style='color:#ff6a5e'>accumulation</b>. Keep 1–2 reps in reserve, add a back-off set, chase 2 extra reps on everything. Bury the muscle in volume.";
-    cinePush({eye:"Two-Face's Call",icon:heads?"🪙":"🩸",accent:col,title:title,titleHtml:`<span style="color:${col}">${esc(title)}</span>`,bodyHtml:dir,btn:"NO CHOOSING"});
-  }catch(e){}
-}
 // Live Patrol Feed — a running log of League activity so you never miss an ally's session,
 // even if you weren't on the app when the live pop fired. Capped, newest first, persisted.
 function pushPatrolFeed(entry){
@@ -6482,8 +6468,6 @@ function stalledLifts(){
   });
   return out;
 }
-/* ===== Two-Face daily coin (#13): a deterministic 50/50 directive for tonight ===== */
-function twoFaceSide(){const now=new Date();const start=new Date(now.getFullYear(),0,0);const doy=Math.floor((now-start)/864e5);return doy%2;}
 /* ========================================================================
    THE INFIRMARY (Wave 5) — one recovery hub: sleep, soreness, conditioning,
    supplements and an injury board. Sleep already feeds Patrol Readiness.
@@ -8552,7 +8536,7 @@ function logRestDay(){
   state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();
   const AFFIRM=[["Recovery is resistance","The muscle grows when you rest. Today you're not skipping — you're building.","🛡️"],["Strategic withdrawal","Batman doesn't fight every night. Tonight you recharge for tomorrow's heavier iron.","🦇"],["Earned rest","You've put in the work. The body needs this. Come back stronger.","💎"],["The forge cools","Iron needs time to cool and harden. So do you.","⚔️"]];
   const a=AFFIRM[(state.data.workouts||[]).length%AFFIRM.length];
-  try{cinePush({eye:"REST DAY · RECOVERY PROTOCOL",icon:a[2],accent:"var(--green)",title:a[0],bodyHtml:`<div style="font-size:15px;line-height:1.6;color:var(--text)">${esc(a[1])}</div>`,btn:"RECHARGE"});}catch(e){toast(restLine());}
+  toast(a[2]+" "+a[0]+" — "+a[1]);
   try{checkStreakMilestone();}catch(e){}
   render();
 }
@@ -8795,9 +8779,9 @@ function wraithShowdownCheck(){
   const pm=new Date(nowD.getFullYear(),nowD.getMonth()-1,1);
   let prN=0;(d.workouts||[]).forEach(x=>{const dt=new Date(x.date);if(dt.getFullYear()===pm.getFullYear()&&dt.getMonth()===pm.getMonth())prN+=((x.prs||[]).length);});
   if(prN>=3){w.wins=(w.wins||0)+1;d.u.xp=(d.u.xp||0)+300;
-    cinePush({killcam:true,hold:true,icon:"🩶",eye:"MONTHLY SHOWDOWN — WON",title:"The Wraith kneels",titleHtml:`The Wraith <span style="color:#22E87A">kneels</span>`,bodyHtml:`<div style="font-size:15px">${prN} records last month. He couldn't match one of them.</div><div class="mini" style="margin-top:8px;color:var(--gold2)">+300 XP · he returns stronger</div>`,btn:"STAY SHARP",accent:"#22E87A"});}
+    toast("🩶 Monthly showdown WON — "+prN+" records last month, the Wraith couldn't match one. +300 XP");}
   else{w.losses=(w.losses||0)+1;
-    cinePush({icon:"🩶",eye:"MONTHLY SHOWDOWN — LOST",title:"The Wraith laughs",titleHtml:`The Wraith <span style="color:#FF5545">laughs</span>`,bodyHtml:`<div style="font-size:14px">${prN} record${prN===1?"":"s"} last month. He needed three to even notice you.</div><div class="mini" style="margin-top:8px;color:var(--text3)">“${WRAITH_TAUNTS[(w.losses||0)%WRAITH_TAUNTS.length]}”</div>`,btn:"AVENGE IT",accent:"#FF5545"});}
+    toast("🩶 Monthly showdown lost — "+prN+" record"+(prN===1?"":"s")+" last month. The Wraith needs three to notice you.");}
   d.wraithMk=mk;save();
 }
 /* ═══════════ 🏆 TITLE FIGHTS — championship belts on the big lifts ═══════════ */
@@ -12633,7 +12617,6 @@ function boot(){
   if(state._restored){state._restored=false;try{toast("🦇 Workout recovered — your logged sets are safe. Tap the bar to resume.");}catch(e){}}
   if(state.data.onboardingDone){
     checkUnlocks(); // unlock toasts are minor notifications, always fine
-    maybeShowTwoFaceCall(); // ONE launch cinematic: tonight's training direction
     applyRankAccent(); // shift accent based on current rank
     // villain taunt + daily wisdom are now contextual: see maybeContextualVillainTaunt / maybeContextualDailyWisdom
   }
