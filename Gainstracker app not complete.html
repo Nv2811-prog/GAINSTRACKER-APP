@@ -6251,7 +6251,8 @@ function openThreatInfo(){const t=gothamThreat();const d=state.data;
 // Fatigue Debt — accumulated fatigue vs recovery across trained muscles
 function fatigueDebt(){   // judged on the MOST fatigued muscles (mean of the 4 worst) — an all-muscle mean lets fresh muscles hide tired legs
   const debts=M12.filter(m=>(state.data.muscleVol[m]||0)>0).map(m=>Math.max(0,100-getRecovery(m))).sort((a,b)=>b-a),n=debts.length;
-  const top=debts.slice(0,4),pct=n?clamp(Math.round(top.reduce((a,b)=>a+b,0)/top.length),0,100):0;
+  if(!n)return {pct:0,status:"Log a session to unlock.",color:"var(--text3)",low:0,n:0};   // nothing trained yet — nothing to report
+  const top=debts.slice(0,4),pct=clamp(Math.round(top.reduce((a,b)=>a+b,0)/top.length),0,100);
   const low=debts.filter(x=>x>50).length,cnt=`${low} of ${n} muscle${n===1?"":"s"} under 50% recovered`;
   let status,color;
   if(pct<25){status=low?`${cnt} — train the rest hard.`:"Every muscle is close to ready. Push hard.";color="var(--green)";}
@@ -6265,7 +6266,7 @@ function openFatigueInfo(){const f=fatigueDebt();
   const rows=trained.length?trained.map(m=>{const rec=getRecovery(m),col=recoveryColor(rec),hrs=hoursToReady(m),debt=Math.max(0,100-rec);
     return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px">${mIcon(m,17,col)}<b style="font-size:13px;color:var(--text2)">${MNAME[m]}</b></span><div class="row g" style="gap:10px;align-items:center"><span class="mini" style="color:var(--text3)">${hrs>0?hrs+"h to ready":"ready"}</span><div class="bar" style="width:64px;margin:0"><i style="width:${debt}%;background:${col}"></i></div><b style="color:${col};min-width:34px;text-align:right">${debt}%</b></div></div>`;
   }).join(""):`<div class="empty-state" style="padding:28px 14px 16px"><div class="es-icon">💪</div><div class="es-title">SUIT UNACTIVATED</div><div class="es-body">Log a session and your fatigue map illuminates the Suit with live recovery data.</div></div>`;
-  openSheet(`<div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="font-size:22px;color:${f.color}">${f.pct}%</b></div>
+  openSheet(`<div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="font-size:22px;color:${f.color}">${f.n?f.pct+"%":"—"}</b></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 6px">The average fatigue of your 4 most fatigued muscles — fresh muscles can't hide tired ones. Higher = more accumulated fatigue still to clear.</div>
     <div class="bar" style="margin:8px 0"><i style="width:${f.pct}%;background:${f.color}"></i></div>
     <div class="mini" style="font-style:italic;color:${f.color};margin-bottom:6px">${esc(f.status)}</div>
@@ -11830,7 +11831,7 @@ function gtv2ScorePanel(){
       <div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div>
       <div class="gtv2-note">${note}</div>
       <div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color};box-shadow:0 0 10px currentColor"></i></div></div>`;})()}
-    <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.pct}%</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.n?f.pct+"%":"—"}</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
     <div class="gtv2-panel" style="border-color:${patrolClr};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${patrolClr}" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"};text-shadow:0 0 18px currentColor">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
   </div>`;
 }
