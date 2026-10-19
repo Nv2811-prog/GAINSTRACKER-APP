@@ -3223,7 +3223,19 @@ function restStart(defer){const dur=state.data.u.restTime||120;state.restEnd=Dat
 // Rest lives in the sticky header now — no fullscreen takeover. Tapping the REST box opens a compact controls sheet.
 
 /* ========================= START WORKOUT (Rule 6: unbroken path) ========================= */
+/* A live/minimised session must never be silently overwritten by START / FREE SESSION. */
+function sessionCounts(ses){const w=((ses&&ses.exercises)||[]).filter(e=>!e._skip).flatMap(e=>(e.sets||[]).filter(s=>s.type!=="W"));return {done:w.filter(s=>s.done).length,total:w.length};}
+function sessionHasData(ses){return !!ses&&(ses.exercises||[]).some(e=>(e.sets||[]).some(s=>s.done||String(s.w==null?"":s.w).trim()||String(s.r==null?"":s.r).trim()));}
+function guardLiveSession(go){ // true = intercepted (modal asks); Resume is the safe default (cancel / backdrop)
+  const ses=state.session;if(!sessionHasData(ses))return false;
+  const c=sessionCounts(ses);
+  appConfirm({title:"Workout in progress",body:`${ses.day||"Your session"} is still live (${c.done}/${c.total} sets done). Starting a new one erases it.`,ok:"Discard & start new",cancel:"Resume current",danger:true}).then(ok=>{
+    if(!ok){if(state.step!=="logging")resumeWorkout();return;}
+    stopTimers();state.session=null;state.minimized=false;clearSavedSession();go();});
+  return true;
+}
 function startWorkout(splitId,dayIdx){
+  if(guardLiveSession(()=>startWorkout(splitId,dayIdx)))return;
   try{closeSheet();}catch(e){}   // dismiss any open sheet (e.g. raid) so it can't linger over the session
   const sp=state.data.splits.find(s=>s.id===splitId);
   const day=sp?sp.days[dayIdx]:null;
@@ -3233,7 +3245,7 @@ function startWorkout(splitId,dayIdx){
   state.workoutTimer=0;state.restTimer=0;state.restRunning=false;
   state.step="readiness";render();playEntrance(state.session.day);
 }
-function freeWorkout(){try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
+function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
 const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
 // planned = the split day's target for this lift ({s:sets, r:"5–8"}). With a plan, seed exactly that
@@ -11743,6 +11755,10 @@ function gtv2MissionHero(){
   }else{
     focal=`<div class="gtv2-tonight empty"><div class="gtv2-tonight-tag"><i></i>No active split</div><div class="gtv2-tonight-day">FREE SESSION</div><div class="gtv2-tonight-meta">Start a session now, or build your plan in Mission.</div></div>`;
     btn=`<button class="btn gold" onclick="freeWorkout()">FREE SESSION</button><button class="btn ghost sm" style="width:auto" onclick="goPlan()">Plan</button>`;
+  }
+  if(state.session){ // a live/minimised workout always wins the hero: RESUME, never START over it
+    const c=sessionCounts(state.session),nm=String(state.session.day||"Session").split(/\s+[·—-]\s+/)[0];
+    btn=btn.replace(/<button class="btn gold"[^>]*>[^<]*<\/button>/,`<button class="btn gold" onclick="resumeWorkout()">RESUME · ${esc(nm)} · ${c.done}/${c.total} sets</button>`);
   }
   return `<section class="gtv2-hero">
     <img class="gtv2-hero-img" src="Batman.jpg" alt="">
