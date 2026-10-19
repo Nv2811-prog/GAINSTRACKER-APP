@@ -4374,23 +4374,10 @@ function progressionFrom(name,lb){   // lb = {w,r} = the best WORKING set of the
 }
 function progressionFor(name){return progressionFrom(name,lastBestSet(name));}
 function nextTarget(name){const p=progressionFor(name);return p?p.text:null;}
-// Stale-lift radar: established lifts (have a record) that haven't set a PR in 3+ weeks but are
-// still in active rotation — surfaced as revival targets. Pairs with PR Fight Night.
+// Stale-lift radar: the stalled lifts (ONE detector — liftIntel) shaped for the revival targets of Fight Night / tonight's plan.
 function staleLifts(maxDays){
-  const d=state.data,nowMs=Date.now(),DAY=86400000;
-  const lastTrain={};                                          // newest training touch per lift
-  (d.workouts||[]).forEach(w=>{const t=Date.parse(w.date)||0;(w.exercises||[]).forEach(e=>{if(lastTrain[e.name]==null||t>lastTrain[e.name])lastTrain[e.name]=t;});});
-  const out=[];
-  Object.entries(d.prs||{}).forEach(([name,p])=>{
-    if(!p||!(p.orm>0)||!p.date)return;                         // need an established record + a date
-    const sincePR=Math.floor((nowMs-Date.parse(p.date))/DAY);
-    if(!(sincePR>=21))return;                                  // fresh record — not stale
-    const lt=lastTrain[name];if(lt==null)return;
-    const sinceTrain=Math.floor((nowMs-lt)/DAY);
-    if(sinceTrain>(maxDays||45))return;                        // abandoned, not "stale in rotation"
-    out.push({name,sincePR,sinceTrain,orm:Math.round(p.orm)});
-  });
-  return out.sort((a,b)=>b.sincePR-a.sincePR).slice(0,5);
+  return stalledLifts().filter(s=>s.daysAgo<=(maxDays||45)).map(s=>({name:s.n,sincePR:s.bestAgo,sinceTrain:s.daysAgo,orm:Math.round(s.best)}))
+    .sort((a,b)=>b.sincePR-a.sincePR).slice(0,5);
 }
 // Tonight's game plan: Alfred's pre-session briefing — 1-2 concrete, winnable targets drawn from the
 // lifts queued this session (revive the stalest, then a clean progression on the heaviest established lift).
@@ -5984,7 +5971,7 @@ function exerciseHistory(name){
   const verdict=intel?liftVerdict(intel):"";
   const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
   const tgtBlock=(intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"")
-    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Hold the weight, change the rep range, and own 10 clean reps before adding load again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
+    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${(f=>`<b>${f[0]}</b> — ${esc(f[1])}`)(stallFix(name))}</div></div></div>`:"");
   // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
   const recordE1=Math.max(...e1s);
   const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
@@ -6064,15 +6051,17 @@ function loggedExerciseNamesByRecency(){
 }
 // Per-lift coaching read: trend verdict, stall detection and the weight/reps to beat next time.
 // Pure analysis over exerciseRows — no side effects, safe to call anywhere.
+const STALL_DAYS=21;   // a lift only counts as stalled while it is still in rotation (trained in the last 3 weeks)
 function liftIntel(name){
   const ex=exFor(name),rows=exerciseRows(name);
   if(!rows.length)return null;
   const last=rows[rows.length-1],e1s=rows.map(r=>r.e1rm);
   const bestE=Math.max(...e1s),lastDate=new Date(last.date);
   const daysAgo=Math.floor((Date.now()-lastDate.getTime())/864e5);
-  // stall: best e1RM hasn't improved across the last 3+ sessions
-  let stalled=false,sinceImprove=0;
-  if(rows.length>=3){const peakIdx=e1s.lastIndexOf(bestE);sinceImprove=rows.length-1-peakIdx;stalled=sinceImprove>=3&&last.e1rm<bestE-0.5;}
+  // THE stall detector (stalledLifts, plateauCard, staleLifts and the Home card all read this): best e1RM not beaten for 3+
+  // sessions, last session below that best, lift trained within STALL_DAYS
+  let stalled=false,sinceImprove=0,bestAgo=0;
+  if(rows.length>=3){const peakIdx=e1s.lastIndexOf(bestE);sinceImprove=rows.length-1-peakIdx;bestAgo=Math.floor((Date.now()-new Date(rows[peakIdx].date).getTime())/864e5);stalled=sinceImprove>=3&&last.e1rm<bestE-0.5&&daysAgo<=STALL_DAYS;}
   // trend across last up-to-5 sessions
   const win=rows.slice(-5),d=win.length>1?win[win.length-1].e1rm-win[0].e1rm:0;
   const pct=win.length>1&&win[0].e1rm?Math.round(d/win[0].e1rm*100):0;
@@ -6081,7 +6070,7 @@ function liftIntel(name){
   const pg=progressionFor(name)||(last.bset?progressionFrom(name,{w:+last.bset.w||0,r:+last.bset.r||0}):null);
   const ld=pg&&(pg.w?`${ex&&ex.bw?"+":""}${fmtKg(pg.w)}kg`:"bodyweight");
   const tgt=pg?{type:pg.add?"load":"rep",w:pg.w,r:pg.r,reason:pg.reason,txt:`${ld} × ${pg.r}${pg.add?"":"+"} — ${pg.add?"weight goes up, reps restart":"same load, beat last by one rep"}`}:null;
-  return {bestE,last,daysAgo,stalled,sinceImprove,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
+  return {bestE,last,daysAgo,stalled,sinceImprove,bestAgo,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
 }
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
 function liftVerdict(intel){
@@ -6515,15 +6504,30 @@ const GAUNTLET=[
 ];
 function gauntletKey(){const t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
 /* ===== Stalled-lift detector (#2): flags lifts with no est-1RM progress in 3+ sessions ===== */
-function stalledLifts(){
+function stalledLifts(){   // every stalled lift, biggest first — straight from liftIntel (one detector)
   const out=[];
-  loggedExerciseNames().forEach(n=>{
-    const rows=exerciseRows(n);if(rows.length<4)return;
-    const prior=rows[rows.length-4].e1rm;
-    const recent=rows.slice(-3).map(r=>r.e1rm);
-    if(Math.max(...recent)<=prior)out.push({n,best:Math.max(...rows.map(r=>r.e1rm)),sessions:rows.length});
-  });
-  return out;
+  loggedExerciseNames().forEach(n=>{const i=liftIntel(n);
+    if(i&&i.stalled)out.push({n,best:i.bestE,last:i.last.e1rm,sessions:i.sinceImprove,daysAgo:i.daysAgo,bestAgo:i.bestAgo});});
+  return out.sort((a,b)=>b.best-a.best);
+}
+// ONE suggested change per stalled lift — angle, grip or rep range, picked by movement (never a deload, never less effort)
+const STALL_FIX=[["Angle","Move the bench or machine setting 10–15° for 3 weeks, then come back to the lift."],
+  ["Grip","Change width or hand position (neutral, wider, closer) for 3 weeks, then come back."],
+  ["Rep range","Work the heavy 5–7 end for two weeks, then rebuild toward 10 reps and add weight there."]];
+function stallFix(name,k){const n=(name||"").toLowerCase();
+  return STALL_FIX[/press|bench|fly|dip|raise|incline|pec/.test(n)?0:/row|pull|chin|curl|lat /.test(n)?1:/squat|deadlift|leg|lunge|calf|thrust|extension|adduct|abduct/.test(n)?2:(k||0)%3];}
+function openStalledLifts(){
+  const L=stalledLifts();
+  const rows=L.length?L.map((s,k)=>{const f=stallFix(s.n,k),ago=s.daysAgo<=0?"today":s.daysAgo===1?"yesterday":s.daysAgo+"d ago";
+    return `<div style="border-top:1px solid var(--border);padding:11px 0;cursor:pointer" onclick="exerciseHistory('${esc(s.n).replace(/'/g,"")}')">
+      <div class="row sp" style="gap:8px"><b style="font-size:14px;min-width:0">${esc(s.n)}</b><span class="chip" style="font-size:11px;flex:none">flat ${s.sessions} session${s.sessions===1?"":"s"}</span></div>
+      <div class="mini" style="margin-top:3px;color:var(--text3)">Best e1RM ${fmtKg(s.best)}kg · last session ${fmtKg(s.last)}kg · trained ${ago}</div>
+      <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45"><b>${f[0]}</b> — ${f[1]}</div></div>`;}).join("")
+    :`<div class="mini" style="padding:14px 0;color:var(--text2)">No stalled lifts right now. Every lift you trained in the last 3 weeks is still moving.</div>`;
+  openSheet(`<div class="ttl">Stalled lifts</div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 8px;line-height:1.45">Best estimated 1RM not beaten for 3+ sessions, on lifts trained in the last 3 weeks. Change one variable and keep the effort.</div>
+    ${rows}
+    <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 /* ========================================================================
    THE INFIRMARY (Wave 5) — one recovery hub: sleep, soreness, conditioning,
@@ -8271,30 +8275,14 @@ function weeklyBalanceCard(){
     ${rowR("Push : Pull sets",push,pull)}${rowR("Quad : Hamstring sets",quad,ham)}
     ${flags.map(([k,t])=>`<div class="banner" style="margin-top:6px;${k==="ok"?"background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)":""}"><span>${k==="warn"?"⚠️":"✓"}</span><div class="mini">${esc(t)}</div></div>`).join("")}</div>`;
 }
-// Plateau breaker: per-lift e1RM history; flag lifts with no new best across their last 3 outings (≥10d span).
+// Plateau breaker: the stalled lifts (ONE detector — liftIntel), each with one suggested change.
 function plateauCard(){
-  const ws=(state.data.workouts||[]);if(ws.length<4)return "";
-  const byEx={};
-  for(let i=ws.length-1;i>=0;i--){const w=ws[i];const ex0=w.date;
-    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);let best=0;
-      (e.sets||[]).forEach(s=>{if(s.type==="W")return;const v=setE1RM(ex,s);if(v>best)best=v;});
-      if(best>0)(byEx[e.name]=byEx[e.name]||[]).push({date:ex0,e1:best});});
-  }
-  const PROTO=["Change one variable — swap the grip, angle or machine for 3 weeks, then return to the lift.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: work the 5–7 end for two weeks, then build back up to 10 reps.","Hold the weight and add a single rep every set until you own 10 reps.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
-  const stalled=[];
-  Object.keys(byEx).forEach(name=>{const arr=byEx[name];if(arr.length<4)return;
-    const last3=arr.slice(-3),prior=arr.slice(0,-3);
-    const recentPeak=Math.max(...last3.map(a=>a.e1)),priorPeak=Math.max(...prior.map(a=>a.e1));
-    const span=(new Date(last3[last3.length-1].date)-new Date(last3[0].date))/86400000;
-    if(recentPeak<=priorPeak*1.005&&span>=10){
-      stalled.push({name,e1:Math.round(recentPeak),weeks:Math.round(span/7),idx:stalled.length});}
-  });
-  if(!stalled.length)return "";
-  stalled.sort((a,b)=>b.e1-a.e1);
-  let h=`<div class="card" style="border-color:rgba(232,69,60,.4);background:linear-gradient(180deg,rgba(232,69,60,.07),transparent)"><div class="ttl" style="color:#ff6b5c;display:flex;align-items:center">${secIcon('plateau','#ff6b5c')}Plateau breaker</div><div class="mini" style="margin-bottom:10px;color:var(--text2)">These lifts haven't set a new estimated 1RM in a while. Time to change the stimulus.</div>`;
-  stalled.slice(0,3).forEach((s,k)=>{h+=`<div style="border-top:1px solid var(--border);padding:9px 0">
-    <div class="row sp"><b>${esc(s.name)}</b><span class="chip" style="font-size:11px">stuck ~${s.weeks||1}w · ${s.e1}kg</span></div>
-    <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45">🔓 ${PROTO[k%PROTO.length]}</div></div>`;});
+  const stalled=stalledLifts();if(!stalled.length)return "";
+  let h=`<div class="card" style="border-color:rgba(232,69,60,.4);background:linear-gradient(180deg,rgba(232,69,60,.07),transparent)"><div class="ttl" style="color:#ff6b5c;display:flex;align-items:center">${secIcon('plateau','#ff6b5c')}Plateau breaker</div><div class="mini" style="margin-bottom:10px;color:var(--text2)">Best estimated 1RM not beaten for 3+ sessions. Change one variable — keep the effort.</div>`;
+  stalled.slice(0,3).forEach((s,k)=>{const f=stallFix(s.n,k);h+=`<div style="border-top:1px solid var(--border);padding:9px 0">
+    <div class="row sp"><b>${esc(s.n)}</b><span class="chip" style="font-size:11px">flat ${s.sessions} session${s.sessions===1?"":"s"} · ${fmtKg(s.best)}kg</span></div>
+    <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45"><b>${f[0]}</b> — ${f[1]}</div></div>`;});
+  if(stalled.length>3)h+=`<div class="mini" style="border-top:1px solid var(--border);padding-top:9px;color:var(--gold2);cursor:pointer" onclick="openStalledLifts()">All ${stalled.length} stalled lifts ›</div>`;
   h+=`</div>`;return h;
 }
 /* ===== Wave J — Sports Science Lab: junk-volume detector + stimulus-to-fatigue (SFR) ratings ===== */
@@ -12302,7 +12290,7 @@ function renderGotham(){
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
     html+=`<div class="gtv2-panel wide" style="margin-bottom:14px"><div class="gtv2-label">Active case files</div>`;
-    if(stalled.length)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ffb15c">🩺</div><div><div class="gtv2-action-title">${stalled.length} stalled lift${stalled.length===1?"":"s"}</div><div class="gtv2-action-copy">${stalled.slice(0,3).map(s=>esc(s.n)).join(", ")} - change one variable (grip, tempo or rep zone) and attack it fresh.</div></div><button class="btn ghost sm" style="width:auto" onclick="openBatcomputer()">Open</button></div>`;
+    if(stalled.length)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ffb15c">🩺</div><div><div class="gtv2-action-title">${stalled.length} stalled lift${stalled.length===1?"":"s"}</div><div class="gtv2-action-copy">${stalled.slice(0,3).map(s=>esc(s.n)).join(", ")}${stalled.length>3?` +${stalled.length-3} more`:""} - best e1RM flat for 3+ sessions. Change one variable (angle, grip or rep range).</div></div><button class="btn ghost sm" style="width:auto" onclick="openStalledLifts()">Open</button></div>`;
     if(cb)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ff887f">👁️</div><div><div class="gtv2-action-title">${esc(cb.villain)} has returned</div><div class="gtv2-action-copy">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-book the case.</div></div><span class="gtv2-chip red">boss</span></div>`;
     html+=`</div>`;
   }
