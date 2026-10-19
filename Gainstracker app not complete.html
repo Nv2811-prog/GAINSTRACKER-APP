@@ -1984,7 +1984,7 @@ const QUOTES=["It's not who I am underneath, but what I do that defines me.","Wh
 /* evidence-based training facts — shown 50/50 with Batman quotes (Feature 15) */
 const SCIENCE_FACTS=[
 "Hypertrophy responds to sets taken close to failure: RIR 0–3 is the effective range, with ~2 RIR a good default.",
-"Most muscles grow well on ~10–20 hard sets per week. Below that is maintenance, far above it just adds fatigue.",
+"Most muscles grow well on ~10–20 hard sets per week. Below your MEV there isn't enough to grow; far above MRV it just adds fatigue.",
 "Training a muscle 2× per week tends to beat 1× for growth at equal weekly volume — frequency spreads the stimulus.",
 "The full range of motion, especially the stretched position, drives more hypertrophy than partials in the short range.",
 "Protein around 1.6–2.2 g per kg of bodyweight per day maximises muscle protein synthesis for most lifters.",
@@ -2428,14 +2428,18 @@ function heatColorFor(m,s){
   return `hsl(${H} ${S}% ${L}%)`;
 }
 function heatColor(m){return heatColorFor(MM_NORM(m),weeklySets(MM_NORM(m)));}
+/* ONE ZONE SCALE for weekly hard sets — every label, bar, dot and card reads it: below MEV / growth zone (MEV–MAV) /
+   high but recoverable (MAV–effective MRV) / over MRV. Effective MRV rises when volume is spread over sub-regions. */
+const ZONES={low:["Below MEV — not enough to grow","#8a8a8a"],grow:["Growth zone","#2ECC71"],high:["High — recoverable","#E8C56A"],over:["Over MRV","#E8453C"]};
+const zoneKey=(s,mev,mav,mrv)=>s<mev?"low":s<=mav?"grow":s<=mrv?"high":"over";
+function zoneOf(m,sets){
+  const lm=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m),key=zoneKey(sets,lm.mev,lm.mav,mrv);
+  return {key,label:ZONES[key][0],color:ZONES[key][1],mev:lm.mev,mav:lm.mav,mrv};
+}
 function heatLabel(m){
-  const nm=MM_NORM(m);
-  const s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20}, eMrv=effectiveMRV(nm);
+  const nm=MM_NORM(m),s=weeklySets(nm);
   if(!(s>0))return ["Untrained","var(--text3)"];
-  if(s<lm.mev)return ["Below maintenance","var(--text2)"];
-  if(s<lm.mav)return ["Productive zone","var(--yellow)"];
-  if(s<=eMrv)return [eMrv>lm.mrv?"Optimal — well spread":"Optimal / high","var(--green)"];
-  return ["Over MRV — junk risk","var(--red)"];
+  const z=zoneOf(nm,s);return [z.label,z.color];
 }
 // Compact heat body: lights the tapped muscle by training intensity, on a Gym80-style dark tile.
 /* Sub-region heat ON the figure: for muscles whose heads stack vertically on the body, the muscle
@@ -2457,7 +2461,7 @@ function muscleHeatFig(m){
     }
   }
   const col=mm=> mm===nm?{fill:fillV,op:".95"}:{fill:"#E8C56A",op:".06"};
-  const [lab,lc]=heatLabel(nm), s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20};
+  const [lab,lc]=heatLabel(nm), s=weeklySets(nm);
   const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
   const fig=suitFigure(view,col,null,extraDefs);state._figShade=ps;state._figGlow=pg;
   return `<div class="row" style="gap:12px;align-items:center;margin-bottom:10px">
@@ -2467,8 +2471,6 @@ function muscleHeatFig(m){
       <div style="font-weight:800;color:${lc};font-size:15px;line-height:1.1">${lab}</div>
       <div class="mini" style="margin-top:4px;color:var(--text2)">${s>0?s+" hard set"+(s===1?"":"s")+" this week":"No sets logged this week"}</div>
       ${axNote}
-      <div style="height:7px;border-radius:5px;margin-top:7px;background:linear-gradient(90deg,#566070,hsl(6 80% 38%),hsl(4 92% 56%),hsl(0 94% 64%))"></div>
-      <div class="row sp mini" style="margin-top:2px;color:var(--text3)"><span>MEV ${lm.mev}</span><span>MAV ${lm.mav}</span><span>MRV ${lm.mrv}</span></div>
     </div></div>`;
 }
 function figureSVG(ex){
@@ -5755,8 +5757,8 @@ function renderSuit(){
       const recCol=trained?(rec>=80?'#2ECC71':rec>=50?'#E8C53C':'#E8453C'):'var(--text3)';
       const status=!trained?'untrained':hrs>0?(hrs<24?hrs+'h':Math.round(hrs/24*10)/10+'d')+' to ready':'READY';
       const statusCol=!trained?'#3a3e4a':hrs>0?recCol:'#2ECC71';
-      const volCol=!trained||sets<=0?'var(--text3)':sets<lm.mev?'#E8453C':sets<lm.mav?'#E8C53C':sets<=lm.mrv?'#2ECC71':'#E8973C';
-      const volTxt=sets>lm.mrv?`${sets} sets ⚡MRV`:`${sets}/${lm.mav} sets`;
+      const zn=zoneOf(m,sets),volCol=!trained||sets<=0?'var(--text3)':zn.color;
+      const volTxt=zn.key==="over"?`${sets} sets ⚡MRV`:`${sets}/${lm.mav} sets`;
       const glow=trained?`border-color:${recCol}44;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 16px -8px ${recCol}`:'';
       return `<div class="muscle-tile" style="${glow}" onclick="muscleDrill('${m}')">
         ${muscleRing(m,rec,sets,lm.mav,trained)}
@@ -6096,8 +6098,7 @@ function volBar(sets,lm,m){
   const cap=Math.max(eMrv+5,sets*1.12,lm.mrv*1.25);
   const P=v=>clamp(v/cap*100,0,100);
   const mev=P(lm.mev),mav=P(lm.mav),mrv=P(eMrv),cur=clamp(P(sets),0,100);
-  const zc=sets<lm.mev?"#8a8a8a":sets<=lm.mav?"#2ECC71":sets<=eMrv?"#E8C56A":"#E8453C";
-  const zt=sets<lm.mev?"below MEV — maintenance only":sets<=lm.mav?"growth zone (MEV–MAV)":sets<=eMrv?"high but recoverable (MAV–MRV)":"over MRV — back off";
+  const zk=zoneKey(sets,lm.mev,lm.mav,eMrv),zc=ZONES[zk][1],zt=ZONES[zk][0];
   const spreadNote=(spread&&eMrv>lm.mrv&&sets>lm.mav)
     ? `<div class="mini" style="text-align:center;margin-top:4px;color:#2ECC71">Spread across ${spread.covered} sub-regions — ceiling raised to ${eMrv}, so this volume still works.</div>` : "";
   return `<div style="margin:6px 0 2px">
@@ -6388,7 +6389,7 @@ function coverageRadar(){
     const[lx,ly]=pt(i,R+16);labels+=mGlyph(m,lx,ly,0.82);});
   const dataP=muscles.map((m,i)=>{const sets=weeklySets(m),lm=VL[m]||{mav:14};return pt(i,R*clamp(sets/lm.mav,0,1.16));});
   const poly=dataP.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ");
-  const dots=dataP.map((p,i)=>{const m=muscles[i],sets=weeklySets(m),lm=VL[m]||{mev:8,mav:14,mrv:20};const col=sets<lm.mev?"#8a8a8a":sets<=lm.mav?"#2ECC71":sets<=lm.mrv?"#E8C56A":"#E8453C";return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.7" fill="${col}"/>`;}).join("");
+  const dots=dataP.map((p,i)=>{const m=muscles[i],col=zoneOf(m,weeklySets(m)).color;return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.7" fill="${col}"/>`;}).join("");
   return `<div class="card"><div class="ttl">🕸️ Coverage radar <span class="mini" style="font-weight:400">— weekly sets vs growth target</span></div>
     <svg viewBox="0 0 300 290" style="width:100%;max-width:330px;height:auto;display:block;margin:2px auto 0">
       ${grid}${spokes}${labels}
@@ -8238,10 +8239,10 @@ function volMapCard(){
         <i style="position:absolute;left:${mav}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45)"></i></div></div>`;
   }).join("");
   return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center">${secIcon('volume')}Weekly volume map</div>
-    <div class="mini" style="margin-bottom:10px;color:var(--text2)">Brighter red = more hard sets this week. Faint lines mark each muscle's MEV (maintenance) and MAV (optimal). Tap a muscle for its dossier.</div>
+    <div class="mini" style="margin-bottom:10px;color:var(--text2)">Brighter red = more hard sets this week. Faint lines mark each muscle's MEV (minimum to grow) and MAV (top of the growth zone). Tap a muscle for its dossier.</div>
     ${volMapBodies()}
     <div style="margin-top:10px">${rowHtml}</div>
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Below the first line = under maintenance · between the lines = the growth zone · past the bar end = pushing MRV (junk-volume risk).</div></div>`;
+    <div class="mini" style="margin-top:8px;color:var(--text3)">Below the first line = below MEV (not enough to grow) · between the lines = the growth zone · past the bar end = pushing MRV.</div></div>`;
 }
 function weeklyBalanceCard(){
   const ws=m=>weeklySets(m);
@@ -8317,7 +8318,7 @@ function scienceLabCard(){
   let verdict,vc;
   if(junk.length>=2){verdict=`Junk-volume risk — ${junk.length} muscles past MRV. Recovery, not more sets, is the limiter now.`;vc="var(--red)";}
   else if(junk.length===1){verdict=`${MNAME[junk[0].m]} has crept past MRV. Trim ~2 sets to keep every rep productive.`;vc="var(--orange)";}
-  else if(below>=4){verdict=`${below} muscles sit below maintenance — clean runway to add productive volume.`;vc="var(--gold2)";}
+  else if(below>=4){verdict=`${below} muscles sit below MEV — clean runway to add productive volume.`;vc="var(--gold2)";}
   else {verdict="Volume is well-distributed across the growth zone. Textbook week, sir.";vc="var(--green)";}
   const dist=`<div class="row" style="gap:6px;margin:9px 0 4px">
     <div style="flex:${Math.max(below,0.001)};height:9px;border-radius:5px;background:#3a3a44"></div>
@@ -8736,7 +8737,7 @@ function openBatcomputer(){
   const mv=M12.map(m=>({m,s:weeklySets(m)})).sort((a,b)=>b.s-a.s);
   const mmx=Math.max(1,...mv.map(x=>x.s));
   const movers=loggedExerciseNames().map(n=>{const rows=exerciseRows(n);if(!rows||rows.length<2)return null;const e=rows.map(r=>r.e1rm);return {n,gain:Math.round(e[e.length-1]-e[0]),now:e[e.length-1]};}).filter(x=>x&&x.gain>0).sort((a,b)=>b.gain-a.gain).slice(0,5);
-  const mBar=x=>{const lm=VL[x.m]||{mev:8,mav:14,mrv:20};const col=x.s===0?'#3a3a3a':x.s<lm.mev?'#8a8a8a':x.s<=lm.mav?'#2ECC71':x.s<=lm.mrv?'#E8C56A':'#E8453C';
+  const mBar=x=>{const col=x.s===0?'#3a3a3a':zoneOf(x.m,x.s).color;
     return `<div style="margin-bottom:6px"><div class="row sp" style="margin-bottom:2px"><span class="mini">${MNAME[x.m]}</span><span class="mini" style="color:${col}">${x.s} set${x.s===1?'':'s'}</span></div><div class="bar" style="height:7px;background:var(--bg4)"><i style="width:${(x.s/mmx*100).toFixed(0)}%;background:${col}"></i></div></div>`;};
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('radar')}Batcomputer</div>
     <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Every patrol, crunched. The full picture of your war on weakness.</div>
@@ -10263,7 +10264,7 @@ function alfredBriefing(){
     rows+=`<div class="mini" style="margin-bottom:6px"><b style="color:var(--gold2)">Still recovering:</b> ${top}</div>`;
   }
   // volume flags
-  under.slice(0,3).forEach(x=>rows+=`<div class="mini" style="margin-bottom:5px">📉 <b>${MNAME[x.m]}</b> — only ${x.ws} hard ${x.ws===1?"set":"sets"} this week, below your ${x.mev}-set MEV. Below maintenance it won't grow; add a couple of sets.</div>`);
+  under.slice(0,3).forEach(x=>rows+=`<div class="mini" style="margin-bottom:5px">📉 <b>${MNAME[x.m]}</b> — only ${x.ws} hard ${x.ws===1?"set":"sets"} this week, below your ${x.mev}-set MEV. Below MEV there isn't enough to grow; add a couple of sets.</div>`);
   over.slice(0,2).forEach(x=>rows+=`<div class="mini" style="margin-bottom:5px">🔥 <b>${MNAME[x.m]}</b> — ${x.ws} sets this week, past your ${x.mrv}-set MRV. That's into junk territory; ease off and let it recover.</div>`);
   // coverage gap (top 1)
   if(gaps.length)rows+=`<div class="mini" style="margin-bottom:5px">🎯 <b>${MNAME[gaps[0].m]}:</b> ${esc(gaps[0].text)}</div>`;
@@ -10559,8 +10560,7 @@ function alfredAsk(q){
   m=s.match(/(?:volume|sets)\s+(?:for\s+)?(.+)$/)||s.match(/(.+?)\s+(?:volume|sets)$/);
   if(m){const mq=m[1].toLowerCase();const mm=M12.find(x=>MNAME[x].toLowerCase().includes(mq)||x.includes(mq));
     if(!mm)return "Which muscle, sir? Name one of the twelve.";const ws=weeklySets(mm),vl=VL[mm],eMrv=effectiveMRV(mm);
-    const zone=ws<vl.mev?"below MEV — it won't grow":ws<=vl.mav?"in the growth zone":ws<=eMrv?"high but recoverable":"past MRV — back off";
-    return `<b>${MNAME[mm]}</b>: ${ws} hard sets this week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). You're ${zone}, Master.`;}
+    return `<b>${MNAME[mm]}</b>: ${ws} hard sets a week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). Zone: <b>${zoneOf(mm,ws).label}</b>, Master.`;}
   return {__fallback:true,text:`I can answer or act, Master. Try: <b>what should I train</b>, <b>weakest muscle</b>, <b>how strong am I</b>, <b>PR for bench</b>, <b>volume for chest</b>, <b>am I recovered</b> — or commands like <b>open leaderboard</b>, <b>start push day</b>, <b>add face pull to push</b>, <b>set weekly goal to 5</b>.`};
 }
 function openAlfredConsole(){openAlfredChat();} /* the old command console now lives in the one Alfred chat (typed commands still work there) */
@@ -11725,14 +11725,6 @@ function renderAlfred(){
    weekly set landmarks. */
 function gtv2Clr(kind){
   return kind==="red"?"#ff887f":kind==="green"?"#75e5a5":kind==="blue"?"#9fd0ff":kind==="gold"?"var(--gold2)":"var(--text2)";
-}
-function gtv2Stimulus(m){
-  const ws=weeklySets(m),vl=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m);
-  if(ws<=0)return {zone:"Silent",kind:"",text:"no sets this week"};
-  if(ws<vl.mev)return {zone:"Below MEV",kind:"red",text:`${ws}/${vl.mev} sets - not enough to grow`};
-  if(ws<=vl.mav)return {zone:"Growth",kind:"green",text:`${ws} sets - productive range`};
-  if(ws<=mrv)return {zone:"High",kind:"gold",text:`${ws} sets - high but recoverable`};
-  return {zone:"Past MRV",kind:"red",text:`${ws}/${mrv} sets - junk-volume risk`};
 }
 function gtv2Pattern(ex){
   const p=((ex&&ex.p&&ex.p[0])||"other");
