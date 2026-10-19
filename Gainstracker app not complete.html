@@ -160,8 +160,6 @@ body.rest-final::after{content:"";position:fixed;inset:0;z-index:60;pointer-even
 @keyframes rfPulse{0%,100%{opacity:.5}50%{opacity:1}}
 .landed{animation:landShake .35s ease}
 @keyframes landShake{0%{transform:scale(1.12)}40%{transform:scale(.97) translateX(-2px)}70%{transform:translateX(2px)}100%{transform:none}}
-.gsweep{position:fixed;inset:0;z-index:225;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,222,120,.35) 47%,rgba(255,240,180,.5) 50%,rgba(255,222,120,.35) 53%,transparent 70%);background-size:280% 100%;animation:gswp 1s ease-in-out forwards;mix-blend-mode:screen}
-@keyframes gswp{0%{background-position:120% 0;opacity:0}15%{opacity:1}100%{background-position:-40% 0;opacity:0}}
 @keyframes gcLightning{0%,96.5%,98.2%,100%{opacity:0}97%{opacity:.5}97.6%{opacity:.15}97.9%{opacity:.6}}
 .gc-light{animation:gcLightning 26s linear infinite;pointer-events:none}
 @keyframes gcBM{0%,92%{transform:translateX(600px)}97%,100%{transform:translateX(-120px)}}
@@ -1442,6 +1440,10 @@ input::placeholder,textarea::placeholder{color:var(--tx3);opacity:1}
 /* blur lives on the tab bar, the top timer bar and the sheet backdrop only */
 .btn,.btn.ghost,.btn.gold,.chip,.card,.scanpanel-tool,.restbtn,#mmaov,.ac-head{-webkit-backdrop-filter:none;backdrop-filter:none}
 .ac-head{background:rgba(12,18,28,.96)}
+
+/* ---- 7 · MOTION: no ambient loops. Only live/recording dots and the rest timer keep moving; full-screen moments are PRs and the session finish. ---- */
+.gc-star,.gc-cloud,.gc-rain line,.gc-signal,.gc-wf,.gc-beacon,.gc-bat,.gc-light,.gc-bm,.gar-v,.gtv2-hero-img,.gtv2-tonight-tag i,.gtv2-threat.crit,.gtv2-threat.crit .thz,.threat-skull,.scanpanel-scan::after,.scanpanel-tag i,.mb-eyebrow i,.suit-breathe,.suit-stage-glow::after,.suit-halo,.vmed.cur,.batlogo,.brandlogo,.ob-bat-aura::before,.ob-bat-aura .bat-em,.fighter.hero,.fighter.boss,.patrol2-grid,.btn.gold::after,[style*="calpulse"],[style*="suitGlowPulse"]{animation:none!important}
+body.rest-final::after{animation:none;box-shadow:inset 0 0 90px 12px rgba(255,90,78,.18)}
 
 /* ===== GP:HOME (wave 2) ===== */
 
@@ -3274,7 +3276,6 @@ function countUpEl(id,target,suffix){const el=document.getElementById(id);if(!el
     if(p<1)requestAnimationFrame(step);else{el.classList.add("landed");setTimeout(()=>el.classList.remove("landed"),400);}};
   requestAnimationFrame(step);}
 /* once-a-day arrival ritual — an 900ms signal sweep, never twice, never blocking */
-function signalSweep(){try{const el=document.createElement("div");el.className="gsweep";document.body.appendChild(el);setTimeout(()=>el.remove(),1000);}catch(e){}}
 /* Alfred, live: a REAL AI message (Gemini) — throttled, silent without a key, text-only (he speaks on records + session finish only) */
 function alfredPingAI(ctx){try{
   if(!geminiKey())return false;
@@ -12487,7 +12488,7 @@ function renderGotham(){
   const ws=weeklyStreak(),dop=daysOnProtocol();
   // once-a-day arrival ritual + Alfred noticing you
   try{const today=new Date().toDateString();
-    if(u._ritualDay!==today&&!state.showOnboarding){u._ritualDay=today;save();signalSweep();
+    if(u._ritualDay!==today&&!state.showOnboarding){u._ritualDay=today;save();
       const lastW=(d.workouts||[])[0];const away=lastW?Math.floor((now()-new Date(lastW.date).getTime())/864e5):0;
       if(away>=4){if(!alfredPingAI("the user just opened the app after "+away+" days away from training. Welcome them back — warm but pointed."))setTimeout(()=>toast("🎩 Good to see you again, sir. I kept the lights on."),900);}
       else if(ws>=3){if(!alfredPingAI("weekly streak is "+ws+" weeks strong. A brief nod of respect."))setTimeout(()=>toast("🎩 "+ws+" weeks unbroken. I shall stop worrying, sir."),900);}
@@ -12963,7 +12964,7 @@ function playStinger(title,sub,accent){
     setTimeout(()=>{try{el.remove();}catch(e){}},1500);
   }catch(e){}
 }
-function beginPatrol(){playStinger('PATROL BEGINS',esc((state.session&&state.session.day)||''));state.step='logging';startTimers();try{haptic('done');}catch(e){}
+function beginPatrol(){state.step='logging';startTimers();try{haptic('done');}catch(e){}
   try{cloudPresence(true);}catch(e){}
   // the mission brief is text-only now (Alfred speaks aloud on records + session finish only)
   render();}
@@ -13026,39 +13027,8 @@ function skipExercise(ei,reason){
 
 /* ===== Wave 9 v5: Garage doors + vehicle roll-out + anatomy-only figures ===== */
 
-/* Garage doors open → Gotham city revealed → grappler sweeps across → vehicle rolls in */
-function playEntrance(name){
-  if(state._entrLock)return;state._entrLock=true;
-  try{haptic('light');}catch(e){}
-  try{document.querySelectorAll('.g9-entr,.g9-entr2,.g9-garage').forEach(n=>n.remove());}catch(_){}
-  let topV={e:'🏎️',n:'Batmobile'};
-  try{const gs=gothamStats();const own=GARAGE.filter(v=>v.req(gs));if(own.length)topV=own[own.length-1];}catch(_){}
-  const nm=typeof esc==='function'?esc(name||'Workout'):(name||'Workout');
-  const vn=typeof esc==='function'?esc(topV.n):topV.n;
-  const ov=document.createElement('div');ov.className='g9-garage';
-  ov.innerHTML=`
-    <div class="g9-garage-city-bg"></div>
-    <div class="g9-garage-overlay"></div>
-    <div class="g9-garage-grid" style="z-index:2;position:absolute;inset:0"></div>
-    <div class="gar-veh-wrap" style="bottom:30%">
-      <div class="gar-veh-e">${vehImg(topV.n,170,"margin:0 auto;filter:drop-shadow(0 14px 26px rgba(0,0,0,.9));")||topV.e}</div>
-      <div class="gar-veh-floor"></div>
-      <div class="gar-veh-nm">${vn}</div>
-    </div>
-    <div style="position:absolute;bottom:8%;left:0;right:0;text-align:center;z-index:5;pointer-events:none">
-      <div class="g9-garage-label" style="animation:garTxt .5s 1.5s ease both">GOTHAM IRON PROTOCOL</div>
-      <div class="g9-garage-name" style="animation:garTxt .5s 1.65s ease both">${nm}</div>
-    </div>
-    <div class="g9-garage-scan" style="z-index:6"></div>
-    <div class="g9-garage-c tl" style="z-index:6"></div><div class="g9-garage-c tr" style="z-index:6"></div>
-    <div class="g9-garage-c bl" style="z-index:6"></div><div class="g9-garage-c br" style="z-index:6"></div>
-    <div class="g9-garage-crack" style="z-index:7"></div>
-    <div class="g9-door-left" style="z-index:8"></div>
-    <div class="g9-door-right" style="z-index:8"></div>`;
-  document.body.appendChild(ov);
-  const close=()=>{if(ov._done)return;ov._done=true;state._entrLock=false;ov.classList.add('closing');setTimeout(()=>{try{ov.remove();}catch(_){}},520);};
-  setTimeout(close,2500);
-}
+/* Workout start used to play a 2.5 s garage cinematic; full-screen moments now belong to PRs and the session finish only, so it is a no-op. */
+function playEntrance(){}
 
 /* Always anatomy SVG — the grey bodybuilder with red worked muscles. Never demo images. */
 function thumb(ex,small){
