@@ -2920,9 +2920,16 @@ function strengthLevel(){
   return Math.max(1,Math.min(45,Math.round(0.30*Math.sqrt(pts))));
 }
 
-/* ========================= WEEKLY SETS PER MUSCLE ========================= */
+/* ========================= WEEKLY SETS PER MUSCLE =========================
+   Weekly numbers read a window = ONE FULL CYCLE of the active split (rest days included; 7 with no split) and are then
+   normalised to "per week" (x7/len). A 7-day window on an 8-day cycle swings with the cycle phase (quads/hams read
+   "below MEV" 43% of days on unchanged training). Rolling (now-len days), NOT calendar-aligned: before tonight's session is
+   logged a calendar window silently drops one slot of the cycle, so the muscles it trains read half-volume. */
+function cycleLen(){const d=state.data,sp=(d.splits||[]).find(s=>s.id===d.activeSplitId);return (sp&&(sp.days||[]).length)||7;}
+function cycleStart(k){return now()-(k+1)*cycleLen()*864e5;}   // k=0: the cycle that ends now
+const perWeek=n=>n*7/cycleLen();
 function weeklySets(m){
-  const wk=now()-7*864e5; let c=0;
+  const wk=cycleStart(0); let c=0;
   state.data.workouts.forEach(w=>{
     if(new Date(w.date).getTime()<wk)return;
     (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -2931,7 +2938,7 @@ function weeklySets(m){
       if(ex.s&&ex.s.includes(m))c+=working*0.5;
     });
   });
-  return Math.round(c);
+  return Math.round(perWeek(c));
 }
 // How well is this muscle's volume distributed across its heads this week? Uses the same per-head
 // tally the coverage coach does (subSetCounts). covered = sub-regions getting real work (>=2 sets).
@@ -2956,7 +2963,7 @@ function effectiveMRV(m){
    Science: each muscle grows best trained ~2× / week (every ~72h). We use that to tell the
    user exactly which muscles to train next and which are already covered. ===== */
 function muscleSessionsThisWeek(m){
-  const wk=now()-7*864e5, days=new Set();
+  const wk=cycleStart(0), days=new Set();
   (state.data.workouts||[]).forEach(w=>{
     if(new Date(w.date).getTime()<wk)return;
     let hit=false;
@@ -2965,7 +2972,7 @@ function muscleSessionsThisWeek(m){
       if(working&&((ex.p&&ex.p.includes(m))||(ex.s&&ex.s.includes(m))))hit=true;});
     if(hit)days.add(new Date(w.date).toDateString());
   });
-  return days.size;
+  return Math.round(perWeek(days.size));
 }
 function muscleLastTrained(m){
   let best=null;
@@ -3016,7 +3023,7 @@ function freqGuideCard(){
    Respects the user's rule: 2-3 real sets per region across several exercises is GOOD, not
    junk. We only flag a region as a GAP when its complementary region is trained but it isn't. */
 function subSetCounts(m){
-  const wk=now()-7*864e5, c={}; (SUBG[m]||[]).forEach(s=>c[s[0]]=0);
+  const wk=cycleStart(0), c={}; (SUBG[m]||[]).forEach(s=>c[s[0]]=0);
   (state.data.workouts||[]).forEach(w=>{
     if(new Date(w.date).getTime()<wk)return;
     (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3025,7 +3032,7 @@ function subSetCounts(m){
       exSub(ex,m).forEach(id=>{if(id in c)c[id]+=w8;});
     });
   });
-  Object.keys(c).forEach(k=>c[k]=Math.round(c[k]*10)/10); return c;
+  Object.keys(c).forEach(k=>c[k]=Math.round(perWeek(c[k])*10)/10); return c;
 }
 const COVER_RULES={
   chest:[{need:"up",from:["mid","lo"],tip:"No upper-pec work — your pressing is flat/decline. Add an incline press or low-to-high cable for the clavicular head."}],
@@ -6505,9 +6512,9 @@ function closeInfirmary(){state.subpage=null;go("gotham");}
    Acute:Chronic Workload Ratio — this week's training load vs the rolling 4-week average.
    A genuine sports-science marker: sudden load spikes (ratio >1.5) are the strongest
    modifiable predictor of soft-tissue injury; 0.8–1.3 is the "sweet spot". Load = tonnage. */
-function weeklyLoad(weekIdx){
-  const e=now()-weekIdx*7*864e5, s=e-7*864e5;
-  return (state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0);
+function weeklyLoad(weekIdx){   // tonnage of the weekIdx-th cycle back (0 = the cycle ending tonight), per week
+  const s=cycleStart(weekIdx),e=weekIdx?cycleStart(weekIdx-1):Infinity;
+  return perWeek((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0));
 }
 function acwrInfo(){
   const acute=weeklyLoad(0);
@@ -6534,8 +6541,8 @@ function workloadCard(){
       <i style="position:absolute;left:${pos}%;top:-4px;width:3px;height:19px;border-radius:2px;background:#fff;box-shadow:0 0 7px #000;transform:translateX(-50%)"></i></div>
     <div class="row sp" style="margin-top:3px"><span class="mini" style="color:var(--text3)">detrain</span><span class="mini" style="color:var(--green)">0.8–1.3 sweet</span><span class="mini" style="color:var(--red)">spike</span></div>
     <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">${a.msg}</div>
-    <div class="row sp" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span class="mini">This week's load</span><b class="gold">${fmtNum(a.acute)}kg</b></div>
-    <div class="row sp"><span class="mini">4-week average</span><b style="color:var(--text2)">${fmtNum(a.chronic)}kg</b></div></div>`;
+    <div class="row sp" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span class="mini">Load per week · latest cycle</span><b class="gold">${fmtNum(a.acute)}kg</b></div>
+    <div class="row sp"><span class="mini">Load per week · 4-cycle average</span><b style="color:var(--text2)">${fmtNum(a.chronic)}kg</b></div></div>`;
 }
 /* ===== Sleep debt — cumulative shortfall vs an 8h/night target over the last 7 nights ===== */
 function sleepDebt(){
