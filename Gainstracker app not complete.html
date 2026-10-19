@@ -1448,6 +1448,19 @@ body.rest-final::after{animation:none;box-shadow:inset 0 0 90px 12px rgba(255,90
 .acc-ttl .gi-t{width:18px;height:18px;margin:0;vertical-align:0;color:var(--gold-ink)}
 #offline-pill .gi{width:14px;height:14px;vertical-align:-2px}
 
+/* ---- calm pass: screen titles, figure thumbs, villain bar, muscle chips, hero id row ---- */
+h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
+.exwrap{border:1px solid var(--hair2);box-shadow:var(--hl)}
+.foehud{box-shadow:var(--hl)}
+.mb-chip{border-color:var(--hair2)!important;background:rgba(150,178,222,.07)!important;color:var(--tx1)!important}
+.gtv2-idlogo{display:none}
+.gtv2-idtext{flex:1 1 auto}
+.gtv2-idname{font:700 20px/1.1 var(--body);letter-spacing:-.01em;color:var(--tx1);text-shadow:none}
+.gtv2-iddate{font:600 11px/1.2 var(--body);letter-spacing:.06em;color:var(--tx2);white-space:nowrap}
+
+.cal-pr{color:var(--gold-ink)}
+.cal-pr .gi{width:11px;height:11px}
+
 /* ===== GP:HOME (wave 2) ===== */
 
 
@@ -5916,7 +5929,7 @@ function renderSuit(){
   // Cinematic hero header
   let html=`<div style="text-align:center;padding:10px 0 6px;position:relative">
     <div style="font-size:10px;font-weight:800;letter-spacing:.35em;color:var(--gold2);opacity:.65;text-transform:uppercase;margin-bottom:5px">Gotham Iron Protocol</div>
-    <div style="font-family:var(--num);font-size:42px;color:#fff;letter-spacing:.04em;line-height:1.05;text-shadow:0 0 40px rgba(232,197,106,.45),0 0 80px rgba(232,69,60,.15),0 3px 12px rgba(0,0,0,.9)">THE BATSUIT</div>
+    <div style="font-family:var(--disp);font-weight:700;font-size:30px;color:var(--tx1);letter-spacing:-.02em;line-height:1.1">THE BATSUIT</div>
     <div style="font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:5px 0 10px">Sector Status · Tap any plate for detail</div>
     <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
       <span class="chip on">${r.emoji} ${r.name} · Str ${sl}</span>
@@ -7180,14 +7193,14 @@ function profileCalendarHtml(d){
       const names=dayNames[k]||[];
       const label=names.join(' · ')||'Training';
       const prN=prsD[k]||0;
-      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="position:relative;border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.11+t*0.13).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1.5px solid rgba(235,199,107,${(0.25+t*0.55).toFixed(2)});box-shadow:0 0 ${Math.round(3+t*10)}px rgba(235,199,107,${(t*.35).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 3px 6px;min-height:66px">
+      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="position:relative;border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.11+t*0.13).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1px solid rgba(235,199,107,${(0.12+t*0.22).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 3px 6px;min-height:66px">
         <span style="font-size:8px;color:rgba(255,255,255,.3);font-weight:500;line-height:1;align-self:center">${day}</span>
-        <span style="font-size:8.5px;font-weight:800;color:var(--gold2);text-align:center;line-height:1.25;letter-spacing:.02em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%;padding:0 2px">${esc(label)}</span>
+        <span style="font-size:8.5px;font-weight:700;color:var(--tx1);text-align:center;line-height:1.25;letter-spacing:.02em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%;padding:0 2px">${esc(label)}</span>
         <span class="num" style="font-size:10.5px;color:var(--gold2);line-height:1;opacity:.92">${v>=1000?(v/1000).toFixed(1)+'t':Math.round(v)+''}</span>
-        ${prN?`<span style="position:absolute;top:2px;right:3px;font-size:9.5px;filter:drop-shadow(0 0 4px rgba(255,208,72,.9))">👑</span>`:''}
+        ${prN?`<span class="cal-pr" style="position:absolute;top:2px;right:3px;line-height:0">${GP.icon("trophy")}</span>`:''}
       </div>`;
     } else {
-      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.02)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};${isToday?'animation:calpulse 2.2s ease-in-out infinite;':''}display:flex;align-items:center;justify-content:center;min-height:66px">
+      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.02)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;min-height:66px">
         <span style="font-size:${isToday?13:11}px;color:${isToday?'var(--gold2)':'rgba(255,255,255,.15)'};font-weight:${isToday?'700':'400'};line-height:1">${future?'':day}</span>
       </div>`;
     }
@@ -7297,7 +7310,7 @@ function profileEveryLiftTile(d){
     <div class="row sp" style="align-items:flex-start;margin-bottom:10px">
       <div>
         <div style="font-size:11px;letter-spacing:.18em;color:rgba(232,197,106,.6);text-transform:uppercase;margin-bottom:4px">Your arsenal</div>
-        <div style="font-family:var(--num);font-size:26px;color:var(--gold2);letter-spacing:.02em;line-height:1">EVERY LIFT</div>
+        <div style="font-family:var(--disp);font-weight:700;font-size:22px;color:var(--tx1);letter-spacing:-.02em;line-height:1.1">Every lift</div>
         <div class="mini" style="color:var(--text2);margin-top:4px">${exCount} exercise${exCount===1?'':'s'} · ${prCount} records · tap for full curves</div>
       </div>
       <div style="text-align:right;flex:none">
@@ -9525,7 +9538,7 @@ function renderAllies(){
     <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(60,150,255,.7),transparent)"></div>
     <div class="row sp" style="align-items:center;margin-bottom:12px">
       <div>
-        <div style="font-family:var(--num);font-size:26px;color:#9fc1f2;letter-spacing:.04em;line-height:1">ALLIES</div>
+        <div style="font-family:var(--disp);font-weight:700;font-size:26px;color:var(--tx1);letter-spacing:-.02em;line-height:1.1">Allies</div>
         <div style="font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-top:2px">Gotham Patrol Network · live sync</div>
       </div>
       <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid ${cloudOn?'rgba(46,204,122,.4)':'rgba(255,255,255,.12)'};color:${cloudOn?'#6ef5a8':'var(--text3)'}"><i style="width:6px;height:6px;border-radius:50%;background:${cloudOn?'#6ef5a8':'rgba(255,255,255,.2)'};${cloudOn?'animation:gtv2pulse 2s infinite':''}"></i>${cloudOn?'LIVE':'OFFLINE'}</span>
@@ -11900,7 +11913,7 @@ function renderAlfred(){
         <input value="${esc(geminiKey())}" placeholder="Paste Gemini API key…" oninput="setGemKey(this.value)" style="margin-bottom:8px;font-size:14px"/>
         <div class="mini" style="color:var(--text3)">Free key at aistudio.google.com/apikey · takes 30 seconds</div>
       </div>`;
-  let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach · tap 🦇 anywhere to chat</div>`;
+  let html=`<h1 style="font-size:34px;color:var(--gold2)">ALFRED</h1><div class="tag" style="margin-bottom:12px">Evidence-based coach · tap the Alfred avatar (top right) to chat</div>`;
   html+=launchCard;
   html+=alfredBriefing();
   html+=storyCampaignCard();
@@ -11998,14 +12011,14 @@ function gtv2MissionHero(){
     <div class="gtv2-hero-body">
       <div class="gtv2-idrow"><img class="gtv2-idlogo" src="logo_t.png" alt=""><div class="gtv2-idtext"><span class="gtv2-idname">${esc(title)}</span><span class="gtv2-iddate">${dateStr}</span></div>
       ${(()=>{const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);const cur=RANKS[ri],next=RANKS[ri+1];const lo=cur[0],hi=next?next[0]:cur[0];const pct=next?clamp((sl-lo)/Math.max(1,hi-lo)*100,0,100):100;const C=2*Math.PI*24;
-      return `<div style="margin-left:auto;flex:none;display:flex;align-items:center;gap:9px;cursor:pointer;background:rgba(0,0,0,.4);border:1px solid rgba(255,208,72,.35);border-radius:14px;padding:6px 11px 6px 7px;box-shadow:0 0 20px -8px rgba(255,208,72,.6)" onclick="openRankLadder()">
+      return `<div style="margin-left:auto;flex:none;display:flex;align-items:center;gap:9px;cursor:pointer;background:rgba(0,0,0,.4);border:1px solid var(--hair2);border-radius:var(--r-m);padding:6px 11px 6px 7px" onclick="openRankLadder()">
         <svg width="58" height="58" viewBox="0 0 58 58" style="flex:none"><circle cx="29" cy="29" r="24" fill="rgba(0,0,0,.5)" stroke="rgba(255,255,255,.14)" stroke-width="4"/><circle cx="29" cy="29" r="24" fill="none" stroke="#FFD048" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(C*pct/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 29 29)" style="filter:drop-shadow(0 0 6px rgba(255,208,72,.9))"/><text x="29" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="10" fill="#A06E14">LV</text><text x="29" y="42" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="20" fill="#FFD048">${sl}</text></svg>
         <div style="text-align:left;line-height:1.15">
           <div style="font-family:var(--disp);font-weight:650;font-size:14px;color:#FFD048;letter-spacing:.05em;text-shadow:0 0 10px rgba(255,208,72,.5)">${cur[2]} ${esc(cur[1]).toUpperCase()}</div>
           <div style="font-size:9px;color:var(--text3)">RANK ${ri+1}/${RANKS.length}</div>
           <div style="font-size:9px;color:${next?'var(--gold-dim)':'var(--green)'}">${next?`${Math.max(0,hi-sl)} lv → ${esc(next[1])}`:"MAX RANK"}</div>
         </div></div>`;})()}
-      <button onclick="openOmni()" aria-label="Find anything" style="flex:none;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,208,72,.3);background:rgba(0,0,0,.45);color:var(--gold2);font-size:15px;margin-left:7px;box-shadow:0 0 14px -6px rgba(255,208,72,.7)">🔍</button>
+      <button class="tbtn" onclick="openOmni()" aria-label="Find anything" style="flex:none;margin-left:7px">${GP.icon("search")}</button>
     </div>
       ${focal}
       ${track}
@@ -12919,8 +12932,21 @@ function iconize(n){
     if(nm)el.insertAdjacentHTML("afterbegin",GP.icon(nm,"gi-t"));
   });
 }
-new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);}))).observe(document.body,{childList:true,subtree:true});
-hxScan(document.body);iconize(document.body);
+/* Inline "0 0 Npx colour" glows are what made panels read as game UI. Strip them from inline styles the moment nodes land;
+   inset rings, offset drop shadows and near-black shadows stay. */
+const _glowDark=l=>{const c=(l.match(/rgba?\(([^)]*)\)/)||[])[1];if(!c)return /#0{3,6}\b|black/i.test(l);const v=c.split(",").map(Number);return Math.max(v[0],v[1],v[2])<45;};
+const _isGlow=l=>{if(/inset/.test(l)||_glowDark(l))return false;const p=(l.match(/-?[\d.]+px/g)||[]).map(parseFloat);return p.length>=3&&p[0]===0&&Math.abs(p[1])<=2&&p[2]>=6;};
+function calmGlow(n){
+  if(n.nodeType!==1)return;
+  const hs=n.matches('[style*="shadow"]')?[n]:[];n.querySelectorAll('[style*="shadow"]').forEach(e=>hs.push(e));
+  hs.forEach(el=>{
+    const st=el.style;
+    ["boxShadow","textShadow"].forEach(k=>{const v=st[k];if(!v)return;const ls=v.split(/,(?![^(]*\))/),keep=ls.filter(l=>!_isGlow(l));if(keep.length<ls.length)st[k]=keep.join(",")||"none";});
+    const f=st.filter;if(f&&/drop-shadow/.test(f)){const g=f.replace(/drop-shadow\((?:[^()]|\([^()]*\))*\)/g,m=>_isGlow(m.slice(12,-1))?"":m).trim();if(g!==f)st.filter=g||"none";}
+  });
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);}))).observe(document.body,{childList:true,subtree:true});
+hxScan(document.body);iconize(document.body);calmGlow(document.body);
 document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 boot();
 
