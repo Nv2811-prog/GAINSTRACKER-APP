@@ -1984,7 +1984,7 @@ const QUOTES=["It's not who I am underneath, but what I do that defines me.","Wh
 /* evidence-based training facts — shown 50/50 with Batman quotes (Feature 15) */
 const SCIENCE_FACTS=[
 "Hypertrophy responds to sets taken close to failure: RIR 0–3 is the effective range, with ~2 RIR a good default.",
-"Most muscles grow well on ~10–20 hard sets per week. Below that is maintenance, far above it just adds fatigue.",
+"Most muscles grow well on ~10–20 hard sets per week. Below your MEV there isn't enough to grow; far above MRV it just adds fatigue.",
 "Training a muscle 2× per week tends to beat 1× for growth at equal weekly volume — frequency spreads the stimulus.",
 "The full range of motion, especially the stretched position, drives more hypertrophy than partials in the short range.",
 "Protein around 1.6–2.2 g per kg of bodyweight per day maximises muscle protein synthesis for most lifters.",
@@ -2196,13 +2196,13 @@ const MIGRATION_BACKUP_META_KEY="gt_data_backup_meta";
 const MIGRATION_ERROR_KEY="gt_migration_error";
 // The 8-day cycle: 5 sessions + 3 rest days. [lift, sets, reps, optional?]
 const CYCLE8={id:"cycle8",name:"8-Day Cycle · Upper / Lower",days:[
-  ["Upper A · Wingspan",[["Plate-Loaded Chest Press",2,"5–8"],["Lat Pulldown (Wide Grip)",2,"5–8"],["Incline Machine Chest Press",2,"5–8"],["Chest-Supported T-Bar Row",2,"5–8"],["High-to-Low Cable Row",1,"5–8"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
-  ["Lower A · Foundation",[["Leg Extension",2,"6–10"],["Machine Seated Leg Curl",2,"6–10"],["Leg Press (45°)",2,"5–8"],["Hip Adduction Machine",2,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",2,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
+  ["Upper A · Wingspan",[["Plate-Loaded Chest Press",2,"5–10"],["Lat Pulldown (Wide Grip)",2,"5–10"],["Incline Machine Chest Press",2,"5–10"],["Chest-Supported T-Bar Row",2,"5–10"],["High-to-Low Cable Row",1,"5–10"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
+  ["Lower A · Foundation",[["Leg Extension",2,"6–10"],["Machine Seated Leg Curl",2,"6–10"],["Leg Press (45°)",2,"5–10"],["Hip Adduction Machine",2,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",2,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
   ["Rest & Recover"],
-  ["Upper B · Shoulder Armor",[["High-to-Low Cable Row",2,"5–8"],["Plate-Loaded Chest Press",2,"5–8"],["Chest-Supported T-Bar Row",2,"5–8"],["Incline Machine Chest Press",2,"5–8"],["Reverse Pec Deck",2,"6–10"],["Machine Shoulder Press",2,"5–8"],["Cable Lateral Raise",1,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",1,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
-  ["Lower B · Backbone",[["Leg Extension",2,"6–10"],["Hip Hinge (Erectors)",2,"6–10"],["Leg Press (45°)",2,"5–8"],["Machine Seated Leg Curl",2,"6–10"],["Hip Adduction Machine",1,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",1,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
+  ["Upper B · Shoulder Armor",[["High-to-Low Cable Row",2,"5–10"],["Plate-Loaded Chest Press",2,"5–10"],["Chest-Supported T-Bar Row",2,"5–10"],["Incline Machine Chest Press",2,"5–10"],["Reverse Pec Deck",2,"6–10"],["Machine Shoulder Press",2,"5–10"],["Cable Lateral Raise",1,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",1,"6–10"],["Machine Preacher Curl",2,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"]]],
+  ["Lower B · Backbone",[["Leg Extension",2,"6–10"],["Hip Hinge (Erectors)",2,"6–10"],["Leg Press (45°)",2,"5–10"],["Machine Seated Leg Curl",2,"6–10"],["Hip Adduction Machine",1,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",1,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]]],
   ["Rest & Recover"],
-  ["Upper C · Chest Plate",[["Plate-Loaded Chest Press",2,"5–8"],["Lat Pulldown (Wide Grip)",2,"5–8"],["Incline Machine Chest Press",2,"5–8"],["Chest-Supported T-Bar Row",2,"5–8"],["Pec Deck Fly",1,"6–10",1],["Machine Shoulder Press",1,"5–8"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"]]],
+  ["Upper C · Chest Plate",[["Plate-Loaded Chest Press",2,"5–10"],["Lat Pulldown (Wide Grip)",2,"5–10"],["Incline Machine Chest Press",2,"5–10"],["Chest-Supported T-Bar Row",2,"5–10"],["Pec Deck Fly",1,"6–10",1],["Machine Shoulder Press",1,"5–10"],["Cable Lateral Raise",2,"6–10"],["Cable Cross-Body Extension",2,"6–10"],["V-Bar Triceps Pushdown",2,"6–10"],["Machine Preacher Curl",2,"6–10"]]],
   ["Rest & Recover"]
 ]};
 function cycle8Split(){
@@ -2228,6 +2228,15 @@ const MIGRATIONS=[
     const id=existing?existing.id:fresh.id,gym=d.u&&d.u.activeGym;
     return Object.assign({},d,{splits:nextSplits,activeSplitId:id,_nextDay:0,
       activeGymSplits:Object.assign({},d.activeGymSplits||{},gym?{[gym]:id}:{})});
+  }},
+  // v2 — plan rep ranges are 5–10 (user decision 2026-10-19). In the 8-day cycle (by id, or by name for an imported copy)
+  // every plan target that is EXACTLY "5–8" becomes "5–10". Custom ranges and all logged workouts are never touched.
+  {v:2,name:"plan reps 5–10",run:d=>{
+    const lc=x=>String(x||"").toLowerCase().trim();
+    const isCycle=sp=>sp&&(sp.id===CYCLE8.id||lc(sp.name)===lc(CYCLE8.name));
+    const fix=pl=>pl&&pl.r==="5–8"?Object.assign({},pl,{r:"5–10"}):pl;
+    return Object.assign({},d,{splits:(d.splits||[]).map(sp=>!isCycle(sp)?sp:Object.assign({},sp,{days:(sp.days||[]).map(day=>
+      !day.plan?day:Object.assign({},day,{plan:Object.fromEntries(Object.entries(day.plan).map(([n,pl])=>[n,fix(pl)]))}))}))});
   }}
 ];
 function migrateData(data){
@@ -2299,6 +2308,7 @@ const now=()=>Date.now();
 const fmtTime=s=>{s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return (m<10?"0":"")+m+":"+((s%60)<10?"0":"")+(s%60);};
 const fmtVol=v=>Math.round(v).toLocaleString("en-US")+"kg";
 const fmtNum=n=>Math.round(n).toLocaleString("en-US");
+const fmtKg=n=>String(Math.round((+n||0)*10)/10);   // suggestion weights keep one decimal: 72.5, not 73
 const hoursSince=t=>t?(now()-new Date(t).getTime())/3600000:99999;
 const daysSince=t=>hoursSince(t)/24;
 // Toasts queue and play ONE AT A TIME so a burst (coach line + PR + tip) can all be read,
@@ -2418,14 +2428,18 @@ function heatColorFor(m,s){
   return `hsl(${H} ${S}% ${L}%)`;
 }
 function heatColor(m){return heatColorFor(MM_NORM(m),weeklySets(MM_NORM(m)));}
+/* ONE ZONE SCALE for weekly hard sets — every label, bar, dot and card reads it: below MEV / growth zone (MEV–MAV) /
+   high but recoverable (MAV–effective MRV) / over MRV. Effective MRV rises when volume is spread over sub-regions. */
+const ZONES={low:["Below MEV — not enough to grow","#8a8a8a"],grow:["Growth zone","#2ECC71"],high:["High — recoverable","#E8C56A"],over:["Over MRV","#E8453C"]};
+const zoneKey=(s,mev,mav,mrv)=>s<mev?"low":s<=mav?"grow":s<=mrv?"high":"over";
+function zoneOf(m,sets){
+  const lm=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m),key=zoneKey(sets,lm.mev,lm.mav,mrv);
+  return {key,label:ZONES[key][0],color:ZONES[key][1],mev:lm.mev,mav:lm.mav,mrv};
+}
 function heatLabel(m){
-  const nm=MM_NORM(m);
-  const s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20}, eMrv=effectiveMRV(nm);
+  const nm=MM_NORM(m),s=weeklySets(nm);
   if(!(s>0))return ["Untrained","var(--text3)"];
-  if(s<lm.mev)return ["Below maintenance","var(--text2)"];
-  if(s<lm.mav)return ["Productive zone","var(--yellow)"];
-  if(s<=eMrv)return [eMrv>lm.mrv?"Optimal — well spread":"Optimal / high","var(--green)"];
-  return ["Over MRV — junk risk","var(--red)"];
+  const z=zoneOf(nm,s);return [z.label,z.color];
 }
 // Compact heat body: lights the tapped muscle by training intensity, on a Gym80-style dark tile.
 /* Sub-region heat ON the figure: for muscles whose heads stack vertically on the body, the muscle
@@ -2447,7 +2461,7 @@ function muscleHeatFig(m){
     }
   }
   const col=mm=> mm===nm?{fill:fillV,op:".95"}:{fill:"#E8C56A",op:".06"};
-  const [lab,lc]=heatLabel(nm), s=weeklySets(nm), lm=VL[nm]||{mev:8,mav:14,mrv:20};
+  const [lab,lc]=heatLabel(nm), s=weeklySets(nm);
   const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
   const fig=suitFigure(view,col,null,extraDefs);state._figShade=ps;state._figGlow=pg;
   return `<div class="row" style="gap:12px;align-items:center;margin-bottom:10px">
@@ -2457,8 +2471,6 @@ function muscleHeatFig(m){
       <div style="font-weight:800;color:${lc};font-size:15px;line-height:1.1">${lab}</div>
       <div class="mini" style="margin-top:4px;color:var(--text2)">${s>0?s+" hard set"+(s===1?"":"s")+" this week":"No sets logged this week"}</div>
       ${axNote}
-      <div style="height:7px;border-radius:5px;margin-top:7px;background:linear-gradient(90deg,#566070,hsl(6 80% 38%),hsl(4 92% 56%),hsl(0 94% 64%))"></div>
-      <div class="row sp mini" style="margin-top:2px;color:var(--text3)"><span>MEV ${lm.mev}</span><span>MAV ${lm.mav}</span><span>MRV ${lm.mrv}</span></div>
     </div></div>`;
 }
 function figureSVG(ex){
@@ -2840,7 +2852,7 @@ function setStim(s){
   else if(s.type==="D")prox=1.4;       // drop set
   else if(s.type==="RP")prox=1.5;      // rest-pause — repeated failure
   else if(s.type==="M")prox=1.45;      // myo-reps — near-failure mini-sets
-  else{const rpe=+s.rpe; if(rpe>=5&&rpe<=10)prox=0.6+(rpe-5)*0.18;} // RPE5→.6 … RPE10→1.5
+  else{const rir=rirOfSet(s);if(rir!=null)prox=1.5-rir*0.225;}     // logged RIR: 0 → 1.5 … 4+ → 0.6 (legacy RPE values are converted by rirOfSet)
   return prox;
 }
 // live fatigue for a muscle. Each recent session owes a fatigue debt that recovers LINEARLY over
@@ -2904,15 +2916,22 @@ function strengthLevel(){
   // Read from the authoritative workouts array AND the lifetime counters, take the max.
   // (Counters can desync from the array after imports/migrations; the array is truth.)
   let vol=0,n=0;(d.workouts||[]).forEach(w=>{vol+=+w.totalVol||0;n++;});
-  vol=Math.max(vol,u.totalVolume||0); n=Math.max(n,u.totalWorkouts||0);
+  vol=lifetimeVolume(); n=Math.max(n,u.totalWorkouts||0);
   const pts=vol/1000 + n*8;   // ~1pt/1000kg + 8pts/session
   // ~5 sessions → Gotham Cop (Lv3), ~20 → Vigilante (Lv6), ~55 → Robin (Lv10); elite ranks take years.
   return Math.max(1,Math.min(45,Math.round(0.30*Math.sqrt(pts))));
 }
 
-/* ========================= WEEKLY SETS PER MUSCLE ========================= */
+/* ========================= WEEKLY SETS PER MUSCLE =========================
+   Weekly numbers read a window = ONE FULL CYCLE of the active split (rest days included; 7 with no split) and are then
+   normalised to "per week" (x7/len). A 7-day window on an 8-day cycle swings with the cycle phase (quads/hams read
+   "below MEV" 43% of days on unchanged training). Rolling (now-len days), NOT calendar-aligned: before tonight's session is
+   logged a calendar window silently drops one slot of the cycle, so the muscles it trains read half-volume. */
+function cycleLen(){const d=state.data,sp=(d.splits||[]).find(s=>s.id===d.activeSplitId);return (sp&&(sp.days||[]).length)||7;}
+function cycleStart(k){return now()-(k+1)*cycleLen()*864e5;}   // k=0: the cycle that ends now
+const perWeek=n=>n*7/cycleLen();
 function weeklySets(m){
-  const wk=now()-7*864e5; let c=0;
+  const wk=cycleStart(0); let c=0;
   state.data.workouts.forEach(w=>{
     if(new Date(w.date).getTime()<wk)return;
     (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -2921,7 +2940,7 @@ function weeklySets(m){
       if(ex.s&&ex.s.includes(m))c+=working*0.5;
     });
   });
-  return Math.round(c);
+  return Math.round(perWeek(c));
 }
 // How well is this muscle's volume distributed across its heads this week? Uses the same per-head
 // tally the coverage coach does (subSetCounts). covered = sub-regions getting real work (>=2 sets).
@@ -2946,7 +2965,7 @@ function effectiveMRV(m){
    Science: each muscle grows best trained ~2× / week (every ~72h). We use that to tell the
    user exactly which muscles to train next and which are already covered. ===== */
 function muscleSessionsThisWeek(m){
-  const wk=now()-7*864e5, days=new Set();
+  const wk=cycleStart(0), days=new Set();
   (state.data.workouts||[]).forEach(w=>{
     if(new Date(w.date).getTime()<wk)return;
     let hit=false;
@@ -2955,7 +2974,7 @@ function muscleSessionsThisWeek(m){
       if(working&&((ex.p&&ex.p.includes(m))||(ex.s&&ex.s.includes(m))))hit=true;});
     if(hit)days.add(new Date(w.date).toDateString());
   });
-  return days.size;
+  return Math.round(perWeek(days.size));
 }
 function muscleLastTrained(m){
   let best=null;
@@ -3006,7 +3025,7 @@ function freqGuideCard(){
    Respects the user's rule: 2-3 real sets per region across several exercises is GOOD, not
    junk. We only flag a region as a GAP when its complementary region is trained but it isn't. */
 function subSetCounts(m){
-  const wk=now()-7*864e5, c={}; (SUBG[m]||[]).forEach(s=>c[s[0]]=0);
+  const wk=cycleStart(0), c={}; (SUBG[m]||[]).forEach(s=>c[s[0]]=0);
   (state.data.workouts||[]).forEach(w=>{
     if(new Date(w.date).getTime()<wk)return;
     (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
@@ -3015,7 +3034,7 @@ function subSetCounts(m){
       exSub(ex,m).forEach(id=>{if(id in c)c[id]+=w8;});
     });
   });
-  Object.keys(c).forEach(k=>c[k]=Math.round(c[k]*10)/10); return c;
+  Object.keys(c).forEach(k=>c[k]=Math.round(perWeek(c[k])*10)/10); return c;
 }
 const COVER_RULES={
   chest:[{need:"up",from:["mid","lo"],tip:"No upper-pec work — your pressing is flat/decline. Add an incline press or low-to-high cable for the clavicular head."}],
@@ -3167,15 +3186,8 @@ function tickWork(){if(!state.session){const el=$("wt-display");if(!el){clearInt
 function tickRest(){if(!state.restRunning)return;const rem=Math.ceil((state.restEnd-Date.now())/1000);const el=$("rest-display");if(rem<=0){state.restRunning=false;state.restTimer=0;haptic("rest");sfx("go");beep(880);document.body.classList.remove("rest-final");try{const gf=document.createElement("div");gf.className="goflash";gf.textContent="GO";document.body.appendChild(gf);setTimeout(()=>gf.remove(),700);}catch(e){}if(el){el.textContent="GO";el.parentElement.style.borderColor="var(--green)";}hideRestStrip();return;}if(rem<=5){document.body.classList.add("rest-final");haptic([16,50]);}else document.body.classList.remove("rest-final");state.restTimer=rem;if(el)el.textContent=fmtTime(rem);const rb=$("restbar");if(rb)rb.style.width=(clamp(rem/(state._restTotal||1),0,1)*100).toFixed(1)+"%";}
 /* ----- Rest lives in the sticky top bar: draining bar in the REST box + a compact control strip. No full-screen takeover. ----- */
 function hideRestStrip(){const rb=$("restbar");if(rb)rb.style.width="0%";const rs=$("reststrip");if(rs){rs.style.display="none";const tb=$("timerbar"),sp=$("timerspace");if(tb&&sp)sp.style.height=tb.offsetHeight+"px";}}
-// Concrete numeric next-set target for the one-tap ⚡ chip. FIRM RULE: <9 reps → +1 rep, same weight; 9+ → +weight, reset to 6.
-function nextTargetSet(name){
-  const ex=exFor(name),lb=lastBestSet(name);
-  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
-  const r=lb.r;
-  if(r<9)return {w:lb.w||0,r:r+1};
-  if(ex.bw)return lb.w?{w:lb.w+2.5,r:6}:{w:0,r:r+1};
-  return {w:lb.w+(lb.w>=60?5:2.5),r:6};
-}
+// Concrete numeric next-set target for the one-tap ⚡ chip — the ONE progression rule (progressionFor).
+function nextTargetSet(name){const p=progressionFor(name);return p?{w:p.w,r:p.r}:null;}
 /* Tapping the tick on an empty working set must never create an empty "done" set: accept the numbers the row
    is already hinting at (last time's prevW/prevR, else the progression target) — or refuse if there is nothing. */
 function fillEmptySet(e,s){
@@ -3278,7 +3290,7 @@ function startWorkout(splitId,dayIdx){
 function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
 // Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
 const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
-// planned = the split day's target for this lift ({s:sets, r:"5–8"}). With a plan, seed exactly that
+// planned = the split day's target for this lift ({s:sets, r:"5–10"}). With a plan, seed exactly that
 // many working sets (last session's numbers shown per set where they exist) instead of copying last
 // session's set count — otherwise every session starts with the old plan's sets to delete by hand.
 function seedSets(name,planned){
@@ -4279,10 +4291,12 @@ function renderReadiness(){
 }
 
 /* ========================= LOGGING ========================= */
+// Working-weight estimate (warm-up base, "Intel" fallback): the progression rule decides; with no history in this gym it
+// falls back to the record weight and never goes above it — only reps earn weight.
 function suggestionFor(name){
-  const pr=state.data.prs[name];if(!pr)return null;
-  const r=state.session.readiness;const mult=r==="fresh"?1.025:r==="tired"?0.97:1.0;
-  return Math.round(pr.w*mult);
+  const p=progressionFor(name);if(p&&p.w)return p.w;
+  const pr=state.data.prs[name];if(!pr||!pr.w)return null;
+  return Math.round(pr.w*(state.session&&state.session.readiness==="tired"?0.97:1)*2)/2;
 }
 // Most recent logged top working set for a lift (scans workout history, newest first).
 /* 🔧 REAL-TIME WEIGHT CHECK — fires the instant a set is logged, not after the workout. A weight
@@ -4334,37 +4348,36 @@ function lastBestSet(name){
   }
   return null;
 }
-// Double-progression coach: read last performance, tell the lifter exactly what to chase.
-/* FIRM RULE: at 8 reps or under NEVER suggest more weight — build reps to 9 first. At 9+ → load up, reset to 6. */
-function nextTarget(name){
-  const ex=exFor(name);const lb=lastBestSet(name);
-  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
-  const r=lb.r;
-  if(ex.bw){
-    if(r<9)return `last ${r} reps${lb.w?" +"+lb.w+"kg":""} → chase <b>${r+1}+ reps</b>`;
-    return lb.w?`${r} reps at +${lb.w}kg → <b>add 2.5kg</b>, reset to 6`:`${r} clean reps → <b>add a vest/belt</b> or keep climbing`;
-  }
-  if(r<9)return `<b>${lb.w}kg × ${r+1}+</b> — build reps to 9, then we add weight`;
-  const inc=lb.w>=60?5:2.5;
-  return `${r} reps banked → <b>+${inc}kg to ${fmtNum(lb.w+inc)}kg × 6</b>`;
+/* ===== ONE PROGRESSION RULE (user decision 2026-10-19) — every suggestion path reads progressionFor/progressionFrom =====
+   Plan ranges are 5–10. A WORKING set (warm-ups never count) that reaches the top of the range (10+) earns more weight
+   (+5kg from 60kg up, else +2.5) and reps restart at 6 (or the plan's bottom if higher). 5–9 reps = same load, +1 rep.
+   A custom plan with a higher top (e.g. 12–15) moves the threshold up with it. Returns {w,r,add,top,reason,text(html)}. */
+const REP_TOP=10,REP_RESTART=6;
+function planReps(name){            // [low,high] of the plan range — live session first, else the active split; null if none
+  const ses=state.session,d=state.data;
+  let pl=ses&&(ses.exercises.find(e=>e.name===name)||{}).plan;
+  if(!pl){const sp=(d.splits||[]).find(s=>s.id===d.activeSplitId);for(const day of (sp&&sp.days)||[])if(day.plan&&day.plan[name]){pl=day.plan[name];break;}}
+  const m=pl&&String(pl.r||"").match(/(\d+)\D+(\d+)/);
+  return m?[+m[1],+m[2]]:null;
 }
-// Stale-lift radar: established lifts (have a record) that haven't set a PR in 3+ weeks but are
-// still in active rotation — surfaced as revival targets. Pairs with PR Fight Night.
+const repTop=name=>Math.max(REP_TOP,(planReps(name)||[0,0])[1]);
+function progressionFrom(name,lb){   // lb = {w,r} = the best WORKING set of the last outing
+  const ex=exFor(name);
+  if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
+  const w=+lb.w||0,r=+lb.r,top=repTop(name),pr=planReps(name),restart=Math.max(REP_RESTART,pr?pr[0]:0);
+  if(r<top)return {w,r:r+1,add:false,top,reason:`${r} reps is under ${top} — same load, +1 rep`,
+    text:ex.bw?`last ${r} reps${w?" +"+fmtKg(w)+"kg":""} → chase <b>${r+1}+ reps</b>`:`<b>${fmtKg(w)}kg × ${r+1}+</b> — ${r+1>=top?`hit ${top} and we add weight`:`build reps to ${top}, then we add weight`}`};
+  if(ex.bw&&!w)return {w:0,r:r+1,add:false,top,reason:`${r} clean reps — add a vest/belt or keep climbing`,text:`${r} clean reps → <b>add a vest/belt</b> or keep climbing`};
+  const inc=ex.bw?2.5:(w>=60?5:2.5),nw=Math.round((w+inc)*10)/10;
+  return {w:nw,r:restart,add:true,top,inc,reason:`${r} reps hit the top of the range (${top}+) — add ${fmtKg(inc)}kg`,
+    text:ex.bw?`${r} reps at +${fmtKg(w)}kg → <b>add ${fmtKg(inc)}kg</b>, reset to ${restart}`:`${r} reps banked → <b>+${fmtKg(inc)}kg to ${fmtKg(nw)}kg × ${restart}</b>`};
+}
+function progressionFor(name){return progressionFrom(name,lastBestSet(name));}
+function nextTarget(name){const p=progressionFor(name);return p?p.text:null;}
+// Stale-lift radar: the stalled lifts (ONE detector — liftIntel) shaped for the revival targets of Fight Night / tonight's plan.
 function staleLifts(maxDays){
-  const d=state.data,nowMs=Date.now(),DAY=86400000;
-  const lastTrain={};                                          // newest training touch per lift
-  (d.workouts||[]).forEach(w=>{const t=Date.parse(w.date)||0;(w.exercises||[]).forEach(e=>{if(lastTrain[e.name]==null||t>lastTrain[e.name])lastTrain[e.name]=t;});});
-  const out=[];
-  Object.entries(d.prs||{}).forEach(([name,p])=>{
-    if(!p||!(p.orm>0)||!p.date)return;                         // need an established record + a date
-    const sincePR=Math.floor((nowMs-Date.parse(p.date))/DAY);
-    if(!(sincePR>=21))return;                                  // fresh record — not stale
-    const lt=lastTrain[name];if(lt==null)return;
-    const sinceTrain=Math.floor((nowMs-lt)/DAY);
-    if(sinceTrain>(maxDays||45))return;                        // abandoned, not "stale in rotation"
-    out.push({name,sincePR,sinceTrain,orm:Math.round(p.orm)});
-  });
-  return out.sort((a,b)=>b.sincePR-a.sincePR).slice(0,5);
+  return stalledLifts().filter(s=>s.daysAgo<=(maxDays||45)).map(s=>({name:s.n,sincePR:s.bestAgo,sinceTrain:s.daysAgo,orm:Math.round(s.best)}))
+    .sort((a,b)=>b.sincePR-a.sincePR).slice(0,5);
 }
 // Tonight's game plan: Alfred's pre-session briefing — 1-2 concrete, winnable targets drawn from the
 // lifts queued this session (revive the stalest, then a clean progression on the heaviest established lift).
@@ -5731,8 +5744,8 @@ function renderSuit(){
       const recCol=trained?(rec>=80?'#2ECC71':rec>=50?'#E8C53C':'#E8453C'):'var(--text3)';
       const status=!trained?'untrained':hrs>0?(hrs<24?hrs+'h':Math.round(hrs/24*10)/10+'d')+' to ready':'READY';
       const statusCol=!trained?'#3a3e4a':hrs>0?recCol:'#2ECC71';
-      const volCol=!trained||sets<=0?'var(--text3)':sets<lm.mev?'#E8453C':sets<lm.mav?'#E8C53C':sets<=lm.mrv?'#2ECC71':'#E8973C';
-      const volTxt=sets>lm.mrv?`${sets} sets ⚡MRV`:`${sets}/${lm.mav} sets`;
+      const zn=zoneOf(m,sets),volCol=!trained||sets<=0?'var(--text3)':zn.color;
+      const volTxt=zn.key==="over"?`${sets} sets ⚡MRV`:`${sets}/${lm.mav} sets`;
       const glow=trained?`border-color:${recCol}44;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 16px -8px ${recCol}`:'';
       return `<div class="muscle-tile" style="${glow}" onclick="muscleDrill('${m}')">
         ${muscleRing(m,rec,sets,lm.mav,trained)}
@@ -5958,7 +5971,7 @@ function exerciseHistory(name){
   const verdict=intel?liftVerdict(intel):"";
   const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
   const tgtBlock=(intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"")
-    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${esc(["Hold the weight, change the rep range, and own 9 clean reps before adding load again.","Run a close variant for 3 weeks (different grip, angle or machine), then return.","Keep the top set — add one back-off set at −10% for extra volume.","Slow the negative to 3 seconds; same weight becomes a new stimulus."][(name.length+ (state.data.workouts||[]).length)%4])}</div></div></div>`:"");
+    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${(f=>`<b>${f[0]}</b> — ${esc(f[1])}`)(stallFix(name))}</div></div></div>`:"");
   // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
   const recordE1=Math.max(...e1s);
   const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
@@ -6038,26 +6051,26 @@ function loggedExerciseNamesByRecency(){
 }
 // Per-lift coaching read: trend verdict, stall detection and the weight/reps to beat next time.
 // Pure analysis over exerciseRows — no side effects, safe to call anywhere.
+const STALL_DAYS=21;   // a lift only counts as stalled while it is still in rotation (trained in the last 3 weeks)
 function liftIntel(name){
   const ex=exFor(name),rows=exerciseRows(name);
   if(!rows.length)return null;
   const last=rows[rows.length-1],e1s=rows.map(r=>r.e1rm);
   const bestE=Math.max(...e1s),lastDate=new Date(last.date);
   const daysAgo=Math.floor((Date.now()-lastDate.getTime())/864e5);
-  // stall: best e1RM hasn't improved across the last 3+ sessions
-  let stalled=false,sinceImprove=0;
-  if(rows.length>=3){const peakIdx=e1s.lastIndexOf(bestE);sinceImprove=rows.length-1-peakIdx;stalled=sinceImprove>=3&&last.e1rm<bestE-0.5;}
+  // THE stall detector (stalledLifts, plateauCard, staleLifts and the Home card all read this): best e1RM not beaten for 3+
+  // sessions, last session below that best, lift trained within STALL_DAYS
+  let stalled=false,sinceImprove=0,bestAgo=0;
+  if(rows.length>=3){const peakIdx=e1s.lastIndexOf(bestE);sinceImprove=rows.length-1-peakIdx;bestAgo=Math.floor((Date.now()-new Date(rows[peakIdx].date).getTime())/864e5);stalled=sinceImprove>=3&&last.e1rm<bestE-0.5&&daysAgo<=STALL_DAYS;}
   // trend across last up-to-5 sessions
   const win=rows.slice(-5),d=win.length>1?win[win.length-1].e1rm-win[0].e1rm:0;
   const pct=win.length>1&&win[0].e1rm?Math.round(d/win[0].e1rm*100):0;
   const trend=d>1?"up":d<-1?"down":"flat";
-  // next target: beat last top working set — same weight +1 rep, or if reps high, +load
-  let tgt=null;
-  if(last.bset){const w=+last.bset.w||0,r=+last.bset.r||0;
-    if(r>=12)tgt={type:"load",w:Math.round((w+(w>=60?5:2.5))*10)/10,r:Math.max(6,r-3),txt:`${Math.round((w+(w>=60?5:2.5))*10)/10}kg — drop to ~${Math.max(6,r-3)} reps and climb again`};
-    else tgt={type:"rep",w,r:r+1,txt:`${w}${ex&&ex.bw?"+":""}kg × ${r+1} reps (beat last by one rep)`};
-  }
-  return {bestE,last,daysAgo,stalled,sinceImprove,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
+  // next target: the ONE progression rule — same load +1 rep until the top of the range, then +load
+  const pg=progressionFor(name)||(last.bset?progressionFrom(name,{w:+last.bset.w||0,r:+last.bset.r||0}):null);
+  const ld=pg&&(pg.w?`${ex&&ex.bw?"+":""}${fmtKg(pg.w)}kg`:"bodyweight");
+  const tgt=pg?{type:pg.add?"load":"rep",w:pg.w,r:pg.r,reason:pg.reason,txt:`${ld} × ${pg.r}${pg.add?"":"+"} — ${pg.add?"weight goes up, reps restart":"same load, beat last by one rep"}`}:null;
+  return {bestE,last,daysAgo,stalled,sinceImprove,bestAgo,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
 }
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
 function liftVerdict(intel){
@@ -6074,8 +6087,7 @@ function volBar(sets,lm,m){
   const cap=Math.max(eMrv+5,sets*1.12,lm.mrv*1.25);
   const P=v=>clamp(v/cap*100,0,100);
   const mev=P(lm.mev),mav=P(lm.mav),mrv=P(eMrv),cur=clamp(P(sets),0,100);
-  const zc=sets<lm.mev?"#8a8a8a":sets<=lm.mav?"#2ECC71":sets<=eMrv?"#E8C56A":"#E8453C";
-  const zt=sets<lm.mev?"below MEV — maintenance only":sets<=lm.mav?"growth zone (MEV–MAV)":sets<=eMrv?"high but recoverable (MAV–MRV)":"over MRV — back off";
+  const zk=zoneKey(sets,lm.mev,lm.mav,eMrv),zc=ZONES[zk][1],zt=ZONES[zk][0];
   const spreadNote=(spread&&eMrv>lm.mrv&&sets>lm.mav)
     ? `<div class="mini" style="text-align:center;margin-top:4px;color:#2ECC71">Spread across ${spread.covered} sub-regions — ceiling raised to ${eMrv}, so this volume still works.</div>` : "";
   return `<div style="margin:6px 0 2px">
@@ -6210,7 +6222,8 @@ function gothamThreat(){
   if(!d.workouts.length)return {score:55,level:"UNKNOWN",color:"var(--text2)",desc:"No patrols logged. Gotham waits to see who you are."};
   const dsl=d.u.lastTrainedDate?daysSince(d.u.lastTrainedDate):14;
   const wc=weekCount(),goal=d.u.weeklyGoal||4,streak=d.u.streakDays||0;
-  let s=dsl*8+Math.max(0,goal-wc)*7-streak*1.2-(wc>=goal?12:0);
+  const pace=goal*clamp((now()-weekStartK(0))/(7*864e5),0,1);   // sessions you should have by now this calendar week (Monday morning owes none)
+  let s=dsl*8+Math.max(0,pace-wc)*7-streak*1.2-(wc>=goal?12:0);
   s=clamp(Math.round(s),0,100);
   const bands=[[0,"SECURE","var(--green)","Gotham sleeps safe. The Bat is on patrol."],
     [25,"UNEASY","var(--gold2)","Whispers in the alleys. Stay sharp, stay consistent."],
@@ -6236,51 +6249,74 @@ function openThreatInfo(){const t=gothamThreat();const d=state.data;
     <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 // Fatigue Debt — accumulated fatigue vs recovery across trained muscles
-function fatigueDebt(){
-  let debt=0,n=0;M12.forEach(m=>{if(!(state.data.muscleVol[m]||0))return;n++;debt+=Math.max(0,100-getRecovery(m));});
-  const pct=n?clamp(Math.round(debt/(n*100)*100),0,100):0;
+function fatigueDebt(){   // judged on the MOST fatigued muscles (mean of the 4 worst) — an all-muscle mean lets fresh muscles hide tired legs
+  const debts=M12.filter(m=>(state.data.muscleVol[m]||0)>0).map(m=>Math.max(0,100-getRecovery(m))).sort((a,b)=>b-a),n=debts.length;
+  if(!n)return {pct:0,status:"Log a session to unlock.",color:"var(--text3)",low:0,n:0};   // nothing trained yet — nothing to report
+  const top=debts.slice(0,4),pct=clamp(Math.round(top.reduce((a,b)=>a+b,0)/top.length),0,100);
+  const low=debts.filter(x=>x>50).length,cnt=`${low} of ${n} muscle${n===1?"":"s"} under 50% recovered`;
   let status,color;
-  if(pct<25){status="Recovered — the bank is in credit. Push hard.";color="var(--green)";}
-  else if(pct<55){status="Manageable load. Train as planned.";color="var(--gold2)";}
-  else if(pct<80){status="High fatigue debt. Favour quality over junk volume.";color="var(--orange)";}
-  else {status="Deep in the red. Cut junk sets, keep 1–3 reps in reserve.";color="var(--red)";}
-  return {pct,status,color};
+  if(pct<25){status=low?`${cnt} — train the rest hard.`:"Every muscle is close to ready. Push hard.";color="var(--green)";}
+  else if(pct<55){status=`${low?cnt+". ":""}Manageable load. Train as planned.`;color="var(--gold2)";}
+  else if(pct<80){status=`${cnt}. Favour quality over junk volume.`;color="var(--orange)";}
+  else {status=`${cnt}. Cut junk sets, keep 1–3 reps in reserve.`;color="var(--red)";}
+  return {pct,status,color,low,n};
 }
 function openFatigueInfo(){const f=fatigueDebt();
   const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0).sort((a,b)=>getRecovery(a)-getRecovery(b));
   const rows=trained.length?trained.map(m=>{const rec=getRecovery(m),col=recoveryColor(rec),hrs=hoursToReady(m),debt=Math.max(0,100-rec);
     return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)"><span style="display:flex;align-items:center;gap:8px">${mIcon(m,17,col)}<b style="font-size:13px;color:var(--text2)">${MNAME[m]}</b></span><div class="row g" style="gap:10px;align-items:center"><span class="mini" style="color:var(--text3)">${hrs>0?hrs+"h to ready":"ready"}</span><div class="bar" style="width:64px;margin:0"><i style="width:${debt}%;background:${col}"></i></div><b style="color:${col};min-width:34px;text-align:right">${debt}%</b></div></div>`;
   }).join(""):`<div class="empty-state" style="padding:28px 14px 16px"><div class="es-icon">💪</div><div class="es-title">SUIT UNACTIVATED</div><div class="es-body">Log a session and your fatigue map illuminates the Suit with live recovery data.</div></div>`;
-  openSheet(`<div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="font-size:22px;color:${f.color}">${f.pct}%</b></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 6px">Your average fatigue across every trained muscle — the running tab between how hard you've hit them and how much they've recovered. Higher = more accumulated fatigue to clear.</div>
+  openSheet(`<div class="row sp"><div class="ttl" style="margin:0">🩸 Fatigue Debt</div><b style="font-size:22px;color:${f.color}">${f.n?f.pct+"%":"—"}</b></div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 6px">The average fatigue of your 4 most fatigued muscles — fresh muscles can't hide tired ones. Higher = more accumulated fatigue still to clear.</div>
     <div class="bar" style="margin:8px 0"><i style="width:${f.pct}%;background:${f.color}"></i></div>
     <div class="mini" style="font-style:italic;color:${f.color};margin-bottom:6px">${esc(f.status)}</div>
     <div class="ttl" style="font-size:13px;margin:12px 0 0">Per-muscle debt <span class="mini" style="font-weight:400;color:var(--text3)">— most fatigued first</span></div>
     ${rows}
     <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
-// Patrol Readiness — one daily score fusing recovery, sleep and accumulated fatigue.
+// Patrol Readiness — built ONLY from what is known. Recovery of the muscles that matter tonight (tonight's planned primary
+// muscles, else the 3 most fatigued) + freshness; sleep joins ONLY when today's sleep is logged (nothing is assumed — the UI says
+// "sleep not logged"). A brand-new user (no sessions) gets no score at all: "—" + "log a session to unlock".
 function patrolReadiness(){
   const d=state.data,trained=M12.filter(m=>(d.muscleVol[m]||0)>0);
-  const rec=trained.length?clamp(100-fatigueDebt().pct,0,100):85;
-  // sleep — latest log within 40h
-  let sleep=72,sleepKnown=false;
-  const sl=(d.sleepLog||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
-  if(sl&&(now()-new Date(sl.date).getTime())<40*36e5){
-    const q=sl.quality?clamp(sl.quality/5,0,1):null,h=sl.hours?clamp(sl.hours/8,0,1):null;
-    const parts=[q,h].filter(v=>v!=null);
-    if(parts.length){sleep=Math.round(parts.reduce((a,b)=>a+b,0)/parts.length*100);sleepKnown=true;}
-  }
-  // freshness — consecutive training days fatigue the CNS
-  const cons=consecutiveDays();
+  if(!(d.workouts||[]).length||!trained.length)return {score:null,label:"—",color:"var(--text3)",line:"Log a session to unlock.",rec:null,sleep:null,fresh:null,sleepKnown:false,unlock:true};
+  const cur=gtv2CurrentPlanDay(),tonight=cur&&cur.day&&!isRest(cur.day)?Object.keys(dayMuscles(cur.day).prim):[];
+  const pool=tonight.length?tonight:trained.slice().sort((a,b)=>getRecovery(a)-getRecovery(b)).slice(0,3);
+  const rec=pool.reduce((a,m)=>a+getRecovery(m),0)/pool.length;
+  let sleep=null;const sl=sleepToday();                     // sleep — only a log dated today
+  if(sl){const q=sl.quality?clamp(sl.quality/5,0,1):null,h=sl.hours?clamp(sl.hours/8,0,1):null,parts=[q,h].filter(v=>v!=null);
+    if(parts.length)sleep=Math.round(parts.reduce((a,b)=>a+b,0)/parts.length*100);}
+  const sleepKnown=sleep!=null;
+  // freshness — consecutive training days fatigue the CNS (a streak that ended 2+ days ago is over)
+  const last=Math.max(...d.workouts.map(w=>new Date(w.date).getTime()||0));
+  const cons=now()-last<2*864e5?consecutiveDays():0;
   const fresh=clamp(100-Math.max(0,cons-1)*11,30,100);
-  const score=clamp(Math.round(rec*0.45+sleep*0.30+fresh*0.25),0,100);
+  const score=clamp(Math.round(sleepKnown?rec*0.45+sleep*0.30+fresh*0.25:(rec*0.45+fresh*0.25)/0.70),0,100);
   const bands=[[80,"PRIMED","var(--green)","Green light — attack the hardest session on your plan."],
     [60,"READY","var(--gold2)","Good to go. Train as planned, push the top sets."],
     [40,"GUARDED","var(--orange)","Below peak. Favour quality over junk volume tonight."],
     [0,"DEPLETED","var(--red)","Recovery is the mission today. Back off or rest, sir."]];
   let b=bands[bands.length-1];for(const x of bands)if(score>=x[0]){b=x;break;}
-  return {score,label:b[1],color:b[2],line:b[3],rec:Math.round(rec),sleep,fresh,sleepKnown};
+  return {score,label:b[1],color:b[2],line:b[3],rec:Math.round(rec),sleep,fresh,sleepKnown,scope:tonight.length?"tonight":"worst3"};
+}
+/* Optional 2-tap sleep log: hours chip + quality chip → state.data.sleepLog {date,hours,quality}. Readiness counts sleep for that day. */
+function openSleepLog(){const e=sleepToday();state._sl={h:e&&e.hours?Math.min(9,Math.max(5,Math.round(e.hours))):0,q:e&&e.quality||0};sleepLogSheet();}
+function sleepLogSheet(){
+  const s=state._sl||{},H=[[5,"≤5"],[6,"6"],[7,"7"],[8,"8"],[9,"9+"]],Q=[[2,"Poor"],[3,"OK"],[5,"Great"]];
+  const chip=(k,v,l)=>`<button class="chip ${s[k]===v?"on":""} g" style="flex:1;min-width:48px;justify-content:center" onclick="pickSleep('${k}',${v})">${l}</button>`;
+  openSheet(`<div class="ttl">Log sleep</div>
+    <div class="mini" style="color:var(--text2);margin-bottom:12px;line-height:1.45">Optional — two taps. With it, today's readiness counts sleep; without it, readiness uses recovery and freshness only.</div>
+    <div class="mini" style="color:var(--text3);letter-spacing:.08em;margin-bottom:6px">HOURS LAST NIGHT</div>
+    <div class="row" style="gap:7px;margin-bottom:14px">${H.map(([v,l])=>chip("h",v,l)).join("")}</div>
+    <div class="mini" style="color:var(--text3);letter-spacing:.08em;margin-bottom:6px">QUALITY</div>
+    <div class="row" style="gap:7px;margin-bottom:4px">${Q.map(([v,l])=>chip("q",v,l)).join("")}</div>`);
+}
+function pickSleep(k,v){
+  const s=state._sl=Object.assign({},state._sl,{[k]:v});
+  if(!(s.h&&s.q)){haptic("tap");sleepLogSheet();return;}
+  const d=state.data;d.sleepLog=d.sleepLog||[];
+  let e=sleepToday();if(!e){e={date:new Date().toISOString(),quality:null,hours:null};d.sleepLog.push(e);}
+  e.hours=s.h;e.quality=s.q;save();haptic("done");closeSheet();toast("Sleep logged");render();
 }
 // Tiny recovery strip that lives UNDER the readiness card — the most-fatigued sectors at a glance,
 // each with its realistic hours-to-ready (bounded by the muscle's own recovery window).
@@ -6321,11 +6357,14 @@ function villainNemesis(){
   const last=w.filter(b=>b.villain===top).sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
   return {villain:top,emoji:em[top]||SP[top]||"😈",count:tc,last,total:w.length};
 }
+// ONE source for lifetime tonnage (Iron Ledger, Batcomputer, rank, milestones, Alfred): the logged sessions, floored by the running
+// counter — a restore/import can leave either one stale, so the larger is the truth.
+function lifetimeVolume(){const d=state.data;return Math.max((d.workouts||[]).reduce((a,w)=>a+(+w.totalVol||0),0),(d.u&&+d.u.totalVolume)||0);}
 // Iron Ledger — lifetime stats
 function ironLedger(){
   const ws=state.data.workouts;let vol=0,sets=0,reps=0,dur=0;
   ws.forEach(w=>{vol+=w.totalVol||0;dur+=w.duration||0;(w.exercises||[]).forEach(e=>{(e.sets||[]).forEach(s=>{if(s.type==="W")return;const r=+s.r||0;if(s.done&&r){sets++;reps+=r;}});});});
-  vol=Math.max(vol,state.data.u.totalVolume||0);
+  vol=lifetimeVolume();
   const everest=8849; // metres; ~0.5 m of bar travel per rep
   return {vol,sets,reps,dur,workouts:ws.length||state.data.u.totalWorkouts||0,
     climbs:(reps*0.5)/everest, batmobiles:vol/1600, elephants:vol/6000,
@@ -6366,7 +6405,7 @@ function coverageRadar(){
     const[lx,ly]=pt(i,R+16);labels+=mGlyph(m,lx,ly,0.82);});
   const dataP=muscles.map((m,i)=>{const sets=weeklySets(m),lm=VL[m]||{mav:14};return pt(i,R*clamp(sets/lm.mav,0,1.16));});
   const poly=dataP.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ");
-  const dots=dataP.map((p,i)=>{const m=muscles[i],sets=weeklySets(m),lm=VL[m]||{mev:8,mav:14,mrv:20};const col=sets<lm.mev?"#8a8a8a":sets<=lm.mav?"#2ECC71":sets<=lm.mrv?"#E8C56A":"#E8453C";return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.7" fill="${col}"/>`;}).join("");
+  const dots=dataP.map((p,i)=>{const m=muscles[i],col=zoneOf(m,weeklySets(m)).color;return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.7" fill="${col}"/>`;}).join("");
   return `<div class="card"><div class="ttl">🕸️ Coverage radar <span class="mini" style="font-weight:400">— weekly sets vs growth target</span></div>
     <svg viewBox="0 0 300 290" style="width:100%;max-width:330px;height:auto;display:block;margin:2px auto 0">
       ${grid}${spokes}${labels}
@@ -6470,15 +6509,30 @@ const GAUNTLET=[
 ];
 function gauntletKey(){const t=new Date();return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
 /* ===== Stalled-lift detector (#2): flags lifts with no est-1RM progress in 3+ sessions ===== */
-function stalledLifts(){
+function stalledLifts(){   // every stalled lift, biggest first — straight from liftIntel (one detector)
   const out=[];
-  loggedExerciseNames().forEach(n=>{
-    const rows=exerciseRows(n);if(rows.length<4)return;
-    const prior=rows[rows.length-4].e1rm;
-    const recent=rows.slice(-3).map(r=>r.e1rm);
-    if(Math.max(...recent)<=prior)out.push({n,best:Math.max(...rows.map(r=>r.e1rm)),sessions:rows.length});
-  });
-  return out;
+  loggedExerciseNames().forEach(n=>{const i=liftIntel(n);
+    if(i&&i.stalled)out.push({n,best:i.bestE,last:i.last.e1rm,sessions:i.sinceImprove,daysAgo:i.daysAgo,bestAgo:i.bestAgo});});
+  return out.sort((a,b)=>b.best-a.best);
+}
+// ONE suggested change per stalled lift — angle, grip or rep range, picked by movement (never a deload, never less effort)
+const STALL_FIX=[["Angle","Move the bench or machine setting 10–15° for 3 weeks, then come back to the lift."],
+  ["Grip","Change width or hand position (neutral, wider, closer) for 3 weeks, then come back."],
+  ["Rep range","Work the heavy 5–7 end for two weeks, then rebuild toward 10 reps and add weight there."]];
+function stallFix(name,k){const n=(name||"").toLowerCase();
+  return STALL_FIX[/press|bench|fly|dip|raise|incline|pec/.test(n)?0:/row|pull|chin|curl|lat /.test(n)?1:/squat|deadlift|leg|lunge|calf|thrust|extension|adduct|abduct/.test(n)?2:(k||0)%3];}
+function openStalledLifts(){
+  const L=stalledLifts();
+  const rows=L.length?L.map((s,k)=>{const f=stallFix(s.n,k),ago=s.daysAgo<=0?"today":s.daysAgo===1?"yesterday":s.daysAgo+"d ago";
+    return `<div style="border-top:1px solid var(--border);padding:11px 0;cursor:pointer" onclick="exerciseHistory('${esc(s.n).replace(/'/g,"")}')">
+      <div class="row sp" style="gap:8px"><b style="font-size:14px;min-width:0">${esc(s.n)}</b><span class="chip" style="font-size:11px;flex:none">flat ${s.sessions} session${s.sessions===1?"":"s"}</span></div>
+      <div class="mini" style="margin-top:3px;color:var(--text3)">Best e1RM ${fmtKg(s.best)}kg · last session ${fmtKg(s.last)}kg · trained ${ago}</div>
+      <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45"><b>${f[0]}</b> — ${f[1]}</div></div>`;}).join("")
+    :`<div class="mini" style="padding:14px 0;color:var(--text2)">No stalled lifts right now. Every lift you trained in the last 3 weeks is still moving.</div>`;
+  openSheet(`<div class="ttl">Stalled lifts</div>
+    <div class="mini" style="color:var(--text2);margin:2px 0 8px;line-height:1.45">Best estimated 1RM not beaten for 3+ sessions, on lifts trained in the last 3 weeks. Change one variable and keep the effort.</div>
+    ${rows}
+    <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 /* ========================================================================
    THE INFIRMARY (Wave 5) — one recovery hub: sleep, soreness, conditioning,
@@ -6490,9 +6544,9 @@ function closeInfirmary(){state.subpage=null;go("gotham");}
    Acute:Chronic Workload Ratio — this week's training load vs the rolling 4-week average.
    A genuine sports-science marker: sudden load spikes (ratio >1.5) are the strongest
    modifiable predictor of soft-tissue injury; 0.8–1.3 is the "sweet spot". Load = tonnage. */
-function weeklyLoad(weekIdx){
-  const e=now()-weekIdx*7*864e5, s=e-7*864e5;
-  return (state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0);
+function weeklyLoad(weekIdx){   // tonnage of the weekIdx-th cycle back (0 = the cycle ending tonight), per week
+  const s=cycleStart(weekIdx),e=weekIdx?cycleStart(weekIdx-1):Infinity;
+  return perWeek((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0));
 }
 function acwrInfo(){
   const acute=weeklyLoad(0);
@@ -6519,8 +6573,8 @@ function workloadCard(){
       <i style="position:absolute;left:${pos}%;top:-4px;width:3px;height:19px;border-radius:2px;background:#fff;box-shadow:0 0 7px #000;transform:translateX(-50%)"></i></div>
     <div class="row sp" style="margin-top:3px"><span class="mini" style="color:var(--text3)">detrain</span><span class="mini" style="color:var(--green)">0.8–1.3 sweet</span><span class="mini" style="color:var(--red)">spike</span></div>
     <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">${a.msg}</div>
-    <div class="row sp" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span class="mini">This week's load</span><b class="gold">${fmtNum(a.acute)}kg</b></div>
-    <div class="row sp"><span class="mini">4-week average</span><b style="color:var(--text2)">${fmtNum(a.chronic)}kg</b></div></div>`;
+    <div class="row sp" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span class="mini">Load per week · latest cycle</span><b class="gold">${fmtNum(a.acute)}kg</b></div>
+    <div class="row sp"><span class="mini">Load per week · 4-cycle average</span><b style="color:var(--text2)">${fmtNum(a.chronic)}kg</b></div></div>`;
 }
 /* ===== Sleep debt — cumulative shortfall vs an 8h/night target over the last 7 nights ===== */
 function sleepDebt(){
@@ -6569,7 +6623,7 @@ function renderInfirmary(){
   const supp=suppToday();const cStreak=creatineStreak();
   const inj=d.injuries||{};const injKeys=Object.keys(inj);
   let html=`<div class="fade">
-    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeInfirmary()">‹ Gotham</button><span class="chip" style="color:${r.color}">Readiness ${r.score}</span></div>
+    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeInfirmary()">‹ Gotham</button><span class="chip" style="color:${r.color}">Readiness ${r.score==null?"—":r.score}</span></div>
     <h1 style="font-size:34px;color:var(--gold2)">THE INFIRMARY</h1>
     <div class="tag" style="margin-bottom:14px">Sleep · soreness · conditioning · supplements · injuries</div>`;
 
@@ -6658,7 +6712,7 @@ function drawIndex(){
 
 /* ===== Shared milestone stats for garage/most-wanted ===== */
 function gothamStats(){const d=state.data,a=(typeof trainingAge==="function"?trainingAge():null);
-  return {w:d.workouts.length,vol:d.u.totalVolume||0,boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0,prs:Object.keys(d.prs).length};}
+  return {w:d.workouts.length,vol:lifetimeVolume(),boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0,prs:Object.keys(d.prs).length};}
 
 /* ===== THE BATMOBILE GARAGE (#11): a fleet that unlocks with real milestones ===== */
 const GARAGE=[
@@ -6780,26 +6834,18 @@ function renderGarage(){
 }
 
 /* ===== WEEKLY MOST WANTED (#12): the weakest sector as a bounty with a target ===== */
-function mostWantedCard(){
-  const m=weakestMuscle();if(!m)return "";
-  const lm=VL[m]||{mev:8,mav:14};const target=lm.mev;const cur=weeklySets(m);
-  const done=cur>=target;const pct=clamp(cur/Math.max(1,target)*100,0,100);
-  const bc=done?"#2ECC71":"#E8453C";
+function mostWantedCard(){   // FURTHEST BEHIND MEV = argmax(MEV − weekly sets) over trained muscles (top two) + a flag for anything over MRV
+  const tr=M12.filter(m=>(state.data.muscleVol[m]||0)>0).map(m=>{const cur=weeklySets(m),z=zoneOf(m,cur);return {m,cur,z,gap:z.mev-cur};});
+  if(!tr.length)return "";
+  const behind=tr.filter(r=>r.gap>0).sort((a,b)=>b.gap-a.gap||a.cur/a.z.mev-b.cur/b.z.mev).slice(0,2),over=tr.filter(r=>r.z.key==="over");
+  const row=r=>{const pct=clamp(r.cur/Math.max(1,r.z.mev)*100,0,100);
+    return `<div style="margin-top:8px"><div class="row sp" style="align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:8px;min-width:0">${mIcon(r.m,22,"#E8453C")}<b style="font-size:14px;color:#E8453C;font-family:var(--disp)">${MNAME[r.m]}</b></div><div style="text-align:right;flex:none"><b style="font-size:12px;color:#E8453C">${r.cur}/${r.z.mev}</b> <span style="font-size:10px;color:var(--text3)">sets this week · ${r.gap} short</span></div></div>
+      <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px"><i style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#E8453C,#E8A52A);border-radius:999px"></i></div></div>`;};
+  const bc=behind.length?"#E8453C":"#2ECC71";
   return `<div class="gtv2-panel wide" style="border-color:${bc}55;margin-bottom:8px;padding:10px 12px">
-    <div class="row sp" style="align-items:center;gap:8px">
-      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-        ${mIcon(m,26,bc)}
-        <div style="min-width:0">
-          <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:var(--disp)">FURTHEST BEHIND MEV</div>
-          <div style="font-size:15px;font-weight:800;color:${bc};font-family:var(--disp)">${MNAME[m]}</div>
-        </div>
-      </div>
-      <div style="text-align:right;flex:none">
-        <div style="font-size:12px;color:${bc};font-weight:700">${done?'✓ MEV MET':cur+'/'+target}</div>
-        <div style="font-size:10px;color:var(--text3)">${done?'minimum hit':'sets this week'}</div>
-      </div>
-    </div>
-    <div style="height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:${pct}%;background:${done?'#2ECC71':'linear-gradient(90deg,#E8453C,#E8A52A)'};border-radius:999px;box-shadow:0 0 8px ${bc}"></i></div>
+    <div style="font-size:10px;letter-spacing:.1em;color:var(--text3);font-family:var(--disp)">FURTHEST BEHIND MEV</div>
+    ${behind.length?behind.map(row).join(""):`<div style="margin-top:6px;font-size:13px;font-weight:700;color:#2ECC71">✓ MEV met on every trained muscle</div>`}
+    ${over.length?`<div style="margin-top:8px;font-size:11px;color:#E8453C"><b>Over MRV</b> · ${over.map(r=>`${MNAME[r.m]} ${r.cur}/${r.z.mrv}`).join(" · ")} — extra sets here are junk volume</div>`:""}
   </div>`;
 }
 
@@ -6825,15 +6871,11 @@ const WAYNE_TOWER_KG=20000;
 /* Streak that respects rest: a WEEKLY streak (weeks that hit your goal) + days-on-protocol
    (consecutive days where you trained OR took a planned rest — only an unplanned skipped
    session breaks it). Rest never breaks these; rest is part of the plan. */
-function weeklyStreak(){
+function weeklyStreak(){   // consecutive calendar weeks (weekDays) that hit the goal; the in-progress week never breaks it, counts once met
   const goal=Math.max(1,state.data.u.weeklyGoal||4);
-  const ws=state.data.workouts||[];if(!ws.length)return 0;
-  const WEEK=7*864e5,byWeek={};
-  ws.forEach(w=>{const k=fnWeekStart(new Date(w.date).getTime());(byWeek[k]=byWeek[k]||new Set()).add(new Date(w.date).toDateString());});
-  const met=k=>(byWeek[k]?byWeek[k].size:0)>=goal;
-  const thisWk=fnWeekStart(now());let streak=0,k;
-  if(met(thisWk)){streak++;k=thisWk-WEEK;}else{k=thisWk-WEEK;}   // in-progress week never breaks it; counts only once met
-  while(met(k)){streak++;k-=WEEK;}
+  if(!(state.data.workouts||[]).length)return 0;
+  let streak=weekDays(0)>=goal?1:0;
+  for(let k=1;k<520&&weekDays(k)>=goal;k++)streak++;
   return streak;
 }
 function daysOnProtocol(){
@@ -7130,28 +7172,28 @@ function profileRecordsHtml(d){
   return html;
 }
 
-/* ⚖️ Relative strength — top-3 e1RM total vs bodyweight, with a 4-week delta. */
+/* ⚖️ Relative strength — the SAME barbell-equivalent big-3 the Strength standards card uses (liftEstimate converts machine/Smith/variation
+   lifts), total vs bodyweight, with a 4-week delta. Needs 2 of the 3 lifts; the card says which are in the total. */
 function relStrengthCard(){
   const d=state.data,bw=bodyW();if(!bw)return "";
-  const tops=Object.entries(d.prs||{}).filter(([,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm).slice(0,3);
+  const tops=["Bench Press","Squat","Deadlift"].map(l=>({l,e:liftEstimate(l)})).filter(x=>x.e);
   if(tops.length<2)return "";
   const cutoff=Date.now()-28*864e5;
-  let nowT=0,thenT=0;
-  // Floor "a" at the PR's own recorded orm — exerciseRows() reads state.data.workouts, which can
-  // legitimately have no matching entry for a real PR (per-gym PR pointer, a restored/imported
-  // record, an exercise that's since been renamed). Without the floor, the headline number silently
-  // dropped that lift to 0 while the subtitle line right below it — which reads p.orm directly —
-  // kept showing the real value, so the two halves of the same card visibly disagreed.
-  tops.forEach(([n,p])=>{let a=0,b=0;exerciseRows(n).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});nowT+=Math.max(a,p.orm||0);thenT+=b;});
+  let nowT=0,nowC=0,thenT=0;
+  // f = converter from the underlying PR lift to its barbell-equivalent (1 for the real barbell lift). Floor the lift at its own
+  // recorded PR — exerciseRows() reads state.data.workouts, which can have no matching entry for a real PR (per-gym pointer, import).
+  tops.forEach(({e})=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;let a=0,b=0;
+    exerciseRows(e.name).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});
+    const now1=Math.max(a*f,e.orm);nowT+=now1;if(b>0){nowC+=now1;thenT+=b*f;}});   // delta only over lifts that existed 4 weeks ago
   if(!nowT)return "";
-  const dPct=thenT>0?Math.round((nowT-thenT)/thenT*100):null;
+  const dPct=thenT>0?Math.round((nowC-thenT)/thenT*100):null;
   return `<div class="card" style="padding:13px">
-    <div class="ttl" style="font-size:13px;margin-bottom:6px">⚖️ Relative strength <span class="mini" style="color:var(--text3);letter-spacing:0">— big-3 e1RM total vs bodyweight</span></div>
+    <div class="ttl" style="font-size:13px;margin-bottom:6px">⚖️ Relative strength <span class="mini" style="color:var(--text3);letter-spacing:0">— ${tops.length===3?"big-3":"big-3 ("+tops.length+" of 3 logged)"}, barbell-equivalent e1RM vs bodyweight</span></div>
     <div class="row" style="gap:14px;align-items:flex-end">
       <div><div class="big" style="font-size:34px;color:var(--gold2)">${(nowT/bw).toFixed(2)}×</div><div class="mini">bodyweight — ${fmtNum(Math.round(nowT))}kg ÷ ${bw}kg</div></div>
       ${dPct!==null&&dPct!==0?`<div class="mini num" style="font-weight:800;color:${dPct>=0?'var(--green)':'#ff7a6e'}">${dPct>=0?'▲ +':'▼ '}${dPct}% / 4 wk</div>`:''}
     </div>
-    <div class="mini" style="margin-top:6px;color:var(--text3)">${tops.map(([n,p])=>esc(n)+" "+Math.round(p.orm)+"kg").join(" · ")}</div>
+    <div class="mini" style="margin-top:6px;color:var(--text3)">${tops.map(({l,e})=>esc(l)+" "+Math.round(e.orm)+"kg"+(e.est?" (est. from "+esc(e.via)+")":"")).join(" · ")}</div>
   </div>`;
 }
 function profileStrengthHtml(){
@@ -7198,7 +7240,14 @@ function renderProfile(){
   html+=acc('prf-bases','🏛️','Bases & Tools',profileBasesToolsHtml(d,u),false,(u.gyms||[]).length+' gym'+(((u.gyms||[]).length)===1?'':'s')+' · tools');
   $("app").innerHTML=html;
 }
-function weekCount(){const wk=now()-7*864e5;return new Set(state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk).map(w=>new Date(w.date).toDateString())).size;}
+/* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, Threat/consistency, the Evidence Crate, Alfred and the weekly streak.
+   Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
+function weekStartK(k){const d=new Date(fnWeekStart(now()));d.setDate(d.getDate()-7*(k||0));return d.getTime();}
+function weekDays(k){   // distinct training days in the calendar week k weeks back (0 = this week)
+  const s=weekStartK(k),e=weekStartK((k||0)-1);
+  return new Set((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).map(w=>new Date(w.date).toDateString())).size;
+}
+function weekCount(){return weekDays(0);}
 function avgWeekVol(){const wk=now()-7*864e5;const ws=state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk);return ws.length?ws.reduce((a,w)=>a+w.totalVol,0)/ws.length:0;}
 function weakestMuscle(){let weak=null,wl=999;M12.forEach(m=>{if((state.data.muscleVol[m]||0)>0){const l=muscleLevel(m);if(l<wl){wl=l;weak=m;}}});return weak;}
 function sparkline(){
@@ -7769,8 +7818,7 @@ function myPatrolCard(){
   // session log itself is accurate. w (session count) is trusted live from d.workouts.length, so
   // vol must be at least as consistent with it — otherwise the card reads "20 sessions, 0kg moved",
   // which looks broken. Floor at what the actual logged sessions sum to.
-  const loggedVol=(d.workouts||[]).reduce((s,w)=>s+(+w.totalVol||0),0);
-  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(Math.max(u.totalVolume||0,loggedVol)),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent,ssn};
+  return {n:(u.name||"Vigilante").slice(0,22),sl,rk:r.name,re:r.emoji,vol:Math.round(lifetimeVolume()),w:d.workouts.length,boss:(d.bossWins||[]).length,days:a?a.days:0,streak:u.streakDays||0,prTot,lifts,liftsAll,spl,bw,opt,big,recent,ssn};
 }
 // URL-safe base64 so the code survives copy/paste through messaging apps (which mangle + and /).
 function encodeCard(c){try{const b=btoa(unescape(encodeURIComponent(JSON.stringify(c))));return "GTJL1:"+b.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}catch(e){return "";}}
@@ -8216,10 +8264,10 @@ function volMapCard(){
         <i style="position:absolute;left:${mav}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45)"></i></div></div>`;
   }).join("");
   return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center">${secIcon('volume')}Weekly volume map</div>
-    <div class="mini" style="margin-bottom:10px;color:var(--text2)">Brighter red = more hard sets this week. Faint lines mark each muscle's MEV (maintenance) and MAV (optimal). Tap a muscle for its dossier.</div>
+    <div class="mini" style="margin-bottom:10px;color:var(--text2)">Brighter red = more hard sets this week. Faint lines mark each muscle's MEV (minimum to grow) and MAV (top of the growth zone). Tap a muscle for its dossier.</div>
     ${volMapBodies()}
     <div style="margin-top:10px">${rowHtml}</div>
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Below the first line = under maintenance · between the lines = the growth zone · past the bar end = pushing MRV (junk-volume risk).</div></div>`;
+    <div class="mini" style="margin-top:8px;color:var(--text3)">Below the first line = below MEV (not enough to grow) · between the lines = the growth zone · past the bar end = pushing MRV.</div></div>`;
 }
 function weeklyBalanceCard(){
   const ws=m=>weeklySets(m);
@@ -8234,30 +8282,14 @@ function weeklyBalanceCard(){
     ${rowR("Push : Pull sets",push,pull)}${rowR("Quad : Hamstring sets",quad,ham)}
     ${flags.map(([k,t])=>`<div class="banner" style="margin-top:6px;${k==="ok"?"background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)":""}"><span>${k==="warn"?"⚠️":"✓"}</span><div class="mini">${esc(t)}</div></div>`).join("")}</div>`;
 }
-// Plateau breaker: per-lift e1RM history; flag lifts with no new best across their last 3 outings (≥10d span).
+// Plateau breaker: the stalled lifts (ONE detector — liftIntel), each with one suggested change.
 function plateauCard(){
-  const ws=(state.data.workouts||[]);if(ws.length<4)return "";
-  const byEx={};
-  for(let i=ws.length-1;i>=0;i--){const w=ws[i];const ex0=w.date;
-    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);let best=0;
-      (e.sets||[]).forEach(s=>{if(s.type==="W")return;const v=setE1RM(ex,s);if(v>best)best=v;});
-      if(best>0)(byEx[e.name]=byEx[e.name]||[]).push({date:ex0,e1:best});});
-  }
-  const PROTO=["Change one variable — swap the grip, angle or machine for 3 weeks, then return to the lift.","Add one extra working set — drive the weekly volume up a notch.","Switch rep range: go heavier for 4–6 reps and let the nervous system adapt.","Reset the weight, then add a single rep every set until you own the top of the range.","Slow the eccentric to a 3-count — more tension, new stimulus at the same load."];
-  const stalled=[];
-  Object.keys(byEx).forEach(name=>{const arr=byEx[name];if(arr.length<4)return;
-    const last3=arr.slice(-3),prior=arr.slice(0,-3);
-    const recentPeak=Math.max(...last3.map(a=>a.e1)),priorPeak=Math.max(...prior.map(a=>a.e1));
-    const span=(new Date(last3[last3.length-1].date)-new Date(last3[0].date))/86400000;
-    if(recentPeak<=priorPeak*1.005&&span>=10){
-      stalled.push({name,e1:Math.round(recentPeak),weeks:Math.round(span/7),idx:stalled.length});}
-  });
-  if(!stalled.length)return "";
-  stalled.sort((a,b)=>b.e1-a.e1);
-  let h=`<div class="card" style="border-color:rgba(232,69,60,.4);background:linear-gradient(180deg,rgba(232,69,60,.07),transparent)"><div class="ttl" style="color:#ff6b5c;display:flex;align-items:center">${secIcon('plateau','#ff6b5c')}Plateau breaker</div><div class="mini" style="margin-bottom:10px;color:var(--text2)">These lifts haven't set a new estimated 1RM in a while. Time to change the stimulus.</div>`;
-  stalled.slice(0,3).forEach((s,k)=>{h+=`<div style="border-top:1px solid var(--border);padding:9px 0">
-    <div class="row sp"><b>${esc(s.name)}</b><span class="chip" style="font-size:11px">stuck ~${s.weeks||1}w · ${s.e1}kg</span></div>
-    <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45">🔓 ${PROTO[k%PROTO.length]}</div></div>`;});
+  const stalled=stalledLifts();if(!stalled.length)return "";
+  let h=`<div class="card" style="border-color:rgba(232,69,60,.4);background:linear-gradient(180deg,rgba(232,69,60,.07),transparent)"><div class="ttl" style="color:#ff6b5c;display:flex;align-items:center">${secIcon('plateau','#ff6b5c')}Plateau breaker</div><div class="mini" style="margin-bottom:10px;color:var(--text2)">Best estimated 1RM not beaten for 3+ sessions. Change one variable — keep the effort.</div>`;
+  stalled.slice(0,3).forEach((s,k)=>{const f=stallFix(s.n,k);h+=`<div style="border-top:1px solid var(--border);padding:9px 0">
+    <div class="row sp"><b>${esc(s.n)}</b><span class="chip" style="font-size:11px">flat ${s.sessions} session${s.sessions===1?"":"s"} · ${fmtKg(s.best)}kg</span></div>
+    <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45"><b>${f[0]}</b> — ${f[1]}</div></div>`;});
+  if(stalled.length>3)h+=`<div class="mini" style="border-top:1px solid var(--border);padding-top:9px;color:var(--gold2);cursor:pointer" onclick="openStalledLifts()">All ${stalled.length} stalled lifts ›</div>`;
   h+=`</div>`;return h;
 }
 /* ===== Wave J — Sports Science Lab: junk-volume detector + stimulus-to-fatigue (SFR) ratings ===== */
@@ -8295,7 +8327,7 @@ function scienceLabCard(){
   let verdict,vc;
   if(junk.length>=2){verdict=`Junk-volume risk — ${junk.length} muscles past MRV. Recovery, not more sets, is the limiter now.`;vc="var(--red)";}
   else if(junk.length===1){verdict=`${MNAME[junk[0].m]} has crept past MRV. Trim ~2 sets to keep every rep productive.`;vc="var(--orange)";}
-  else if(below>=4){verdict=`${below} muscles sit below maintenance — clean runway to add productive volume.`;vc="var(--gold2)";}
+  else if(below>=4){verdict=`${below} muscles sit below MEV — clean runway to add productive volume.`;vc="var(--gold2)";}
   else {verdict="Volume is well-distributed across the growth zone. Textbook week, sir.";vc="var(--green)";}
   const dist=`<div class="row" style="gap:6px;margin:9px 0 4px">
     <div style="flex:${Math.max(below,0.001)};height:9px;border-radius:5px;background:#3a3a44"></div>
@@ -8714,11 +8746,11 @@ function openBatcomputer(){
   const mv=M12.map(m=>({m,s:weeklySets(m)})).sort((a,b)=>b.s-a.s);
   const mmx=Math.max(1,...mv.map(x=>x.s));
   const movers=loggedExerciseNames().map(n=>{const rows=exerciseRows(n);if(!rows||rows.length<2)return null;const e=rows.map(r=>r.e1rm);return {n,gain:Math.round(e[e.length-1]-e[0]),now:e[e.length-1]};}).filter(x=>x&&x.gain>0).sort((a,b)=>b.gain-a.gain).slice(0,5);
-  const mBar=x=>{const lm=VL[x.m]||{mev:8,mav:14,mrv:20};const col=x.s===0?'#3a3a3a':x.s<lm.mev?'#8a8a8a':x.s<=lm.mav?'#2ECC71':x.s<=lm.mrv?'#E8C56A':'#E8453C';
+  const mBar=x=>{const col=x.s===0?'#3a3a3a':zoneOf(x.m,x.s).color;
     return `<div style="margin-bottom:6px"><div class="row sp" style="margin-bottom:2px"><span class="mini">${MNAME[x.m]}</span><span class="mini" style="color:${col}">${x.s} set${x.s===1?'':'s'}</span></div><div class="bar" style="height:7px;background:var(--bg4)"><i style="width:${(x.s/mmx*100).toFixed(0)}%;background:${col}"></i></div></div>`;};
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('radar')}Batcomputer</div>
     <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Every patrol, crunched. The full picture of your war on weakness.</div>
-    <div class="row" style="gap:7px;flex-wrap:wrap;margin-bottom:13px">${caveStat(fmtNum(Math.round(u.totalVolume||0))+"kg","lifted")}${caveStat(sessions,"sessions")}${caveStat(hrs+"h","under iron")}${caveStat(prc,"records")}</div>
+    <div class="row" style="gap:7px;flex-wrap:wrap;margin-bottom:13px">${caveStat(fmtNum(Math.round(lifetimeVolume()))+"kg","lifted")}${caveStat(sessions,"sessions")}${caveStat(hrs+"h","under iron")}${caveStat(prc,"records")}</div>
     <div class="ttl" style="font-size:14px">Weekly tonnage · 10 wk</div>
     ${trendChart(ton,{color:"#7FC8FF",unit:"kg"})}
     <div class="ttl" style="font-size:14px;margin-top:10px">Sessions per week</div>
@@ -9677,6 +9709,7 @@ VOICE: Still Alfred — dry British wit, economical, calm authority, warm undern
 CLARITY: Plain language first, then the precise term in brackets — e.g. "how close you got to failure (reps in reserve, RIR)". When he asks why or how, actually explain it. If a question is ambiguous, ask ONE short clarifying question instead of guessing. If you are unsure, or the data doesn't show it, say so plainly. Cite a study (author + year) only when it genuinely adds weight, never as decoration. Lean on HIS numbers — lifts, sets, recovery — not generalities.
 EQUIPMENT: He trains machines and cables on purpose. Never push free weights as superior; honour what he uses.
 NEVER suggest a deload, a deload week or a planned light week. Manage fatigue with set volume (MEV/MAV/MRV), exercise choice, rest days and the firm progression rule.
+PROGRESSION: plan ranges are 5–10 reps. Add weight only after a WORKING set reaches 10+ reps; at 5–9 reps keep the load and add a rep; warm-up sets never count.
 LENGTH: casual or simple question = 1–3 sentences. Explain / why / how = up to about 150 words, bullets welcome. App how-to = at most 5 numbered steps using the real button labels.
 PHYSIQUE PHOTOS: If an image is attached to the user's message, that IS his current physique — look at it directly and assess development, symmetry, weak points, and the single highest-leverage training priority. Never claim you cannot view or rate a photo that has been attached — you can see it.
 ACTIONS: When the user explicitly asks you to DO something in the app, end your reply with ONE action tag on its own line, in this exact format — nothing else on that line:
@@ -9688,7 +9721,7 @@ GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN tar
 const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
 FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
 const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
-Five tabs along the bottom. GOTHAM is home: tonight's mission card (next plan day with a start button; on a rest day REST LOGGED, or Train for a free session), Territory War (a muscle-by-muscle freshness map) and the score panel: Readiness, Threat, Fatigue Debt, Weekly Patrols (sessions this week against your goal). MISSION holds your plan: PLAN lists the active split day by day (tonight is marked) plus other plans under The bench; LAB & TOOLS has the plate calculator and 1RM test. SUIT is the muscle map: tap a muscle for its dossier (recovery, weekly sets against the landmarks, what to train next), plus the Effort Dossier (average RIR), measurements and progress photos. PROFILE holds Records & Ranks, Strength Analysis, Bases & Tools (splits, gyms), history and the training calendar. ALLIES is your friends. Settings and Search sit in the top bar; the round Alfred button opens this chat.
+Five tabs along the bottom. GOTHAM is home: tonight's mission card (next plan day with a start button; on a rest day REST LOGGED, or Train for a free session), Territory War (a muscle-by-muscle freshness map) and the score panel: Readiness, Threat, Fatigue Debt, Weekly Patrols (sessions this calendar week, Monday to Sunday, against your goal). Under the panel, Active case files lists your stalled lifts and the FURTHEST BEHIND MEV card names the two muscles furthest below their weekly minimum. MISSION holds your plan: PLAN lists the active split day by day (tonight is marked) plus other plans under The bench; LAB & TOOLS has the plate calculator and 1RM test. SUIT is the muscle map: tap a muscle for its dossier (recovery, weekly sets against the landmarks, what to train next), plus the Effort Dossier (average RIR), measurements and progress photos. PROFILE holds Records & Ranks, Strength Analysis, Bases & Tools (splits, gyms), history and the training calendar. ALLIES is your friends. Settings and Search sit in the top bar; the round Alfred button opens this chat.
 
 ## A SESSION FROM START TO FINISH
 Tap start on the Gotham mission card (or a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen, one card per exercise. Tick each set as you finish it; the rest timer runs between sets (length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary shows volume, records, my verdict, notes and how-it-felt chips. Minimising a session keeps it alive while you browse.
@@ -9697,13 +9730,16 @@ Tap start on the Gotham mission card (or a day under MISSION). Pick the gym (rec
 A set row has the set-number badge (tap to cycle the set type), last time's numbers, kilos, reps, the RIR tile and the tick. RIR is reps in reserve: how many clean reps you had left; tap the tile to cycle it (0 = nothing left). Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). The ⋮ menu changes type, moves, duplicates or deletes a set. A weight far off that lift's history triggers a quick "new machine?" check.
 
 ## PLAN TARGETS AND THE PROGRESSION RULE (WHEN TO ADD WEIGHT)
-A plan day shows each lift's target as sets × rep range, e.g. "Plan: 2 × 5–8" (some are optional tonight). The progression rule is firm: at 8 reps or fewer never add weight — build reps to 9 first. At 9 or more, add weight (2.5 kg, or 5 kg from 60 kg up) and drop back to about 6 reps. Each lift shows a hint like "80kg × 9+ — build reps to 9, then we add weight".
+A plan day shows each lift's target as sets × rep range, e.g. "Plan: 2 × 5–10" (some are optional tonight). Plan ranges are 5–10 reps and ONE progression rule runs everywhere — the logging hint, the rest-strip chip, the exercise detail, the finish summary and my comments after a set. Only a WORKING set counts: warm-up sets never do. If your best working set reached the top of the range (10 or more reps), add weight (2.5 kg, or 5 kg from 60 kg up) and restart at about 6 reps. At 5–9 reps keep the same load and add one rep. A custom plan with a higher top (say 12–15) moves the add-weight point up with it. Suggested weights show one decimal where needed (72.5 kg, not 73). Each lift shows a hint like "72.5kg × 9+ — build reps to 10, then we add weight".
 
 ## RECORDS: E1RM AND PR CROWNS (PER GYM)
 Each set becomes an estimated one-rep max (e1RM, Epley: weight × (1 + reps/30)), so 100 kg × 8 compares with 110 kg × 5. A new best e1RM earns the crown, the top record tier; smaller tiers such as heaviest weight exist. Records are kept per gym because machines differ. Find them in PROFILE → Records & Ranks.
 
 ## RECOVERY, READINESS AND WEEKLY VOLUME (MEV, MAV, MRV)
-Recovery %: each muscle has its own window (72 h for back and legs, 48 h for chest, shoulders and arms, less for small muscles). Hard sets from the last seven days create fatigue that fades across that window; recovery % = 100 minus the fatigue left. Green 80+, yellow 50–79, red below 50; a muscle's dossier shows the hours until ready. Fatigue Debt is the average unrecovered share across trained muscles. Gotham's Readiness = muscle recovery 45% + sleep 30% (latest sleep log, neutral if none) + freshness 25% (falls with consecutive training days): PRIMED 80+, READY 60+, GUARDED 40+, DEPLETED below. Weekly sets count working sets in the last seven days (secondary muscles count half) against MEV (minimum effective volume — below it a muscle won't grow), MAV (maximum adaptive volume — the productive range) and MRV (maximum recoverable volume — beyond it sets turn to junk). Chest: MEV 8, MAV 16, MRV 22.
+Recovery %: each muscle has its own window (72 h for back and legs, 48 h for chest, shoulders and arms, less for small muscles). Hard sets from the last seven days create fatigue that fades across that window — sets close to failure (low RIR) weigh more than easy ones — and recovery % = 100 minus the fatigue left. Green 80+, yellow 50–79, red below 50; a muscle's dossier shows the hours until ready. Fatigue Debt is the average unrecovered share of your FOUR MOST FATIGUED muscles (fresh muscles can't hide tired ones) and its note counts how many muscles are under 50% recovered. Gotham's Readiness is built only from what is known: the recovery of tonight's planned muscles (on a rest day, your three most fatigued muscles) plus freshness (falls with consecutive training days). Sleep joins only when TODAY's sleep is logged — tap Log sleep on the Readiness tile (two taps: hours, then Poor / OK / Great); until then the tile says "sleep not logged" and nothing is assumed. With sleep the weights are recovery 45%, sleep 30%, freshness 25%. A brand-new user with no sessions sees "—" and "Log a session to unlock". PRIMED 80+, READY 60+, GUARDED 40+, DEPLETED below. Weekly sets count working sets (secondary muscles half) over one full cycle of your active split — 8 days for the 8-Day Cycle, rest days included, or 7 days with no split — and are shown as a per-week number, so a muscle's figure doesn't swing with where you are in the cycle. They are read on one scale: Below MEV (minimum effective volume — not enough to grow), Growth zone (MEV to MAV, the maximum adaptive volume), High — recoverable (MAV up to MRV, the maximum recoverable volume; the ceiling rises a little when the volume is spread over sub-regions), Over MRV (sets beyond it turn to junk). Chest: MEV 8, MAV 16, MRV 22.
+
+## STALLED LIFTS AND THE FURTHEST-BEHIND-MEV CARD
+One detector: a lift is stalled when its best estimated 1RM hasn't been beaten for 3 or more sessions and you trained it in the last 3 weeks. Gotham's Active case files counts them; Open lists each stalled lift with its best e1RM, how many sessions it has been flat and ONE suggested change — the angle, the grip or the rep range — never a deload. FURTHEST BEHIND MEV shows the two muscles furthest below their weekly MEV (sets short) and flags any muscle past its MRV. Weekly Patrols, Threat and the weekly streak all read the same calendar week (Monday to Sunday).
 
 ## THE 8-DAY CYCLE AND LOGGING A REST DAY
 The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did, not the calendar: tonight is the day after the last plan day you completed. Logging a rest day (REST LOGGED on Gotham) moves it on; a Free Session doesn't. Miss a day and the cycle waits for you.
@@ -10241,7 +10277,7 @@ function alfredBriefing(){
     rows+=`<div class="mini" style="margin-bottom:6px"><b style="color:var(--gold2)">Still recovering:</b> ${top}</div>`;
   }
   // volume flags
-  under.slice(0,3).forEach(x=>rows+=`<div class="mini" style="margin-bottom:5px">📉 <b>${MNAME[x.m]}</b> — only ${x.ws} hard ${x.ws===1?"set":"sets"} this week, below your ${x.mev}-set MEV. Below maintenance it won't grow; add a couple of sets.</div>`);
+  under.slice(0,3).forEach(x=>rows+=`<div class="mini" style="margin-bottom:5px">📉 <b>${MNAME[x.m]}</b> — only ${x.ws} hard ${x.ws===1?"set":"sets"} this week, below your ${x.mev}-set MEV. Below MEV there isn't enough to grow; add a couple of sets.</div>`);
   over.slice(0,2).forEach(x=>rows+=`<div class="mini" style="margin-bottom:5px">🔥 <b>${MNAME[x.m]}</b> — ${x.ws} sets this week, past your ${x.mrv}-set MRV. That's into junk territory; ease off and let it recover.</div>`);
   // coverage gap (top 1)
   if(gaps.length)rows+=`<div class="mini" style="margin-bottom:5px">🎯 <b>${MNAME[gaps[0].m]}:</b> ${esc(gaps[0].text)}</div>`;
@@ -10499,7 +10535,7 @@ function alfredAsk(q){
   if(/streak|consecutive|chain/.test(s))return `Current streak: <b>${d.u.streakDays||0} day${(d.u.streakDays||0)===1?"":"s"}</b>, sir. Don't break the chain.`;
   // READ: sessions this week  (must precede the broad train/today read)
   if(/this week|how many.*sessions?|sessions? (?:this|so far)|trained this week/.test(s)){
-    const wk=now()-7*864e5,c=(d.workouts||[]).filter(w=>new Date(w.date).getTime()>=wk).length,g=d.u.weeklyGoal||4;
+    const c=weekCount(),g=d.u.weeklyGoal||4;
     return `<b>${c}</b> session${c===1?"":"s"} this week against a goal of <b>${g}</b>, Master.${c>=g?" Target met — excellent.":" "+(g-c)+" to go."}`;}
   // READ: bodyweight
   if(/body\s?weight|how much do i weigh|my weight|weigh/.test(s)){const bw=bodyW();return bw?`You're <b>${bw}kg</b> on record, sir.`:"No bodyweight logged yet, Master — set it in Settings or the Infirmary.";}
@@ -10537,8 +10573,7 @@ function alfredAsk(q){
   m=s.match(/(?:volume|sets)\s+(?:for\s+)?(.+)$/)||s.match(/(.+?)\s+(?:volume|sets)$/);
   if(m){const mq=m[1].toLowerCase();const mm=M12.find(x=>MNAME[x].toLowerCase().includes(mq)||x.includes(mq));
     if(!mm)return "Which muscle, sir? Name one of the twelve.";const ws=weeklySets(mm),vl=VL[mm],eMrv=effectiveMRV(mm);
-    const zone=ws<vl.mev?"below MEV — it won't grow":ws<=vl.mav?"in the growth zone":ws<=eMrv?"high but recoverable":"past MRV — back off";
-    return `<b>${MNAME[mm]}</b>: ${ws} hard sets this week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). You're ${zone}, Master.`;}
+    return `<b>${MNAME[mm]}</b>: ${ws} hard sets a week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). Zone: <b>${zoneOf(mm,ws).label}</b>, Master.`;}
   return {__fallback:true,text:`I can answer or act, Master. Try: <b>what should I train</b>, <b>weakest muscle</b>, <b>how strong am I</b>, <b>PR for bench</b>, <b>volume for chest</b>, <b>am I recovered</b> — or commands like <b>open leaderboard</b>, <b>start push day</b>, <b>add face pull to push</b>, <b>set weekly goal to 5</b>.`};
 }
 function openAlfredConsole(){openAlfredChat();} /* the old command console now lives in the one Alfred chat (typed commands still work there) */
@@ -10900,9 +10935,12 @@ function alfredRirCallout(ei,si){
     const working=(e.sets||[]).filter(x=>x.type!=="W");
     const isLast=working.length>0&&working.filter(x=>x.done).length>=working.length;
     if(r>=4){state.session._coachTone="bad";
-      return _pickLine(["Four in reserve, sir? That was a handshake, not a fight — add weight.",
-        "The bar barely noticed you. 4+ RIR builds nothing but patience — load it.",
-        "Plenty left in the tank. Next set, bring the tank."],"rir4");}
+      if((+s.r||0)>=repTop(e.name))return _pickLine(["Four in reserve at the top of the range, sir? That was a handshake. Add weight.",
+        "The bar barely noticed you. Top-of-range reps with 4+ in reserve — load it.",
+        "Plenty left in the tank at "+s.r+" reps. Next set, bring the tank — and the weight."],"rir4");
+      return _pickLine(["Four in reserve, sir? That was a handshake. Same weight — take it closer to failure.",
+        "The bar barely noticed you. 4+ RIR builds nothing; grind out more reps at this load.",
+        "Plenty left in the tank. Reps first: chase "+repTop(e.name)+", then the weight moves."],"rir4r");}
     if(r===0&&isLast){state.session._coachTone="good";
       return _pickLine(["Emptied the tank on the final set — textbook. That's where growth lives.",
         "Zero left in reserve to close the lift. Gotham approves, sir.",
@@ -11567,8 +11605,8 @@ function termRespond(cmd){
   const d=state.data,u=d.u,c=(cmd||"").trim().toLowerCase();
   if(!c)return "";
   if(c==="help"||c==="?")return "COMMANDS:\\n  status   — overview\\n  volume   — weekly tonnage\\n  weak     — weakest muscle\\n  prs      — recent personal records\\n  rank     — current rank & level\\n  villains — bosses defeated\\n  streak   — current streak\\n  clear    — wipe the console";
-  if(c==="status")return `OPERATIVE STATUS\\n  Workouts: ${u.totalWorkouts}\\n  Volume:   ${fmtNum(Math.round(u.totalVolume))}kg lifetime\\n  Streak:   ${u.streakDays} days\\n  Rank:     ${rankFor(strengthLevel()).name}`;
-  if(c==="volume")return `WEEKLY TONNAGE\\n  Avg/week: ${fmtNum(Math.round(avgWeekVol()))}kg\\n  Lifetime: ${fmtNum(Math.round(u.totalVolume))}kg`;
+  if(c==="status")return `OPERATIVE STATUS\\n  Workouts: ${u.totalWorkouts}\\n  Volume:   ${fmtNum(Math.round(lifetimeVolume()))}kg lifetime\\n  Streak:   ${u.streakDays} days\\n  Rank:     ${rankFor(strengthLevel()).name}`;
+  if(c==="volume")return `WEEKLY TONNAGE\\n  Avg/week: ${fmtNum(Math.round(avgWeekVol()))}kg\\n  Lifetime: ${fmtNum(Math.round(lifetimeVolume()))}kg`;
   if(c==="weak"){const m=weakestMuscle();return m?`WEAKEST LINK\\n  ${MNAME[m]} — level ${muscleLevel(m)}\\n  Prioritise it next session.`:"Not enough data — train more muscles.";}
   if(c==="prs"){const prs=Object.entries(d.prs).slice(-6);return prs.length?"RECENT PRs\\n"+prs.map(([k,p])=>`  ${k}: ${Math.round(p.orm||0)}kg`).join("\\n"):"No PRs logged yet.";}
   if(c==="rank"){const l=strengthLevel(),r=rankFor(l);return `RANK\\n  ${r.emoji} ${r.name}\\n  Strength level ${l}`;}
@@ -11639,7 +11677,7 @@ const STORY=[
 const STORY_TITLES={vow:"The Initiate",first:"Recruit of the Cave",cave:"Cave-Dweller",iron:"Iron-Forged",rogues:"Rogue-Hunter",night:"Watcher of Gotham",becoming:"The Becoming",knight:"The Dark Knight",legend:"Legend of Gotham",war:"Warlord of the Cave",order:"Unbreakable",immortal:"The Immortal"};
 function earnedTitle(){const s=storyStats();let t="";STORY.forEach(c=>{if(c.req(s))t=STORY_TITLES[c.id]||t;});return t;}
 function storyStats(){const d=state.data,a=(typeof trainingAge==="function"?trainingAge():null);
-  return {w:d.workouts.length,vol:d.u.totalVolume||0,boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0};}
+  return {w:d.workouts.length,vol:lifetimeVolume(),boss:(d.bossWins||[]).length,streak:d.u.streakDays||0,sl:strengthLevel(),days:a?a.days:0};}
 function storyCampaignCard(){
   const s=storyStats();
   const states=STORY.map(c=>c.req(s));
@@ -11701,14 +11739,6 @@ function renderAlfred(){
 function gtv2Clr(kind){
   return kind==="red"?"#ff887f":kind==="green"?"#75e5a5":kind==="blue"?"#9fd0ff":kind==="gold"?"var(--gold2)":"var(--text2)";
 }
-function gtv2Stimulus(m){
-  const ws=weeklySets(m),vl=VL[m]||{mev:8,mav:14,mrv:20},mrv=effectiveMRV(m);
-  if(ws<=0)return {zone:"Silent",kind:"",text:"no sets this week"};
-  if(ws<vl.mev)return {zone:"Below MEV",kind:"red",text:`${ws}/${vl.mev} sets - not enough to grow`};
-  if(ws<=vl.mav)return {zone:"Growth",kind:"green",text:`${ws} sets - productive range`};
-  if(ws<=mrv)return {zone:"High",kind:"gold",text:`${ws} sets - high but recoverable`};
-  return {zone:"Past MRV",kind:"red",text:`${ws}/${mrv} sets - junk-volume risk`};
-}
 function gtv2Pattern(ex){
   const p=((ex&&ex.p&&ex.p[0])||"other");
   const n=((ex&&ex.n)||"").toLowerCase();
@@ -11742,17 +11772,6 @@ function gtv2BalanceAudit(){
   if(pull>=10&&pull>push*1.5)return {kind:"gold",icon:"⚖️",title:"Pull dominates the week",copy:`Pull work is ${pull} sets vs ${push} push sets. Add pressing only if recovery is green and joints feel good.`};
   if(quad>=8&&quad>post*1.6)return {kind:"gold",icon:"🦵",title:"Posterior chain lag",copy:`Quads have ${quad} sets while hamstrings + glutes have ${post}. Add curls, RDLs, hip thrusts or back extensions.`};
   return null;
-}
-function gtv2ProgressionFor(name){
-  const rows=exerciseRows(name);if(!rows.length)return null;
-  const last=rows[rows.length-1],set=last.bset;if(!set)return null;
-  const ex=exFor(name),w=+set.w||0,r=+set.r||0,load=setLoad(ex,w),profile=typeof prProfileTag==="function"?prProfileTag(name):"";
-  if(r>=9){
-    const step=ex.bw?"small added load":"2.5kg";
-    return {kind:"green",icon:"📈",title:"Progression order",copy:`${name}${profile}: last top set was ${load}kg x ${r}. Since it cleared 9+ reps, add ${step} next time and keep reps clean.`};
-  }
-  if(r>=6)return {kind:"blue",icon:"🎯",title:"Progression order",copy:`${name}${profile}: hold ${load}kg and beat ${r} reps first. No weight jump until the last set reaches 9+ reps.`};
-  return {kind:"gold",icon:"🛠️",title:"Progression order",copy:`${name}${profile}: ${load}kg x ${r} is still heavy. Repeat the load, own technique, and build reps before adding weight.`};
 }
 function gtv2MissionHero(){
   const d=state.data,u=d.u,cur=gtv2CurrentPlanDay(),title=u.name?u.name.toUpperCase():"GOTHAM";
@@ -11801,7 +11820,7 @@ function gtv2ScorePanel(){
   const r=patrolReadiness(),t=gothamThreat(),f=fatigueDebt(),w=weekCount(),goal=state.data.u.weeklyGoal||4;
   const patrolClr=w>=goal?"var(--green)":"var(--gold)";
   return `<div class="gtv2-grid">
-    <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score}</div><div class="gtv2-note">${esc(r.label)} — ${esc(r.line)}</div><div class="gtv2-meter"><i style="width:${r.score}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score==null?"—":r.score}</div><div class="gtv2-note">${r.unlock?esc(r.line):esc(r.label)+" — "+esc(r.line)}${r.unlock||r.sleepKnown?"":` <span style="color:var(--text3)">· sleep not logged</span> <span class="chip" style="font-size:10px;padding:2px 8px" onclick="event.stopPropagation();openSleepLog()">Log sleep</span>`}</div><div class="gtv2-meter"><i style="width:${r.score||0}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
     ${(()=>{let worstM=null,wcr=-1;M12.forEach(m=>{const dc=districtCrime(m);if(!dc.untrained&&dc.crime>wcr){wcr=dc.crime;worstM=m;}});
       // worstM stays null when nothing has ever been trained — don't invent a villain narrative
       // ("Bane rising in The Narrows") from a district you've never even set foot in.
@@ -11812,7 +11831,7 @@ function gtv2ScorePanel(){
       <div class="gtv2-value" style="color:${t.color};text-shadow:0 0 18px currentColor">${t.level}</div>
       <div class="gtv2-note">${note}</div>
       <div class="gtv2-meter"><i style="width:${t.score}%;background:${t.color};box-shadow:0 0 10px currentColor"></i></div></div>`;})()}
-    <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.pct}%</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${f.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${f.color}" onclick="openFatigueInfo()"><div class="gtv2-label">Fatigue Debt</div><div class="gtv2-value" style="color:${f.color};text-shadow:0 0 18px currentColor">${f.n?f.pct+"%":"—"}</div><div class="gtv2-note">${esc(f.status)}</div><div class="gtv2-meter"><i style="width:${f.pct}%;background:${f.color};box-shadow:0 0 10px currentColor"></i></div></div>
     <div class="gtv2-panel" style="border-color:${patrolClr};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${patrolClr}" onclick="goPlan()"><div class="gtv2-label">Weekly Patrols</div><div class="gtv2-value" style="color:${w>=goal?"var(--green)":"var(--gold2)"};text-shadow:0 0 18px currentColor">${w}/${goal}</div><div class="gtv2-note">${w>=goal?"Goal secured. Maintain quality.":(goal-w)+" session"+(goal-w===1?"":"s")+" to hit the target."}</div><div class="gtv2-meter"><i style="width:${clamp(w/goal*100,0,100)}%"></i></div></div>
   </div>`;
 }
@@ -12282,7 +12301,7 @@ function renderGotham(){
   const cb=(d.bossReturns||[]).find(b=>!b.defeated);
   if(stalled.length||cb){
     html+=`<div class="gtv2-panel wide" style="margin-bottom:14px"><div class="gtv2-label">Active case files</div>`;
-    if(stalled.length)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ffb15c">🩺</div><div><div class="gtv2-action-title">${stalled.length} stalled lift${stalled.length===1?"":"s"}</div><div class="gtv2-action-copy">${stalled.slice(0,3).map(s=>esc(s.n)).join(", ")} - change one variable (grip, tempo or rep zone) and attack it fresh.</div></div><button class="btn ghost sm" style="width:auto" onclick="openBatcomputer()">Open</button></div>`;
+    if(stalled.length)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ffb15c">🩺</div><div><div class="gtv2-action-title">${stalled.length} stalled lift${stalled.length===1?"":"s"}</div><div class="gtv2-action-copy">${stalled.slice(0,3).map(s=>esc(s.n)).join(", ")}${stalled.length>3?` +${stalled.length-3} more`:""} - best e1RM flat for 3+ sessions. Change one variable (angle, grip or rep range).</div></div><button class="btn ghost sm" style="width:auto" onclick="openStalledLifts()">Open</button></div>`;
     if(cb)html+=`<div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ff887f">👁️</div><div><div class="gtv2-action-title">${esc(cb.villain)} has returned</div><div class="gtv2-action-copy">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-book the case.</div></div><span class="gtv2-chip red">boss</span></div>`;
     html+=`</div>`;
   }
@@ -12296,15 +12315,16 @@ function renderGotham(){
 function overloadSuggestions(wk){
   const out=[];
   (wk.exercises||[]).forEach(e=>{
-    const working=(e.sets||[]).filter(s=>s.done&&s.type!=="W"&&+s.r>0);
+    const ex=exFor(e.name),working=(e.sets||[]).filter(s=>s.done&&s.type!=="W"&&+s.r>0);
     if(!working.length)return;
-    const last=working[working.length-1],top=working.reduce((a,s)=>(+s.w||0)>(+a.w||0)?s:a,working[0]);
-    const reps=+last.r||0,ex=exFor(e.name),load=setLoad(ex,top.w);
-    let text,tone;
-    if(reps>=9){text=`Last working set hit ${reps} reps, so weight may rise next time: ${ex.bw?"add the smallest load you can":"try +2.5kg"} and keep form strict.`;tone="up";}
-    else if(reps>=6){text=`Do not add weight yet. Hold ${load}kg and push the last set from ${reps} toward 9+ clean reps first.`;tone="ok";}
-    else{text=`Hold or reduce the load. Last set was only ${reps} reps; earn 6-8 clean reps before chasing load.`;tone="hold";}
-    out.push({name:e.name,text,tone});
+    const best=working.reduce((a,s)=>setE1RM(ex,s)>setE1RM(ex,a)?s:a,working[0]);   // best working set, not the last one
+    const pg=progressionFrom(e.name,{w:+best.w||0,r:+best.r||0});if(!pg)return;
+    const reps=+best.r||0,lo=(planReps(e.name)||[5])[0],up=reps>=pg.top;
+    const ld=+best.w?`${fmtKg(best.w)}kg${ex.bw?" added":""}`:"bodyweight";
+    const text=up?(pg.add?`Best set hit ${reps} reps, the top of the range. Weight goes up next time: ${fmtKg(pg.w)}kg × ${pg.r}, form strict.`:`${reps} clean bodyweight reps. Add a vest or belt, or keep climbing.`)
+      :reps>=lo?`Same load next time. Hold ${ld} and push the best set from ${reps} to ${pg.top} reps first.`
+      :`Same load next time. Earn ${lo}+ clean reps at ${ld} first; the best set was ${reps}.`;
+    out.push({name:e.name,text,tone:up?"up":reps>=lo?"ok":"hold"});
   });
   return out;
 }
@@ -13000,7 +13020,7 @@ function renderLogging(){
         intel=hasNext?`NEXT · ${nIsW?'WARM-UP':'SET '+nWnum} — <b>${esc(e0.name)}</b>`:'ALL SETS IN — <b>next exercise</b>';}}catch(e){}
     restStripHtml=`<div class="reststrip" id="reststrip">
       <div class="rs-int">${intel}</div>
-      ${tg?`<button class="rs-btn gold" id="restapply" onclick="restApplyTarget()">⚡ ${tg.w?fmtNum(tg.w)+'kg × ':''}${tg.r}</button>`:''}
+      ${tg?`<button class="rs-btn gold" id="restapply" onclick="restApplyTarget()">⚡ ${tg.w?fmtKg(tg.w)+'kg × ':''}${tg.r}</button>`:''}
       <button class="rs-btn" onclick="addRest(30)">+30s</button>
       <button class="rs-btn" onclick="skipRest()">SKIP</button>
     </div>`;
@@ -13059,7 +13079,7 @@ function renderLogging(){
       ${figHtml}
       <div class="log-focus-body">
           ${e.plan?`<div class="log-target" style="color:var(--gold2)">📋 Plan: ${+e.plan.s||0} × ${esc(e.plan.r||'')}${e.plan.opt?' · optional tonight':''}</div>`:''}
-          ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${sug}kg</div>`:''}
+          ${nt?`<div class="log-target">🎯 ${nt}</div>`:sug?`<div class="log-target" style="color:var(--text2)">Intel: ~${fmtKg(sug)}kg</div>`:''}
           ${(()=>{try{const pr=state.data.prs[e.name],lb=lastBestSet(e.name),m0=(ex.p||[])[0];
             if(pr&&pr.orm>0&&lb&&lb.e1>=pr.orm*0.97&&(!m0||getRecovery(m0)>=80)&&ses.readiness!=="tired")
               return `<div class="prwin">🔥 PR WINDOW: HIGH — fresh + trending at ${Math.round(lb.e1/pr.orm*100)}% of your record. Send it.</div>`;}catch(_){}return '';})()}
