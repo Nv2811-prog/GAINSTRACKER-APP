@@ -12284,7 +12284,7 @@ function gothamSeasonCard(){
   // chapter intro — once per week, a toast (no full-screen takeover on opening the app); the story itself lives in the season card
   if(state.data.season._introW!==ss.week&&!state.session&&!state.showOnboarding){
     state.data.season._introW=ss.week;try{save();}catch(e){}
-    setTimeout(()=>toast(`Season ${ss.n}, week ${ss.week+1}: ${ch.v}. ${ch.m.length?"Train "+ch.m.map(m=>MNAME[m]).join(" and ")+" to clear the chapter.":"Finale: set new records."}`),1400);
+    setTimeout(()=>toast(`New chapter: ${ch.v}. ${ch.m.length?"Train "+ch.m.map(m=>MNAME[m]).join(" and ")+".":"Set new records."}`),1400);
   }
   const totSt=SEASON_CHAPTERS.reduce((a,_,i)=>a+(i<ss.week?seasonChapterEval(i).stars:i===ss.week?ev.stars:0),0);
   const track=SEASON_CHAPTERS.map((cc,i)=>{
