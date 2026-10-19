@@ -1,0 +1,7 @@
+{
+  "name": "gainstracker-qa",
+  "private": true,
+  "type": "module",
+  "description": "Headless-iPhone QA harness for the single-file app (see README.md)",
+  "dependencies": { "puppeteer-core": "23.11.1" }
+}

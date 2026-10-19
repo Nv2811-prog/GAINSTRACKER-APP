@@ -23,10 +23,14 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
   network-first so it self-updates online.
 
 ## Verify before you ship (no app build step — it's plain vanilla JS)
-- Syntax check: `export LC_ALL=C; osascript -l JavaScript /tmp/synck.js` (recreate /tmp/synck.js if
-  missing — a JXA wrapper that parses the file). Never push a file that fails the syntax check.
-- Render/QA: use the chrome-devtools MCP + evaluate_script to check the rendered HTML. Screenshots
-  may time out — if so, verify via the DOM and ask the user to eyeball on iPhone.
+- Harness lives in `scripts/qa/` (see its README; one-time `cd scripts/qa && npm install --cache /tmp/npm-cache-gt`).
+- Syntax check: `node scripts/qa/syncheck.mjs` — never push a file that fails it.
+- Smoke test: `node scripts/qa/smoke.mjs` — real taps (through the haptic switches) on nav, set ✓,
+  RESUME, finish, Alfred chat; must report zero console errors.
+- Screenshots of any state at iPhone size: `node scripts/qa/shoot.mjs --out /tmp/shots --name x --js "..."`
+  (fixtures = synthetic 8-week history; external network blocked; NEVER hit the RapidAPI GIF quota).
+- Migrations: `node scripts/test-migrations.cjs "Gainstracker app not complete.html"`.
+- The chrome-devtools MCP is optional; the harness above needs only the installed Google Chrome.
 
 ## ARCHITECTURE FACTS
 - Live home = `renderGotham()` (the **gtv2** build: gtv2MissionHero, gtv2ScorePanel, gtv2ScorePanel).
@@ -43,7 +47,25 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
   ever** • **no settings/toggles** — make it great by default • always clear + functional WHILE being
   cinematic • personal use only.
 
-## DESIGN LANGUAGE (this is what the user actually wants)
+## PRO / "CEO VIBE" DIRECTION (user, 2026-10-19 — SUPERSEDES the "crazy eye-popping" wording below)
+The user now wants the app **professional, executive and useful** — "more professional and CEO vibe than
+gaming vibe". Calibration: Whoop, Apple Fitness/Health, Hevy/Strong. Gotham/Batman stays only as SMALL
+hints (dark gold palette, Alfred, bat glyph, tab names).
+- Fonts: SF Pro system stack for ALL text incl. titles; Bebas Neue (embedded, offline) ONLY for big numerals.
+- Surfaces: matte tiers (row / card / ONE hero per screen); no neon outline-glow boxes; gold = action,
+  selection, records — thin accents, never glow decoration. Line SVG icons, no emoji as UI chrome.
+- Data first: rings, landmark bars (MEV/MAV/MRV), sparklines, honest numbers (no invented inputs).
+- Motion: short + physical (one press spring); full-screen only at session finish; PRs = in-row moment.
+- Haptics: iOS 26.5+ only buzzes on a FINGER tap of a real `<input type=checkbox switch>` — the taptic
+  module injects invisible `.hx` switches into key tappables; keep them working.
+- Alfred: header avatar + one-line tips (no floating FAB); approachable but terse; speaks only on PRs,
+  session finish, or when spoken to. His app knowledge lives in `ALFRED_APP_GUIDE` — update it when
+  features change.
+- Progression rule (2026-10-19, replaces the old 9+ rule): plan ranges 5–10; add weight only when a
+  WORKING set hits 10; 5–9 → build reps; warm-ups never count. Weekly volume is counted per split cycle
+  (8-day cycle) and shown per week. Readiness never invents sleep (optional 2-tap sleep log).
+
+## DESIGN LANGUAGE (older — read through the PRO direction above)
 The user LOVES the tactile, alive hero at the very top of the Home screen and wants that energy
 spread to the WHOLE app. The plain flat boxes are what they hate.
 - **CRAZY, EYE-POPPING, CINEMATIC — never grey/muted/boring.** The app should look vivid and alive:
