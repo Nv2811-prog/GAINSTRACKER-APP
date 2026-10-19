@@ -6282,28 +6282,49 @@ function openFatigueInfo(){const f=fatigueDebt();
     ${rows}
     <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
-// Patrol Readiness — one daily score fusing recovery, sleep and accumulated fatigue.
+// Patrol Readiness — built ONLY from what is known. Recovery of the muscles that matter tonight (tonight's planned primary
+// muscles, else the 3 most fatigued) + freshness; sleep joins ONLY when today's sleep is logged (nothing is assumed — the UI says
+// "sleep not logged"). A brand-new user (no sessions) gets no score at all: "—" + "log a session to unlock".
 function patrolReadiness(){
   const d=state.data,trained=M12.filter(m=>(d.muscleVol[m]||0)>0);
-  const rec=trained.length?clamp(100-fatigueDebt().pct,0,100):85;
-  // sleep — latest log within 40h
-  let sleep=72,sleepKnown=false;
-  const sl=(d.sleepLog||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
-  if(sl&&(now()-new Date(sl.date).getTime())<40*36e5){
-    const q=sl.quality?clamp(sl.quality/5,0,1):null,h=sl.hours?clamp(sl.hours/8,0,1):null;
-    const parts=[q,h].filter(v=>v!=null);
-    if(parts.length){sleep=Math.round(parts.reduce((a,b)=>a+b,0)/parts.length*100);sleepKnown=true;}
-  }
-  // freshness — consecutive training days fatigue the CNS
-  const cons=consecutiveDays();
+  if(!(d.workouts||[]).length||!trained.length)return {score:null,label:"—",color:"var(--text3)",line:"Log a session to unlock.",rec:null,sleep:null,fresh:null,sleepKnown:false,unlock:true};
+  const cur=gtv2CurrentPlanDay(),tonight=cur&&cur.day&&!isRest(cur.day)?Object.keys(dayMuscles(cur.day).prim):[];
+  const pool=tonight.length?tonight:trained.slice().sort((a,b)=>getRecovery(a)-getRecovery(b)).slice(0,3);
+  const rec=pool.reduce((a,m)=>a+getRecovery(m),0)/pool.length;
+  let sleep=null;const sl=sleepToday();                     // sleep — only a log dated today
+  if(sl){const q=sl.quality?clamp(sl.quality/5,0,1):null,h=sl.hours?clamp(sl.hours/8,0,1):null,parts=[q,h].filter(v=>v!=null);
+    if(parts.length)sleep=Math.round(parts.reduce((a,b)=>a+b,0)/parts.length*100);}
+  const sleepKnown=sleep!=null;
+  // freshness — consecutive training days fatigue the CNS (a streak that ended 2+ days ago is over)
+  const last=Math.max(...d.workouts.map(w=>new Date(w.date).getTime()||0));
+  const cons=now()-last<2*864e5?consecutiveDays():0;
   const fresh=clamp(100-Math.max(0,cons-1)*11,30,100);
-  const score=clamp(Math.round(rec*0.45+sleep*0.30+fresh*0.25),0,100);
+  const score=clamp(Math.round(sleepKnown?rec*0.45+sleep*0.30+fresh*0.25:(rec*0.45+fresh*0.25)/0.70),0,100);
   const bands=[[80,"PRIMED","var(--green)","Green light — attack the hardest session on your plan."],
     [60,"READY","var(--gold2)","Good to go. Train as planned, push the top sets."],
     [40,"GUARDED","var(--orange)","Below peak. Favour quality over junk volume tonight."],
     [0,"DEPLETED","var(--red)","Recovery is the mission today. Back off or rest, sir."]];
   let b=bands[bands.length-1];for(const x of bands)if(score>=x[0]){b=x;break;}
-  return {score,label:b[1],color:b[2],line:b[3],rec:Math.round(rec),sleep,fresh,sleepKnown};
+  return {score,label:b[1],color:b[2],line:b[3],rec:Math.round(rec),sleep,fresh,sleepKnown,scope:tonight.length?"tonight":"worst3"};
+}
+/* Optional 2-tap sleep log: hours chip + quality chip → state.data.sleepLog {date,hours,quality}. Readiness counts sleep for that day. */
+function openSleepLog(){const e=sleepToday();state._sl={h:e&&e.hours?Math.min(9,Math.max(5,Math.round(e.hours))):0,q:e&&e.quality||0};sleepLogSheet();}
+function sleepLogSheet(){
+  const s=state._sl||{},H=[[5,"≤5"],[6,"6"],[7,"7"],[8,"8"],[9,"9+"]],Q=[[2,"Poor"],[3,"OK"],[5,"Great"]];
+  const chip=(k,v,l)=>`<button class="chip ${s[k]===v?"on":""} g" style="flex:1;min-width:48px;justify-content:center" onclick="pickSleep('${k}',${v})">${l}</button>`;
+  openSheet(`<div class="ttl">Log sleep</div>
+    <div class="mini" style="color:var(--text2);margin-bottom:12px;line-height:1.45">Optional — two taps. With it, today's readiness counts sleep; without it, readiness uses recovery and freshness only.</div>
+    <div class="mini" style="color:var(--text3);letter-spacing:.08em;margin-bottom:6px">HOURS LAST NIGHT</div>
+    <div class="row" style="gap:7px;margin-bottom:14px">${H.map(([v,l])=>chip("h",v,l)).join("")}</div>
+    <div class="mini" style="color:var(--text3);letter-spacing:.08em;margin-bottom:6px">QUALITY</div>
+    <div class="row" style="gap:7px;margin-bottom:4px">${Q.map(([v,l])=>chip("q",v,l)).join("")}</div>`);
+}
+function pickSleep(k,v){
+  const s=state._sl=Object.assign({},state._sl,{[k]:v});
+  if(!(s.h&&s.q)){haptic("tap");sleepLogSheet();return;}
+  const d=state.data;d.sleepLog=d.sleepLog||[];
+  let e=sleepToday();if(!e){e={date:new Date().toISOString(),quality:null,hours:null};d.sleepLog.push(e);}
+  e.hours=s.h;e.quality=s.q;save();haptic("done");closeSheet();toast("Sleep logged");render();
 }
 // Tiny recovery strip that lives UNDER the readiness card — the most-fatigued sectors at a glance,
 // each with its realistic hours-to-ready (bounded by the muscle's own recovery window).
@@ -6592,7 +6613,7 @@ function renderInfirmary(){
   const supp=suppToday();const cStreak=creatineStreak();
   const inj=d.injuries||{};const injKeys=Object.keys(inj);
   let html=`<div class="fade">
-    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeInfirmary()">‹ Gotham</button><span class="chip" style="color:${r.color}">Readiness ${r.score}</span></div>
+    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeInfirmary()">‹ Gotham</button><span class="chip" style="color:${r.color}">Readiness ${r.score==null?"—":r.score}</span></div>
     <h1 style="font-size:34px;color:var(--gold2)">THE INFIRMARY</h1>
     <div class="tag" style="margin-bottom:14px">Sleep · soreness · conditioning · supplements · injuries</div>`;
 
@@ -11807,7 +11828,7 @@ function gtv2ScorePanel(){
   const r=patrolReadiness(),t=gothamThreat(),f=fatigueDebt(),w=weekCount(),goal=state.data.u.weeklyGoal||4;
   const patrolClr=w>=goal?"var(--green)":"var(--gold)";
   return `<div class="gtv2-grid">
-    <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score}</div><div class="gtv2-note">${esc(r.label)} — ${esc(r.line)}</div><div class="gtv2-meter"><i style="width:${r.score}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
+    <div class="gtv2-panel" style="border-color:${r.color};box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 22px -8px ${r.color}" onclick="openInfirmary()"><div class="gtv2-label">Readiness</div><div class="gtv2-value" style="color:${r.color};text-shadow:0 0 18px currentColor">${r.score==null?"—":r.score}</div><div class="gtv2-note">${r.unlock?esc(r.line):esc(r.label)+" — "+esc(r.line)}${r.unlock||r.sleepKnown?"":` <span style="color:var(--text3)">· sleep not logged</span> <span class="chip" style="font-size:10px;padding:2px 8px" onclick="event.stopPropagation();openSleepLog()">Log sleep</span>`}</div><div class="gtv2-meter"><i style="width:${r.score||0}%;background:${r.color};box-shadow:0 0 10px currentColor"></i></div></div>
     ${(()=>{let worstM=null,wcr=-1;M12.forEach(m=>{const dc=districtCrime(m);if(!dc.untrained&&dc.crime>wcr){wcr=dc.crime;worstM=m;}});
       // worstM stays null when nothing has ever been trained — don't invent a villain narrative
       // ("Bane rising in The Narrows") from a district you've never even set foot in.
