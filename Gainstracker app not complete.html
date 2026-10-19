@@ -399,6 +399,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 /* timer bars */
 .minbar{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);border-radius:10px;padding:7px 10px;margin:0 0 10px;font-size:12.5px;font-weight:700;letter-spacing:.03em;cursor:pointer}
 .minbar:active{transform:scale(.99)}
+#savefail{position:fixed;left:0;right:0;top:0;z-index:2147483000;padding:calc(env(safe-area-inset-top,0px) + 8px) calc(14px + env(safe-area-inset-right,0px)) 9px calc(14px + env(safe-area-inset-left,0px));background:#D4170A;color:#fff;font:700 12.5px/1.35 var(--body);text-align:center;letter-spacing:.01em;box-shadow:0 6px 22px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.18) inset;pointer-events:none}
 .resumebar{position:fixed;left:10px;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:41;display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:14px;border:1px solid var(--gold2);background:linear-gradient(180deg,#1a1407,#0e0b05);box-shadow:0 10px 30px rgba(0,0,0,.55);cursor:pointer;animation:rbIn .25s ease}
 @keyframes rbIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .resumebar .rb-pulse{font-size:20px;animation:rbPulse 1.4s ease-in-out infinite}
@@ -2119,7 +2120,14 @@ activeGymSplits:{}
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
 
-function save(){try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){}try{if(typeof cloud!=="undefined"&&cloud.ready)cloudPublish(false);}catch(e){}}
+/* save() reports the truth: true = persisted, false = NOT persisted (quota / blocked storage). While writes fail a
+   persistent red bar stays up (never silently lose a session); the next successful save clears it. In-memory data is never touched. */
+const SAVE_FAIL_MSG="Storage full — recent changes are NOT saved. Settings → Data control → back up, then delete old progress photos.";
+function saveFailBanner(on){const b=$("savefail");if(!on){if(b)b.remove();return;}if(b||!document.body)return;const d=document.createElement("div");d.id="savefail";d.setAttribute("role","alert");d.textContent=SAVE_FAIL_MSG;document.body.appendChild(d);}
+function save(){let ok=true;try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){ok=false;}
+  try{if(ok===!!state._saveFail||(!ok&&!document.getElementById("savefail"))){state._saveFail=!ok;saveFailBanner(!ok);}}catch(e){}
+  try{if(typeof cloud!=="undefined"&&cloud.ready)cloudPublish(false);}catch(e){}
+  return ok;}
 function load(){try{const r=localStorage.getItem("gt_data");if(r){const p=JSON.parse(r);const d=Object.assign(blankData(),p);if(p&&p.u)d.u=Object.assign(blankData().u,p.u);
   // Migration: older builds seeded muscleVol from experience at onboarding, inflating the level.
   // Real volume only ever comes from logged workouts, so volume with zero workouts = seeded -> clear.
@@ -5824,8 +5832,8 @@ function addProgress(input){
       let img;try{img=cv.toDataURL("image/jpeg",0.72);}catch(err){img=e.target.result;}
       state.data.photos=state.data.photos||[];
       state.data.photos.push({id:"ph"+now(),date:new Date().toISOString(),img,bw:Math.round(state.data.u.bodyweight)||null,note:""});
-      try{save();checkAchievements();haptic("done");toast("Progress photo saved");}
-      catch(err){state.data.photos.pop();toast("Storage full — delete an old photo first.");}
+      if(save()){try{checkAchievements();}catch(err){}haptic("done");toast("Progress photo saved");}
+      else{state.data.photos.pop();save();haptic("warn");toast("Photo NOT saved — storage is full. Delete an old photo first.");}
       render();
     };
     im.onerror=()=>toast("Couldn't read that image.");
