@@ -3497,7 +3497,11 @@ function reorderMove(ei,dir){
 function activeExIdx(){const ses=state.session;if(ses&&ses._focusEi!=null&&ses.exercises[ses._focusEi])return ses._focusEi;const o=findOpenSet();return o?o.ei:-1;}
 function isExOpen(ei){const e=state.session.exercises[ei];if(!e)return false;const active=activeExIdx();if(ei===active)return e._open!==false;return e._open===true;}
 function toggleExCollapse(ei){const e=state.session.exercises[ei];if(!e)return;const open=isExOpen(ei);e._open=!open;state.session._focusEi=null;haptic("tap");render();}
-function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>s.done||parseFloat(s.r)>0).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
+/* ONE definition of "logged": ticked AND carrying numbers (exProgress, confirmFinish and finishWorkout all use it).
+   setFilled = numbers present (bodyweight lifts may leave weight empty); a typed-but-unticked set is filled but not logged. */
+function setFilled(name,s){return !!s&&((s.w!==""&&s.w!=null)||!!exFor(name).bw)&&s.r!==""&&s.r!=null;}
+function setLogged(name,s){return !!s&&!!s.done&&setFilled(name,s);}
+function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>setLogged(e.name,s)).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
 // ---- Hold-to-drag exercise reordering (touch + mouse). Reorders DOM live, commits to the array once on drop — no re-render mid-drag, so it stays smooth. ----
 function initDragReorder(){
   if(window._dragInit)return;window._dragInit=true;
@@ -3639,7 +3643,7 @@ function finishWorkout(){
   if(typeof stopVoice==="function")stopVoice();
   try{syncSessionToSplit();}catch(e){}
   const ses=state.session;const dur=Math.round((now()-ses.startedAt)/1000);
-  const done=ses.exercises.map(e=>({name:e.name,sets:(e.sets||[]).filter(s=>s.done&&(s.w!==""||exFor(e.name).bw)&&s.r!=="")})).filter(e=>e.sets.length);
+  const done=ses.exercises.map(e=>({name:e.name,sets:(e.sets||[]).filter(s=>setLogged(e.name,s))})).filter(e=>e.sets.length);
   if(!done.length){appConfirm({title:"No sets logged",body:"You haven't completed any sets. Discard this session?",ok:"Discard",cancel:"Keep going",danger:true}).then(ok=>{if(ok)endSession();});return;}
   let totalVol=0,fails=0,sessFails={},sessVol={},musclesHit={};const prsThis=[];
   done.forEach(e=>{
@@ -12903,11 +12907,21 @@ function initSwipeExercises(){
 
 /* Full logging screen — exercise focus card with input table + swipable list. */
 /* Finish guard — if working sets are still open, ask before ending the night (one accidental tap must never cost a session). */
+function saveTypedAndFinish(){closeSheet();const ses=state.session;if(!ses)return;ses.exercises.forEach(e=>{if(e._skip)return;(e.sets||[]).forEach(s=>{if(s.type!=="W"&&!s.done&&setFilled(e.name,s))s.done=true;});});finishWorkout();}
 function confirmFinish(){
   const ses=state.session;if(!ses)return;
-  const open=(ses.exercises||[]).reduce((a,e)=>a+(e._skip?0:(e.sets||[]).filter(s=>s.type!=="W"&&!s.done&&!(parseFloat(s.r)>0)).length),0);
+  const work=[];(ses.exercises||[]).forEach(e=>{if(!e._skip)(e.sets||[]).forEach(s=>{if(s.type!=="W")work.push([e.name,s]);});});
+  const open=work.filter(([n,s])=>!setLogged(n,s)).length;
   if(!open)return finishWorkout();
+  const typed=work.filter(([n,s])=>!s.done&&setFilled(n,s)).length,rest=open-typed;
   try{haptic("warn");}catch(e){}
+  if(typed){ // numbers typed but never ticked would silently vanish at finish — ask first
+    openSheet(`<div class="ttl">${typed} set${typed===1?" has":"s have"} numbers but ${typed===1?"isn't":"aren't"} ticked</div>
+    <p class="mini" style="color:var(--text2);line-height:1.55;margin:6px 0 12px">Unticked sets are not saved. Save them to the record, or leave them out.${rest?` ${rest} other set${rest===1?" is":"s are"} empty and will be left behind.`:""}</p>
+    <button class="btn gold" onclick="saveTypedAndFinish()">✓ SAVE THEM &amp; FINISH</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="closeSheet();finishWorkout()">Discard them &amp; finish</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">← Keep going</button>`);
+    return;}
   openSheet(`<div class="ttl">Leave the field?</div>
     <p class="mini" style="color:var(--text2);line-height:1.55;margin:6px 0 12px">${open} working set${open===1?"":"s"} still unlogged, sir. Finish anyway — or go back and close the job.</p>
     <button class="btn gold" onclick="closeSheet();finishWorkout()">🏁 FINISH — LEAVE ${open} BEHIND</button>
@@ -13134,7 +13148,7 @@ function renderLogging(){
 
   // Damage report
   {const hitM=[];ses.exercises.forEach(function(e){
-     const anyDone=(e.sets||[]).some(function(s){return s.type!=='W'&&(s.done||parseFloat(s.r)>0);});
+     const anyDone=(e.sets||[]).some(function(s){return s.type!=='W'&&setLogged(e.name,s);});
      if(anyDone){const x=exFor(e.name);(x.p||[]).forEach(function(m){hitM.push(m);});}});
    if(hitM.length){const dmgOpen=state._dmgOpen===true;
      h+=`<div class="card glow" style="padding:11px;margin-bottom:8px">
