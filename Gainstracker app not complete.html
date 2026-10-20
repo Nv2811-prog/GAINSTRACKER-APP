@@ -1607,7 +1607,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
 .gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
-.s3.is-live .gh-art,.s3.is-rest .gh-art{opacity:.5}
+.s3.is-live .gh-art{opacity:.5}
 @keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
 @media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
@@ -1777,6 +1777,27 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-anim .lmk .fill{animation:ghFill .5s var(--ease-out) both;animation-delay:calc(var(--k,0)*30ms)}
 .toast .tundo{min-height:28px;height:28px;margin-left:12px;padding:0 10px;color:var(--gold-ink)}
 .gh-ring.empty .ring-v{display:none}
+
+/* ===== GP:ART (wave 4) ===== */
+/* Cinematic Gotham stills behind the heroes (assets/art/*.jpg, 720x480, subject in the right ~40%). One per screen, static, always veiled so text stays crisp.
+   gaArt() drops a .ga layer into the S3 at z-index:-2 (under the grain): the still feathers in from the left, a card-coloured veil closes the bottom. The workout bar and the finish moment use the same stills. */
+.ga{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.ga img{position:absolute;inset:0;width:100%;max-width:none;height:100%;display:block;object-fit:cover;object-position:right center;opacity:var(--o,.8);-webkit-mask-image:linear-gradient(90deg,transparent 4%,#000 56%);mask-image:linear-gradient(90deg,transparent 4%,#000 56%)}
+.ga::after{content:"";position:absolute;inset:0;background:var(--v,linear-gradient(transparent,transparent)),linear-gradient(0deg,#111927 0%,rgba(17,25,39,.6) 28%,rgba(17,25,39,0) 62%),linear-gradient(90deg,rgba(17,25,39,.55),rgba(17,25,39,0) 72%)}
+.ga-rest img{width:calc(100% + 60px);object-position:right 38%}   /* skyline pushed past the right edge so the moon clears the Next row */
+.ga-mission{--o:.66;--v:linear-gradient(180deg,rgba(17,25,39,.62),rgba(17,25,39,0) 34%)}   /* top veil keeps "Day 7 of 8" crisp */
+.ga-mission.dim{--o:.4}   /* the no-plan hero runs a paragraph across the full width */
+.ga-suit{top:auto;height:44%;--o:.9}   /* the quietest still: a carbon-plate band under the legend, the figure stays on clean matte */
+.ga-suit img{object-position:right bottom;filter:brightness(1.7);-webkit-mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%);mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%)}
+.ga-profile{--o:.8}
+.ga-profile img{width:calc(100% + 24px);object-position:right 14%}
+.p3-id .sub,.p3-id .p3-rank-h span{text-shadow:0 1px 10px rgba(5,7,12,.95)}
+.ga-finish.sum{--o:.62;--v:radial-gradient(60% 70% at 100% 0%,rgba(17,25,39,.82),rgba(17,25,39,0))}
+.ga-finish.sum img{object-position:right bottom}
+.ga-finish.fin{bottom:30%}
+.ga-finish.fin img{--o:.9;object-position:68% 30%;-webkit-mask-image:linear-gradient(180deg,#000 44%,transparent 100%);mask-image:linear-gradient(180deg,#000 44%,transparent 100%)}
+.ga-finish.fin::after{background:radial-gradient(75% 60% at 50% 100%,rgba(5,7,12,.85),rgba(5,7,12,0) 100%),linear-gradient(90deg,rgba(5,7,12,.5),rgba(5,7,12,0) 70%)}
+.lg2-bar::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:url(assets/art/logging.jpg) right 55%/cover no-repeat;opacity:.85;-webkit-mask-image:linear-gradient(90deg,transparent 24%,#000 88%);mask-image:linear-gradient(90deg,transparent 24%,#000 88%)}
 
 /* ===== GP:MISSION+SUIT (wave 3) ===== */
 /* Mission, Suit and the muscle dossier run on Home's primitives (.gh .s1/.s2/.s3, .gh-row, .gh-lh, .gh-lore, .lmk, .ring, .tag) plus the rules below, all scoped under .gm.
@@ -6072,6 +6093,9 @@ function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";
   // Alfred speaks his verdict over the summary, unless this session earns a rank-up (that announcement owns the voice)
   setTimeout(()=>{try{if(state.step==="summary"&&!rankUpPending())alfredVoiceLine(alfredSessionVerdict());}catch(e){}},P3_FIN_MS+450);
   render();}
+/* GP:ART: cinematic still behind a hero (assets/art/<n>.jpg, subject in the right ~40%, see the GP:ART css). Static, absolute, no layout; a missing file just drops the layer. */
+function gaArt(n,c){return `<div class="ga ga-${n}${c?" "+c:""}" aria-hidden="true"><img src="assets/art/${n}.jpg" alt="" width="720" height="480" decoding="async" onerror="this.parentNode.remove()"></div>`;}
+setTimeout(()=>{["finish","logging"].forEach(n=>{try{new Image().src="assets/art/"+n+".jpg";}catch(e){}});},4000);   // warm the two stills the live flow needs, so the workout bar and the 1.25 s finish moment never wait on them
 /* the finish moment: duration · sets · volume · PRs, one quiet gold line per PR, gone in 1.25 s (tap skips) */
 function playOutro(R){
   const old=document.getElementById("p3fin");if(old)old.remove();
@@ -6079,7 +6103,7 @@ function playOutro(R){
   const prs=R.prsThis||[],v=p3Vol(R.totalVol);
   const cell=(n,dec,u,gold)=>`<div><b class="num${gold?" g":""}" data-to="${n}" data-dec="${dec}">0</b><span>${u}</span></div>`;
   const el=document.createElement("div");el.id="p3fin";el.className="p3-fin";el.setAttribute("role","status");
-  el.innerHTML=`<div class="c"><div class="eb">${GP.icon("bat")}<span>Session complete</span></div><div class="ttl">${esc(R.wk.name)}</div>
+  el.innerHTML=`${gaArt("finish","fin")}<div class="c"><div class="eb">${GP.icon("bat")}<span>Session complete</span></div><div class="ttl">${esc(R.wk.name)}</div>
     <div class="n">${cell(p3Min(R.dur),0,"min")}${cell(p3Working(R.wk),0,"sets")}${cell(v.n,v.dec,v.u==="t"?"tonnes":"kg")}${cell(prs.length,0,prs.length===1?"PR":"PRs",prs.length>0)}</div>
     ${prs.length?`<div class="pr">${prs.slice(0,3).map((p,i)=>`<div style="--i:${i}">${GP.icon("trophy")}<span>${esc(p.name)}</span><b>${Math.round(p.orm)} kg</b></div>`).join("")}${prs.length>3?`<div class="mo" style="--i:3">+${prs.length-3} more</div>`:""}</div>`:""}</div>`;
   document.body.appendChild(el);
@@ -6096,7 +6120,7 @@ function p3SumSession(R){
   const stats=[[p3Min(R.dur)+"<small>min</small>","Time"],[sets,"Sets"],[rir==null?"–":rir.toFixed(1),"Avg RIR"],[prs.length,"Records"]];
   const prRows=prs.slice(0,6).map(p=>`<div class="gh-row" data-hx onclick="openExDetail(${ghJs(p.name)})"><span class="lead gold">${GP.icon("trophy")}</span><div class="main"><div class="gh-t1">${esc(p.name)}</div><div class="gh-t2">${fmtKg(p.w)} kg × ${p.r} · e1RM ${Math.round(p.orm)} kg</div></div><span class="trail">${p.first?`<span class="tag ok">First</span>`:`<span class="p3-d">+${(p.orm-p.prevOrm).toFixed(1)}</span>`}${GP.icon("chevR")}</span></div>`).join("");
   return `${p3SumHead(R,"Session complete")}
-  <section class="s3 p3-hero gh-c" style="--i:1">
+  <section class="s3 p3-hero gh-c" style="--i:1">${gaArt("finish","sum")}
     <div class="p3-vh"><span class="eyebrow">Volume</span>${dTag}</div>
     <div class="p3-vol"><span class="num" id="p3vol">${v.v}</span><span class="u">${v.u}</span></div>
     <div class="p3-g4">${stats.map(a=>`<div><span class="num">${a[0]}</span><span class="eyebrow">${a[1]}</span></div>`).join("")}</div>
@@ -6579,7 +6603,7 @@ function gsHero(){
   const n=(a,b)=>rows.filter(x=>x.r>=a&&x.r<b).length,low=rows.filter(x=>x.r<GS_MID).map(x=>ghName(x.m));
   const dot=(c,t,k)=>`<span><i style="background:${c}"></i>${t} <b>${k}</b></span>`;
   const status=!rows.length?"Log a session and the figure lights up.":low.length?`<span class="c-warn">${low.join(", ")} below ${GS_MID}%</span>`:rows.every(x=>x.r>=GS_FRESH)?`<span class="c-ok">All trained muscles above ${GS_FRESH}%</span>`:"Tap a muscle for its dossier";
-  return `<section class="s3 gm-suit gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
+  return `<section class="s3 gm-suit gh-c" style="--i:0">${gaArt("suit")}<div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
     <div class="gm-fig2">${buildSuit()}</div>
     <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
 }
@@ -7768,7 +7792,7 @@ function p3Identity(){
   const age=mo<1?"<1 mo training":mo<24?mo+" mo training":(mo/12).toFixed(1)+" yr training",wk=weeklyStreak();
   const prN=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
   const st=[[Math.max(ws.length,u.totalWorkouts||0),"Sessions",""],[wk>0?wk+"<small>wk</small>":"–","Streak",""],[vol.v+"<small>"+vol.u+"</small>","Lifetime","openIronLedger()"],[prN,"Records",""]];
-  return `<section class="s3 p3-id gh-c" style="--i:0">
+  return `<section class="s3 p3-id gh-c" style="--i:0">${gaArt("profile")}
     <div class="p3-idh" data-hx onclick="openSettings()"><span class="p3-av"><img src="Batman.jpg" alt="" onerror="this.parentNode.style.display='none'"></span>
       <div class="p3-idn"><h1>${u.name?esc(u.name):"Athlete"}</h1><div class="sub">${esc(u.activeGym||"")}${u.activeGym?" · ":""}${bodyW()} kg · ${age}</div></div><span class="trail">${GP.icon("sliders")}</span></div>
     <div class="p3-rank" data-hx onclick="openRankLadder()"><div class="p3-rank-h"><b>${esc(cur[1])} · Lv ${sl}</b><span>${next?(next[0]-sl)+" lv to "+esc(next[1]):"Top rank"}</span></div><div class="bar"><i style="width:${pct.toFixed(0)}%"></i></div></div>
@@ -8052,7 +8076,7 @@ function gmHero(cur){
   const sp=cur.sp,n=sp.days.length,tr=sp.days.filter(d=>!isRest(d)),st=tr.map(ghDayStats),sets=st.reduce((a,x)=>a+x.sets,0),
     min=tr.length?Math.round(st.reduce((a,x)=>a+x.min,0)/tr.length/GH_MIN_STEP)*GH_MIN_STEP:0;
   const rail=sp.days.map((_,i)=>`<i class="${i<cur.i?"d":i===cur.i?"t":""}"></i>`).join("");
-  return `<section class="s3 gh-hero gm-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Active plan</span><span class="gh-cnt">Day <b class="num">${cur.i+1}</b> of ${n}</span></div>
+  return `<section class="s3 gh-hero gm-hero gh-c" style="--i:0">${gaArt("mission")}<div class="gh-top"><span class="eyebrow gh-live">Active plan</span><span class="gh-cnt">Day <b class="num">${cur.i+1}</b> of ${n}</span></div>
     <h2 class="num gh-title">${esc(sp.name)}</h2>
     <div class="gm-rail" role="img" aria-label="Cycle position: day ${cur.i+1} of ${n}">${rail}</div>
     <div class="gh-meta"><span><b>${tr.length}</b> training</span><span><b>${n-tr.length}</b> rest</span><span><b>${sets}</b> sets / cycle</span>${min?`<span>~<b>${min}</b> min a day</span>`:""}</div>
@@ -8095,7 +8119,7 @@ function gmLabHtml(){
   const tools=[["scale","Plate calculator","openPlateSheet(-1)"],["bolt","1RM calculator","open1RM()"],["target","1RM test day","openTestDay()"],["wrench","Forge","openForge()"],["note","Measure","openMeasure()"]];
   return `<div class="gm-lab">${contractCard()}${scienceCardsHtml()}<section class="s2 gh-list"><div class="gh-lh"><h3>Tools</h3></div>${tools.map(t=>`<div class="gh-row" data-hx onclick="${t[2]}"><span class="lead">${GP.icon(t[0])}</span><div class="main"><div class="gh-t1">${t[1]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`;
 }
-const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
+const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0">${gaArt("mission","dim")}<div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
   <div class="gh-cta"><button class="btn btn-1" onclick="newSplit();openSplitSheet()">${GP.icon("plus")}New split</button><button class="btn" onclick="freeWorkout()">Free session</button></div></section>`;
 function renderMission(){
   const cur=gtv2CurrentPlanDay(),live=!!state.session;
@@ -12980,7 +13004,7 @@ function ghHeroRest(cur,vol){
   const n=cur.sp.days.length,logged=ghRestLoggedToday();
   let ni=-1;for(let j=1;j<n;j++){const k=(cur.i+j)%n;if(!isRest(cur.sp.days[k])){ni=k;break;}}
   const nd=ni>=0?cur.sp.days[ni]:null,low=vol.filter(t=>t.trained).sort((a,b)=>a.rec-b.rec).slice(0,4);
-  return `<section class="s3 gh-hero is-rest gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
+  return `<section class="s3 gh-hero is-rest gh-c" style="--i:0">${gaArt("rest")}<div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">Rest day</h2>
     <div class="gh-meta">${nd?`<button class="gh-next" data-hx onclick="openDayBriefing('${cur.sp.id}',${ni})">Next: <b>${esc(nd.name)}</b>${GP.icon("chevR")}</button>`:"<span>Recovery is part of the plan</span>"}</div>
     ${ghBand(low,"Recovery outlook: the muscles furthest from ready")}
