@@ -1415,6 +1415,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 /* ===== GP:PROFILE+FINISH (wave 3) ===== */
 /* Finish moment, summary slides, Profile tab, exercise sheet. Built on the Home primitives (.gh .s1/.s2/.s3, gh-row, gh-sec, .lmk, .tag); only the new pieces live here. */
 .gi.flip{transform:scaleX(-1)}
+@keyframes sumFade{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
 .gh small{margin-left:3px;font:600 12px/1 var(--body);color:var(--tx2)}
 .gh .tag{background:rgba(150,178,222,.1);color:var(--tx2)}
 .gh .p3-d{font:650 13px/1 var(--body);color:var(--ok);font-variant-numeric:tabular-nums}
@@ -1619,6 +1620,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh .p3-hr .trail .num{font-size:22px;color:var(--tx1)}
 .p3-cue{display:flex;gap:8px;align-items:flex-start;padding:7px 0;font-size:14px;line-height:1.45;color:var(--tx2)}
 .p3-cue .gi{width:15px;height:15px;margin-top:3px;color:var(--gold-ink)}
+.p3-xd .gh-row .gh-t2{white-space:normal}
 .p3-acts{display:flex;flex-direction:column;gap:8px}
 .p3-acts .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 
@@ -6060,6 +6062,14 @@ function shareCardShare(){
 }
 /* Shared muscle accent palette + cinematic slide hero — every debrief slide opens like the patrol card. */
 const MCOL={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
+function sumHero(kick,title,icon,accent){
+  return `<div style="position:relative;text-align:center;padding:12px 0 4px;margin-bottom:12px">
+    <div style="position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:82px;opacity:.09;pointer-events:none;filter:blur(.5px)">${icon}</div>
+    <span style="display:inline-block;font-size:10px;font-weight:800;letter-spacing:.3em;text-transform:uppercase;color:${accent};padding:4px 13px;border:1px solid ${accent}55;border-radius:20px;background:${accent}12;text-shadow:0 0 10px ${accent}66;animation:sumFade .5s both">${kick}</span>
+    <h1 style="font-family:var(--num);font-size:40px;line-height:.96;margin:11px 0 9px;color:${accent};text-shadow:0 0 36px ${accent}66,0 2px 14px rgba(0,0,0,.9);animation:sumFade .55s .08s both">${title}</h1>
+    <div style="width:150px;height:2px;margin:0 auto;background:linear-gradient(90deg,transparent,${accent},transparent);box-shadow:0 0 12px ${accent};animation:sumFade .6s .14s both"></div>
+  </div>`;
+}
 // ===== Alfred's read (post-workout) — ALWAYS works, with or without a Gemini key. =====
 // Builds a real, data-driven verdict from the session, in Alfred's "on roids — wild but good" voice.
 function alfredLocalRead(R){
@@ -13049,7 +13059,7 @@ function confirmUnarchiveAll(){
 }
 function confirmArchiveExercise(name){
   appConfirm({title:"Archive "+name+"?",body:"Tonight's first set won't be compared to old numbers, and \"last time\" starts fresh from here. Every set you've already logged stays in your record — nothing is deleted.",ok:"Archive",danger:false}).then(ok=>{
-    if(!ok)return;archiveExercise(name);haptic("done");toast("🗄️ "+name+" archived — starting fresh next time");refreshDataControl();
+    if(!ok)return;archiveExercise(name);haptic("done");toast("🗄️ "+name+" archived — starting fresh next time");if($("dc-search"))refreshDataControl();else p3XdRefresh(name);
   });
 }
 function u_set(k,v){state.data.u[k]=v;save();}
