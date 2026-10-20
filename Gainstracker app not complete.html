@@ -617,7 +617,8 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 .sheet{background:linear-gradient(180deg,#172131,#0F1621);border-top:1px solid var(--hair2);border-radius:var(--r-l) var(--r-l) 0 0;padding:8px 16px calc(18px + env(safe-area-inset-bottom));max-height:92dvh;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 -20px 40px -10px rgba(0,0,0,.8),0 90px 0 0 #0F1621;transition:transform .42s var(--spring)}
 .sheet:not(.on){transition:transform .22s cubic-bezier(.4,0,1,1)}
 .sheet::before{content:"";display:block;width:38px;height:5px;border-radius:3px;margin:2px auto 14px;background:rgba(190,206,232,.28);box-shadow:none}
-.sheetbg{background:rgba(2,4,8,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .2s}
+.sheetbg{background:rgba(2,4,8,.6);transition:opacity .2s}
+.sheetbg.on{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}   /* blur only while a sheet is open: no idle backdrop layer on every screen */
 .ovcard,#modal .mcard{background:linear-gradient(180deg,#172131,#0F1621);border:1px solid var(--hair2);border-radius:var(--r-l);box-shadow:var(--sh2)}
 .ovbg,#modal .mbg{background:rgba(2,4,8,.72);-webkit-backdrop-filter:none;backdrop-filter:none}
 .toast{bottom:calc(92px + env(safe-area-inset-bottom));max-width:min(92vw,420px);padding:11px 18px;border:0;border-radius:999px;background:rgba(26,36,54,.96);box-shadow:inset 0 0 0 1px var(--hair2),0 14px 30px -10px rgba(0,0,0,.9);color:var(--tx1);font:600 14px/1.3 var(--body);transform:translateX(-50%) translateY(8px);transition:opacity .18s,transform .18s var(--ease-out)}
@@ -1057,7 +1058,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
 .gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
-.s3.is-live .gh-art{opacity:.5}
+.s3.is-live .gh-art{opacity:.5;animation:none}   /* live hero: the pulsing dot is the one moving thing */
 @keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
 @media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
