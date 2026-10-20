@@ -1816,6 +1816,104 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .sx-bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi))}
 .sx-f{display:flex;align-items:baseline;gap:6px;margin-top:9px;font:500 13px/1 var(--body);color:var(--tx2)}
 .sx-f .num{font-size:24px;color:var(--tx1)}.sx-f .r{margin-left:auto;color:var(--tx3)}
+/* secondary pages: header, Infirmary, Garage, Wayne Tech, Fuel, Every lift */
+.sp-hd{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
+.sp-hd>div:not(.btn-i){flex:1;min-width:0}
+.sp-hd h1{margin:0;color:var(--tx1)}
+.sp-hd .t-xs{margin-top:3px}
+.sp-hd .btn-i{flex:none}
+.gh .inf-c,.gh .fu-c,.gh .ar-si,.gh .gar-nx,.gh .sp-cal{margin-top:12px;padding-bottom:14px}
+.inf-c>:not(.gh-lh):not(.gh-row),.fu-c>:not(.gh-lh):not(.gh-row),.ar-si>:not(.gh-lh),.gar-nx>*,.sp-cal>:not(.gh-lh){margin-left:14px;margin-right:14px}
+.gh .inf-p,.gh .fu-p,.gh .ar-p{margin:8px 14px 0}
+.gh .gm-inf{margin-top:12px;margin-bottom:12px;padding-bottom:13px;cursor:pointer}
+.gm-inf-g .num.c-ok{color:var(--ok)}.gm-inf-g .num.c-warn{color:var(--warn)}.gm-inf-g .num.c-bad{color:#FF786D}.gm-inf-g .num.c-3{color:var(--tx3)}
+.gm-inf .gh-lh .trail{display:flex;color:var(--tx3)}.gm-inf .gh-lh .gi{width:16px;height:16px}
+.gm-inf-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 0}
+.gm-inf-g>div{min-width:0}
+.gm-inf-g .num{display:block;font-size:26px;line-height:.95;color:var(--tx1);white-space:nowrap}
+.gm-inf-g .num small{font-size:13px;color:var(--tx2);margin-left:1px}
+.gm-inf-g .eyebrow{display:block;margin-top:6px;font-size:10px;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inf-big{font-size:28px;color:var(--tx1)}.inf-big small{font-size:14px;color:var(--tx2);margin-left:2px}
+.inf-seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.inf-seg button{min-height:52px;border-radius:12px;background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:500 11px/1 var(--body)}
+.inf-seg button b{font:400 22px/1 var(--num);color:var(--tx1)}
+.inf-seg button.on{background:var(--tint-gold);box-shadow:inset 0 0 0 1px rgba(242,193,78,.45);color:var(--gold-ink)}
+.inf-seg button.on b{color:var(--gold-ink)}
+.inf-step{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.inf-step>div{display:flex;align-items:center;gap:12px}
+.inf-step .num{font-size:24px;min-width:54px;text-align:center;color:var(--tx1)}
+.inf-debt{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid var(--hair);font:500 13px/18px var(--body);color:var(--tx2)}
+.inf-debt b{font:600 15px/1 var(--body)}
+.inf-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.inf-chip{min-height:36px;padding:7px 12px;border-radius:999px;background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx1);font:600 13px/1.1 var(--body)}
+.inf-chip i{font-style:normal;font-weight:500;margin-left:6px;opacity:.85}
+.inf-chip.lv1{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.4)}
+.inf-chip.lv2{background:var(--tint-warn);color:var(--warn);box-shadow:inset 0 0 0 1px rgba(255,178,36,.4)}
+.inf-chip.lv3{background:var(--tint-bad);color:#FF786D;box-shadow:inset 0 0 0 1px rgba(255,90,78,.4)}
+.inf-inj .gh-t2{white-space:normal}
+.inf .btn.sm,.fu-stack .btn.sm,.fu-add .btn.sm{min-height:34px;padding:6px 12px;font-size:13px;border-radius:11px}
+.gar-hero{margin-top:2px;min-height:300px;padding:0;display:flex;flex-direction:column;justify-content:flex-end}
+.gar-bg{position:absolute;inset:0;z-index:-1}
+.gar-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 34%;opacity:.62}
+.gar-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,13,21,.15) 0%,rgba(9,13,21,.35) 45%,#0E1520 100%)}
+.gar-car{height:210px;overflow:hidden;margin-top:6px}
+.gar-car img{display:block;width:330px;height:330px!important;max-width:none;margin:-62px auto 0;filter:brightness(1.45) contrast(1.06) drop-shadow(0 16px 22px rgba(0,0,0,.65))!important;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;mask-composite:intersect}
+.gar-cap{position:relative;padding:0 16px 16px}
+.gar-cap h2{margin:3px 0 4px;font-size:clamp(30px,9vw,36px);line-height:.98;color:#FBF7EC}
+.gar-next b{display:block;margin:5px 0 9px;font:650 18px/1.2 var(--body);letter-spacing:-.01em;color:var(--tx1)}
+.gar-nh{display:flex;align-items:baseline;justify-content:space-between}
+.gar-next .t-xs{display:block;margin-top:7px}
+.gar-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gar-v2{background:var(--g1);box-shadow:var(--hl);border-radius:var(--r-m);padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px}
+.gar-img{height:78px;overflow:hidden;border-radius:10px;margin-bottom:4px;background:radial-gradient(85% 95% at 50% 85%,rgba(150,178,222,.28),rgba(150,178,222,.05) 78%);display:flex;align-items:center;justify-content:center}
+.gar-img img{height:100%!important;width:auto;max-width:100%;object-fit:contain;filter:brightness(1.5) contrast(1.06) drop-shadow(0 3px 6px rgba(0,0,0,.5))!important;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;mask-composite:intersect}
+.gar-v2 b{font:600 15px/20px var(--body);color:var(--tx1)}
+.gar-v2.lock .gar-img .gi{width:26px;height:26px;color:var(--tx3)}
+.gar .gh-sec{margin:22px 4px 10px}
+.gar-v2.lock b{color:var(--tx2)}
+.gar-v2 .sx-bar{margin-top:5px;height:4px}
+.gh-xs .lead.car img{filter:brightness(1.5) contrast(1.06) drop-shadow(0 3px 6px rgba(0,0,0,.5))!important;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;mask-composite:intersect}
+.sp-pg .gh-sec{margin:22px 4px 10px}
+.sp-calb{padding:10px 14px 0;overflow-x:auto}
+.sp-tools .gh-t2{white-space:normal}
+.gh .fu-hero{position:relative;margin-top:2px;padding:14px}
+.fu-kcal{display:flex;align-items:baseline;gap:8px;margin:8px 0 2px}
+.fu-kcal .num{font-size:52px;line-height:.95;color:var(--gold-ink)}
+.fu-kcal span{font:500 14px/1 var(--body);color:var(--tx2)}
+.fu-mac{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.fu-mac>div{min-width:0}
+.fu-mac .num{display:block;font-size:30px;line-height:.9;color:var(--tx1)}.fu-mac small{font-size:14px;color:var(--tx2);margin-left:1px}
+.fu-mac .eyebrow{display:block;margin-top:6px}
+.fu-left{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(150,178,222,.07);font:500 13px/18px var(--body);color:var(--tx2)}
+.fu-left b{font:600 14px/1 var(--body)}
+.fu-hero .btn{width:100%}
+.gh .fu-hero .fu-p{margin:10px 0 0}
+.fu-log .gh-row .btn-i{width:34px;height:34px;flex:none}
+.fu-add{padding:12px 14px 14px;border-top:1px solid var(--hair);display:grid;gap:10px}
+.fu-chips{display:flex;flex-wrap:wrap;gap:7px}
+.fu-chips .chip{min-height:34px;padding:6px 11px;font-size:13px}
+.fu-saved{display:grid;gap:8px}
+.fu-sh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fu-meal{display:inline-flex;align-items:center;gap:8px;padding-right:6px}
+.fu-meal button{width:24px;height:24px;display:grid;place-items:center;border-radius:99px;color:var(--tx3)}
+.fu-meal .gi{width:13px;height:13px}
+.fu-gl{display:flex;gap:5px;margin-top:12px}
+.fu-gl i{flex:1;height:24px;max-width:28px;border-radius:7px;background:rgba(150,178,222,.1)}
+.fu-gl i.on{background:linear-gradient(180deg,#9AD6FF,#2E86FF)}
+.fu-btns{display:flex;gap:8px;margin-top:12px}.fu-btns .btn{flex:1}.fu-btns .btn+.btn{flex:0 0 52px}
+.fu-stack .gh-row.fu-tg{width:100%;text-align:left;color:var(--tx1);background:none;border:0}
+.fu-ck{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 1.5px var(--hair2);color:var(--on-gold)}
+.fu-tg.on .fu-ck{background:var(--gold-ink);box-shadow:none}.fu-ck .gi{width:16px;height:16px;stroke-width:3}
+.fu-bw{font-size:28px;color:var(--tx1)}.fu-bw small{font-size:14px;color:var(--tx2);margin-left:2px}
+.fu-curve{margin:8px 14px 0}
+.fu-wi{display:flex;gap:8px;margin:12px 14px 0}.fu-wi input{flex:1;min-width:0}.fu-wi .btn{flex:none;min-height:46px;font-size:15px}
+.ar-sih{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:8px}
+.ar-sih .num{font-size:44px;line-height:.9;color:var(--gold-ink)}.ar-sih small{font-size:15px;color:var(--tx2);margin-left:4px}
+.ar-chart{margin-top:8px}
+.gh .ar-lifts{padding-bottom:4px}
+.ar-q{display:block;width:calc(100% - 28px);margin:10px 14px 6px}
+.ar-empty{padding:8px 14px 12px}
+.ar-best{font-size:20px;color:var(--tx1);min-width:58px;text-align:right}.ar-best small{font-size:11px;color:var(--tx3);margin-left:2px}
 /* ===== /GP:PRUNE+HOME ===== */
 
 /* ===== GP:LOGGING (wave 2) ===== */
@@ -6053,7 +6151,7 @@ function gsBody(){
   const me=state.data.u.measurements||{},cells=[["chest","Chest"],["waist","Waist"],["leftArm","L arm"],["rightArm","R arm"],["leftThigh","L thigh"],["rightThigh","R thigh"]];
   return `<div class="gh-sec"><h2>Body</h2><button class="gh-more" data-hx onclick="openMeasure()">Edit</button></div>
     <section class="s2 gm-meas"><div class="gm-ms">${cells.map(([k,l])=>`<div><b class="num">${me[k]||"—"}</b><span class="eyebrow">${l}${me[k]?" cm":""}</span></div>`).join("")}</div></section>
-    ${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
+    ${gsInfirmary()}${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
 }
 function renderSuit(){
   const sl=strengthLevel(),r=rankFor(sl);
@@ -6340,7 +6438,7 @@ function volBar(sets,lm,m){
    Defeats PR/villain timeline, per-lift strength forecasts, the Iron Efficiency
    leaderboard, and the full searchable exercise list with live curves.
    ======================================================================== */
-function openArchive(){state._archQ=state._archQ||"";go("history");}
+function openArchive(){state._archQ=state._archQ||"";state.subpage="archive";render();window.scrollTo(0,0);}
 function closeArchive(){state.subpage=null;go("case");}
 function setArchQ(v){state._archQ=v;const list=$("arch-list");if(list)list.innerHTML=archExerciseList();}
 // running composite Strength Index across the user's top main lifts
@@ -6376,54 +6474,26 @@ function archExerciseList(){
   const q=(state._archQ||"").toLowerCase().trim();
   let names=loggedExerciseNamesByRecency();           // most recently trained first
   if(q)names=names.filter(n=>n.toLowerCase().includes(q));
-  if(!names.length)return `<p class="muted center" style="padding:14px 0">No lifts match "${esc(q)}".</p>`;
+  if(!names.length)return `<p class="t-s ar-empty">No lifts match "${esc(q)}".</p>`;
   const fmtAgo=da=>da<=0?"today":da===1?"yesterday":da<7?da+"d ago":da<30?Math.round(da/7)+"w ago":Math.round(da/30)+"mo ago";
   return names.map(n=>{
-    const rows=exerciseRows(n);const e1s=rows.map(r=>r.e1rm);const best=e1s.length?Math.max(...e1s):0;
-    const d=e1s.length>1?e1s[e1s.length-1]-e1s[0]:0;
-    const dl=d>0?`<span class="green">+${d}</span>`:d<0?`<span class="red">${d}</span>`:`<span class="muted">—</span>`;
-    const intel=liftIntel(n);const ago=intel?fmtAgo(intel.daysAgo):"";
-    const flag=intel&&intel.stalled?`<span class="chip" style="background:rgba(232,69,60,.15);color:#ff6a5e;border-color:rgba(232,69,60,.4);font-size:9px;padding:1px 6px">STALLED</span>`:"";
-    return `<div class="row sp exrow" style="padding:11px 0;border-top:1px solid var(--border);cursor:pointer;gap:10px" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
-      <div style="min-width:0;flex:1"><b style="font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)} ${flag}</b><span class="mini">${ago} · ${rows.length} session${rows.length>1?"s":""} · ${dl}kg</span></div>
-      ${miniSpark(e1s)}<b class="gold" style="white-space:nowrap">${best}kg ›</b></div>`;
+    const rows=exerciseRows(n),e1s=rows.map(r=>r.e1rm),best=e1s.length?Math.max(...e1s):0,d=e1s.length>1?e1s[e1s.length-1]-e1s[0]:0,intel=liftIntel(n),ago=intel?fmtAgo(intel.daysAgo):"",st=!!(intel&&intel.stalled);
+    const dl=d>0?`<span class="c-ok">+${d}</span>`:d<0?`<span class="c-bad">${d}</span>`:`<span class="c-3">—</span>`;
+    return `<div class="gh-row" role="button" tabindex="0" onclick="exerciseHistory(${ghJs(n)})"><span class="lead${st?" warn":""}">${GP.icon(st?"flat":"dumbbell")}</span><div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">${ago?ago+" · ":""}${rows.length} session${rows.length>1?"s":""} · ${dl} kg${st?" · stalled":""}</div></div><span class="trail">${e1s.length>1?GP.spark(e1s.slice(-8),{w:44,h:22,area:false}):""}<b class="num ar-best">${best}<small>kg</small></b></span></div>`;
   }).join("");
 }
 function archiveCardsHtml(){
-  const d=state.data;
   const si=strengthIndexSeries();
-  const totalPRs=Object.values(d.prs).reduce((a,p)=>a+(p.count||1),0);
-  let html="";
-  // Strength Index hero
-  html+=`<div class="card glow"><div class="ttl">📈 Strength Index <span class="mini" style="font-weight:400">— combined est-1RM of your main lifts over time</span></div>`;
+  let html=`<section class="s2 ar-si"><div class="gh-lh"><h3>Strength index</h3><span class="t-xs">Combined e1RM of your top lifts</span></div>`;
   if(si.vals.length>=2){const first=si.vals[0],last=si.vals[si.vals.length-1],up=last>=first,pct=first?Math.round((last-first)/first*100):0;
-    html+=`<div class="row sp" style="align-items:flex-end;margin:2px 0 4px"><div class="big" style="font-size:38px;color:var(--gold2)">${last}<span style="font-size:16px;color:var(--text3)"> idx</span></div><span class="chip ${up?'on':''}" style="color:${up?'var(--green)':'var(--red)'}">${up?'▲':'▼'} ${pct>0?'+':''}${pct}% since start</span></div>
-    ${trendChart(si.vals,{color:"#E8C56A"})}
-    <div class="mini" style="text-align:center;color:var(--text3);margin-top:2px">Sum of your best est-1RM across up to 8 top lifts, tracked every session.</div>`;
-  }else html+=`<p class="muted" style="padding:10px 0">Log a few sessions across your main lifts and your Strength Index curve will rise here.</p>`;
-  html+=`</div>`;
-
-  // Strength Forecast, record est-1RM and gains/session now live INSIDE each lift's own curve
-  // (tap any lift below) — where the data actually is, instead of as separate stacked cards.
-
-  // EVERY LIFT — the hero of this page: a big, prominent, searchable vault.
-  // (Hall of Defeats removed per request — its content lives in the Arkham gallery / boss wins already.)
-  html+=`<div class="card glow" style="padding:21px">
-    <div class="ttl" style="font-size:18px;opacity:1">📚 Every lift</div>
-    <div class="mini" style="color:var(--text2);margin:-6px 0 10px">Your whole arsenal — tap any lift for its full strength curve.</div>
-    <input placeholder="🔍 Search lifts…" value="${esc(state._archQ||"")}" oninput="setArchQ(this.value)" style="margin-bottom:8px;font-size:16px"/>
-    <div id="arch-list">${archExerciseList()}</div></div>`;
+    html+=`<div class="ar-sih"><b class="num">${last}<small>idx</small></b><span class="tag ${up?"ok":"warn"}">${pct>0?"+":""}${pct}% since the start</span></div><div class="ar-chart">${trendChart(si.vals,{color:"#F2C14E"})}</div><p class="t-xs ar-p">Sum of your best e1RM across up to 8 top lifts, tracked every session.</p>`;
+  }else html+=`<p class="t-s ar-p">Log a few sessions across your main lifts and the strength index will rise here.</p>`;
+  html+=`</section><div class="gh-sec"><h2>Every lift</h2><span class="t-xs">Tap a lift for its full curve</span></div>
+    <section class="s2 gh-list ar-lifts"><input class="ar-q" placeholder="Search lifts" value="${esc(state._archQ||"")}" oninput="setArchQ(this.value)" aria-label="Search lifts"><div id="arch-list">${archExerciseList()}</div></section>`;
   return html;
 }
 function renderArchive(){
-  const wins=(state.data.bossWins||[]);
-  let html=`<div class="fade">
-    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeArchive()">‹ Case File</button><span class="chip">${wins.length} defeats</span></div>
-    <h1 style="font-size:34px;color:var(--gold2)">THE ARCHIVE</h1>
-    <div class="tag" style="margin-bottom:14px">Every curve, every record, every villain you've put down</div>`;
-  html+=archiveCardsHtml();
-  html+=`<button class="btn ghost" style="margin:6px 0 20px" onclick="closeArchive()">‹ Back to Case File</button></div>`;
-  $("app").innerHTML=html;
+  $("app").innerHTML=`<div class="gh sp-pg"><div class="sp-hd"><button class="btn-i" onclick="closeArchive()" aria-label="Back">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><div><h1>Lift history</h1><div class="t-xs">Strength curves, records and every lift</div></div></div>${archiveCardsHtml()}</div>`;
 }
 /* ===== HISTORY TAB — the Archive promoted to a first-class tab, plus the
    chronological patrol log, activity heatmap & body-measurement trends. ===== */
@@ -6652,8 +6722,8 @@ function openStalledLifts(){
    THE INFIRMARY (Wave 5) — one recovery hub: sleep, soreness, conditioning,
    supplements and an injury board. Sleep already feeds Patrol Readiness.
    ======================================================================== */
-function openInfirmary(){state.subpage="infirmary";render();window.scrollTo(0,0);}
-function closeInfirmary(){state.subpage=null;go("gotham");}
+function openInfirmary(){state._infFrom=state.subpage?(state._infFrom||"suit"):(state.tab||"suit");state.subpage="infirmary";render();window.scrollTo(0,0);}
+function closeInfirmary(){state.subpage=null;go(state._infFrom||"suit");}
 /* ===== Wave 11 — THE CAVE: injury-risk workload ratio (ACWR) =====
    Acute:Chronic Workload Ratio — this week's training load vs the rolling 4-week average.
    A genuine sports-science marker: sudden load spikes (ratio >1.5) are the strongest
@@ -6731,52 +6801,32 @@ function openInjuryPicker(){
 }
 function addInjury(m){state.data.injuries=state.data.injuries||{};state.data.injuries[m]={since:new Date().toISOString(),note:""};save();haptic("done");closeSheet();renderInfirmary();}
 function clearInjury(m){if(state.data.injuries)delete state.data.injuries[m];save();haptic("done");toast(MNAME[m]+" cleared — back in action");renderInfirmary();}
+/* The Infirmary: a body page inside Suit (Body section). Sleep, soreness, the workload watch and the injury board. */
+function gsInfirmary(){   // Suit → Body: one row of today's numbers; tap opens the page
+  const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,a=acwrInfo();
+  const cell=(v,l,c)=>`<div><b class="num${c?" c-"+c:""}">${v}</b><span class="eyebrow">${l}</span></div>`;
+  const z={sweet:["sweet","ok"],high:["climbing","warn"],spike:["spike","bad"],detrain:["low",""]}[a.zone];
+  return `<section class="s2 gm-inf" role="button" tabindex="0" onclick="openInfirmary()" aria-label="Open the Infirmary: sleep, soreness, workload, injuries"><div class="gh-lh"><h3>Infirmary</h3><span class="trail">${GP.icon("chevR")}</span></div>
+    <div class="gm-inf-g">${cell(sl&&sl.hours?sl.hours+"<small>h</small>":"—","Sleep",sl&&sl.hours?"":"3")}${cell(sore||"0","Sore today",sore?"warn":"")}${cell(inj||"0","Injuries",inj?"bad":"")}${cell(a.zone==="building"?"—":a.ratio.toFixed(2),"Load ratio",z?z[1]:"3")}</div></section>`;
+}
 function renderInfirmary(){
-  const d=state.data;const r=patrolReadiness();
-  const sl=sleepToday();const sore=soreToday();const wkC=weekCardio();const cGoal=120;
-  const supp=suppToday();const cStreak=creatineStreak();
-  const inj=d.injuries||{};const injKeys=Object.keys(inj);
-  let html=`<div class="fade">
-    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeInfirmary()">‹ Gotham</button><span class="chip" style="color:${r.color}">Readiness ${r.score==null?"—":r.score}</span></div>
-    <h1 style="font-size:34px;color:var(--gold2)">THE INFIRMARY</h1>
-    <div class="tag" style="margin-bottom:14px">Sleep · soreness · conditioning · supplements · injuries</div>`;
-
-  // SLEEP
-  const qEmo=["😵","😴","😐","🙂","💪"];
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">😴 Last night's sleep</div>${sl&&sl.hours?`<b class="gold">${sl.hours}h</b>`:""}</div>
-    <div class="mini" style="margin:4px 0 8px">Feeds your Patrol Readiness directly. Quality:</div>
-    <div class="row" style="gap:6px">${[1,2,3,4,5].map(q=>`<button class="btn ${sl&&sl.quality===q?'gold':'ghost'} sm" onclick="setSleepField('quality',${q})" style="font-size:18px;padding:8px 0">${qEmo[q-1]}</button>`).join("")}</div>
-    <div class="row sp" style="margin-top:10px;align-items:center"><span class="mini">Hours slept</span><div class="row g" style="gap:8px;align-items:center"><button class="btn ghost sm" style="width:auto;padding:4px 12px" onclick="setSleepField('hours',-0.5)">−</button><b style="font-size:17px;min-width:42px;text-align:center">${sl&&sl.hours?sl.hours+"h":"—"}</b><button class="btn ghost sm" style="width:auto;padding:4px 12px" onclick="setSleepField('hours',0.5)">+</button></div></div>
-    ${(()=>{const sd=sleepDebt();if(!sd)return "";const over=sd.debt<=0;const col=over?"var(--green)":sd.debt>=10?"var(--red)":sd.debt>=5?"var(--orange)":"var(--gold2)";
-      return `<div class="row sp" style="margin-top:10px;padding-top:9px;border-top:1px solid var(--border)"><span class="mini">Sleep debt <span style="color:var(--text3)">· last ${sd.nights} night${sd.nights===1?"":"s"} · avg ${sd.avg}h</span></span><b style="color:${col}">${over?"none — banked ✓":"−"+sd.debt+"h"}</b></div>
-      <div class="mini" style="margin-top:5px;color:var(--text2);line-height:1.5">${over?"You're meeting your 8h target — recovery, testosterone and PR potential all thank you.":sd.debt>=10?"Heavy debt. Sleep is where muscle is built; cut a set before you cut an hour of sleep.":"Running a small shortfall vs 8h/night. A couple of early nights repays it."}</div>`;})()}</div>`;
-
-  // SORENESS MAP
-  const sLab=["","mild","moderate","severe"];const sCol=["#3a3a3a","#E8C56A","#E8A52A","#E8453C"];
-  const soreList=Object.keys(sore);
-  html+=`<div class="card"><div class="ttl">🩹 Soreness map <span class="mini" style="font-weight:400">— tap a sector to cycle</span></div>
-    <div class="row wrap" style="gap:7px;margin-top:6px">${M12.map(m=>{const lv=sore[m]||0;return `<button class="chip" onclick="toggleSore('${m}')" style="display:flex;align-items:center;gap:5px;border-color:${lv?sCol[lv]:'var(--border)'};color:${lv?sCol[lv]:'var(--text2)'}">${mIcon(m,15,lv?sCol[lv]:'#888')} ${MNAME[m]}${lv?` · ${sLab[lv]}`:''}</button>`;}).join("")}</div>
-    <div class="mini" style="margin-top:9px;color:var(--text2)">${soreList.length?`Sore today: <b>${soreList.map(m=>MNAME[m]).join(", ")}</b>. Train around them or keep volume light — DOMS isn't a scorecard, but pain is information.`:"Nothing flagged sore. Tap a sector if it's tender so Alfred can factor it in."}</div></div>`;
-
-  // WORKLOAD WATCH (ACWR — injury-risk ratio)
-  html+=workloadCard();
-
-  // (Patrol Mileage / cardio and the Daily Stack / supplements cards were removed to streamline the Infirmary — sleep, soreness, workload & injuries remain.)
-
-  // INJURY BOARD
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">🚑 Injury board</div><button class="btn ghost sm" style="width:auto" onclick="openInjuryPicker()">+ Flag</button></div>`;
-  if(injKeys.length){
-    html+=injKeys.map(m=>{
-      const risky=(typeof EXBYNAME==="object")?Object.values(EXBYNAME).filter(e=>(e.p||[]).includes(m)).slice(0,4).map(e=>e.n):[];
-      return `<div style="padding:10px 0;border-top:1px solid var(--border)"><div class="row sp"><b style="font-size:14px;display:flex;align-items:center;gap:6px">${mIcon(m,16,'#E8453C')} ${MNAME[m]}</b><div class="row g" style="gap:8px;align-items:center"><span class="mini" style="color:var(--text3)">${injuryDuration(inj[m].since)}</span><button class="btn ghost sm" style="width:auto;padding:3px 9px;color:var(--green)" onclick="clearInjury('${m}')">Cleared ✓</button></div></div>
-        ${risky.length?`<div class="mini" style="margin-top:4px;color:#E8A52A">⚠ Caution: ${risky.map(esc).join(", ")}</div>`:""}</div>`;
-    }).join("");
-    html+=`<div class="mini" style="margin-top:8px;color:var(--text2)">Tracked over months & years. Clear a sector when it's healed.</div>`;
-  }else html+=`<p class="muted" style="padding:8px 0">No injuries flagged. Tap <b>+ Flag</b> if something's hurt and lifts that hit it will show a caution.</p>`;
-  html+=`</div>`;
-
-  html+=`<button class="btn ghost" style="margin:6px 0 20px" onclick="closeInfirmary()">‹ Back to Gotham</button></div>`;
-  $("app").innerHTML=html;
+  const d=state.data,r=patrolReadiness(),sl=sleepToday(),sore=soreToday(),inj=d.injuries||{},injKeys=Object.keys(inj),sd=sleepDebt();
+  const QL=["Poor","Light","OK","Good","Great"],SL=["","mild","moderate","severe"],soreList=Object.keys(sore);
+  const sleep=`<section class="s2 inf-c"><div class="gh-lh"><h3>Sleep</h3><b class="num inf-big">${sl&&sl.hours?sl.hours+"<small>h</small>":"—"}</b></div>
+    <p class="t-s inf-p">Last night. It feeds Readiness directly.</p>
+    <div class="inf-seg" role="group" aria-label="Sleep quality">${[1,2,3,4,5].map(q=>`<button class="${sl&&sl.quality===q?"on":""}" aria-pressed="${!!(sl&&sl.quality===q)}" onclick="setSleepField('quality',${q})"><b>${q}</b><span>${QL[q-1]}</span></button>`).join("")}</div>
+    <div class="inf-step"><span class="t-s">Hours slept</span><div><button class="btn-i" onclick="setSleepField('hours',-0.5)" aria-label="Half an hour less">−</button><b class="num">${sl&&sl.hours?sl.hours+"h":"—"}</b><button class="btn-i" onclick="setSleepField('hours',0.5)" aria-label="Half an hour more">+</button></div></div>
+    ${sd?`<div class="inf-debt"><span>Sleep debt · last ${sd.nights} night${sd.nights===1?"":"s"} · avg ${sd.avg} h</span><b class="${sd.debt<=0?"c-ok":sd.debt>=10?"c-bad":"c-warn"}">${sd.debt<=0?"None":"−"+sd.debt+" h"}</b></div>
+      <p class="t-xs inf-p">${sd.debt<=0?"You are meeting the 8 h target.":sd.debt>=10?"Heavy debt. Cut a set before you cut an hour of sleep.":"A small shortfall against 8 h a night. A couple of early nights repays it."}</p>`:""}</section>`;
+  const soreSec=`<section class="s2 inf-c"><div class="gh-lh"><h3>Soreness</h3><span class="t-xs">Tap a muscle to cycle</span></div>
+    <div class="inf-chips">${M12.map(m=>{const lv=sore[m]||0;return `<button class="inf-chip${lv?" lv"+lv:""}" onclick="toggleSore('${m}')">${esc(MNAME[m])}${lv?`<i>${SL[lv]}</i>`:""}</button>`;}).join("")}</div>
+    <p class="t-xs inf-p">${soreList.length?`Sore today: ${soreList.map(m=>MNAME[m]).join(", ")}. Train around it or keep volume light. Soreness is not a scorecard, but pain is information.`:"Nothing flagged. Tap a muscle if it is tender."}</p></section>`;
+  const injRows=injKeys.map(m=>{
+    const risky=(typeof EXBYNAME==="object")?Object.values(EXBYNAME).filter(e=>(e.p||[]).includes(m)).slice(0,4).map(e=>e.n):[];
+    return `<div class="gh-row inf-inj"><span class="lead bad">${GP.icon("alert")}</span><div class="main"><div class="gh-t1">${esc(MNAME[m])}</div><div class="gh-t2">${injuryDuration(inj[m].since)}${risky.length?" · caution: "+risky.map(esc).join(", "):""}</div></div><button class="btn sm" onclick="clearInjury('${m}')">Cleared</button></div>`;}).join("");
+  const injSec=`<section class="s2 gh-list inf-c"><div class="gh-lh"><h3>Injury board</h3><button class="btn sm" onclick="openInjuryPicker()">${GP.icon("plus")}Flag</button></div>
+    ${injKeys.length?injRows:`<p class="t-s inf-p">No injuries flagged. If something hurts, tap Flag and the lifts that hit it show a caution.</p>`}</section>`;
+  $("app").innerHTML=`<div class="gh gm inf"><div class="sp-hd"><button class="btn-i" onclick="closeInfirmary()" aria-label="Back">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><div><h1>Infirmary</h1><div class="t-xs">Readiness ${r.score==null?"not yet scored":r.score}</div></div></div>${sleep}${soreSec}${workloadCard()}${injSec}</div>`;
 }
 
 /* ========================================================================
@@ -6801,6 +6851,7 @@ const INDEX_ITEMS=[
   ["🛠️","THE FORGE","1RM, percentage loading & next plate jump","openForge()"],
   ["🚗","THE GARAGE","Vehicles you've unlocked by milestones","openGarage()"],
   ["🚑","THE INFIRMARY","Sleep, soreness, workload, injuries (Suit · Body)","openInfirmary()"],
+  ["🍽️","FUEL","Calories, macros, food log, hydration, weigh-ins","go('fuel')"],
   ["📡","Batcomputer","Full analytics dashboard","openBatcomputer()"],
   ["📂","Batcomputer report","30-day · 90-day · yearly review","periodReport(30)"],
   ["🤝","Justice League","Compare with allies' Patrol Cards","openJusticeLeague()"],
@@ -6827,15 +6878,15 @@ function gothamStats(){const d=state.data,a=(typeof trainingAge==="function"?tra
 
 /* ===== THE BATMOBILE GARAGE (#11): a fleet that unlocks with real milestones ===== */
 const GARAGE=[
-  {e:"🪝",n:"Grappling Hook",d:"Standard issue. Every Bat starts here.",req:s=>true,how:"Unlocked"},
-  {e:"🏍️",n:"Batcycle",d:"Nimble and fast. Earned through showing up.",req:s=>s.w>=5,how:"5 missions"},
-  {e:"🚙",n:"The Tumbler",d:"Armored prototype. It does not brake for criminals.",req:s=>s.w>=25,how:"25 missions"},
-  {e:"🚤",n:"The Batboat",d:"Gotham harbor patrol craft.",req:s=>s.streak>=14,how:"14-day streak"},
-  {e:"🦇",n:"The Batmobile",d:"The legend itself. 100 tonnes of moved iron forged it.",req:s=>s.vol>=100000,how:"100,000kg lifted"},
-  {e:"🚁",n:"The Batwing",d:"Air superiority over the Narrows.",req:s=>s.prs>=25,how:"Records on 25 lifts"},
-  {e:"✈️",n:'"The Bat"',d:"VTOL command craft. Reserved for the prime of the Dark Knight.",req:s=>s.w>=50,how:"50 missions"},
-  {e:"🛸",n:"Justice Cruiser",d:"Beyond Gotham. League-grade hardware.",req:s=>s.sl>=25,how:"Strength Lv 25"},
-  {e:"🏎️",n:"Wayne Hypercar",d:"Bruce's personal ride. Quarter-million kilos says you earned the keys.",req:s=>s.vol>=250000,how:"250,000kg lifetime"}
+  {e:"🪝",n:"Grappling Hook",d:"Standard issue. Every Bat starts here.",req:s=>true,how:"Unlocked from the start",k:"w",need:0},
+  {e:"🏍️",n:"Batcycle",d:"Nimble and fast. Earned by showing up.",req:s=>s.w>=5,how:"5 sessions",k:"w",need:5},
+  {e:"🚙",n:"The Tumbler",d:"Armored prototype. It does not brake for criminals.",req:s=>s.w>=25,how:"25 sessions",k:"w",need:25},
+  {e:"🚤",n:"The Batboat",d:"Gotham harbor patrol craft.",req:s=>s.streak>=14,how:"14-day streak",k:"streak",need:14},
+  {e:"🦇",n:"The Batmobile",d:"The legend itself. 100 tonnes of moved iron forged it.",req:s=>s.vol>=100000,how:"100,000 kg lifetime",k:"vol",need:100000},
+  {e:"🚁",n:"The Batwing",d:"Air superiority over the Narrows.",req:s=>s.prs>=25,how:"Records on 25 lifts",k:"prs",need:25},
+  {e:"✈️",n:'"The Bat"',d:"VTOL command craft. Reserved for the prime of the Dark Knight.",req:s=>s.w>=50,how:"50 sessions",k:"w",need:50},
+  {e:"🛸",n:"Justice Cruiser",d:"Beyond Gotham. League-grade hardware.",req:s=>s.sl>=25,how:"Strength level 25",k:"sl",need:25},
+  {e:"🏎️",n:"Wayne Hypercar",d:"Bruce's personal ride. A quarter-million kilos earns the keys.",req:s=>s.vol>=250000,how:"250,000 kg lifetime",k:"vol",need:250000}
 ];
 function openGarage(){state.subpage="garage";render();window.scrollTo(0,0);}
 function closeGarage(){state.subpage=null;go("gotham");}
@@ -6851,21 +6902,18 @@ const TITLES=[
   {n:"Iron Saint of Gotham",req:w=>w.totalVolume>=250000}
 ];
 function activeTitle(){try{const w=achStats();let best=null;TITLES.forEach(t=>{try{if(t.req(w))best=t;}catch(e){}});return best;}catch(e){return null;}}
-function renderGarage(){
-  const s=gothamStats();const unlocked=GARAGE.filter(v=>v.req(s)).length;
-  let html=`<div class="fade">
-    <div class="row sp" style="margin-bottom:6px"><button class="btn ghost sm" style="width:auto" onclick="closeGarage()">‹ Gotham</button><span class="chip on">${unlocked}/${GARAGE.length} unlocked</span></div>
-    <h1 style="font-size:34px;color:var(--gold2)">THE GARAGE</h1>
-    <div class="tag" style="margin-bottom:14px">Every milestone earns a new ride for the cave</div>`;
-  html+=GARAGE.map(v=>{const on=v.req(s);
-    return `<div class="card" style="display:flex;gap:13px;align-items:center;${on?'border-color:var(--gold-dim)':'opacity:.62'}">
-      <div style="font-size:40px;line-height:1;flex:none;${on?'filter:drop-shadow(0 0 10px rgba(232,197,106,.4))':'filter:grayscale(1) brightness(.6)'}">${on?v.e:"🔒"}</div>
-      <div style="flex:1;min-width:0"><h2 style="font-size:19px;margin:0;color:${on?'var(--gold2)':'var(--text3)'}">${on?esc(v.n):"▓▓▓▓▓▓"}</h2>
-        <div class="mini" style="color:var(--text2);line-height:1.45;margin-top:2px">${on?esc(v.d):"Locked vehicle"}</div>
-        <div class="mini" style="margin-top:4px;color:${on?'var(--green)':'var(--gold-dim)'}">${on?"✓ "+esc(v.how):"🔒 "+esc(v.how)}</div></div></div>`;
-  }).join("");
-  html+=`<button class="btn ghost" style="margin:6px 0 20px" onclick="closeGarage()">‹ Back to Gotham</button></div>`;
-  $("app").innerHTML=html;
+function renderGarage(){   // the fleet: current ride on a Gotham backdrop, the next unlock with its progress, every vehicle with its requirement
+  const s=gothamStats(),own=GARAGE.filter(v=>v.req(s)),top=own[own.length-1]||GARAGE[0],next=GARAGE.find(v=>!v.req(s));
+  const pct=v=>v.need?Math.round(Math.min(1,(s[v.k]||0)/v.need)*100):100,cur=v=>fmtNum(Math.round(s[v.k]||0));
+  const nextBlk=next?`<div class="gar-next"><div class="gar-nh"><span class="eyebrow">Next unlock</span><span class="t-xs">${cur(next)} of ${fmtNum(next.need)}</span></div><b>${esc(next.n)}</b><div class="sx-bar" role="img" aria-label="${pct(next)} percent to ${esc(next.n)}"><i style="width:${pct(next)}%"></i></div><span class="t-xs">${esc(next.how)}</span></div>`:`<div class="gar-next"><b>The fleet is complete</b></div>`;
+  const cards=GARAGE.map(v=>{const on=v.req(s);
+    return `<div class="gar-v2${on?"":" lock"}"><div class="gar-img">${on?vehImg(v.n,74):GP.icon("lock")}</div><b>${esc(v.n)}</b><span class="t-xs">${on?"Unlocked":esc(v.how)}</span>${on?"":`<div class="sx-bar"><i style="width:${pct(v)}%"></i></div>`}</div>`;}).join("");
+  $("app").innerHTML=`<div class="gh gar"><div class="sp-hd"><button class="btn-i" onclick="closeGarage()" aria-label="Back">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><div><h1>Garage</h1><div class="t-xs">${own.length} of ${GARAGE.length} unlocked</div></div></div>
+    <section class="s3 gar-hero"><div class="gar-bg" aria-hidden="true"><img src="assets/entrance/bat-city.png" alt="" decoding="async" onerror="this.parentNode.remove()"></div>
+      <div class="gar-car">${vehImg(top.n,330)}</div>
+      <div class="gar-cap"><span class="eyebrow">Current ride</span><h2 class="num">${esc(top.n)}</h2><p class="t-s">${esc(top.d)}</p></div></section>
+    <section class="s2 gar-nx">${nextBlk}</section>
+    <div class="gh-sec"><h2>The fleet</h2></div><div class="gar-grid">${cards}</div></div>`;
 }
 
 
@@ -7020,7 +7068,7 @@ function p3Records(){
   const rows=(all?list:list.slice(0,6)).map(([n,p])=>{const tr=p3Trend(n,{w:64,h:26,mini:1}),fresh=new Date(p.date||0).getTime()>=recent;
     return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(n)})"><span class="lead${fresh?" gold":""}">${GP.icon(fresh?"trophy":"dumbbell")}</span><div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">e1RM <b>${Math.round(p.orm)} kg</b> · PR ${p.date?ghAgo(p.date):"–"}</div></div><span class="trail">${tr?tr.svg:""}${GP.icon("chevR")}</span></div>`;}).join("");
   return `<div class="gh-sec gh-c" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
-    <section class="s2 gh-list gh-c" style="--i:2">${rows}${p3Row("chart","Every lift",loggedExerciseNames().length+" exercises · full curves","renderArchive()")}</section>`;
+    <section class="s2 gh-list gh-c" style="--i:2">${rows}${p3Row("chart","Every lift",loggedExerciseNames().length+" exercises · full curves","openArchive()")}</section>`;
 }
 function p3BigThree(){   // barbell-equivalent bench + squat + deadlift vs bodyweight (liftEstimate converts machine/Smith lifts), 4-week delta
   const d=state.data,bw=bodyW(),tops=["Bench Press","Squat","Deadlift"].map(l=>({l,e:liftEstimate(l)})).filter(x=>x.e);
@@ -10177,18 +10225,16 @@ function calcFuel(p){
 function fuelProtocolCard(){
   const n=state.data.u.nutrition;
   if(!n||!n.cals){
-    return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><button class="btn gold sm" style="width:auto" onclick="openFuel()">Set up</button></div>
-      <div class="mini" style="color:var(--text2)">Let Alfred calculate the exact calories and macros to match your goal — build, lean gain, maintain or cut. Two minutes, sir.</div></div>`;
+    return `<section class="s2 fu-c"><div class="gh-lh"><h3>Fuel protocol</h3><button class="btn btn-1 sm" onclick="openFuel()">Set up</button></div><p class="t-s fu-p">Calories and macros matched to your goal (Mifflin-St Jeor): build, lean gain, maintain or cut. Two minutes.</p></section>`;
   }
-  const macro=(v,l,c)=>`<div style="flex:1;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:9px 4px;background:var(--bg2)"><div style="font-family:var(--num);font-weight:400;font-size:21px;color:${c}">${v}<span style="font-size:12px">g</span></div><div class="mini" style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase">${l}</div></div>`;
-  const _day=foodDay();const _tot=foodTotals(_day);const _train=isTrainingToday();const _tgt=cycledTargets(n,_train?"train":"rest");const _left=_tgt.cals-_tot.k;const _logged=(_day.items||[]).length;
-  return `<div class="card glow"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('flame')}Fuel protocol</div><span class="chip ${_train?'on':''}" style="font-size:10.5px">${_train?trainIcon(12):restIcon(12)} ${_train?'Training':'Rest'}</span></div>
-    <div class="center" style="margin:2px 0 4px"><span class="chip on">${esc(n.goalLabel)} · ${n.goalAdj} maintenance</span></div>
-    <div class="center" style="font-family:var(--num);font-size:42px;color:var(--gold2);line-height:1.1">${fmtNum(_tgt.cals)}<span style="font-size:15px;color:var(--text2)"> kcal today</span></div>
-    <div class="row" style="gap:8px;margin-top:10px">${macro(_tgt.protein,"Protein","#ff8a7a")}${macro(_tgt.carbs,"Carbs","#E8C56A")}${macro(_tgt.fat,"Fat","#7cc4ff")}</div>
-    ${_logged?`<div class="row sp" style="margin-top:10px;padding:8px 10px;border:1px solid var(--border2);border-radius:11px;background:var(--bg2)"><span class="mini">Logged today · ${_tot.k} kcal · ${_tot.p}g protein</span><b class="mini" style="color:${_left<0?'#ff8a7a':'var(--gold2)'}">${_left>=0?fmtNum(_left)+" left":fmtNum(-_left)+" over"}</b></div>`:""}
-    <button class="btn gold" style="margin-top:11px" onclick="openMessHall()">${_logged?"Open the Mess Hall — log food":"Log today's food — Mess Hall"}</button>
-    <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">${_train?"Training day — carbs cycled up to fuel the work.":"Rest day — carbs trimmed, protein held high for recovery."} Hit <b style="color:#ff8a7a">${_tgt.protein}g protein</b> every day; it's the non-negotiable. ${n.goalLabel==="Cut fat"?"If the scale stalls 2 weeks, drop carbs ~30g.":n.goalLabel==="Maintain"?"Keep it steady and let training drive the change.":"Aim for ~0.25–0.5kg/week; faster is mostly fat."}</div></div>`;
+  const day=foodDay(),tot=foodTotals(day),train=isTrainingToday(),tgt=cycledTargets(n,train?"train":"rest"),left=tgt.cals-tot.k,logged=(day.items||[]).length;
+  const mac=(v,l)=>`<div><b class="num">${v}<small>g</small></b><span class="eyebrow">${l}</span></div>`;
+  return `<section class="s3 fu-hero"><div class="sx-h"><span class="eyebrow">${train?"Training day":"Rest day"} · ${esc(n.goalLabel)}</span><span class="tag">${esc(String(n.goalAdj))} maintenance</span></div>
+    <div class="fu-kcal"><b class="num">${fmtNum(tgt.cals)}</b><span>kcal today</span></div>
+    <div class="fu-mac">${mac(tgt.protein,"Protein")}${mac(tgt.carbs,"Carbs")}${mac(tgt.fat,"Fat")}</div>
+    ${logged?`<div class="fu-left"><span>Logged ${tot.k} kcal · ${tot.p} g protein</span><b class="${left<0?"c-bad":"c-gold"}">${left>=0?fmtNum(left)+" left":fmtNum(-left)+" over"}</b></div>`:""}
+    <button class="btn btn-1" onclick="openMessHall()">${logged?"Open the Mess Hall":"Log today's food"}</button>
+    <p class="t-xs fu-p">${train?"Carbs cycled up to fuel the work.":"Carbs trimmed, protein held high for recovery."} Hit ${tgt.protein} g protein every day; it is the non-negotiable. ${n.goalLabel==="Cut fat"?"If the scale stalls for 2 weeks, drop carbs by about 30 g.":n.goalLabel==="Maintain"?"Keep it steady and let training drive the change.":"Aim for 0.25 to 0.5 kg a week; faster is mostly fat."}</p></section>`;
 }
 function openFuel(){
   const u=state.data.u,n=u.nutrition||{};
@@ -10282,9 +10328,8 @@ function addMealTemplate(id){const t=(state.data.mealTemplates||[]).find(x=>x.id
 function delMealTemplate(id){state.data.mealTemplates=(state.data.mealTemplates||[]).filter(x=>x.id!==id);save();haptic("tap");fuelRefresh();}
 function mealTemplatesHtml(){
   const ts=state.data.mealTemplates||[];
-  const chips=ts.map(t=>{const tot=foodTotals({items:t.items});return `<div class="chip g" style="margin:0 6px 6px 0;display:inline-flex;align-items:center;gap:7px"><span onclick="addMealTemplate('${t.id}')" style="cursor:pointer">🍱 ${esc(t.name)} <span class="mini" style="color:var(--text3)">${tot.k}k·${tot.p}p</span></span><span onclick="delMealTemplate('${t.id}')" style="cursor:pointer;color:#ff8a7a;font-size:11px">✕</span></div>`;}).join("");
-  return `<div class="hr"></div><div class="row sp"><span class="mini" style="color:var(--text2)">🍱 Saved meals <span style="color:var(--text3)">— one-tap re-add</span></span><button class="btn ghost sm" style="width:auto;padding:4px 10px" onclick="saveMealTemplate()">+ Save today's log</button></div>
-    ${ts.length?`<div class="row wrap" style="margin-top:8px">${chips}</div>`:`<div class="mini" style="color:var(--text3);margin-top:6px">No saved meals yet. Log a meal you eat often, then tap <b>Save today's log</b> to reuse it instantly.</div>`}`;
+  const chips=ts.map(t=>{const tot=foodTotals({items:t.items});return `<div class="chip fu-meal"><span role="button" tabindex="0" onclick="addMealTemplate('${t.id}')">${esc(t.name)} <span class="t-xs">${tot.k}k · ${tot.p}p</span></span><button onclick="delMealTemplate('${t.id}')" aria-label="Delete ${esc(t.name)}">${GP.icon("x")}</button></div>`;}).join("");
+  return `<div class="fu-saved"><div class="fu-sh"><span class="eyebrow">Saved meals</span><button class="btn sm" onclick="saveMealTemplate()">Save today's log</button></div>${ts.length?`<div class="fu-chips">${chips}</div>`:`<p class="t-xs">No saved meals yet. Log a meal you eat often, then tap Save today's log to reuse it in one tap.</p>`}</div>`;
 }
 /* ===== Wave 12 — Alfred's voice: speak a line aloud via the browser's Web Speech API ===== */
 let _alfredVoices=[];
@@ -10585,48 +10630,31 @@ function logBW(){const el=$("fuel-bw");const v=el?parseFloat(el.value):NaN;
   const kg=Math.round(v*10)/10;state.data.bwLog=state.data.bwLog||[];
   state.data.bwLog.push({date:new Date().toISOString(),kg});state.data.u.bodyweight=kg;
   save();haptic("done");toast("Weigh-in logged · "+kg+"kg");render();}
-function renderFuel(){
-  const d=state.data,u=d.u;const n=u.nutrition;
-  let html=`<div class="row sp"><div><h1 style="font-size:34px;color:var(--gold2)">FUEL</h1><div class="tag" style="margin-bottom:2px">Eat for the mission</div></div><button class="btn ghost sm" style="width:auto" onclick="openIndex()" title="Find anything">🧭</button></div>
-    <div class="muted" style="font-style:italic;font-size:13px;margin:2px 0 12px">"You are what you eat, Master Wayne. Make it count." — Alfred</div>`;
-  // 1) Fuel protocol — targets + carb-cycle + Mess Hall link (reused card)
+function renderFuel(){   // Fuel: the protocol up top, then today's intake, hydration, the daily stack and bodyweight
+  const d=state.data,u=d.u,n=u.nutrition;
+  let html=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Fuel</h1><div class="t-xs">Calories, macros, hydration, bodyweight</div></div></div>`;
   html+=fuelProtocolCard();
   if(n&&n.cals){
-    const day=foodDay();const tot=foodTotals(day);const train=isTrainingToday();const tgt=cycledTargets(n,train?"train":"rest");
-    // 2) Quick food log right on the tab
-    const chips=FOODS.map((fd,i)=>`<button class="chip g" style="margin:0 5px 6px 0;text-align:left" onclick="addFood(${i})">+ ${esc(fd.n)} <span class="mini" style="color:var(--text3)">${fd.s} · ${fd.p}p</span></button>`).join("");
-    const logRows=(day.items||[]).length?day.items.map((it,i)=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)">
-        <div class="g"><b style="font-size:13.5px">${esc(it.n)}</b><div class="mini" style="color:var(--text3)">${it.k}kcal · P${it.p} C${it.c} F${it.f}</div></div>
-        <button class="btn ghost sm" style="width:auto;padding:5px 9px;color:#ff8a7a" onclick="removeFood(${i})">✕</button></div>`).join("")
-      :`<p class="mini" style="color:var(--text3);padding:8px 0">Nothing logged yet today. Tap a food below or open the Mess Hall for custom entries.</p>`;
-    html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">📋 Today's intake</div><span class="mini"><b style="color:${tot.k>tgt.cals?'#ff8a7a':'var(--gold2)'}">${tot.k}</b>/${tgt.cals} kcal · ${tot.p}/${tgt.protein}g P</span></div>
-      ${logRows}
-      <div class="hr"></div>
-      <div class="mini" style="margin-bottom:6px;color:var(--text2)">Quick add</div>
-      <div class="row wrap">${chips}</div>
-      ${mealTemplatesHtml()}
-      <button class="btn gold sm" style="margin-top:11px" onclick="openMessHall()">Open the Mess Hall — full log, rings & custom foods ›</button></div>`;
+    const day=foodDay(),tot=foodTotals(day),train=isTrainingToday(),tgt=cycledTargets(n,train?"train":"rest");
+    const chips=FOODS.map((fd,i)=>`<button class="chip" onclick="addFood(${i})">+ ${esc(fd.n)} <span class="t-xs">${fd.s} · ${fd.p}p</span></button>`).join("");
+    const logRows=(day.items||[]).length?day.items.map((it,i)=>`<div class="gh-row"><div class="main"><div class="gh-t1">${esc(it.n)}</div><div class="gh-t2">${it.k} kcal · P${it.p} C${it.c} F${it.f}</div></div><button class="btn-i" onclick="removeFood(${i})" aria-label="Remove ${esc(it.n)}">${GP.icon("x")}</button></div>`).join(""):`<p class="t-s fu-p">Nothing logged yet today. Tap a food below or open the Mess Hall for custom entries.</p>`;
+    html+=`<section class="s2 gh-list fu-log"><div class="gh-lh"><h3>Today's intake</h3><span class="t-xs"><b class="${tot.k>tgt.cals?"c-bad":"c-gold"}">${tot.k}</b> / ${tgt.cals} kcal · ${tot.p} / ${tgt.protein} g protein</span></div>${logRows}
+      <div class="fu-add"><span class="eyebrow">Quick add</span><div class="fu-chips">${chips}</div>${mealTemplatesHtml()}<button class="btn" onclick="openMessHall()">Open the Mess Hall: full log, rings, custom foods</button></div></section>`;
   }
-  // 3) Hydration (works even before a protocol is set)
-  const day2=foodDay();const wT=waterTargetGlasses(n);const wHave=day2.water||0;
-  const glasses=Array.from({length:wT},(_,i)=>`<span style="font-size:17px;filter:grayscale(${i<wHave?0:1});opacity:${i<wHave?1:.4}">💧</span>`).join("");
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">💧 Hydration</div><span class="mini">${wHave}/${wT} glasses · ${(wHave*0.25).toFixed(2)}L</span></div>
-    <div style="margin:8px 0;line-height:1.9">${glasses}</div>
-    <div class="row g" style="gap:8px"><button class="btn ghost sm" onclick="addWater(1)">+ Glass</button><button class="btn ghost sm" style="flex:0 0 auto;width:auto" onclick="addWater(-1)">−</button></div></div>`;
-  // 4) Daily supplement stack (shared with Infirmary; toggleSupp is context-aware)
-  const supp=suppToday();const cStreak=creatineStreak();
-  const items=[["creatine","Creatine 5g","💊"],["protein","Protein target","🥩"],["omega","Omega-3","🐟"],["vitd","Vitamin D","☀️"],["water","Hydration","💧"]];
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">💊 Daily stack</div>${cStreak?`<span class="chip on" style="color:var(--gold2)">🔥 ${cStreak}d creatine</span>`:""}</div>
-    <div style="margin-top:6px">${items.map(([k,l,e])=>{const on=!!supp[k];return `<button class="row sp" onclick="toggleSupp('${k}')" style="width:100%;background:none;border:none;padding:9px 0;border-top:1px solid var(--border);cursor:pointer"><span style="font-size:13.5px;color:${on?'var(--text)':'var(--text2)'}">${e} ${l}</span><span style="font-size:18px">${on?'✅':'⬜️'}</span></button>`;}).join("")}</div>
-    <div class="mini" style="margin-top:7px;color:var(--text3);font-style:italic">Creatine monohydrate 3–5g daily is the most evidence-backed legal supplement — consistency is the whole game.</div></div>`;
-  // 5) Bodyweight weigh-in + trend
-  const log=(d.bwLog||[]);const vals=log.slice(-16).map(e=>+e.kg).filter(v=>v>0);
-  const first=vals.length?vals[0]:null,last=vals.length?vals[vals.length-1]:null;const delta=(first!=null&&last!=null)?(last-first):null;
+  const day2=foodDay(),wT=waterTargetGlasses(n),wHave=day2.water||0;
+  html+=`<section class="s2 fu-c"><div class="gh-lh"><h3>Hydration</h3><span class="t-xs">${wHave} / ${wT} glasses · ${(wHave*0.25).toFixed(2)} L</span></div>
+    <div class="fu-gl" role="img" aria-label="${wHave} of ${wT} glasses">${Array.from({length:wT},(_,i)=>`<i class="${i<wHave?"on":""}"></i>`).join("")}</div>
+    <div class="fu-btns"><button class="btn" onclick="addWater(1)">${GP.icon("plus")}Glass</button><button class="btn" onclick="addWater(-1)" aria-label="Remove a glass">−</button></div></section>`;
+  const supp=suppToday(),cStreak=creatineStreak(),items=[["creatine","Creatine 5 g"],["protein","Protein target"],["omega","Omega-3"],["vitd","Vitamin D"],["water","Hydration"]];
+  html+=`<section class="s2 gh-list fu-stack"><div class="gh-lh"><h3>Daily stack</h3>${cStreak?`<span class="tag ok">${cStreak} d creatine streak</span>`:""}</div>
+    ${items.map(([k,l])=>{const on=!!supp[k];return `<button class="gh-row fu-tg${on?" on":""}" aria-pressed="${on}" onclick="toggleSupp('${k}')"><div class="main"><div class="gh-t1">${l}</div></div><span class="fu-ck">${on?GP.icon("check"):""}</span></button>`;}).join("")}
+    <p class="t-xs fu-p">Creatine monohydrate, 3 to 5 g daily, is the best-evidenced legal supplement. Consistency is the whole game.</p></section>`;
+  const log=(d.bwLog||[]),vals=log.slice(-16).map(e=>+e.kg).filter(v=>v>0),first=vals.length?vals[0]:null,last=vals.length?vals[vals.length-1]:null,delta=(first!=null&&last!=null)?(last-first):null;
   const curve=vals.length>=2&&typeof trendChart==="function"?trendChart(vals,{color:"#7cc4ff",unit:"kg"}):"";
-  html+=`<div class="card"><div class="row sp"><div class="ttl" style="margin:0">⚖️ Bodyweight</div><span class="big" style="font-size:24px">${u.bodyweight||"—"}<span style="font-size:13px">kg</span></span></div>
-    ${curve?`<div style="margin:8px 0 2px">${curve}</div><div class="mini" style="color:${delta>0?'#7cc4ff':delta<0?'#ff8a7a':'var(--text3)'}">${delta!=null?(delta>0?"▲ +":delta<0?"▼ ":"")+ (delta?Math.abs(delta).toFixed(1)+"kg across last "+vals.length+" weigh-ins":"holding steady"):""}</div>`:`<div class="mini" style="color:var(--text3);margin:4px 0">Log a few weigh-ins to draw your trend curve.</div>`}
-    <div class="row g" style="gap:8px;margin-top:9px"><input id="fuel-bw" inputmode="decimal" placeholder="${u.bodyweight||75} kg" style="flex:1"/><button class="btn gold sm" style="width:auto" onclick="logBW()">Log weigh-in</button></div>
-    <div class="mini" style="margin-top:7px;color:var(--text3)">Weigh first thing, same conditions. Track the weekly average, not the daily noise.</div></div>`;
+  html+=`<section class="s2 fu-c"><div class="gh-lh"><h3>Bodyweight</h3><b class="num fu-bw">${u.bodyweight||"—"}<small>kg</small></b></div>
+    ${curve?`<div class="fu-curve">${curve}</div><p class="t-xs fu-p">${delta?(delta>0?"Up ":"Down ")+Math.abs(delta).toFixed(1)+" kg across the last "+vals.length+" weigh-ins":"Holding steady across the last "+vals.length+" weigh-ins"}</p>`:`<p class="t-s fu-p">Log a few weigh-ins to draw your trend.</p>`}
+    <div class="fu-wi"><input id="fuel-bw" inputmode="decimal" placeholder="${u.bodyweight||75} kg" aria-label="Bodyweight in kilograms"/><button class="btn btn-1" onclick="logBW()">Log weigh-in</button></div>
+    <p class="t-xs fu-p">Weigh first thing, same conditions. Track the weekly average, not the daily noise.</p></section></div>`;
   $("app").innerHTML=html;
 }
 
@@ -10721,32 +10749,22 @@ function openRankLadder(){
    Tools: Patrol Calendar (heatmap) · Trophy Room (badge gallery) · Oracle (projections)
           · Contracts (custom goals) · Strength Simulator · Batcomputer Terminal · Bat-Focus
    ================================================================================= */
-function renderTech(){
-  const d=state.data,u=d.u;
-  let html=`<div class="row sp"><div><h1 style="font-size:34px;color:var(--gold2)">WAYNE TECH</h1><div class="tag" style="margin-bottom:2px">The gadget vault</div></div><button class="btn ghost sm" style="width:auto" onclick="openIndex()" title="Find anything">🧭</button></div>
-    <div class="muted" style="font-style:italic;font-size:13px;margin:2px 0 12px">"Every tool in the cave, in one place. No more hunting, sir." — Lucius Fox</div>`;
-  // Hero — 26-week patrol heatmap
-  html+=`<div class="card" style="padding:14px"><div class="row sp"><div class="ttl" style="margin:0">🗓️ Patrol Calendar</div><span class="mini" style="color:var(--text2)">Last 26 weeks</span></div>
-    <div class="mini" style="color:var(--text3);margin:2px 0 10px">Every square is a day. Brighter = bigger tonnage moved.</div>
-    ${patrolCalendar()}
-    <button class="btn ghost sm" style="margin-top:10px" onclick="openFocus()">🧘 Open Bat-Focus — box-breathing for between sets ›</button></div>`;
-  // Tool launcher grid
+function renderTech(){   // Wayne Tech: the training tools in one place. The calendar first, then every tool as a row.
   const tools=[
-    ["openOracle","🔮","ORACLE","Predicts your next rank & lifts"],
-    ["openTrophyRoom","🏆","TROPHY ROOM","All 26 honors & progress"],
-    ["openContracts","📜","CONTRACTS","Set custom goals, track to target"],
-    ["openSimulator","🧪","SIMULATOR","Model future strength gains"],
-    ["openTerminal","💻","BATCOMPUTER","Query your data by command"],
-    ["openArchive","🗄️","ARCHIVE","Every lift's full history"]
+    ["openOracle","up","Oracle","Rank and lift projections with an ETA"],
+    ["openSimulator","flask","Strength simulator","Model future gains from consistency"],
+    ["openContracts","target","Contracts","Custom goals tracked to a target"],
+    ["openForge","scale","Plate forge","1RM, percentage loading, the next plate jump"],
+    ["openBatcomputer","chart","Batcomputer","Volume, balance and trend analytics"],
+    ["openTerminal","note","Terminal","Query your data by command"],
+    ["openArchive","book","Every lift","Strength curves and history for each lift"],
+    ["openTrophyRoom","trophy","Trophy room","Badges and progress to the locked ones"],
+    ["openFocus","moon","Bat-Focus","Box breathing between sets"]
   ];
-  html+=`<div class="grid2" style="margin-top:10px">${tools.map(t=>`<button class="card" style="text-align:left;padding:14px;cursor:pointer" onclick="${t[0]}()">
-    <div style="font-size:26px">${t[1]}</div><div class="ttl" style="margin:4px 0 2px;font-size:15px">${t[2]}</div>
-    <div class="mini" style="color:var(--text3);line-height:1.4">${t[3]}</div></button>`).join("")}</div>`;
-  // Jump-to chips (deep links to tools that live elsewhere)
-  const jumps=[["openForge","⚒️ Plate Forge"],["openGarage","🏍️ Batmobile"],["openInfirmary","🏥 Infirmary"],["openBatcomputer","🧠 Batcomputer"],["openJusticeLeague","🦸 Justice League"]];
-  html+=`<div class="card" style="margin-top:10px;padding:13px"><div class="ttl" style="margin:0 0 8px;font-size:14px">⚡ Quick jump</div>
-    <div class="row wrap">${jumps.map(j=>`<button class="chip g" style="margin:0 5px 6px 0" onclick="${j[0]}()">${j[1]}</button>`).join("")}</div></div>`;
-  $("app").innerHTML=html;
+  const rows=tools.map(t=>`<div class="gh-row" role="button" tabindex="0" onclick="${t[0]}()"><span class="lead">${GP.icon(t[1])}</span><div class="main"><div class="gh-t1">${t[2]}</div><div class="gh-t2">${t[3]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("");
+  $("app").innerHTML=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Wayne Tech</h1><div class="t-xs">Training tools in one place</div></div></div>
+    <section class="s2 sp-cal"><div class="gh-lh"><h3>Patrol calendar</h3><span class="t-xs">Last 26 weeks</span></div><div class="sp-calb">${patrolCalendar()}</div></section>
+    <section class="s2 gh-list sp-tools"><div class="gh-lh"><h3>Tools</h3></div>${rows}</section></div>`;
 }
 /* ---- Patrol heatmap ---- */
 function dayVolMap(){
