@@ -1467,11 +1467,11 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .topbar.tb-home{margin-bottom:6px}
 .topbar.tb-home .tb-r{gap:6px}
 .topbar.tb-home .tbtn{width:36px;height:36px}
-.gh-eb{flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--gold-ink);font:650 11px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
-.gh-eb .gi{width:16px;height:16px;flex:none}
-.gh-eb .gh-cy{color:var(--tx3);overflow:hidden;text-overflow:ellipsis}
-@media(max-width:389px){.gh-cyw{display:none}}
-.gh-hi{margin:0 2px 14px;font:700 27px/1.1 var(--body);letter-spacing:-.028em;color:var(--tx1);text-wrap:balance}
+.gh-eb{flex:1;min-width:0;display:flex;align-items:center;gap:10px;overflow:hidden}
+.gh-logo{width:30px;height:30px;flex:none;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+.gh-id{min-width:0;display:flex;flex-direction:column;gap:4px}
+.gh-idn{font:700 18px/1.05 var(--body);letter-spacing:-.02em;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-idd{font:650 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink);white-space:nowrap}
 
 /* type + colour helpers */
 .gh .eyebrow{font:600 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx2)}
@@ -1491,7 +1491,13 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh .s3.is-live{box-shadow:inset 0 1px 0 rgba(255,226,150,.16),0 0 0 1.5px var(--gold),0 26px 50px -22px rgba(0,0,0,.95)}
 
 /* TONIGHT hero */
-.gh-hero{padding:15px 16px 16px}
+.gh-hero{padding:12px 16px 10px}
+.gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
+.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
+.s3.is-live .gh-art,.s3.is-rest .gh-art{opacity:.5}
+@keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
+@media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
 .gh-live{display:inline-flex;align-items:center;gap:7px;color:var(--gold-ink)}
 .gh-live::before{content:"";width:7px;height:7px;border-radius:9px;background:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.2)}
@@ -1504,7 +1510,8 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh-cyc i{width:13px;height:4px;border-radius:2px;background:rgba(150,178,222,.17)}
 .gh-cyc i.d{background:rgba(242,193,78,.45)}
 .gh-cyc i.t{width:20px;background:var(--gold)}
-.gh .gh-title{margin:6px 0 6px;font-size:clamp(30px,9.6vw,37px);color:#FBF7EC;line-height:.95;text-wrap:balance}
+.gh-cyn{margin-left:5px;font:600 11px/1 var(--body);letter-spacing:.04em;color:var(--tx3);font-variant-numeric:tabular-nums}
+.gh .gh-title{margin:2px 0 6px;font-size:clamp(30px,9.6vw,37px);color:#FBF7EC;line-height:.95;text-wrap:balance;text-shadow:0 2px 14px rgba(0,0,0,.55)}
 .gh-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:13px;line-height:18px;color:var(--tx2)}
 .gh-meta b{color:var(--tx1);font-weight:600}
 .gh-meta .up{color:var(--gold-ink);font-weight:600;display:inline-flex;align-items:center;gap:3px}
@@ -1512,55 +1519,42 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh-next{display:inline-flex;align-items:center;gap:2px;position:relative;color:var(--tx2);font:inherit;text-align:left;padding:4px 0}
 .gh-next .gi{width:15px;height:15px;color:var(--tx3)}
 .gh-seg{margin:14px 0 16px}
-.gh-tm{display:flex;justify-content:space-between;gap:10px 8px;margin:15px 0 16px;padding-top:13px;border-top:1px solid rgba(242,193,78,.14)}
+/* readiness band: score ring beside tonight's muscles, one chip row of drivers under it */
+.gh-band{display:flex;align-items:center;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(242,193,78,.16)}
+.gh-rg{position:relative;flex:none;width:82px;height:82px;border-radius:99px;background:radial-gradient(circle,rgba(7,9,13,.6) 56%,transparent 71%)}
+.gh-rg.empty .ring-v{display:none}
+.gh-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.gh-rc .num{font-size:34px;margin-top:3px}
+.gh-rc .eyebrow{font-size:9px;letter-spacing:.03em}
+.gh-tm{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 6px}
 .gh-tmc{display:flex;align-items:center;gap:7px;min-width:0}
 .gh-tmc .ring{flex:none}
 .gh-tmc b{display:block;font:600 13px/1.15 var(--body);color:var(--tx1)}
 .gh-tmc span{font:500 12px/1.2 var(--body);color:var(--tx2);white-space:nowrap}
 .gh-tmc.warn span{color:var(--warn);font-weight:600}
-.gh-tm2{display:grid;grid-template-columns:1fr 1fr}
-@media(max-width:389px){.gh-tm{display:grid;grid-template-columns:1fr 1fr}}
-.gh-cta{display:flex;gap:10px}
-.gh-cta .btn{width:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 18px;border:0;flex:none}
+.gh-drv{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gh-drv.col{flex-direction:column;align-items:flex-start;margin:0}
+.gh-chip{position:relative;display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 8px;border-radius:9px;background:rgba(7,9,13,.5);box-shadow:inset 0 0 0 1px rgba(150,178,222,.2);font:500 12px/1 var(--body);color:var(--tx2);white-space:nowrap}
+.gh-chip .k{color:var(--tx3);font-weight:600}
+.gh-chip b{color:var(--tx1);font-weight:650;font-variant-numeric:tabular-nums}
+.gh-chip .act{display:inline-flex;align-items:center;gap:2px;color:var(--gold-ink);font-weight:650}
+.gh-chip .act .gi{width:12px;height:12px;stroke-width:2.4}
+.gh-cta{display:flex;gap:10px;margin-top:12px}
+.gh-cta .btn{width:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 18px;border:0;flex:none}
 .gh-cta .btn-1{flex:1;padding:0 22px}
 .gh-cta .btn .gi{width:18px;height:18px}
 .gh-cta .btn.gh-done{flex:1;background:var(--tint-ok);color:var(--ok);box-shadow:inset 0 0 0 1px rgba(52,210,127,.28);opacity:1;filter:none}
-
-/* Batman art behind the hero (wave 3c): right-aligned poster, dark veils from the left and bottom keep the text legible, one slow transform-only drift */
-.gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-.gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.2),rgba(4,5,8,.76) 54%,#07090d),linear-gradient(90deg,rgba(7,9,13,.96),rgba(7,9,13,.52) 52%,rgba(7,9,13,.86))}
-.gh-art{position:absolute;right:-28px;top:-18px;width:66%;height:112%;object-fit:cover;object-position:center;opacity:.72;filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
-.s3.is-live .gh-art,.s3.is-rest .gh-art{opacity:.5}
-@keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
-@media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
-
-/* READINESS */
-.gh-ready{margin-top:12px;padding:13px 16px 11px}
-.gh-rd-main{display:flex;gap:16px;align-items:center}
-.gh-ring{position:relative;width:92px;height:92px;flex:none}
-.gh-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.gh-rc .num{font-size:38px;margin-top:4px}
-.gh-rc .eyebrow{letter-spacing:.04em}
-.gh-rd{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
-.gh-rd-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.gh-drv{position:relative;display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:8px;font-size:13px;color:var(--tx2);min-height:20px}
-.gh-drv .bar{height:5px;border-radius:3px;background:rgba(150,178,222,.12);overflow:hidden}
-.gh-drv .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,rgba(243,240,232,.55),#F3F0E8)}
-.gh-drv .num{font-size:19px;color:var(--tx1);min-width:22px;text-align:right}
-.gh-nl{font-size:12.5px;color:var(--warn);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gh-lr{grid-column:2/4;color:var(--tx1);white-space:nowrap}
-.gh-lr span{font-weight:600}
-.gh-log{position:relative;display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 9px;border-radius:7px;font:650 12.5px/1 var(--body);background:var(--tint-gold);color:var(--gold-ink)}
-.gh-log .gi{width:13px;height:13px;stroke-width:2.4}
-.gh-hint{font-size:13px;line-height:18px;color:var(--tx2)}
-.gh-coach{position:relative;display:flex;align-items:center;gap:9px;width:100%;margin-top:11px;padding:10px 0 2px;border-top:1px solid var(--hair);font-size:13px;line-height:17px;color:var(--tx2);text-align:left}
+.gh-coach{position:relative;display:flex;align-items:center;gap:9px;width:100%;margin-top:10px;padding:8px 0 0;border-top:1px solid var(--hair);font-size:12.5px;line-height:16px;color:var(--tx2);text-align:left}
 .gh-coach .av{width:24px;height:24px;border-radius:99px;flex:none;overflow:hidden;box-shadow:0 0 0 1px rgba(242,193,78,.7)}
 .gh-coach .av img{width:100%;height:100%;object-fit:cover;object-position:50% 26%}
+.gh-coach .tx{flex:1;min-width:0}
 .gh-coach b{color:var(--tx1);font-weight:600}
+.gh-coach .trail{flex:none;color:var(--tx3)}
+.gh-coach .trail .gi{width:15px;height:15px}
 
 /* THIS WEEK + volume map */
-.gh-week{margin-top:12px;padding:14px 14px 10px}
-.gh-wk-h{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.gh-week{margin-top:12px;padding:12px 14px 10px}
+.gh-wk-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .gh-wk-l{position:relative;min-width:0}
 .gh-wk-t{display:flex;align-items:baseline;gap:6px;margin-top:5px}
 .gh-wk-t .num{font-size:30px}
@@ -1568,7 +1562,11 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh-stk{display:flex;align-items:center;gap:4px;margin-top:6px;font:600 12px/1 var(--body);color:var(--gold-ink)}
 .gh-stk.off{color:var(--tx3)}
 .gh-stk .gi{width:14px;height:14px}
-.gh-wk-r{position:relative;width:178px;flex:none}
+.gh-wk-r{width:178px;flex:none;display:flex;flex-direction:column;align-items:stretch;gap:9px}
+.gh-wk-d{position:relative}
+.gh-ton{position:relative;align-self:flex-end;display:flex;align-items:center;gap:6px;padding:1px 0}
+.gh-ton .num{font-size:21px;line-height:1;margin-top:2px}
+.gh-ton .u{font:600 12px/1 var(--body);color:var(--tx2)}
 .gh .wk{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
 .gh .wk .d{display:flex;flex-direction:column;align-items:center;gap:4px;font:600 11px/1 var(--body);color:var(--tx3)}
 .gh .wk .dot{width:20px;height:20px;border-radius:999px;display:grid;place-items:center;background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair)}
@@ -1578,25 +1576,21 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh .wk .dot.rest::after{content:"";width:8px;height:2px;border-radius:1px;background:var(--tx3)}
 .gh .wk .dot.today{box-shadow:inset 0 0 0 2px var(--gold);background:var(--tint-gold)}
 .gh .wk .d.is-today{color:var(--gold-ink)}
-.gh-lgd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 10px;padding-top:12px;border-top:1px solid var(--hair)}
+.gh-lgd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 8px;padding-top:9px;border-top:1px solid var(--hair)}
+.gh-lgd .eyebrow{white-space:nowrap}
 .gh-lgd .k{display:flex;gap:10px;font:600 11px/1 var(--body);color:var(--tx3);white-space:nowrap}
 .gh-lgd .k span{display:inline-flex;align-items:center;gap:4px}
-.gh-rd-h .eyebrow{white-space:nowrap}
-.gh-wk-f .btn.btn-3{white-space:nowrap;flex:none}
-.gh-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:44px}
-.gh-col i{font-style:normal}
 .gh-lgd .sw{width:12px;height:5px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(243,240,232,.75) 0 2px,rgba(243,240,232,.25) 2px 4px)}
-.gh-mgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
-.gh-mt{position:relative;min-width:0;padding:4px 2px 8px;border-radius:10px}
-.gh-mt-t{display:flex;align-items:center;gap:6px;height:19px;margin-bottom:6px}
-.gh-mt-t .ring{flex:none}
-.gh-mt-n{min-width:0;font:600 13px/1 var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gh-mt-h{flex:none;font:600 11px/1 var(--body);color:var(--rest);white-space:nowrap}
-.gh-mt-v{margin-left:auto;flex:none;display:flex;align-items:center;gap:5px}
-.gh-mt-v .num{font-size:21px;line-height:1;margin-top:2px}
-.gh-wk-f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;padding-top:6px;border-top:1px solid var(--hair)}
-.gh .btn.btn-3{width:auto;min-height:36px;height:36px;padding:0 6px;border:0;background:none;box-shadow:none;color:var(--gold-ink);font-size:14px;gap:6px}
-.gh .btn.btn-3 .gi{width:17px;height:17px}
+.gh-mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.gh-mt{position:relative;min-width:0;padding:6px 8px 7px;border-radius:10px;background:rgba(150,178,222,.05)}
+.gh-mt.is-warn{background:var(--tint-warn)}
+.gh-mt.is-bad{background:var(--tint-bad)}
+.gh-mt-t{display:flex;align-items:center;gap:4px;height:17px;margin-bottom:5px}
+.gh-mt-n{min-width:0;flex:1;font:600 12px/1 var(--body);color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-mt-t i{flex:none;font:700 8px/1 var(--body);font-style:normal}
+.gh-mt-t .num{flex:none;font-size:20px;line-height:1;margin-top:2px}
+.gh-fc{display:inline-flex;flex:none;color:var(--warn)}
+.gh-fc .gi{width:13px;height:13px}
 .gh-empty{margin:14px 0 6px;padding-top:12px;border-top:1px solid var(--hair);font-size:13px;line-height:18px;color:var(--tx2)}
 /* landmark bar (GP.landmark) */
 .gh .lmk{position:relative;height:6px;border-radius:3px;background:rgba(150,178,222,.11)}
@@ -1613,25 +1607,18 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh svg.spark,.gh svg.bars{display:block;height:auto;gap:0;align-items:initial}
 .gh svg.ring{display:block}
 
-/* PROGRESS tiles, record + stalled lists */
-.gh-sec{display:flex;align-items:baseline;justify-content:space-between;margin:26px 4px 10px}
-.gh-sec h2{margin:0;font:700 20px/1.2 var(--body);letter-spacing:-.02em}
+/* LIFTS: recent records + stalled lifts in one card */
 .gh-more{position:relative;padding:6px 0 6px 12px;font:600 15px/1 var(--body);color:var(--gold-ink)}
-.gh-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.gh-tile{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0;padding:12px 14px}
-.gh-v{display:flex;align-items:baseline;gap:5px}
-.gh-v .num{font-size:34px}
-.gh-v .u{font-size:13px;font-weight:600;color:var(--tx2)}
-.gh-dl{display:flex;align-items:center;gap:6px;font:600 13px/1 var(--body)}
-.gh-dl .gi{width:15px;height:15px}
-.gh-dl.up{color:var(--ok)}.gh-dl.flat{color:var(--tx3)}
-.gh-tile .spark,.gh-tile .bars{width:100%;margin-top:2px}
 .gh-list{overflow:hidden;margin-top:12px}
-.gh-lh{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 14px 4px}
+.gh-lh{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px 0}
 .gh-lh h3{margin:0;display:flex;align-items:center;gap:8px;font:650 17px/1.2 var(--body);letter-spacing:-.015em}
-.gh-row{position:relative;display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 14px}
+.gh-sub{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px 3px;font:650 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx2)}
+.gh-sub span{display:inline-flex;align-items:center;gap:6px}
+.gh-sub i{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none;color:var(--tx3)}
+.gh-row+.gh-sub{margin-top:2px;padding-top:10px;border-top:1px solid var(--hair)}
+.gh-row{position:relative;display:flex;align-items:center;gap:12px;min-height:46px;padding:6px 14px}
 .gh-row+.gh-row{border-top:1px solid var(--hair)}
-.gh-row .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:rgba(150,178,222,.08);color:var(--tx2)}
+.gh-row .lead{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;flex:none;background:rgba(150,178,222,.08);color:var(--tx2)}
 .gh-row .lead.gold{background:var(--tint-gold);color:var(--gold-ink)}
 .gh-row .lead.warn{background:var(--tint-warn);color:var(--warn)}
 .gh-row .main{flex:1;min-width:0}
@@ -1640,21 +1627,34 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh-row .trail{display:flex;align-items:center;gap:6px;flex:none;color:var(--tx3)}
 .gh-row .trail .gi{width:16px;height:16px}
 .gh-row .trail .d{font:600 13px/1 var(--body);color:var(--ok)}
-.gh-row:active,.gh-lh:active{background:rgba(150,178,222,.05)}
+.gh-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:44px}
+.gh-col i{font-style:normal}
+.gh-row:active,.gh-lh:active,.gh-sub:active{background:rgba(150,178,222,.05)}
 
-/* LORE fold: one row; the district map, chronicle, season, crate, siege and garage open under it */
-.gh-lore{position:relative;display:flex;align-items:center;gap:12px;min-height:58px;margin-top:12px;padding:10px 14px;border-radius:var(--r-m);overflow:hidden}
-.gh-lore>:not(.sky):not(.hx){position:relative;z-index:1}
-.gh-fc{display:inline-flex;color:var(--warn)}
-.gh-fc .gi{width:15px;height:15px}
-.gh-lore .sky{position:absolute;right:0;bottom:0;width:230px;height:62px;z-index:0;pointer-events:none}
-.gh-lore .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--tint-gold);color:var(--gold-ink)}
-.gh-lore .main{flex:1;min-width:0}
-.gh-lore .trail{flex:none;color:var(--tx3)}
-.gh-lore .trail .gi{width:16px;height:16px;transition:transform .28s var(--spring)}
-.gh-lore.open .trail .gi{transform:rotate(90deg)}
-.gh-lore-body{margin-top:12px}
-.gh-lore-body .gh-list{margin-top:0}
+/* GOTHAM EXTRAS: one slim row on Home, the story layer lives in its sheet */
+.gh-x{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:48px;margin-top:12px;padding:8px 14px;border-radius:var(--r-m);text-align:left}
+.gh-x .lead{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;background:var(--tint-gold);color:var(--gold-ink)}
+.gh-x .lead .gi{width:17px;height:17px}
+.gh-x .main{flex:1;min-width:0}
+.gh-x .main>span{display:block}
+.gh-x .gh-t1{line-height:18px}
+.gh-x .gh-t2{font-size:12px;line-height:16px}
+.gh-x .trail{flex:none;color:var(--tx3)}
+.gh-x .trail .gi{width:16px;height:16px}
+.gh-dot{flex:none;width:8px;height:8px;border-radius:9px;background:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.2)}
+.gx{margin-top:10px;border-radius:var(--r-m);overflow:hidden;background:var(--g1);box-shadow:var(--hl)}
+.gx-row{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:9px 14px;text-align:left;color:var(--tx1)}
+.gx-row+.gx-row{border-top:1px solid var(--hair)}
+.gx-row .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:rgba(150,178,222,.08);color:var(--tx2)}
+.gx-row .lead .gi{width:18px;height:18px}
+.gx-row .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.gx-row b{font:600 15px/20px var(--body);color:var(--tx1)}
+.gx-row .s{font:500 13px/17px var(--body);color:var(--tx2)}
+.gx-row .trail{flex:none;color:var(--tx3)}
+.gx-row .trail .gi{width:16px;height:16px}
+.gx-row:active{background:rgba(150,178,222,.05)}
+.gx-now{margin:10px 0 2px}
+.gx-now>.card,.gx-now>.gtv2-panel{margin-bottom:10px}
 
 /* motion: first paint of the view only (the stagger stays under 200ms), reduced motion is handled globally */
 @keyframes ghIn{from{opacity:0;transform:translateY(8px)}}
@@ -12882,9 +12882,9 @@ function ghGreeting(){
   const h=new Date().getHours(),n=String(state.data.u.name||"").trim();
   return (h>=5&&h<12?"Good morning":h>=12&&h<17?"Good afternoon":"Good evening")+(n?", "+esc(n):"");
 }
-function ghEyebrow(){   // the top bar's left slot on Home
-  const t=new Date(),cur=gtv2CurrentPlanDay();
-  return `<div class="gh-eb">${GP.icon("bat")}<span>${GH_DOW[t.getDay()]} ${t.getDate()} ${GH_MON[t.getMonth()]}</span>${cur?`<span class="gh-cy">· <span class="gh-cyw">Cycle </span>day ${cur.i+1} of ${cur.sp.days.length}</span>`:""}</div>`;
+function ghEyebrow(){   // the top bar's left slot on Home: the Gotham mark, the greeting, the date. The cycle day lives on the hero rail.
+  const t=new Date();
+  return `<div class="gh-eb"><img class="gh-logo" src="logo_t.png" alt="" onerror="this.style.display='none'"><div class="gh-id"><span class="gh-idn">${ghGreeting()}</span><span class="gh-idd">${GH_DOW[t.getDay()]} ${t.getDate()} ${GH_MON[t.getMonth()]}</span></div></div>`;
 }
 
 /* ---- tonight's numbers ---- */
@@ -12910,9 +12910,9 @@ function ghVol(day){   // one row per muscle: sets this cycle-week, landmarks, r
     return {m,sets,L,zone:GP.zone(sets,L),rec,hrs:rec<GH_FRESH?hoursToReady(m):0,plan:Math.round(perWeek(plan[m]||0)*10)/10,trained:(state.data.muscleVol[m]||0)>0};
   });
 }
-function ghAttention(vol){   // over MRV (worst first), under MEV (furthest first), then the rest by lowest recovery
+function ghAttention(vol){   // over MRV (worst first), then under MEV (furthest first); everything else keeps the fixed muscle order so tiles never shuffle
   const k=t=>t.zone==="bad"?0:t.zone==="warn"?1:2;
-  return vol.slice().sort((a,b)=>k(a)-k(b)||(k(a)===0?(b.sets-b.L.mrv)-(a.sets-a.L.mrv):k(a)===1?(b.L.mev-b.sets)-(a.L.mev-a.sets):a.rec-b.rec));
+  return vol.slice().sort((a,b)=>k(a)-k(b)||(k(a)===0?(b.sets-b.L.mrv)-(a.sets-a.L.mrv):k(a)===1?(b.L.mev-b.sets)-(a.L.mev-a.sets):0));
 }
 function ghRestLoggedToday(){return (state.data.restLog||[]).some(r=>ghSameDay(r,now()));}
 
@@ -12938,13 +12938,35 @@ function ghTip(vol,day,rest){
 }
 
 /* ---- TONIGHT hero (the one S3 surface) ---- */
-const ghTwo=list=>list.filter(x=>x.rec<GH_FRESH&&x.hrs).length>1?" gh-tm2":"";   // two chips carrying hours would overflow one row
 function ghRings(list){   // [{m,rec,hrs}] → recovery rings; warn text + hours when below GH_FRESH
   return list.map(x=>{const low=x.rec<GH_FRESH;
     return `<div class="gh-tmc${low?" warn":""}">${GP.muscleRing(x.rec,30)}<div><b>${ghName(x.m)}</b><span>${x.rec}%${low&&x.hrs?" · "+x.hrs+"h":""}</span></div></div>`;}).join("");
 }
-function ghRail(cur){   // cycle position: one segment per day, tonight long and gold
-  return `<button class="gh-cyc" data-hx onclick="goPlan()" aria-label="Cycle day ${cur.i+1} of ${cur.sp.days.length}. Open the plan">${cur.sp.days.map((_,i)=>`<i class="${i<cur.i?"d":i===cur.i?"t":""}"></i>`).join("")}</button>`;
+function ghRail(cur){   // cycle position: one segment per day, tonight long and gold; the day number lives here and nowhere else on Home
+  const n=cur.sp.days.length;
+  return `<button class="gh-cyc" data-hx onclick="goPlan()" aria-label="Cycle day ${cur.i+1} of ${n}. Open the plan">${cur.sp.days.map((_,i)=>`<i class="${i<cur.i?"d":i===cur.i?"t":""}"></i>`).join("")}<span class="gh-cyn">${cur.i+1}/${n}</span></button>`;
+}
+function ghReadyRing(r){   // readiness score + band; tap opens the Infirmary (sleep, soreness, supplements)
+  const has=r.score!=null,tone=!has?"":r.score>=60?"ok":r.score>=40?"warn":"bad",
+    col={ok:["#7BF0B0","#22B86A"],warn:["#FFD27A","#E39A12"],bad:["#FF9A90","#E0463B"]}[tone]||["#7F8BA1","#7F8BA1"],
+    why=has?`Readiness ${r.score}, ${esc(String(r.label).toLowerCase())}. Recovery ${r.rec}, freshness ${r.fresh}, sleep ${r.sleepKnown?r.sleep:"not logged"}.`:"Readiness unlocks after your first session.";
+  return `<button class="gh-rg${has?"":" empty"}" data-hx onclick="openInfirmary()" aria-label="${why} Open the Infirmary">${GP.ring(has?r.score:0,100,{size:82,stroke:7,c1:col[0],c2:col[1]})}<span class="gh-rc">${has?`<span class="num" data-roll="${r.score}" data-k="ready">${r.score}</span><span class="eyebrow c-${tone}">${esc(r.label)}</span>`:`<span class="num c-3">—</span><span class="eyebrow">No data</span>`}</span></button>`;
+}
+function ghDrivers(r){   // the readiness inputs that are not tonight's muscles (those are the rings): sleep and the load ratio
+  const a=acwrInfo(),z={sweet:["sweet spot","c-ok"],high:["climbing","c-warn"],spike:["spike","c-bad"],detrain:["low","c-2"]}[a.zone],
+    sleep=r.sleepKnown
+      ?`<button class="gh-chip" data-hx onclick="openSleepLog()" aria-label="Sleep ${r.sleep}. Edit"><span class="k">Sleep</span><b>${r.sleep}</b></button>`
+      :`<button class="gh-chip" data-hx onclick="openSleepLog()" aria-label="Sleep not logged. Log it"><span class="k">Sleep</span><span class="c-warn">Not logged</span><span class="act">${GP.icon("plus")}Log</span></button>`,
+    load=z?`<span class="gh-chip" aria-label="Load ratio ${a.ratio.toFixed(2)}, ${z[0]}"><span class="k">Load</span><b>${a.ratio.toFixed(2)}</b><span class="${z[1]}">${z[0]}</span></span>`
+      :`<span class="gh-chip"><span class="k">Load</span><span class="c-3">Building</span></span>`;
+  return sleep+load;
+}
+function ghBand(muscles,label){   // readiness ring beside tonight's muscles, the drivers as one chip row; with no muscles the drivers sit beside the ring
+  const r=patrolReadiness(),drv=ghDrivers(r);
+  return `<div class="gh-band">${ghReadyRing(r)}${muscles.length?`<div class="gh-tm" aria-label="${label}">${ghRings(muscles)}</div>`:`<div class="gh-drv col">${drv}</div>`}</div>${muscles.length?`<div class="gh-drv">${drv}</div>`:""}`;
+}
+function ghCoach(vol,day,rest){   // Alfred's one line, the hero footer; tap opens the chat
+  return `<button class="gh-coach" data-hx onclick="openAlfredChat()" aria-label="Alfred's tip. Open the chat"><span class="av"><img src="assets/alfred.png" alt=""></span><span class="tx">${esc(ghTip(vol,day,rest))}</span><span class="trail">${GP.icon("chevR")}</span></button>`;
 }
 const GH_ART='<div class="gh-bg" aria-hidden="true"><img class="gh-art" src="Batman.jpg" alt="" decoding="async" onerror="this.parentNode.remove()"></div>';   // the old Batman poster, one per hero
 function ghHeroLive(ses){   // a live or minimised session always wins the hero: RESUME, never START over it
@@ -12959,14 +12981,15 @@ function ghHeroLive(ses){   // a live or minimised session always wins the hero:
     <div class="gh-seg">${seg}</div>
     <div class="gh-cta"><button class="btn btn-1" onclick="resumeWorkout()">${GP.icon("play")}Resume workout</button><button class="btn" onclick="discardSession()">End</button></div></section>`;
 }
-function ghHeroTonight(cur){
+function ghHeroTonight(cur,vol){
   const day=cur.day,st=ghDayStats(day),prim=dayMuscles(day).prim;
   const top=Object.keys(prim).map(m=>({m,n:prim[m],rec:getRecovery(m),hrs:hoursToReady(m)})).sort((a,b)=>b.n-a.n||a.rec-b.rec).slice(0,4);
   return `<section class="s3 gh-hero gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Tonight</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">${esc(day.name)}</h2>
     <div class="gh-meta"><span><b>${st.lifts}</b> lifts</span><span><b>${st.sets}</b> sets</span><span>~<b>${st.min}</b> min</span>${st.up?`<span class="up">${GP.icon("up")}${st.up} ready for +kg</span>`:""}</div>
-    ${top.length?`<div class="gh-tm${ghTwo(top)}" aria-label="Recovery of tonight's muscles">${ghRings(top)}</div>`:`<div style="height:14px"></div>`}
-    <div class="gh-cta"><button class="btn btn-1" onclick="startWorkout('${cur.sp.id}',${cur.i})">${GP.icon("play")}Start Patrol</button><button class="btn" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Preview</button></div></section>`;
+    ${ghBand(top,"Recovery of tonight's muscles")}
+    <div class="gh-cta"><button class="btn btn-1" onclick="startWorkout('${cur.sp.id}',${cur.i})">${GP.icon("play")}Start Patrol</button><button class="btn" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Preview</button></div>
+    ${ghCoach(vol,day,false)}</section>`;
 }
 function ghHeroRest(cur,vol){
   const n=cur.sp.days.length,logged=ghRestLoggedToday();
@@ -12975,31 +12998,17 @@ function ghHeroRest(cur,vol){
   return `<section class="s3 gh-hero is-rest gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">Rest day</h2>
     <div class="gh-meta">${nd?`<button class="gh-next" data-hx onclick="openDayBriefing('${cur.sp.id}',${ni})">Next: <b>${esc(nd.name)}</b>${GP.icon("chevR")}</button>`:"<span>Recovery is part of the plan</span>"}</div>
-    ${low.length?`<div class="gh-tm${ghTwo(low)}" aria-label="Recovery outlook">${ghRings(low)}</div>`:`<div style="height:14px"></div>`}
+    ${ghBand(low,"Recovery outlook: the muscles furthest from ready")}
     <div class="gh-cta">${logged?`<button class="btn gh-done" disabled>${GP.icon("check")}Rest day logged</button><button class="btn" onclick="undoRestDay()">Undo</button>`
-      :`<button class="btn btn-1" onclick="logRestDay()">Log rest day</button><button class="btn" onclick="freeWorkout()">Train anyway</button>`}</div></section>`;
+      :`<button class="btn btn-1" onclick="logRestDay()">Log rest day</button><button class="btn" onclick="freeWorkout()">Train anyway</button>`}</div>
+    ${ghCoach(vol,null,true)}</section>`;
 }
-function ghHeroFree(){
+function ghHeroFree(vol){
   return `<section class="s3 gh-hero gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Tonight</span></div>
-    <h2 class="num gh-title">Free session</h2><div class="gh-meta"><span>No active split. Start a session now, or build a plan in Mission.</span></div><div style="height:16px"></div>
-    <div class="gh-cta"><button class="btn btn-1" onclick="freeWorkout()">${GP.icon("play")}Start session</button><button class="btn" onclick="goPlan()">Plan</button></div></section>`;
-}
-
-/* ---- READINESS: score ring, honest drivers, one Alfred line ---- */
-function ghReadiness(vol,day,rest){
-  const r=patrolReadiness(),a=acwrInfo(),has=r.score!=null,tone=!has?"":r.score>=60?"ok":r.score>=40?"warn":"bad";
-  const col={ok:["#7BF0B0","#22B86A"],warn:["#FFD27A","#E39A12"],bad:["#FF9A90","#E0463B"]}[tone]||["#7F8BA1","#7F8BA1"];
-  const drv=(lab,v,fn)=>`<div class="gh-drv"${fn?` data-hx onclick="${fn}"`:""}><span>${lab}</span><b class="bar"><i style="width:${v}%"></i></b><b class="num">${v}</b></div>`;
-  const lrTxt={sweet:["sweet spot","c-ok"],high:["climbing","c-warn"],spike:["spike","c-bad"],detrain:["low","c-2"]}[a.zone],
-    lr=lrTxt?`${a.ratio.toFixed(2)} <span class="${lrTxt[1]}">· ${lrTxt[0]}</span>`:`<span class="c-3">Building</span>`;
-  const sleepRow=r.sleepKnown?drv("Sleep",r.sleep,"event.stopPropagation();openSleepLog()")
-    :`<div class="gh-drv"><span>Sleep</span><span class="gh-nl">Not logged</span><button class="gh-log" data-hx onclick="event.stopPropagation();openSleepLog()">${GP.icon("plus")}Log</button></div>`;
-  const drivers=has?drv("Recovery",r.rec,"event.stopPropagation();openFatigueInfo()")+drv("Freshness",r.fresh)+sleepRow+`<div class="gh-drv"><span>Load ratio</span><span class="gh-lr">${lr}</span></div>`
-    :`<div class="gh-hint">${esc(r.line)} Recovery, freshness and load ratio appear once there is history.</div>`;
-  return `<section class="s2 gh-ready gh-c" style="--i:1"><div class="gh-rd-main" onclick="openInfirmary()">
-      <div class="gh-ring${has?"":" empty"}">${GP.ring(has?r.score:0,100,{size:92,stroke:9,c1:col[0],c2:col[1]})}<div class="gh-rc">${has?`<span class="num" data-roll="${r.score}" data-k="ready">${r.score}</span><span class="eyebrow c-${tone}">${esc(r.label)}</span>`:`<span class="num c-3">—</span><span class="eyebrow">No data</span>`}</div></div>
-      <div class="gh-rd"><div class="gh-rd-h"><span class="eyebrow">Readiness drivers</span></div>${drivers}</div></div>
-    <button class="gh-coach" data-hx onclick="openAlfredChat()"><span class="av"><img src="assets/alfred.png" alt=""></span><span><b>Alfred</b> · ${esc(ghTip(vol,day,rest))}</span></button></section>`;
+    <h2 class="num gh-title">Free session</h2><div class="gh-meta"><span>No active split. Start a session now, or build a plan in Mission.</span></div>
+    ${ghBand([],"")}
+    <div class="gh-cta"><button class="btn btn-1" onclick="freeWorkout()">${GP.icon("play")}Start session</button><button class="btn" onclick="goPlan()">Plan</button></div>
+    ${ghCoach(vol,null,false)}</section>`;
 }
 
 /* ---- THIS WEEK + the pro muscle map ---- */
@@ -13009,26 +13018,28 @@ function ghWeekDots(){
   return ["M","T","W","T","F","S","S"].map((l,i)=>{const dt=new Date(t0);dt.setDate(t0.getDate()+i);const k=dt.toDateString();
     return {d:l,s:trained.has(k)?"done":k===today?"today":rested.has(k)?"rest":"plan"};});
 }
-function ghTile(t,i){
-  const fz=GP.zone(t.sets+t.plan,t.L),tag=t.zone==="bad"?'<span class="tag bad">over</span>':t.zone==="warn"?'<span class="tag warn">under</span>':fz==="bad"?`<span class="gh-fc" title="Tonight's plan takes this past MRV">${GP.icon("alert")}</span>`:"";
-  return `<div class="gh-mt" style="--k:${i}" data-hx onclick="muscleDrill('${t.m}')"><div class="gh-mt-t">${GP.recRing(t.rec)}<span class="gh-mt-n">${MNAME[t.m]}</span>${t.hrs?`<span class="gh-mt-h">${t.hrs} h</span>`:""}<span class="gh-mt-v">${tag}<b class="num${t.zone==="ok"?"":" c-"+t.zone}">${t.sets}</b></span></div>${GP.landmark(t.sets,t.L,t.plan)}</div>`;
+function ghTile(t,i){   // sets this week against the landmarks; recovery lives in the hero (tonight's muscles) and on the Suit tab
+  const f=t.zone==="bad"?"over":t.zone==="warn"?"under":"",fz=GP.zone(t.sets+t.plan,t.L),
+    mk=f?`<i class="c-${t.zone}" aria-hidden="true">${f==="over"?"▲":"▼"}</i>`:fz==="bad"?`<span class="gh-fc" title="Tonight's plan takes this past MRV">${GP.icon("alert")}</span>`:"";
+  return `<div class="gh-mt${f?" is-"+t.zone:""}" style="--k:${i}" data-hx onclick="muscleDrill('${t.m}')" aria-label="${MNAME[t.m]}: ${t.sets} sets this week${f?", "+f+" the target range":""}"><div class="gh-mt-t"><span class="gh-mt-n">${ghName(t.m)}</span>${mk}<b class="num${t.zone==="ok"?"":" c-"+t.zone}">${t.sets}</b></div>${GP.landmark(t.sets,t.L,t.plan)}</div>`;
 }
 function ghWeek(vol){
   const goal=state.data.u.weeklyGoal||4,w=weekCount(),ws=weeklyStreak(),has=(state.data.workouts||[]).length>0;
   const streak=ws>0?`<div class="gh-stk">${GP.icon("flame")}${ws}-week streak</div>`:`<div class="gh-stk off">${w>=goal?"Goal met":(goal-w)+" more to hit your goal"}</div>`;
+  const vols=[7,6,5,4,3,2,1,0].map(k=>weeklyLoad(k)/1000),tn=vols[7];   // weekly tonnage trend: one small stat, the load ratio itself is a hero chip
+  const ton=has&&tn>0?`<div class="gh-ton" data-hx onclick="go('case',1)" aria-label="Tonnage this week ${tn.toFixed(1)} tonnes. Open stats"><span class="num" data-roll="${tn.toFixed(1)}" data-dec="1" data-k="vol">${tn.toFixed(1)}</span><span class="u">t</span>${GP.spark(vols,{w:62,h:22,area:false})}</div>`:"";
   let map;
   if(!has)map=`<div class="gh-empty">Weekly volume for every muscle appears after your first session: sets against the minimum, productive and maximum landmarks.</div>`;
   else{
-    const over=vol.filter(t=>t.zone==="bad").length,under=vol.filter(t=>t.zone==="warn").length;
-    map=`<div class="gh-lgd"><span class="eyebrow">Sets vs MEV · MAV · MRV</span><span class="k"><span>${GP.recRing(70,11)}recovery</span>${vol.some(t=>t.plan>0)?`<span><i class="sw"></i>tonight</span>`:""}</span></div>
-      <div class="gh-mgrid">${ghAttention(vol).map(ghTile).join("")}</div>
-      <div class="gh-wk-f"><span class="t-xs">${over} over · ${under} under · ${12-over-under} in range</span><button class="btn btn-3" onclick="ghOpenLore()">${GP.icon("map")}Gotham map</button></div>`;
+    const flagged=vol.some(x=>x.zone!=="ok");
+    map=`<div class="gh-lgd"><span class="eyebrow">Sets vs MEV · MAV · MRV</span><span class="k">${flagged?"":`<span class="c-ok">all in range</span>`}${vol.some(x=>x.plan>0)?`<span><i class="sw"></i>tonight</span>`:""}</span></div>
+      <div class="gh-mgrid">${ghAttention(vol).map(ghTile).join("")}</div>`;
   }
-  return `<section class="s2 gh-week gh-c" style="--i:2"><div class="gh-wk-h"><div class="gh-wk-l" data-hx onclick="goPlan()"><div class="eyebrow">This week</div><div class="gh-wk-t"><span class="num" data-roll="${w}" data-k="wk">${w}</span><span>/ ${goal} sessions</span></div>${streak}</div>
-    <div class="gh-wk-r" data-hx onclick="go('case',1)" aria-label="Open the training calendar">${GP.weekDots(ghWeekDots())}</div></div>${map}</section>`;
+  return `<section class="s2 gh-week gh-c" style="--i:1"><div class="gh-wk-h"><div class="gh-wk-l" data-hx onclick="goPlan()"><div class="eyebrow">This week</div><div class="gh-wk-t"><span class="num" data-roll="${w}" data-k="wk">${w}</span><span>/ ${goal} sessions</span></div>${streak}</div>
+    <div class="gh-wk-r"><div class="gh-wk-d" data-hx onclick="go('case',1)" aria-label="Open the training calendar">${GP.weekDots(ghWeekDots())}</div>${ton}</div></div>${map}</section>`;
 }
 
-/* ---- PROGRESS tiles, recent records, stalled lifts ---- */
+/* ---- LIFTS: recent records and stalled lifts in one card ---- */
 function ghRecentPRs(max){
   const out=[],seen=new Set();
   for(const w of (state.data.workouts||[])){   // newest first
@@ -13044,47 +13055,44 @@ function ghRecentPRs(max){
   }
   return out;
 }
-function ghProgress(){
-  const ws=state.data.workouts||[];if(!ws.length)return "";
-  const a=acwrInfo(),vols=[7,6,5,4,3,2,1,0].map(k=>weeklyLoad(k)/1000),t=vols[7],pv=prVelocity();
-  const prWk=[7,6,5,4,3,2,1,0].map(k=>{const s=weekStartK(k),e=weekStartK(k-1);return ws.reduce((n,w)=>{const x=new Date(w.date).getTime();return x>=s&&x<e?n+((w.prs||[]).length):n;},0);});
-  const pct=a.zone!=="building"&&a.chronic>0?Math.round((a.acute/a.chronic-1)*100):null,dp=pv.recent-pv.prior;
-  const volDelta=pct==null?`<div class="gh-dl flat">Building history</div>`:`<div class="gh-dl ${pct>=0?"up":"flat"}">${pct>=0?GP.icon("up")+"+":"−"}${Math.abs(pct)}% <span class="t-xs">vs 4-wk avg</span></div>`;
-  return `<div class="gh-sec gh-c" style="--i:3"><h2>Progress</h2><button class="gh-more" data-hx onclick="go('case',1)">All lifts</button></div>
-    <div class="gh-tiles gh-c" style="--i:3">
-      <div class="s1 gh-tile" data-hx onclick="go('case',1)"><span class="eyebrow">Volume · week</span><div class="gh-v"><span class="num" data-roll="${t.toFixed(1)}" data-dec="1" data-k="vol">${t.toFixed(1)}</span><span class="u">t</span></div>${volDelta}${GP.spark(vols,{w:150,h:34})}</div>
-      <div class="s1 gh-tile" data-hx onclick="go('case',1)"><span class="eyebrow">PRs · 30 days</span><div class="gh-v"><span class="num" data-roll="${pv.recent}" data-k="pr">${pv.recent}</span><span class="u">records</span></div><div class="gh-dl ${dp>0?"up":"flat"}">${dp>0?GP.icon("up")+"+"+dp:dp<0?"−"+Math.abs(dp):"Steady"} <span class="t-xs">vs prior 30 d</span></div>${GP.bars(prWk,{w:150,h:34})}</div>
-    </div>`;
-}
-function ghRecents(){
-  const rows=ghRecentPRs(3);if(!rows.length)return "";
-  return `<section class="s2 gh-list gh-c"><div class="gh-lh"><h3>Recent records</h3><span class="t-xs">e1RM trend</span></div>${rows.map(r=>`<div class="gh-row" data-hx onclick="exerciseHistory(${ghJs(r.name)})"><span class="lead gold">${GP.icon("trophy")}</span><div class="main"><div class="gh-t1">${esc(r.name)}</div><div class="gh-t2">${fmtKg(r.w)} kg × ${r.r} · e1RM ${Math.round(r.e1)}</div></div><span class="trail">${r.spark.length>1?GP.spark(r.spark,{w:44,h:22,area:false}):""}<span class="gh-col">${r.d>0?`<b class="d">+${fmtKg(r.d)}</b>`:""}<i class="t-xs">${r.ago}</i></span></span></div>`).join("")}</section>`;
-}
-function ghStalled(){
-  const L=stalledLifts();if(!L.length)return "";
-  return `<section class="s2 gh-list gh-c"><div class="gh-lh" data-hx onclick="openStalledLifts()"><h3>Stalled lifts <span class="tag warn">${L.length}</span></h3><span class="t-xs">3+ sessions flat${L.length>4?" · +"+(L.length-4)+" more":""}</span></div>${L.slice(0,4).map(s=>{
+function ghLifts(){
+  const rec=ghRecentPRs(3),L=stalledLifts();
+  if(!rec.length&&!L.length)return "";
+  const recRows=rec.map(r=>`<div class="gh-row" data-hx onclick="exerciseHistory(${ghJs(r.name)})"><span class="lead gold">${GP.icon("trophy")}</span><div class="main"><div class="gh-t1">${esc(r.name)}</div><div class="gh-t2">${fmtKg(r.w)} kg × ${r.r} · e1RM ${Math.round(r.e1)}</div></div><span class="trail">${r.spark.length>1?GP.spark(r.spark,{w:44,h:22,area:false}):""}<span class="gh-col">${r.d>0?`<b class="d">+${fmtKg(r.d)}</b>`:""}<i class="t-xs">${r.ago}</i></span></span></div>`).join("");
+  const stRows=L.slice(0,2).map(s=>{
     const p=exerciseRows(s.n).slice(-6).map(r=>r.e1rm),b=p[0]||1;
-    return `<div class="gh-row" data-hx onclick="openStalledLifts()"><span class="lead warn">${GP.icon("flat")}</span><div class="main"><div class="gh-t1">${esc(s.n)}</div><div class="gh-t2">e1RM ${Math.round(s.best)} · flat ${s.sessions} session${s.sessions===1?"":"s"}</div></div><span class="trail">${p.length>1?GP.spark(p,{w:44,h:22,color:"var(--warn)",area:false,min:b*.9,max:b*1.1}):""}${GP.icon("chevR")}</span></div>`;}).join("")}</section>`;
+    return `<div class="gh-row" data-hx onclick="openStalledLifts()"><span class="lead warn">${GP.icon("flat")}</span><div class="main"><div class="gh-t1">${esc(s.n)}</div><div class="gh-t2">e1RM ${Math.round(s.best)} · flat ${s.sessions} session${s.sessions===1?"":"s"}</div></div><span class="trail">${p.length>1?GP.spark(p,{w:44,h:22,color:"var(--warn)",area:false,min:b*.9,max:b*1.1}):""}${GP.icon("chevR")}</span></div>`;}).join("");
+  return `<section class="s2 gh-list gh-c" style="--i:2"><div class="gh-lh"><h3>Lifts</h3><button class="gh-more" data-hx onclick="go('case',1)">All lifts</button></div>
+    ${rec.length?`<div class="gh-sub"><span>Recent records</span><i>e1RM trend</i></div>${recRows}`:""}
+    ${L.length?`<div class="gh-sub" data-hx onclick="openStalledLifts()"><span>Stalled <b class="tag warn">${L.length}</b></span><i>3+ sessions flat${L.length>2?" · all "+L.length:""}</i></div>${stRows}`:""}</section>`;
 }
-
-/* ---- LORE fold: nothing deleted, all of it one tap away and off the main flow ---- */
-const GH_SKY='<svg class="sky" viewBox="0 0 230 62" preserveAspectRatio="xMaxYMax slice" aria-hidden="true"><defs><linearGradient id="ghsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFDD8A" stop-opacity=".13"/><stop offset="1" stop-color="#FFDD8A" stop-opacity="0"/></linearGradient></defs><path fill="url(#ghsky)" d="M0 62V48h10V38h8v10h8V30h4l3-10 3 10h4v24h8V36h10v10h6V24h4V16l2-8 2 8v8h4v22h10V38h10v14h8V28h8v-6h8v20h8V32h8v16h8V18h3l3-12 3 12h3v26h10V34h10v16h8V26h10v12h8v8h10V30h8v12h12v20z"/></svg>';
-function ghToggleLore(force){
-  const b=$("gotham-lore"),r=$("gh-lore-row");if(!b)return;
-  const open=force!=null?force:b.classList.contains("hide");
-  b.classList.toggle("hide",!open);if(r)r.classList.toggle("open",open);
-  state.accOpen=state.accOpen||{};state.accOpen["gotham-lore"]=open;
-  if(open)setTimeout(()=>{try{b.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}},60);
+/* ---- GOTHAM EXTRAS: the story layer (territory war, season, crate, events, siege, garage, ledger, threat, rank, infirmary) lives in one sheet; nothing is deleted, every row opens its existing screen ---- */
+function ghExtras(){   // runs on every Home render so the earned side effects (event XP, the weekly chapter toast) still fire; the cards only show inside the sheet
+  const d=state.data,mm=state._gcMemo=state._gcMemo||{},
+    memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+(((d.workouts||[])[0]||{}).id||"");
+  if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
+  const cb=(d.bossReturns||[]).find(b=>!b.defeated),
+    boss=cb?`<div class="gtv2-panel wide" style="margin-bottom:12px"><div class="gtv2-label">Active case files</div><div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ff887f">👁️</div><div><div class="gtv2-action-title">${esc(cb.villain)} has returned</div><div class="gtv2-action-copy">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-book the case.</div></div><span class="gtv2-chip red">boss</span></div></div>`:"";
+  let now="";try{now=crateCard()+seasonEventCard()+chronicleCard()+caveReviewCard()+siegeCard()+boss;}catch(e){}
+  state._ghNow=now;return now;
 }
-function ghOpenLore(){ghToggleLore(true);}
-function ghLore(loreHtml){
-  const d=state.data,open=accIsOpen("gotham-lore",false),cb=(d.bossReturns||[]).find(b=>!b.defeated);
-  let held=null;try{held=M12.filter(m=>{const dc=districtCrime(m);return !dc.untrained&&dc.crime<45;}).length;}catch(e){}
-  const boss=cb?`<div class="gtv2-panel wide" style="margin-bottom:12px"><div class="gtv2-label">Active case files</div><div class="gtv2-action"><div class="gtv2-action-ic" style="color:#ff887f">👁️</div><div><div class="gtv2-action-title">${esc(cb.villain)} has returned</div><div class="gtv2-action-copy">Demands ${cb.targetW}kg on ${esc(cb.ex)}. Beat it next session to re-book the case.</div></div><span class="gtv2-chip red">boss</span></div></div>`:"";
-  const links=[["scale","Iron Ledger","Lifetime volume","openIronLedger()"],["alert","Threat level","City crime and districts","openThreatInfo()"],["crown","Rank ladder","Level "+strengthLevel(),"openRankLadder()"],["pulse","Infirmary","Sleep, soreness, supplements","openInfirmary()"]];
-  const rows=`<section class="s2 gh-list gh-c">${links.map(l=>`<div class="gh-row" data-hx onclick="${l[3]}"><span class="lead">${GP.icon(l[0])}</span><div class="main"><div class="gh-t1">${l[1]}</div><div class="gh-t2">${l[2]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section>`;
-  return `<div class="s1 gh-lore gh-c${open?" open":""}" id="gh-lore-row" data-hx onclick="ghToggleLore()">${GH_SKY}<span class="lead">${GP.icon("bat")}</span><div class="main"><div class="gh-t1">Gotham</div><div class="gh-t2">Districts${held!=null?" "+held+"/12":""} · chronicle · events</div></div><span class="trail">${GP.icon("chevR")}</span></div>
-    <div id="gotham-lore" class="gh-lore-body${open?"":" hide"}"><div class="gtv2-shell">${territoryWarCard()}${mostWantedCard()}${boss}${loreHtml}</div>${rows}</div>`;
+function ghExtrasRow(now){   // the one slim last row; a gold dot means something is waiting inside
+  return `<button class="s1 gh-x gh-c" style="--i:3" data-hx onclick="ghOpenExtras()"><span class="lead">${GP.icon("bat")}</span><span class="main"><span class="gh-t1">Gotham extras</span><span class="gh-t2">Territory war · season · garage · more</span></span>${now?`<i class="gh-dot" role="img" aria-label="Something is waiting"></i>`:""}<span class="trail">${GP.icon("chevR")}</span></button>`;
+}
+function ghOpenExtras(){
+  let held=null,ss=null;
+  try{held=M12.filter(m=>{const dc=districtCrime(m);return !dc.untrained&&dc.crime<45;}).length;}catch(e){}
+  try{ss=seasonState();}catch(e){}
+  const rows=[["map","Territory War","Districts"+(held!=null?" "+held+"/12":"")+" · priorities","openDistricts()"],
+    ["book","Season",ss?"Season "+ss.n+" · week "+Math.min(ss.week+1,8)+" of 8":"Weekly chapters","openSeason()"],
+    ["wrench","Garage","Vehicles you have earned","openGarage()"],
+    ["scale","Iron Ledger","Lifetime volume","openIronLedger()"],
+    ["alert","Threat level","City crime and districts","openThreatInfo()"],
+    ["crown","Rank ladder","Level "+strengthLevel(),"openRankLadder()"],
+    ["pulse","Infirmary","Sleep, soreness, supplements","openInfirmary()"]];
+  openSheet(`<div class="ttl">Gotham extras</div>${state._ghNow?`<div class="gx-now">${state._ghNow}</div>`:""}
+    <div class="gx">${rows.map(r=>`<button class="gx-row" data-hx onclick="closeSheet();${r[3]}"><span class="lead">${GP.icon(r[0])}</span><span class="main"><b>${r[1]}</b><span class="s">${r[2]}</span></span><span class="trail">${GP.icon("chevR")}</span></button>`).join("")}</div>
+    <button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
 }
 
 function renderGotham(){
@@ -13099,15 +13107,10 @@ function renderGotham(){
       else if(new Date().getDay()===1){alfredPingAI("It's Monday — a new training week begins. One-line marching order for the week based on the training data above.");}
       try{wraithShowdownCheck();}catch(e){}
     }}catch(e){}
-  // Memoize the heaviest lore card (season eval) — rebuilt at most once/min or when data changes
-  const memoKey=Math.floor(Date.now()/60000)+":"+(d.workouts||[]).length+":"+((d.workouts[0]||{}).id||"");
-  const mm=state._gcMemo=state._gcMemo||{};
-  if(mm.k!==memoKey){mm.k=memoKey;mm.season=gothamSeasonCard();}
-  // The story layer (crate, events, chronicle, cave review, siege, season, garage, territory map) lives behind ONE collapsed row at the bottom.
-  const loreHtml=(()=>{try{return crateCard()+seasonEventCard()+chronicleCard()+caveReviewCard()+siegeCard()+mm.season+garageCard();}catch(e){return "";}})();
+  const extras=ghExtras();   // the story layer only shows inside the Gotham extras sheet
   const cur=gtv2CurrentPlanDay(),day=cur&&cur.day,rest=!!(day&&isRest(day)),vol=ghVol(day&&!rest?day:null);
-  const hero=state.session?ghHeroLive(state.session):!cur?ghHeroFree():rest?ghHeroRest(cur,vol):ghHeroTonight(cur);
-  $("app").innerHTML=`<div class="gh${state._same?"":" gh-anim"}"><h1 class="gh-hi">${ghGreeting()}</h1>${hero}${ghReadiness(vol,day&&!rest?day:null,rest)}${ghWeek(vol)}${ghProgress()}${ghRecents()}${ghStalled()}${ghLore(loreHtml)}</div>`;
+  const hero=state.session?ghHeroLive(state.session):!cur?ghHeroFree(vol):rest?ghHeroRest(cur,vol):ghHeroTonight(cur,vol);
+  $("app").innerHTML=`<div class="gh${state._same?"":" gh-anim"}">${hero}${ghWeek(vol)}${ghLifts()}${ghExtrasRow(extras)}</div>`;
   ghRoll();ghTick();
 }
 function overloadSuggestions(wk){
