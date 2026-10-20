@@ -1477,7 +1477,8 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .p3-alh{display:flex;align-items:center;gap:9px;margin-bottom:8px;font:600 14px/1 var(--body)}
 .p3-alh .av{width:26px;height:26px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 1.5px rgba(242,193,78,.6)}
 .p3-alh .av img{width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block}
-.p3-alt{font-size:14px;line-height:1.5;color:var(--tx2);display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
+.p3-alt{font-size:14px;line-height:1.5;color:var(--tx2);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.p3-alt.open{-webkit-line-clamp:unset}
 .p3-alt+.mini{margin-top:6px;color:var(--tx3);font-size:12px}
 .p3-nt{margin-top:12px;padding:13px 14px}
 .p3-feel{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
@@ -1492,8 +1493,11 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .p3-bk{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 14px}
 .p3-bk .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--tint-warn);color:var(--warn)}
 .p3-bk .main{flex:1;min-width:0}
+.p3-bk .gh-t2{white-space:normal}
+#app:has(.p3-sum){padding-bottom:0}
 .p3-bk .btn{width:auto;flex:none;height:36px;min-height:0;padding:0 14px;border:0}
-.p3-nav{margin-top:20px}
+.p3-nav{position:sticky;bottom:0;z-index:6;margin:16px -14px 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(5,7,12,0),var(--g0) 38%)}
+body:has(.p3-sum) .toast{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .p3-nav .dots{margin:0 0 14px}
 .p3-btns{display:flex;gap:10px}
 .p3-btns .btn{width:auto;display:inline-flex;align-items:center;justify-content:center;height:52px;padding:0 24px;border:0}
@@ -1536,11 +1540,12 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .p3-cl .ht{margin-left:auto}
 .gh .gh-row.p3-otd{margin-top:12px}
 .p3-std-c{padding:4px 0 10px}
-.p3-b3{display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;padding:12px 14px 8px}
+.p3-b3{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 14px 0}
+.p3-b3c{padding:4px 14px 10px;font-size:13px;line-height:18px;color:var(--tx2)}
 .gh .p3-b3 .num{font-size:40px;line-height:.9;color:var(--gold-ink)}
 .p3-b3 .u{margin-left:4px;font:600 13px/1 var(--body);color:var(--tx2)}
 .p3-sr{padding:12px 14px}
-.p3-sr+.p3-sr,.p3-b3+.p3-sr{border-top:1px solid var(--hair)}
+.p3-sr+.p3-sr,.p3-b3c+.p3-sr{border-top:1px solid var(--hair)}
 .p3-srh{display:flex;align-items:baseline;gap:6px;margin-bottom:11px}
 .p3-srh b{flex:1;min-width:0;font:600 15px/1.2 var(--body)}
 .gh .p3-srh .num{font-size:26px;line-height:.9}
@@ -3371,34 +3376,9 @@ function figLayerHtml(ex,fi){
 /* 🦇 SCANPANEL builder — the single source of truth for the Batcomputer target-scan picture used
    by both the exercise dossier and the active lift's focus card during logging. o: {ex, fi, id,
    height, name, tag, meta, col, tool, entrance, onclick}. */
-function scanPanelHtml(o){
-  const ex=o.ex;
-  const col=o.col||'var(--gold2)';
-  const name=o.name!=null?o.name:ex.n;
-  return `<div class="scanpanel${o.entrance?' entrance':''}" style="--fg:${col}4d;height:${o.height}px" ${o.onclick?`onclick="${o.onclick}"`:''}>
-    <div class="scanpanel-screen" id="${o.id||''}">
-      <div class="scanpanel-grid"></div>
-      <div class="figlayer">${figLayerHtml(ex,o.fi)}</div>
-      <div class="scanpanel-scan"></div>
-      <div class="scanpanel-vig"></div>
-      <div class="scanpanel-c tl"></div><div class="scanpanel-c tr"></div><div class="scanpanel-c bl"></div><div class="scanpanel-c br"></div>
-      ${o.tool||''}
-      <div class="scanpanel-cap">
-        <div class="scanpanel-tag" style="color:${col}"><i></i>${esc(o.tag||'TARGET ANALYSIS')}</div>
-        <b>${esc(name)}</b>
-        <span style="color:${col}">${esc(o.meta||'')}</span>
-      </div>
-    </div>
-  </div>`;
-}
 
 function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x[0])r=x;return{name:r[1],emoji:r[2]};}
 // Feature 15: bottom note alternates 50/50 between Batman flavour and real training science
-function gothamNote(){
-  const day=new Date().getDate();
-  if(day%2===0)return {kind:"science",label:"TRAINING INTEL",text:SCIENCE_FACTS[Math.floor(day/2)%SCIENCE_FACTS.length]};
-  return {kind:"gotham",label:"GOTHAM",text:QUOTES[day%QUOTES.length]};
-}
 function openTips(cat){
   const lib=SCIENCE_LIBRARY;
   const active=cat||state._tipCat||lib[0].cat;state._tipCat=active;
@@ -5647,19 +5627,19 @@ function openExDetail(exName){
   openSheet(p3XdHtml(exName));
   try{attachExGif("exdet-fig",exFor(exName).n,360);}catch(e){}
 }
-function p3XdRefresh(name){const sh=$("sheet");if(!sh)return;const sc=sh.scrollTop;sh.innerHTML=p3XdHtml(name);sh.scrollTop=sc;}
+function p3XdRefresh(name){const sh=$("sheet");if(!sh||!sh.classList.contains("on")||!$("exdet-fig"))return;   // only while this lift's sheet is the one on screen
+  const sc=sh.scrollTop;sh.innerHTML=p3XdHtml(name);sh.scrollTop=sc;}
 function p3XdAll(name){state._xdAll=true;p3XdRefresh(name);}
-/* ---- rep-PR book: heaviest load for N reps or more, N = 1…15 (recent = gold) ---- */
+/* ---- rep-PR book: heaviest load at each rep count, N = 1…15 (recent = gold) ---- */
 function p3RepBook(nm){
   const ex=exFor(nm),key=nm.toLowerCase().trim(),cut=exResetAt(nm),by={},at={};
   (state.data.workouts||[]).forEach(w=>{if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())return;
     (w.exercises||[]).forEach(e=>{if((e.name||"").toLowerCase().trim()!==key)return;
       (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;const r=Math.min(15,Math.floor(+s.r||0)),ld=setLoad(ex,s.w);if(r<1||!(ld>0))return;if(ld>(by[r]||0)){by[r]=ld;at[r]=w.date;}});});});
   if(!Object.keys(by).length)return "";
-  const cells=[];let run=0,runAt=null;
-  for(let r=15;r>=1;r--){if((by[r]||0)>run){run=by[r];runAt=at[r];}cells[r]={w:run,at:runAt};}
+  const cells=[];for(let r=1;r<=15;r++)cells[r]={w:by[r]||0,at:at[r]};
   const recent=now()-30*P3_DAY,lab=w=>ex.bw?(w-bodyW()>0?"+"+fmtKg(w-bodyW()):"BW"):fmtKg(w);
-  return `<section class="s2 p3-card"><div class="p3-ch2"><h3>Rep PR book</h3><span class="t-xs">heaviest load for N reps or more</span></div><div class="rpb">${Array.from({length:15},(_,i)=>{const c=cells[i+1];
+  return `<section class="s2 p3-card"><div class="p3-ch2"><h3>Rep PR book</h3><span class="t-xs">heaviest load at each rep count</span></div><div class="rpb">${Array.from({length:15},(_,i)=>{const c=cells[i+1];
     return `<div class="${c.w?"has":""}${c.w&&new Date(c.at).getTime()>=recent?" rec":""}"><span class="k">${i+1} rep${i?"s":""}</span><b>${c.w?lab(c.w):"–"}</b></div>`;}).join("")}</div></section>`;
 }
 /* ---- stall breaker: three evidence-based options, one tap writes it into the NEXT session's plan (never a deload) ---- */
@@ -5672,10 +5652,10 @@ function p3Variant(nm){   // a sister lift: same primary muscle and movement wor
   return EXDB.filter(e=>e.n!==nm&&(e.p||[])[0]===p0&&e.n.toLowerCase().includes(mv)&&!inDay.has(e.n)).sort((a,b)=>sc(b)-sc(a)||a.n.localeCompare(b.n))[0]||null;
 }
 function p3StallOpts(nm){
-  const ex=exFor(nm),slots=p3Slots(nm),lb=lastBestSet(nm),m=(ex.p||[])[0],sets=m?weeklySets(m):0,z=m?zoneOf(m,sets):null,alt=p3Variant(nm),heavy=!!lb&&lb.r>=8,rng=heavy?"5-8":"8-10",mn=MNAME[m]||m;
+  const ex=exFor(nm),slots=p3Slots(nm),lb=lastBestSet(nm),m=(ex.p||[])[0],sets=m?weeklySets(m):0,z=m?zoneOf(m,sets):null,alt=p3Variant(nm),heavy=!!lb&&lb.r>=8,rng=heavy?"5–8":"8–10",mn=MNAME[m]||m;
   const free=slots.length?"":"Add this lift to a split day to apply it.";
   return [
-    {k:"rep",ic:"sliders",ttl:`Work ${rng.replace("-","–")} reps for a block`,why:free||(heavy?"Reps are stuck high. Go heavier: 5–8 reps, the load rises sooner.":"Reps are stuck low. Own 8–10 clean reps at this load before the next jump."),off:!slots.length,rng},
+    {k:"rep",ic:"sliders",ttl:`Work ${rng} reps for a block`,why:free||(heavy?"Reps are stuck high. Go heavier: 5–8 reps, the load rises sooner.":"Reps are stuck low. Own 8–10 clean reps at this load before the next jump."),off:!slots.length,rng},
     {k:"swap",ic:"swap",ttl:alt?`Swap to ${alt.n}`:"Swap the variant",why:free||(alt?"Same muscle, new angle or implement: fresh stimulus, fresh progress.":"No close variant in your library. Shift the angle 10–15° or change grip for 3 weeks."),off:!slots.length||!alt,alt},
     {k:"set",ic:"plus",ttl:"Add a set",why:free||(z?(sets<z.mav?`${mn} is at ${sets} of ${z.mav} weekly sets (MAV). One more set is productive volume.`:`${mn} already sits at ${sets} sets (MAV ${z.mav}). More volume only adds fatigue.`):"No muscle data for this lift."),off:!slots.length||!z||sets>=z.mav}
   ];
@@ -5729,12 +5709,12 @@ function p3XdHtml(name){
 }
 /* ---- workload ratio: session load = session RPE × minutes where the session was rated, tonnage elsewhere ---- */
 function sessLoadK(){   // the user's own median (RPE × min) ÷ tonnage over rated sessions; 0 = nothing rated yet (pure tonnage)
-  const r=(state.data.workouts||[]).filter(w=>+w.rpe>0&&w.duration>0&&w.totalVol>0).map(w=>w.rpe*w.duration/60/w.totalVol).sort((a,b)=>a-b);
+  const r=(state.data.workouts||[]).filter(w=>+w.rpe>0&&w.duration>0&&w.totalVol>0).map(w=>w.rpe*p3Min(w.duration)/w.totalVol).sort((a,b)=>a-b);
   return r.length?r[r.length>>1]:0;
 }
 function weeklyLoadS(weekIdx,k){   // like weeklyLoad, but a rated session counts as RPE × minutes; unrated ones as tonnage × k, so mixed history stays one unit
   const s=cycleStart(weekIdx),e=weekIdx?cycleStart(weekIdx-1):Infinity;
-  return perWeek((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(+w.rpe>0&&w.duration>0?w.rpe*w.duration/60:(w.totalVol||0)*(k||1)),0));
+  return perWeek((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(+w.rpe>0&&w.duration>0?w.rpe*p3Min(w.duration):(w.totalVol||0)*(k||1)),0));
 }
 
 /* ===== CUSTOM EXERCISE CREATOR ===== */
@@ -5927,7 +5907,7 @@ function playOutro(R){
   const cell=(n,dec,u,gold)=>`<div><b class="num${gold?" g":""}" data-to="${n}" data-dec="${dec}">0</b><span>${u}</span></div>`;
   const el=document.createElement("div");el.id="p3fin";el.className="p3-fin";el.setAttribute("role","status");
   el.innerHTML=`<div class="c"><div class="eb">${GP.icon("bat")}<span>Session complete</span></div><div class="ttl">${esc(R.wk.name)}</div>
-    <div class="n">${cell(p3Min(R.dur),0,"min")}${cell(p3Working(R.wk),0,"sets")}${cell(v.n,v.dec,v.u)}${cell(prs.length,0,prs.length===1?"PR":"PRs",prs.length>0)}</div>
+    <div class="n">${cell(p3Min(R.dur),0,"min")}${cell(p3Working(R.wk),0,"sets")}${cell(v.n,v.dec,v.u==="t"?"tonnes":"kg")}${cell(prs.length,0,prs.length===1?"PR":"PRs",prs.length>0)}</div>
     ${prs.length?`<div class="pr">${prs.slice(0,3).map((p,i)=>`<div style="--i:${i}">${GP.icon("trophy")}<span>${esc(p.name)}</span><b>${Math.round(p.orm)} kg</b></div>`).join("")}${prs.length>3?`<div class="mo" style="--i:3">+${prs.length-3} more</div>`:""}</div>`:""}</div>`;
   document.body.appendChild(el);
   el.querySelectorAll("b[data-to]").forEach(b=>rollUp(b,+b.dataset.to,{ms:520,dec:+b.dataset.dec}));
@@ -5971,7 +5951,7 @@ function p3SumMuscles(R){
 function p3RpeHtml(wk){
   const v=+wk.rpe||0;
   return `<div class="p3-rpe-g">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="${n===v?"on":""}" data-hx onclick="setSessionRpe(${n})" aria-label="Session RPE ${n}">${n}</button>`).join("")}</div>
-    <div class="p3-rpe-n">${v?`Session load <b>${v} × ${p3Min(wk.duration)} min = ${Math.round(v*(wk.duration||0)/60)}</b> · feeds your workload ratio`:"1 easy · 10 nothing left. One tap; it feeds your workload ratio."}</div>`;
+    <div class="p3-rpe-n">${v?`Session load <b>${v} × ${p3Min(wk.duration)} min = ${v*p3Min(wk.duration)}</b> · feeds your workload ratio`:"1 easy · 10 nothing left. One tap; it feeds your workload ratio."}</div>`;
 }
 function setSessionRpe(n){const R=state.lastResult;if(!R)return;const wk=R.wk;if(wk.rpe===n)delete wk.rpe;else wk.rpe=n;save();haptic("tap");const b=$("p3rpe");if(b)b.innerHTML=p3RpeHtml(wk);}
 function p3Targets(wk){
@@ -5994,7 +5974,7 @@ function p3SumNext(R){
   return `${p3SumHead(R,"Next session")}
   ${tg?`<section class="s2 gh-list gh-c" style="--i:1"><div class="gh-lh"><h3>Targets</h3><span class="t-xs">add weight at 10 reps</span></div>${tg}</section>`:""}
   <section class="s2 p3-rpe gh-c" style="--i:2"><div class="gh-lh p3-rh"><h3>Session effort</h3><span class="t-xs">RPE 1–10</span></div><div id="p3rpe">${p3RpeHtml(wk)}</div></section>
-  <section class="s2 p3-al gh-c" style="--i:3"><div class="p3-alh"><span class="av"><img src="assets/alfred.png" alt=""></span><b>Alfred</b></div><div id="ai-out" class="p3-alt">Alfred is reviewing the session…</div></section>
+  <section class="s2 p3-al gh-c" style="--i:3"><div class="p3-alh"><span class="av"><img src="assets/alfred.png" alt=""></span><b>Alfred</b></div><div id="ai-out" class="p3-alt" onclick="this.classList.toggle('open')">Alfred is reviewing the session…</div></section>
   ${p3Notes(wk)}
   <section class="s2 p3-share gh-c" style="--i:6"><img id="sharecard" alt="Session card"><div class="p3-sbtn"><button class="btn" data-hx onclick="shareCardShare()">${GP.icon("share")}Save card</button><button class="btn btn-3" data-hx onclick="shareWorkout()">Share with allies</button></div></section>
   ${p3Backup()}`;
@@ -6033,7 +6013,7 @@ async function renderShareCard(R){
   g=x.createRadialGradient(0,H,40,0,H,900);g.addColorStop(0,"rgba(91,180,255,.07)");g.addColorStop(1,"rgba(91,180,255,0)");x.fillStyle=g;x.fillRect(0,0,W,H);
   g=x.createLinearGradient(0,0,W,0);[[0,0],[.28,.9],[.72,.9],[1,0]].forEach(a=>g.addColorStop(a[0],`rgba(255,221,138,${a[1]})`));x.fillStyle=g;x.fillRect(0,0,W,3);
   // wordmark + date
-  try{x.save();x.translate(M-8,38);x.fillStyle=GOLD;x.fill(new Path2D(BAT_PATH));x.restore();}catch(e){}
+  try{x.save();x.translate(M-6,48);x.scale(3.4,3.4);x.fillStyle=GOLD;x.fill(new Path2D("M12 8.7l.9-1.5.6-1.3.45 2.25c1.45-.65 4.65-.95 8.65-1.25-1.4 1-1.9 2.4-1.5 4.1-.9-.7-1.9-.6-2.6.9-.6-.8-1.7-1-2.6-.3-.3 1.4-1.3 1.8-1.9 1.5-.6 1.3-1.4 2.2-2 3.6-.6-1.4-1.4-2.3-2-3.6-.6.3-1.6-.1-1.9-1.5-.9-.7-2-.5-2.6.3-.7-1.5-1.7-1.6-2.6-.9.4-1.7-.1-3.1-1.5-4.1 4 .3 7.2.6 8.65 1.25l.45-2.25.6 1.3z"));x.restore();}catch(e){}
   txt("GAINSTRACKER",28,M+92,98,{w:700,c:TX2,ls:5});
   txt(p3Date(R.wk.date).toUpperCase(),28,W-M,98,{c:TX3,ls:4,a:"right"});
   // title
@@ -6054,23 +6034,21 @@ async function renderShareCard(R){
   else rows=(R.wk.exercises||[]).map(e=>{const ex=exFor(e.name);let bo=0,bs=null;(e.sets||[]).forEach(s=>{const o=setE1RM(ex,s);if(o>bo){bo=o;bs=s;}});return bs?{n:e.name,s:fmtKg(bs.w)+" kg × "+bs.r,v:Math.round(bo),d:null}:null;}).filter(Boolean).sort((a,b)=>b.v-a.v).slice(0,3);
   txt(prs.length?"NEW RECORDS":"TOP SETS",26,M,926,{c:prs.length?GOLD:TX3,ls:6});
   rows.forEach((r,i)=>{const y=990+i*84;txt(r.n,fit(r.n,40,W-2*M-300),M,y,{c:TX1,w:600});txt(r.s,28,M,y+34,{c:TX3,w:500});
-    txt(String(r.v),72,W-M-70,y+20,{num:1,w:400,c:GOLD,a:"right"});txt("kg",28,W-M,y+20,{c:TX2,w:600,a:"right"});
-    if(r.d!=null&&r.d>0)txt("+"+r.d.toFixed(1),26,W-M-70,y+54,{c:OK,w:700,a:"right"});});
+    txt(String(r.v),72,W-M-58,y+20,{num:1,w:400,c:GOLD,a:"right"});txt("kg",28,W-M,y+20,{c:TX2,w:600,a:"right"});
+    if(r.d!=null&&r.d>0)txt("+"+r.d.toFixed(1),26,W-M-58,y+54,{c:OK,w:700,a:"right"});});
   // footer
   x.fillStyle="rgba(150,178,222,.18)";x.fillRect(M,1236,W-2*M,2);
   try{const u=state.data.u,sl=strengthLevel(),ws=weeklyStreak();txt((u.name?u.name+" · ":"")+rankFor(sl).name+" · Lv "+sl,28,M,1296,{c:TX2,w:600});if(ws>0)txt(ws+"-week streak",28,W-M,1296,{c:GOLD,w:600,a:"right"});}catch(e){}
   // earned card frame — rarest unlocked auto-applies (blood > gold leaf > foil)
   try{const fr=(state.data.prestige||0)>=1?"blood":((state.data.frames||{}).goldleaf?"goldleaf":((state.data.frames||{}).foil?"foil":""));
-    if(fr==="foil"){const gg=x.createLinearGradient(0,0,W,H);["#7fd8ff","#c9b8ff","#ffd048","#7fffc9"].forEach((c,i)=>gg.addColorStop(i/3,c));x.strokeStyle=gg;x.lineWidth=14;x.strokeRect(10,10,W-20,H-20);}
-    else if(fr==="goldleaf"){x.strokeStyle="#FFD048";x.lineWidth=16;x.strokeRect(12,12,W-24,H-24);x.strokeStyle="rgba(255,208,72,.45)";x.lineWidth=4;x.strokeRect(34,34,W-68,H-68);}
-    else if(fr==="blood"){x.strokeStyle="#FF3622";x.lineWidth=14;x.strokeRect(10,10,W-20,H-20);x.strokeStyle="rgba(255,54,34,.5)";x.lineWidth=4;x.strokeRect(30,30,W-60,H-60);}
+    if(fr==="foil"){const gg=x.createLinearGradient(0,0,W,H);["#7fd8ff","#c9b8ff","#ffd048","#7fffc9"].forEach((c,i)=>gg.addColorStop(i/3,c));x.strokeStyle=gg;x.lineWidth=4;x.strokeRect(26,26,W-52,H-52);}
+    else if(fr==="goldleaf"){x.strokeStyle=GOLD;x.lineWidth=3;x.strokeRect(26,26,W-52,H-52);x.strokeStyle="rgba(242,193,78,.35)";x.lineWidth=1.5;x.strokeRect(38,38,W-76,H-76);}
+    else if(fr==="blood"){x.strokeStyle="#FF5A4E";x.lineWidth=3;x.strokeRect(26,26,W-52,H-52);x.strokeStyle="rgba(255,90,78,.35)";x.lineWidth=1.5;x.strokeRect(38,38,W-76,H-76);}
   }catch(e){}
   el.src=cv.toDataURL("image/png");
   cv.toBlob(b=>{state._shareBlob=b;},"image/png");
 }
-const BAT_PATH="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
 /* ===== 📸 PATROL CARD — auto-rendered shareable PNG (1080×1350) shown right on the finish screen ===== */
-function _scImg(src,ms){return new Promise(res=>{if(!src)return res(null);const im=new Image();const t=setTimeout(()=>res(null),ms||900);im.onload=()=>{clearTimeout(t);res(im);};im.onerror=()=>{clearTimeout(t);res(null);};im.src=src;});}
 function shareCardShare(){
   const b=state._shareBlob;if(!b){toast("Card is still rendering, sir…");return;}
   haptic("tap");
@@ -6307,13 +6285,6 @@ function muscleRing(m,rec,sets,mav,trained){
     <text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle"
       font-family="Bebas Neue,sans-serif" font-size="${labelSz}" fill="${trained?recCol:'#3a3e4a'}">${label}</text>
   </svg>`;
-}
-function miniSuit(hit){
-  const front=["chest","shoulders","biceps","forearms","abs","quads","calves","traps"];
-  return `<div class="grid3" style="grid-template-columns:repeat(4,1fr)">${M12.map(m=>{
-    const on=hit&&hit[m];const col=on>=1?"var(--gold2)":on?"var(--gold-dim)":"var(--text3)";
-    return `<div class="center" style="opacity:${on?1:.4}"><div style="line-height:1">${mIcon(m,22,on?'#E8C56A':'#7c7c7c')}</div><div class="mini" style="color:${col}">${MNAME[m]}</div></div>`;
-  }).join("")}</div>`;
 }
 
 /* ========================= PER-DAY TARGET FIGURES (split images) =========================
@@ -6691,11 +6662,6 @@ function exerciseRows(name){
   return rows;
 }
 /* Rep-max PRs — heaviest load lifted for at least N reps (5/8/10) from the active gym's history. */
-function repMaxes(name){
-  const ex=exFor(name),best={5:0,8:0,10:0};
-  (state.data.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{if((e.name||"").toLowerCase().trim()!==(name||"").toLowerCase().trim())return;(e.sets||[]).forEach(s=>{if(s.type==="W"||!s.done)return;const reps=+s.r||0,load=setLoad(ex,s.w);if(!load||!reps)return;[5,8,10].forEach(rm=>{if(reps>=rm&&load>best[rm])best[rm]=load;});});});});
-  return best;
-}
 function miniSpark(vals){
   if(!vals||vals.length<2)return "";
   const w=60,h=20,min=Math.min(...vals),max=Math.max(...vals),r=(max-min)||1,n=vals.length;
@@ -6739,13 +6705,6 @@ function liftIntel(name){
   return {bestE,last,daysAgo,stalled,sinceImprove,bestAgo,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
 }
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
-function liftVerdict(intel){
-  if(!intel)return "";
-  if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change one variable — angle, grip or rep range. Repeating it won't move it.`;
-  if(intel.trend==="up")return `Climbing — +${intel.d}kg (${intel.pct>0?"+":""}${intel.pct}%) of late. Keep the pressure on, sir.`;
-  if(intel.trend==="down")return `Going BACKWARDS, sir — ${intel.d}kg down (${intel.pct}%). I won't sugar-coat it: you were stronger than this. Eat, sleep, and reclaim that weight.`;
-  return `Holding steady. Steady isn't growth, Master — go and take the next rep.`;
-}
 // ---- weekly-set volume landmark bar (MEV/MAV/MRV) ----
 function volBar(sets,lm,m){
   const eMrv=m?effectiveMRV(m):lm.mrv;                 // spread across sub-regions raises the ceiling
@@ -7606,7 +7565,7 @@ function p3Trend(name,o={}){
   const T=r=>new Date(r.date).getTime(),t1=now(),days=o.days||84,from=t1-days*P3_DAY;
   let win=rows.filter(r=>T(r)>=from);const full=win.length>=2;if(!full)win=rows.slice(-Math.min(rows.length,6));
   let run=0;const pr=new Set();rows.forEach((r,i)=>{if(i&&r.e1rm>run+.4)pr.add(r.date);run=Math.max(run,r.e1rm);});
-  const a=full?from:T(win[0]),b=Math.max(t1,T(win[win.length-1])+P3_DAY),ys=win.map(r=>r.e1rm),lo=Math.min(...ys),hi=Math.max(...ys);
+  const a=full?Math.max(from,T(win[0])-2*P3_DAY):T(win[0]),b=Math.max(t1,T(win[win.length-1])+P3_DAY),ys=win.map(r=>r.e1rm),lo=Math.min(...ys),hi=Math.max(...ys);
   const rg=Math.max(hi-lo,Math.max(4,hi*.04)),mn=lo-rg*.2,mx=hi+rg*.2,mini=!!o.mini,w=o.w||320,h=o.h||140;
   const pl=mini?3:34,pr_=mini?3:10,pt=mini?3:16,pb=mini?3:24;
   const X=r=>pl+(T(r)-a)/(b-a)*(w-pl-pr_),Y=v=>pt+(1-(v-mn)/(mx-mn))*(h-pt-pb);
@@ -7614,10 +7573,10 @@ function p3Trend(name,o={}){
   const n=win.length,t0=T(win[0]),xs=win.map(r=>(T(r)-t0)/P3_DAY),mxs=xs.reduce((s,v)=>s+v,0)/n,mys=ys.reduce((s,v)=>s+v,0)/n;
   let num=0,den=0;xs.forEach((x,i)=>{num+=(x-mxs)*(ys[i]-mys);den+=(x-mxs)*(x-mxs);});
   const pct=den>0&&xs[n-1]>=10?num/den*30/mys*100:null;
-  const dots=win.filter(r=>pr.has(r.date)).map(r=>mini?`<circle cx="${X(r).toFixed(1)}" cy="${Y(r.e1rm).toFixed(1)}" r="2.3" class="p3t-pr"/>`:`<circle cx="${X(r).toFixed(1)}" cy="${Y(r.e1rm).toFixed(1)}" r="7" class="p3t-halo"/><circle cx="${X(r).toFixed(1)}" cy="${Y(r.e1rm).toFixed(1)}" r="3.6" class="p3t-pr"/>`).join("");
+  const dots=mini?"":win.filter(r=>pr.has(r.date)).map(r=>`<circle cx="${X(r).toFixed(1)}" cy="${Y(r.e1rm).toFixed(1)}" r="7" class="p3t-halo"/><circle cx="${X(r).toFixed(1)}" cy="${Y(r.e1rm).toFixed(1)}" r="3.6" class="p3t-pr"/>`).join("");
   const axis=mini?"":`<line x1="${pl}" x2="${w-pr_}" y1="${Y(hi).toFixed(1)}" y2="${Y(hi).toFixed(1)}" class="p3t-g"/><line x1="${pl}" x2="${w-pr_}" y1="${Y(lo).toFixed(1)}" y2="${Y(lo).toFixed(1)}" class="p3t-g"/>
     <text x="${pl-7}" y="${(Y(hi)+4).toFixed(1)}" text-anchor="end" class="p3t-t">${Math.round(hi)}</text><text x="${pl-7}" y="${(Y(lo)+4).toFixed(1)}" text-anchor="end" class="p3t-t">${Math.round(lo)}</text>
-    <text x="${pl}" y="${h-6}" class="p3t-t">${full?Math.round(days/7)+" wk ago":p3Date(win[0].date)}</text><text x="${w-pr_}" y="${h-6}" text-anchor="end" class="p3t-t">now</text>`;
+    <text x="${pl}" y="${h-6}" class="p3t-t">${a<=from+1?Math.round(days/7)+" wk ago":new Date(a).getDate()+" "+GH_MON[new Date(a).getMonth()]}</text><text x="${w-pr_}" y="${h-6}" text-anchor="end" class="p3t-t">now</text>`;
   const svg=`<svg class="p3t${mini?" mini":""}" ${mini?`width="${w}" height="${h}" `:""}viewBox="0 0 ${w} ${h}" role="img" aria-label="e1RM trend"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="p3t-s0"/><stop offset="1" class="p3t-s1"/></linearGradient></defs>${axis}
     <path d="${line} L${X(lr).toFixed(1)} ${h-pb} L${X(win[0]).toFixed(1)} ${h-pb}Z" fill="url(#${id})"/><path d="${line}" class="p3t-l"/>${dots}
     <circle cx="${X(lr).toFixed(1)}" cy="${Y(lr.e1rm).toFixed(1)}" r="${mini?2.6:3.6}" class="p3t-e"/></svg>`;
@@ -7699,15 +7658,15 @@ function p3BigThree(){   // barbell-equivalent bench + squat + deadlift vs bodyw
 function p3Strength(){
   const bw=bodyW(),rows=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].map(l=>({l,s:STD[l],e:liftEstimate(l)})).filter(x=>x.e);
   if(!rows.length)return "";
-  const b3=p3BigThree();
+  const b3=p3BigThree(),full=t=>({"Inter.":"Intermediate","Adv.":"Advanced"})[t]||t;
   const body=rows.map(({l,s,e})=>{
     const r=e.orm/bw,tiers=[["Novice",s.b],["Inter.",s.i],["Adv.",s.a],["Elite",s.e]],lvl=tiers.slice().reverse().find(t=>r>=t[1]),nxt=tiers.find(t=>r<t[1]),max=s.e*1.18,p=v=>clamp(v/max*100,0,100).toFixed(1)+"%";
     return `<div class="p3-sr"><div class="p3-srh"><b>${l}</b><span class="num">${r.toFixed(2)}</span><span class="u">× BW</span></div>
       <div class="lmk p3-std" style="--v:${p(r)}"><i class="fill"></i>${tiers.map(t=>`<i class="tk" style="left:${p(t[1])}"></i>`).join("")}</div>
       <div class="p3-tl">${tiers.map(t=>`<span style="left:${p(t[1])}">${t[0]}</span>`).join("")}</div>
-      <div class="p3-sn">${Math.round(e.orm)} kg e1RM · ${lvl?lvl[0].replace("Inter.","Intermediate").replace("Adv.","Advanced"):"Below novice"}${nxt?` · next at ${fmtKg(nxt[1]*bw)} kg`:""}${e.est?` · est. from ${esc(e.via)}`:""}</div></div>`;}).join("");
+      <div class="p3-sn">${Math.round(e.orm)} kg e1RM · ${lvl?full(lvl[0]):"Below novice"}${nxt?` · ${full(nxt[0])} in +${fmtKg(Math.ceil((nxt[1]*bw-e.orm)*2)/2)} kg`:""}${e.est?` · est. from ${esc(e.via)}`:""}</div></div>`;}).join("");
   return `<div class="gh-sec gh-c" style="--i:3"><h2>Strength</h2><span class="t-xs">e1RM ÷ ${bw} kg bodyweight</span></div>
-    <section class="s2 p3-std-c gh-c" style="--i:3">${b3?`<div class="p3-b3"><div><span class="num">${b3.ratio.toFixed(2)}</span><span class="u">× BW</span></div><div class="t-s">Big-3 total, barbell-equivalent${b3.n<3?" · "+b3.n+" of 3 lifts":""}${b3.d?` · <b class="${b3.d>0?"c-ok":"c-warn"}">${b3.d>0?"+":""}${b3.d}% / 4 wk</b>`:""}</div></div>`:""}${body}
+    <section class="s2 p3-std-c gh-c" style="--i:3">${b3?`<div class="p3-b3"><div><span class="num">${b3.ratio.toFixed(2)}</span><span class="u">× BW</span></div>${b3.d?`<span class="tag ${b3.d>0?"ok":"warn"}">${b3.d>0?"+":""}${b3.d}% / 4 wk</span>`:""}</div><div class="p3-b3c">Big-3 total, barbell-equivalent${b3.n<3?" · "+b3.n+" of 3 lifts":""}</div>`:""}${body}
       <div class="p3-sfoot">Machine, Smith and variation lifts are converted to a barbell estimate. e1RM is a guide, not a verdict.</div></section>`;
 }
 function openBelts(){openSheet(`<div class="ttl">Title belts</div>${titleBeltsCard()||'<p class="muted" style="margin:6px 0">No belts yet. Lift to claim one.</p>'}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
@@ -7719,7 +7678,7 @@ function p3Trophies(){
   const next=(typeof BOSSES!=="undefined"?BOSSES:[]).slice().sort((a,b)=>a.min-b.min).find(b=>!won.has(b.v));
   const body=p3Row("crown","Title belts",belts?belts+" held":"Lift to claim one","openBelts()")
     +p3Row("lock","Arkham lockup",won.size+" inmate"+(won.size===1?"":"s")+(esc2?" · "+esc2+" escaped":""),"openArkhamLockup()")
-    +p3Row("flag","Rogues gallery",next?"Next: "+esc(next.v)+" · Lv "+next.min:"All felled","openArkham()")
+    +p3Row("flag","Rogues gallery",next?"Next: "+esc(next.v)+(next.min?" · Lv "+next.min:""):"All felled","openArkham()")
     +p3Row("news","Gotham Gazette","This month's front page","openGazette()")
     +p3Row("trophy","Badges","The trophy room","openTrophyRoom()")
     +(rec&&rec.weeks>=2?p3Row("target","Fight record",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · "+rec.kos+" KO · week vs week",""):"");
