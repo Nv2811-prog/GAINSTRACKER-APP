@@ -115,7 +115,6 @@ body.rest-final::after{content:"";position:fixed;inset:0;z-index:60;pointer-even
   background:radial-gradient(ellipse 90% 70% at 50% 45%,rgba(40,6,4,.94),rgba(2,3,6,.98));animation:stgFade 1.15s ease-in-out forwards}
 /* alive hero backdrops — slow breathing pan so the top of a tab feels in motion */
 @keyframes hsBreathe{0%{transform:scale(1) translateX(0)}100%{transform:scale(1.07) translateX(-8px)}}
-.gtv2-hero-img{animation:hsBreathe 12s ease-in-out infinite alternate}
 .card h2,.card h3{color:var(--gold2)}
 .ttl{font-family:var(--disp);font-weight:650;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold2);opacity:.95;margin-bottom:12px}
 .big{font-family:var(--num);font-size:58px;color:var(--gold2);line-height:.86;font-variant-numeric:tabular-nums;text-shadow:0 0 22px rgba(255,208,72,.55),0 0 48px rgba(255,208,72,.22)}
@@ -368,10 +367,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 #cine.killcam .cbg{background:radial-gradient(circle at 50% 38%,rgba(74,12,12,.93),rgba(3,1,1,.99));animation:cFade .3s ease forwards}
 #cine.killcam .cstage{animation:cIn .48s cubic-bezier(.16,1.1,.3,1) 0s forwards}
 #cine.killcam .cbody{font-style:normal;margin-top:6px}
-#cine .kcnum{font-family:var(--num);font-size:76px;line-height:.95;font-weight:800;letter-spacing:-.01em;text-shadow:0 0 28px currentColor;animation:kcSmash .62s cubic-bezier(.2,1.4,.35,1) .16s both}
-#cine .kcnum .kcunit{display:block;font-size:13px;font-weight:600;letter-spacing:.22em;color:var(--text3);text-shadow:none;margin-top:9px}
 #cine .kcdelta{font-family:var(--disp);font-weight:650;font-size:22px;letter-spacing:.05em;margin-top:14px;opacity:0;animation:cRise .6s ease .5s both}
-@keyframes kcSmash{0%{transform:scale(1.85);filter:blur(8px);opacity:0}55%{filter:blur(0);opacity:1}72%{transform:scale(.95)}100%{transform:scale(1)}}
 @keyframes cFade{to{opacity:1}}
 @keyframes cFadeOut{to{opacity:0}}
 @keyframes cSpin{to{transform:rotate(360deg)}}
@@ -707,137 +703,24 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .badgepill{font-family:var(--disp);font-weight:650;font-size:13px;letter-spacing:.06em;color:var(--gold2);background:var(--gold-bg);border:1px solid var(--gold-dim);padding:3px 10px;border-radius:20px;white-space:nowrap}
 @keyframes flicker{0%,100%{opacity:.85}50%{opacity:1}}
 /* ===== Gotham Iron Protocol v2: command-deck visual layer ===== */
-.gtv2-shell{position:relative;margin:-2px -2px 0}
-.gtv2-hero{position:relative;overflow:hidden;border:1px solid rgba(242,208,121,.25);border-radius:18px;margin-bottom:14px;min-height:254px;background:#07090d;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 22px 60px -30px #000}
-.gtv2-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,5,8,.2),rgba(4,5,8,.76) 54%,#07090d),linear-gradient(90deg,rgba(7,9,13,.96),rgba(7,9,13,.52) 52%,rgba(7,9,13,.86));z-index:1}
-.gtv2-hero::after{content:"";position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(242,208,121,.2),transparent 30%,rgba(85,155,232,.14) 78%,rgba(240,82,74,.12));mix-blend-mode:screen;z-index:2;pointer-events:none}
-.gtv2-hero-img{position:absolute;right:-28px;top:-18px;width:66%;height:112%;object-fit:cover;object-position:center;opacity:.72;filter:saturate(.9) contrast(1.08)}
-.gtv2-hero-body{position:relative;z-index:3;padding:18px 16px 16px;display:flex;flex-direction:column;min-height:254px}
-.gtv2-idrow{display:flex;align-items:center;gap:10px;margin-bottom:13px}
-.gtv2-idlogo{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.65))}
-.gtv2-idtext{display:flex;flex-direction:column;line-height:1.05;min-width:0}
-.gtv2-idname{font-family:var(--disp);font-weight:650;font-size:22px;letter-spacing:.04em;color:var(--gold2);text-shadow:0 2px 12px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gtv2-iddate{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-dim);margin-top:2px}
-.gtv2-tonight{position:relative;border-radius:15px;padding:14px 15px 13px;margin-bottom:12px;background:linear-gradient(180deg,rgba(242,208,121,.14),rgba(12,15,21,.46));border:1px solid rgba(242,208,121,.36);box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 0 28px -12px rgba(242,208,121,.5),0 16px 42px -26px #000}
-.gtv2-tonight.rest{background:linear-gradient(180deg,rgba(85,155,232,.14),rgba(12,15,21,.46));border-color:rgba(85,155,232,.36);box-shadow:inset 0 1px 0 rgba(255,255,255,.11),inset 0 0 28px -12px rgba(85,155,232,.45),0 16px 42px -26px #000}
-.gtv2-tonight.empty{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(12,15,21,.46));border-color:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 42px -26px #000}
-.gtv2-tonight-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--disp);font-weight:650;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold2)}
-.gtv2-tonight.rest .gtv2-tonight-tag{color:#9fc1f2}
-.gtv2-tonight.empty .gtv2-tonight-tag{color:var(--text2)}
-.gtv2-tonight-tag i{width:7px;height:7px;border-radius:50%;background:var(--gold2);animation:gtv2pulse 2.1s infinite}
-.gtv2-tonight.rest .gtv2-tonight-tag i{background:#9fc1f2}
-.gtv2-tonight.empty .gtv2-tonight-tag i{background:var(--text3);animation:none}
 @keyframes gtv2pulse{0%{box-shadow:0 0 0 0 rgba(242,208,121,.55)}70%{box-shadow:0 0 0 8px rgba(242,208,121,0)}100%{box-shadow:0 0 0 0 rgba(242,208,121,0)}}
-.gtv2-tonight-day{font-family:var(--num);font-size:34px;line-height:.92;color:var(--text);margin:5px 0 3px;letter-spacing:.01em}
-.gtv2-tonight-meta{font-size:12px;line-height:1.4;color:var(--text2)}
-.gtv2-hero-actions{margin-top:auto;display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}
-.gtv2-track{display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.gtv2-track::-webkit-scrollbar{display:none}
-.gtv2-step{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:9px;cursor:pointer;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#aab0bc;font-family:var(--disp);font-weight:650;font-size:11.5px;letter-spacing:.04em;white-space:nowrap;transition:transform .12s ease}
-.gtv2-step-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);flex:0 0 auto}
-.gtv2-step.on{background:linear-gradient(180deg,var(--gold3),var(--gold));color:#150f02;border-color:transparent;box-shadow:0 0 16px -3px rgba(242,208,121,.6)}
-.gtv2-step.on .gtv2-step-dot{background:#150f02}
 /* ── Gotham panel grid ── */
-.gtv2-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 
 /* ── Base panel: compact + cinematic lighting ── */
-.gtv2-panel{
- position:relative;overflow:hidden;
- border:1px solid rgba(255,255,255,.09);
- background:
-   radial-gradient(ellipse 80% 58% at 0% 0%, rgba(255,255,255,.042), transparent 60%),
-   radial-gradient(ellipse 60% 48% at 100% 100%, rgba(0,0,0,.32), transparent 62%),
-   linear-gradient(158deg, rgba(18,25,40,.98), rgba(7,10,17,.98));
- border-radius:16px;padding:11px;
- box-shadow:
-   inset 0 1px 0 rgba(255,255,255,.09),
-   inset 0 0 0 1px rgba(255,255,255,.025),
-   0 18px 44px -20px rgba(0,0,0,.94),
-   0 3px 10px -5px rgba(0,0,0,.7);
- transition:border-color .2s,box-shadow .2s}
 /* gold top shimmer */
-.gtv2-panel::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
- background:linear-gradient(90deg,transparent 8%,rgba(255,208,72,.44) 50%,transparent 92%);pointer-events:none}
 /* inner diagonal highlight — simulates a studio key-light from top-left */
-.gtv2-panel::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
- background:linear-gradient(135deg,rgba(255,255,255,.055) 0%,transparent 38%,rgba(0,0,0,.14) 100%)}
-.gtv2-panel.wide{grid-column:1/-1}
 
 /* ── Compact data typography ── */
-.gtv2-label{font-family:var(--disp);font-weight:650;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
-.gtv2-value{font-family:var(--disp);font-weight:650;font-size:25px;line-height:1;color:var(--text)}
-.gtv2-note{font-size:11px;line-height:1.38;color:var(--text2);margin-top:3px}
-.gtv2-meter{height:5px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:7px}
-.gtv2-meter i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 10px rgba(255,208,72,.5)}
 
 /* ── Action rows inside panels ── */
-.gtv2-action{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.07)}
-.gtv2-action:first-child{border-top:0;padding-top:0}
-.gtv2-action-ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,208,72,.09);border:1px solid rgba(255,208,72,.22);font-size:15px;flex:none}
-.gtv2-action-title{font-weight:800;font-size:13px;color:var(--text)}
-.gtv2-action-copy{font-size:11.5px;line-height:1.4;color:var(--text2);margin-top:1px}
 
-.gtv2-chipline{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
-.gtv2-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;border-radius:999px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text2)}
-.gtv2-chip.red{color:#ff887f;border-color:rgba(255,54,34,.4);background:rgba(255,54,34,.1)}
-.gtv2-chip.green{color:#6ef5a8;border-color:rgba(34,232,122,.36);background:rgba(34,232,122,.1)}
-.gtv2-chip.gold{color:var(--gold2);border-color:rgba(255,208,72,.36);background:rgba(255,208,72,.09)}
-.gtv2-chip.blue{color:#9fc1f2;border-color:rgba(60,150,255,.38);background:rgba(60,150,255,.1)}
 
 /* ── Alfred Protocol: command-terminal treatment ── */
-.gtv2-protocol{
- border-color:rgba(60,150,255,.3);
- background:
-   radial-gradient(ellipse 80% 55% at 0% 0%, rgba(60,150,255,.06), transparent 58%),
-   radial-gradient(ellipse 50% 40% at 100% 100%, rgba(0,0,0,.35), transparent 62%),
-   linear-gradient(158deg, rgba(8,16,32,.99), rgba(4,8,16,.99));
- box-shadow:
-   inset 0 1px 0 rgba(60,150,255,.14),
-   inset 0 0 0 1px rgba(60,150,255,.06),
-   0 0 0 1px rgba(60,150,255,.08),
-   0 20px 48px -22px rgba(0,0,0,.98)}
-.gtv2-protocol::before{background:linear-gradient(90deg,transparent 5%,rgba(60,150,255,.5) 50%,transparent 95%)}
-.gtv2-protocol .gtv2-action-ic{background:rgba(60,150,255,.12);border-color:rgba(60,150,255,.32)}
 
 /* ── Alfred intel card ── */
-.gtv2-alfred-top{
- display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;
- margin-top:9px;padding:10px;border-radius:13px;cursor:pointer;
- background:linear-gradient(158deg,rgba(14,22,38,.95),rgba(6,10,18,.85));
- border:1px solid rgba(60,150,255,.2);
- box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 18px -10px rgba(0,0,0,.7);
- transition:transform .12s ease,border-color .15s}
-.gtv2-alfred-top:active{transform:scale(.99);border-color:rgba(60,150,255,.4)}
-.gtv2-alfred-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);flex:none}
-.gtv2-alfred-ic.red{background:rgba(255,54,34,.14);border-color:rgba(255,54,34,.4)}
-.gtv2-alfred-ic.gold{background:rgba(255,208,72,.14);border-color:rgba(255,208,72,.42)}
-.gtv2-alfred-ic.green{background:rgba(34,232,122,.14);border-color:rgba(34,232,122,.38)}
-.gtv2-alfred-ic.blue{background:rgba(60,150,255,.14);border-color:rgba(60,150,255,.38)}
-.gtv2-alfred-title{font-family:var(--disp);font-weight:650;font-size:15px;letter-spacing:.01em;color:var(--text)}
-.gtv2-alfred-copy{font-size:12px;line-height:1.4;color:var(--text2);margin-top:2px}
-.gtv2-alfred-more{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;cursor:pointer}
-.gtv2-alfred-link{font-size:11px;color:var(--gold2);font-weight:700;margin-left:auto;white-space:nowrap;text-shadow:0 0 10px rgba(255,208,72,.4)}
 
 /* ── Muscle grid ── */
-.gtv2-map{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}
-.gtv2-muscle{
- position:relative;overflow:hidden;
- border:1px solid rgba(255,255,255,.09);
- background:linear-gradient(155deg,rgba(16,22,34,.96),rgba(8,11,17,.96));
- border-radius:12px;padding:7px 5px;text-align:center;min-width:0;cursor:pointer;
- box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 12px -8px rgba(0,0,0,.7);
- transition:border-color .15s,box-shadow .15s}
-.gtv2-muscle::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
- background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)}
-.gtv2-muscle:active{border-color:rgba(255,208,72,.4);box-shadow:0 0 0 1px rgba(255,208,72,.14)}
-.gtv2-muscle b{display:block;font-family:var(--disp);font-weight:650;font-size:13px;line-height:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gtv2-muscle span{display:block;font-size:9.5px;color:var(--text3);margin-top:2px;line-height:1.2}
-.gtv2-minimusle{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);cursor:pointer;transition:.12s;-webkit-tap-highlight-color:transparent}
 
-.gtv2-audit-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-top:1px solid rgba(255,255,255,.07)}
-.gtv2-audit-row:first-child{border-top:0}
-.gtv2-audit-row strong{font-size:13px}
-.gtv2-audit-row p{font-size:12px;line-height:1.45;color:var(--text2);margin:1px 0 0}
 /* 🎯 MISSION BRIEFING — the dominant hero moment on the Mission tab: tonight's operation pulled
    out of the day list into its own Batcomputer-grid card, muscle chips, exercise strip, one huge
    DEPLOY button. Replaces "just another highlighted row" with an actual mission-control feeling. */
@@ -981,16 +864,6 @@ button.card,.card[onclick]{cursor:pointer;border-color:var(--hair)!important;box
 .card.glow,.mission-briefing,.log-focus{background:radial-gradient(120% 85% at 100% 0%,rgba(242,193,78,.13),transparent 56%),radial-gradient(90% 70% at 0% 100%,rgba(91,180,255,.06),transparent 60%),linear-gradient(180deg,#1B2638 0%,#111927 100%);border:1px solid rgba(242,193,78,.2);border-radius:var(--r-l);box-shadow:inset 0 1px 0 rgba(255,226,150,.14),0 24px 46px -22px rgba(0,0,0,.95)}
 .card.glow::before,.mission-briefing::before,.log-focus::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,221,138,.85) 28%,rgba(255,221,138,.85) 72%,transparent)}
 /* Home hero + tiles (rebuilt in wave 2; calm until then) */
-.gtv2-hero{border:1px solid rgba(242,193,78,.2);border-radius:var(--r-l);box-shadow:inset 0 1px 0 rgba(255,226,150,.14),0 24px 46px -22px #000}
-.gtv2-hero::after{content:none}
-.gtv2-hero-img{opacity:.6}
-.gtv2-tonight,.gtv2-tonight.rest,.gtv2-tonight.empty{background:rgba(8,12,20,.5);border:1px solid var(--hair2);box-shadow:none;border-radius:var(--r-m)}
-.gtv2-tonight-tag,.gtv2-tonight.rest .gtv2-tonight-tag{color:var(--gold-ink)}
-.gtv2-tonight.rest .gtv2-tonight-tag{color:var(--rest)}
-.gtv2-panel{background:linear-gradient(180deg,#131B29,#0F1621);border:1px solid var(--hair)!important;border-radius:var(--r-m);padding:12px;box-shadow:var(--hl),var(--sh1)!important}
-.gtv2-panel::before,.gtv2-panel::after{content:none}
-.gtv2-meter i{box-shadow:none}
-.gtv2-action-ic{background:rgba(150,178,222,.08);border:0}
 /* accordions */
 .accsec{background:linear-gradient(180deg,#131B29,#0F1621);border:1px solid var(--hair);border-radius:var(--r-m);box-shadow:var(--hl),var(--sh2)}
 .accsec::before{content:none}
@@ -1056,9 +929,6 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 .subtab.on{color:var(--gold-ink);background:var(--tint-gold);box-shadow:inset 0 0 0 1px rgba(242,193,78,.3)}
 .rs-btn,.restbtn{background:var(--g4);border:0;box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);font:600 14px/1 var(--body);letter-spacing:-.005em;-webkit-backdrop-filter:none;backdrop-filter:none}
 .rs-btn.gold,.restbtn.go{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.38)}
-.gtv2-step{background:rgba(150,178,222,.07);border:0;box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx2)}
-.gtv2-step.on{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.38)}
-.gtv2-step.on .gtv2-step-dot{background:var(--gold-ink)}
 /* ---- icons: one inline-SVG set (GP.icon), 24px grid, currentColor strokes ---- */
 .gi{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
 .gi-t,.gi-sec{width:15px;height:15px;margin-right:7px;vertical-align:-2px;color:var(--tx2)}
@@ -1116,10 +986,6 @@ body.rest-final::after{animation:none;box-shadow:inset 0 0 90px 12px rgba(255,90
 /* ---- calm pass: screen titles, figure thumbs, villain bar, muscle chips, hero id row ---- */
 h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .exwrap{border:1px solid var(--hair2);box-shadow:var(--hl)}
-.gtv2-idlogo{display:none}
-.gtv2-idtext{flex:1 1 auto}
-.gtv2-idname{font:700 20px/1.1 var(--body);letter-spacing:-.01em;color:var(--tx1);text-shadow:none}
-.gtv2-iddate{font:600 11px/1.2 var(--body);letter-spacing:.06em;color:var(--tx2);white-space:nowrap}
 
 .cal-pr{color:var(--gold-ink)}
 .cal-pr .gi{width:11px;height:11px}
@@ -4036,8 +3902,6 @@ function startWorkout(splitId,dayIdx){
   state.step="readiness";render();playEntrance(state.session.day);
 }
 function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
-// Cinematic Batcave arrival — a high-end vehicle rolls into the garage as the session opens.
-const _ENTR_RIDES=[["🏎️","BATMOBILE ONLINE"],["🏍️","BATCYCLE ENGAGED"],["🚘","TUMBLER DEPLOYED"],["🚗","NIGHTRIDER ARMED"]];
 // planned = the split day's target for this lift ({s:sets, r:"5–10"}). With a plan, seed exactly that
 // many working sets (last session's numbers shown per set where they exist) instead of copying last
 // session's set count — otherwise every session starts with the old plan's sets to delete by hand.
@@ -4071,8 +3935,7 @@ function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap")
 const STYPES=["NRM","W","F","D","L","R"];
 function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
 function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();saveSession();}
-// Real-time PR + boss: the moment a working set is completed and beats your record,
-// fire a toast and (first time per exercise this session) the villain boss fight.
+// Real-time PR check: the moment a working set is completed and beats your record, it is flagged in its row.
 function liveCheckPR(ei,si){
   const exObj=state.session.exercises[ei];const s=exObj.sets[si];
   if(!s||!s.done||s.type==="W")return null;            // warm-ups never count as PRs
@@ -4083,7 +3946,6 @@ function liveCheckPR(ei,si){
   const rec=state.data.prs[exObj.name]||{};
   const cOrm=rec.orm||0,cW=rec.maxW||0,cReps=rec.maxReps||0,cVol=rec.maxVol||0;
   state.session.liveBest=state.session.liveBest||{};
-  state.session.bossed=state.session.bossed||{};
   // Tiered PRs: a single set can break several records at once. Track the session's running best
   // for each tier so we only toast genuine new ground, and rank them — e1RM is the crown.
   const lb=state.session.liveBest[exObj.name]=state.session.liveBest[exObj.name]||{orm:0,maxW:0,maxReps:0,maxVol:0};
@@ -4151,28 +4013,6 @@ function showPRToast(name,hits,info){
   p.classList.remove("on");void p.offsetWidth;p.classList.add("on");
   clearTimeout(p._t);p._t=setTimeout(()=>{p.classList.remove("on");},2800);
   haptic("pr");
-}
-// PR KILL-CAM — full-screen slow-mo cinematic when a record falls. Reuses the #cine overlay
-// with a kill-cam skin: the exercise, a smashing big number, the delta over your old best.
-// Auto-dismisses so it never blocks logging; tap anywhere (or ONWARD) to skip.
-function prKillCam(name,hits,info,again){
-  try{
-    hits=hits.slice().sort((a,b)=>PR_TIER[b.t].rank-PR_TIER[a.t].rank);
-    const top=hits[0],cfg=PR_TIER[top.t];
-    const round1=v=>Math.round(v*10)/10;
-    const big=top.t==="reps"?top.val:Math.round(top.val);
-    const dval=top.prev?(top.val-top.prev):0;
-    const pct=top.prev?((top.val-top.prev)/top.prev*100):0;
-    const deltaStr=top.prev
-      ? `+${top.t==="reps"?dval:round1(dval)}${top.t==="reps"?" reps":"kg"} · ▲ ${pct>=10?Math.round(pct):round1(pct)}% over your old best`
-      : `FIRST RECORD — nothing to beat but yourself`;
-    const liftStr=(info&&info.w!=null&&info.r)?`${round1(info.w)}kg × ${info.r}`:"";
-    const extra=hits.length>1?` · +${hits.length-1} more record${hits.length>2?"s":""} this set`:"";
-    const bodyHtml=`<div class="kcnum" style="color:${cfg.accent}">${big}<span class="kcunit">${esc(cfg.unit)}</span></div>
-      <div class="kcdelta" style="color:${cfg.accent}">${deltaStr}</div>
-      ${(liftStr||extra)?`<div class="mini" style="margin-top:11px;color:var(--text3);letter-spacing:.1em">${liftStr}${extra}</div>`:""}`;
-    cinePush({killcam:true,hold:true,icon:cfg.badge,eye:again?"RAISED AGAIN — SAME NIGHT":"RECORD SHATTERED",titleHtml:esc(name),title:name,bodyHtml,btn:again?"UNSTOPPABLE":"ONWARD",accent:cfg.accent});
-  }catch(e){try{showPRToast(name,hits,info);}catch(_){}}
 }
 function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();saveSession();}
 function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();saveSession();}
@@ -4390,7 +4230,7 @@ function finishWorkout(){
       (ex.p||[]).forEach(m=>{sessVol[m]=(sessVol[m]||0)+v;musclesHit[m]=Math.max(musclesHit[m]||0,1);if(s.type==="F")sessFails[m]=(sessFails[m]||0)+1;});
       (ex.s||[]).forEach(m=>{sessVol[m]=(sessVol[m]||0)+v*0.4;musclesHit[m]=Math.max(musclesHit[m]||0,.5);});
     });
-    // Tiered PR commit: e1RM stays the crown (drives boss + summary), but we also persist the
+    // Tiered PR commit: e1RM stays the crown (drives the summary), but we also persist the
     // all-time best weight, reps and single-set volume so the live tiered toasts have a baseline.
     const prev=state.data.prs[e.name];
     const newOrm=Math.max(bestORM,prev&&prev.orm||0);
@@ -4425,8 +4265,6 @@ function finishWorkout(){
   // high-rep marathons don't dominate; PRs carry real weight. ~60–115 XP/session → ~2-4 sessions/level early.
   const xpGain=Math.min(Math.round(totalVol/140),65)+prsThis.length*22+30;
   u.totalWorkouts++;u.totalVolume+=totalVol;u.totalDuration+=dur;u.xp+=xpGain;u.failureSets+=fails;
-  // weakest muscle for taunt memory
-  let weak=M12[0],wl=999;M12.forEach(m=>{const l=muscleLevel(m);if((state.data.muscleVol[m]||0)>0&&l<wl){wl=l;weak=m;}});u.lastMissedMuscle=weak;
   // splitId/dayIdx (when this session came from a real split day) are the STABLE identity for
   // "which day was this" — renaming a day, or a Free Session with no split at all, must never make
   // computeNextDay() blind to a session that actually happened. Name-string matching (name/split
@@ -4443,7 +4281,7 @@ function finishWorkout(){
   // advance the case-file rotation when the session came from a planned split (not a free session)
   if(ses.split&&ses.split!=="Free Session")advanceDay();
   save();
-  // store result for summary + boss
+  // store result for the summary
   try{const sk=(ses.exercises||[]).filter(e=>e._skip);if(sk.length){const line="Skipped: "+sk.map(e=>e.name+" ("+String(e._skip).replace(/^[^\s]+\s/,"")+")").join(", ");wk.notes=(wk.notes?wk.notes+"\n":"")+line;}}catch(e){}
   state.lastResult={wk,totalVol,xpGain,prsThis,sessVol,musclesHit,dur,readiness:ses.readiness,notes:wk.notes};
   // Smart profile capture: carry any "suspicious leap" flags out of the session so Alfred can offer
@@ -4452,7 +4290,6 @@ function finishWorkout(){
   stopTimers();state.step=null;state.session=null;state.minimized=false;clearSavedSession(); // session is committed — clear it so the resume bar can't linger
   try{cloudPresence(false);}catch(e){}
   try{duelNote(state.lastResult);}catch(e){}
-  // Bosses now fire live during the session (see liveCheckPR), so just show the summary.
   openSummary();
   try{setTimeout(maybeOfferProfile,900);}catch(e){}
 }
@@ -6365,14 +6202,6 @@ function exerciseRows(name){
   });
   return rows;
 }
-/* Rep-max PRs — heaviest load lifted for at least N reps (5/8/10) from the active gym's history. */
-function miniSpark(vals){
-  if(!vals||vals.length<2)return "";
-  const w=60,h=20,min=Math.min(...vals),max=Math.max(...vals),r=(max-min)||1,n=vals.length;
-  const pts=vals.map((v,i)=>`${(i/(n-1)*w).toFixed(1)},${(h-2-((v-min)/r)*(h-4)).toFixed(1)}`).join(" ");
-  const up=vals[n-1]>=vals[0];
-  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="flex:none"><polyline points="${pts}" fill="none" stroke="${up?'#2ECC71':'#E8453C'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-}
 function loggedExerciseNames(){
   const m=new Map();
   state.data.workouts.forEach(w=>(w.exercises||[]).forEach(e=>{if((e.sets||[]).some(s=>s.done&&s.type!=="W"))m.set(e.name,(m.get(e.name)||0)+1);}));
@@ -6780,8 +6609,6 @@ function setSleepField(field,val){
 // ---- soreness ----
 function soreToday(){return (state.data.soreness=state.data.soreness||{})[infDateKey()]||{};}
 function toggleSore(m){const k=infDateKey();const map=state.data.soreness[k]=state.data.soreness[k]||{};map[m]=((map[m]||0)+1)%4;if(!map[m])delete map[m];save();haptic("tap");renderInfirmary();}
-// ---- cardio / patrol mileage ----
-function weekCardio(){const wk=now()-7*864e5;return (state.data.cardioLog||[]).filter(c=>new Date(c.date).getTime()>=wk).reduce((a,c)=>a+(+c.mins||0),0);}
 // ---- supplements ----
 function suppToday(){return (state.data.suppLog=state.data.suppLog||{})[infDateKey()]||{};}
 function toggleSupp(item){const k=infDateKey();const map=state.data.suppLog[k]=state.data.suppLog[k]||{};map[item]=!map[item];save();checkAchievements();haptic("tap");if(state.subpage==="infirmary")renderInfirmary();else render();}
@@ -10016,7 +9843,7 @@ function maybeOfferProfile(){
   try{
     const offers=state._profileOffers;if(!offers||!offers.length)return;
     if(state.step==="summary"&&document.getElementById("cine")&&document.getElementById("cine").classList.contains("on")){
-      setTimeout(maybeOfferProfile,1200);return; // wait for any kill-cam/boss cine to clear first
+      setTimeout(maybeOfferProfile,1200);return; // wait for any full-screen moment to clear first
     }
     const o=offers.shift();state._profileOffers=offers.length?offers:null;
     if(!o||!o.name){if(state._profileOffers)maybeOfferProfile();return;}
@@ -10497,7 +10324,7 @@ function alfredOver12(ei,si){
 }
 function alfredCoachLine(ei,si,ev){
   const e=state.session.exercises[ei];if(!e)return _ALFRED_SET[0];
-  if(ev==="pr"||ev==="boss"){if(state.session)state.session._coachTone="good";return _pickLine(_ALFRED_PR,"pr");}
+  if(ev==="pr"){if(state.session)state.session._coachTone="good";return _pickLine(_ALFRED_PR,"pr");}
   const over=alfredOver12(ei,si);if(over){if(state.session)state.session._coachTone="bad";return over;}
   const weak=alfredWeakCallout(ei,si);if(weak){if(state.session)state.session._coachTone="bad";return weak;}
   const reg=alfredRegressionCallout(ei,si);if(reg){if(state.session)state.session._coachTone="bad";return reg;}
