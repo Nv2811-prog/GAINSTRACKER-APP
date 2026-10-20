@@ -1786,6 +1786,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ga::after{content:"";position:absolute;inset:0;background:var(--v,linear-gradient(transparent,transparent)),linear-gradient(0deg,#111927 0%,rgba(17,25,39,.6) 28%,rgba(17,25,39,0) 62%),linear-gradient(90deg,rgba(17,25,39,.55),rgba(17,25,39,0) 72%)}
 .ga-rest img{width:calc(100% + 60px);object-position:right 38%}   /* skyline pushed past the right edge so the moon clears the Next row */
 .ga-mission{--o:.66;--v:linear-gradient(180deg,rgba(17,25,39,.62),rgba(17,25,39,0) 34%)}   /* top veil keeps "Day 7 of 8" crisp */
+.ga-mission.dim{--o:.4}   /* the no-plan hero runs a paragraph across the full width */
 .ga-suit{top:auto;height:44%;--o:.9}   /* the quietest still: a carbon-plate band under the legend, the figure stays on clean matte */
 .ga-suit img{object-position:right bottom;-webkit-mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%);mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%)}
 .ga-profile{--o:.8}
@@ -8118,7 +8119,7 @@ function gmLabHtml(){
   const tools=[["scale","Plate calculator","openPlateSheet(-1)"],["bolt","1RM calculator","open1RM()"],["target","1RM test day","openTestDay()"],["wrench","Forge","openForge()"],["note","Measure","openMeasure()"]];
   return `<div class="gm-lab">${contractCard()}${scienceCardsHtml()}<section class="s2 gh-list"><div class="gh-lh"><h3>Tools</h3></div>${tools.map(t=>`<div class="gh-row" data-hx onclick="${t[2]}"><span class="lead">${GP.icon(t[0])}</span><div class="main"><div class="gh-t1">${t[1]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`;
 }
-const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0">${gaArt("mission")}<div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
+const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0">${gaArt("mission","dim")}<div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
   <div class="gh-cta"><button class="btn btn-1" onclick="newSplit();openSplitSheet()">${GP.icon("plus")}New split</button><button class="btn" onclick="freeWorkout()">Free session</button></div></section>`;
 function renderMission(){
   const cur=gtv2CurrentPlanDay(),live=!!state.session;
