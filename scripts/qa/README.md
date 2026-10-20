@@ -9,6 +9,7 @@ in headless Google Chrome at iPhone size (393x852 @2x), with realistic seeded da
 ## Every change
     node scripts/qa/syncheck.mjs                       # syntax-check the app's inline <script> (exit 1 + line on error)
     node scripts/qa/smoke.mjs                          # real taps through the haptic switches: nav, set ✓, RESUME, finish, Alfred chat
+    node scripts/qa/home.mjs [--tab] / tab.mjs --tab mission|suit [--fixture train|rest|none] [--width 375]  # tap every control on one tab, report console errors
     node scripts/migrations-check (see scripts/test-migrations.cjs)
 
 ## Screenshot any state
