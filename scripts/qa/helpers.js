@@ -1,16 +1,14 @@
 // In-page QA helpers (window.__qa). Injected before the app boots; call after boot.
 // They drive the REAL app functions so the screens you reach are the screens the user reaches.
 window.__qa = {
-  // Remove one-shot cinematic overlays (garage entrance, stinger, cine queue, toasts) so a
+  // Remove one-shot cinematic overlays (stinger, cine queue, outro, toasts) so a
   // screenshot shows the underlying screen. Never touches data.
   clear() {
-    try { document.querySelectorAll('.g9-garage,.g9-entr,.g9-entr2,.ripple').forEach((n) => n.remove()); } catch (e) {}
-    try { state._entrLock = false; } catch (e) {}
-    try { ['stinger','outro','kocam'].forEach((id) => { const n = document.getElementById(id); if (n) n.remove(); }); } catch (e) {}
+    try { document.querySelectorAll('.ripple').forEach((n) => n.remove()); } catch (e) {}
+    try { ['stinger','outro'].forEach((id) => { const n = document.getElementById(id); if (n) n.remove(); }); } catch (e) {}
     try { if (typeof cineDismiss === 'function') cineDismiss(); } catch (e) {}
     try { state._cineQ = []; state._cineOn = false; } catch (e) {}
     try { const c = document.getElementById('cine'); if (c) c.classList.remove('on'); } catch (e) {}
-    try { const k = document.getElementById('kocam'); if (k) k.remove(); } catch (e) {}
     try { document.querySelectorAll('.g9-outro,.outro,#outro').forEach((n) => n.remove()); } catch (e) {}
     try { const t = document.getElementById('toast'); if (t) t.classList.remove('on'); } catch (e) {}
   },

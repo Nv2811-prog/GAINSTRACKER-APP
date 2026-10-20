@@ -10,7 +10,7 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
 
 ## THE FILE (this is the #1 thing people get wrong)
 - **Edit the source file: `Gainstracker app not complete.html`** — single-file vanilla-JS PWA, one
-  `<script>`, ~9.5k lines. ALL code changes go here.
+  `<script>`, ~11.5k lines. ALL code changes go here.
 - **`index.html` is a GENERATED DEPLOY COPY. Never hand-edit it.**
 - **Deploy / ship (run after every shippable change):**
   ```
@@ -33,13 +33,39 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
 - The chrome-devtools MCP is optional; the harness above needs only the installed Google Chrome.
 
 ## ARCHITECTURE FACTS
-- Live home = `renderGotham()` (the **gtv2** build: gtv2MissionHero, gtv2ScorePanel, gtv2ScorePanel).
-  Only one definition exists — a prior dead duplicate was already removed. If you ever find two
-  `function renderGotham` again, that's new drift, not a known issue — delete the unused one.
-- 5 tabs: **GOTHAM, MISSION, SUIT, PROFILE, ALLIES** (case key → renderProfile).
+- **Design system = Gotham Pro — `DESIGN.md` is the contract** (tokens, S1/S2/S3 surfaces, B1/B2/B3 buttons + the one
+  press recipe, the `GP` helper object, art recipe, haptics rule, motion budget, CSS anchors, one-thing-once rule).
+  The `<style>` is layered per wave before the anchors `GP:HOME`, `GP:LOGGING`, `GP:PROFILE+FINISH`,
+  `GP:MISSION+SUIT`, `GP:ART`, `GP:TABS`, `GP:PRUNE+HOME` — edit a rule in place, never stack an override on it.
+- **Home = `renderGotham()`**, composed from `gh*` helpers (there is no gtv2 code left): one hero
+  (`ghHeroTonight` / `ghHeroRest` / `ghHeroLive` / `ghHeroFree`, readiness folded in) → `ghWeek` (+ volume map) →
+  `ghSunday` → `ghLifts` → `ghRecap` (Last session) → `ghNext` → `ghExtrasRow` (Garage, seasonal events). Each
+  metric appears once. Only one `function renderGotham` exists; a second copy is new drift — delete the unused one.
+- **5 tabs:** GOTHAM, MISSION, SUIT, PROFILE, ALLIES (the `case` key → `renderProfile`; `TABS` drives the nav).
+  Mission + Suit are scoped under `.gm`; Profile is built by the `p3*` functions; Allies by `renderAllies`;
+  Settings, Data control and onboarding are GP:TABS pages/sheets.
+- **Alfred = the header avatar (gold-ring) + ONE text-first chat** (`openAlfredChat()`, `#ac-panel`, `.ac-*`) and an
+  Alfred page (`go('alfred')`: today's read, suggestions, last conversation, dossiers). No floating button, no second
+  chat UI. His app knowledge is `ALFRED_APP_GUIDE` (+ `ALFRED_PERSONA`, `ALFRED_CHAT_RULES`): every label in it must
+  exist in the UI, so grep the code before changing one and update it whenever a screen or rule changes.
+- **Deleted on purpose in the Gotham Pro overhaul (don't resurrect unless asked):** Territory War, Threat, Iron
+  Ledger, Chronicle/Gazette, crate, siege, season pass, villain case files/Arkham/boss fights, Wraith, title belts,
+  wardrobe/liveries/frames/prestige, the Home lore fold. **Still here:** the Garage (vehicles unlock with real
+  milestones), seasonal events, and Allies (league, leaderboard, co-op raids, sparring, Fight Night). This is the
+  executed form of the "dial back" bullet in SCIENCE > FLAVOR below; the science systems are untouched.
 - Per-gym PRs: `d.prsByGym[gym]`; `d.prs` re-points to the active gym each load. `u.gyms`,
   `u.activeGym`, `switchGym()`. Machine settings: `d.machineSettings[gym][exName]`.
-- Images: keep them tiny (downscale to ≤420px wide). NEVER embed multi-MB images → iOS memory crash.
+- Images: keep them tiny (downscale to ≤420px wide). NEVER embed multi-MB images → iOS memory crash. Tab heroes use
+  `assets/art/*.jpg` via `gaArt()` (see `assets/art/README.md`); exercise pictures are `assets/exfig/<pattern>.png`.
+- **QA harness (`scripts/qa`, README there)** drives the REAL app in headless Chrome at iPhone size (393 default,
+  `--width 375` for the small phone) with a seeded fixture, a pinned clock and external network blocked. Every
+  script defaults to the repo's own app file, so it works in worktrees. `syncheck.mjs` (parse), `smoke.mjs`,
+  `flow.mjs` (nav → start → one-tap ghost ticks → PR row → finish → summary RPE → Home, Records header, Alfred
+  chat), `home.mjs`, `tab.mjs --tab mission|suit|case|allies|alfred [--inject-file scripts/qa/seed-allies.js]`,
+  `onboarding.mjs`, `settings.mjs`, `shoot.mjs`, `perf.mjs [--throttle 4]` (size, DOM nodes, render ms, infinite
+  animations ≤ 1 and backdrop-filters ≤ 3 per screen, first paint) and `node scripts/test-migrations.cjs <file>`.
+  Everything must end green with zero console errors; a missing style is invisible to console checks, so
+  also look at a screenshot when you touch CSS.
 
 ## HARD RULES (never violate)
 - Offline PWA on GitHub Pages • single-file vanilla JS • never break/erase `localStorage` data

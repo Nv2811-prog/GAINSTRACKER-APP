@@ -9,11 +9,14 @@ in headless Google Chrome at iPhone size (393x852 @2x), with realistic seeded da
 ## Every change
     node scripts/qa/syncheck.mjs                       # syntax-check the app's inline <script> (exit 1 + line on error)
     node scripts/qa/smoke.mjs                          # real taps through the haptic switches: nav, set ✓, RESUME, finish, Alfred chat
+    node scripts/qa/flow.mjs [--width 375|393] [--out dir]  # the whole loop with real touch taps: 5 tabs, start, one-tap ghost ticks, PR row, finish, summary slides, session RPE, Done > Home, Profile "Records" header on one row, Alfred chat (screenshots to --out)
+    node scripts/qa/perf.mjs [--throttle 4] [--width 393]   # budget per screen: size, DOM nodes, render() ms, infinite animations (<= 1), backdrop-filter (<= 3), first paint
     node scripts/qa/home.mjs [--tab] / tab.mjs --tab mission|suit [--fixture train|rest|none] [--width 375]  # tap every control on one tab, report console errors
     node scripts/migrations-check (see scripts/test-migrations.cjs)
     node scripts/qa/onboarding.mjs [--out dir]         # new-user flow: welcome > you > goal > experience > Home, guards, persistence, Settings edit mode
     node scripts/qa/settings.mjs [--out dir]           # Settings + Data control: field validation, archive, restore guards, two-step erase, backup/CSV hooks
-    # tab.mjs also taps sheets: --open "openSettings()" --scope "#sheet [onclick]"; --inject-file seed.js (e.g. allies); --skip "backupData|exportCSV"
+    # tab.mjs also taps sheets: --open "openSettings()" --scope "#sheet [onclick]"; --inject-file scripts/qa/seed-allies.js (three seeded allies: one on patrol, one streak at risk, one idle; pair with --tab allies and --open "openAllySheet(0)"); --skip "backupData|exportCSV"
+    # Every script defaults to the app file of the repo it lives in (works in worktrees); pass --file <html> (smoke/syncheck: a positional path) to test another build.
 
 ## Screenshot any state
     node scripts/qa/shoot.mjs --out /tmp/shots --name home [--js "<page code>"] [--eval "<expr>"] [--width 375|393|430] [--scroller "#sheet"] [--file <html>] [--fixture none]
