@@ -5825,10 +5825,10 @@ function p3Variant(nm){   // a sister lift: same primary muscle and movement wor
   return EXDB.filter(e=>e.n!==nm&&(e.p||[])[0]===p0&&e.n.toLowerCase().includes(mv)&&!inDay.has(e.n)).sort((a,b)=>sc(b)-sc(a)||a.n.localeCompare(b.n))[0]||null;
 }
 function p3StallOpts(nm){
-  const ex=exFor(nm),slots=p3Slots(nm),lb=lastBestSet(nm),m=(ex.p||[])[0],sets=m?weeklySets(m):0,z=m?zoneOf(m,sets):null,alt=p3Variant(nm),heavy=!!lb&&lb.r>=8,rng=heavy?"5–8":"8–10",mn=MNAME[m]||m;
+  const ex=exFor(nm),slots=p3Slots(nm),lb=lastBestSet(nm),m=(ex.p||[])[0],sets=m?weeklySets(m):0,z=m?zoneOf(m,sets):null,alt=p3Variant(nm),heavy=!!lb&&lb.r>=8,rng="8–10",mn=MNAME[m]||m;   /* never a 5–8 option: the firm rule adds weight only at the top (10), so a lower ceiling would block progression */
   const free=slots.length?"":"Add this lift to a split day to apply it.";
   return [
-    {k:"rep",ic:"sliders",ttl:`Work ${rng} reps for a block`,why:free||(heavy?"Reps are stuck high. Go heavier: 5–8 reps, the load rises sooner.":"Reps are stuck low. Own 8–10 clean reps at this load before the next jump."),off:!slots.length,rng},
+    {k:"rep",ic:"sliders",ttl:`Work ${rng} reps for a block`,why:free||(heavy?"Reps already sit high. Swap the variant or add a set instead.":"Reps are stuck low. Own 8–10 clean reps at this load before the next jump."),off:!slots.length||heavy,rng},
     {k:"swap",ic:"swap",ttl:alt?`Swap to ${alt.n}`:"Swap the variant",why:free||(alt?"Same muscle, new angle or implement: fresh stimulus, fresh progress.":"No close variant in your library. Shift the angle 10–15° or change grip for 3 weeks."),off:!slots.length||!alt,alt},
     {k:"set",ic:"plus",ttl:"Add a set",why:free||(z?(sets<z.mav?`${mn} is at ${sets} of ${z.mav} weekly sets (MAV). One more set is productive volume.`:`${mn} already sits at ${sets} sets (MAV ${z.mav}). More volume only adds fatigue.`):"No muscle data for this lift."),off:!slots.length||!z||sets>=z.mav}
   ];
