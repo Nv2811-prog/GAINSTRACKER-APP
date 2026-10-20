@@ -1057,10 +1057,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-hero{padding:12px 16px 10px}
 .gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
-.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
-.s3.is-live .gh-art{opacity:.5;animation:none}   /* live hero: the pulsing dot is the one moving thing */
-@keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
-@media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
+.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08)}
+.s3.is-live .gh-art{opacity:.5}   /* live hero: dimmed; the pulsing live dot is the one time-based motion */
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
 .gh-live{display:inline-flex;align-items:center;gap:7px;color:var(--gold-ink)}
 .gh-live::before{content:"";width:7px;height:7px;border-radius:9px;background:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.2)}
@@ -1229,6 +1227,21 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ga-finish.fin img{--o:.9;object-position:68% 30%;-webkit-mask-image:linear-gradient(180deg,#000 44%,transparent 100%);mask-image:linear-gradient(180deg,#000 44%,transparent 100%)}
 .ga-finish.fin::after{background:radial-gradient(75% 60% at 50% 100%,rgba(5,7,12,.85),rgba(5,7,12,0) 100%),linear-gradient(90deg,rgba(5,7,12,.5),rgba(5,7,12,0) 70%)}
 .lg2-bar::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:url(assets/art/logging.jpg) right 55%/cover no-repeat;opacity:.85;-webkit-mask-image:linear-gradient(90deg,transparent 24%,#000 88%);mask-image:linear-gradient(90deg,transparent 24%,#000 88%)}
+
+/* ===== GP:CHARM (wave 6) ===== */
+/* The charm layer: hero art that lives (scroll-driven, transform only), a one-shot gold light sweep per tab, art in the sheets and the Alfred chat, a line icon + accent on every section header, live numbers, and the tab-switch morph.
+   Time-based motion stays at <= 1 infinite animation per screen: the hero art is driven by SCROLL (animation-timeline), never by a clock. */
+/* 1 · living hero art: while the page scrolls the still lags behind and pushes in (translateY 7% + scale 1.1 around its lower right, so no edge ever shows). Feature-detected; elsewhere the still simply holds. */
+@keyframes gpPar{to{transform:translate3d(0,7%,0) scale(1.1)}}
+@keyframes gpParBar{to{transform:scale(1.1)}}
+@keyframes gpPush{from{transform:scale(1)}to{transform:scale(1.08)}}
+@supports (animation-timeline:scroll()){
+  .gh-art,.ga:not(.fin):not(.hd) img,.al-bg img,.af-bg img{transform-origin:72% 100%;animation:gpPar linear both;animation-timeline:scroll(root block);animation-range:0px 340px}
+  .lg2-bar::before{transform-origin:72% 50%;animation:gpParBar linear both;animation-timeline:scroll(root block);animation-range:0px 700px}
+}
+.p3-fin .ga img{transform-origin:68% 30%;animation:gpPush 1.4s var(--ease-out) both}   /* the finish moment: one slow push-in, once */
+@media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}}
+/* ===== /GP:CHARM ===== */
 
 /* ===== GP:MISSION+SUIT (wave 3) ===== */
 /* Mission, Suit and the muscle dossier run on Home's primitives (.gh .s1/.s2/.s3, .gh-row, .gh-lh, .gh-lore, .lmk, .ring, .tag) plus the rules below, all scoped under .gm.
@@ -1631,7 +1644,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 
 /* ===== GP:LOGGING (wave 2) ===== */
 /* sticky bar: title row folds on scroll, the strip + segments stay pinned (≈64–100px) */
-.lg2-bar{position:sticky;top:0;z-index:30;margin:calc(-20px - env(safe-area-inset-top,0px)) -14px 0;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px 0;background:rgba(5,7,12,.9);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-bottom:1px solid var(--hair)}
+.lg2-bar{position:sticky;top:0;z-index:30;overflow:hidden;margin:calc(-20px - env(safe-area-inset-top,0px)) -14px 0;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px 0;background:rgba(5,7,12,.9);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-bottom:1px solid var(--hair)}
 .lg2-title{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;height:44px;overflow:hidden}
 .lg2-title .lt{min-width:0}
 .lg2-eyebrow{display:flex;align-items:center;gap:6px;font:600 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink);white-space:nowrap}
