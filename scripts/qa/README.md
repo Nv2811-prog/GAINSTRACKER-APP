@@ -11,6 +11,9 @@ in headless Google Chrome at iPhone size (393x852 @2x), with realistic seeded da
     node scripts/qa/smoke.mjs                          # real taps through the haptic switches: nav, set ✓, RESUME, finish, Alfred chat
     node scripts/qa/home.mjs [--tab] / tab.mjs --tab mission|suit [--fixture train|rest|none] [--width 375]  # tap every control on one tab, report console errors
     node scripts/migrations-check (see scripts/test-migrations.cjs)
+    node scripts/qa/onboarding.mjs [--out dir]         # new-user flow: welcome > you > goal > experience > Home, guards, persistence, Settings edit mode
+    node scripts/qa/settings.mjs [--out dir]           # Settings + Data control: field validation, archive, restore guards, two-step erase, backup/CSV hooks
+    # tab.mjs also taps sheets: --open "openSettings()" --scope "#sheet [onclick]"; --inject-file seed.js (e.g. allies); --skip "backupData|exportCSV"
 
 ## Screenshot any state
     node scripts/qa/shoot.mjs --out /tmp/shots --name home [--js "<page code>"] [--eval "<expr>"] [--width 375|393|430] [--scroller "#sheet"] [--file <html>] [--fixture none]

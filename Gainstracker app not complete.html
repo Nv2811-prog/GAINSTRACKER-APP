@@ -163,19 +163,6 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .btn.sm{padding:8px 12px;font-size:13px;width:auto}
 .btn.danger{color:var(--red);border-color:rgba(232,82,74,.32);background:linear-gradient(180deg,rgba(40,20,21,.55),rgba(20,12,13,.42))}
 /* ── TACTILE ACTION TILES — embossed metal buttons that kill the flat ghost-button stacks ── */
-.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:10px}
-.tgrid.two{grid-template-columns:repeat(2,1fr)}
-.ttile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px 12px;border-radius:16px;cursor:pointer;min-height:76px;text-align:center;
-  background:linear-gradient(180deg,rgba(48,55,72,.92),rgba(17,21,31,.94));
-  border:1px solid rgba(255,255,255,.11);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 -16px 28px -20px rgba(0,0,0,.8),0 10px 26px -14px rgba(0,0,0,.92);
-  transition:transform .12s var(--ease-out),filter .12s,box-shadow .2s}
-.ttile .ti{font-size:23px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
-.ttile .tl{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);line-height:1.2}
-.ttile.gold{border-color:rgba(255,208,72,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -16px 28px -20px rgba(0,0,0,.6),0 10px 28px -12px rgba(255,208,72,.32)}
-.ttile.gold .tl{color:var(--gold2)}
-.ttile.danger{border-color:rgba(255,54,34,.4);background:linear-gradient(180deg,rgba(52,26,24,.9),rgba(22,13,13,.94))}
-.ttile.danger .ti,.ttile.danger .tl{color:var(--red)}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(38,42,54,.5),rgba(20,24,32,.4));backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:600;width:auto;flex:none;white-space:nowrap;transition:transform .12s,filter .12s}
 .chip.on{background:linear-gradient(180deg,rgba(50,32,4,.75),rgba(32,20,2,.65));border-color:rgba(255,208,72,.6);color:var(--gold2);box-shadow:0 0 18px -3px rgba(255,208,72,.6)}
 /* TAPTIC: invisible real <input switch> over a tappable — iOS buzzes only for a FINGER tap on one (see hxHost) */
@@ -1215,9 +1202,6 @@ button.card,.card[onclick]{cursor:pointer;border-color:var(--hair)!important;box
 /* S1 rows and tiles */
 .exrow,.muscle-tile,.splitday,.freq2-stat,.ttile{background:var(--g1);border:1px solid var(--hair);border-radius:var(--r-m);box-shadow:var(--hl)}
 .exrow.added{background:var(--tint-ok);border-color:rgba(52,210,127,.35);box-shadow:none}
-.ttile.gold{border-color:rgba(242,193,78,.3);box-shadow:var(--hl)}
-.ttile.danger{background:var(--tint-bad);border-color:rgba(255,90,78,.3);box-shadow:none}
-.ttile .ti{filter:none}
 /* figure stage + pop helpers + instrument panels: lit by luminance, not glow */
 .stage{border-color:var(--hair)!important;box-shadow:var(--hl)!important}
 .pop,.pop-red,.pop-green{box-shadow:var(--hl),var(--sh1)!important}
@@ -1369,8 +1353,10 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 /* ALLIES: league rows, duel, tools, ally sheet, invite */
 .al-list,.al-tools,.al-duel{margin-top:12px;overflow:hidden}
 .al-list .gh-lh{padding-bottom:6px}
-.al-inv{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 2px 0 8px;font:650 14px/1 var(--body);color:var(--gold-ink)}
+.al-inv{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 2px 0 8px;font:650 14px/1 var(--body);color:var(--gold-ink)}
 .al-inv .gi{width:15px;height:15px;stroke-width:2.2}
+.al-inv::after{content:"";position:absolute;inset:-8px -6px}
+.af-read .gh-more,.af-last .gh-more{display:inline-flex;align-items:center;min-height:36px;padding-top:0;padding-bottom:0}
 .al-row{position:relative;display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer}
 .al-row+.al-row{border-top:1px solid var(--hair)}
 .al-row:active{background:rgba(150,178,222,.05)}
@@ -1412,7 +1398,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .al-sh-n .eyebrow{margin:6px 0 0;white-space:nowrap}
 .al-code{display:flex;gap:8px;align-items:stretch}
 .al-code input{flex:1;min-width:0;font:600 13px/1 var(--body);color:var(--gold-ink)}
-.al-sh textarea{display:block;width:100%;height:68px;resize:none;font-size:14px}
+.al-sh textarea{display:block;width:100%;height:68px;resize:none;font-size:16px}
 .al-cta2{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
 
 /* ALFRED page */
@@ -1455,7 +1441,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .st-i input{width:92px;min-height:40px;padding:8px 11px;text-align:right;font:600 16px/1 var(--body)}
 .st-i u{min-width:44px;text-decoration:none;font:500 13px/1 var(--body);color:var(--tx3)}
 .st-name{flex:1;min-width:0;max-width:210px;min-height:40px;padding:8px 11px;text-align:right;font:600 16px/1 var(--body)}
-.st-sel{flex:1;min-width:0;min-height:40px;padding:8px 10px;font-size:14px}
+.st-sel{flex:1;min-width:0;min-height:40px;padding:8px 10px;font-size:16px}
 .st-seg{display:inline-flex;flex:none;padding:3px;border-radius:12px;background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair)}
 .st-seg button{min-height:34px;padding:0 15px;border-radius:9px;font:650 13px/1 var(--body);color:var(--tx2)}
 .st-seg button.on{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.34)}
@@ -1481,7 +1467,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .st-ta{display:block;width:100%;height:56px;margin-top:10px;resize:none;font-size:11px;color:var(--tx3)}
 
 /* ONBOARDING */
-.ob-pg{min-height:calc(100dvh - 130px);display:flex;flex-direction:column}
+.ob-pg{min-height:calc(100dvh - 116px - env(safe-area-inset-top,0px));display:flex;flex-direction:column}
 .ob-top{display:flex;align-items:center;gap:14px;margin:0 0 20px}
 .ob-seg{flex:1;display:flex;gap:6px}
 .ob-seg i{flex:1;height:4px;border-radius:2px;background:rgba(150,178,222,.16)}
@@ -10631,6 +10617,7 @@ function closeAlfredChat(){
   _alfListening=false;_alfMicUi();ALFRED_PIC=null;
   if(was){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
   const i=$("ac-in");if(i)i.blur();
+  if(was&&state.tab==="alfred"&&!state.showOnboarding&&!state.step&&!state.subpage){try{render();}catch(e){}}   // the Alfred page shows the last conversation
 }
 /* keyboard-safe: size the panel to the visual viewport so the input row rides above the iOS keyboard */
 function _alfFit(){
@@ -11471,7 +11458,7 @@ function alfredVoiceOptions(){
   const cur=(state.data.u.coachVoiceName)||"";
   // Most natural / least-robotic first (Enhanced & British voices rise to the top)
   en.sort((a,b)=>_voiceScore(b)-_voiceScore(a));
-  let html='<option value="">Auto: best available voice</option>';
+  let html='<option value="">Auto (best voice)</option>';
   en.forEach(v=>{const hi=/premium|enhanced|neural|natural|siri/i.test((v.name||"")+" "+(v.voiceURI||""));html+=`<option value="${esc(v.name)}" ${v.name===cur?'selected':''}>${esc(v.name)} · ${esc(v.lang)}${hi?' ✦':''}</option>`;});
   return html;
 }
