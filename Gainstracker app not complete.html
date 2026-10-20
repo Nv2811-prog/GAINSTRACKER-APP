@@ -10892,6 +10892,49 @@ function openFocus(){
     <button class="btn" style="margin-top:18px" onclick="closeOverlay()">Done</button>`;
 }
 
+/* ===== ALFRED PAGE (GP:TABS, wave 5) — a premium entry to the ONE text-first chat (#ac-panel): hero · suggestions · last conversation · today's read · dossiers · lore fold. No second chat UI. ===== */
+function alfSuggest(){   // one source for the page and the chat's empty state
+  const cur=_alfCurLift();
+  const tr=cur?["What weight next on "+cur+"?","Is "+cur+" progressing?","How many sets for "+_alfCurMuscle(cur)+"?"]:["What should I hit tonight?","Why is my press stalling?","How many sets for chest?"];
+  const ap=["What does readiness mean?","How do I archive old machine weights?","How does my 8-day cycle advance?"];
+  return {tr,ap};
+}
+function alfPageAsk(q){haptic("tap");openAlfredChat();if(!_alfBusy)_alfSend(q,null,false);}
+function alfLast(){   // the last question + answer, for the page preview
+  _alfEnsureLoaded();
+  const m=ALFRED_MSGS.filter(x=>x&&x.text&&!x.pending);
+  let ai=-1;for(let k=m.length-1;k>=0;k--)if(m[k].role==="alfred"){ai=k;break;}
+  if(ai<0)return null;
+  let ui=-1;for(let k=ai-1;k>=0;k--)if(m[k].role==="user"){ui=k;break;}
+  const clean=t=>String(t||"").replace(/\*\*/g,"").replace(/\s+/g," ").trim();
+  return {q:ui>=0?clean(m[ui].text):"",a:clean(m[ai].text)};
+}
+function alfredBriefing(){   // "Alfred's read": tonight's state + at most three flags, same engine as before (recovery, MEV/MRV, stalls, coverage)
+  const d=state.data,u=d.u,trained=M12.filter(m=>(d.muscleVol[m]||0)>0);
+  const row=(ic,tone,html)=>`<div class="af-rr ${tone}"><span class="lead">${GP.icon(ic)}</span><p>${html}</p></div>`;
+  const wrap=(body,voice)=>{ALFRED_VOICE=voice;return `<section class="s2 af-read gh-c" style="--i:4"><div class="gh-lh"><h3>Alfred's read</h3>${voice?`<button class="gh-more" onclick="alfredSpeak(ALFRED_VOICE)">Listen</button>`:""}</div>${body}</section>`;};
+  if(!trained.length)return wrap(row("bulb","","Nothing to read yet. Log a session and I will track recovery, weekly volume against your landmarks and what you are neglecting."),"");
+  const di=(new Date().getDay()+6)%7,isTrainDay=u.weekSchedule[di]!==false,ready=[],recovering=[];
+  trained.forEach(m=>{const r=getRecovery(m);if(r>=78)ready.push(m);else recovering.push({m,r,hrs:hoursToReady(m)});});
+  recovering.sort((a,b)=>a.r-b.r);
+  const prime=trained.filter(m=>getRecovery(m)>=70&&weeklySets(m)<VL[m].mav).sort((a,b)=>getRecovery(b)-getRecovery(a)).slice(0,3);
+  const under=[],over=[];
+  M12.forEach(m=>{const ws=weeklySets(m),vl=VL[m],eMrv=effectiveMRV(m);if(ws>0&&ws<vl.mev)under.push({m,ws,mev:vl.mev});if(ws>eMrv)over.push({m,ws,mrv:eMrv});});
+  let stalled=null;try{for(const n of loggedExerciseNamesByRecency()){const it=liftIntel(n);if(it&&it.stalled){stalled=n;break;}}}catch(e){}
+  const gaps=[];trained.forEach(m=>coverageTips(m).slice(0,1).forEach(t=>gaps.push({m,text:t.text})));
+  const flags=[];
+  if(over.length)flags.push(row("flame","bad",`<b>Over MRV:</b> ${over.slice(0,2).map(x=>`${MNAME[x.m]} ${x.ws}/${x.mrv} sets`).join(" · ")}. Ease off and let it recover.`));
+  if(stalled)flags.push(row("plateau","warn",`<b>${esc(stalled)}</b> has stalled. Change the stimulus before it sets like concrete.`));
+  if(under.length)flags.push(row("alert","warn",`<b>Below MEV:</b> ${under.slice(0,3).map(x=>`${MNAME[x.m]} ${x.ws}/${x.mev}`).join(" · ")}. Too little volume to grow.`));
+  if(gaps.length)flags.push(row("bulb","",`<b>${MNAME[gaps[0].m]}:</b> ${esc(gaps[0].text)}`));
+  const state1=!isTrainDay?row("moon","rest",`Scheduled rest day. ${recovering.length?`${MNAME[recovering[0].m]} are ${recovering[0].r}% recovered, good timing.`:"Everything is fresh by tomorrow."}`)
+    :prime.length?row("target","",`<b>Tonight's targets:</b> ${prime.map(m=>MNAME[m]).join(", ")}. Recovered and still below weekly MAV.`)
+    :ready.length?row("check","ok",`<b>Fresh and ready:</b> ${ready.slice(0,4).map(m=>MNAME[m]).join(", ")}.`)
+    :row("timer","warn","Everything you trained is still recovering. Go lighter, or hit an untrained group.");
+  const body=state1+(flags.length?flags.slice(0,3).join(""):row("check","ok","Volume and coverage look balanced this week. Hold the standard."));
+  const voice=("Briefing. "+body).replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+  return wrap(body,voice);
+}
 function renderAlfred(){
   const has=!!geminiKey();state.data.u.aiKeySet=has;
   const nm=(state.data.u.name||"").trim().split(/\s+/)[0],hr=new Date().getHours();
