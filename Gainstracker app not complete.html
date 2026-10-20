@@ -1169,6 +1169,11 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh svg.spark,.gh svg.bars{display:block;height:auto;gap:0;align-items:initial}
 .gh svg.ring{display:block}
 
+/* SECTION HEADER: title left, caption or action right on ONE row (Profile Records, Mission/Suit/Garage headers). The action keeps a 44px tap target without growing the row. */
+.gh-sec{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 4px 10px}
+.gh-sec h2{flex:none;margin:0;font:700 20px/1.2 var(--body);letter-spacing:-.02em}
+.gh-sec .t-xs{min-width:0;text-align:right}
+.gh-sec .gh-more{flex:none;align-self:center;padding:12px 0 12px 16px;margin:-12px 0}
 /* LIFTS: recent records + stalled lifts in one card */
 .gh-more{position:relative;padding:6px 0 6px 12px;font:600 15px/1 var(--body);color:var(--gold-ink)}
 .gh-list{overflow:hidden;margin-top:12px}
