@@ -1665,6 +1665,262 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 
 
 
+/* ===== GP:MISSION+SUIT (wave 3) ===== */
+/* Mission, Suit and the muscle dossier run on Home's primitives (.gh .s1/.s2/.s3, .gh-row, .gh-lh, .gh-lore, .lmk, .ring, .tag) plus the rules below, all scoped under .gm.
+   Mission = plan hero + cycle days + volume forecast + frequency + Lab fold. Suit = recovery figure + 12-muscle grid + effort + fold + body. Dossier + day preview + plan editor are sheets. */
+.gm .tag.gold{background:var(--tint-gold);color:var(--gold-ink)}
+.gm .tag.rest{background:var(--tint-rest);color:var(--rest)}
+.gm .btn{width:auto}
+.gm-brief>.btn,.gm-dos>.btn,.gm-cta2 .btn{width:100%}
+.gm .btn .gi{width:17px;height:17px}
+.gm .btn-i .gi{width:18px;height:18px}
+.gm-chips{display:flex;flex-wrap:wrap;gap:5px}
+.gm-chip{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;font:600 12px/1 var(--body);color:var(--tx2);background:rgba(150,178,222,.08);box-shadow:inset 0 0 0 1px var(--hair);white-space:nowrap}
+.gm-chip.on{color:var(--tx1)}
+.gm-chip i{font-style:normal;font-weight:600;color:var(--gold-ink)}
+.gm .t-s{font-size:13px;line-height:18px;color:var(--tx2)}
+
+/* MISSION hero: active plan, cycle rail, stats, two actions */
+.gm-hero .gh-title{margin-top:10px}
+.gm-rail{display:flex;gap:4px;margin:12px 0 14px}
+.gm-rail i{flex:1;max-width:30px;height:4px;border-radius:2px;background:rgba(150,178,222,.17)}
+.gm-rail i.d{background:rgba(242,193,78,.45)}
+.gm-rail i.t{flex:1.6;max-width:46px;background:var(--gold)}
+.gm-hero .gh-meta{margin-bottom:16px}
+.gm-cta .btn{flex:1;padding:0 12px;width:auto}
+
+/* cycle days */
+.gm-days{margin-top:12px}
+.gm-day{position:relative;display:flex;align-items:flex-start;gap:12px;padding:12px 14px;cursor:pointer}
+.gm-day+.gm-day{border-top:1px solid var(--hair)}
+.gm-day .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:rgba(150,178,222,.08);color:var(--tx2)}
+.gm-day .lead .num{font-size:21px;line-height:1;margin-top:2px}
+.gm-day .lead .gi{width:18px;height:18px}
+.gm-day .main{flex:1;min-width:0}
+.gm-day .gh-t1{display:flex;align-items:center;gap:7px}
+.gm-day .gh-t1 .nm{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.gm-day .gm-tn{margin-bottom:2px;font:650 10.5px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+.gm-day .gh-t2 b{color:var(--tx1);font-weight:600}
+.gm-day .gm-chips{margin-top:7px}
+.gm-day .trail{display:flex;align-items:center;gap:6px;flex:none;align-self:center;color:var(--tx3)}
+.gm-day .trail .gi{width:16px;height:16px}
+.gm-day.is-done .lead{background:var(--tint-ok);color:var(--ok)}
+.gm-day.is-done .gh-t1{color:var(--tx2)}
+.gm-day.is-rest .lead{background:var(--tint-rest);color:var(--rest)}
+.gm-day.is-rest{align-items:center}
+.gm-day.is-tonight{background:var(--tint-gold);box-shadow:inset 3px 0 0 var(--gold)}
+.gm-day.is-tonight .lead{background:var(--gold);color:var(--on-gold)}
+.gm-day:active{background:rgba(150,178,222,.05)}
+.gm-day.is-tonight:active{background:rgba(242,193,78,.18)}
+.gm-go{flex:none;min-height:38px;height:38px;padding:0 14px;gap:5px;font-size:14px}
+.gm .btn.gold.gm-go{min-height:38px;font-size:14px}
+
+/* volume forecast */
+.gm-fc{margin-top:12px;padding-bottom:12px}
+.gm-pick{display:flex;gap:6px;overflow-x:auto;padding:6px 14px 8px;scrollbar-width:none}
+.gm-pick::-webkit-scrollbar{display:none}
+.gm-pick .chip{flex:none;min-width:38px;justify-content:center;font-variant-numeric:tabular-nums}
+.gm-cap{padding:0 14px 12px;font-size:12.5px;line-height:17px;color:var(--tx2)}
+.gm-cap b{color:var(--tx1);font-weight:600}
+.gm-ftg{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;padding:0 14px 2px}
+.gm-ft{min-width:0}
+.gm-ft .gh-mt-t{margin-bottom:7px}
+.gm-pl{font:600 12px/1 var(--body);color:var(--tx3);font-variant-numeric:tabular-nums}
+.gm-trim{display:flex;align-items:center;gap:5px;width:100%;margin-top:8px;height:30px;padding:0 9px;border-radius:9px;background:var(--tint-bad);color:#FF9A90;font:600 12.5px/1 var(--body);text-align:left;white-space:nowrap;overflow:hidden}
+.gm-trim .gi{width:14px;height:14px;flex:none;stroke-width:2.4}
+.gm-trim b{flex:none;font-weight:650}
+.gm-trim span{min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--tx2);font-weight:500}
+.gm-ff{margin:12px 14px 0;padding-top:9px;border-top:1px solid var(--hair)}
+
+/* frequency chips */
+.gm-freq{margin-top:12px;padding-bottom:14px}
+.gm-fb{display:grid;gap:12px;padding:4px 14px 0}
+.gm-fr{display:grid;gap:7px}
+.gm-fq{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:999px;font:600 13px/1 var(--body);color:var(--tx1);background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair)}
+.gm-fq i{font-style:normal;font-weight:500;color:var(--tx3)}
+.gm-fq.train{background:var(--tint-bad);color:#FF9A90;box-shadow:inset 0 0 0 1px rgba(255,90,78,.28)}
+.gm-fq.soon{background:var(--tint-warn);color:var(--warn);box-shadow:inset 0 0 0 1px rgba(255,178,36,.28)}
+.gm-bench .btn.sm{min-height:34px;height:34px;padding:0 14px}
+
+/* folded rows + the Lab body (old cards keep their logic; this puts them on the calm surfaces) */
+.gm-fold .gh-t1{font-size:15px}
+.gm-lab>.card,.gm .gm-lab .card.glow{margin:12px 0 0}
+.gm .gm-lab .card,.gm .gm-lab .card.glow{background:linear-gradient(180deg,#131B29,#0F1621);border:1px solid var(--hair);border-radius:var(--r-l);box-shadow:var(--hl),var(--sh2);padding:15px}
+.gm .gm-lab .card.glow::before,.gm .gm-lab .card::after{content:none}
+.gm .gm-lab .ttl{margin-bottom:10px}
+.gm .gm-lab .gh-list{margin-top:12px}
+
+/* PLAN EDITOR sheet */
+.gm-edh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 14px}
+.gm-edh h2{font:700 22px/1.15 var(--body);letter-spacing:-.02em}
+.gm-ed .s2{margin-bottom:12px}
+.gm-sch{padding:0 14px 14px}
+.gm-sch .gh-lh{padding:14px 0 10px}
+.gm-sch .chip{min-height:34px}
+.gm-dpw{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.gm-dpw .chip{min-height:38px;justify-content:center;font-size:15px}
+.gm-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:12px 0 10px}
+.gm-wd{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 0 8px;border-radius:12px;background:rgba(150,178,222,.06);box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx3);font:650 11px/1 var(--body)}
+.gm-wd .gi{width:17px;height:17px}
+.gm-wd.on{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.34)}
+.gm-sp{padding:12px 14px 14px}
+.gm-sp.is-active{border-color:rgba(242,193,78,.28)}
+.gm-sph{display:flex;align-items:center;gap:10px}
+.gm-spname,.gm-dname{flex:1;min-width:0;font-weight:650;letter-spacing:-.01em}
+.gm-spname{height:44px;padding:0 12px;font-size:17px}
+.gm-dname{height:40px;padding:0 12px;font-size:16px}
+.gm-spa{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.gm-spa .btn.sm{min-height:36px;height:36px}
+.gm-dayed{margin-top:14px;padding-top:14px;border-top:1px solid var(--hair)}
+.gm-dh{display:flex;align-items:center;gap:10px}
+.gm-dn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:rgba(150,178,222,.08);color:var(--tx2)}
+.gm-dn .num{font-size:21px;line-height:1;margin-top:2px}
+.gm-dn .gi{width:18px;height:18px}
+.gm-dayed.is-rest .gm-dn{background:var(--tint-rest);color:var(--rest)}
+.gm-drow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.gm-drow .gm-chips{flex:1;min-width:0}
+.gm-mv{display:flex;gap:4px;flex:none}
+.btn-i.sm{width:34px;height:34px;min-height:0}
+.btn-i.sm .gi{width:16px;height:16px}
+.gm-acts{justify-content:flex-start;flex-wrap:wrap}
+.gm-acts .btn.sm{min-height:38px;height:38px}
+.gm-bot{margin-top:2px}
+.gm-bot .btn{flex:1}
+.gm-lift{margin-top:8px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl)}
+.gm-lh{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px}
+.gm-lm{flex:1;min-width:0;display:flex;align-items:center;gap:10px;cursor:pointer}
+.gm-lm .exwrap{width:42px;height:42px;border-radius:10px;flex:none}
+.gm-ln{min-width:0}
+.gm-ln .gh-t1{font-size:14.5px;line-height:19px}
+.gm-ln .mini{font-size:11.5px;line-height:15px}
+.gm-tgt{flex:none;height:32px;padding:0 11px;border-radius:9px;background:var(--tint-gold);color:var(--gold-ink);font:650 13px/1 var(--body);font-variant-numeric:tabular-nums;white-space:nowrap}
+.gm-tgt.dflt{background:rgba(150,178,222,.08);color:var(--tx2)}
+.gm-tgt.on{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.gm-pe{display:grid;gap:10px;padding:2px 12px 12px}
+.gm-step{display:flex;align-items:center;gap:14px}
+.gm-step span{font-size:14px;color:var(--tx2)}
+.gm-step b{font-size:28px;line-height:.9;color:var(--tx1);margin-right:3px}
+.gm-pe .gm-drow{margin-top:0}
+
+/* DAY PREVIEW sheet */
+.gm-bh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:2px 0 10px}
+.gm-bt{font:700 25px/1.12 var(--body);letter-spacing:-.022em;margin-top:3px;text-wrap:balance}
+.gm-brief .gh-meta{margin:2px 0 12px}
+.gm-fig{padding:10px 6px 10px;margin:0 0 12px}
+.gm-fig svg{max-width:100%}
+.gm-lg{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;margin-top:6px;font:600 11.5px/1 var(--body);color:var(--tx2)}
+.gm-lg span{display:inline-flex;align-items:center;gap:6px}
+.gm-lg i{display:inline-block;width:9px;height:9px;border-radius:3px}
+.gm-lg b{color:var(--tx1);font-weight:650}
+.gm-sec{margin:18px 2px 8px}
+.gm-pl2{margin-top:0}
+.gm-brief .gh-row{gap:11px;padding:9px 14px}
+.gm-brief .exwrap{width:44px;height:44px;border-radius:11px;flex:none}
+.gm-brief .gh-row .main .mini{display:block;font-size:11.5px;line-height:15px}
+.gm-cta2{margin-top:16px}
+.gm-rest{display:flex;align-items:flex-start;gap:12px;padding:14px;margin:12px 0 16px}
+.gm-rest .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--tint-rest);color:var(--rest)}
+.gm-rest p{margin:2px 0 0}
+
+/* SUIT: recovery hero, 12-muscle grid (GP.muscleTile), effort numbers */
+.gm-suit{margin-top:4px;padding:14px 14px 12px}
+.gm-st{margin:4px 0 2px;font:600 13.5px/18px var(--body);color:var(--tx2)}
+.gm-fig2{margin:6px -2px 0}
+.gm-fig2 svg{display:block;width:100%;height:auto}
+.gm-leg{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin-top:10px;padding-top:11px;border-top:1px solid rgba(242,193,78,.14);font:600 12px/1 var(--body);color:var(--tx2)}
+.gm-leg span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.gm-leg i{width:9px;height:9px;border-radius:50%}
+.gm-leg b{color:var(--tx1);font-weight:650}
+.gm .gh-sec{margin:24px 4px 10px}
+.gm .gh-sec .t-xs{font-size:11.5px;color:var(--tx3)}
+.gm-mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gm-mt{position:relative;min-width:0}
+.gm .mc{display:block;padding:11px 12px 12px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl)}
+.gm .mc-t{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;grid-template-areas:"n n n v" "r p h t";align-items:center;column-gap:5px;row-gap:7px;margin-bottom:11px}
+.gm .mc-n,.gm .mc-v{display:contents}
+.gm .mc-nm{grid-area:n;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:650 15px/1.15 var(--body);letter-spacing:-.01em;color:var(--tx1)}
+.gm .mc-p{grid-area:p;font:650 12.5px/1 var(--body);font-style:normal;color:var(--tx1);font-variant-numeric:tabular-nums}
+.gm .mc-h{grid-area:h;min-width:0;font:600 11.5px/1 var(--body);color:var(--rest);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm .mc-h::after{content:" to ready";color:var(--tx3);font-weight:500}
+.gm .mc-t>.ring{grid-area:r;width:16px;height:16px}
+.gm .mc-v .num{grid-area:v;justify-self:end;font-size:27px;line-height:.85}
+.gm .mc-v .tag{grid-area:t;justify-self:end;height:15px;padding:0 4px;font-size:9.5px;letter-spacing:.03em}
+.gm .gm-mt.is-untr .ring{opacity:.32}
+.gm .gm-mt.is-untr .mc-p{color:var(--tx3)}
+.gm-eff{margin-top:12px;padding-bottom:12px;cursor:pointer}
+.gm-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:6px 14px 12px}
+.gm-nums>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.gm-nums .num{font-size:36px;line-height:.9}
+.gm-nums .eyebrow{font-size:10.5px;letter-spacing:.05em}
+.gm-rir{position:relative;height:6px;margin:2px 14px 0;border-radius:3px;background:linear-gradient(90deg,var(--ok) 0 75%,rgba(150,178,222,.2) 75%)}
+.gm-rir.is-empty{background:rgba(150,178,222,.12)}
+.gm-rir i{position:absolute;top:-4px;width:4px;height:14px;margin-left:-2px;border-radius:2px;background:var(--tx1);box-shadow:0 0 0 2px #0F1621}
+.gm-rirk{display:grid;grid-template-columns:repeat(5,1fr);margin:7px 14px 0;font:600 11px/1 var(--body);color:var(--tx3)}
+.gm-rirk span:nth-child(n+2){text-align:center}
+.gm-rirk span:last-child{text-align:right}
+.gm-effn{margin:9px 14px 0}
+.gm-meas{padding:14px}
+.gm-ms{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 10px}
+.gm-ms>div{display:flex;flex-direction:column;gap:4px}
+.gm-ms .num{font-size:30px;line-height:.9}
+.gm-mastery{margin-top:12px;padding-bottom:12px}
+.gm-mastery .gm-fig2{margin:0 12px}
+.gm-mastery .gm-leg{margin:6px 14px 0}
+
+/* MUSCLE DOSSIER sheet */
+.gm-dos .s2{margin-top:12px}
+.gm-dhead{display:flex;align-items:center;gap:14px;padding:14px;margin-top:4px}
+.gm-dhead .gh-ring{width:84px;height:84px}
+.gm-dhead .gh-rc .num{font-size:34px}
+.gm-dm{flex:1;min-width:0;display:grid;gap:6px;align-content:center}
+.gm-dr{font:650 17px/1.2 var(--body);letter-spacing:-.01em}
+.gm-dr b{font-weight:700}
+.gm-hf{width:76px;height:76px;flex:none;border-radius:14px;overflow:hidden}
+.gm-hf svg{width:100%;height:100%;display:block}
+.gm-big{display:flex;align-items:baseline;gap:8px;padding:0 14px 6px}
+.gm-big .num{font-size:46px;line-height:.9}
+.gm-big span{font-size:13px;color:var(--tx2)}
+.gm-blk>.lmk{margin:10px 14px 0}
+.gm-lm3{display:flex;justify-content:space-between;margin:10px 14px 14px;font:600 11.5px/1 var(--body);color:var(--tx3)}
+.gm-fn{margin:0 14px 12px}
+.gm-eff2{display:flex;gap:2px;height:10px;margin:8px 14px 12px;border-radius:5px;overflow:hidden;background:rgba(150,178,222,.1)}
+.gm-eff2 i,.gm-lg2 i{display:block}
+.gm-eff2 i.e,.gm-lg2 i.e{background:var(--ok)}
+.gm-eff2 i.j,.gm-lg2 i.j{background:repeating-linear-gradient(135deg,rgba(243,240,232,.62) 0 2px,rgba(243,240,232,.14) 2px 5px)}
+.gm-eff2 i.n,.gm-lg2 i.n{background:rgba(150,178,222,.26)}
+.gm-lg2{justify-content:flex-start;margin:0 14px 14px}
+.gm-lg2 i{width:10px;height:10px;border-radius:3px}
+.gm-subs{display:grid;padding:2px 0 4px}
+.gm-sub{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) 36px;gap:12px;align-items:center;padding:8px 14px}
+.gm-sn{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gm-sn b{display:flex;align-items:center;gap:6px;font:600 13.5px/1.2 var(--body);color:var(--tx1)}
+.gm-sn span:not(.tag){font-size:11.5px;line-height:14px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-sbar{position:relative;height:6px;border-radius:3px;background:rgba(150,178,222,.12)}
+.gm-sbar i{display:block;height:100%;border-radius:3px;background:var(--ok)}
+.gm-sbar u{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:#D7DFEC;opacity:.5;text-decoration:none}
+.gm-sub .num{font-size:21px;line-height:1;text-align:right;margin-top:2px}
+.gm-sub.is-gap .gm-sbar i{background:var(--warn)}
+.gm-sub.is-gap .num{color:var(--warn)}
+.gm-gaps{display:grid;gap:8px;margin:6px 14px 12px}
+.gm-gap{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--tint-warn);color:var(--warn)}
+.gm-gap .gi{width:17px;height:17px;flex:none;margin-top:1px}
+.gm-gap b{display:block;font:600 13.5px/1.3 var(--body);color:var(--tx1)}
+.gm-gap span{display:block;margin-top:2px;font-size:12.5px;line-height:16px;color:var(--tx2)}
+.gm-tip{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 2px 2px;border-top:1px solid var(--hair);font-size:13px;line-height:18px;color:var(--tx2)}
+.gm-tip b{color:var(--tx1);font-weight:600}
+.gm-tip .av{width:26px;height:26px;border-radius:99px;flex:none;overflow:hidden;box-shadow:0 0 0 1px rgba(242,193,78,.7)}
+.gm-tip .av img{width:100%;height:100%;object-fit:cover;object-position:50% 26%}
+@media(max-width:389px){
+  .gm .mc{padding:10px 10px 11px}
+  .gm .mc-n{font-size:14px}
+  .gm-nums .num{font-size:32px}
+  .gm-dhead{gap:11px;padding:12px}
+  .gm-hf{width:68px;height:68px}
+  .gm-sub{gap:10px;padding:8px 12px}
+  .gm-day{padding:11px 12px}
+}
+
+
 /* ===== GP:LOGGING (wave 2) ===== */
 /* sticky bar: title row folds on scroll, the strip + segments stay pinned (≈64–100px) */
 .lg2-bar{position:sticky;top:0;z-index:30;margin:calc(-20px - env(safe-area-inset-top,0px)) -14px 0;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px 0;background:rgba(5,7,12,.9);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-bottom:1px solid var(--hair)}
@@ -2986,7 +3242,7 @@ function heatLabel(m){
 /* Sub-region heat ON the figure: for muscles whose heads stack vertically on the body, the muscle
    path is filled with a gradient — each band = that sub-region's weekly-volume heat. */
 const SUBAXIS={chest:["up","mid","lo"],back:["ulat","mid","llat","ere"],traps:["up","mid","lo"],abs:["up","lo"],hamstrings:["hip","knee"],glutes:["med","max"],calves:["gas","sol"]};
-function muscleHeatFig(m){
+function muscleHeatFig(m,compact){
   const nm=MM_NORM(m), view=MM_BACK.has(nm)?"back":"front";
   const hc=heatColor(nm);
   let fillV=hc,extraDefs="",axNote="";
@@ -3005,6 +3261,7 @@ function muscleHeatFig(m){
   const [lab,lc]=heatLabel(nm), s=weeklySets(nm);
   const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
   const fig=suitFigure(view,col,null,extraDefs);state._figShade=ps;state._figGlow=pg;
+  if(compact)return {fig,axNote};   // the dossier lays out its own header; it only needs the lit figure and the head-order note
   return `<div class="row" style="gap:12px;align-items:center;margin-bottom:10px">
     <div class="stage" style="width:104px;height:104px;flex:none;border-radius:14px;overflow:hidden">${fig}</div>
     <div style="min-width:0">
@@ -5303,28 +5560,6 @@ function rirBand(avg){
   if(avg<=3.4)return {t:"EFFECTIVE",c:"#22E87A",d:"Solid stimulus. Push the last set of each lift 1 rep closer and the graphs will thank you."};
   return {t:"SANDBAGGING",c:"#5f8fd6",d:"Too much left in the tank, sir. Sets this far from failure barely count — add load or reps."};
 }
-function rirSuitCard(){
-  const I=rirIntel(30),B=rirBand(I.avg);
-  const avgTxt=I.avg==null?"—":(Math.round(I.avg*10)/10).toFixed(1);
-  const effTxt=I.rate==null?"—":Math.round(I.rate*100)+"%";
-  return `<div class="card" onclick="openRirDossier()" style="cursor:pointer;position:relative;overflow:hidden;border:1.5px solid ${B.c}44;background:linear-gradient(165deg,rgba(20,15,6,.98),rgba(7,6,4,1));box-shadow:0 0 26px -12px ${B.c},inset 0 1px 0 rgba(255,255,255,.06)">
-    <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,${B.c},transparent)"></div>
-    <div class="row sp" style="align-items:center">
-      <div class="row" style="gap:11px;align-items:center">
-        <div style="width:52px;height:52px;border-radius:13px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,${B.c}2e,${B.c}0a);border:1px solid ${B.c}55;box-shadow:0 0 18px -6px ${B.c}">
-          <div style="font-family:var(--num);font-weight:400;font-size:20px;color:${B.c};text-shadow:0 0 12px ${B.c}">${avgTxt}</div>
-          <div style="font-size:7.5px;letter-spacing:.14em;color:var(--text3)">AVG RIR</div>
-        </div>
-        <div>
-          <div style="font-family:var(--disp);font-weight:650;font-size:15px;letter-spacing:.04em;color:var(--text)">EFFORT DOSSIER</div>
-          <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:${B.c};text-shadow:0 0 10px ${B.c}66">${B.t}</div>
-          <div class="mini" style="color:var(--text3);margin-top:1px">${effTxt} of sets in the effective zone · 30 days</div>
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--gold2);font-weight:800;white-space:nowrap;text-shadow:0 0 10px rgba(255,208,72,.4)">OPEN ›</div>
-    </div>
-  </div>`;
-}
 function openRirDossier(){
   haptic("tap");
   const I30=rirIntel(30),I7=rirIntel(7),B=rirBand(I30.avg);
@@ -5348,7 +5583,7 @@ function openRirDossier(){
       </div></div>`;
   }).join("");
   const logPct=Math.round(I30.logRate*100);
-  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:8px">🔥 Effort Dossier <span class="mini" style="color:var(--text3);font-weight:400">· proximity to failure</span></div>
+  openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:8px">Effort by muscle <span class="mini" style="color:var(--text3);font-weight:400">· proximity to failure</span></div>
     <div style="text-align:center;padding:14px 0 10px">
       <div style="font-family:var(--num);font-size:56px;line-height:1;color:${B.c};text-shadow:0 0 34px ${B.c}88">${avgTxt}</div>
       <div style="font-size:10px;letter-spacing:.3em;color:var(--text3);margin-top:2px">AVG REPS IN RESERVE · 30 DAYS</div>
@@ -6247,30 +6482,32 @@ function dayHeatFigure(day){
   state._figColor=prev;
   return svg;
 }
+/* Day preview sheet (wave 3): numbers first. Header → lifts · sets · minutes → target figure (anatomy stays grey, worked muscles lit) → muscles → the plan rows → one primary action.
+   A live session turns START into RESUME; starting another day still goes through guardLiveSession. */
 function openDayBriefing(splitId,dayIdx){
   const sp=state.data.splits.find(s=>s.id===splitId);if(!sp)return;
   const day=sp.days[dayIdx];if(!day)return;
-  if(isRest(day)){openSheet(`<div class="row sp"><div class="ttl" style="display:flex;align-items:center;gap:7px">${restIcon(20)} ${esc(day.name)}</div><span class="chip">recovery</span></div>
-    <p class="muted" style="font-size:13.5px;line-height:1.5;margin:8px 0 14px">${esc(restLine())}</p>
-    ${(()=>{const c=gtv2CurrentPlanDay();return c&&c.sp.id===splitId&&c.i===dayIdx&&!restLoggedToday();})()?'<button class="btn gold" onclick="logRestDay();closeSheet()">Log rest day</button>':''}
-    <button class="btn ghost" style="margin-top:8px" onclick="freeWorkout()">Feeling fresh? Train anyway</button>`);return;}
-  const {prim,sec}=dayMuscles(day);
-  const primList=Object.keys(prim).sort((a,b)=>prim[b]-prim[a]);
-  const secList=Object.keys(sec).filter(m=>!prim[m]);
-  const chips=primList.map(m=>`<span class="chip on" style="font-size:12px">${mIcon(m,16)} ${MNAME[m]} <b class="mini" style="color:var(--gold2)">×${prim[m]}</b></span>`).join("")
-    +secList.map(m=>`<span class="chip" style="font-size:12px;opacity:.75">${mIcon(m,16)} ${MNAME[m]} <span class="mini">assist</span></span>`).join("");
-  const exList=(day.exercises||[]).map(n=>{const ex=exFor(n);const safe=esc(n).replace(/'/g,"");return `<div class="row" style="gap:9px;padding:7px 0;border-top:1px solid var(--border);cursor:pointer" onclick="openExDetail('${safe}')">
-    ${thumb(ex,true)}<div class="g"><div class="exname" style="font-size:14px">${esc(n)}</div><div class="exmeta">${exTarget(ex)}${ex.bw?" · bodyweight":""}</div>${splitExHint(n)}</div><span style="color:var(--text3)">›</span></div>`;}).join("");
-  openSheet(`<div class="row sp"><div><div class="tag">${esc(sp.name)}</div><div class="ttl" style="margin:0;font-size:22px">${esc(day.name)}</div></div><span class="chip">${(day.exercises||[]).length} exercises</span></div>
-    <div class="card" style="margin:10px 0;padding:8px">${dayHeatFigure(day)}
-      <div class="row" style="justify-content:center;gap:14px;margin-top:2px">
-        <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#E8453C"></i> primary</span>
-        <span class="mini"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#E8C56A"></i> assist</span></div></div>
-    <div class="ttl" style="font-size:14px;margin:0 0 6px">Targets tonight</div>
-    <div class="row wrap" style="gap:5px;margin-bottom:12px">${chips}</div>
-    <div class="ttl" style="font-size:14px;margin:0 0 2px">The plan</div>
-    ${exList}
-    <button class="btn gold" style="margin-top:14px" onclick="closeSheet();startWorkout('${splitId}',${dayIdx})">START MISSION ▶</button>`);
+  const cur=gtv2CurrentPlanDay(),tn=!!cur&&cur.sp.id===splitId&&cur.i===dayIdx,live=!!state.session;
+  const head=`<div class="gm-bh"><div><div class="eyebrow">${esc(sp.name)} · Day ${dayIdx+1}</div><h2 class="gm-bt">${esc(day.name)}</h2></div><button class="btn-i" onclick="closeSheet()" aria-label="Close">${GP.icon("x")}</button></div>`;
+  if(isRest(day)){
+    openSheet(`<div class="gh gm gm-brief">${head}<div class="s1 gm-rest"><span class="lead">${GP.icon("moon")}</span><p class="t-s">${esc(restLine())}</p></div>
+      ${tn&&!live&&!restLoggedToday()?`<button class="btn btn-1" onclick="logRestDay();closeSheet()">Log rest day</button>`:""}
+      <button class="btn" style="margin-top:8px" onclick="freeWorkout()">Train anyway</button></div>`);return;}
+  const {prim,sec}=dayMuscles(day),st=ghDayStats(day);
+  const primList=Object.keys(prim).sort((a,b)=>prim[b]-prim[a]),secList=Object.keys(sec).filter(m=>!prim[m]);
+  const chips=primList.map(m=>`<span class="gm-chip on">${MNAME[m]}<i>×${prim[m]}</i></span>`).join("")+secList.map(m=>`<span class="gm-chip">${MNAME[m]}<i>assist</i></span>`).join("");
+  const rows=(day.exercises||[]).map(n=>{
+    const ex=exFor(n),pl=day.plan&&day.plan[n],p=progressionFor(n),safe=esc(n).replace(/'/g,"");
+    return `<div class="gh-row" data-hx onclick="openExDetail('${safe}')">${thumb(ex,true)}<div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">${ghSetsOf(day,n)} × ${esc((pl&&pl.r)||GM_REPS)}${pl&&pl.opt?" · optional":""} · ${esc(ex.eq||"bodyweight")}</div>${splitExHint(n)}</div><span class="trail">${p&&p.add?'<span class="tag gold">+kg</span>':""}${GP.icon("chevR")}</span></div>`;}).join("");
+  const cta=live?`<button class="btn btn-1" onclick="closeSheet();resumeWorkout()">${GP.icon("play")}Resume workout</button><button class="btn" style="margin-top:8px" onclick="closeSheet();startWorkout('${splitId}',${dayIdx})">Start this day instead</button>`
+    :`<button class="btn btn-1" onclick="closeSheet();startWorkout('${splitId}',${dayIdx})">${GP.icon("play")}Start this day</button>`;
+  openSheet(`<div class="gh gm gm-brief">${head}
+    <div class="gh-meta"><span><b>${st.lifts}</b> lifts</span><span><b>${st.sets}</b> sets</span><span>~<b>${st.min}</b> min</span>${st.up?`<span class="up">${GP.icon("up")}${st.up} ready for +kg</span>`:""}</div>
+    <div class="s1 gm-fig">${dayHeatFigure(day)}<div class="gm-lg"><span><i style="background:#E8453C"></i>primary</span><span><i style="background:#E8C56A"></i>assist</span></div></div>
+    <div class="gm-chips">${chips}</div>
+    <div class="eyebrow gm-sec">The plan</div>
+    <div class="s2 gh-list gm-pl2">${rows||'<div class="gh-empty" style="margin:12px 14px">No lifts yet. Add some in the plan editor.</div>'}</div>
+    <div class="gm-cta2">${cta}</div></div>`);
 }
 
 /* ========================= THE SUIT TAB ========================= */
@@ -6319,93 +6556,58 @@ function symmetryCard(){
   }
   return html+`</div>`;
 }
+/* ========================= THE SUIT TAB (wave 3) =========================
+   Recovery figure (anatomy stays grey, the worked muscle lights) with a counted legend → 12-muscle grid (GP.muscleTile: recovery %, hours to ready,
+   weekly sets vs MEV/MAV/MRV in zoneOf colours; tap = dossier) → Effort numbers → one folded row (time-lapse · mastery · radar · wardrobe) → Body.
+   Read-only over getRecovery / hoursToReady / weeklySets / zoneOf / rirIntel. Scoped under .gh.gm like Mission. */
+const GS_FRESH=80,GS_MID=50;   // recovery bands, identical to the figure's colours: fresh >= 80, 50-79, fatigued < 50
+const GS_BAND={"NO EFFORT DATA":["No data",""],REDLINING:["Near failure","warn"],"THE KILL ZONE":["On target","ok"],EFFECTIVE:["Effective","ok"],SANDBAGGING:["Too easy","warn"]};
+function gsHero(){
+  const rows=M12.filter(m=>(state.data.muscleVol[m]||0)>0).map(m=>({m,r:getRecovery(m)}));
+  const n=(a,b)=>rows.filter(x=>x.r>=a&&x.r<b).length,low=rows.filter(x=>x.r<GS_MID).map(x=>ghName(x.m));
+  const dot=(c,t,k)=>`<span><i style="background:${c}"></i>${t} <b>${k}</b></span>`;
+  const status=!rows.length?"Log a session and the figure lights up.":low.length?`<span class="c-warn">${low.join(", ")} below ${GS_MID}%</span>`:rows.every(x=>x.r>=GS_FRESH)?`<span class="c-ok">All trained muscles above ${GS_FRESH}%</span>`:"Tap a muscle for its dossier";
+  return `<section class="s3 gm-suit gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
+    <div class="gm-fig2">${buildSuit()}</div>
+    <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
+}
+function gsGrid(){
+  const tile=m=>{
+    const trained=(state.data.muscleVol[m]||0)>0,rec=getRecovery(m),hrs=trained&&rec<100?hoursToReady(m):0,sets=weeklySets(m),z=zoneOf(m,sets);
+    return `<div class="gm-mt${trained?"":" is-untr"}" data-hx onclick="muscleDrill('${m}')">${GP.muscleTile({name:`<span class="mc-nm">${ghName(m)}</span><i class="mc-p">${trained?rec+"%":"new"}</i>`,sets,L:{mev:z.mev,mav:z.mav,mrv:z.mrv},rec,hrs})}</div>`;
+  };
+  return `<div class="gh-sec gh-c" style="--i:1"><h2>Muscles</h2><span class="t-xs">sets / week vs MEV · MAV · MRV</span></div><div class="gm-mgrid gh-c" style="--i:1">${M12.map(tile).join("")}</div>`;
+}
+function gsEffort(){
+  const I=rirIntel(30),B=rirBand(I.avg),bd=GS_BAND[B.t]||["",""];
+  const avg=I.avg==null?"—":(Math.round(I.avg*10)/10).toFixed(1),eff=I.rate==null?"—":Math.round(I.rate*100)+"%",lg=I.work?Math.round(I.logRate*100)+"%":"—";
+  const pos=I.avg==null?null:clamp(I.avg/4*100,0,100);
+  return `<section class="s2 gm-eff gh-c" style="--i:2" data-hx onclick="openRirDossier()"><div class="gh-lh"><h3>Effort</h3>${bd[0]?`<span class="tag${bd[1]?" "+bd[1]:""}">${bd[0]}</span>`:""}</div>
+    <div class="gm-nums"><div><b class="num">${avg}</b><span class="eyebrow">avg RIR</span></div><div><b class="num">${eff}</b><span class="eyebrow">sets at RIR 0–3</span></div><div><b class="num">${lg}</b><span class="eyebrow">sets logged</span></div></div>
+    <div class="gm-rir${pos==null?" is-empty":""}" role="img" aria-label="Average reps in reserve ${avg} on a 0 to 4 scale">${pos==null?"":`<i style="left:${pos.toFixed(1)}%"></i>`}</div>
+    <div class="gm-rirk"><span>0</span><span>1</span><span>2</span><span>3</span><span>4+</span></div><div class="t-xs gm-effn">${I.n} sets with RIR · last 30 days · tap for every muscle</div></section>`;
+}
+function gsFoldHtml(){   // time-lapse, mastery figure, coverage radar, wardrobe: all one tap down
+  const sl=strengthLevel(),r=rankFor(sl),skin=activeSkin(),dot=(c,t)=>`<span><i style="background:${c}"></i>${t}</span>`;
+  const prev=state._figColor;let fig="";
+  state._figColor=m=>{const v=state.data.muscleVol[m]||0;return v?{fill:masteryOf(m)[1],op:".92"}:{fill:"#E8C56A",op:".07"};};
+  try{fig=buildSuit();}finally{state._figColor=prev;}
+  let tl="";try{tl=timeLapseCard();}catch(e){}
+  return `<div class="gm-lab">${tl}<section class="s2 gm-mastery"><div class="gh-lh"><h3>Mastery</h3><span class="t-xs">${esc(r.name)} · Str ${sl}</span></div><div class="gm-fig2">${fig}</div>
+    <div class="gm-leg">${[["#FFD048","Legendary"],["#9840F8","Epic"],["#3C96FF","Rare"],["#22E87A","Honed"],["#9aa0ab","Trained"]].map(x=>dot(x[0],x[1])).join("")}</div></section>
+    ${coverageRadar()}
+    <section class="s2 gh-list"><div class="gh-row" data-hx onclick="openSkins()"><span class="lead gold">${GP.icon("crown")}</span><div class="main"><div class="gh-t1">Wardrobe</div><div class="gh-t2">${esc(skin.n)}</div></div><span class="trail">${GP.icon("chevR")}</span></div></section></div>`;
+}
+function gsBody(){
+  const me=state.data.u.measurements||{},cells=[["chest","Chest"],["waist","Waist"],["leftArm","L arm"],["rightArm","R arm"],["leftThigh","L thigh"],["rightThigh","R thigh"]];
+  return `<div class="gh-sec"><h2>Body</h2><button class="gh-more" data-hx onclick="openMeasure()">Edit</button></div>
+    <section class="s2 gm-meas"><div class="gm-ms">${cells.map(([k,l])=>`<div><b class="num">${me[k]||"—"}</b><span class="eyebrow">${l}${me[k]?" cm":""}</span></div>`).join("")}</div></section>
+    ${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
+}
 function renderSuit(){
-  const sl=strengthLevel();const r=rankFor(sl);const skin=activeSkin();
-  const compromised=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)<50);
-  const allReady=M12.filter(m=>(state.data.muscleVol[m]||0)>0).every(m=>getRecovery(m)>=80);
-
-  // Cinematic hero header
-  let html=`<div style="text-align:center;padding:10px 0 6px;position:relative">
-    <div style="font-size:10px;font-weight:800;letter-spacing:.35em;color:var(--gold2);opacity:.65;text-transform:uppercase;margin-bottom:5px">Gotham Iron Protocol</div>
-    <div style="font-family:var(--disp);font-weight:700;font-size:30px;color:var(--tx1);letter-spacing:-.02em;line-height:1.1">THE BATSUIT</div>
-    <div style="font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:5px 0 10px">Sector Status · Tap any plate for detail</div>
-    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
-      <span class="chip on">${r.emoji} ${r.name} · Str ${sl}</span>
-      <button class="chip g" onclick="openSkins()">${skin.e} ${esc(skin.n)}</button>
-    </div>
-  </div>`;
-
-  // Alert banner
-  if(compromised.length>=3)html+=`<div class="banner alert"><span>🛠️</span><div><b>Multiple sectors compromised, sir.</b><div class="mini">${compromised.map(m=>MNAME[m]).join(", ")} below 50% — suit integrity at risk.</div></div></div>`;
-  if(allReady&&M12.some(m=>(state.data.muscleVol[m]||0)>0))html+=`<div class="banner" style="background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.4)"><span>⚡</span><div><b style="color:#2ECC71">All sectors operational, sir.</b><div class="mini">Full readiness — the city is yours.</div></div></div>`;
-
-  // Big suit stage — dramatic dark backdrop
-  html+=`<div class="card" style="background:linear-gradient(175deg,rgba(18,13,6,.98) 0%,rgba(6,5,3,1) 100%);border:1.5px solid ${skin.c}33;padding:14px;position:relative;overflow:hidden">
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% 35%,${skin.c}10 0%,transparent 68%);pointer-events:none;animation:suitGlowPulse 5s ease-in-out infinite"></div>
-    ${(()=>{ // two slides of the suit: READINESS (recovery colors) vs MASTERY (rarity tiers)
-      const mastery=state.suitMode==="lvl";
-      let svg;
-      if(mastery){const prev=state._figColor;
-        state._figColor=m=>{const v=state.data.muscleVol[m]||0;if(!v)return{fill:"#E8C56A",op:".07"};return{fill:masteryOf(m)[1],op:".92"};};
-        svg=buildSuit();state._figColor=prev;
-      }else svg=buildSuit();
-      const dot=(c,t)=>`<span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};box-shadow:0 0 6px ${c};margin-right:4px"></i>${t}</span>`;
-      const legend=mastery
-        ?[dot("#FFD048","Legendary"),dot("#9840F8","Epic"),dot("#3C96FF","Rare"),dot("#22E87A","Honed"),dot("#9aa0ab","Trained")].join("")
-        :[dot("#2ECC71","Fresh ≥80%"),dot("#E8C53C","50–79%"),dot("#E8453C","Fatigued &lt;50%"),`<span class="mini"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold2);opacity:.25;margin-right:4px"></i>Untrained</span>`].join("");
-      return `<div class="row" style="gap:7px;justify-content:center;margin-bottom:8px;position:relative">
-        <button class="chip ${!mastery?'on':''}" onclick="state.suitMode='rec';render()">⚡ Readiness</button>
-        <button class="chip ${mastery?'on':''}" onclick="state.suitMode='lvl';render()">👑 Mastery</button></div>
-      <div class="suit-stage-glow">${svg}</div>
-      <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:12px">${legend}</div>`;
-    })()}
-  </div>`;
-
-  // 🔥 Effort Dossier — pressable RIR intel, right under the suit
-  html+=rirSuitCard();
-
-  // Sector Command — THE one per-muscle readout: recovery ring + weekly sets + ready-when.
-  // (Replaces the old separate Recovery Forecast, Weekly Volume and District Control cards.)
-  html+=`<div class="card" style="padding:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="ttl" style="margin:0">⚡ Sector Command</div>
-      <div class="row" style="gap:8px"><button class="chip g" style="font-size:11px;padding:4px 10px" onclick="openDistricts()">🗺️ map ›</button><div style="font-size:10px;color:var(--text3);line-height:1.4;text-align:right">Outer = recovery<br>Inner = weekly sets</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-    ${M12.map(m=>{
-      const rec=getRecovery(m),trained=(state.data.muscleVol[m]||0)>0;
-      const sets=weeklySets(m),lm=VL[m]||{mev:8,mav:14,mrv:20};
-      const hrs=hoursToReady(m);
-      const recCol=trained?(rec>=80?'#2ECC71':rec>=50?'#E8C53C':'#E8453C'):'var(--text3)';
-      const status=!trained?'untrained':hrs>0?(hrs<24?hrs+'h':Math.round(hrs/24*10)/10+'d')+' to ready':'READY';
-      const statusCol=!trained?'#3a3e4a':hrs>0?recCol:'#2ECC71';
-      const zn=zoneOf(m,sets),volCol=!trained||sets<=0?'var(--text3)':zn.color;
-      const volTxt=zn.key==="over"?`${sets} sets ⚡MRV`:`${sets}/${lm.mav} sets`;
-      const glow=trained?`border-color:${recCol}44;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 16px -8px ${recCol}`:'';
-      return `<div class="muscle-tile" style="${glow}" onclick="muscleDrill('${m}')">
-        ${muscleRing(m,rec,sets,lm.mav,trained)}
-        <div style="font-size:10px;font-weight:800;color:var(--text1);margin-top:5px;letter-spacing:.05em;text-transform:uppercase">${MNAME[m]}</div>
-        <div style="font-size:10px;color:${statusCol};margin-top:1px;font-weight:600">${status}</div>
-        <div style="font-size:9.5px;color:${volCol};margin-top:1px;font-weight:700">${volTxt}</div>
-        ${trained?(()=>{const t=masteryOf(m);return `<div style="font-size:8.5px;letter-spacing:.08em;color:${t[1]};margin-top:1px;font-weight:800;text-shadow:0 0 6px ${t[1]}66">Lv ${muscleLevel(m)} · ${t[0]}</div>`;})():""}
-      </div>`;
-    }).join('')}
-    </div>
-  </div>`;
-
-  // Coverage radar (shape of the week — kept, it's the one non-redundant view)
-  html+=coverageRadar();
-
-
-  const me=state.data.u.measurements;
-  html+=`<div class="card"><div class="row sp"><div class="ttl">Body measurements</div><button class="btn ghost sm" style="width:auto" onclick="openMeasure()">Edit</button></div>
-    <div class="grid3 center">${[["chest","Chest"],["waist","Waist"],["leftArm","L Arm"],["rightArm","R Arm"],["leftThigh","L Thigh"],["rightThigh","R Thigh"]].map(([k,l])=>`<div><div class="num gold" style="font-size:22px">${me[k]?me[k]+"":"—"}</div><div class="mini">${l}${me[k]?" cm":""}</div></div>`).join("")}</div></div>`;
-
-  html+=symmetryCard();
-  try{html+=timeLapseCard();}catch(e){}
-  html+=progressPhotosCard();
-  html+=suitPhysiqueAlfredCard();
-  $("app").innerHTML=html;
+  const sl=strengthLevel(),r=rankFor(sl);
+  $("app").innerHTML=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Suit</h1>${gsHero()}${gsGrid()}${gsEffort()}`
+    +gmFoldRow("suit-fold","film","Time-lapse · mastery · wardrobe",`${esc(r.name)} · Str ${sl} · radar`,"gsFoldHtml")+gsBody()+`</div>`;
 }
 
 function suitPhysiqueAlfredCard(){
@@ -6427,7 +6629,7 @@ function suitPhysiqueAlfredCard(){
   const analyseBtn=last&&hasKey?`<button class="btn ghost sm" style="width:auto" onclick="alfredPhysiqueReview()">Analyse →</button>`:'';
   return `<div class="card" style="border-color:rgba(255,208,72,.22);padding:14px">
     <div class="row sp" style="margin-bottom:10px">
-      <div class="row" style="gap:8px"><span style="font-size:20px">🦇</span><div><div style="font-family:var(--disp);font-weight:650;font-size:15px;color:var(--gold2)">ALFRED PHYSIQUE REVIEW</div><div class="mini" style="color:var(--text3)">Cross-referenced with your training data</div></div></div>
+      <div class="row" style="gap:8px"><span style="width:22px;flex:none;color:var(--gold-ink)">${GP.icon("bat")}</span><div><div style="font-family:var(--disp);font-weight:650;font-size:15px;color:var(--gold2)">ALFRED PHYSIQUE REVIEW</div><div class="mini" style="color:var(--text3)">Cross-referenced with your training data</div></div></div>
       ${analyseBtn}
     </div>
     ${inner}
@@ -6458,7 +6660,7 @@ async function alfredPhysiqueReview(){
 function progressPhotosCard(){
   const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
   const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
-  const cmp=ph.length>=2?`<span class="row" style="gap:6px"><button class="btn ghost sm" style="width:auto" onclick="openPhotoTimeline()">🎞 Timeline</button><button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button></span>`:"";
+  const cmp=ph.length>=2?`<span class="row" style="gap:6px"><button class="btn ghost sm" style="width:auto" onclick="openPhotoTimeline()">Timeline</button><button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button></span>`:"";
   const cells=ph.map(p=>`<div class="pcell" onclick="viewProgress('${p.id}')"><img src="${p.img}" alt=""><div class="pdate">${fmtP(p.date)}${p.bw?" · "+p.bw+"kg":""}</div></div>`).join("");
   const add=`<label class="pcell add"><input type="file" accept="image/*" capture="environment" style="display:none" onchange="addProgress(this)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#E8C56A" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg><span class="mini">Add photo</span></label>`;
   return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
@@ -6512,49 +6714,77 @@ function compareProgress(){
     <div class="pcompare">${cell(first,"BEFORE")}${cell(last,"NOW")}</div>
     <button class="btn" style="margin-top:11px" onclick="closeSheet()">Close</button>`);
 }
+/* ========================= MUSCLE DOSSIER (wave 3) =========================
+   One muscle, numbers first: recovery ring + hours to ready → weekly sets on ONE landmark bar (zoneOf) → effective sets (RIR 0–3, 4+ hatched as junk)
+   → muscle-head coverage (sets per head, gaps, the stretched-position head) → top lifts → one Alfred line. Opened from the Suit figure, the Suit grid and Home's map tiles. */
+const GM_STRETCH={triceps:"long",biceps:"long",hamstrings:"hip"};   // the head that only trains properly lengthened (overhead / incline / hip-hinge): SUBBIAS notes
+const GM_ZONE={low:["Below MEV","warn"],grow:["Growth zone","ok"],high:["High, recoverable","gold"],over:["Over MRV","bad"]};
+const gmN=v=>v%1?v.toFixed(1):String(v);
+function gmEffSets(m){   // credited sets for m over the same window + credit rule as weeklySets (primary 1, secondary 0.5), split by effort and normalised per week
+  const wk=cycleStart(0),o={eff:0,junk:0,none:0};
+  (state.data.workouts||[]).forEach(w=>{
+    if(new Date(w.date).getTime()<wk)return;
+    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name),k=(ex.p||[]).includes(m)?1:(ex.s||[]).includes(m)?.5:0;if(!k)return;
+      (e.sets||[]).forEach(s=>{if(!s||!s.done||s.type==="W")return;
+        const c=k*((s.type==="L"||s.type==="R")?.5:1),r=rirOfSet(s);   // RIR is logged 0–3 or "4+" (4 or more in reserve): 4+ is the far-from-failure junk bucket
+        if(r==null)o[["F","D","RP","M"].includes(s.type)?"eff":"none"]+=c;else o[r<=3?"eff":"junk"]+=c;});});});
+  Object.keys(o).forEach(k=>o[k]=Math.round(perWeek(o[k])*10)/10);
+  return o;
+}
+function gmTopLifts(m){   // the muscle's main lifts over the last 4 weeks: working sets and best e1RM
+  const cut=now()-28*864e5,agg={};
+  (state.data.workouts||[]).forEach(w=>{if(new Date(w.date).getTime()<cut)return;
+    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);if(!(ex.p||[]).includes(m))return;
+      const a=agg[e.name]||(agg[e.name]={n:e.name,sets:0,e1:0});
+      (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;a.sets++;const v=setE1RM(ex,s);if(v>a.e1)a.e1=v;});});});
+  return Object.values(agg).filter(a=>a.sets).sort((a,b)=>b.sets-a.sets||b.e1-a.e1).slice(0,4);
+}
+function gmDosTip(o){   // one line, first rule that matches
+  const nm=MNAME[o.m];
+  if(!o.trained)return `No ${nm.toLowerCase()} sets yet. Start with ${o.L.mev} a week.`;
+  if(o.rec<60)return `${nm} at ${o.rec}%: keep its sets at 2 RIR${o.hrs?` for the next ${o.hrs} h`:""}.`;
+  if(o.z.key==="over")return `${o.sets} sets is past the ${o.L.mrv}-set limit. Cut ${o.sets-o.L.mrv} from the plan.`;
+  if(o.gaps.length)return `${o.gaps[0].what}${o.gaps[0].sugg?`. Try ${o.gaps[0].sugg[0]}`:""}.`;
+  if(o.z.key==="low")return `${o.sets} of ${o.L.mev} minimum sets. Add ${o.L.mev-o.sets} this week.`;
+  const tot=o.E.eff+o.E.junk+o.E.none;
+  if(tot>=4&&o.E.junk/tot>=.3)return `${gmN(o.E.junk)} of ${gmN(tot)} sets were 4+ reps from failure. Push them closer.`;
+  return "On track: volume, recovery and coverage all look right.";
+}
 function muscleDrill(m){
-  const f=muscleFatigue(m),rec=getRecovery(m),x=muscleXP(m),trained=(state.data.muscleVol[m]||0)>0;
-  const sets=weeklySets(m),lm=VL[m]||{mev:8,mav:14,mrv:20};
-  const weak=(state.data.u.physiqueAnalysis.weakPoints||[]).includes(m);
-  const prs=Object.entries(state.data.prs).filter(([n])=>{const ex=exFor(n);return ex.p&&ex.p.includes(m);}).slice(0,4);
-  const counts=subSetCounts(m), subs=SUBG[m]||[], tips=coverageTips(m);
-  // per-head heat + weekly-set breakdown
-  const subRows=subs.map(([id,nm,term])=>{
-    const c=counts[id]||0, fa=trained?subFatigue(m,id):0;
-    const lab=c>=1.5?(c>=4?"Well trained":"Trained"):(c>0?"Light":"Not hit this week");
-    const labCol=c>=1.5?"var(--green)":c>0?"var(--yellow)":"var(--text3)";
-    const bias=subBias(m,id);
-    const badge=bias?{high:["Targetable","#2ECC71","rgba(46,204,113,.14)"],mid:["Some bias","#E8A52A","rgba(232,165,42,.14)"],low:["Whole-muscle","#8a93a3","rgba(138,147,163,.12)"]}[bias[0]]:null;
-    return `<div style="margin:0 0 11px">
-      <div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px"><b>${nm}</b> &nbsp;<span class="mini" style="color:var(--text3)">${term}</span></span>
-        <span class="mini" style="color:${labCol}">${c?c+" set"+(c===1?"":"s")+"/wk · "+lab:lab}</span></div>
-      <div class="bar" style="height:7px;background:var(--bg4)"><i style="width:${trained?fa:0}%;background:${rcHex(100-fa)};${fa>0?"box-shadow:0 0 7px "+rcHex(100-fa)+"88":""}"></i></div>
-      ${bias?`<div style="margin-top:5px;display:flex;gap:7px;align-items:flex-start"><span class="mini" style="flex:none;padding:1px 7px;border-radius:20px;font-weight:700;color:${badge[1]};background:${badge[2]}">${badge[0]}</span><span class="mini" style="color:var(--text2);line-height:1.45;min-width:0">${bias[1]}</span></div>`:""}</div>`;
-  }).join("");
-  // coverage coach
-  let coach="";
-  if(tips.length){
-    coach=tips.map(t=>{
-      const sugg=t.need?suggestForSub(m,t.need,3):[];
-      return `<div class="banner" style="margin-top:8px;align-items:flex-start;background:rgba(232,165,42,.12);border-color:rgba(232,165,42,.55)"><span>🧭</span><div style="min-width:0"><div style="color:var(--gold);font-weight:700;font-size:12.5px;margin-bottom:3px">Coverage gap — ${subName(m,t.need)}</div><div style="font-size:12.5px;line-height:1.5;color:#e7e2d6">${t.text}</div>${sugg.length?`<div style="font-size:11.5px;margin-top:6px;color:var(--gold2)">Try: ${sugg.map(s=>esc(s)).join(" · ")}</div>`:""}</div></div>`;
-    }).join("");
-  } else if(trained){
-    coach=`<div class="banner" style="margin-top:8px;background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.35)"><span>✓</span><div class="mini">All major angles of the ${MNAME[m].toLowerCase()} are covered this week. Balanced work — nice.</div></div>`;
-  }
-  openSheet(`<div class="row sp"><div class="ttl">${mIcon(m,16)} ${MNAME[m]}</div><span class="chip">Lv ${x.lvl}</span></div>
-    <div class="bar xpbar" style="margin:6px 0"><i style="width:${x.pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
-    <div class="mini" style="margin-bottom:12px">${fmtNum(x.cur)} / ${fmtNum(x.need)} XP to Lv ${x.lvl+1}</div>
-    ${muscleHeatFig(m)}
-    <div class="row sp" style="margin-bottom:4px"><span class="muted">Fatigue / recovery</span><b style="color:${trained?recoveryColor(rec):'var(--text3)'}">${trained?f.pct+"% fatigued · "+rec+"% fresh":"untrained"}</b></div>
-    ${trained?`<div class="mini" style="margin-bottom:10px;color:var(--text3)">${f.hrs>0?"≈ "+f.hrs+"h until fully recovered (this muscle's recovery rate ≈ "+(MREC[m]||48)+"h)":"Fully recovered — ready to train"}</div>`:""}
-    <div class="ttl" style="font-size:14px;margin-bottom:2px">Weekly volume</div>
-    ${volBar(sets,lm,m)}
-    <div class="ttl" style="font-size:14px;margin:13px 0 4px">Sub-regions <span class="mini" style="font-weight:400;color:var(--text3)">— bar = current fatigue heat</span></div>
-    ${subRows}
-    ${coach}
-    ${weak?`<div class="banner" style="margin-top:8px"><span>🎯</span><div class="mini">This is a naturally weak point for your physique. Informational only — you decide what to prioritise.</div></div>`:""}
-    ${prs.length?`<div class="ttl" style="margin-top:12px">PRs hitting this sector <span class="mini" style="font-weight:400">— tap for history</span></div>${prs.map(([n,p])=>`<div class="row sp" style="margin-bottom:5px;cursor:pointer" onclick="closeSheet();exerciseHistory('${esc(n).replace(/'/g,"")}')"><span style="font-size:13px">${esc(n)} ›</span><b class="gold">${Math.round(p.orm)}kg</b></div>`).join("")}`:""}
-    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
+  const d=state.data,trained=(d.muscleVol[m]||0)>0,rec=getRecovery(m),f=muscleFatigue(m),x=muscleXP(m),nm=MNAME[m];
+  const sets=weeklySets(m),z=zoneOf(m,sets),L={mev:z.mev,mav:z.mav,mrv:z.mrv},hrs=trained?f.hrs:0,zt=GM_ZONE[z.key];
+  const last=muscleLastTrained(m),dsl=last!=null?Math.floor((now()-last)/864e5):null;
+  const tone=!trained?"":rec>=GS_FRESH?"ok":rec>=GS_MID?"warn":"bad",col={ok:["#7BF0B0","#22B86A"],warn:["#FFD27A","#E39A12"],bad:["#FF9A90","#E0463B"]}[tone]||["#7F8BA1","#7F8BA1"];
+  const weak=((d.u.physiqueAnalysis||{}).weakPoints||[]).includes(m),heat=muscleHeatFig(m,true);
+  const E=gmEffSets(m),eTot=E.eff+E.junk+E.none;
+  const counts=subSetCounts(m),subs=SUBG[m]||[],mx=Math.max(4,...Object.values(counts)),tips=coverageTips(m),gapIds=new Set(tips.map(t=>t.need)),st=GM_STRETCH[m];
+  const hy=s=>s.toLowerCase().replace(/\s+head$/,"-head");
+  const gaps=tips.map(t=>({id:t.need,what:`${gmN(counts[t.need]||0)} ${hy(subName(m,t.need))} ${nm.toLowerCase()} sets this cycle`,sugg:suggestForSub(m,t.need,2)}));
+  if(trained&&st&&(counts[st]||0)<1.5&&!gapIds.has(st))gaps.push({id:st,what:`No ${hy(subName(m,st))} ${nm.toLowerCase()} work in the stretched position`,sugg:suggestForSub(m,st,2)});
+  const subRows=subs.map(([id,sn,term])=>{const c=counts[id]||0,gap=gaps.some(g=>g.id===id);
+    return `<div class="gm-sub${gap?" is-gap":""}"><div class="gm-sn"><b>${sn}${id===st?'<span class="tag rest">stretch</span>':""}</b><span>${term}</span></div><div class="gm-sbar"><i style="width:${(c/mx*100).toFixed(1)}%"></i><u style="left:${(2/mx*100).toFixed(1)}%"></u></div><b class="num">${gmN(c)}</b></div>`;}).join("");
+  const gapRows=gaps.map(g=>`<div class="gm-gap">${GP.icon("alert")}<div><b>${esc(g.what)}</b>${g.sugg.length?`<span>Add: ${g.sugg.map(esc).join(" · ")}</span>`:""}</div></div>`).join("");
+  const top=gmTopLifts(m),tipTxt=gmDosTip({m,trained,rec,hrs,z,L,sets,gaps,E});
+  const seg=(k,n)=>n>0?`<i class="${k}" style="flex:${n}"></i>`:"";
+  openSheet(`<div class="gh gm gm-dos">
+    <div class="gm-bh"><div><div class="eyebrow">Muscle dossier</div><h2 class="gm-bt">${nm}</h2></div><button class="btn-i" onclick="closeSheet()" aria-label="Close">${GP.icon("x")}</button></div>
+    <section class="s2 gm-dhead"><div class="gh-ring${trained?"":" empty"}">${GP.ring(trained?rec:0,100,{size:84,stroke:9,c1:col[0],c2:col[1]})}<div class="gh-rc">${trained?`<span class="num">${rec}</span><span class="eyebrow c-${tone}">fresh</span>`:`<span class="num c-3">—</span><span class="eyebrow">untrained</span>`}</div></div>
+      <div class="gm-dm"><div class="gm-dr${!trained?" c-3":hrs>0?" c-rest":" c-ok"}">${!trained?"Not trained yet":hrs>0?`Ready in <b>${hrs} h</b>`:"Fully recovered"}</div>
+        <div class="t-s">${dsl==null?"No sessions logged":dsl===0?"Trained today":`Last trained ${dsl} day${dsl===1?"":"s"} ago`}</div>
+        <div class="gm-chips"><span class="gm-chip">Lv ${x.lvl}</span>${weak?'<span class="gm-chip">Weak point</span>':""}</div></div>
+      <div class="stage gm-hf">${heat.fig}</div></section>
+    <section class="s2 gm-blk"><div class="gh-lh"><h3>Weekly sets</h3><span class="tag ${zt[1]}">${zt[0]}</span></div>
+      <div class="gm-big"><b class="num${z.key==="over"?" c-bad":z.key==="low"?" c-warn":""}">${sets}</b><span>sets / week</span></div>${GP.landmark(sets,L)}
+      <div class="gm-lm3"><span>MEV ${L.mev}</span><span>MAV ${L.mav}</span><span>MRV ${L.mrv}${L.mrv>(VL[m]||L).mrv?"*":""}</span></div>${L.mrv>(VL[m]||L).mrv?'<div class="t-xs gm-fn">* ceiling raised by spreading sets across heads</div>':""}</section>
+    <section class="s2 gm-blk"><div class="gh-lh"><h3>Effective sets</h3>${eTot?`<span class="t-s"><b>${gmN(E.eff)}</b> of ${gmN(eTot)} sets</span>`:""}</div>
+      ${eTot?`<div class="gm-eff2">${seg("e",E.eff)}${seg("j",E.junk)}${seg("n",E.none)}</div>
+      <div class="gm-lg gm-lg2"><span><i class="e"></i>RIR 0–3 <b>${gmN(E.eff)}</b></span><span><i class="j"></i>4+ junk <b>${gmN(E.junk)}</b></span><span><i class="n"></i>no RIR <b>${gmN(E.none)}</b></span></div>`
+      :`<div class="gh-empty" style="margin:4px 14px 14px">No working sets for ${nm.toLowerCase()} this cycle.</div>`}</section>
+    <section class="s2 gm-blk"><div class="gh-lh"><h3>Muscle-head coverage</h3><span class="t-xs">sets / week</span></div>
+      <div class="gm-subs">${subRows}</div>${gapRows?`<div class="gm-gaps">${gapRows}</div>`:""}<div class="t-xs gm-fn">A lift counts toward every head it trains, so heads do not add up to the weekly total.${heat.axNote?" "+heat.axNote.replace(/<[^>]+>/g,""):""}</div></section>
+    ${top.length?`<section class="s2 gh-list"><div class="gh-lh"><h3>Top lifts</h3><span class="t-xs">last 4 weeks</span></div>${top.map(a=>`<div class="gh-row" data-hx onclick="closeSheet();exerciseHistory(${ghJs(a.n)})"><span class="lead">${GP.icon("dumbbell")}</span><div class="main"><div class="gh-t1">${esc(a.n)}</div><div class="gh-t2">${a.sets} sets · e1RM ${Math.round(a.e1)}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section>`:""}
+    <div class="gm-tip"><span class="av"><img src="assets/alfred.png" alt=""></span><span><b>Alfred</b> · ${esc(tipTxt)}</span></div>
+    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button></div>`);
 }
 // ---- progression chart + per-exercise history ----
 function trendChart(vals,opts){
@@ -7041,7 +7271,7 @@ function coverageRadar(){
   const dataP=muscles.map((m,i)=>{const sets=weeklySets(m),lm=VL[m]||{mav:14};return pt(i,R*clamp(sets/lm.mav,0,1.16));});
   const poly=dataP.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ");
   const dots=dataP.map((p,i)=>{const m=muscles[i],col=zoneOf(m,weeklySets(m)).color;return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.7" fill="${col}"/>`;}).join("");
-  return `<div class="card"><div class="ttl">🕸️ Coverage radar <span class="mini" style="font-weight:400">— weekly sets vs growth target</span></div>
+  return `<div class="card"><div class="ttl">${secIcon('radar')}Coverage radar <span class="mini" style="font-weight:400">— weekly sets vs growth target</span></div>
     <svg viewBox="0 0 300 290" style="width:100%;max-width:330px;height:auto;display:block;margin:2px auto 0">
       ${grid}${spokes}${labels}
       <polygon points="${poly}" fill="rgba(232,197,106,.16)" stroke="#E8C56A" stroke-width="2" stroke-linejoin="round"/>${dots}</svg>
@@ -7197,7 +7427,7 @@ function acwrInfo(){
 }
 function workloadCard(){
   const a=acwrInfo();
-  const head=`<div class="ttl" style="display:flex;align-items:center;gap:7px">🩻 Workload watch <span class="mini" style="font-weight:400">— injury-risk ratio</span></div>`;
+  const head=`<div class="ttl" style="display:flex;align-items:center;gap:7px">${secIcon('pulse')}Workload watch <span class="mini" style="font-weight:400">— injury-risk ratio</span></div>`;
   if(a.zone==="building")return `<div class="card">${head}<p class="muted" style="margin-top:6px">${a.msg}</p></div>`;
   // gauge 0 → 2.0, sweet band 0.8–1.3
   const max=2.0, pos=clamp(a.ratio/max*100,2,99);
@@ -7952,31 +8182,8 @@ function gymCampaignsCard(){
   return html;
 }
 
-/* ========================= COMPACT SPLIT TILE ========================= */
-function splitCompactTileHtml(){
-  const d=state.data;const count=(d.splits||[]).length;
-  const activeSp=d.splits.find(s=>s.id===d.activeSplitId)||d.splits[0];
-  const exTotal=(d.splits||[]).reduce((a,sp)=>a+(sp.days||[]).reduce((b,dy)=>b+(dy.exercises||[]).length,0),0);
-  return `<div class="card" style="cursor:pointer;border-color:var(--gold-dim);background:linear-gradient(135deg,rgba(232,197,106,.07),rgba(12,15,22,.9))" onclick="openSplitSheet()">
-    <div class="row sp">
-      <div class="row" style="gap:10px;min-width:0">
-        <span style="font-size:24px;flex:none">🗂️</span>
-        <div style="min-width:0">
-          <div class="ttl" style="margin:0;font-size:15px">Training splits <span class="chip on" style="font-size:10px;margin-left:6px;padding:2px 7px">${count}</span></div>
-          <div class="mini" style="color:var(--text2);margin-top:2px">${activeSp?`Active: <b style="color:var(--gold2)">${esc(activeSp.name)}</b> · ${activeSp.days.length}d`:"No splits yet"} · ${exTotal} ex total</div>
-        </div>
-      </div>
-      <span style="color:var(--gold2);flex:none;font-size:20px">›</span>
-    </div>
-    ${activeSp?`<div class="row" style="gap:5px;flex-wrap:wrap;margin-top:9px;pointer-events:none">${(activeSp.days||[]).slice(0,6).map(dy=>`<span class="chip" style="font-size:10px;padding:3px 8px;${isRest(dy)?'opacity:.5;border-color:var(--text3)':''}">${isRest(dy)?'🛌 ':''}${esc(dy.name)}</span>`).join("")}${activeSp.days.length>6?`<span class="chip" style="font-size:10px;padding:3px 8px;opacity:.5">+${activeSp.days.length-6} more</span>`:""}</div>`:""}
-  </div>`;
-}
 function _splitSheetInner(){
-  return `<div class="row sp" style="margin-bottom:12px">
-    <div class="ttl" style="margin:0;font-size:18px">🗂️ Splits &amp; schedule</div>
-    <button class="btn ghost sm" style="width:auto;border-color:var(--gold-dim);color:var(--gold2)" onclick="closeSheet();render()">Done ✓</button>
-  </div>
-  ${splitsEditorHtml()}`;
+  return `<div class="gh gm gm-ed"><div class="gm-edh"><h2>Plan editor</h2><button class="btn gold sm" onclick="closeSheet();render()">Done</button></div>${scheduleEditorHtml()}${splitsEditorHtml()}</div>`;
 }
 function openSplitSheet(){
   state._sheetKind="splits";
@@ -7991,105 +8198,154 @@ function refreshSplitSheet(){
 }
 function splitsChanged(){save();try{refreshSplitSheet();}catch(e){}render();}
 
-/* ========================= MISSION TAB ========================= */
-/* The hero moment of the Mission tab: tonight's operation as its own Batcomputer-grid card,
-   not just a highlighted row buried in the split's day list. */
-function missionBriefingHero(sp,dayIdx){
-  const day=sp.days[dayIdx];
-  if(!day||isRest(day))return '';
-  let chips='';
-  try{
-    const {prim}=dayMuscles(day);
-    chips=Object.keys(prim).sort((a,b)=>prim[b]-prim[a]).slice(0,5).map(m=>{
-      const c=MCOL[m]||'#E8C56A';
-      return `<span class="mb-chip" style="color:${c};background:${c}22;border-color:${c}55">${mIcon(m,13,c)} ${MNAME[m]}</span>`;
-    }).join("");
-  }catch(e){}
-  const exList=day.exercises||[];
-  const strip=exList.slice(0,6).map(n=>`<div onclick="event.stopPropagation();openExDetail('${esc(n).replace(/'/g,"")}')">${thumb(exFor(n),1)}</div>`).join("")
-    +(exList.length>6?`<div class="mb-thumb-more">+${exList.length-6}</div>`:"");
-  return `<div class="mission-briefing" onclick="openDayBriefing('${sp.id}',${dayIdx})">
-    <div class="mb-grid"></div>
-    <div class="mb-eyebrow"><i></i>TONIGHT'S OPERATION</div>
-    <div class="mb-title">${esc(day.name)}</div>
-    <div class="mb-sub">${esc(sp.name)} · ${exList.length} exercise${exList.length===1?'':'s'}</div>
-    ${chips?`<div class="mb-chips">${chips}</div>`:''}
-    ${strip?`<div class="mb-strip">${strip}</div>`:''}
-    <button class="mb-start" onclick="event.stopPropagation();startWorkout('${sp.id}',${dayIdx})">DEPLOY TO THE FIELD ▶</button>
-  </div>`;
+/* ========================= MISSION TAB (wave 3) =========================
+   Mission = the plan. Hero (active split + cycle position) → cycle days (tonight highlighted: START / RESUME) → volume forecast with a one-tap trim
+   → frequency chips → other plans → Lab fold. Read-only over the science helpers (ghPlanSets, perWeek, zoneOf, freqInfo); the only writes are
+   plan edits (trim, sets × reps targets), each through splitsChanged() and each undoable. Scoped under .gh.gm: Home's primitives + the GP:MISSION+SUIT CSS. */
+const GM_REPS="5–10",GM_REP_PRESETS=["5–10","8–12","12–15"],GM_MIN_SETS=2,GM_MAX_SETS=10;   // plan default 5–10: add weight at 10; a trim never takes a lift under 2 sets
+const GM_IC={
+  up:'<path d="M12 19V5M6.5 10.5L12 5l5.5 5.5"/>',down:'<path d="M12 5v14M6.5 13.5L12 19l5.5-5.5"/>',minus:'<path d="M5.5 12h13"/>',
+  copy:'<rect x="8.5" y="8.5" width="11" height="11" rx="2.6"/><path d="M15.5 8.5V7A2.5 2.5 0 0 0 13 4.5H7A2.5 2.5 0 0 0 4.5 7v6A2.5 2.5 0 0 0 7 15.5h1.5"/>',
+  trash:'<path d="M5 7h14M9.5 7V4.8h5V7M7 7l.8 12.2h8.4L17 7M10.2 11v5M13.8 11v5"/>'
+};
+const gmIc=(n,c="")=>`<svg class="gi ${c}" viewBox="0 0 24 24" aria-hidden="true">${GM_IC[n]||""}</svg>`;
+const gmTop=(day,k)=>{const p=dayMuscles(day).prim;return Object.keys(p).sort((a,b)=>p[b]-p[a]).slice(0,k);};
+const gmChips=(day,k)=>gmTop(day,k).map(m=>`<span class="gm-chip">${ghName(m)}</span>`).join("");
+/* a fold row + body (Lab on Mission, time-lapse/mastery/wardrobe on Suit): the body is built on first open, so a folded section costs nothing per render */
+function gmFold(id,buildName){
+  const b=$(id),r=$(id+"-row");if(!b)return;
+  const open=b.classList.contains("hide");
+  if(open&&!b.dataset.f){b.innerHTML=window[buildName]();b.dataset.f="1";}
+  b.classList.toggle("hide",!open);if(r)r.classList.toggle("open",open);
+  state.accOpen=state.accOpen||{};state.accOpen[id]=open;haptic("tap");
+  if(open)setTimeout(()=>{try{b.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}},60);
 }
-function renderMission(){
-  const d=state.data;
-  let html=`<div style="position:relative;overflow:hidden;border-radius:18px;border:1px solid rgba(242,208,121,.24);margin-bottom:13px;min-height:134px;background:#07090d;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 16px 40px -22px #000">
-    <img src="assets/mission-warroom.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 52%;opacity:.9;filter:saturate(1.05) contrast(1.05);animation:hsBreathe 16s ease-in-out infinite alternate">
-    <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,9,13,.92) 22%,rgba(7,9,13,.28) 64%,rgba(7,9,13,.5))"></div>
-    <div style="position:relative;padding:18px 16px 16px">
-      <h1 style="font-size:34px;color:var(--gold2);text-shadow:0 0 24px rgba(255,208,72,.45)">MISSION</h1>
-      <div class="tag" style="margin-top:2px">Know your enemy · plan the war</div>
-    </div>
-  </div>`;
-  // ===== 1) TONIGHT — the ACTIVE split leads the tab; no duplicated Batsuit figure here =====
-  if(!d.splits.length){
-    html+=`<div class="empty-state" style="padding:36px 14px 20px"><div class="es-icon">🗂️</div><div class="es-title">NO TRAINING PLAN</div><div class="es-body">Build your first split and Gotham will track your schedule, day rotation, and muscle balance automatically.</div><button class="btn gold" style="margin-top:10px" onclick="newSplit();setMSub('plan')">BUILD A SPLIT →</button></div>`;
-  }
-  const splitFull=sp=>{
-    const isActive=d.activeSplitId===sp.id;
-    const ni=isActive?computeNextDay(sp):-1;       // highlight the day you're actually up for next
-    return `<div class="card${isActive?' glow':''}"><div class="row sp"><div class="ttl" style="margin:0">${esc(sp.name)}</div>${isActive?'<span class="chip on">active</span>':`<button class="btn ghost sm" style="width:auto" onclick="setActiveSplit('${sp.id}')">Set active</button>`}</div>
-      <div style="margin-top:8px">${sp.days.map((day,i)=>{
-        const tn=i===ni?`<span class="chip on" style="font-size:9px;padding:1px 7px;margin-left:7px;vertical-align:middle">TONIGHT</span>`:"";
-        return isRest(day)
-        ? `<div class="splitday rest${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${restIcon(15)} ${esc(day.name)}${tn}</b><span>Planned recovery — protects your streak</span></div></div><button class="splitday-start rest" onclick="logRestDay()">REST ✓</button></div>`
-        : `<div class="splitday${i===ni?' tonight':''}"><div class="splitday-main" onclick="openDayBriefing('${sp.id}',${i})">${dayThumb(day)}<div class="splitday-tx"><b>${esc(day.name)} <span class="mini" style="color:var(--gold2)">›</span>${tn}</b><span>${day.exercises.length} exercises · tap to preview</span></div></div><button class="splitday-start" onclick="startWorkout('${sp.id}',${i})">START ▶</button></div>`;
-      }).join("")}</div></div>`;
-  };
-  // compact one-row tile for benched (non-active) splits — tap to expand, no wall of START buttons
-  const splitTile=sp=>{
-    if(state.mExpandSplit===sp.id)return splitFull(sp);
-    const ex=sp.days.reduce((a,dd)=>a+(dd.exercises?dd.exercises.length:0),0);
-    return `<div class="splitday" style="margin:0 0 10px">
-      <div class="splitday-main" onclick="state.mExpandSplit='${sp.id}';render()">${dayThumb(sp.days.find(dd=>!isRest(dd))||sp.days[0])}<div class="splitday-tx"><b>${esc(sp.name)} <span class="mini" style="color:var(--gold2)">›</span></b><span>${sp.days.length} days · ${ex} exercises · tap to open</span></div></div>
-      <button class="splitday-start" onclick="setActiveSplit('${sp.id}')">USE ✓</button></div>`;
-  };
-  const act=d.splits.find(sp=>d.activeSplitId===sp.id);
-  if(act){const ni0=computeNextDay(act);html+=missionBriefingHero(act,ni0);}
-  if(act)html+=splitFull(act);
-  // ===== 2) the weekly contract + body coach directly under tonight =====
-  html+=contractCard();
-  html+=freqGuideCard();
-  // ===== 3) the bench — other splits, compact =====
-  const bench=d.splits.filter(sp=>d.activeSplitId!==sp.id);
-  if(bench.length)html+=`<div class="ttl" style="font-size:13px;margin:2px 0 8px">🗂 The bench — other plans</div>`+bench.map(splitTile).join("");
-  html+=`<button class="btn" onclick="freeWorkout()">⚡ Free session</button>`;
-  // ===== 3) FEATURE SUB-TABS — two clean homes for everything else =====
-  html+=missionSubTabs();
-  $("app").innerHTML=html;
+function gmFoldRow(id,icon,title,sub,buildName){
+  const open=accIsOpen(id,id==="mission-lab"&&state.mSub==="lab");
+  return `<div class="s1 gh-lore gm-fold gh-c${open?" open":""}" id="${id}-row" data-hx onclick="gmFold('${id}','${buildName}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
+    <div id="${id}" class="gh-lore-body${open?"":" hide"}"${open?' data-f="1"':""}>${open?window[buildName]():""}</div>`;
 }
-/* Mission sub-tabs: keep the dense planning + science tools out of the way but one tap deep. */
-function setMSub(s){state.mSub=(s==="lab"?"lab":"plan");haptic("tap");render();}
-function missionSubTabs(){
-  const sub=state.mSub==="lab"?"lab":"plan";
-  const bar=`<div class="subtabs" style="margin:18px 0 12px">
-    <button class="subtab ${sub==='plan'?'on':''}" onclick="setMSub('plan')">📋 PLAN</button>
-    <button class="subtab ${sub==='lab'?'on':''}" onclick="setMSub('lab')">🧪 LAB &amp; TOOLS</button></div>`;
-  let body="";
-  if(sub==="plan"){
-    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Build your splits and set which nights you patrol.</div>`
-      +scheduleEditorHtml()+splitCompactTileHtml();
+
+/* ---- volume forecast: planned working sets per muscle per week, running through the cycle. Same credit rule + per-week normalising as Home's tonight forecast (ghPlanSets, perWeek). ---- */
+function gmFcRows(sp,sel){
+  const per=sp.days.map(d=>isRest(d)?{}:ghPlanSets(d)),last=sel==="all"?sp.days.length-1:sel;
+  return M12.map(m=>{
+    let tot=0;for(let i=0;i<=last;i++)tot+=perWeek(per[i][m]||0);
+    const add=sel==="all"?0:perWeek(per[sel][m]||0),t=Math.round(tot),z=zoneOf(m,t),L={mev:z.mev,mav:z.mav,mrv:z.mrv};
+    return {m,tot:t,add:Math.round(add*10)/10,base:Math.max(0,Math.round((tot-add)*10)/10),L,zone:GP.zone(t,L),over:t>L.mrv};
+  });
+}
+function gmTrimPick(day,m){   // the lift to trim: primary movers first, then the most sets, then the later (accessory) slot; never below GM_MIN_SETS
+  const c=(day.exercises||[]).map((n,j)=>({n,j,s:ghSetsOf(day,n),ex:exFor(n)})).filter(x=>x.s>GM_MIN_SETS&&((x.ex.p||[]).includes(m)||(x.ex.s||[]).includes(m)));
+  c.sort((a,b)=>((b.ex.p||[]).includes(m)-(a.ex.p||[]).includes(m))||b.s-a.s||b.j-a.j);
+  return c[0]||null;
+}
+function gmTrimTarget(sp,m,sel){   // {i,pick}: the day that carries the most of this muscle's sets and still has a lift to trim
+  const idx=sel==="all"?sp.days.map((_,i)=>i):[sel];
+  return idx.filter(i=>!isRest(sp.days[i])).map(i=>({i,pick:gmTrimPick(sp.days[i],m),w:ghPlanSets(sp.days[i])[m]||0})).filter(x=>x.pick).sort((a,b)=>b.w-a.w)[0]||null;
+}
+function gmWritePlan(spId,i,n,pl){   // pl = the lift's {s,r,opt} target, or null to remove it (undo of a first-time target)
+  const sp=state.data.splits.find(s=>s.id===spId),day=sp&&sp.days[i];if(!day)return;
+  const plan=Object.assign({},day.plan||{});if(pl)plan[n]=pl;else delete plan[n];
+  const {plan:_old,...rest}=day;
+  sp.days[i]=Object.keys(plan).length?Object.assign({},rest,{plan}):rest;
+  splitsChanged();
+}
+function gmTrim(spId,i,j){
+  const sp=state.data.splits.find(s=>s.id===spId),day=sp&&sp.days[i],n=day&&day.exercises[j];if(!n)return;
+  const cur=ghSetsOf(day,n);if(cur<=GM_MIN_SETS)return;
+  const prev=day.plan&&day.plan[n]?Object.assign({},day.plan[n]):null;
+  gmWritePlan(spId,i,n,Object.assign({r:GM_REPS},prev,{s:cur-1}));
+  haptic("tap");
+  toastUndo(`${n}: ${cur} → ${cur-1} sets`,()=>gmWritePlan(spId,i,n,prev),"Undo");
+}
+function gmFcPick(v){state.mFc=v==="all"?"all":+v;haptic("tap");render();}
+function gmFcTile(t,i,sp,sel){
+  const day=sel!=="all",under=!day&&t.zone==="warn",tag=t.over?'<span class="tag bad">over</span>':under?'<span class="tag warn">under</span>':"";
+  const col=t.over?"var(--bad)":day?"rgba(243,240,232,.72)":under?"var(--warn)":"var(--ok)";   // mid-cycle "under MEV" is expected, so a single day only ever flags "over"
+  const bar=GP.landmark(t.base,t.L,t.add).replace(/--c:[^;"]+/,"--c:"+col);
+  const tg=t.over?gmTrimTarget(sp,t.m,sel):null;
+  const trim=tg?`<button class="gm-trim" onclick="gmTrim('${sp.id}',${tg.i},${tg.pick.j})" aria-label="Trim one set from ${esc(tg.pick.n)}">${gmIc("minus")}<b>1 set</b><span>${sel==="all"?"D"+(tg.i+1)+" · ":""}${esc(tg.pick.n)}</span></button>`:"";
+  return `<div class="gm-ft${t.over?" is-over":""}" style="--k:${i}"><div class="gh-mt-t"><span class="gh-mt-n">${MNAME[t.m]}</span><span class="gh-mt-v">${tag}${day&&t.add>0?`<span class="gm-pl">+${t.add}</span>`:""}<b class="num${t.over?" c-bad":under?" c-warn":""}">${t.tot}</b></span></div>${bar}${trim}</div>`;
+}
+function gmForecast(sp){
+  let sel=state.mFc;if(sel!=="all"&&!(Number.isInteger(sel)&&sp.days[sel]&&!isRest(sp.days[sel])))sel="all";
+  const rows=gmFcRows(sp,sel);
+  if(!rows.some(t=>t.tot>0))return `<section class="s2 gm-fc gh-c" style="--i:3"><div class="gh-lh"><h3>Volume forecast</h3></div><div class="gh-empty" style="margin:6px 14px 14px">Add lifts to a training day and the weekly sets per muscle appear here, against the minimum, productive and maximum landmarks.</div></section>`;
+  const k=t=>t.over?0:t.zone==="warn"?1:2,all=sel==="all";
+  rows.sort(all?((a,b)=>k(a)-k(b)||(k(a)===0?(b.tot-b.L.mrv)-(a.tot-a.L.mrv):k(a)===1?(b.L.mev-b.tot)-(a.L.mev-a.tot):0)):((a,b)=>b.add-a.add||b.tot-a.tot));
+  const over=rows.filter(t=>t.over).length,under=rows.filter(t=>t.zone==="warn").length;
+  const picks=sp.days.map((d,i)=>isRest(d)?"":`<button class="chip${sel===i?" on":""}" onclick="gmFcPick(${i})" aria-label="After day ${i+1}, ${esc(d.name)}">D${i+1}</button>`).join("");
+  const cap=all?"Planned sets per week if you run the whole cycle as written.":`After day ${sel+1} · <b>${esc(sp.days[sel].name)}</b>. Running total through this day; hatched = what it adds.`;
+  return `<section class="s2 gm-fc gh-c" style="--i:3"><div class="gh-lh"><h3>Volume forecast</h3><span class="t-xs">sets / week · MEV MAV MRV</span></div>
+    <div class="gm-pick" role="group" aria-label="Forecast through day"><button class="chip${all?" on":""}" onclick="gmFcPick('all')">Cycle</button>${picks}</div>
+    <div class="gm-cap">${cap}</div>
+    <div class="gm-ftg">${rows.map((t,i)=>gmFcTile(t,i,sp,sel)).join("")}</div>
+    ${all?`<div class="gm-ff"><span class="t-xs">${over} over · ${under} under · ${12-over-under} in range</span></div>`:""}</section>`;
+}
+
+/* ---- hero + cycle days ---- */
+function gmHero(cur){
+  const sp=cur.sp,n=sp.days.length,tr=sp.days.filter(d=>!isRest(d)),st=tr.map(ghDayStats),sets=st.reduce((a,x)=>a+x.sets,0),
+    min=tr.length?Math.round(st.reduce((a,x)=>a+x.min,0)/tr.length/GH_MIN_STEP)*GH_MIN_STEP:0;
+  const rail=sp.days.map((_,i)=>`<i class="${i<cur.i?"d":i===cur.i?"t":""}"></i>`).join("");
+  return `<section class="s3 gh-hero gm-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Active plan</span><span class="gh-cnt">Day <b class="num">${cur.i+1}</b> of ${n}</span></div>
+    <h2 class="num gh-title">${esc(sp.name)}</h2>
+    <div class="gm-rail" role="img" aria-label="Cycle position: day ${cur.i+1} of ${n}">${rail}</div>
+    <div class="gh-meta"><span><b>${tr.length}</b> training</span><span><b>${n-tr.length}</b> rest</span><span><b>${sets}</b> sets / cycle</span>${min?`<span>~<b>${min}</b> min a day</span>`:""}</div>
+    <div class="gh-cta gm-cta"><button class="btn" onclick="openSplitSheet()">${GP.icon("sliders")}Edit plan</button><button class="btn" onclick="freeWorkout()">${GP.icon("bolt")}Free session</button></div></section>`;
+}
+function gmDayRow(sp,i,cur,live){
+  const day=sp.days[i],rest=isRest(day),tn=cur.i===i,done=i<cur.i;
+  let sub,go="";
+  if(rest){
+    sub=`<div class="gh-t2">Rest day · recovery</div>`;
+    if(tn&&!live)go=ghRestLoggedToday()?'<span class="tag ok">Logged</span>':`<button class="btn sm gm-go" onclick="event.stopPropagation();logRestDay()">Log rest</button>`;
   }else{
-    body=`<div class="mini" style="margin:-2px 0 11px;color:var(--text3)">Volume science, balance, plateaus & every quick tool — all in one place.</div>`
-      +scienceCardsHtml()
-      +`<div class="ttl" style="font-size:14px;margin:18px 0 9px;display:flex;align-items:center;gap:7px">🔧 Utility belt</div>
-        <div class="tgrid">
-          <div class="ttile" onclick="openPlateSheet(-1)"><span class="ti">⚖️</span><span class="tl">Plate calc</span></div>
-          <div class="ttile" onclick="open1RM()"><span class="ti">🏋️</span><span class="tl">1RM calc</span></div>
-          <div class="ttile" onclick="openTestDay()"><span class="ti">🎯</span><span class="tl">1RM test day</span></div>
-          <div class="ttile" onclick="openForge()"><span class="ti">⚒️</span><span class="tl">Forge</span></div>
-          <div class="ttile" onclick="openMeasure()"><span class="ti">📐</span><span class="tl">Measure</span></div>
-        </div>`;
+    const st=ghDayStats(day);
+    sub=`<div class="gh-t2"><b>${st.lifts}</b> lifts · <b>${st.sets}</b> sets · ~${st.min} min${st.up?` · <span class="c-gold">${st.up} ready for +kg</span>`:""}</div><div class="gm-chips">${gmChips(day,tn?3:4)}</div>`;
+    if(tn)go=live?`<button class="btn gold sm gm-go" onclick="event.stopPropagation();resumeWorkout()">${GP.icon("play")}Resume</button>`
+      :`<button class="btn gold sm gm-go" onclick="event.stopPropagation();startWorkout('${sp.id}',${i})">${GP.icon("play")}Start</button>`;
   }
-  return bar+`<div class="fade">${body}</div>`;
+  const lead=rest?GP.icon("moon"):done?GP.icon("check"):`<span class="num">${i+1}</span>`;
+  return `<div class="gm-day${tn?" is-tonight":""}${rest?" is-rest":""}${done?" is-done":""}"${go.startsWith("<button")?"":" data-hx"} onclick="openDayBriefing('${sp.id}',${i})"><span class="lead">${lead}</span><div class="main">${tn?'<div class="gm-tn">Tonight</div>':""}<div class="gh-t1"><span class="nm">${esc(day.name)}</span></div>${sub}</div><span class="trail">${go||GP.icon("chevR")}</span></div>`;
 }
+
+/* ---- frequency coach as chips (freqInfo: days since last hit, sets vs MEV) ---- */
+function gmFreq(){
+  const it=M12.map(freqInfo),by=s=>it.filter(x=>x.stat===s),ok=by("ok");
+  const why=x=>x.dsl==null?"new":x.stat==="train"&&x.dsl<4?`${x.sets}/${(VL[x.m]||{mev:8}).mev} sets`:x.stat==="soon"&&x.sess<2&&x.dsl<3?"1× this week":x.dsl+"d ago";
+  const chip=x=>`<button class="gm-fq ${x.stat}" onclick="muscleDrill('${x.m}')">${ghName(x.m)}<i>${why(x)}</i></button>`;
+  const row=(lab,l)=>l.length?`<div class="gm-fr"><span class="eyebrow">${lab}</span><div class="gm-chips">${l.map(chip).join("")}</div></div>`:"";
+  return `<section class="s2 gm-freq gh-c" style="--i:4"><div class="gh-lh"><h3>Frequency</h3><span class="t-xs">each muscle ~2× a week</span></div>
+    <div class="gm-fb">${row("Train next",by("train"))}${row("Due soon",by("soon"))}${ok.length?`<div class="gm-fr"><span class="eyebrow">On track</span><div class="t-s">${ok.length} of 12 muscles at a good rhythm</div></div>`:""}</div></section>`;
+}
+function gmBench(act){
+  const rest=(state.data.splits||[]).filter(s=>s.id!==act.id);if(!rest.length)return "";
+  return `<section class="s2 gh-list gm-bench gh-c" style="--i:5"><div class="gh-lh"><h3>Other plans</h3><span class="t-xs">${rest.length}</span></div>${rest.map(sp=>{
+    const ex=sp.days.reduce((a,dd)=>a+(dd.exercises||[]).length,0);
+    return `<div class="gh-row"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">${esc(sp.name)}</div><div class="gh-t2">${sp.days.length} days · ${ex} lifts</div></div><span class="trail"><button class="btn sm" onclick="setActiveSplit('${sp.id}')">Use</button></span></div>`;}).join("")}</section>`;
+}
+/* ---- Lab: everything that is not the plan, folded into one row. Cards keep their logic; .gm-lab restyles them. ---- */
+function scienceCardsHtml(){return volMapCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+plateauCard();}
+function gmLabHtml(){
+  const tools=[["scale","Plate calculator","openPlateSheet(-1)"],["bolt","1RM calculator","open1RM()"],["target","1RM test day","openTestDay()"],["wrench","Forge","openForge()"],["note","Measure","openMeasure()"]];
+  return `<div class="gm-lab">${contractCard()}${scienceCardsHtml()}<section class="s2 gh-list"><div class="gh-lh"><h3>Tools</h3></div>${tools.map(t=>`<div class="gh-row" data-hx onclick="${t[2]}"><span class="lead">${GP.icon(t[0])}</span><div class="main"><div class="gh-t1">${t[1]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`;
+}
+const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
+  <div class="gh-cta"><button class="btn btn-1" onclick="newSplit();openSplitSheet()">${GP.icon("plus")}New split</button><button class="btn" onclick="freeWorkout()">Free session</button></div></section>`;
+function renderMission(){
+  const cur=gtv2CurrentPlanDay(),live=!!state.session;
+  let h=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Mission</h1>`;
+  if(!cur)h+=gmEmpty();
+  else h+=gmHero(cur)
+    +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
+    +gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
+  h+=gmFoldRow("mission-lab","flask","Lab","Volume map · SFR · workload · tools","gmLabHtml")+`</div>`;
+  $("app").innerHTML=h;
+}
+/* kept for old callers (BUILD A SPLIT, goPlan): the Lab tab maps to the folded Lab row */
+function setMSub(s){state.mSub=(s==="lab"?"lab":"plan");haptic("tap");render();}
 /* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
 /* ══════════ CLOUD SYNC ══════════ Firebase Realtime DB + Anonymous Auth.
    Makes the Justice League fully ONLINE: your Patrol Card auto-publishes, and
@@ -8852,12 +9108,12 @@ function tlPlay(){
 function timeLapseCard(){
   const W=tlBuildWeeks();
   if(!W||W.n<3||(state.data.workouts||[]).length<4){
-    return `<div class="card"><div class="ttl" style="display:flex;align-items:center">🎞️ Training time-lapse</div>
+    return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('film')}Training time-lapse</div>
       <div class="mini" style="color:var(--text2)">Log a few weeks of sessions and you'll be able to scrub your muscle map back through time — watch the heat build, week by week.</div></div>`;
   }
   if(!state._tlWeek||state._tlWeek>W.n)state._tlWeek=W.n;
   const init=tlCompute(state._tlWeek)||{fig:"",label:""};
-  return `<div class="card glow"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center">🎞️ Training time-lapse</div>
+  return `<div class="card glow"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center">${secIcon('film')}Training time-lapse</div>
       <button id="tl-play" class="btn ghost sm" style="width:auto" onclick="tlPlay()">▶ Play</button></div>
     <div class="mini" style="margin:2px 0 9px;color:var(--text2)">Drag the slider to scrub your weekly muscle heat across your whole history — or hit Play to watch it animate.</div>
     <div id="tl-fig" class="stage" style="border-radius:14px;overflow:hidden;padding:6px 6px 2px">${init.fig}</div>
@@ -8899,7 +9155,7 @@ function weeklyBalanceCard(){
   const rowR=(lab,a,b)=>a+b?`<div class="row sp" style="padding:6px 0"><span class="mini">${lab}</span><b class="gold">${a} : ${b}</b></div>`:"";
   return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('balance')}Balance &amp; symmetry <span class="mini" style="font-weight:400;margin-left:4px">— this week</span></div>
     ${rowR("Push : Pull sets",push,pull)}${rowR("Quad : Hamstring sets",quad,ham)}
-    ${flags.map(([k,t])=>`<div class="banner" style="margin-top:6px;${k==="ok"?"background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)":""}"><span>${k==="warn"?"⚠️":"✓"}</span><div class="mini">${esc(t)}</div></div>`).join("")}</div>`;
+    ${flags.map(([k,t])=>`<div class="banner" style="margin-top:6px;${k==="ok"?"background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)":""}"><span>${k==="warn"?GP.icon("alert"):GP.icon("check")}</span><div class="mini">${esc(t)}</div></div>`).join("")}</div>`;
 }
 // Plateau breaker: the stalled lifts (ONE detector — liftIntel), each with one suggested change.
 function plateauCard(){
@@ -8953,7 +9209,7 @@ function scienceLabCard(){
     <div style="flex:${Math.max(growth,0.001)};height:9px;border-radius:5px;background:var(--green)"></div>
     <div style="flex:${Math.max(junk.length,0.001)};height:9px;border-radius:5px;background:var(--red)"></div></div>
     <div class="row sp"><span class="mini" style="color:var(--text3)">${below} maintaining</span><span class="mini" style="color:var(--green)">${growth} growing</span><span class="mini" style="color:var(--red)">${junk.length} over MRV</span></div>`;
-  const junkHtml=junk.length?`<div class="banner" style="margin-top:9px;background:rgba(232,69,60,.10);border-color:rgba(232,69,60,.4)"><span>🩸</span><div class="mini">Past MRV: ${junk.map(j=>`<b>${MNAME[j.m]}</b> (${j.s}/${j.mrv})`).join(", ")}. Extra sets here add fatigue, not muscle — bank them for a lagging group.</div></div>`:"";
+  const junkHtml=junk.length?`<div class="banner" style="margin-top:9px;background:rgba(232,69,60,.10);border-color:rgba(232,69,60,.4)"><span>${GP.icon("alert")}</span><div class="mini">Past MRV: ${junk.map(j=>`<b>${MNAME[j.m]}</b> (${j.s}/${j.mrv})`).join(", ")}. Extra sets here add fatigue, not muscle — bank them for a lagging group.</div></div>`:"";
   // SFR leaderboard over last 14 days
   const lab=recentExerciseStim(14).filter(a=>a.sets>=2);
   lab.forEach(a=>a.sfr=sfrScore(a));
@@ -8971,75 +9227,52 @@ function scienceLabCard(){
     <div style="font-family:var(--disp);font-weight:650;font-size:15px;color:${vc};line-height:1.35;margin:5px 0 2px">${esc(verdict)}</div>
     ${dist}${junkHtml}${sfrBlock}</div>`;
 }
-function scienceCardsHtml(){
-  return volMapCard()+timeLapseCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+plateauCard();
+/* ===== PLAN EDITOR (wave 3): the same editor functions, restyled. Schedule · splits · days · lifts; a lift's sets × reps target opens inline (5–10 default). ===== */
+function gmPlanEd(spId,i,j){const k=spId+"|"+i+"|"+j;state._gmPlanEd=state._gmPlanEd===k?null:k;haptic("tap");refreshSplitSheet();}
+function gmPlanSet(spId,i,j,patch){   // sets 1–10, reps range, optional flag; creates the lift's target the first time it is touched
+  const sp=state.data.splits.find(s=>s.id===spId),day=sp&&sp.days[i],n=day&&day.exercises[j];if(!n)return;
+  const cur=Object.assign({s:ghSetsOf(day,n),r:GM_REPS},day.plan&&day.plan[n]||{}),nx=Object.assign({},cur,patch);
+  nx.s=clamp(Math.round(+nx.s)||cur.s,1,GM_MAX_SETS);if(!nx.opt)delete nx.opt;
+  haptic("tap");gmWritePlan(spId,i,n,nx);
+}
+function gmMoveEx(spId,i,j,dir){state._gmPlanEd=spId+"|"+i+"|"+(j+dir);moveDayEx(spId,i,j,dir);}   // the open panel follows the lift
+function gmRmEx(spId,i,j){state._gmPlanEd=null;rmDayEx(spId,i,j);}
+function gmLiftRow(sp,i,day,j){
+  const n=day.exercises[j],ex=exFor(n),pl=day.plan&&day.plan[n],id=sp.id,js=`'${id}',${i},${j}`,open=state._gmPlanEd===id+"|"+i+"|"+j,
+    s=ghSetsOf(day,n),r=(pl&&pl.r)||GM_REPS,safe=esc(n).replace(/'/g,""),last=day.exercises.length-1;
+  const panel=open?`<div class="gm-pe"><div class="gm-step"><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s-1}})" aria-label="Fewer sets"${s<=1?" disabled":""}>${gmIc("minus")}</button><span><b class="num">${s}</b> sets</span><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s+1}})" aria-label="More sets"${s>=GM_MAX_SETS?" disabled":""}>${GP.icon("plus")}</button></div>
+      <div class="gm-chips">${GM_REP_PRESETS.map(p=>`<button class="chip${r===p?" on":""}" onclick="gmPlanSet(${js},{r:'${p}'})">${p} reps</button>`).join("")}<button class="chip${pl&&pl.opt?" on":""}" onclick="gmPlanSet(${js},{opt:${pl&&pl.opt?0:1}})">Optional</button></div>
+      <div class="gm-drow"><span class="t-xs">Order · remove</span><div class="gm-mv"><button class="btn-i sm" onclick="gmMoveEx(${js},-1)" aria-label="Move lift up"${j===0?" disabled":""}>${gmIc("up")}</button><button class="btn-i sm" onclick="gmMoveEx(${js},1)" aria-label="Move lift down"${j===last?" disabled":""}>${gmIc("down")}</button><button class="btn-i sm" onclick="gmRmEx(${js})" aria-label="Remove lift">${GP.icon("x")}</button></div></div></div>`:"";
+  return `<div class="gm-lift"><div class="gm-lh"><div class="gm-lm" onclick="openExDetail('${safe}')">${thumb(ex,2)}<div class="gm-ln"><div class="gh-t1">${esc(n)}</div>${splitExHint(n)}</div></div>
+    <button class="gm-tgt${pl?"":" dflt"}${open?" on":""}" onclick="gmPlanEd(${js})" aria-expanded="${open}" aria-label="Sets and reps for ${esc(n)}">${s} × ${esc(r)}${pl&&pl.opt?" opt":""}</button></div>${panel}</div>`;
+}
+function gmDayEd(sp,i){
+  const day=sp.days[i],id=sp.id,rest=isRest(day),last=sp.days.length-1;
+  const mv=`<div class="gm-mv"><button class="btn-i sm" onclick="moveDay('${id}',${i},-1)" aria-label="Move day up"${i===0?" disabled":""}>${gmIc("up")}</button><button class="btn-i sm" onclick="moveDay('${id}',${i},1)" aria-label="Move day down"${i===last?" disabled":""}>${gmIc("down")}</button><button class="btn-i sm" onclick="dupDay('${id}',${i})" aria-label="Duplicate day">${gmIc("copy")}</button><button class="btn-i sm" onclick="delDay('${id}',${i})" aria-label="Delete day"${sp.days.length<=1?" disabled":""}>${gmIc("trash")}</button></div>`;
+  const head=`<div class="gm-dh"><span class="gm-dn">${rest?GP.icon("moon"):`<span class="num">${i+1}</span>`}</span><input class="gm-dname" value="${esc(day.name)}" onchange="renameDay('${id}',${i},this.value)" aria-label="Day name"></div>`;
+  if(rest)return `<div class="gm-dayed is-rest">${head}<div class="gm-drow"><span class="t-xs">Planned recovery</span>${mv}</div><div class="gm-drow gm-acts"><button class="btn sm" onclick="toggleRestDay('${id}',${i})">Make training day</button></div></div>`;
+  const chips=gmChips(day,4);
+  return `<div class="gm-dayed">${head}<div class="gm-drow"><div class="gm-chips">${chips||'<span class="t-xs">No lifts yet</span>'}</div>${mv}</div>
+    ${(day.exercises||[]).map((_,j)=>gmLiftRow(sp,i,day,j)).join("")}
+    <div class="gm-drow gm-acts"><button class="btn sm" onclick="addDayExercise('${id}',${i})">${GP.icon("plus")}Add lifts</button><button class="btn sm" onclick="toggleRestDay('${id}',${i})">Make rest</button></div></div>`;
 }
 function scheduleEditorHtml(){
-  const d=state.data;
-  return `<div class="card"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center">${secIcon('schedule')}Training days per week</div><span class="chip on">${trainingDayCount()} / week</span></div>
-    <div class="row" style="gap:6px;margin:10px 0 12px">${[2,3,4,5,6].map(n=>`<button class="chip ${trainingDayCount()===n?'on':''} g" style="justify-content:center" onclick="setDaysPerWeek(${n})">${n} days</button>`).join("")}</div>
-    <div class="ttl" style="margin:0 0 7px">Which days do you train?</div>
-    <div class="row" style="gap:5px;justify-content:space-between">
-    ${DAYS.map((dn,i)=>`<button onclick="toggleDay(${i})" class="center" style="flex:1;padding:8px 2px;border-radius:9px;border:1px solid ${d.u.weekSchedule[i]!==false?'var(--gold-dim)':'var(--border)'};background:${d.u.weekSchedule[i]!==false?'var(--gold-bg)':'var(--bg2)'}">
-      <div style="font-family:var(--disp);font-weight:650;font-size:13px;color:${d.u.weekSchedule[i]!==false?'var(--gold2)':'var(--text3)'}">${dn}</div>
-      <div style="line-height:1">${d.u.weekSchedule[i]!==false?trainIcon(15):restIcon(15)}</div></button>`).join("")}</div>
-    <div class="mini" style="margin-top:8px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">${trainIcon(13)} training · ${restIcon(13)} rest. Your weekly goal updates automatically. Villains only taunt you for missed <b>training</b> days.</div></div>`;
+  const d=state.data,n=trainingDayCount();
+  return `<section class="s2 gm-sch"><div class="gh-lh"><h3>Training days per week</h3><span class="tag gold">${n}</span></div>
+    <div class="gm-dpw" role="group" aria-label="Training days per week">${[2,3,4,5,6].map(k=>`<button class="chip${n===k?" on":""}" onclick="setDaysPerWeek(${k})">${k}</button>`).join("")}</div>
+    <div class="gm-wk">${DAYS.map((dn,i)=>{const on=d.u.weekSchedule[i]!==false;return `<button class="gm-wd${on?" on":""}" onclick="toggleDay(${i})" aria-pressed="${on}" aria-label="${dn}: ${on?"training":"rest"}"><span>${dn}</span>${GP.icon(on?"dumbbell":"moon")}</button>`;}).join("")}</div>
+    <div class="t-xs">Your weekly goal follows the training days.</div></section>`;
 }
 function splitsEditorHtml(){
-  const d=state.data;let html="";
-  d.splits.forEach(sp=>{
-    const isActive=d.activeSplitId===sp.id;
-    html+=`<div class="card" style="${isActive?'border-color:rgba(242,208,121,.4);box-shadow:0 0 24px -14px rgba(242,208,121,.6)':''}">
-      <div class="row sp">
-        <input value="${esc(sp.name)}" onchange="renameSplit('${sp.id}',this.value)" style="font-weight:700;border:none;background:transparent;padding:4px 0;font-size:16px;min-width:0;flex:1"/>
-        <div class="row" style="gap:4px;flex:none">
-          ${isActive?'<span class="chip on" style="font-size:9px;padding:2px 7px">ACTIVE</span>':`<button class="btn ghost sm" style="width:auto;font-size:10px" onclick="setActiveSplit('${sp.id}')">Use ✓</button>`}
-          <button class="btn ghost sm" style="width:auto;color:var(--gold2)" title="Share this split" onclick="shareSplit('${sp.id}')">📤</button>
-          <button class="btn ghost sm" style="width:auto;color:var(--text2)" title="Duplicate split" onclick="dupSplit('${sp.id}')">⧉</button>
-          <button class="btn ghost sm" style="width:auto;color:var(--text3)" onclick="delSplit('${sp.id}')">🗑</button>
-        </div></div>`;
-    sp.days.forEach((day,i)=>{
-      const dayMv=`<div class="row" style="gap:2px;flex:none">
-        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3);${i===0?'opacity:.25;pointer-events:none':''}" title="Move day up" onclick="moveDay('${sp.id}',${i},-1)">↑</button>
-        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3);${i===sp.days.length-1?'opacity:.25;pointer-events:none':''}" title="Move day down" onclick="moveDay('${sp.id}',${i},1)">↓</button>
-        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text2)" title="Duplicate day" onclick="dupDay('${sp.id}',${i})">⧉</button>
-        <button class="btn ghost sm" style="width:auto;padding:5px 8px;color:var(--text3)" title="Delete day" onclick="delDay('${sp.id}',${i})">🗑</button>
-      </div>`;
-      if(isRest(day)){
-        html+=`<div style="border-top:1px solid var(--border);padding:9px 0 10px;background:linear-gradient(90deg,rgba(124,150,255,.06),transparent)">
-          <div class="row sp"><div class="row" style="gap:7px;align-items:center;min-width:0;flex:1"><span style="line-height:1">${restIcon(15)}</span><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:600;padding:2px 0;min-width:0;flex:1"/></div>${dayMv}</div>
-          <div class="row sp" style="margin-top:4px"><span class="mini" style="color:#7c96ff">Planned recovery — growth happens here.</span><button class="btn ghost sm" style="width:auto;font-size:11px;flex:none" onclick="toggleRestDay('${sp.id}',${i})">Make training</button></div></div>`;
-      }else{
-        let chips="";
-        try{const dm=dayMuscles(day);const tops=Object.keys(dm.prim).sort((a,b)=>dm.prim[b]-dm.prim[a]).slice(0,4);
-          chips=tops.map(m=>`<span class="chip" style="font-size:10px;padding:2px 8px">${mIcon(m,13)} ${MNAME[m]}</span>`).join("");}catch(e){}
-        html+=`<div style="border-top:1px solid var(--border);padding:9px 0 11px">
-          <div class="row sp"><input value="${esc(day.name)}" onchange="renameDay('${sp.id}',${i},this.value)" style="border:none;background:transparent;font-weight:700;padding:2px 0;min-width:0;flex:1;font-size:15px"/>${dayMv}</div>
-          ${chips?`<div class="row" style="gap:4px;flex-wrap:wrap;margin:5px 0 2px">${chips}</div>`:""}
-          <div style="margin-top:6px">${day.exercises.length?day.exercises.map((n,j)=>{const ex=exFor(n);const safe=esc(n).replace(/'/g,"");const mc=MCOL[(ex.p||[])[0]]||'var(--gold-dim)';
-            return `<div class="exrow" style="padding:6px 8px 6px 6px;margin-bottom:6px;gap:9px;border-left:3px solid ${mc}77">
-            <div style="display:flex;gap:9px;align-items:center;flex:1;min-width:0;cursor:pointer" onclick="openExDetail('${safe}')">
-              ${thumb(ex,2)}
-              <div style="min-width:0">
-                <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</div>
-                <div class="mini" style="color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${day.plan&&day.plan[n]?`<b style="color:var(--gold2)">${day.plan[n].s}×${esc(day.plan[n].r)}${day.plan[n].opt?' opt':''}</b> · `:''}${esc(exTarget(ex).split('·')[0].trim())} · ${esc(ex.eq||'—')}</div>
-                ${splitExHint(n)}
-              </div></div>
-            <div class="row" style="gap:2px;flex:none">
-              <button class="btn ghost sm" style="width:auto;padding:6px 9px;color:var(--text3);${j===0?'opacity:.25;pointer-events:none':''}" title="Move up" onclick="moveDayEx('${sp.id}',${i},${j},-1)">↑</button>
-              <button class="btn ghost sm" style="width:auto;padding:6px 9px;color:var(--text3);${j===day.exercises.length-1?'opacity:.25;pointer-events:none':''}" title="Move down" onclick="moveDayEx('${sp.id}',${i},${j},1)">↓</button>
-              <button class="btn ghost sm" style="width:auto;padding:6px 9px;color:var(--text3)" title="Remove" onclick="rmDayEx('${sp.id}',${i},${j})">×</button>
-            </div></div>`;}).join(""):'<span class="mini">No exercises yet — add the first weapon ↓</span>'}</div>
-          <div class="row" style="gap:6px;margin-top:7px">
-            <button class="btn ghost sm g" style="border-color:rgba(242,208,121,.35);color:var(--gold2)" onclick="addDayExercise('${sp.id}',${i})">＋ Add exercises</button>
-            <button class="btn ghost sm" style="width:auto;font-size:11px" onclick="toggleRestDay('${sp.id}',${i})">Make rest</button>
-          </div></div>`;
-      }
-    });
-    html+=`<div class="row" style="gap:6px;margin-top:8px"><button class="btn ghost sm" onclick="addDay('${sp.id}')">+ Training day</button><button class="btn ghost sm" onclick="addRestDay('${sp.id}')">+ Rest day</button></div></div>`;
-  });
-  html+=`<div class="row" style="gap:7px"><button class="btn" style="flex:1" onclick="newSplit()">＋ New split</button><button class="btn ghost" style="flex:1;border-color:var(--gold-dim);color:var(--gold2)" onclick="openImportSplit()">📥 Import a split</button></div>`;
-  return html;
+  const d=state.data;
+  const cards=(d.splits||[]).map(sp=>{
+    const act=d.activeSplitId===sp.id,id=sp.id;
+    return `<section class="s2 gm-sp${act?" is-active":""}"><div class="gm-sph"><input class="gm-spname" value="${esc(sp.name)}" onchange="renameSplit('${id}',this.value)" aria-label="Split name">${act?'<span class="tag ok">Active</span>':`<button class="btn sm" onclick="setActiveSplit('${id}')">Use</button>`}</div>
+      <div class="gm-spa"><button class="btn sm" onclick="shareSplit('${id}')">${GP.icon("share")}Share</button><button class="btn sm" onclick="dupSplit('${id}')">${gmIc("copy")}Duplicate</button><button class="btn sm btn-d" onclick="delSplit('${id}')">${gmIc("trash")}Delete</button></div>
+      ${sp.days.map((_,i)=>gmDayEd(sp,i)).join("")}
+      <div class="gm-drow gm-acts"><button class="btn sm" onclick="addDay('${id}')">${GP.icon("plus")}Training day</button><button class="btn sm" onclick="addRestDay('${id}')">${GP.icon("plus")}Rest day</button></div></section>`;
+  }).join("");
+  return cards+`<div class="gm-drow gm-acts gm-bot"><button class="btn" onclick="newSplit()">${GP.icon("plus")}New split</button><button class="btn" onclick="openImportSplit()">${GP.icon("down")}Import a split</button></div>`;
 }
 function renderStrategy(){
   // STRATEGY is now merged into MISSION — render the merged tab in place (no nested render()).
@@ -9051,8 +9284,8 @@ function syncWeeklyGoal(){state.data.u.weeklyGoal=clamp(trainingDayCount(),1,7);
 function setDaysPerWeek(n){
   const patterns={2:[0,3],3:[0,2,4],4:[0,1,3,4],5:[0,1,2,4,5],6:[0,1,2,3,4,5]};
   const on=patterns[n]||[0,2,4];const ws={};for(let i=0;i<7;i++)ws[i]=on.includes(i);
-  state.data.u.weekSchedule=ws;syncWeeklyGoal();save();render();}
-function toggleDay(i){const ws=state.data.u.weekSchedule;ws[i]=ws[i]===false?true:false;syncWeeklyGoal();save();render();}
+  state.data.u.weekSchedule=ws;syncWeeklyGoal();save();try{refreshSplitSheet();}catch(e){}render();}
+function toggleDay(i){const ws=state.data.u.weekSchedule;ws[i]=ws[i]===false?true:false;syncWeeklyGoal();save();try{refreshSplitSheet();}catch(e){}render();}
 function newSplit(){const d=state.data;const id="s"+now();d.splits.push({id,name:"New Split",days:[{name:"Day 1",exercises:[]}]});if(!d.activeSplitId){d.activeSplitId=id;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;}splitsChanged();}
 function renameSplit(id,v){const s=state.data.splits.find(x=>x.id===id);if(s)s.name=v;save();}
 function delSplit(id){appConfirm({title:"Delete split",body:"Delete this split permanently?",ok:"Delete",danger:true}).then(ok=>{if(!ok)return;state.data.splits=state.data.splits.filter(x=>x.id!==id);if(state.data.activeSplitId===id)state.data.activeSplitId=state.data.splits[0]?.id||null;splitsChanged();});}
@@ -12686,10 +12919,9 @@ function contractCard(){
   const c=weeklyContract();
   const rows=c.goals.map(g=>`<div class="row" style="gap:7px;padding:3px 0"><span style="flex:none;width:16px;text-align:center;color:${g.done?'var(--green)':'var(--text3)'}">${g.done?'✓':'○'}</span><span class="mini" style="flex:1;color:${g.done?'var(--text2)':'var(--text)'}">${g.lab}</span><b class="mini" style="color:${g.done?'var(--green)':'var(--gold2)'}">${Math.min(g.cur,g.tgt)}/${g.tgt}</b></div>`).join("");
   return `<div class="card" style="border-color:rgba(255,208,72,.3);padding:13px 14px">
-    <div class="row sp" style="margin-bottom:4px"><div class="ttl" style="margin:0;font-size:14px">🎩 Alfred's weekly contract</div>
+    <div class="row sp" style="margin-bottom:4px"><div class="ttl" style="margin:0;font-size:14px">${secIcon('target')}Weekly contract</div>
       ${c.claimed?`<span class="chip" style="color:var(--green)">✓ fulfilled</span>`:c.all?`<button class="btn gold sm" style="width:auto" onclick="claimContract()">CLAIM +150 XP</button>`:`<span class="chip">${c.done}/3</span>`}</div>
     ${rows}
-    <div class="mini" style="color:var(--text3);margin-top:5px;font-style:italic">"Complete all three and I shall say something almost complimentary, sir."</div>
   </div>`;
 }
 /* ===== ARKHAM LOCKUP — every villain you've ever put down, behind glass ===== */
