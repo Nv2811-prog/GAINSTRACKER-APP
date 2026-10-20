@@ -2,7 +2,7 @@
 // node syncheck.mjs [file.html]  → exit 0 = OK, 1 = syntax error (prints line in the HTML file)
 import fs from 'node:fs';
 import vm from 'node:vm';
-const file = process.argv[2] || '/Users/nickivendelbo/Desktop/Gainstracker batman/Gainstracker app not complete.html';
+const file = process.argv[2] || decodeURIComponent(new URL('../../Gainstracker app not complete.html', import.meta.url).pathname);
 const html = fs.readFileSync(file, 'utf8');
 const re = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi;
 let m, n = 0, bad = 0;

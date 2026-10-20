@@ -9,7 +9,7 @@ import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 
 export const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-export const DEFAULT_FILE = '/Users/nickivendelbo/Desktop/Gainstracker batman/Gainstracker app not complete.html';
+export const DEFAULT_FILE = fileURLToPath(new URL('../../Gainstracker app not complete.html', import.meta.url));
 export const VIEWPORT = { width: 393, height: 852, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1';
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml', '.gif': 'image/gif' };
