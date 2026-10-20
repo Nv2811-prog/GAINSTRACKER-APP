@@ -1526,6 +1526,14 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gh-cta .btn .gi{width:18px;height:18px}
 .gh-cta .btn.gh-done{flex:1;background:var(--tint-ok);color:var(--ok);box-shadow:inset 0 0 0 1px rgba(52,210,127,.28);opacity:1;filter:none}
 
+/* Batman art behind the hero (wave 3c): right-aligned poster, dark veils from the left and bottom keep the text legible, one slow transform-only drift */
+.gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.2),rgba(4,5,8,.76) 54%,#07090d),linear-gradient(90deg,rgba(7,9,13,.96),rgba(7,9,13,.52) 52%,rgba(7,9,13,.86))}
+.gh-art{position:absolute;right:-28px;top:-18px;width:66%;height:112%;object-fit:cover;object-position:center;opacity:.72;filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
+.s3.is-live .gh-art,.s3.is-rest .gh-art{opacity:.5}
+@keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
+@media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
+
 /* READINESS */
 .gh-ready{margin-top:12px;padding:13px 16px 11px}
 .gh-rd-main{display:flex;gap:16px;align-items:center}
@@ -12938,13 +12946,14 @@ function ghRings(list){   // [{m,rec,hrs}] → recovery rings; warn text + hours
 function ghRail(cur){   // cycle position: one segment per day, tonight long and gold
   return `<button class="gh-cyc" data-hx onclick="goPlan()" aria-label="Cycle day ${cur.i+1} of ${cur.sp.days.length}. Open the plan">${cur.sp.days.map((_,i)=>`<i class="${i<cur.i?"d":i===cur.i?"t":""}"></i>`).join("")}</button>`;
 }
+const GH_ART='<div class="gh-bg" aria-hidden="true"><img class="gh-art" src="Batman.jpg" alt="" decoding="async" onerror="this.parentNode.remove()"></div>';   // the old Batman poster, one per hero
 function ghHeroLive(ses){   // a live or minimised session always wins the hero: RESUME, never START over it
   const exs=(ses.exercises||[]).filter(e=>!e._skip),c=sessionCounts(ses);
   const ci=exs.findIndex(e=>(e.sets||[]).some(s=>s.type!=="W"&&!s.done)),cur=exs[ci];
   const si=cur?(cur.sets||[]).filter(s=>s.type!=="W").findIndex(s=>!s.done)+1:0;
   const rem=state.restRunning&&state.restEnd?Math.ceil((state.restEnd-now())/1000):0;
   const seg=GP.seg(exs.map((e,i)=>{const w=(e.sets||[]).filter(s=>s.type!=="W");return {n:Math.max(1,w.length),done:w.filter(s=>s.done).length,cur:i===ci};}));
-  return `<section class="s3 gh-hero is-live gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Live · <span class="gh-el">${fmtTime(Math.floor((now()-ses.startedAt)/1000))}</span></span><span class="gh-cnt"><b class="num">${c.done}</b> / ${c.total} sets</span></div>
+  return `<section class="s3 gh-hero is-live gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Live · <span class="gh-el">${fmtTime(Math.floor((now()-ses.startedAt)/1000))}</span></span><span class="gh-cnt"><b class="num">${c.done}</b> / ${c.total} sets</span></div>
     <h2 class="num gh-title">${esc(ses.day||"Session")}</h2>
     <div class="gh-meta"><span>${cur?`${esc(cur.name)} · set ${si} next`:"All sets logged · ready to finish"}</span>${rem>0?`<span>Rest <b class="gh-rt">${fmtTime(rem)}</b></span>`:""}</div>
     <div class="gh-seg">${seg}</div>
@@ -12953,7 +12962,7 @@ function ghHeroLive(ses){   // a live or minimised session always wins the hero:
 function ghHeroTonight(cur){
   const day=cur.day,st=ghDayStats(day),prim=dayMuscles(day).prim;
   const top=Object.keys(prim).map(m=>({m,n:prim[m],rec:getRecovery(m),hrs:hoursToReady(m)})).sort((a,b)=>b.n-a.n||a.rec-b.rec).slice(0,4);
-  return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight</span>${ghRail(cur)}</div>
+  return `<section class="s3 gh-hero gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Tonight</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">${esc(day.name)}</h2>
     <div class="gh-meta"><span><b>${st.lifts}</b> lifts</span><span><b>${st.sets}</b> sets</span><span>~<b>${st.min}</b> min</span>${st.up?`<span class="up">${GP.icon("up")}${st.up} ready for +kg</span>`:""}</div>
     ${top.length?`<div class="gh-tm${ghTwo(top)}" aria-label="Recovery of tonight's muscles">${ghRings(top)}</div>`:`<div style="height:14px"></div>`}
@@ -12963,7 +12972,7 @@ function ghHeroRest(cur,vol){
   const n=cur.sp.days.length,logged=ghRestLoggedToday();
   let ni=-1;for(let j=1;j<n;j++){const k=(cur.i+j)%n;if(!isRest(cur.sp.days[k])){ni=k;break;}}
   const nd=ni>=0?cur.sp.days[ni]:null,low=vol.filter(t=>t.trained).sort((a,b)=>a.rec-b.rec).slice(0,4);
-  return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
+  return `<section class="s3 gh-hero is-rest gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">Rest day</h2>
     <div class="gh-meta">${nd?`<button class="gh-next" data-hx onclick="openDayBriefing('${cur.sp.id}',${ni})">Next: <b>${esc(nd.name)}</b>${GP.icon("chevR")}</button>`:"<span>Recovery is part of the plan</span>"}</div>
     ${low.length?`<div class="gh-tm${ghTwo(low)}" aria-label="Recovery outlook">${ghRings(low)}</div>`:`<div style="height:14px"></div>`}
@@ -12971,7 +12980,7 @@ function ghHeroRest(cur,vol){
       :`<button class="btn btn-1" onclick="logRestDay()">Log rest day</button><button class="btn" onclick="freeWorkout()">Train anyway</button>`}</div></section>`;
 }
 function ghHeroFree(){
-  return `<section class="s3 gh-hero gh-c" style="--i:0"><div class="gh-top"><span class="eyebrow gh-live">Tonight</span></div>
+  return `<section class="s3 gh-hero gh-c" style="--i:0">${GH_ART}<div class="gh-top"><span class="eyebrow gh-live">Tonight</span></div>
     <h2 class="num gh-title">Free session</h2><div class="gh-meta"><span>No active split. Start a session now, or build a plan in Mission.</span></div><div style="height:16px"></div>
     <div class="gh-cta"><button class="btn btn-1" onclick="freeWorkout()">${GP.icon("play")}Start session</button><button class="btn" onclick="goPlan()">Plan</button></div></section>`;
 }
