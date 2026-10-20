@@ -6662,7 +6662,7 @@ function renderInfirmary(){
 const INDEX_ITEMS=[
   ["🦇","Gotham home","Tonight's mission, readiness, daily challenges","go('gotham')"],
   ["⚔️","Mission / log a workout","Start or log tonight's session","go('mission')"],
-  ["📈","Case File","Records, defeats, history & analytics","go('case')"],
+  ["📈","Profile","Records, ranks, history & analytics","go('case')"],
   ["📋","Plan & schedule","Splits, training days, volume map","goPlan()"],
   ["🤖","Alfred","AI coach, physique scan, weekly review","go('alfred')"],
   ["💪","The Suit","Your muscle figure & recovery map","go('suit')"],
@@ -11283,9 +11283,9 @@ function ghSunday(vol){
     l2=r.prs.length?`${r.prs.length} record${r.prs.length===1?"":"s"} this week, led by ${esc(r.prs[0])}.`:"No new records this week.",
     l3=r.stalled.length?`Stalled: ${ghList(r.stalled,s=>esc(s.n),2)}.`:"No stalled lifts.";
   const line=(ic,tone,tx)=>`<li><span class="lead ${tone}">${GP.icon(ic)}</span><span>${tx}</span></li>`;
-  return `<button class="s2 gh-sun gh-c" style="--i:2" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
+  return `<div class="s2 gh-sun gh-c" style="--i:2" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
     <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul>
-    <div class="gh-sun-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></button>`;
+    <div class="gh-sun-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></div>`;
 }
 /* the detail behind the Sunday card: the week in numbers, Alfred's flags, the one change */
 function ghReviewHtml(){
