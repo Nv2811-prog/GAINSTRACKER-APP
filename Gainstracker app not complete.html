@@ -1842,6 +1842,9 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gm .mc-p{grid-area:p;font:650 12.5px/1 var(--body);font-style:normal;color:var(--tx1);font-variant-numeric:tabular-nums}
 .gm .mc-h{grid-area:h;min-width:0;font:600 11.5px/1 var(--body);color:var(--rest);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gm .mc-h::after{content:" to ready";color:var(--tx3);font-weight:500}
+.gm .mc-h{grid-column:3 / 5}
+.gm .mc-t:has(.tag) .mc-h{grid-column:3}
+.gm .mc-t:has(.tag) .mc-h::after{content:""}
 .gm .mc-t>.ring{grid-area:r;width:16px;height:16px}
 .gm .mc-v .num{grid-area:v;justify-self:end;font-size:27px;line-height:.85}
 .gm .mc-v .tag{grid-area:t;justify-self:end;height:15px;padding:0 4px;font-size:9.5px;letter-spacing:.03em}
@@ -1859,7 +1862,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gm-rirk span:nth-child(n+2){text-align:center}
 .gm-rirk span:last-child{text-align:right}
 .gm-effn{margin:9px 14px 0}
-.gm-meas{padding:14px}
+.gm-meas{padding:14px;margin-bottom:12px}
 .gm-ms{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 10px}
 .gm-ms>div{display:flex;flex-direction:column;gap:4px}
 .gm-ms .num{font-size:30px;line-height:.9}
@@ -1894,7 +1897,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gm-sub{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) 36px;gap:12px;align-items:center;padding:8px 14px}
 .gm-sn{display:flex;flex-direction:column;gap:2px;min-width:0}
 .gm-sn b{display:flex;align-items:center;gap:6px;font:600 13.5px/1.2 var(--body);color:var(--tx1)}
-.gm-sn span:not(.tag){font-size:11.5px;line-height:14px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-sn>span{display:flex;align-items:center;gap:6px;font-size:11.5px;line-height:15px;color:var(--tx3);white-space:nowrap;overflow:hidden}
 .gm-sbar{position:relative;height:6px;border-radius:3px;background:rgba(150,178,222,.12)}
 .gm-sbar i{display:block;height:100%;border-radius:3px;background:var(--ok)}
 .gm-sbar u{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:#D7DFEC;opacity:.5;text-decoration:none}
@@ -6762,13 +6765,13 @@ function muscleDrill(m){
   const gaps=tips.map(t=>({id:t.need,what:`${gmN(counts[t.need]||0)} ${hy(subName(m,t.need))} ${nm.toLowerCase()} sets this cycle`,sugg:suggestForSub(m,t.need,2)}));
   if(trained&&st&&(counts[st]||0)<1.5&&!gapIds.has(st))gaps.push({id:st,what:`No ${hy(subName(m,st))} ${nm.toLowerCase()} work in the stretched position`,sugg:suggestForSub(m,st,2)});
   const subRows=subs.map(([id,sn,term])=>{const c=counts[id]||0,gap=gaps.some(g=>g.id===id);
-    return `<div class="gm-sub${gap?" is-gap":""}"><div class="gm-sn"><b>${sn}${id===st?'<span class="tag rest">stretch</span>':""}</b><span>${term}</span></div><div class="gm-sbar"><i style="width:${(c/mx*100).toFixed(1)}%"></i><u style="left:${(2/mx*100).toFixed(1)}%"></u></div><b class="num">${gmN(c)}</b></div>`;}).join("");
+    return `<div class="gm-sub${gap?" is-gap":""}"><div class="gm-sn"><b>${sn}</b><span>${term}${id===st?'<span class="tag rest">stretch</span>':""}</span></div><div class="gm-sbar"><i style="width:${(c/mx*100).toFixed(1)}%"></i><u style="left:${(2/mx*100).toFixed(1)}%"></u></div><b class="num">${gmN(c)}</b></div>`;}).join("");
   const gapRows=gaps.map(g=>`<div class="gm-gap">${GP.icon("alert")}<div><b>${esc(g.what)}</b>${g.sugg.length?`<span>Add: ${g.sugg.map(esc).join(" · ")}</span>`:""}</div></div>`).join("");
   const top=gmTopLifts(m),tipTxt=gmDosTip({m,trained,rec,hrs,z,L,sets,gaps,E});
   const seg=(k,n)=>n>0?`<i class="${k}" style="flex:${n}"></i>`:"";
   openSheet(`<div class="gh gm gm-dos">
     <div class="gm-bh"><div><div class="eyebrow">Muscle dossier</div><h2 class="gm-bt">${nm}</h2></div><button class="btn-i" onclick="closeSheet()" aria-label="Close">${GP.icon("x")}</button></div>
-    <section class="s2 gm-dhead"><div class="gh-ring${trained?"":" empty"}">${GP.ring(trained?rec:0,100,{size:84,stroke:9,c1:col[0],c2:col[1]})}<div class="gh-rc">${trained?`<span class="num">${rec}</span><span class="eyebrow c-${tone}">fresh</span>`:`<span class="num c-3">—</span><span class="eyebrow">untrained</span>`}</div></div>
+    <section class="s2 gm-dhead"><div class="gh-ring${trained?"":" empty"}">${GP.ring(trained?rec:0,100,{size:84,stroke:9,c1:col[0],c2:col[1]})}<div class="gh-rc">${trained?`<span class="num">${rec}</span><span class="eyebrow c-${tone}">fresh</span>`:`<span class="num c-3">—</span><span class="eyebrow">none</span>`}</div></div>
       <div class="gm-dm"><div class="gm-dr${!trained?" c-3":hrs>0?" c-rest":" c-ok"}">${!trained?"Not trained yet":hrs>0?`Ready in <b>${hrs} h</b>`:"Fully recovered"}</div>
         <div class="t-s">${dsl==null?"No sessions logged":dsl===0?"Trained today":`Last trained ${dsl} day${dsl===1?"":"s"} ago`}</div>
         <div class="gm-chips"><span class="gm-chip">Lv ${x.lvl}</span>${weak?'<span class="gm-chip">Weak point</span>':""}</div></div>
@@ -9134,7 +9137,7 @@ function volMapCard(){
     return `<div onclick="muscleDrill('${m}')" style="cursor:pointer;padding:8px 0;border-top:1px solid var(--border)">
       <div class="row sp"><span style="font-size:13px">${mIcon(m,16)} ${MNAME[m]} ›</span><span class="mini" style="color:${lc};font-weight:700">${s} set${s===1?"":"s"} · ${lab}</span></div>
       <div style="position:relative;height:9px;border-radius:5px;margin-top:5px;background:#15171d;overflow:hidden">
-        <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${heatColor(m)}"></div>
+        <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${lc}"></div>
         <i style="position:absolute;left:${mev}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28)"></i>
         <i style="position:absolute;left:${mav}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45)"></i></div></div>`;
   }).join("");
