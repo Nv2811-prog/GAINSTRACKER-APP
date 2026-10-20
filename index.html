@@ -68,8 +68,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold-dim
 .lbl{display:block;font-family:var(--disp);font-weight:650;font-size:12px;letter-spacing:.06em;color:var(--gold2);margin-bottom:3px}
 img{display:block;max-width:100%}
 .muted{color:var(--text2)}.dim{color:var(--text3)}
-.gold{color:var(--gold2)}.red{color:var(--red)}.green{color:var(--green)}.blue{color:var(--blue)}
-.center{text-align:center}.row{display:flex;align-items:center;gap:10px}.wrap{flex-wrap:wrap}
+.gold{color:var(--gold2)}.red{color:var(--red)}.center{text-align:center}.row{display:flex;align-items:center;gap:10px}.wrap{flex-wrap:wrap}
 .sp{justify-content:space-between}.g{flex:1}
 .hide{display:none!important}
 .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:700}
@@ -83,12 +82,9 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 .card.glow::before{background:linear-gradient(90deg,transparent,rgba(255,208,72,.85),transparent);height:1px}
 /* glow-pop: lifts any element off the dark so you can see it's there */
 .pop{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(201,168,76,.16),0 8px 26px -10px rgba(201,168,76,.26),0 22px 52px -26px rgba(0,0,0,.9)!important}
-.pop-red{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(240,82,74,.22),0 10px 30px -10px rgba(240,82,74,.3)!important}
-.pop-green{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(52,210,123,.22),0 10px 30px -10px rgba(52,210,123,.28)!important}
 /* figure stage: a lit pedestal so the Batsuit pops off the black */
 .stage{position:relative;background:radial-gradient(ellipse 56% 46% at 50% 18%,rgba(150,170,212,.2),transparent 60%),radial-gradient(ellipse 72% 62% at 50% 36%,#2c323f 0%,#13161f 56%,#060708 100%)!important;border:1px solid rgba(201,168,76,.24)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 72px -22px rgba(124,150,255,.2),inset 0 -34px 54px -30px rgba(0,0,0,.72),0 0 0 1px rgba(201,168,76,.1),0 22px 56px -26px rgba(0,0,0,.92)!important}
 .stage::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse 64% 40% at 50% 98%,rgba(232,197,106,.2),transparent 72%),radial-gradient(ellipse 130% 72% at 50% -4%,rgba(0,0,0,.28),transparent 46%)}
-/* ===== GOTHAM LIVE skyline — the city that lives and dies by your training ===== */
 /* ===== stinger — full-screen cinematic slam at patrol start/finish ===== */
 #stinger{position:fixed;inset:0;z-index:220;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;
   background:radial-gradient(ellipse 80% 60% at 50% 45%,rgba(22,17,4,.96),rgba(3,4,7,.985));animation:stgFade 1.05s ease-in-out forwards}
@@ -98,21 +94,14 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 .stg-ring{position:absolute;width:130px;height:130px;border-radius:50%;border:2px solid #FFD048;animation:stgRing 1s ease-out .28s both}
 @keyframes stgRing{0%{transform:scale(.4);opacity:.9}100%{transform:scale(4.6);opacity:0}}
 /* RIR tile — one-tap effort logging, color = proximity to failure (red 0 → gold 1-2 → green 3 → blue 4+) */
-.rirtile{width:34px;height:34px;margin:0 auto;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13.5px;background:var(--bg2);border:1px solid rgba(255,255,255,.13);color:var(--text3);cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;user-select:none}
-.rirtile.set{background:#131007}
 .stg-title{font-family:var(--num);font-size:40px;letter-spacing:.14em;padding-left:.14em;text-align:center;margin-top:14px;animation:stgSlam .6s .12s cubic-bezier(.2,1.4,.4,1) both}
 .stg-sub{font-size:12px;letter-spacing:.22em;padding-left:.22em;text-align:center;text-transform:uppercase;color:var(--text2);margin-top:8px;animation:stgIn .5s .4s both}
 @keyframes stgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 /* ===== JUICE — impact, tension, ritual ===== */
-.prflash{position:fixed;inset:0;z-index:240;background:#fff;opacity:.85;pointer-events:none;animation:prfl .38s ease-out forwards}
-@keyframes prfl{0%{opacity:.85}100%{opacity:0}}
 body.rest-final::after{content:"";position:fixed;inset:0;z-index:60;pointer-events:none;box-shadow:inset 0 0 120px 30px rgba(255,60,40,.28);animation:rfPulse 1s ease-in-out infinite}
 @keyframes rfPulse{0%,100%{opacity:.5}50%{opacity:1}}
 .landed{animation:landShake .35s ease}
 @keyframes landShake{0%{transform:scale(1.12)}40%{transform:scale(.97) translateX(-2px)}70%{transform:translateX(2px)}100%{transform:none}}
-/* ===== KO CAM — slow-mo finish replay ===== */
-#kocam{position:fixed;inset:0;z-index:230;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;overflow:hidden;
-  background:radial-gradient(ellipse 90% 70% at 50% 45%,rgba(40,6,4,.94),rgba(2,3,6,.98));animation:stgFade 1.15s ease-in-out forwards}
 /* alive hero backdrops — slow breathing pan so the top of a tab feels in motion */
 @keyframes hsBreathe{0%{transform:scale(1) translateX(0)}100%{transform:scale(1.07) translateX(-8px)}}
 .card h2,.card h3{color:var(--gold2)}
@@ -132,7 +121,7 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .chip.on{background:linear-gradient(180deg,rgba(50,32,4,.75),rgba(32,20,2,.65));border-color:rgba(255,208,72,.6);color:var(--gold2);box-shadow:0 0 18px -3px rgba(255,208,72,.6)}
 /* TAPTIC: invisible real <input switch> over a tappable — iOS buzzes only for a FINGER tap on one (see hxHost) */
 .hx{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:.01;z-index:6;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:pan-x pan-y}
-.exrow,.sdone,#nav button,.stype{position:relative;overflow:hidden}
+.exrow,.sdone,#nav button{position:relative;overflow:hidden}
 /* premium static sheen across primary gold CTAs */
 .btn.gold::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(118deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 26%,rgba(255,255,255,0) 70%,rgba(255,255,255,.16) 100%);mix-blend-mode:overlay}
 
@@ -141,10 +130,6 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .tbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:38px;height:34px;padding:0 11px;border:1px solid var(--border);border-radius:11px;background:linear-gradient(160deg,#15151a,#0e0e12);color:var(--text2);font-size:15px;transition:.15s}
 .tbtn.wide{color:var(--gold2);border-color:var(--gold-dim);background:var(--gold-bg)}
 .tbtn.on{color:var(--gold2);border-color:var(--gold-dim);background:var(--gold-bg);box-shadow:0 0 0 1px rgba(232,197,106,.18)}
-.tbtn .tbl{font-family:var(--disp);font-weight:650;font-size:11px;letter-spacing:.06em}
-.subtabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:5px}
-.subtab{flex:1;padding:10px 6px;border:none;border-radius:9px;background:none;color:var(--text2);font-family:var(--disp);font-weight:650;font-size:12.5px;letter-spacing:.04em;transition:.15s;cursor:pointer}
-.subtab.on{color:var(--gold2);background:var(--gold-bg);box-shadow:inset 0 0 0 1px var(--gold-dim)}
 /* Accordion sections — expand/collapse for dense areas */
 .accsec{border:1px solid rgba(242,208,121,.26);border-radius:15px;margin-bottom:12px;overflow:hidden;position:relative;
   background:radial-gradient(ellipse 80% 60% at 0% 0%,rgba(242,208,121,.07),transparent 58%),linear-gradient(160deg,rgba(24,28,40,.96),rgba(9,11,17,.98));
@@ -158,21 +143,10 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .acc-arrow.cl{transform:rotate(-90deg)}
 .acc-body{padding:0 12px 13px}
 .acc-body.hide{display:none}
-/* Command Center tiles */
-.cc-tile{text-align:left;padding:13px 12px;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:74px}
-.cc-tile .cc-ic{font-size:22px;line-height:1}
-.cc-tile .cc-nm{font-family:var(--disp);font-weight:650;font-size:13.5px;color:var(--text);letter-spacing:.01em;margin-top:3px}
-.cc-tile .cc-ds{font-size:10.5px;color:var(--text3);line-height:1.3}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 /* Rank ladder */
 .rl-row{display:flex;align-items:center;gap:11px;padding:9px 11px;border:1px solid var(--border);border-radius:12px;margin-bottom:7px;background:linear-gradient(160deg,#0f0f13,#0c0c0f)}
 .rl-row.cur{border-color:var(--gold-dim);background:var(--gold-bg);box-shadow:0 0 24px rgba(235,199,107,.12)}
 .rl-row.done{opacity:.62}
-/* Report card grade */
-.grade-badge{font-family:var(--num);font-weight:700;font-size:54px;line-height:1;letter-spacing:-.02em}
-/* Tempo dot */
-.tempo-dot{width:120px;height:120px;border-radius:50%;margin:18px auto;background:radial-gradient(circle at 50% 40%,rgba(235,199,107,.3),transparent 70%);border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;transition:transform .15s linear,background .15s}
-/* Hype countdown */
 /* Bat-Focus breathing orb */
 .focus-orb{width:180px;height:180px;border-radius:50%;margin:24px auto;background:radial-gradient(circle at 50% 40%,rgba(235,199,107,.35),rgba(235,199,107,.05) 60%,transparent 72%);border:2px solid rgba(235,199,107,.4);box-shadow:0 0 60px rgba(235,199,107,.25),inset 0 0 50px rgba(235,199,107,.15);animation:focusBreath 16s ease-in-out infinite;display:flex;align-items:center;justify-content:center}
 @keyframes focusBreath{0%,100%{transform:scale(.62);box-shadow:0 0 30px rgba(235,199,107,.15),inset 0 0 30px rgba(235,199,107,.1)}25%{transform:scale(1);box-shadow:0 0 80px rgba(235,199,107,.4),inset 0 0 60px rgba(235,199,107,.22)}50%{transform:scale(1)}75%{transform:scale(.62)}}
@@ -188,16 +162,6 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .exrow{display:flex;gap:13px;align-items:center;padding:12px 12px;border:1px solid rgba(255,208,72,.16);border-radius:14px;background:linear-gradient(160deg,rgba(18,22,34,.97),rgba(9,11,17,.97));margin-bottom:9px;transition:border-color .15s,box-shadow .15s,background .15s}
 .exrow:active{border-color:rgba(255,208,72,.42);background:linear-gradient(160deg,rgba(28,32,48,.97),rgba(14,16,26,.97));box-shadow:0 0 0 1px rgba(255,208,72,.14),0 8px 24px -12px rgba(255,208,72,.3)}
 .exrow.added{border-color:rgba(34,232,122,.55);background:linear-gradient(160deg,rgba(22,80,44,.18),rgba(9,11,17,.97));box-shadow:0 0 0 1px rgba(34,232,122,.15),0 6px 20px -10px rgba(34,232,122,.25)}
-/* Workout exercise cards: never virtualize them (stops the screen jumping when you tap a set),
-   and block text selection / the iOS copy-callout so holding to drag never grabs text. Inputs stay editable. */
-.exdrag{content-visibility:visible;contain-intrinsic-size:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.exdrag input,.exdrag select,.exdrag textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
-/* Dedicated drag grip. touch-action:none stops the browser from scroll-stealing the gesture,
-   so a finger-drag on the grip reorders immediately instead of "giving up" on first move. */
-.draghandle{touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;color:var(--text3);font-size:19px;font-weight:700;letter-spacing:1px;line-height:1;padding:8px 6px;border-radius:9px;flex:none;transition:background .12s,color .12s}
-.draghandle:active,.draghandle.grabbing{cursor:grabbing;background:rgba(232,197,106,.16);color:var(--gold2)}
-.exthumb{display:none}
-.exthumb-ph{display:none}
 .exwrap{display:inline-flex;align-items:center;justify-content:center;width:86px;height:86px;border-radius:15px;position:relative;
 background:radial-gradient(ellipse 80% 70% at 50% 36%,#1a1c28,#06060b 90%);
 border:1px solid rgba(255,54,34,.32);flex:none;overflow:hidden;
@@ -206,10 +170,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .exwrap.sm{width:74px;height:74px;border-radius:12px}
 .exwrap.xs{width:46px;height:46px;border-radius:10px}
 .exwrap svg{pointer-events:none;width:100%;height:100%;position:relative;z-index:2}
-.exwrap img.eximg{width:100%;height:100%;object-fit:contain;display:block;background:#f4f4f4;pointer-events:none}
 .exwrap .exfig{display:none;width:100%;height:100%}
-.exwrap.noimg img.eximg{display:none}
-.exwrap.noimg .exfig{display:block}
 .exwrap img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;z-index:2;pointer-events:none;background:#07080e}
 .exwrap img.exfigimg.hidden{display:none}
 /* Exactly ONE base layer is ever visible at a time — photo OR svg, controlled by inline
@@ -217,50 +178,6 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
    painted). The animated demo (.exgif), when present, sits on top and hides every .figlayer. */
 .exwrap .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2}
 .exwrap .figlayer svg{width:100%;height:100%;display:block}
-/* 🦇 SCANPANEL — "Batcomputer target-scan" hero picture (exercise dossier + the active lift's
-   focus card during logging). A physical instrument, not a flat photo crop: brushed-metal bezel,
-   glass screen with a faint blueprint grid, a slow ambient scan sweep, gold targeting-reticle
-   corners and a HUD readout caption — ties into lore already in this app (Batcomputer, dossiers,
-   case files) instead of a generic dark-mode overlay. Exactly ONE base layer ever shows — photo or
-   anatomy svg, never both (figlayer, shared rule above) — the animated demo (.exgif) layers on top.
-   Demo GIFs ship on a flat white background from ExerciseDB; the fix is NOT to crush it black —
-   .exgif carries a moderate filter (shared rule) that tones the white to a warm off-white and
-   keeps the red muscle-highlight legible, and the glass/vignette/grid do the rest of the work. */
-.scanpanel{position:relative;border-radius:17px;padding:5px;cursor:pointer;
-  background:linear-gradient(155deg,#3a4152 0%,#171b26 42%,#08090d 100%);
-  border:1px solid rgba(242,208,121,.22);
-  box-shadow:0 22px 50px -26px rgba(0,0,0,.92),0 0 44px -20px var(--fg,rgba(242,208,121,.4)),inset 0 1px 0 rgba(255,255,255,.1)}
-.scanpanel-screen{position:relative;height:100%;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse 120% 100% at 50% 16%,#141a28 0%,#05060a 75%);box-shadow:inset 0 2px 16px rgba(0,0,0,.8),inset 0 0 0 1px rgba(0,0,0,.65)}
-.scanpanel-grid{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.55;
-  background-image:linear-gradient(rgba(242,208,121,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.06) 1px,transparent 1px);
-  background-size:17px 17px;
-  -webkit-mask-image:radial-gradient(ellipse 88% 78% at 50% 40%,#000 40%,transparent 88%);mask-image:radial-gradient(ellipse 88% 78% at 50% 40%,#000 40%,transparent 88%)}
-.scanpanel .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:flex;align-items:center;justify-content:center}
-.scanpanel .figlayer svg{height:92%;width:auto;display:block;filter:drop-shadow(0 12px 22px rgba(0,0,0,.65))}
-.scanpanel img.exfigimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;pointer-events:none;filter:contrast(1.08) saturate(1.1)}
-.scanpanel-screen.hasgif .figlayer{visibility:hidden}
-.scanpanel-scan{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
-.scanpanel-scan::after{content:"";position:absolute;left:0;right:0;height:46%;top:-46%;
-  background:linear-gradient(180deg,transparent,rgba(242,208,121,.1) 46%,rgba(242,208,121,.16) 50%,rgba(242,208,121,.1) 54%,transparent);
-  filter:blur(2px);animation:spScan 7s ease-in-out infinite}
-@keyframes spScan{0%,100%{top:-46%}50%{top:100%}}
-.scanpanel-vig{position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse 102% 92% at 50% 40%,transparent 52%,rgba(3,4,7,.58) 100%)}
-.scanpanel-c{position:absolute;width:13px;height:13px;border:0 solid rgba(242,208,121,.7);z-index:6;pointer-events:none;filter:drop-shadow(0 0 5px rgba(242,208,121,.55))}
-.scanpanel.entrance .scanpanel-c{animation:spCorner .4s ease both}
-.scanpanel-c.tl{top:8px;left:8px;border-top-width:2px;border-left-width:2px}
-.scanpanel-c.tr{top:8px;right:8px;border-top-width:2px;border-right-width:2px}
-.scanpanel-c.bl{bottom:8px;left:8px;border-bottom-width:2px;border-left-width:2px}
-.scanpanel-c.br{bottom:8px;right:8px;border-bottom-width:2px;border-right-width:2px}
-@keyframes spCorner{from{opacity:0;transform:scale(1.6)}to{opacity:1;transform:scale(1)}}
-.scanpanel-cap{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:24px 14px 10px;background:linear-gradient(180deg,transparent,rgba(4,5,9,.62) 40%,rgba(4,5,9,.96) 100%);pointer-events:none}
-.scanpanel-tag{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;font-weight:800;margin-bottom:3px;opacity:.92}
-.scanpanel-tag i{width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor;flex:none;animation:spDot 1.8s ease-in-out infinite}
-@keyframes spDot{0%,100%{opacity:1}50%{opacity:.3}}
-.scanpanel-cap b{display:block;font-family:var(--disp);font-weight:650;font-size:18px;letter-spacing:.02em;line-height:1.15;color:var(--text);text-shadow:0 2px 10px rgba(0,0,0,.75)}
-.scanpanel-cap span{display:block;font-size:10px;letter-spacing:.11em;text-transform:uppercase;font-weight:800;margin-top:2px}
-.scanpanel-tool{position:absolute;top:8px;z-index:8;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(6,8,13,.72);border:1px solid rgba(255,255,255,.15);color:var(--text2);backdrop-filter:blur(3px);cursor:pointer;transition:transform .12s ease}
-.scanpanel-tool.right{right:8px}
-.scanpanel-tool.left{left:8px}
 /* 🖼 picture picker grid — filterable gallery of candidate demos, tap to choose */
 .picp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px}
 .picp-tile{cursor:pointer;border-radius:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);padding:6px 6px 8px;text-align:center;transition:border-color .12s,box-shadow .12s,background .12s}
@@ -275,24 +192,11 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .exmeta{font-size:12px;color:var(--text3);margin-top:3px;text-transform:capitalize;letter-spacing:.04em;font-family:var(--disp);font-weight:650}
 
 /* set table */
-.settbl{width:100%;border-collapse:collapse;margin-top:10px}
-.settbl th{font-size:10px;letter-spacing:.09em;color:var(--text3);text-transform:uppercase;font-weight:700;padding:5px 3px;text-align:center}
-.settbl td{padding:5px 3px;text-align:center}
-.settbl input{padding:10px 4px;text-align:center;border-radius:9px;font-size:16px;font-weight:600}
-.prevcell{color:var(--text3);font-size:12px;font-variant-numeric:tabular-nums}
-.stype{width:36px;height:36px;border-radius:9px;font-family:var(--disp);font-weight:650;font-size:15px;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2);background:var(--bg4)}
-.stype.W{color:var(--yellow);border-color:#5a4d1a;background:#15120000}
-.stype.F{color:var(--red);border-color:#4a2420;background:#15080000}
-.stype.D{color:var(--orange);border-color:#5a3a1a;background:#150e0000}
-.stype.L,.stype.R{color:var(--blue);border-color:#1a3a5a;background:#00102000}
-.stype.RP{color:#c89bff;border-color:#3a2a5a;background:rgba(124,92,232,.07);font-size:12px}
-.stype.M{color:#5fd0c0;border-color:#1a4a45;background:rgba(46,200,180,.07)}
 .sdone{width:36px;height:36px;border-radius:9px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:17px;transition:.1s}
 .sdone.on{background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:var(--gold3);color:#241800;font-weight:900;box-shadow:0 0 18px rgba(255,208,72,.6),inset 0 1px 0 rgba(255,255,255,.55);animation:sdonepop .32s var(--ease-spring)}
 @keyframes sdonepop{0%{transform:scale(.6)}55%{transform:scale(1.16)}100%{transform:scale(1)}}
 
 /* timer bars */
-.minbar{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);border-radius:10px;padding:7px 10px;margin:0 0 10px;font-size:12.5px;font-weight:700;letter-spacing:.03em;cursor:pointer}
 #savefail{position:fixed;left:0;right:0;top:0;z-index:2147483000;padding:calc(env(safe-area-inset-top,0px) + 8px) calc(14px + env(safe-area-inset-right,0px)) 9px calc(14px + env(safe-area-inset-left,0px));background:#D4170A;color:#fff;font:700 12.5px/1.35 var(--body);text-align:center;letter-spacing:.01em;box-shadow:0 6px 22px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.18) inset;pointer-events:none}
 .resumebar{position:fixed;left:10px;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:41;display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:14px;border:1px solid var(--gold2);background:linear-gradient(180deg,#1a1407,#0e0b05);box-shadow:0 10px 30px rgba(0,0,0,.55);cursor:pointer;animation:rbIn .25s ease}
 @keyframes rbIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -301,29 +205,13 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .resumebar .rb-ttl{font-size:13.5px;font-weight:800;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .resumebar .rb-sub{font-size:11.5px;color:var(--text2)}
 .resumebar .rb-go{font-size:12px;font-weight:800;letter-spacing:.05em;color:#0b0a06;background:var(--gold2);border-radius:8px;padding:6px 9px;flex:none}
-/* Always-on top bar: position:fixed (not sticky — iOS Safari/PWA refuses to pin sticky here),
-   so the timers stay glued to the top of the screen no matter how far you scroll. */
-.timers{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;z-index:30;display:flex;align-items:stretch;gap:8px;background:linear-gradient(180deg,rgba(10,11,15,.97),rgba(6,6,8,.94));backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);padding:calc(8px + env(safe-area-inset-top)) 14px 9px;box-shadow:0 6px 20px -9px rgba(0,0,0,.65),inset 0 -1px 0 rgba(242,208,121,.14)}
-/* Instrument-gauge treatment — brushed metal bezel + recessed glass, same material language as
-   .scanpanel, so the timer readout reads as part of the same Batcomputer instrument, not a plain box. */
-.tbox{flex:1;text-align:center;border-radius:12px;padding:8px 7px 7px;position:relative;overflow:hidden;
-  background:linear-gradient(165deg,#20242f 0%,#0e1016 55%,#07080b 100%);
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:inset 0 2px 9px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08),0 4px 14px -8px rgba(0,0,0,.7)}
-.tbox .num{font-size:26px;color:var(--gold2);display:block;text-shadow:0 0 14px rgba(255,208,72,.5);position:relative;z-index:1}
-.tbox.rest .num{color:var(--blue);text-shadow:0 0 14px rgba(60,150,255,.5)}
-.tbox small{font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;position:relative;z-index:1}
-/* Minimalist minimise control — just a down-arrow. */
-.minbtn{flex:none;width:36px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:linear-gradient(165deg,#20242f 0%,#0e1016 55%,#07080b 100%);box-shadow:inset 0 2px 9px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08);color:var(--text3);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s,color .12s,background .12s}
-.minbtn:active{transform:scale(.94);color:var(--gold2);background:rgba(232,197,106,.12)}
 
 /* recovery bars / mev */
 .bar{height:7px;border-radius:4px;background:var(--bg4);overflow:hidden;border:1px solid var(--border)}
 .bar>i{display:block;height:100%;border-radius:4px;transition:width .5s}
-.xpbar{height:11px}
 .mini{font-size:11px;color:var(--text3)}
 
-/* overlay / boss / sheet */
+/* overlay / sheet */
 #overlay{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:18px}
 #overlay.on{display:flex}
 .ovbg{position:absolute;inset:0;background:rgba(2,2,2,.82);backdrop-filter:blur(6px)}
@@ -375,22 +263,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .restring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .restnum{position:relative;z-index:2;font-family:var(--num);font-size:60px;color:#eaf2ff;letter-spacing:.02em;text-shadow:0 2px 18px rgba(0,0,0,.55)}
 .restbtns{display:flex;gap:12px}
-/* ===== In-header rest module — draining bar + control strip (rest never covers the screen) ===== */
-.timers{flex-wrap:wrap}
-.tbox.rest{position:relative;overflow:hidden}
-#restbar{position:absolute;left:0;bottom:0;height:3px;width:0;border-radius:2px;background:linear-gradient(90deg,var(--blue),#8fc6ff);box-shadow:0 0 10px rgba(60,150,255,.85);transition:width 1s linear}
-.reststrip{flex:1 0 100%;display:flex;align-items:center;gap:7px;min-width:0;animation:viewFade .25s var(--ease-out) both}
-.reststrip .rs-int{flex:1;min-width:0;font-size:11px;letter-spacing:.06em;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.reststrip .rs-int b{color:var(--text);letter-spacing:.02em}
-.rs-btn{flex:none;padding:10px 13px;border-radius:11px;border:1px solid var(--border2);background:linear-gradient(180deg,var(--bg4),var(--bg3));color:var(--text2);font-family:var(--disp);font-weight:650;font-size:12.5px;letter-spacing:.08em;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
-.rs-btn.gold{border-color:rgba(255,208,72,.5);background:linear-gradient(180deg,rgba(255,208,72,.18),rgba(58,42,8,.5));color:var(--gold2);box-shadow:0 0 16px -7px rgba(255,208,72,.9),inset 0 1px 0 rgba(255,255,255,.16)}
 @keyframes calpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,208,72,0)}50%{box-shadow:0 0 14px 2px rgba(255,208,72,.45)}}
-/* 🦹 FOE HUD — tonight's villain loses HP with every working set */
-/* 🔥 PR-window chip on the focus card */
-.prwin{margin-top:5px;padding:5px 9px;border-radius:9px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--gold2);background:rgba(255,208,72,.12);border:1px solid rgba(255,208,72,.45);animation:calpulse 2.4s ease-in-out infinite}
-/* 🦇 night progress arc along the bottom of the fixed timer bar */
-#nightarc{position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 12px rgba(255,208,72,.9);transition:width .5s var(--ease-out);border-radius:0 2px 2px 0;z-index:1}
-/* ═══════════ TACTILE PASS — one set of overrides that lifts EVERY tab at once ═══════════ */
 /* Primary action = a real embossed gold slab with a live sheen sweep */
 .btn.gold{background:linear-gradient(180deg,#FFE082,#E8A820 55%,#B97F16);color:#241800;font-weight:800;letter-spacing:.05em;border:1px solid #FFEBA6;box-shadow:0 10px 26px -10px rgba(232,168,32,.75),inset 0 1px 0 rgba(255,255,255,.75),inset 0 -2px 0 rgba(0,0,0,.28);text-shadow:0 1px 0 rgba(255,255,255,.35);position:relative;overflow:hidden}
 .btn.gold::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:34%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:btnsheen 5s ease-in-out infinite;pointer-events:none}
@@ -411,10 +284,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 /* Banners lead with an accent bar */
 .banner{border-left-width:3px}
 /* Comfort: bigger set-table touch tiles */
-.stype,.sdone{width:38px;height:38px}
-/* Finish-screen hero polish */
-.es-title{color:var(--gold2);text-shadow:0 0 18px rgba(255,208,72,.4)}
-/* Animated exercise demo (ExerciseDB) — REPLACES the SVG figure inside any .exwrap (never both) */
+.sdone{width:38px;height:38px}
 /* ExerciseDB demos ship on a flat WHITE background — the actual problem is the white IS the
    center of the image, not just its edges, so no vignette can hide it. Real fix: a true CSS
    duotone (grayscale → sepia → hue-rotate is the standard filter-only recipe for retinting any
@@ -463,7 +333,6 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .confetti-layer i{position:absolute;top:-16px;width:9px;height:15px;border-radius:2px;opacity:.95;animation:confettiFall linear forwards}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(115vh) rotate(680deg);opacity:.25}}
 
-/* boss */
 /* MMA octagon boss fight */
 .fighter{font-size:60px;position:relative;z-index:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));transition:transform .15s}
 /* fight faces — clear portrait cards, not feathered blobs: you SEE who you're fighting */
@@ -475,48 +344,15 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 @keyframes bossIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .fighter.boss.ko{animation:bossKO 1s ease forwards}
 @keyframes bossKO{0%{transform:rotate(0)}100%{transform:rotate(84deg) translateY(38px);opacity:.22;filter:grayscale(1)}}
-.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:2}
-.flash.on{animation:flashHit .3s}
-@keyframes flashHit{0%{opacity:0}15%{opacity:.5}100%{opacity:0}}
 /* ===== Cinematic upgrades: slow-mo KO, impact shockwave, big strike callout, screen flash ===== */
 .fighter.hero{font-size:66px}.fighter.boss{font-size:66px}
 .fighter.boss.ko{animation:bossKO 1.15s ease forwards}
-/* ===== Villain DEFEATED reveal — cinematic GCPD booking slate ===== */
-/* booking flashbulb */
-.vflash{position:absolute;inset:0;z-index:9;background:radial-gradient(circle at 50% 38%,#fff,rgba(255,255,255,.7) 30%,transparent 66%);opacity:0;pointer-events:none;animation:vbulb 1.05s ease-out .12s 1 both}
-@keyframes vbulb{0%{opacity:0}6%{opacity:1}20%{opacity:.18}100%{opacity:0}}
-/* height rule behind the panels */
-/* User-dropped villain photos render as a clean circular GCPD mugshot — face-biased crop,
-   feathered edge so the original background fades to nothing, gold ring. No bg-removal needed. */
-/* In the GCPD booking panels & "BOOKED" tiles the mugshot fills as a rectangular booking PHOTO, not the circle. */
-/* held booking slate */
-/* mini booking tiles in the workout summary */
-.roundbadge{display:inline-block;font-family:var(--disp);font-weight:650;letter-spacing:.06em;font-size:12px;color:#ff5a4a;border:1px solid #5a2018;background:#1a0b0a;border-radius:20px;padding:3px 12px;animation:flicker 1.6s infinite}
-
-/* recovery rings (heartbeat) */
-.rring{cursor:pointer;flex:1;min-width:48px}
-@keyframes ringbeat{0%,100%{transform:scale(1)}13%{transform:scale(1.09)}26%{transform:scale(1)}40%{transform:scale(1.05)}54%{transform:scale(1)}}
-.rring svg.beat{animation:ringbeat 1.5s ease-in-out infinite;transform-origin:center}
-
-/* MMA title belts */
 
 /* misc */
-.goal-card{padding:15px;border:1px solid var(--border2);border-radius:13px;background:var(--bg2);margin-bottom:10px;transition:.12s}
-.goal-card.on{border-color:var(--gold);background:var(--gold-bg)}
-.goal-card .gt{font-family:var(--disp);font-weight:650;font-size:22px;color:var(--gold2);letter-spacing:.06em}
 .banner{border:1px solid var(--border2);border-radius:12px;padding:12px 13px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;background:linear-gradient(180deg,#14110a,#0c0a06)}
 .banner.alert{background:linear-gradient(180deg,#1a0d0a,#0c0706);border-color:#4a2420}
 .banner .x{margin-left:auto;color:var(--text3);font-size:20px;flex:none;padding:0 4px}
-.splash{position:fixed;inset:0;z-index:90;background:#060606;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.batlogo{font-size:90px;animation:pulseLogo 1.4s ease-in-out infinite}
-.brandlogo{width:132px;height:132px;object-fit:contain;display:block;margin:0 auto;animation:pulseLogo 2.6s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(201,168,76,.32))}
-.brandlogo.sm{width:34px;height:34px;margin:0;animation:none;filter:drop-shadow(0 2px 8px rgba(201,168,76,.45))}
-.brandlogo.splash{width:172px;height:172px}
-.profavatar{width:78px;height:78px;border-radius:50%;flex:none;overflow:hidden;border:2.5px solid var(--gold2);box-shadow:0 0 24px -4px rgba(242,208,121,.55),inset 0 0 0 3px rgba(0,0,0,.4)}
-.profavatar img{width:100%;height:100%;object-fit:cover;object-position:center 22%}
-/* Alfred FAB — floating butler, visible on all tabs */
 /* ── Alfred chat (.ac-*): one text-first conversation. Closed = visibility:hidden, so nothing animates while it is shut. ── */
-.alf-face{width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block;border-radius:50%}
 .ac-panel{position:fixed;left:0;right:0;top:0;height:100vh;height:100dvh;max-width:560px;margin:0 auto;z-index:202;display:flex;flex-direction:column;color:#f1efe8;background:radial-gradient(120% 46% at 50% -8%,rgba(255,208,72,.075),transparent 62%),#07090d;visibility:hidden;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s;overscroll-behavior:contain}
 .ac-panel.on{visibility:visible;opacity:1;transform:none;pointer-events:auto;transition-delay:0s}
 .ac-panel,.ac-panel *{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;box-sizing:border-box}
@@ -575,24 +411,11 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 #ac-in:focus{border:0;outline:0;box-shadow:none;background:transparent}
 #ac-in::placeholder{color:#6f7888}
 .ac-send{flex:none;width:36px;height:36px;margin:1px;border-radius:50%;border:0;background:linear-gradient(180deg,#ffd75e,#e7a91c);color:#1b1304;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s}
-/* Rank-up ceremony glow */
-.rankup-glow{animation:rankGlow 1.1s ease-out;border-color:var(--gold2)!important;box-shadow:0 0 32px rgba(255,208,72,.35)!important}
-@keyframes rankGlow{0%{box-shadow:0 0 0 rgba(255,208,72,0)}60%{box-shadow:0 0 48px rgba(255,208,72,.5)}100%{box-shadow:0 0 32px rgba(255,208,72,.25)}}
 /* Vivid empty states */
-.empty-state{text-align:center;padding:48px 18px 32px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.empty-state .es-icon{font-size:56px;filter:drop-shadow(0 0 14px rgba(255,208,72,.35))}
-.empty-state .es-title{font-family:var(--num);font-size:28px;color:var(--gold2);letter-spacing:.04em}
-.empty-state .es-body{color:var(--text2);font-size:14px;line-height:1.6;max-width:280px}
-@keyframes pulseLogo{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(201,168,76,.3))}50%{transform:scale(1.08);filter:drop-shadow(0 0 28px rgba(201,168,76,.6))}}
 @keyframes breathe{0%,100%{transform:scaleY(1) translateY(0)}50%{transform:scaleY(1.015) translateY(-3px)}}
 .suit-breathe{animation:breathe 4.5s ease-in-out infinite;transform-origin:bottom center}
 @keyframes suitGlowPulse{0%,100%{opacity:.55}50%{opacity:1}}
 .fade{animation:fade .35s ease both}@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.ssgroup{position:relative;border-left:2px solid rgba(232,69,60,.55);border-radius:0 14px 14px 0;padding-left:9px;margin-bottom:13px;background:linear-gradient(90deg,rgba(232,69,60,.07),transparent 55%)}
-.ssgroup .card{margin-bottom:8px}
-.ssgroup .card:last-of-type{margin-bottom:4px}
-.sshead{display:flex;align-items:center;gap:6px;font-family:var(--disp);font-weight:650;letter-spacing:.06em;font-size:12px;color:#ff8378;padding:9px 4px 5px}
-.sshead em{font-style:normal;font-family:inherit;letter-spacing:normal;color:var(--text3);font-weight:400;font-size:11px;text-transform:none}
 .fnboard{display:flex;flex-direction:column;gap:9px}
 .fnrow{display:flex;gap:10px;align-items:center}
 .fnrow.you .fnav{box-shadow:0 0 0 2px var(--gold2)}
@@ -609,11 +432,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .badge.locked{opacity:.32;filter:grayscale(1)}
 .badge.earned{border-color:rgba(232,197,106,.4);background:linear-gradient(180deg,rgba(232,197,106,.1),var(--bg2));box-shadow:0 0 14px -4px rgba(232,197,106,.45)}
 .badge.earned .be{filter:drop-shadow(0 2px 6px rgba(232,197,106,.5))}
-.badge .be{font-size:24px}.badge .bn{font-size:10px;line-height:1.1;color:var(--text2)}
-.acbar{height:6px;border-radius:4px;background:var(--bg2);overflow:hidden;margin:2px 0 10px;border:1px solid var(--border)}
-.acbar i{display:block;height:100%;background:linear-gradient(90deg,#c9a84c,#e8c56a);box-shadow:0 0 8px rgba(232,197,106,.6)}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.badge .be{font-size:24px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
 .classified{background:#0c0c0c;border:1px dashed var(--border2);border-radius:12px;padding:16px;font-family:'DM Mono',ui-monospace,monospace}
 .stamp{display:inline-block;border:2px solid var(--red);color:var(--red);font-family:var(--disp);font-weight:650;letter-spacing:.06em;padding:3px 9px;border-radius:5px;transform:rotate(-5deg);font-size:14px}
 .scroll-x{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
@@ -624,24 +443,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .prpop{position:fixed;left:50%;bottom:96px;transform:translate(-50%,140%);z-index:90;width:calc(100% - 26px);max-width:380px;border-radius:20px;padding:16px 17px 15px;background:linear-gradient(150deg,#1d1606 0%,#241a07 48%,#15100a 100%);border:1px solid var(--gold-dim);box-shadow:0 20px 54px rgba(0,0,0,.62),0 0 30px rgba(232,197,106,.18);opacity:0;cursor:pointer;pointer-events:none;transition:transform .5s cubic-bezier(.16,.9,.22,1.02),opacity .4s;overflow:hidden}
 .prpop:before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 50% -10%,rgba(232,197,106,.22),transparent 60%);pointer-events:none}
 .prpop.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.prpop .prhead{display:flex;align-items:center;gap:10px;margin-bottom:11px;position:relative}
-.prpop .prbadge{font-size:30px;line-height:1;filter:drop-shadow(0 0 9px rgba(232,197,106,.6));animation:prSpin .7s cubic-bezier(.2,1.4,.4,1) both}
-@keyframes prSpin{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
-.prpop .prkick{font-family:var(--disp);letter-spacing:1.5px;color:var(--gold2);font-size:13px;font-weight:800}
-.prpop .prname{font-size:16.5px;font-weight:800;color:#fff;line-height:1.15;margin-top:1px}
-.prpop .prmain{display:flex;align-items:baseline;gap:8px;position:relative;margin:2px 0 11px}
-.prpop .prbig{font-family:var(--num);font-size:40px;line-height:.9;color:#fff;text-shadow:0 2px 14px rgba(232,197,106,.3)}
-.prpop .prunit{font-size:14px;color:var(--text2);font-weight:700}
-.prpop .prdelta{margin-left:auto;text-align:right;font-weight:800;color:var(--green);font-size:15px;line-height:1.1}
-.prpop .prdelta .pct{font-size:12px;color:#9fe7b0;font-weight:700}
-.prpop .prgrid{display:flex;gap:8px;position:relative}
-.prpop .prcell{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(232,197,106,.16);border-radius:12px;padding:8px 9px;text-align:center}
-.prpop .prcell .k{font-size:9.5px;letter-spacing:.6px;color:var(--text3);text-transform:uppercase;font-weight:700}
-.prpop .prcell .v{font-size:15px;color:#fff;font-weight:800;margin-top:2px}
-.prpop .prchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:2px 0 11px;position:relative}
-.prpop .prchip{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;border:1px solid;border-radius:999px;padding:3px 9px;background:rgba(255,255,255,.03);white-space:nowrap}
-.prpop .prtap{text-align:center;color:var(--text3);font-size:10.5px;margin-top:10px;position:relative}
-/* ===== Cinematic Batcave garage entrance ===== */
+/* ===== Unlock toast ===== */
 .unlock-pop{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translate(-50%,-170%);z-index:9999;display:flex;align-items:center;gap:12px;width:calc(100% - 26px);max-width:360px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#1b1408,#251a09);border:1px solid var(--gold-dim);box-shadow:0 16px 44px rgba(0,0,0,.55),0 0 22px rgba(232,197,106,.14);opacity:0;cursor:pointer;pointer-events:none;transition:transform .42s cubic-bezier(.18,.9,.24,1),opacity .42s}
 .unlock-pop.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .unlock-pop .up-emoji{font-size:30px;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
@@ -670,93 +472,19 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .heatcells .hc.tap:active{outline:1px solid var(--gold2)}
 .heatleg{display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:9px;font-size:11px;color:var(--text3)}
 .heatleg i{width:9px;height:9px;border-radius:2px;display:inline-block}
-/* threat meter / iron ledger / training age */
-.badgepill{font-family:var(--disp);font-weight:650;font-size:13px;letter-spacing:.06em;color:var(--gold2);background:var(--gold-bg);border:1px solid var(--gold-dim);padding:3px 10px;border-radius:20px;white-space:nowrap}
-@keyframes flicker{0%,100%{opacity:.85}50%{opacity:1}}
 /* ===== Gotham Iron Protocol v2: command-deck visual layer ===== */
-@keyframes gtv2pulse{0%{box-shadow:0 0 0 0 rgba(242,208,121,.55)}70%{box-shadow:0 0 0 8px rgba(242,208,121,0)}100%{box-shadow:0 0 0 0 rgba(242,208,121,0)}}
-/* ── Gotham panel grid ── */
+@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(242,208,121,.55)}70%{box-shadow:0 0 0 8px rgba(242,208,121,0)}100%{box-shadow:0 0 0 0 rgba(242,208,121,0)}}
 
-/* ── Base panel: compact + cinematic lighting ── */
-/* gold top shimmer */
-/* inner diagonal highlight — simulates a studio key-light from top-left */
-
-/* ── Compact data typography ── */
-
-/* ── Action rows inside panels ── */
-
-
-/* ── Alfred Protocol: command-terminal treatment ── */
-
-/* ── Alfred intel card ── */
-
-/* ── Muscle grid ── */
-
-/* 🎯 MISSION BRIEFING — the dominant hero moment on the Mission tab: tonight's operation pulled
-   out of the day list into its own Batcomputer-grid card, muscle chips, exercise strip, one huge
-   DEPLOY button. Replaces "just another highlighted row" with an actual mission-control feeling. */
-@media(max-width:380px){
-  .gtv2-tonight-day{font-size:29px}
-  .gtv2-idname{font-size:20px}
-  .gtv2-hero-img{width:74%;opacity:.5}
-  .gtv2-map{grid-template-columns:repeat(3,1fr)}
-}
 /* ===== Wave 9: Cinematic Logging & Start-Patrol ===== */
-.patrol-hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px 24px;background:radial-gradient(ellipse at 50% 35%,rgba(242,208,121,.16) 0%,transparent 68%),#07090d}
 .patrol-day{font-family:var(--num);font-size:48px;letter-spacing:.04em;color:var(--gold2);line-height:.9;text-shadow:0 0 40px rgba(242,208,121,.55),0 4px 20px rgba(0,0,0,.9);margin:4px 0 6px}
-.patrol-split-tag{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim,#6b5420);margin-bottom:22px}
-.patrol-muscles{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:4px 0 22px}
-.patrol-mtag{font-family:var(--disp);font-weight:650;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;padding:5px 12px;border-radius:20px;border:1px solid;white-space:nowrap}
-.patrol-gp{width:100%;max-width:380px;margin:0 0 20px;display:flex;flex-direction:column;gap:7px}
-.patrol-gp-item{font-size:13px;line-height:1.5;color:var(--text2);background:rgba(242,208,121,.06);border:1px solid rgba(242,208,121,.18);border-radius:11px;padding:10px 13px;text-align:left}
-.patrol-begin{font-family:var(--disp);font-weight:650;font-size:18px;letter-spacing:.06em;padding:18px 0;border-radius:16px;background:linear-gradient(180deg,var(--gold3,#d4a828),var(--gold,#b8902e));color:#100c00;box-shadow:0 0 36px -6px rgba(242,208,121,.65),inset 0 1px 0 rgba(255,255,255,.38);border:none;cursor:pointer;width:100%;max-width:380px;transition:transform .12s ease;display:block}
-.log-focus{border-radius:20px;overflow:hidden;margin-bottom:10px;background:linear-gradient(180deg,#0d1020,#080b12);border:1px solid rgba(242,208,121,.22);box-shadow:0 20px 60px -28px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07)}
-.log-focus-body{padding:12px 16px 4px}
-.log-target{font-size:12px;color:var(--green,#2ecc71);line-height:1.4;margin-bottom:3px}
-.log-setbar{display:flex;align-items:center;gap:6px;padding:7px 16px;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.22)}
-.log-setdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.13);transition:all .2s;flex:0 0 8px}
-.log-setdot.done{background:var(--green,#2ecc71);box-shadow:0 0 5px rgba(46,204,113,.6)}
-.log-setdot.current{background:var(--gold2,#f2d079);box-shadow:0 0 8px rgba(242,208,121,.75);transform:scale(1.5)}
-.log-stepper-area{padding:10px 16px 12px}
 .log-stepper-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.log-stepper-lbl{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);width:34px;flex:0 0 34px;text-align:right}
-.log-stepper{display:flex;align-items:center;flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden;height:56px}
-.log-step-btn{height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:22px;font-weight:300;color:var(--gold2);cursor:pointer;user-select:none;-webkit-user-select:none;background:rgba(242,208,121,.07);border:none;outline:none;-webkit-tap-highlight-color:transparent;transition:background .1s;padding:0}
-.log-step-btn:active{background:rgba(242,208,121,.22)}
-.log-step-val{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-.log-step-num{font-family:var(--num);font-size:28px;letter-spacing:.02em;color:var(--text);line-height:1}
-.log-step-unit{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
-.log-platebar{margin:4px 0 10px;padding:8px 10px;background:rgba(0,0,0,.38);border-radius:11px;border:1px solid rgba(255,255,255,.07)}
-.log-prev{display:flex;align-items:center;gap:6px;padding:2px 0 8px;font-size:12px;color:var(--text3)}
-.dlt-up{color:var(--green,#2ecc71)}.dlt-dn{color:#e8453c}.dlt-eq{color:var(--text3)}
 .log-save-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:0 16px 14px}
-.log-save-btn{font-family:var(--disp);font-weight:650;font-size:15px;letter-spacing:.06em;padding:15px;border-radius:14px;background:linear-gradient(180deg,rgba(46,204,113,.28),rgba(46,204,113,.12));border:1px solid rgba(46,204,113,.45);color:var(--green,#2ecc71);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
-.log-amrap-btn{padding:15px 12px;border-radius:14px;background:rgba(232,69,60,.1);border:1px solid rgba(232,69,60,.32);color:#e8453c;font-family:var(--disp);font-weight:650;font-size:12px;letter-spacing:.06em;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap}
-.log-amrap-btn.on{background:rgba(232,69,60,.3);border-color:#e8453c;box-shadow:0 0 10px -3px #e8453c}
-.log-set-hist{padding:0 16px 12px;display:flex;flex-direction:column;gap:5px}
 .log-set-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .log-set-row.done-row{background:rgba(46,204,113,.07);border:1px solid rgba(46,204,113,.18)}
 .log-set-row.warm-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
 .log-set-row.cur-row{background:rgba(242,208,121,.07);border:1px solid rgba(242,208,121,.25)}
 .log-set-row.pend-row{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05)}
-.log-set-badge{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:0 0 22px}
-.log-set-badge.done{background:var(--green,#2ecc71);color:#000}
-.log-set-badge.warm{background:rgba(232,197,106,.28);color:var(--gold2);font-size:9px;letter-spacing:.03em}
-.log-set-badge.cur{background:rgba(242,208,121,.2);color:var(--gold2);border:1px solid rgba(242,208,121,.5)}
-.log-set-badge.pend{background:rgba(255,255,255,.07);color:var(--text3)}
-.log-ex-strip{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:10px}
-.log-ex-strip::-webkit-scrollbar{display:none}
-.log-ex-pill{display:flex;align-items:center;gap:6px;flex:0 0 auto;padding:5px 12px 5px 6px;border-radius:10px;font-family:var(--disp);font-weight:650;font-size:11.5px;letter-spacing:.05em;cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:var(--text3);transition:all .15s;-webkit-tap-highlight-color:transparent}
-.log-ex-pill.ex-active{background:rgba(242,208,121,.11);border-color:rgba(242,208,121,.38);color:var(--gold2)}
-.log-ex-pill.ex-done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.28);color:var(--green,#2ecc71)}
-.log-ex-pill-ic{width:22px;height:22px;border-radius:50%;background:radial-gradient(ellipse 90% 80% at 50% 30%,#181c28,#050609);display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
-.log-ex-pill-ic svg{width:82%;height:82%}
-/* ===== Wave 9 v3: Cinematic entrance (g9-entr) ===== */
 
-/* ===== Batcave garage-door entrance (replaces g9-entr) ===== */
-/* Garage entrance: city background + grappler + vehicle */
-/* Grappler sweeps in from right, holds, exits left */
-/* Vehicle rolling in at bottom */
 /* Patrol intro vehicle bar */
 .pveh-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;animation:pfade .55s .04s ease both}
 .pveh-e{font-size:54px;line-height:1;filter:drop-shadow(0 0 18px rgba(242,208,121,.55));animation:pveh-roll .9s .1s cubic-bezier(.1,0,.2,1.1) both}
@@ -767,7 +495,6 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .pbat-fig-lbl{font-size:8px;letter-spacing:.55em;text-transform:uppercase;color:rgba(242,208,121,.38);text-align:center;margin-bottom:7px}
 .pbat-fig{background:rgba(0,0,0,.45);border-radius:14px;border:1px solid rgba(255,255,255,.06);overflow:hidden;padding:6px 6px 2px}
 
-/* ===== Wave 9 v2: Patrol intro v2 + swipe + input table ===== */
 /* Patrol intro */
 .patrol2-wrap{min-height:100svh;display:flex;flex-direction:column;background:#04060a;position:relative;overflow:hidden}
 .patrol2-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(242,208,121,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.035) 1px,transparent 1px);background-size:44px 44px;animation:pgrid 80s linear infinite;pointer-events:none}
@@ -787,31 +514,8 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .patrol2-deploy:active{transform:scale(.97);box-shadow:0 0 10px -4px rgba(242,208,121,.3)}
 @keyframes pfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 /* Swipable exercise rows */
-.ex-swipable{position:relative;overflow:hidden;margin-bottom:8px;border-radius:14px}
-.ex-act-l{position:absolute;left:0;top:0;bottom:0;width:72px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;background:linear-gradient(90deg,rgba(59,130,246,.35),rgba(59,130,246,.12));color:#93c5fd;font-family:var(--disp);font-weight:650;font-size:10px;letter-spacing:.07em;text-transform:uppercase;z-index:1;pointer-events:none;border-radius:14px 0 0 14px}
 .ex-act-r{position:absolute;right:0;top:0;bottom:0;width:72px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;background:linear-gradient(270deg,rgba(232,69,60,.35),rgba(232,69,60,.12));color:#f87171;font-family:var(--disp);font-weight:650;font-size:10px;letter-spacing:.07em;text-transform:uppercase;z-index:1;pointer-events:none;border-radius:0 14px 14px 0}
-.ex-act-l span,.ex-act-r span{font-size:18px}
-.ex-swipe-inner{position:relative;z-index:2;transform:translateX(0);background:var(--bg2,#0e0e12);border-radius:14px;border:1px solid rgba(255,255,255,.08)}
-/* Logging set table */
-.log-settbl{width:100%;border-collapse:collapse}
-.log-settbl thead th{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);padding:6px 4px 5px;text-align:center;font-weight:600;border-bottom:1px solid rgba(255,255,255,.07)}
-.log-settbl td{padding:5px 3px;vertical-align:middle;text-align:center}
-.log-settbl .stcell{width:28px}
-.log-settbl .prevcell2{text-align:left;padding-left:6px;white-space:nowrap;font-size:12px;color:var(--text2);min-width:74px}
-.log-settbl .prevcell2 .pv{color:var(--text3);font-size:10.5px}
-.log-settbl .dlt-arrow{font-size:11px;margin-left:3px}
-.log-settbl input{width:100%;min-width:52px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:var(--text);text-align:center;padding:9px 3px;font:inherit;font-size:15px;-webkit-appearance:none;appearance:none}
-.log-settbl input:focus{border-color:rgba(242,208,121,.5);outline:none;background:rgba(242,208,121,.06)}
-/* Done set = the row LIGHTS UP gold (never dims) — instant "that one's in the bag" */
-.log-settbl tr.set-done-row td{background:rgba(255,208,72,.07);animation:rowlite .6s var(--ease-out)}
-.log-settbl tr.set-done-row td:first-child{border-radius:10px 0 0 10px}
-.log-settbl tr.set-done-row td:last-child{border-radius:0 10px 10px 0}
-.log-settbl tr.set-done-row input{color:var(--gold2);font-weight:700;border-color:rgba(255,208,72,.55);background:rgba(255,208,72,.10);text-shadow:0 0 12px rgba(255,208,72,.45)}
-.log-settbl tr.set-done-row .prevcell2{color:var(--text)}
-@keyframes rowlite{0%{background:rgba(255,208,72,.45)}100%{background:rgba(255,208,72,.07)}}
-.log-settbl tr.set-warm-row .stype,.log-settbl tr.set-warm-row input{opacity:.8}
-.log-platezone{padding:10px 16px 4px}
-/* ============ GOTHAM PRO · FOUNDATION (wave 1) — SPEC §1-§3: tokens, surfaces, buttons, chrome ============ */
+.ex-act-r span{font-size:18px}
 /* canvas: one calm gold haze + a cool hint; the neon multi-glow and the blue grid are gone */
 body{background:radial-gradient(110% 55% at 50% -12%,rgba(242,193,78,.07),transparent 58%) no-repeat,radial-gradient(80% 40% at 100% 2%,rgba(91,180,255,.045),transparent 60%) no-repeat,var(--g0);background-attachment:scroll;letter-spacing:-.005em}
 body::before{content:none}
@@ -823,7 +527,6 @@ h3{font-weight:650;letter-spacing:-.01em}
 .ttl::before{content:none}
 #sheet>.ttl:first-child,#sheet>.row:first-child .ttl{font-size:17px;letter-spacing:-.01em;text-transform:none;color:var(--tx1)}
 .lbl{font:650 12px/1.3 var(--body);letter-spacing:.05em;text-transform:uppercase;color:var(--tx2)}
-.tnum{font-variant-numeric:tabular-nums}
 .big{font-family:var(--num);color:var(--gold-ink);text-shadow:none}
 /* ---- 3 · SURFACES: S2 matte card, S3 hero (gold edge-light), S1 rows. No glow rings, no sheen, no backdrop blur. Status = small accent, never a glowing border. ---- */
 .card{background:linear-gradient(180deg,#131B29,#0F1621);-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid var(--hair);border-radius:var(--r-l);padding:17px;margin-bottom:14px;box-shadow:var(--hl),var(--sh2)}
@@ -832,44 +535,32 @@ h3{font-weight:650;letter-spacing:-.01em}
 button.card,.card[onclick]{cursor:pointer;border-color:var(--hair)!important;box-shadow:var(--hl),var(--sh2)!important}
 @media(hover:hover){button.card:hover,.card[onclick]:hover{border-color:var(--hair2)!important;transform:none}}
 /* S3 = the one hero per screen: gold radial haze + 1px gold top edge-light */
-.card.glow,.mission-briefing,.log-focus{background:radial-gradient(120% 85% at 100% 0%,rgba(242,193,78,.13),transparent 56%),radial-gradient(90% 70% at 0% 100%,rgba(91,180,255,.06),transparent 60%),linear-gradient(180deg,#1B2638 0%,#111927 100%);border:1px solid rgba(242,193,78,.2);border-radius:var(--r-l);box-shadow:inset 0 1px 0 rgba(255,226,150,.14),0 24px 46px -22px rgba(0,0,0,.95)}
-.card.glow::before,.mission-briefing::before,.log-focus::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,221,138,.85) 28%,rgba(255,221,138,.85) 72%,transparent)}
-/* Home hero + tiles (rebuilt in wave 2; calm until then) */
+.card.glow{background:radial-gradient(120% 85% at 100% 0%,rgba(242,193,78,.13),transparent 56%),radial-gradient(90% 70% at 0% 100%,rgba(91,180,255,.06),transparent 60%),linear-gradient(180deg,#1B2638 0%,#111927 100%);border:1px solid rgba(242,193,78,.2);border-radius:var(--r-l);box-shadow:inset 0 1px 0 rgba(255,226,150,.14),0 24px 46px -22px rgba(0,0,0,.95)}
+.card.glow::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,221,138,.85) 28%,rgba(255,221,138,.85) 72%,transparent)}
 /* accordions */
 .accsec{background:linear-gradient(180deg,#131B29,#0F1621);border:1px solid var(--hair);border-radius:var(--r-m);box-shadow:var(--hl),var(--sh2)}
 .accsec::before{content:none}
 .acc-head .acc-ttl{font:650 15px/1.2 var(--body);letter-spacing:-.01em;color:var(--tx1);text-shadow:none}
 .acc-arrow{color:var(--tx3)}
 /* S1 rows and tiles */
-.exrow,.muscle-tile,.splitday,.freq2-stat,.ttile{background:var(--g1);border:1px solid var(--hair);border-radius:var(--r-m);box-shadow:var(--hl)}
+.exrow{background:var(--g1);border:1px solid var(--hair);border-radius:var(--r-m);box-shadow:var(--hl)}
 .exrow.added{background:var(--tint-ok);border-color:rgba(52,210,127,.35);box-shadow:none}
 /* figure stage + pop helpers + instrument panels: lit by luminance, not glow */
 .stage{border-color:var(--hair)!important;box-shadow:var(--hl)!important}
-.pop,.pop-red,.pop-green{box-shadow:var(--hl),var(--sh1)!important}
-.scanpanel{background:linear-gradient(155deg,#243045,#111925 46%,#0A0F18);border:1px solid var(--hair2);box-shadow:var(--hl),var(--sh2)}
-.scanpanel-c{filter:none}
-.scanpanel-tag i,.mb-eyebrow i{box-shadow:none}
-.timers{background:rgba(8,12,20,.94);box-shadow:inset 0 -1px 0 var(--hair)}
-.tbox{background:var(--g1);border:0;box-shadow:inset 0 0 0 1px var(--hair)}
-.tbox .num,.tbox.rest .num{text-shadow:none}
-.tbox.rest .num{color:var(--rest)}
-.profavatar{border:2px solid var(--gold-ink);box-shadow:none}
+.pop{box-shadow:var(--hl),var(--sh1)!important}
 .pcell.add{border-color:var(--hair2);color:var(--gold-ink)}
 .resumebar{border:1px solid rgba(242,193,78,.34);background:var(--g3);box-shadow:var(--sh2)}
 .resumebar .rb-ttl{color:var(--tx1)}
 /* a finished set is "done" = green; gold stays for action / selection / records */
 .sdone{background:var(--g4)}
 .sdone.on{background:var(--ok);border-color:transparent;color:#04210F;box-shadow:none}
-.log-settbl tr.set-done-row td{background:rgba(52,210,127,.075);animation:rowlite .4s var(--ease-out)}
-.log-settbl tr.set-done-row input{color:var(--ok);border-color:rgba(52,210,127,.4);background:rgba(52,210,127,.1);text-shadow:none}
-@keyframes rowlite{0%{background:rgba(52,210,127,.2)}100%{background:rgba(52,210,127,.075)}}
 /* ---- 4 · BUTTONS (B1 primary / B2 secondary / B3 tertiary / chip / icon) + the ONE press recipe ----
    press = scale(.97) + a touch of brightness in 90ms, released on --spring over 280ms; big surfaces use .985.
    No glow, no ripple, no per-component :active scale. */
-button,.btn,.chip,.tbtn,.subtab,.ttile,.exrow,.card[onclick],.gtv2-panel,.splitday-main,.splitday-start,.mb-start,.acc-head,.muscle-tile,.rs-btn,.restbtn,.log-ex-pill,.gtv2-step,.freq2-chip,.sdone,.stype,.rirtile,.scanpanel-tool,.tap{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform var(--d-out) var(--spring),filter .16s,background-color .16s,border-color .16s,box-shadow .16s,color .16s}
-button:active,.btn:active,.chip:active,.tbtn:active,.subtab:active,.splitday-start:active,.mb-start:active,.rs-btn:active,.restbtn:active,.log-ex-pill:active,.gtv2-step:active,.freq2-chip:active,.sdone:active,.stype:active,.rirtile:active,.scanpanel-tool:active,.tap:active{transform:scale(.97);filter:brightness(1.08);transition-duration:var(--d-in)}
-.card[onclick]:active,.gtv2-panel:active,.mission-briefing:active,.splitday-main:active,.exrow:active,.muscle-tile:active,.ttile:active,.acc-head:active,.tap.big:active{transform:scale(.985);transition-duration:var(--d-in)}
-.exrow:active,.muscle-tile:active{border-color:var(--hair2);background:var(--g2);box-shadow:var(--hl)}
+button,.btn,.chip,.tbtn,.exrow,.card[onclick],.acc-head,.restbtn,.sdone,.tap{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform var(--d-out) var(--spring),filter .16s,background-color .16s,border-color .16s,box-shadow .16s,color .16s}
+button:active,.btn:active,.chip:active,.tbtn:active,.restbtn:active,.sdone:active,.tap:active{transform:scale(.97);filter:brightness(1.08);transition-duration:var(--d-in)}
+.card[onclick]:active,.exrow:active,.acc-head:active,.tap.big:active{transform:scale(.985);transition-duration:var(--d-in)}
+.exrow:active{border-color:var(--hair2);background:var(--g2);box-shadow:var(--hl)}
 button:disabled,.btn[disabled],[aria-disabled=true]{opacity:.38;filter:saturate(.4);pointer-events:none}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
@@ -892,11 +583,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none}
 button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px -2px}
 .chip.on{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.38)}
 /* segmented controls, rest strip, row actions */
-.subtabs{background:var(--g1);border:1px solid var(--hair);border-radius:14px}
-.subtab{font:650 12.5px/1.2 var(--body);letter-spacing:.02em;color:var(--tx2)}
-.subtab.on{color:var(--gold-ink);background:var(--tint-gold);box-shadow:inset 0 0 0 1px rgba(242,193,78,.3)}
-.rs-btn,.restbtn{background:var(--g4);border:0;box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);font:600 14px/1 var(--body);letter-spacing:-.005em;-webkit-backdrop-filter:none;backdrop-filter:none}
-.rs-btn.gold,.restbtn.go{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.38)}
+.restbtn{background:var(--g4);border:0;box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);font:600 14px/1 var(--body);letter-spacing:-.005em;-webkit-backdrop-filter:none;backdrop-filter:none}
+.restbtn.go{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.38)}
 /* ---- icons: one inline-SVG set (GP.icon), 24px grid, currentColor strokes ---- */
 .gi{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
 .gi-t,.gi-sec{width:15px;height:15px;margin-right:7px;vertical-align:-2px;color:var(--tx2)}
@@ -929,7 +617,8 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 .sheet{background:linear-gradient(180deg,#172131,#0F1621);border-top:1px solid var(--hair2);border-radius:var(--r-l) var(--r-l) 0 0;padding:8px 16px calc(18px + env(safe-area-inset-bottom));max-height:92dvh;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 -20px 40px -10px rgba(0,0,0,.8),0 90px 0 0 #0F1621;transition:transform .42s var(--spring)}
 .sheet:not(.on){transition:transform .22s cubic-bezier(.4,0,1,1)}
 .sheet::before{content:"";display:block;width:38px;height:5px;border-radius:3px;margin:2px auto 14px;background:rgba(190,206,232,.28);box-shadow:none}
-.sheetbg{background:rgba(2,4,8,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .2s}
+.sheetbg{background:rgba(2,4,8,.6);transition:opacity .2s}
+.sheetbg.on{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}   /* blur only while a sheet is open: no idle backdrop layer on every screen */
 .ovcard,#modal .mcard{background:linear-gradient(180deg,#172131,#0F1621);border:1px solid var(--hair2);border-radius:var(--r-l);box-shadow:var(--sh2)}
 .ovbg,#modal .mbg{background:rgba(2,4,8,.72);-webkit-backdrop-filter:none;backdrop-filter:none}
 .toast{bottom:calc(92px + env(safe-area-inset-bottom));max-width:min(92vw,420px);padding:11px 18px;border:0;border-radius:999px;background:rgba(26,36,54,.96);box-shadow:inset 0 0 0 1px var(--hair2),0 14px 30px -10px rgba(0,0,0,.9);color:var(--tx1);font:600 14px/1.3 var(--body);transform:translateX(-50%) translateY(8px);transition:opacity .18s,transform .18s var(--ease-out)}
@@ -938,25 +627,21 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 input,select,textarea{background:var(--g4);border:1px solid var(--hair2);border-radius:12px;font-size:16px;color:var(--tx1)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.22)}
 input::placeholder,textarea::placeholder{color:var(--tx3);opacity:1}
-.log-settbl input{font-size:16px}
-.log-settbl input:focus{border-color:var(--gold);background:var(--tint-gold)}
 /* blur lives on the tab bar, the top timer bar and the sheet backdrop only */
-.btn,.btn.ghost,.btn.gold,.chip,.card,.scanpanel-tool,.restbtn,#mmaov,.ac-head{-webkit-backdrop-filter:none;backdrop-filter:none}
+.btn,.btn.ghost,.btn.gold,.chip,.card,.restbtn,#mmaov,.ac-head{-webkit-backdrop-filter:none;backdrop-filter:none}
 .ac-head{background:rgba(12,18,28,.96)}
 
 /* ---- 7 · MOTION: no ambient loops. Only live/recording dots and the rest timer keep moving; full-screen moments are PRs and the session finish. ---- */
-.gc-star,.gc-cloud,.gc-rain line,.gc-signal,.gc-wf,.gc-beacon,.gc-bat,.gc-light,.gc-bm,.gar-v,.gtv2-hero-img,.gtv2-tonight-tag i,.gtv2-threat.crit,.gtv2-threat.crit .thz,.threat-skull,.scanpanel-scan::after,.scanpanel-tag i,.mb-eyebrow i,.suit-breathe,.suit-stage-glow::after,.suit-halo,.vmed.cur,.batlogo,.brandlogo,.ob-bat-aura::before,.ob-bat-aura .bat-em,.fighter.hero,.fighter.boss,.patrol2-grid,.btn.gold::after,[style*="calpulse"],[style*="suitGlowPulse"],[style*="hsBreathe"]{animation:none!important}
+.suit-breathe,.fighter.hero,.fighter.boss,.patrol2-grid,.btn.gold::after,[style*="calpulse"],[style*="suitGlowPulse"],[style*="hsBreathe"]{animation:none!important}
 body.rest-final::after{animation:none;box-shadow:inset 0 0 90px 12px rgba(255,90,78,.18)}
 
 .acc-ttl .gi-t{width:18px;height:18px;margin:0;vertical-align:0;color:var(--gold-ink)}
 #offline-pill .gi{width:14px;height:14px;vertical-align:-2px}
 
-/* ---- calm pass: screen titles, figure thumbs, villain bar, muscle chips, hero id row ---- */
+/* ---- calm pass: screen titles, figure thumbs, muscle chips, hero id row ---- */
 h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .exwrap{border:1px solid var(--hair2);box-shadow:var(--hl)}
 
-.cal-pr{color:var(--gold-ink)}
-.cal-pr .gi{width:11px;height:11px}
 
 /* ===== GP:TABS (wave 5) ===== */
 /* Allies, the Alfred page, Settings + Data control and Onboarding. Built on the Home primitives (.gh .s1/.s2/.s3, gh-row, gh-lh, gh-x, gh-cta, gh-more, .tag, .btn-1); only what is new lives here. */
@@ -1012,7 +697,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .al-dbar i{display:block;height:100%;background:var(--gold)}
 .al-dst{padding:0 14px 14px;font:650 13px/1 var(--body)}
 .al-tools .gh-row,.al-fold{cursor:pointer}
-.al-fold.open .trail .gi,.af-fold.open .trail .gi{transform:rotate(180deg)}
+.al-fold.open .trail .gi{transform:rotate(180deg)}
 .al-sh-h{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
 .al-sh-h .main{flex:1;min-width:0}
 .al-sh-h h2{font:700 22px/1.1 var(--body);letter-spacing:-.02em;color:var(--tx1)}
@@ -1053,9 +738,6 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .af-rr p{flex:1;min-width:0;padding-top:4px;font-size:14px;line-height:20px;color:var(--tx2)}
 .af-rr p b{color:var(--tx1);font-weight:600}
 .af-chips{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 14px}
-.af-fold{cursor:pointer}
-.af-lore{margin-top:4px}
-.af-lore .card{margin:10px 0 0;border:1px solid var(--hair)!important;background:linear-gradient(180deg,#131B29,#0F1621)!important;box-shadow:var(--hl)!important}
 
 /* SETTINGS + DATA CONTROL (also the field rows of Onboarding) */
 .st-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px}
@@ -1343,7 +1025,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-acts .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 
 /* ===== GP:HOME (wave 2) ===== */
-/* Home = header (date · cycle in the top bar, greeting under it) → Tonight (the one S3 hero) → Readiness → This week + volume map → Progress → Stalled → Lore fold.
+/* Home = header (date · cycle in the top bar, greeting under it) → ONE hero (Tonight / Rest / Live / Free, readiness folded in) → This week + volume map → Sunday review → Lifts (records + stalled) → Last session → Next up → extras row (Garage, events).
    Everything is scoped under .gh so the other tabs keep their look; the primitives GP.* emit (ring, lmk, wk, seg, spark) are styled here. */
 .topbar.tb-home{margin-bottom:6px}
 .topbar.tb-home .tb-r{gap:6px}
@@ -1376,7 +1058,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
 .gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
-.s3.is-live .gh-art{opacity:.5}
+.s3.is-live .gh-art{opacity:.5;animation:none}   /* live hero: the pulsing dot is the one moving thing */
 @keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
 @media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
@@ -1488,6 +1170,11 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh svg.spark,.gh svg.bars{display:block;height:auto;gap:0;align-items:initial}
 .gh svg.ring{display:block}
 
+/* SECTION HEADER: title left, caption or action right on ONE row (Profile Records, Mission/Suit/Garage headers). The action keeps a 44px tap target without growing the row. */
+.gh-sec{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 4px 10px}
+.gh-sec h2{flex:none;margin:0;font:700 20px/1.2 var(--body);letter-spacing:-.02em}
+.gh-sec .t-xs{min-width:0;text-align:right}
+.gh-sec .gh-more{flex:none;align-self:center;padding:12px 0 12px 16px;margin:-12px 0}
 /* LIFTS: recent records + stalled lifts in one card */
 .gh-more{position:relative;padding:6px 0 6px 12px;font:600 15px/1 var(--body);color:var(--gold-ink)}
 .gh-list{overflow:hidden;margin-top:12px}
@@ -1511,8 +1198,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:44px}
 .gh-col i{font-style:normal}
 .gh-row:active,.gh-lh:active,.gh-sub:active{background:rgba(150,178,222,.05)}
-
-/* GOTHAM EXTRAS: one slim row on Home, the story layer lives in its sheet */
 
 /* motion: first paint of the view only (the stagger stays under 200ms), reduced motion is handled globally */
 @keyframes ghIn{from{opacity:0;transform:translateY(8px)}}
@@ -2678,7 +2363,6 @@ const CORE_EX = [{"n":"Barbell Bench Press","id":"barbellbench","eq":"barbell","
 /* ========================= CONSTANTS ========================= */
 const M12=["chest","back","shoulders","biceps","triceps","forearms","quads","hamstrings","glutes","calves","abs","traps"];
 const MNAME={chest:"Chest",back:"Back",shoulders:"Shoulders",biceps:"Biceps",triceps:"Triceps",forearms:"Forearms",quads:"Quads",hamstrings:"Hamstrings",glutes:"Glutes",calves:"Calves",abs:"Abs",traps:"Traps"};
-const MEMOJI={chest:"🛡️",back:"🦇",shoulders:"⚡",biceps:"💪",triceps:"🔱",forearms:"✊",quads:"🦵",hamstrings:"🦿",glutes:"🍑",calves:"🐊",abs:"📐",traps:"⛰️"};
 /* Custom per-muscle icons — FILLED anatomical silhouettes (not abstract line glyphs). Each is the
    actual shape of the muscle as seen on an anatomy chart: pectoral fans, lat wings, deltoid cap,
    flexed biceps, triceps horseshoe, tapered forearm, quad teardrop, hamstring bellies, glutes,
@@ -2709,10 +2393,6 @@ const _TRAIN_P=`<path d="M4 9.5v5M6.6 7.4v9.2M17.4 7.4v9.2M20 9.5v5M6.6 12h10.8"
 function _svgIcon(inner,sz,c,sw){return `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="${c}" stroke-width="${sw||1.8}" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))">${inner}</svg>`;}
 function restIcon(sz,c){return _svgIcon(_REST_P+`<path d="M14.4 5.2h2.8l-2.8 3h2.8" stroke-width="1.2"/>`,sz||16,c||"#E8C56A");}
 function trainIcon(sz,c){return _svgIcon(_TRAIN_P,sz||16,c||"#E8C56A");}
-function restGlyph(cx,cy,scale,c){scale=scale||1;c=c||"#E8C56A";return `<g transform="translate(${(cx-12*scale).toFixed(1)},${(cy-12*scale).toFixed(1)}) scale(${scale})" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${_REST_P}</g>`;}
-const MC=MNAME; // alias used by gotham weather spec
-// runtime muscle mapping for the full on-demand DB
-const RMAP={pectorals:"chest",chest:"chest","upper chest":"chest","serratus anterior":"abs",lats:"back","latissimus dorsi":"back","upper back":"back","lower back":"back",rhomboids:"back",back:"back",spine:"back",delts:"shoulders",deltoids:"shoulders",shoulders:"shoulders","rear deltoids":"shoulders","rotator cuff":"shoulders","levator scapulae":"traps",biceps:"biceps",brachialis:"biceps",triceps:"triceps",forearms:"forearms","wrist extensors":"forearms","wrist flexors":"forearms",wrists:"forearms","grip muscles":"forearms",quadriceps:"quads",quads:"quads","hip flexors":"quads",adductors:"quads","inner thighs":"quads",groin:"quads",hamstrings:"hamstrings",glutes:"glutes",abductors:"glutes",calves:"calves",soleus:"calves",shins:"calves",abs:"abs",abdominals:"abs",core:"abs",obliques:"abs","lower abs":"abs",traps:"traps",trapezius:"traps"};
 
 const VL={chest:{mev:8,mav:16,mrv:22},back:{mev:10,mav:18,mrv:25},shoulders:{mev:8,mav:16,mrv:20},biceps:{mev:8,mav:14,mrv:20},triceps:{mev:8,mav:14,mrv:18},quads:{mev:8,mav:16,mrv:20},hamstrings:{mev:6,mav:12,mrv:16},glutes:{mev:4,mav:10,mrv:16},calves:{mev:8,mav:14,mrv:20},abs:{mev:6,mav:14,mrv:20},traps:{mev:4,mav:10,mrv:16},forearms:{mev:4,mav:10,mrv:16}};
 const STD={"Bench Press":{b:.75,i:1,a:1.25,e:1.5},"Squat":{b:1,i:1.5,a:2,e:2.5},"Deadlift":{b:1.25,i:1.75,a:2.25,e:2.75},"Overhead Press":{b:.45,i:.65,a:.85,e:1},"Barbell Row":{b:.6,i:.9,a:1.15,e:1.4},"Pull-Up":{b:1,i:3,a:5,e:8}};
@@ -2751,7 +2431,6 @@ const SUBBIAS={
   abs:{up:["low","Crunch-type work — abs mostly contract as one sheet, limited regional bias."],lo:["mid","Mild bias from reverse crunches / leg raises, but overlap with the upper abs is high."],obl:["high","Yes, separate — rotation, anti-rotation and side bends."]},
   traps:{up:["high","Shrugs — separate from mid/lower traps."],mid:["mid","Rows & scapular retraction."],lo:["high","Y-raises / lower-trap work — usually the weak link holding posture back."]}
 };
-function subBias(m,id){return (SUBBIAS[m]||{})[id]||null;}
 function subName(m,id){const r=(SUBG[m]||[]).find(x=>x[0]===id);return r?r[1]:id;}
 // which sub-regions of muscle m does this exercise hit? (inferred from movement name)
 function exSub(ex,m){
@@ -2790,22 +2469,6 @@ function exTarget(ex){
 const RANKS=[[0,"Street Thug","👊"],[3,"Gotham Cop","🚔"],[6,"Vigilante","🌃"],[10,"Robin","🐦"],[15,"Nightwing","🔵"],[20,"Red Hood","🔴"],[25,"Batman","🦇"],[30,"Dark Knight","🌑"],[40,"The Legend","🔱"]];
 
 
-/* evidence-based training facts — shown 50/50 with Batman quotes (Feature 15) */
-const SCIENCE_FACTS=[
-"Hypertrophy responds to sets taken close to failure: RIR 0–3 is the effective range, with ~2 RIR a good default.",
-"Most muscles grow well on ~10–20 hard sets per week. Below your MEV there isn't enough to grow; far above MRV it just adds fatigue.",
-"Training a muscle 2× per week tends to beat 1× for growth at equal weekly volume — frequency spreads the stimulus.",
-"The full range of motion, especially the stretched position, drives more hypertrophy than partials in the short range.",
-"Protein around 1.6–2.2 g per kg of bodyweight per day maximises muscle protein synthesis for most lifters.",
-"Progressive overload is the actual driver of growth — more weight, reps, or quality over time, not novelty.",
-"A controlled eccentric (2–3 s lowering) increases tension time; you don't need to grind the concentric slowly.",
-"Rest 2–3 min on compounds. Cutting rest short drops your reps and total volume, which blunts growth.",
-"Soreness is not a measure of a good session. Tension and progression matter; DOMS just means novelty or damage.",
-"Sleep is anabolic. Under ~7 h chronically lowers recovery, performance, and testosterone — train your sleep too.",
-"When fatigue piles up, cut junk sets before you cut intensity: keep the heavy work, trim the filler, and leave 1–3 reps in reserve.",
-"Creatine monohydrate, 3–5 g daily, is the most evidence-backed legal supplement for strength and size.",
-"Junk volume is real: once a session's later sets lose reps and quality, more sets add fatigue, not stimulus.",
-"For strength, heavy low-rep work matters; for size, anything from ~5–30 reps grows muscle if taken near failure."];
 
 // Categorised, citable knowledge for the in-app library + contextual cues. Plain-English, evidence-based.
 const SCIENCE_LIBRARY=[
@@ -2843,7 +2506,6 @@ const SCIENCE_LIBRARY=[
 ];
 
 
-const EXP_FILL={RECRUIT:{chest:800,back:700,shoulders:600,biceps:400,triceps:400,forearms:200,quads:1200,hamstrings:600,glutes:500,calves:300,abs:400,traps:250},VIGILANTE:{chest:30000,back:26000,shoulders:22000,biceps:14000,triceps:14000,forearms:6000,quads:45000,hamstrings:22000,glutes:18000,calves:11000,abs:15000,traps:9000},DARK_KNIGHT:{chest:75000,back:65000,shoulders:55000,biceps:35000,triceps:35000,forearms:15000,quads:110000,hamstrings:55000,glutes:45000,calves:27000,abs:38000,traps:22000}};
 
 const ACHIEVEMENTS=[
 // ── Operations: sessions logged ──
@@ -3107,7 +2769,6 @@ const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const now=()=>Date.now();
 const fmtTime=s=>{s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return (m<10?"0":"")+m+":"+((s%60)<10?"0":"")+(s%60);};
-const fmtVol=v=>Math.round(v).toLocaleString("en-US")+"kg";
 const fmtNum=n=>Math.round(n).toLocaleString("en-US");
 const fmtKg=n=>String(Math.round((+n||0)*10)/10);   // suggestion weights keep one decimal: 72.5, not 73
 const hoursSince=t=>t?(now()-new Date(t).getTime())/3600000:99999;
@@ -3628,8 +3289,6 @@ function lastSetFor(name){
    Realistic, evidence-based per group — back/legs ~72h, chest/delts/arms ~48h, calves/abs ~24-36h.
    Recovery is bounded by this window, so a muscle is NEVER shown as needing >MREC[m] hours. */
 const MREC={back:72,quads:72,hamstrings:72,glutes:72,chest:48,shoulders:48,traps:48,biceps:48,triceps:48,forearms:36,calves:36,abs:24};
-const FATIGUE_REF=6;   // effective hard sets of recent stimulus = fully fatigued (deep red)
-const FRESH_PCT=12;    // at/below this fatigue% a muscle is considered fresh/ready
 // per-set fatigue contribution: warmups ~0, working sets scaled by how close to failure
 function setStim(s){
   if(!s||!s.done)return 0;
@@ -3675,7 +3334,6 @@ function getRecovery(m){
   if(!(state.data.muscleVol[m]||0))return 100;
   return clamp(100-muscleFatigue(m).pct,0,100);
 }
-function recoveryColor(r){return r>=80?"var(--green)":r>=50?"var(--yellow)":"var(--red)";}
 function hoursToReady(m){return muscleFatigue(m).hrs;}
 
 /* ========================= MUSCLE LEVELS ========================= */
@@ -3789,7 +3447,6 @@ function freqInfo(m){
   else{stat="ok";col="var(--green)";note=`${sess}× this week · ${sets} sets — good`;}
   return {m,stat,col,note,sets,sess,dsl};
 }
-// The card that answers "what do I train next, what's already covered?"
 
 /* ========================= SUBGROUP VOLUME + COVERAGE COACH =========================
    Per sub-region weekly working sets, and a coach that flags missing angles / stretch-debt.
@@ -3826,35 +3483,11 @@ function coverageTips(m){
   (COVER_RULES[m]||[]).forEach(r=>{ if(r.from.some(id=>trained(id))&&!trained(r.need))tips.push({type:"gap",text:r.tip,need:r.need}); });
   return tips;
 }
-// per sub-region fatigue heat (saturates faster than the whole muscle — a single head needs fewer sets)
-function subFatigue(m,id){
-  const tau=MREC[m]||48, cutoff=now()-7*864e5; let units=0;
-  (state.data.workouts||[]).forEach(w=>{const t=new Date(w.date).getTime(); if(!t||t<cutoff)return;
-    const dt=Math.max(0,(now()-t)/36e5); let sStim=0;
-    (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
-      const prim=ex.p&&ex.p.includes(m), sec=ex.s&&ex.s.includes(m); if(!prim&&!sec)return;
-      if(!exSub(ex,m).includes(id))return;
-      let raw=0;(e.sets||[]).forEach(s=>raw+=setStim(s)); if(raw<=0)return;
-      sStim+=prim?raw:raw*0.4;
-    });
-    if(sStim>0)units+=sStim*Math.exp(-dt/tau);
-  });
-  return clamp(Math.round(units/(FATIGUE_REF*0.6)*100),0,100);
-}
 // suggest library exercises that train a given sub-region (for the coverage coach)
 function suggestForSub(m,id,n){
   return CORE_EX.filter(ex=>ex.p&&ex.p.includes(m)&&exSub(ex,m).includes(id)).slice(0,n||3).map(e=>e.n);
 }
 
-/* ========================= XP / LEVEL (account) =========================
-   Banded curve: each level costs a flat block of XP, and the block grows by
-   one nominal-session every 10 levels. A nominal session ≈ 80 XP, so:
-     • Lv 1–10  → 200 XP/level  ≈ 2–4 sessions each
-     • Lv 11–20 → 300 XP/level  ≈ 3–5 sessions each
-     • Lv 21–30 → 400 XP/level  ≈ 4–6 sessions each
-     • …and on up, getting steeper, capped at MAXLVL for now.
-   (Old curve was 120·l² — a quadratic that ballooned to ~20 sessions/level by Lv10.) */
-const MAXLVL=50;
 
 /* ========================= ACHIEVEMENTS ========================= */
 function achStats(){
@@ -3926,13 +3559,6 @@ function sfx(kind){try{
   else if(kind==="pop"){tone(300,920,.18,"triangle",.25);noise(.26,.12,2400);}
   else if(kind==="go"){tone(440,880,.12,"square",.15);}
 }catch(e){}}
-/* PR flashbulb — one frame of white before the chaos */
-function prFlash(){try{const f=document.createElement("div");f.className="prflash";document.body.appendChild(f);setTimeout(()=>f.remove(),380);}catch(e){}}
-/* count-up — makes big numbers LAND instead of appear */
-function countUpEl(id,target,suffix){const el=document.getElementById(id);if(!el)return;const t0=performance.now(),dur=850;
-  const step=(tn)=>{const p=Math.min(1,(tn-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=fmtNum(Math.round(target*e))+(suffix||"");
-    if(p<1)requestAnimationFrame(step);else{el.classList.add("landed");setTimeout(()=>el.classList.remove("landed"),400);}};
-  requestAnimationFrame(step);}
 /* once-a-day arrival ritual — an 900ms signal sweep, never twice, never blocking */
 /* Alfred, live: a REAL AI message (Gemini) — throttled, silent without a key, text-only (he speaks on records + session finish only) */
 function alfredPingAI(ctx){try{
@@ -3960,7 +3586,6 @@ function tickRest(){
   lgTitle(lgM(rem)+" · Rest");
 }
 /* ----- Rest lives in the sticky top bar: draining bar in the REST box + a compact control strip. No full-screen takeover. ----- */
-function hideRestStrip(){lgRestSwap();}
 // Concrete numeric next-set target for the one-tap ⚡ chip — the ONE progression rule (progressionFor).
 function nextTargetSet(name){const p=progressionFor(name);return p?{w:p.w,r:p.r}:null;}
 /* Tapping the tick on an empty working set must never create an empty "done" set: accept the numbers the row
@@ -3974,28 +3599,9 @@ function fillEmptySet(e,s){
     if(!has(s.r)){const r=has(s.prevR)?s.prevR:(tg&&tg.r?tg.r:"");if(has(r))s.r=String(r);}}
   return setFilled(e.name,s);
 }
-// Load the computed progression target straight into the next unlogged set — progressive overload, no math.
-function restApplyTarget(){
-  const ses=state.session;if(!ses)return;
-  const fei=(typeof activeExIdx==="function")?activeExIdx():-1;if(fei<0)return;
-  const e=ses.exercises[fei];if(!e)return;
-  const si=(e.sets||[]).findIndex(s=>!s.done);if(si<0)return;
-  const tg=nextTargetSet(e.name);if(!tg)return;
-  e.sets[si].w=tg.w?String(tg.w):"";e.sets[si].r=String(tg.r);
-  haptic("light");saveSession();
-  try{render();}catch(_){}
-}
 function addRest(delta){if(!state.restRunning)return;state.restEnd+=delta*1000;state._restTotal=Math.max(5,(state._restTotal||0)+delta);const rem=Math.ceil((state.restEnd-Date.now())/1000);if(rem<=0){skipRest();return;}haptic("tap");tickRest();const l=$("lgrl");if(l&&!state._restRx)l.textContent="of "+lgM(state._restTotal);}
 function skipRest(){state.restRunning=false;state.restTimer=0;state._restGo=null;haptic("tap");document.body.classList.remove("rest-final");lgRestSwap();lgTitle(null);}
 /* ===== MMA Round Timer — combat-conditioning interval timer ===== */
-const MMA_PRESETS=[
-  {n:"MMA Title",d:"5 × 5:00 · 1:00 rest",rounds:5,work:300,rest:60},
-  {n:"MMA Bout",d:"3 × 5:00 · 1:00 rest",rounds:3,work:300,rest:60},
-  {n:"Boxing",d:"12 × 3:00 · 1:00 rest",rounds:12,work:180,rest:60},
-  {n:"Muay Thai",d:"5 × 3:00 · 2:00 rest",rounds:5,work:180,rest:120},
-  {n:"Heavy Bag HIIT",d:"8 × 0:30 · 0:15 rest",rounds:8,work:30,rest:15},
-  {n:"Tabata",d:"8 × 0:20 · 0:10 rest",rounds:8,work:20,rest:10}
-];
 function mmaPhaseDur(){const m=state.mma;return m.phase==="prep"?5:m.phase==="rest"?m.rest:m.work;}
 function paintMMA(rem){
   const m=state.mma;if(!m)return;
@@ -4038,7 +3644,6 @@ function releaseWakeLock(){try{if(_wakeLock){_wakeLock.release();_wakeLock=null;
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&state.session&&state.step==="logging")requestWakeLock();});
 function ensureTimers(){if(state.session){if(!state.wtInt)state.wtInt=setInterval(tickWork,1000);if(!state.restInt)state.restInt=setInterval(tickRest,1000);}}
 function restStart(defer,dur,rx){dur=dur||state.data.u.restTime||120;state.restEnd=Date.now()+dur*1000;state.restTimer=dur;state.restRunning=true;state._restOrigTotal=dur;state._restTotal=dur;state._restRx=rx||0;state._restGo=null;state._restPending=!!defer;lgRestSwap();tickRest();}
-// Rest lives in the sticky header now — no fullscreen takeover. Tapping the REST box opens a compact controls sheet.
 
 /* ========================= START WORKOUT (Rule 6: unbroken path) ========================= */
 /* A live/minimised session must never be silently overwritten by START / FREE SESSION. */
@@ -4061,9 +3666,9 @@ function startWorkout(splitId,dayIdx){
     srcSplit:(sp&&day)?splitId:null,srcDay:(sp&&day)?dayIdx:null,
     exercises:(day?day.exercises:[]).map(n=>{const pl=day.plan&&day.plan[n];return Object.assign({name:n,sets:seedSets(n,pl)},pl?{plan:pl}:{});})};
   state.workoutTimer=0;state.restTimer=0;state.restRunning=false;
-  state.step="readiness";render();playEntrance(state.session.day);
+  state.step="readiness";render();
 }
-function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();playEntrance("Free Session");}
+function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();}catch(e){}state.session={split:"Free Session",day:"Workout",readiness:null,startedAt:now(),exercises:[]};state.workoutTimer=0;state.step="readiness";render();}
 // planned = the split day's target for this lift ({s:sets, r:"5–10"}). With a plan, seed exactly that
 // many working sets (last session's numbers shown per set where they exist) instead of copying last
 // session's set count — otherwise every session starts with the old plan's sets to delete by hand.
@@ -4093,9 +3698,6 @@ function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Different
 /* ========================= LOGGING INTERACTIONS ========================= */
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;saveSessionSoon();} // no render (Rule 1 spirit); debounced backup
 function setSessionNotes(v){if(state.session)state.session.notes=v;} // no render — keep textarea focus
-function toggleDmgReport(){state._dmgOpen=!(state._dmgOpen===true);haptic("tap");render();}
-const STYPES=["NRM","W","F","D","L","R"];
-function cycleType(ei,si){const e=state.session.exercises[ei];const s=e.sets[si];s.type=STYPES[(STYPES.indexOf(s.type)+1)%STYPES.length];e._open=true;state.session._focusEi=ei;render();}
 function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();saveSession();}
 // Real-time PR check: the moment a working set is completed and beats your record, it is flagged in its row.
 function liveCheckPR(ei,si){
@@ -4145,43 +3747,11 @@ const PR_TIER={
   vol   :{rank:2,badge:"📊",kick:"NEW SET VOLUME PR",unit:"kg in one set",accent:"#5ec8c0",fmt:v=>Math.round(v)+"kg"},
   reps  :{rank:1,badge:"🔁",kick:"NEW REP RECORD",unit:"reps · most ever",accent:"#8fa9e8",fmt:v=>v+" reps"}
 };
-function showPRToast(name,hits,info){
-  const p=$("prpop");if(!p)return;
-  // Accept the legacy (name,e1,prev,w,r) signature too, for any remaining callers.
-  if(!Array.isArray(hits)){const e1=hits,prev=arguments[2];hits=[{t:"e1rm",val:e1,prev:prev||0}];info={w:arguments[3],r:arguments[4],e1};}
-  hits=hits.slice().sort((a,b)=>PR_TIER[b.t].rank-PR_TIER[a.t].rank);
-  const top=hits[0],cfg=PR_TIER[top.t];
-  const round1=v=>Math.round(v*10)/10;
-  const dval=top.prev?(top.val-top.prev):0;
-  const pct=top.prev?((top.val-top.prev)/top.prev*100):0;
-  const bigStr=top.t==="reps"?top.val:Math.round(top.val);
-  const deltaHtml=top.prev
-    ? `<div class="prdelta" style="color:${cfg.accent}">+${top.t==="reps"?dval:round1(dval)}${top.t==="reps"?"":"kg"}<div class="pct">▲ ${pct>=10?Math.round(pct):round1(pct)}%</div></div>`
-    : `<div class="prdelta" style="color:${cfg.accent}">FIRST<div class="pct" style="color:${cfg.accent}">record</div></div>`;
-  // chips for every record broken on this set (crown highlighted)
-  const chips=hits.map(h=>{const c=PR_TIER[h.t];const crown=h.t==="e1rm";
-    return `<span class="prchip" style="border-color:${c.accent};color:${c.accent}${crown?";box-shadow:0 0 9px "+c.accent+"55":""}">${c.badge} ${c.kick.split(" · ")[0].replace("NEW ","").replace(" RECORD","").replace(" PR","")} · ${c.fmt(h.val)}</span>`;}).join("");
-  const liftStr=(info&&info.w!=null&&info.r)?`${round1(info.w)}kg × ${info.r}`:cfg.fmt(top.val);
-  const crownStripe=hits.some(h=>h.t==="e1rm");
-  p.innerHTML=`<div class="prhead"><div class="prbadge"${crownStripe?' style="filter:drop-shadow(0 0 8px var(--gold2))"':''}>${cfg.badge}</div><div style="flex:1;min-width:0"><div class="prkick" style="color:${cfg.accent}">${cfg.kick}</div><div class="prname">${esc(name)}</div></div></div>
-    <div class="prmain"><div class="prbig" style="color:${cfg.accent}">${bigStr}</div><div class="prunit">${cfg.unit}</div>${deltaHtml}</div>
-    ${hits.length>1?`<div class="prchips">${chips}</div>`:""}
-    <div class="prgrid">
-      <div class="prcell"><div class="k">The lift</div><div class="v" style="font-size:13.5px">${liftStr}</div></div>
-      <div class="prcell"><div class="k">${cfg.kick.includes("1RM")?"Est 1RM":"This PR"}</div><div class="v" style="font-size:14px">${cfg.fmt(top.val)}</div></div>
-      <div class="prcell"><div class="k">Old best</div><div class="v">${top.prev?cfg.fmt(top.prev):"—"}</div></div>
-    </div>
-    <div class="prtap">tap to dismiss</div>`;
-  p.classList.remove("on");void p.offsetWidth;p.classList.add("on");
-  clearTimeout(p._t);p._t=setTimeout(()=>{p.classList.remove("on");},2800);
-  haptic("pr");
-}
 function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();saveSession();}
 function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();saveSession();}
 function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;render();}
 function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
 function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;e._open=true;state.session._focusEi=ei;closeSheet();render();}
-function moveExercise(ei,dir){const arr=state.session.exercises;const j=ei+dir;if(j<0||j>=arr.length)return;const t=arr[ei];arr[ei]=arr[j];arr[j]=t;saveSession();syncSessionToSplit();render();}
 /* 📌 LIVE PLAN SYNC — anything you change about tonight's line-up (order, swaps, adds, removes)
    is written straight back to the split day it came from, so next time the plan IS how you left it. */
 function syncSessionToSplit(){
@@ -4230,128 +3800,12 @@ function reorderMove(ei,dir){
 }
 // ---- Collapsible exercises: only the one you're actively on stays expanded; others fold like a list. ----
 function activeExIdx(){const ses=state.session;if(ses&&ses._focusEi!=null&&ses.exercises[ses._focusEi])return ses._focusEi;const o=findOpenSet();return o?o.ei:-1;}
-function isExOpen(ei){const e=state.session.exercises[ei];if(!e)return false;const active=activeExIdx();if(ei===active)return e._open!==false;return e._open===true;}
-function toggleExCollapse(ei){const e=state.session.exercises[ei];if(!e)return;const open=isExOpen(ei);e._open=!open;state.session._focusEi=null;haptic("tap");render();}
 /* ONE definition of "logged": ticked AND carrying numbers (exProgress, confirmFinish and finishWorkout all use it).
    setFilled = numbers present (bodyweight lifts may leave weight empty); a typed-but-unticked set is filled but not logged. */
 function setFilled(name,s){return !!s&&((s.w!==""&&s.w!=null)||!!exFor(name).bw)&&s.r!==""&&s.r!=null;}
 function setLogged(name,s){return !!s&&!!s.done&&setFilled(name,s);}
 function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const doneN=working.filter(s=>setLogged(e.name,s)).length;return {doneN,total:working.length,allDone:working.length>0&&doneN>=working.length};}
 // ---- Hold-to-drag exercise reordering (touch + mouse). Reorders DOM live, commits to the array once on drop — no re-render mid-drag, so it stays smooth. ----
-function initDragReorder(){
-  if(window._dragInit)return;window._dragInit=true;
-  const lp={timer:null,active:false,node:null,startY:0,startX:0,suppress:false,pid:null,handle:null,raf:null,vy:0,lastY:0,swRow:null,swiping:false,swDX:0,swDecided:false};
-  window._lpDrag=lp;
-  const SW_FIRE=92; // px past which a swipe commits
-  const resetSwipe=(snap)=>{const r=lp.swRow;if(r){r.style.transition="transform .18s ease, background-color .18s ease";r.style.transform="";r.style.backgroundColor="";r.style.overflow="";const t=r.querySelector(".swipe-hint");if(t)t.remove();}lp.swRow=null;lp.swiping=false;lp.swDX=0;lp.swDecided=false;};
-  // Edge auto-scroll: while dragging near the top/bottom of the viewport, scroll the page so you
-  // can drag an exercise past the visible window without lifting your finger.
-  const EDGE=90, MAXV=18;
-  const autoScroll=()=>{
-    if(!lp.active){lp.raf=null;return;}
-    if(lp.vy!==0){
-      window.scrollBy(0,lp.vy);
-      if(lp.node){const fake={clientX:lp.startX,clientY:lp.lastY};reorder(fake);lp.baseY=lp.lastY;lp.node.style.transform="scale(1.04)";}
-    }
-    lp.raf=requestAnimationFrame(autoScroll);
-  };
-  const updateEdge=(y)=>{
-    lp.lastY=y;const h=window.innerHeight;
-    if(y<EDGE)lp.vy=-Math.ceil(MAXV*(EDGE-y)/EDGE);
-    else if(y>h-EDGE)lp.vy=Math.ceil(MAXV*(y-(h-EDGE))/EDGE);
-    else lp.vy=0;
-    if(lp.vy!==0&&!lp.raf)lp.raf=requestAnimationFrame(autoScroll);
-  };
-  const getRow=(t)=>{while(t&&t!==document.body){if(t.classList&&t.classList.contains("exdrag"))return t;t=t.parentElement;}return null;};
-  const getHandle=(t)=>{while(t&&t!==document.body){if(t.classList&&t.classList.contains("draghandle"))return t;t=t.parentElement;}return null;};
-  const clearTimer=()=>{if(lp.timer){clearTimeout(lp.timer);lp.timer=null;}};
-  // pointer-events:none lets elementFromPoint see the row UNDER the finger (no dead-zone over the dragged card);
-  // transform is left out of the transition so the card tracks the finger 1:1 instead of lagging behind it.
-  const lift=(row)=>{row.style.transition="box-shadow .12s ease,opacity .12s ease";row.style.transform="translateY(0) scale(1.04)";row.style.boxShadow="0 16px 40px rgba(0,0,0,.62)";row.style.opacity="0.96";row.style.position="relative";row.style.zIndex="30";row.style.pointerEvents="none";row.style.willChange="transform";};
-  const begin=(row)=>{lp.active=true;lp.node=row;lp.baseY=lp.startY;lift(row);document.body.style.userSelect="none";if(lp.handle)lp.handle.classList.add("grabbing");haptic("done");};
-  const reorder=(e)=>{
-    const row=getRow(document.elementFromPoint(e.clientX,e.clientY));
-    if(!row||row===lp.node||!row.classList.contains("exdrag"))return;
-    const rect=row.getBoundingClientRect();const before=e.clientY<rect.top+rect.height/2;const parent=row.parentElement;
-    let moved=false;
-    if(before){if(row.previousElementSibling!==lp.node){parent.insertBefore(lp.node,row);moved=true;}}
-    else{if(row.nextElementSibling!==lp.node){parent.insertBefore(lp.node,row.nextElementSibling);moved=true;}}
-    if(moved){lp.baseY=e.clientY;lp.node.style.transform="scale(1.04)";} // landed in a new slot — re-anchor the finger-follow so it keeps tracking cleanly
-  };
-  document.addEventListener("pointerdown",(e)=>{
-    if(state.step!=="logging"||lp.active)return;
-    // Grip handle: start dragging IMMEDIATELY (no long-press), capture the pointer so the
-    // finger can roam over other cards, and preventDefault so the browser never scroll-steals.
-    const handle=getHandle(e.target);
-    if(handle){
-      const row=getRow(handle);if(!row)return;
-      lp.startX=e.clientX;lp.startY=e.clientY;lp.pid=e.pointerId;lp.handle=handle;
-      try{handle.setPointerCapture(e.pointerId);}catch(_){}
-      e.preventDefault();begin(row);return;
-    }
-    // Fallback: long-press anywhere on the card body.
-    if(e.target.closest&&e.target.closest("button,input,select,textarea,a,.stype,.sdone"))return;
-    const row=getRow(e.target);if(!row)return;
-    lp.startX=e.clientX;lp.startY=e.clientY;lp.pid=e.pointerId;lp.handle=null;clearTimer();
-    // Swipe candidate: only collapsed rows can be swiped (left = delete, right = open).
-    resetSwipe();if(row.classList.contains("exfold"))lp.swRow=row;
-    lp.timer=setTimeout(()=>{lp.timer=null;begin(row);},340);
-  },{passive:false});
-  document.addEventListener("pointermove",(e)=>{
-    if(lp.timer&&(Math.abs(e.clientX-lp.startX)>10||Math.abs(e.clientY-lp.startY)>10))clearTimer(); // moved early without a handle = it's a scroll, not a hold
-    // Horizontal swipe on a collapsed row — decide direction once, then track the finger.
-    if(!lp.active&&lp.swRow){
-      const dx=e.clientX-lp.startX,dy=e.clientY-lp.startY;
-      if(!lp.swDecided&&(Math.abs(dx)>12||Math.abs(dy)>12)){
-        if(Math.abs(dx)>Math.abs(dy)+4){lp.swiping=true;lp.swDecided=true;clearTimer();const r=lp.swRow;r.style.transition="none";let hint=r.querySelector(".swipe-hint");if(!hint){hint=document.createElement("div");hint.className="swipe-hint";hint.style.cssText="position:absolute;top:0;bottom:0;display:flex;align-items:center;font-weight:800;font-size:13px;letter-spacing:.04em;pointer-events:none;padding:0 16px";r.style.position="relative";r.style.overflow="hidden";r.appendChild(hint);}}
-        else{lp.swDecided=true;lp.swiping=false;} // vertical first = scroll, let it be
-      }
-      if(lp.swiping){
-        e.preventDefault();lp.swDX=dx;const r=lp.swRow;
-        r.style.transform="translateX("+dx+"px)";
-        const fire=Math.abs(dx)>=SW_FIRE;const hint=r.querySelector(".swipe-hint");
-        if(dx<0){r.style.backgroundColor="rgba(232,69,60,"+Math.min(.28,Math.abs(dx)/420)+")";if(hint){hint.style.right="0";hint.style.left="auto";hint.style.color="#ff6a5a";hint.textContent=fire?"✕ release to remove":"✕ delete";}}
-        else{r.style.backgroundColor="rgba(124,150,255,"+Math.min(.28,Math.abs(dx)/420)+")";if(hint){hint.style.left="0";hint.style.right="auto";hint.style.color="#9fb4ff";hint.textContent=fire?"▸ release to open":"▸ open";}}
-        return;
-      }
-    }
-    if(!lp.active||!lp.node)return;
-    e.preventDefault();
-    reorder(e);
-    lp.node.style.transform="translateY("+(e.clientY-lp.baseY)+"px) scale(1.04)"; // card follows the finger
-    updateEdge(e.clientY);
-  },{passive:false});
-  const end=()=>{
-    clearTimer();
-    lp.vy=0;if(lp.raf){cancelAnimationFrame(lp.raf);lp.raf=null;}
-    // Commit or snap back a horizontal swipe.
-    if(lp.swiping&&lp.swRow){
-      const dx=lp.swDX,row=lp.swRow,ei=parseInt(row.getAttribute("data-ei"));
-      lp.suppress=true;setTimeout(()=>{lp.suppress=false;},700);
-      if(Math.abs(dx)>=SW_FIRE&&!isNaN(ei)){
-        if(dx<0){ // swipe left → remove (confirm modal decides; snap back underneath it)
-          resetSwipe();haptic("warn");removeExercise(ei);return;
-        }else{ // swipe right → open/expand to work on it
-          resetSwipe();haptic("tap");toggleExCollapse(ei);return;
-        }
-      }
-      resetSwipe(); // didn't travel far enough — snap back
-      return;
-    }
-    if(lp.handle){try{lp.handle.releasePointerCapture(lp.pid);}catch(_){}lp.handle.classList.remove("grabbing");lp.handle=null;}
-    if(lp.active&&lp.node){
-      const order=[...document.querySelectorAll("#app .exdrag")].map(n=>parseInt(n.getAttribute("data-ei"))).filter(i=>!isNaN(i));
-      const arr=state.session&&state.session.exercises;
-      if(arr&&order.length===arr.length){const na=order.map(i=>arr[i]);if(na.every(Boolean))state.session.exercises=na;}
-      lp.suppress=true;setTimeout(()=>{lp.suppress=false;},700); // swallow the click that follows a drag; auto-clear if none comes
-      document.body.style.userSelect="";haptic("tap");
-      lp.active=false;lp.node=null;render();
-    }
-  };
-  document.addEventListener("pointerup",end);
-  document.addEventListener("pointercancel",end);
-  document.addEventListener("click",(e)=>{if(lp.suppress){lp.suppress=false;e.stopPropagation();e.preventDefault();}},true);
-}
 // Bottom-sheet menu for a single set: change type, reorder, duplicate, delete.
 const STYPE_LABEL={NRM:"Normal",W:"Warm-up",F:"Failure",D:"Drop set",L:"Left",R:"Right"};
 function openSetSheet(ei,si){
@@ -4488,7 +3942,6 @@ function confettiBurst(){
   host.appendChild(layer);
   setTimeout(()=>layer.remove(),2200);
 }
-function resumePendingRest(){state._restPending=false;/* rest already runs in the sticky header — nothing to reopen */}
 
 
 /* ========================= OVERLAY / SHEET ========================= */
@@ -4711,7 +4164,6 @@ const GP=(()=>{
 /* ========================= NAV ========================= */
 /* Bottom nav = 5 core destinations + a MORE (☰) button. The rest live in the Command Center. */
 const TABS=[["gotham","🦇","GOTHAM","gotham"],["mission","⚔️","MISSION","mission"],["suit","💪","SUIT","suit"],["case","👤","PROFILE","profile"],["allies","🤝","ALLIES","allies"]];
-const MORE_TABS=[["alfred","🤖","ALFRED","Your evidence-based AI coach — chat & physique photo critiques"],["tech","🦾","WAYNE TECH","Patrol calendar, Oracle, contracts & every gadget"]];
 function renderNav(){
   if(state.step==="logging"||state.step==="readiness"||state.step==="summary"||state.showOnboarding){$("nav").classList.add("hide");return;}
   $("nav").classList.remove("hide");
@@ -4935,7 +4387,6 @@ function tonightGamePlan(){
     items.push(firstWithSug?`<b>${esc(firstWithSug)}:</b> ${nextTarget(firstWithSug)}`:`First run through these lifts — log honest sets tonight and I'll have targets ready next time, sir.`);}
   return items.slice(0,2);
 }
-function dismissGamePlan(){if(state.session)state.session._planDismiss=true;if(typeof saveSession==="function")saveSession();render();}
 // Warm-up: only suggested the first time a session touches a given primary muscle.
 // Light and short — "feel the movement", not an exhausting ramp. Body is warm after the first lift.
 function warmupSuggest(ei){
@@ -5172,18 +4623,6 @@ function fillLast(ei){const ses=state.session;if(!ses)return;const e=ses.exercis
 /* Per-gym machine settings — remember seat height / pin / pad for this machine AT THIS GYM. */
 function machineSetting(name){const d=state.data;return ((d.machineSettings||{})[d.u.activeGym]||{})[name]||"";}
 function setMachineSetting(name){const d=state.data;appPrompt({title:"Machine setup · "+(d.u.activeGym||"gym"),body:"Save your settings for this machine (seat height, pin, pad position…). Stored per gym.",ok:"Save",value:machineSetting(name)}).then(v=>{if(v===null)return;d.machineSettings=d.machineSettings||{};d.machineSettings[d.u.activeGym]=d.machineSettings[d.u.activeGym]||{};v=(v||"").trim();if(v)d.machineSettings[d.u.activeGym][name]=v;else delete d.machineSettings[d.u.activeGym][name];save();render();});}
-/* ═══════════ RIR ENGINE — proximity-to-failure intel ═══════════
-   One-tap tactile logging in the set table + a full Effort Dossier on the Suit tab.
-   All history is normalized to RIR 0–4 (RPE-era logs convert as RIR = 10 − RPE). */
-function cycleMetric(ei,si){
-  const s=state.session&&state.session.exercises[ei]&&state.session.exercises[ei].sets[si];if(!s)return;
-  const arr=state.data.u.metric==="rir"?["","0","1","2","3","4+"]:["","10","9","8","7","6"];
-  s.rpe=arr[(arr.indexOf(String(s.rpe||""))+1)%arr.length];
-  try{sfx("clank");haptic("tap");}catch(e){}
-  saveSessionSoon();render();
-}
-function rirTone(v){const s=String(v);const r=s==="4+"?4:parseFloat(s);const rr=isNaN(r)?null:(r>=6?10-r:r);
-  return rr==null?"#8b93a3":rr<=0?"#FF3622":rr<=2?"#FFD048":rr<=3?"#22E87A":"#5f8fd6";}
 function rirOfSet(s){
   if(!s||s.type==="W")return null;const v=String(s.rpe==null?"":s.rpe).trim();if(!v)return null;
   if(v==="4+")return 4;const n=parseFloat(v);if(isNaN(n))return null;
@@ -5250,7 +4689,6 @@ function openRirDossier(){
     <button class="btn ghost sm" style="margin-top:12px" onclick="closeSheet()">Close dossier</button>`);
 }
 /* ===== Voice logging (Web Speech API) — say "80 kilos 8 reps" to fill the next open set. Guarded for unsupported browsers. ===== */
-const NUMW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fourty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
 function findOpenSet(){const ses=state.session;if(!ses)return null;for(let ei=0;ei<ses.exercises.length;ei++){if(ses.exercises[ei]._skip)continue;const sets=ses.exercises[ei].sets||[];for(let si=0;si<sets.length;si++){if(!sets[si].done&&sets[si].type!=="W")return {ei,si};}}return null;}
 // Only Chrome/Edge (desktop) and Chrome (Android) actually run Web Speech recognition.
 // iOS Safari has no API; Opera/Brave have the object but no Google backend → they error at runtime.
@@ -5779,8 +5217,6 @@ function shareCardShare(){
   }catch(e){}
   const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="gainstracker-patrol.png";a.click();
 }
-/* Shared muscle accent palette + cinematic slide hero — every debrief slide opens like the patrol card. */
-const MCOL={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
 // ===== Alfred's read (post-workout) — ALWAYS works, with or without a Gemini key. =====
 // Builds a real, data-driven verdict from the session, in Alfred's "on roids — wild but good" voice.
 function alfredLocalRead(R){
@@ -6039,7 +5475,7 @@ function dayHeatFigure(day){
 function openDayBriefing(splitId,dayIdx){
   const sp=state.data.splits.find(s=>s.id===splitId);if(!sp)return;
   const day=sp.days[dayIdx];if(!day)return;
-  const cur=gtv2CurrentPlanDay(),tn=!!cur&&cur.sp.id===splitId&&cur.i===dayIdx,live=!!state.session;
+  const cur=currentPlanDay(),tn=!!cur&&cur.sp.id===splitId&&cur.i===dayIdx,live=!!state.session;
   const head=`<div class="gm-bh"><div><div class="eyebrow">${esc(sp.name)} · Day ${dayIdx+1}</div><h2 class="gm-bt">${esc(day.name)}</h2></div><button class="btn-i" onclick="closeSheet()" aria-label="Close">${GP.icon("x")}</button></div>`;
   if(isRest(day)){
     openSheet(`<div class="gh gm gm-brief">${head}<div class="s1 gm-rest"><span class="lead">${GP.icon("moon")}</span><p class="t-s">${esc(restLine())}</p></div>
@@ -6404,28 +5840,6 @@ function liftIntel(name){
 }
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
 // ---- weekly-set volume landmark bar (MEV/MAV/MRV) ----
-function volBar(sets,lm,m){
-  const eMrv=m?effectiveMRV(m):lm.mrv;                 // spread across sub-regions raises the ceiling
-  const spread=m?subSpread(m):null;
-  const cap=Math.max(eMrv+5,sets*1.12,lm.mrv*1.25);
-  const P=v=>clamp(v/cap*100,0,100);
-  const mev=P(lm.mev),mav=P(lm.mav),mrv=P(eMrv),cur=clamp(P(sets),0,100);
-  const zk=zoneKey(sets,lm.mev,lm.mav,eMrv),zc=ZONES[zk][1],zt=ZONES[zk][0];
-  const spreadNote=(spread&&eMrv>lm.mrv&&sets>lm.mav)
-    ? `<div class="mini" style="text-align:center;margin-top:4px;color:#2ECC71">Spread across ${spread.covered} sub-regions — ceiling raised to ${eMrv}, so this volume still works.</div>` : "";
-  return `<div style="margin:6px 0 2px">
-    <div style="position:relative;height:15px;border-radius:8px;overflow:hidden;background:#151515">
-      <div style="position:absolute;left:0;width:${mev}%;height:100%;background:#333"></div>
-      <div style="position:absolute;left:${mev}%;width:${Math.max(0,mav-mev)}%;height:100%;background:rgba(46,204,113,.55)"></div>
-      <div style="position:absolute;left:${mav}%;width:${Math.max(0,mrv-mav)}%;height:100%;background:rgba(232,197,106,.55)"></div>
-      <div style="position:absolute;left:${mrv}%;right:0;height:100%;background:rgba(232,69,60,.45)"></div>
-      <div style="position:absolute;left:${cur}%;top:-2px;width:3px;height:19px;background:#fff;border-radius:2px;transform:translateX(-1.5px);box-shadow:0 0 5px #000"></div>
-    </div>
-    <div class="mini" style="display:flex;justify-content:space-between;margin-top:3px;color:var(--text3)"><span>0</span><span>MEV ${lm.mev}</span><span>MAV ${lm.mav}</span><span>MRV ${eMrv}${eMrv>lm.mrv?"*":""}</span></div>
-    <div class="mini" style="text-align:center;margin-top:5px;color:${zc}"><b>${sets} sets/week — ${zt}</b></div>
-    ${spreadNote}
-  </div>`;
-}
 /* ========================================================================
    THE ARCHIVE — a full-screen progression destination. Turns buried lift
    data into an over-the-top page: a rising Strength Index curve, the Hall of
@@ -6516,7 +5930,7 @@ function consecutiveDays(){
 function patrolReadiness(){
   const d=state.data,trained=M12.filter(m=>(d.muscleVol[m]||0)>0);
   if(!(d.workouts||[]).length||!trained.length)return {score:null,label:"—",color:"var(--text3)",line:"Log a session to unlock.",rec:null,sleep:null,fresh:null,sleepKnown:false,unlock:true};
-  const cur=gtv2CurrentPlanDay(),tonight=cur&&cur.day&&!isRest(cur.day)?Object.keys(dayMuscles(cur.day).prim):[];
+  const cur=currentPlanDay(),tonight=cur&&cur.day&&!isRest(cur.day)?Object.keys(dayMuscles(cur.day).prim):[];
   const pool=tonight.length?tonight:trained.slice().sort((a,b)=>getRecovery(a)-getRecovery(b)).slice(0,3);
   const rec=pool.reduce((a,m)=>a+getRecovery(m),0)/pool.length;
   let sleep=null;const sl=sleepToday();                     // sleep — only a log dated today
@@ -6568,7 +5982,7 @@ function trainingAge(){
   const reached=TA_MILES.filter(m=>days>=m[0]);
   return {days,yrs,mo,dd,next,pct,badge:(reached[reached.length-1]||TA_MILES[0])};
 }
-// ONE source for lifetime tonnage (Iron Ledger, Batcomputer, rank, milestones, Alfred): the logged sessions, floored by the running
+// ONE source for lifetime tonnage (Batcomputer, rank, milestones, Alfred): the logged sessions, floored by the running
 // counter — a restore/import can leave either one stale, so the larger is the truth.
 function lifetimeVolume(){const d=state.data;return Math.max((d.workouts||[]).reduce((a,w)=>a+(+w.totalVol||0),0),(d.u&&+d.u.totalVolume)||0);}
 /* ===== Recovery rings (glanceable heartbeat dials for the Cowl dashboard) ===== */
@@ -6597,7 +6011,7 @@ function coverageRadar(){
 }
 /* ========================================================================
    THE FORGE — estimated-1RM lab + percentage-based loading calculator
-   with warm-up ramp and real plate rounding. Reachable from Case File.
+   with warm-up ramp and real plate rounding. Reachable from Mission → Lab → Tools.
    ======================================================================== */
 function forgePlates(){return (state.data.plates&&state.data.plates.length?state.data.plates:DEF_PLATES).slice().sort((a,b)=>b-a);}
 function forgeLoadable(target){               // round DOWN to nearest barbell-loadable weight
@@ -6910,7 +6324,6 @@ function renderGarage(){   // the fleet: current ride on a Gotham backdrop, the 
 
 
 
-/* ===== NIGHTLY PATROL REPORT (#10): a cinematic crime-log recap of a mission ===== */
 
 /* ========================= PROFILE TAB (Case + History merged) =========================
    One identity page: avatar + rank, the big Strength Index curve, title belts, combat ranks,
@@ -6936,8 +6349,6 @@ function mmaRecord(){
   for(let i=1;i<weeks.length;i++){const cur=byWeek[weeks[i]],prev=byWeek[weeks[i-1]];if(cur>prev*1.02)wins++;else if(cur<prev*0.98)losses++;else draws++;}
   return {wins,losses,draws,weeks:weeks.length};
 }
-/* Best-ever Highlight Reel — top lifts by est-1RM at the active gym; tap to open the curve. */
-/* Cross-gym comparison — lifts set at 2+ gyms, side by side (machines differ). */
 
 /* ========================= PROFILE v2 — compact-by-default ========================= */
 
@@ -6967,8 +6378,6 @@ function shareProfilePRCard(){
 
 
 
-/* ⚖️ Relative strength — the SAME barbell-equivalent big-3 the Strength standards card uses (liftEstimate converts machine/Smith/variation
-   lifts), total vs bodyweight, with a 4-week delta. Needs 2 of the 3 lifts; the card says which are in the total. */
 
 
 /* ========================= PROFILE TAB (GP:PROFILE+FINISH, wave 3) =========================
@@ -7109,7 +6518,7 @@ function renderProfile(){
   }
   $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Trophies()}${p3Tools()}</div>`;
 }
-/* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, Threat/consistency, the Evidence Crate, Alfred and the weekly streak.
+/* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, consistency, Alfred and the weekly streak.
    Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
 function weekStartK(k){const d=new Date(fnWeekStart(now()));d.setDate(d.getDate()-7*(k||0));return d.getTime();}
 function weekDays(k){   // distinct training days in the calendar week k weeks back (0 = this week)
@@ -7119,12 +6528,6 @@ function weekDays(k){   // distinct training days in the calendar week k weeks b
 function weekCount(){return weekDays(0);}
 function avgWeekVol(){const wk=now()-7*864e5;const ws=state.data.workouts.filter(w=>new Date(w.date).getTime()>=wk);return ws.length?ws.reduce((a,w)=>a+w.totalVol,0)/ws.length:0;}
 function weakestMuscle(){let weak=null,wl=999;M12.forEach(m=>{if((state.data.muscleVol[m]||0)>0){const l=muscleLevel(m);if(l<wl){wl=l;weak=m;}}});return weak;}
-function sparkline(){
-  const weeks=8;const vals=[];for(let i=weeks-1;i>=0;i--){const s=now()-(i+1)*7*864e5,e=now()-i*7*864e5;vals.push(state.data.workouts.filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+w.totalVol,0));}
-  const mx=Math.max(1,...vals);const up=vals[vals.length-1]>=vals[0];
-  return `<div class="spark" style="margin-top:8px">${vals.map(v=>`<i style="height:${clamp(v/mx*100,4,100)}%;background:${up?'var(--gold-dim)':'var(--red)'}"></i>`).join("")}</div>`;
-}
-// Progressive overload: per completed exercise, what to do next time, from RIR/RPE + completion.
 
 /* ========================= GYM CAMPAIGNS ========================= */
 function gymStats(gymName){
@@ -7339,7 +6742,7 @@ function gmLabHtml(){
 const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0">${gaArt("mission","dim")}<div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
   <div class="gh-cta"><button class="btn btn-1" onclick="newSplit();openSplitSheet()">${GP.icon("plus")}New split</button><button class="btn" onclick="freeWorkout()">Free session</button></div></section>`;
 function renderMission(){
-  const cur=gtv2CurrentPlanDay(),live=!!state.session;
+  const cur=currentPlanDay(),live=!!state.session;
   let h=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Mission</h1>`;
   if(!cur)h+=gmEmpty();
   else h+=gmHero(cur)
@@ -7873,20 +7276,6 @@ function openJusticeLeague(){   // "Splits & backups": share/import a split, the
 function vigilanteScore(c){if(!c)return 0;
   const opt=c.opt||0, sl=c.sl||0, sessions=Math.min(c.w||0,50);
   return Math.round(sl*9 + opt*2.4 + sessions*0.6);}
-// Ally status light from their last logged session: trained today / recovering / fresh.
-function allyStatus(a){
-  let last=null;try{if(a&&a.recent&&a.recent[0]&&a.recent[0].t)last=a.recent[0].t;}catch(e){}
-  if(!last)return null;
-  let days;try{const t0=new Date(new Date().toDateString()),t1=new Date(new Date(last+"T12:00:00").toDateString());days=Math.round((t0-t1)/864e5);}catch(e){return null;}
-  if(isNaN(days))return null;
-  if(days<=0)return {c:"var(--gold2)",t:"Trained today",pulse:true};
-  if(days<=2)return {c:"#E8C53C",t:"Recovering"};
-  return {c:"var(--green)",t:"Fresh"};
-}
-function allyStatusPill(a){
-  const st=allyStatus(a);if(!st)return "";
-  return `<span class="chip" style="color:${st.c};border-color:${st.c};font-size:10px;display:inline-flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:${st.c};display:inline-block${st.pulse?';animation:voicepulse 1.4s ease-in-out infinite':''}"></span>${st.t}</span>`;
-}
 // Rivalry score — the head-to-head number, weighted toward general STRENGTH and OPTIMALITY (how good
 // your lifts are vs the world), with some villain fun. Less about who simply moved more tonnage.
 function rivalryScore(c){if(!c)return 0;return Math.round((c.sl||0)*12+(c.opt||0)*1.6+(c.vol||0)/2500+(c.w||0)*1.5);}
@@ -8408,7 +7797,7 @@ function computeNextDay(sp){
 }
 function restLoggedToday(){return (state.data.restLog||[]).some(r=>new Date(r).toDateString()===new Date().toDateString());}
 function logRestDay(){   // guarded: only on tonight's rest day, once per calendar day; the toast carries Undo
-  const cur=gtv2CurrentPlanDay();
+  const cur=currentPlanDay();
   if(!cur||!isRest(cur.day)){toast("Tonight is a training day");return;}
   if(restLoggedToday()){toast("Rest day already logged");return;}
   state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();
@@ -8421,7 +7810,6 @@ function undoRestDay(){   // reverses today's log: drops the entry and steps the
   r.shift();const n=sp.days.length;d._nextDay=((d._nextDay||0)-1+n)%n;save();render();toast("Rest day undone");
 }
 
-/* ========================= CASE FILE TAB ========================= */
 // ---- strength standards (bodyweight-relative, evidence-based multipliers) ----
 const STD_MATCH={"Bench Press":["bench press"],"Squat":["squat"],"Deadlift":["deadlift"],"Overhead Press":["overhead press","shoulder press","military press","strict press"],"Barbell Row":["barbell row","bent over row","pendlay","bent-over row"]};
 function bestPRMatching(keys){let best=0,nm=null;Object.entries(state.data.prs).forEach(([n,p])=>{const ln=n.toLowerCase();if(keys.some(k=>ln.includes(k))&&p.orm>best){best=p.orm;nm=n;}});return best?{orm:best,name:nm}:null;}
@@ -8478,38 +7866,6 @@ function liftEstimate(lift){
     cfg.conv.forEach(c=>{if(c.kw.some(k=>ln.includes(k))){const e=p.orm*c.f;if(!best||e>best.orm)best={orm:e,name:n,est:true,via:c.l};}});
   });
   return best;
-}
-function strengthStandardsCard(){
-  const bw=bodyW();const lifts=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"];
-  const pcts=[];
-  const fmtTop=t=>t>=10?Math.round(t)+"%":(Math.round(t*10)/10)+"%";
-  const rows=lifts.map(lift=>{
-    const std=STD[lift];const est=liftEstimate(lift);
-    if(!est)return `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${lift}</span><span class="mini">no data</span></div>`;
-    const ratio=est.orm/bw;
-    const level=ratio>=std.e?"Elite":ratio>=std.a?"Advanced":ratio>=std.i?"Intermediate":ratio>=std.b?"Beginner":"Untrained";
-    const lc={Elite:"#E8C56A",Advanced:"#2ECC71",Intermediate:"#7FC8FF",Beginner:"#cfcfcf",Untrained:"#8a8a8a"}[level];
-    const pct=clamp(ratio/std.e*100,4,100);
-    const wp=worldPercentile(ratio,std);pcts.push(wp);
-    const top=Math.max(0.5,100-wp);
-    return `<div style="padding:8px 0;border-top:1px solid var(--border)">
-      <div class="row sp" style="align-items:flex-start"><span style="font-size:13px;min-width:0">${lift} <span class="mini">${Math.round(est.orm)}kg · ${ratio.toFixed(2)}×BW</span>${est.est?`<div class="mini" style="color:#E8A52A">≈ estimated from ${esc(est.via)}</div>`:""}</span>
-        <span style="text-align:right;flex:none"><b style="color:${lc};font-size:12px">${level}</b><div class="mini" style="color:var(--gold2);font-weight:700">Top ${fmtTop(top)}</div></span></div>
-      <div style="position:relative;height:7px;border-radius:4px;background:#1a1a1a;margin-top:5px">
-        <div style="position:absolute;left:0;width:${pct}%;height:100%;border-radius:4px;background:${lc}"></div>
-      </div></div>`;
-  }).join("");
-  // overall standing across logged lifts
-  let overall="";
-  if(pcts.length){const avg=pcts.reduce((a,b)=>a+b,0)/pcts.length;const top=Math.max(0.5,100-avg);
-    overall=`<div class="stage" style="border-radius:12px;padding:11px 13px;margin:2px 0 8px;text-align:center">
-      <div class="mini" style="color:var(--text3);letter-spacing:.1em">WORLD STANDING</div>
-      <b class="gold" style="font-size:20px">Top ${fmtTop(top)} of lifters</b>
-      <div class="mini" style="color:var(--text2);margin-top:2px">stronger than ~${Math.round(avg)}% of trained lifters across your ${pcts.length} logged lift${pcts.length>1?"s":""}</div></div>`;
-  }
-  return `<div class="card"><div class="ttl" style="display:flex;align-items:center">${secIcon('strength')}Strength standards <span class="mini" style="font-weight:400;margin-left:4px">vs ${bw}kg bodyweight</span></div>
-    ${overall}${rows}
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Percentiles are vs trained lifters, anchored to standard Beginner→Elite data. Machine, Smith &amp; variation lifts are converted to a barbell-equivalent estimate so they still count. e1RM is estimated — treat it as a guide, not a verdict.</div></div>`;
 }
 /* ===== Batcomputer — full analytics dashboard ===== */
 function weeklySeries(weeks,fn){const out=[];for(let i=weeks-1;i>=0;i--){const s=now()-(i+1)*7*864e5,e=now()-i*7*864e5;const ws=state.data.workouts.filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;});out.push(fn(ws));}return out;}
@@ -8700,7 +8056,7 @@ function duoStripHtml(){
       <span style="font-size:12px;font-weight:800;color:#7df0b0">${a.re||v.re||"🦇"} ${esc(a.n||v.name||"Ally")} <span style="color:var(--text3);font-weight:600">· ${mins}min</span></span>
       <span class="mini" style="color:var(--text2)">${v.sets||0} sets${v.last?" · "+esc(v.last):""}</span></div>`;}).join("");
   return `<div id="duostrip" style="margin:0 0 10px;padding:9px 12px;border-radius:12px;border:1px solid rgba(34,232,122,.4);background:linear-gradient(160deg,rgba(34,232,122,.08),rgba(6,10,7,.92));box-shadow:0 0 18px -8px rgba(34,232,122,.7)">
-    <div class="mini" style="letter-spacing:.16em;color:#22E87A;font-weight:800"><i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22E87A;box-shadow:0 0 8px #22E87A;margin-right:5px;animation:gtv2pulse 1.6s infinite"></i>DUO PATROL — ALLY IN THE FIELD</div>
+    <div class="mini" style="letter-spacing:.16em;color:#22E87A;font-weight:800"><i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22E87A;box-shadow:0 0 8px #22E87A;margin-right:5px;animation:livePulse 1.6s infinite"></i>DUO PATROL — ALLY IN THE FIELD</div>
     ${rows}</div>`;
 }
 /* ── ⚔️ Ally Duel: a 7-night head-to-head bounty. Both sides publish to duels/{id}/{uid}. ── */
@@ -9294,19 +8650,19 @@ GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN tar
 const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
 FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
 const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
-Five tabs along the bottom. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and one tile per muscle: sets this week against MEV, MAV and MRV, under- and over-range muscles listed first. From 16:00 on Sundays a Sunday review card adds my three lines and next week's one change; tap it for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: PLAN lists the active split day by day (tonight is marked) plus other plans under The bench; LAB & TOOLS has the plate calculator and 1RM test. SUIT is the muscle map: tap a muscle for its dossier (recovery, weekly sets against the landmarks, what to train next), plus the Effort Dossier (average RIR) and the Body section: measurements, the Infirmary (sleep, soreness, workload, injuries), symmetry and progress photos. PROFILE holds Records & Ranks, Strength Analysis, Bases & Tools (splits, gyms), history and the training calendar. ALLIES is your friends. Settings and Search sit in the top bar; the round Alfred button opens this chat.
+Five tabs along the bottom. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and one tile per muscle: sets this week against MEV, MAV and MRV, under- and over-range muscles listed first. From 16:00 on Sundays a Sunday review card adds my three lines and next week's one change; tap it for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Edit plan, Free session, Start), Cycle days (the active split day by day, tonight marked), the Volume forecast against MEV, MAV and MRV, Frequency, and Other plans when you keep more than one. The Lab fold holds the volume map, SFR, workload and Tools: Plate calculator, 1RM calculator, 1RM test day, Forge and Measure. SUIT is the muscle map: the recovery figure and a tile per muscle (tap one for its dossier: recovery, weekly sets against the landmarks, what to train next), the Effort section (average RIR and sets at RIR 0–3), a fold with the time-lapse, mastery and coverage, and the Body section: measurements, the Infirmary (sleep, soreness, injury board, workload), symmetry and progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Every lift, Badges, Week vs week and a Gyms & data fold (gyms, Batcomputer physique tools, measurements, Share PR card, calendar export, Data control, Settings). ALLIES is your friends: your league rank, Leaderboard, Co-op raid, Sparring, Splits & backups and a More from Gotham fold (Fight Night, Week vs last week). Settings and Search sit in the top bar; the round Alfred button opens my page (today's read, things to try asking, your last conversation, muscle dossiers) with this chat one tap away.
 
 ## A SESSION FROM START TO FINISH
-Tap start on the Gotham mission card (or a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen, one card per exercise. Tick each set as you finish it; the rest timer runs between sets (length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary shows volume, records, my verdict, notes and how-it-felt chips. Minimising a session keeps it alive while you browse.
+Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
 
-## LOGGING SETS: THE SET TABLE, RIR TILE AND SET TYPES
-A set row has the set-number badge (tap to cycle the set type), last time's numbers, kilos, reps, the RIR tile and the tick. RIR is reps in reserve: how many clean reps you had left; tap the tile to cycle it (0 = nothing left). Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). The ⋮ menu changes type, moves, duplicates or deletes a set. A weight far off that lift's history triggers a quick "new machine?" check.
+## LOGGING SETS: THE FOCUS CARD, RIR TILES AND SET TYPES
+The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan, the Target, Last time and e1RM boxes, then one row per set with the set badge (tap to cycle the set type), kilos, reps and the tick. Empty kilos and reps show last time's numbers as ghost values, and one tap on the tick logs them as they are. RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
 
 ## PLAN TARGETS AND THE PROGRESSION RULE (WHEN TO ADD WEIGHT)
-A plan day shows each lift's target as sets × rep range, e.g. "Plan: 2 × 5–10" (some are optional tonight). Plan ranges are 5–10 reps and ONE progression rule runs everywhere — the logging hint, the rest-strip chip, the exercise detail, the finish summary and my comments after a set. Only a WORKING set counts: warm-up sets never do. If your best working set reached the top of the range (10 or more reps), add weight (2.5 kg, or 5 kg from 60 kg up) and restart at about 6 reps. At 5–9 reps keep the same load and add one rep. A custom plan with a higher top (say 12–15) moves the add-weight point up with it. Suggested weights show one decimal where needed (72.5 kg, not 73). Each lift shows a hint like "72.5kg × 9+ — build reps to 10, then we add weight".
+A plan day shows each lift's target as sets × rep range, e.g. "PLAN 2 × 5–10" on the focus card (some are optional tonight). Plan ranges are 5–10 reps and ONE progression rule runs everywhere — the focus card's Target box, the exercise detail, the finish summary's Targets and my comments after a set. Only a WORKING set counts: warm-up sets never do. If your best working set reached the top of the range (10 or more reps), add weight (2.5 kg, or 5 kg from 60 kg up) and restart at about 6 reps. At 5–9 reps keep the same load and add one rep. A custom plan with a higher top (say 12–15) moves the add-weight point up with it. Suggested weights show one decimal where needed (72.5 kg, not 73). The Target box shows the next target, for example 67.5 × 10 with "hit 10 → +5 kg" under it.
 
 ## RECORDS: E1RM AND PR CROWNS (PER GYM)
-Each set becomes an estimated one-rep max (e1RM, Epley: weight × (1 + reps/30)), so 100 kg × 8 compares with 110 kg × 5. A new best e1RM earns the crown, the top record tier; smaller tiers such as heaviest weight exist. Records are kept per gym because machines differ. Find them in PROFILE → Records & Ranks.
+Each set becomes an estimated one-rep max (e1RM, Epley: weight × (1 + reps/30)), so 100 kg × 8 compares with 110 kg × 5. A new best e1RM earns the crown, the top record tier; smaller tiers such as heaviest weight exist. Records are kept per gym because machines differ. Find them in PROFILE → Records (the top six, All N for the full list; tap a lift for its curve).
 
 ## RECOVERY, READINESS AND WEEKLY VOLUME (MEV, MAV, MRV)
 Recovery %: each muscle has its own window (72 h for back and legs, 48 h for chest, shoulders and arms, less for small muscles). Hard sets from the last seven days create fatigue that fades across that window — sets close to failure (low RIR) weigh more than easy ones — and recovery % = 100 minus the fatigue left. Green 80+, yellow 50–79, red below 50; a muscle's dossier shows the hours until ready. Gotham's Readiness is built only from what is known: the recovery of tonight's planned muscles (on a rest day, your three most fatigued muscles) plus freshness (falls with consecutive training days). Sleep joins only when TODAY's sleep is logged — tap the Sleep chip on Gotham (two taps: hours, then Poor / OK / Great); until then the chip says "Not logged" and nothing is assumed. With sleep the weights are recovery 45%, sleep 30%, freshness 25%. A brand-new user with no sessions sees "—" and "Log a session to unlock". PRIMED 80+, READY 60+, GUARDED 40+, DEPLETED below. Weekly sets count working sets (secondary muscles half) over one full cycle of your active split — 8 days for the 8-Day Cycle, rest days included, or 7 days with no split — and are shown as a per-week number, so a muscle's figure doesn't swing with where you are in the cycle. They are read on one scale: Below MEV (minimum effective volume — not enough to grow), Growth zone (MEV to MAV, the maximum adaptive volume), High — recoverable (MAV up to MRV, the maximum recoverable volume; the ceiling rises a little when the volume is spread over sub-regions), Over MRV (sets beyond it turn to junk). Chest: MEV 8, MAV 16, MRV 22.
@@ -9324,22 +8680,22 @@ Sleep (hours and quality), a soreness map, the workload watch (the load ratio ag
 The Garage is a fleet that unlocks with real milestones (sessions, streak, lifetime volume, records, strength level). Seasonal events are short training challenges inside fixed date windows (for example the Long Halloween, 24–31 October): a progress row appears on Gotham while one runs, and clearing it pays XP once.
 
 ## THE 8-DAY CYCLE AND LOGGING A REST DAY
-The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did, not the calendar: tonight is the day after the last plan day you completed. Logging a rest day (REST LOGGED on Gotham) moves it on; a Free Session doesn't. Miss a day and the cycle waits for you.
+The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did, not the calendar: tonight is the day after the last plan day you completed. Logging a rest day (Log rest day on Gotham, which then reads "Rest day logged" with an Undo) moves it on; a Free Session doesn't. Miss a day and the cycle waits for you.
 
 ## TOOLS DURING A SESSION: SKIP, REORDER, SWAP, WARM-UP RAMP, PLATE MATHS
-Each exercise card offers Swap (another lift for the same muscle; sets carry over), Pair (superset), Cues, the plate icon (plates per side for a target weight, using the bar weight in Settings), ↕ Order (reorder tonight's lifts) and ⏭ Skip tonight (pick a reason: logged, not judged). When a lift trains a muscle not yet warm, an Add warm-up banner builds a ramp from your working weight (about 40/60/80% on the first lift of the night, two lighter steps later), or Skip.
+The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (save seat, pin, pad), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. When a lift trains a muscle that is still cold, the menu suggests a warm-up ramp built from your working weight (about 40/60/80% on the first lift of the night, two lighter steps later) and lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
 
 ## DATA CONTROL: ARCHIVING OLD MACHINE WEIGHTS, BACKUP, RESTORE AND CSV EXPORT
-Settings → Data control. Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Backup, Restore, Export CSV and Wipe everything (back up first).
+Settings → Data control (also Profile → Gyms & data). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now, Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first).
 
 ## PICTURES AND CUSTOM EXERCISES
 In an exercise's detail, Choose picture browses the demo library (filter with your own words) or picks the plain anatomy figure. For a missing lift, use the dashed custom-exercise button in the exercise picker: name, equipment, muscles, bodyweight or not, cues, picture.
 
 ## ALLIES AND FRIEND CODES
-ALLIES shows your friend code (starts with GTUID:) with a Copy button — send it to a friend, paste theirs into the "paste theirs here" box and tap Add; their card then updates live. You can send callouts (challenge an ally to beat a lift).
+ALLIES → Invite an ally opens a two-step sheet: 1 · Send them your code (it starts with GTUID:, with a Copy button) and 2 · Paste theirs (Paste & add, or paste it in the box and tap Add); their card then updates live. Tap an ally for their top lifts and split, Head to head, a Gauntlet (challenge their numbers) or Send a signal (nudge them to train).
 
 ## SETTINGS
-Top-bar Settings: name, bodyweight, weekly goal, rest timer, bar weight, current gym, Autoregulation metric (RPE or RIR), Alfred's voice, the Gemini API key behind my live chat (kept on this device only), and Data control.
+Top-bar Settings: name, bodyweight, Goal & experience, weekly goal, rest timer, bar weight, current gym, Autoregulation metric (RPE or RIR), Alfred's voice, the Gemini API key behind my live chat (kept on this device only), and Data control.
 
 ## WHAT ALFRED CAN DO
 Answer from your live data (recovery, volume, records, plan, last session); explain the science and the app; build or activate a split; open Settings, Data control, the split editor, a muscle's dossier or an exercise; jump to any tab. Typed commands like "start push day", "add face pull to push" or "set weekly goal to 5" work too, and split edits ask to confirm. Attach a photo with the image button for a physique assessment. I speak aloud only for records, the end-of-session verdict, or after you use the microphone. Live chat needs internet and the free Gemini key; the rest of the app works offline.`;
@@ -9490,7 +8846,6 @@ function openAlfredChat(){
   p.classList.add("on");p.setAttribute("aria-hidden","false");
   _alfFit();_alfRender();_alfPicPrev();_alfSub();
 }
-function openAlfredVoice(){openAlfredChat();} /* legacy name — any older caller still lands in the one chat */
 function closeAlfredChat(){
   const p=$("ac-panel");const was=p&&p.classList.contains("on");
   if(p){p.classList.remove("on");p.setAttribute("aria-hidden","true");}
@@ -9804,7 +9159,6 @@ function _alfExecAction(type,argsRaw){
 
 /* ---- Alfred LOCAL coaching (works with NO API key) — pre-session briefing,
    post-session debrief, and ask-about-a-muscle. Pure local science. ---- */
-function fmtHrs(h){h=Math.max(0,Math.round(h));if(h<1)return "ready now";if(h<24)return h+"h";const dd=Math.floor(h/24),hh=h%24;return dd+"d"+(hh?" "+hh+"h":"");}
 // Alfred's memory — a personalised "welcome back" that proves he remembers the last patrol, your
 // streak and anything that's stalling. Kept tight so it informs without rambling.
 /* ===== ALFRED CONSOLE — he sees the whole training picture and can act on your word.
@@ -9876,12 +9230,6 @@ function switchPRProfile(name,label){
   else delete d.prs[name];                                                              // else start fresh
   if(!Object.keys(d.prVault[name]).length)delete d.prVault[name];
   save();return {label,old,restored};
-}
-// Small gold chip showing a lift's active profile (only when it isn't plain "Standard" or has variants).
-function prProfileTag(name){
-  const cur=prCurrentProfile(name),vault=(state.data.prVault&&state.data.prVault[name])||{};
-  if(cur==="Standard"&&!Object.keys(vault).length)return "";
-  return ` <span class="chip" style="font-size:9.5px;padding:1px 6px;color:var(--gold2);border-color:var(--gold-dim)">${esc(cur)}</span>`;
 }
 /* ===== SMART PROFILE CAPTURE — Alfred proactively offers to file a freak record under its own profile.
    When a crown leaps >30% over a real standing record (flagged in liveCheckPR), it's almost always a
@@ -10080,7 +9428,6 @@ function alfredAsk(q){
     return `<b>${MNAME[mm]}</b>: ${ws} hard sets a week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). Zone: <b>${zoneOf(mm,ws).label}</b>, Master.`;}
   return {__fallback:true,text:`I can answer or act, Master. Try: <b>what should I train</b>, <b>weakest muscle</b>, <b>how strong am I</b>, <b>PR for bench</b>, <b>volume for chest</b>, <b>am I recovered</b> — or commands like <b>open leaderboard</b>, <b>start push day</b>, <b>add face pull to push</b>, <b>set weekly goal to 5</b>.`};
 }
-function openAlfredConsole(){openAlfredChat();} /* the old command console now lives in the one Alfred chat (typed commands still work there) */
 function caveStat(v,l){return `<div style="flex:1;min-width:64px;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:8px 4px;background:var(--bg2)"><div style="font-family:var(--num);font-weight:400;font-size:22px;color:var(--gold2);line-height:1.05">${v}</div><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">${l}</div></div>`;}
 /* ===== Fuel Protocol — Alfred's nutrition calculator (Mifflin-St Jeor → goal-matched macros) ===== */
 const FUEL_ACT=[["1.2","Desk job, little exercise"],["1.375","Light — 1-3 sessions/wk"],["1.55","Moderate — 3-5 sessions/wk"],["1.725","Hard — 6-7 sessions/wk"],["1.9","Athlete — 2-a-days / physical job"]];
@@ -10294,12 +9641,6 @@ function alfredVoiceOptions(){
   let html='<option value="">Auto (best voice)</option>';
   en.forEach(v=>{const hi=/premium|enhanced|neural|natural|siri/i.test((v.name||"")+" "+(v.voiceURI||""));html+=`<option value="${esc(v.name)}" ${v.name===cur?'selected':''}>${esc(v.name)} · ${esc(v.lang)}${hi?' ✦':''}</option>`;});
   return html;
-}
-function toggleCoachVoice(){
-  const u=state.data.u;u.coachVoice=!u.coachVoice;save();haptic("tap");
-  if(u.coachVoice){toast("🎩 Alfred's voice on");alfredVoiceLine("At your service, sir.");}
-  else{try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}toast("🔇 Alfred muted");}
-  render();
 }
 // Bigger line pool + no immediate repeats so Alfred never parrots himself.
 const _ALFRED_SET=["Logged. Recover, sir.","Set down — breathe and reset.","Good work. Rest now.","Noted, sir. Catch your breath.","One more in the bank.","Clean rep, sir.","Strong set. Recover well.","In the books. Steady now.","Well done, sir. Rest up.","That's the standard. Hold it.","Solid. Let the muscle settle.","Logged, sir. Keep the form sharp.","Good tempo. Recover.","Banked it. Breathe deep.","Precise work, sir.","Quality over ego — well played.","That'll do nicely, sir."];
@@ -10575,22 +9916,6 @@ function ordersCard(){
 }
 function openOrders(){openSheet(`<div class="ttl">🎯 Wayne's Orders</div><div class="mini" style="color:var(--text2);margin:-2px 0 10px">Daily marching orders from the Manor. Clear all three.</div>${ordersCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
 
-/* ---- 2) Wayne Wisdom — rotating quotes ---- */
-const WISDOM=[
-  ["It's not who I am underneath, but what I do that defines me.","Batman"],
-  ["Why do we fall? So we can learn to pick ourselves up.","Thomas Wayne"],
-  ["A hero can be anyone.","Batman"],
-  ["The night is darkest just before the dawn.","Harvey Dent"],
-  ["Discipline is choosing between what you want now and what you want most.","Alfred"],
-  ["It's not about the cards you're dealt, but how you play the hand.","Alfred"],
-  ["Endure, Master Wayne. Take it. They'll hate you for it, but that's the point.","Alfred"],
-  ["You either die a hero or you live long enough to become the work.","The Cave"],
-  ["Strength isn't given. It's forged, one rep at a time.","The Cave"],
-  ["Train in the dark so the fight feels like daylight.","The Cave"],
-  ["The body achieves what the mind believes.","The Cave"],
-  ["Show up when you don't want to — that's when it counts.","The Cave"]
-];
-function wisdomToday(){const i=(state._wisdomI!=null)?state._wisdomI:(_daySeed()%WISDOM.length);return WISDOM[i%WISDOM.length];}
 
 /* ---- 3) Rank Ladder ---- */
 function openRankLadder(){
@@ -10606,17 +9931,12 @@ function openRankLadder(){
     <div class="mini" style="color:var(--text2);margin:2px 0 12px">Nine ranks, Street Thug to Legend. Your strength level decides where you stand tonight.</div>${rows}`;
 }
 
-/* ---- 4) Records Hall (PR vault) ---- */
-
-/* ---- 5) Weekly Report Card ---- */
-
-/* ---- 6) Tempo Trainer (rep-cadence metronome) ---- */
 
 
-/* ---- 8) This Day (time machine) ---- */
 
 
-/* ---- 10) Fuel Math (TDEE & macro estimator) ---- */
+
+
 
 
 /* =================================================================================
@@ -10955,42 +10275,11 @@ function renderAlfred(){
    A read-only command deck over the existing data model. It deliberately avoids save()
    and only derives guidance from logged workouts, split structure, PRs, recovery and
    weekly set landmarks. */
-function gtv2Clr(kind){
-  return kind==="red"?"#ff887f":kind==="green"?"#75e5a5":kind==="blue"?"#9fd0ff":kind==="gold"?"var(--gold2)":"var(--text2)";
-}
-function gtv2Pattern(ex){
-  const p=((ex&&ex.p&&ex.p[0])||"other");
-  const n=((ex&&ex.n)||"").toLowerCase();
-  if(p==="chest")return n.includes("incline")||n.includes("upper")?"upper chest":n.includes("fly")||n.includes("pec")?"chest fly":"pressing";
-  if(p==="back")return n.includes("pulldown")||n.includes("pull-up")||n.includes("chin")?"vertical pull":n.includes("deadlift")||n.includes("good morning")?"hinge/back":"row";
-  if(p==="shoulders")return n.includes("rear")?"rear delt":n.includes("lateral")?"side delt":n.includes("press")?"overhead press":"delt raise";
-  if(p==="triceps")return n.includes("overhead")||n.includes("skull")?"long-head triceps":"triceps extension";
-  if(p==="biceps")return n.includes("hammer")||n.includes("reverse")?"brachialis/grip curl":"elbow flexion";
-  if(["quads","hamstrings","glutes"].includes(p))return n.includes("curl")?"knee flexion":n.includes("extension")?"knee extension":n.includes("thrust")||n.includes("bridge")?"hip extension":n.includes("squat")||n.includes("press")?"squat/press":"single-leg/lower";
-  return p;
-}
-function gtv2CurrentPlanDay(){
+function currentPlanDay(){
   const d=state.data,sp=(d.splits||[]).find(s=>s.id===d.activeSplitId)||(d.splits||[])[0];
   if(!sp)return null;
   const i=computeNextDay(sp),day=sp.days[i]||sp.days[0];
   return {sp,i,day};
-}
-function gtv2RedundancyAudit(){
-  const cur=gtv2CurrentPlanDay();if(!cur||isRest(cur.day))return null;
-  const buckets={};
-  (cur.day.exercises||[]).forEach(n=>{const ex=exFor(n),key=gtv2Pattern(ex);(buckets[key]=buckets[key]||[]).push(n);});
-  const dup=Object.keys(buckets).filter(k=>buckets[k].length>=3).sort((a,b)=>buckets[b].length-buckets[a].length)[0];
-  if(!dup)return null;
-  return {kind:"gold",icon:"🧭",title:"Redundancy check",copy:`${cur.day.name} has ${buckets[dup].length} ${dup} movements. Keep the best 2, then add a missing angle instead of more of the same.`};
-}
-function gtv2BalanceAudit(){
-  const push=["chest","shoulders","triceps"].reduce((a,m)=>a+weeklySets(m),0);
-  const pull=["back","biceps","forearms","traps"].reduce((a,m)=>a+weeklySets(m),0);
-  const quad=weeklySets("quads"),post=weeklySets("hamstrings")+weeklySets("glutes");
-  if(push>=10&&push>pull*1.35)return {kind:"gold",icon:"⚖️",title:"Push is outrunning pull",copy:`Push work is ${push} sets vs ${pull} pull sets. Add rows/rear delts before more pressing to keep shoulders honest.`};
-  if(pull>=10&&pull>push*1.5)return {kind:"gold",icon:"⚖️",title:"Pull dominates the week",copy:`Pull work is ${pull} sets vs ${push} push sets. Add pressing only if recovery is green and joints feel good.`};
-  if(quad>=8&&quad>post*1.6)return {kind:"gold",icon:"🦵",title:"Posterior chain lag",copy:`Quads have ${quad} sets while hamstrings + glutes have ${post}. Add curls, RDLs, hip thrusts or back extensions.`};
-  return null;
 }
 /* ===== GAUNTLET — throw a concrete challenge at an ally over the live nudge channel ===== */
 function openGauntlet(i){
@@ -11423,26 +10712,10 @@ function renderGotham(){
       else if(new Date().getDay()===1){alfredPingAI("It's Monday — a new training week begins. One-line marching order for the week based on the training data above.");}
     }}catch(e){}
   ghExtras();   // an event cleared by tonight's session pays out here
-  const cur=gtv2CurrentPlanDay(),day=cur&&cur.day,rest=!!(day&&isRest(day)),vol=ghVol(day&&!rest?day:null);
+  const cur=currentPlanDay(),day=cur&&cur.day,rest=!!(day&&isRest(day)),vol=ghVol(day&&!rest?day:null);
   const hero=state.session?ghHeroLive(state.session):!cur?ghHeroFree(vol):rest?ghHeroRest(cur,vol):ghHeroTonight(cur,vol);
   $("app").innerHTML=`<div class="gh${state._same?"":" gh-anim"}">${hero}${ghWeek(vol)}${ghSunday(vol)}${ghLifts()}${ghRecap()}${ghNext(cur)}${ghExtrasRow()}</div>`;
   ghRoll();ghTick();
-}
-function overloadSuggestions(wk){
-  const out=[];
-  (wk.exercises||[]).forEach(e=>{
-    const ex=exFor(e.name),working=(e.sets||[]).filter(s=>s.done&&s.type!=="W"&&+s.r>0);
-    if(!working.length)return;
-    const best=working.reduce((a,s)=>setE1RM(ex,s)>setE1RM(ex,a)?s:a,working[0]);   // best working set, not the last one
-    const pg=progressionFrom(e.name,{w:+best.w||0,r:+best.r||0});if(!pg)return;
-    const reps=+best.r||0,lo=(planReps(e.name)||[5])[0],up=reps>=pg.top;
-    const ld=+best.w?`${fmtKg(best.w)}kg${ex.bw?" added":""}`:"bodyweight";
-    const text=up?(pg.add?`Best set hit ${reps} reps, the top of the range. Weight goes up next time: ${fmtKg(pg.w)}kg × ${pg.r}, form strict.`:`${reps} clean bodyweight reps. Add a vest or belt, or keep climbing.`)
-      :reps>=lo?`Same load next time. Hold ${ld} and push the best set from ${reps} to ${pg.top} reps first.`
-      :`Same load next time. Earn ${lo}+ clean reps at ${ld} first; the best set was ${reps}.`;
-    out.push({name:e.name,text,tone:up?"up":reps>=lo?"ok":"hold"});
-  });
-  return out;
 }
 
 /* ========================= SETTINGS (GP:TABS, wave 5) ========================= */
@@ -11727,7 +11000,7 @@ function obFinish(){   // commit once, then land straight on Home: no splash, no
   render();window.scrollTo(0,0);
 }
 
-/* ========================= WAVE 10: CINEMATICS, CONTEXTUAL POPUPS, RANK ACCENT ========================= */
+/* ========================= RANK ACCENT ========================= */
 
 // Rank accent palette — app chrome shifts hue as you climb the ladder
 const RANK_ACCENTS={0:"#8fa9e8",3:"#5ec8c0",6:"#A078F0",10:"#22D862",15:"#3CC4FF",20:"#FF5533",25:"#FFD048",30:"#E8C56A",40:"#F75A3C"};
@@ -12128,28 +11401,7 @@ function renderLogging(){
 boot();
 
 
-/* ===== Wave 9: Cinematic Logging — patrol intro + redesigned logging screen ===== */
 
-function renderPlateBar(totalKg){
-  const bar=state.data.u.barWeight||20;
-  const plist=(state.data.plates&&state.data.plates.length)?state.data.plates.slice().sort((a,b)=>b-a):[25,20,15,10,5,2.5,1.25];
-  const cols={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};
-  let per=(totalKg-bar)/2;if(per<0)per=0;
-  const used=[];plist.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});
-  const H=72,cy=H/2,sl=18,W=270,cx=W/2;
-  const ph=p=>20+p*1.3,pw=p=>p>=20?9:p>=10?7:p>=5?6:5;
-  let gap=2,xR=cx+sl,xL=cx-sl,ps="";
-  used.forEach(p=>{const h=ph(p),w=pw(p),col=cols[p]||"#888";
-    ps+=`<rect x="${xR}" y="${cy-h/2}" width="${w}" height="${h}" rx="2" fill="${col}" stroke="#000" stroke-opacity=".4" stroke-width=".8"/>`;
-    ps+=`<rect x="${xL-w}" y="${cy-h/2}" width="${w}" height="${h}" rx="2" fill="${col}" stroke="#000" stroke-opacity=".4" stroke-width=".8"/>`;
-    xR+=w+gap;xL-=w+gap;});
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;max-height:72px">
-    <defs><linearGradient id="psg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b0b8c5"/><stop offset=".5" stop-color="#7a808c"/><stop offset="1" stop-color="#4a5058"/></linearGradient></defs>
-    <rect x="14" y="${cy-2}" width="${W-28}" height="4" rx="2" fill="url(#psg)"/>
-    <rect x="${cx-sl}" y="${cy-5.5}" width="${sl*2}" height="11" rx="2.5" fill="url(#psg)"/>
-    ${ps}</svg>
-  <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:3px">${used.length?used.join(" + ")+" per side":"Just the bar"} · <b style="color:var(--text2)">${totalKg}kg total</b></div>`;
-}
 
 /* ===== Cinematic stinger — full-screen bat-emblem slam used at patrol start & finish ===== */
 function playStinger(title,sub,accent){
@@ -12182,25 +11434,6 @@ function focusEx(ei){
   render();
 }
 
-function stepW(ei,si,delta){try{sfx("clank");}catch(e){}
-  const ses=state.session;if(!ses||!ses.exercises[ei])return;
-  const s=ses.exercises[ei].sets[si];if(!s)return;
-  const cur=parseFloat(s.w)||0;
-  s.w=String(Math.max(0,Math.round((cur+delta)*10)/10));
-  saveSessionSoon();render();
-}
-function stepR(ei,si,delta){try{sfx("clank");}catch(e){}
-  const ses=state.session;if(!ses||!ses.exercises[ei])return;
-  const s=ses.exercises[ei].sets[si];if(!s)return;
-  const cur=parseInt(s.r)||0;s.r=String(Math.max(0,cur+delta));
-  saveSessionSoon();render();
-}
-function markFail(ei,si){
-  const ses=state.session;if(!ses||!ses.exercises[ei])return;
-  const s=ses.exercises[ei].sets[si];if(!s)return;
-  s.type=s.type==='F'?'NRM':'F';saveSessionSoon();render();
-}
-function saveFocusedSet(ei,si){toggleDone(ei,si);}
 /* ⏭ Skip an exercise — no forcing, no guilt. Reason optional, noted in tonight's log. */
 function openSkipEx(ei){
   const e=state.session&&state.session.exercises[ei];if(!e)return;
@@ -12219,12 +11452,9 @@ function skipExercise(ei,reason){
   saveSession();render();
 }
 
-/* Override renderLogging with the Wave 9 cinematic layout. */
 
-/* ===== Wave 9 v5: Garage doors + vehicle roll-out + anatomy-only figures ===== */
+/* ===== Anatomy-only figures ===== */
 
-/* Workout start used to play a 2.5 s garage cinematic; full-screen moments now belong to PRs and the session finish only, so it is a no-op. */
-function playEntrance(){}
 
 /* Always anatomy SVG — the grey bodybuilder with red worked muscles. Never demo images. */
 function thumb(ex,small){
@@ -12291,35 +11521,6 @@ function renderPatrolIntro(){
   </div>`;
 }
 
-/* Swipe gesture init — attach after render. Right swipe = Swap, Left swipe = Remove. */
-function initSwipeExercises(){
-  document.querySelectorAll('.ex-swipable').forEach(function(el){
-    const inner=el.querySelector('.ex-swipe-inner');if(!inner)return;
-    let sx=0,sy=0,dx=0,vertLock=false,moved=false;
-    inner.addEventListener('touchstart',function(e){
-      sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;vertLock=false;moved=false;
-      inner.style.transition='none';
-    },{passive:true});
-    inner.addEventListener('touchmove',function(e){
-      const nx=e.touches[0].clientX-sx,ny=e.touches[0].clientY-sy;
-      if(!moved&&Math.abs(ny)>Math.abs(nx)+4){vertLock=true;}
-      if(vertLock)return;
-      moved=true;dx=nx;
-      inner.style.transform='translateX('+Math.max(-76,Math.min(76,dx))+'px)';
-    },{passive:true});
-    inner.addEventListener('touchend',function(){
-      inner.style.transition='transform .22s ease';
-      const ei=+(el.dataset.ei);
-      if(dx>60){
-        inner.style.transform='translateX(76px)';
-        setTimeout(function(){inner.style.transition='';inner.style.transform='';focusEx(ei);openSwap(ei);},200);
-      }else if(dx<-60){
-        inner.style.transform='translateX(-76px)';
-        setTimeout(function(){inner.style.transition='';inner.style.transform='';removeExercise(ei);},200);
-      }else{inner.style.transform='';}
-    },{passive:true});
-  });
-}
 
 /* Full logging screen — exercise focus card with input table + swipable list. */
 /* Finish guard — if working sets are still open, ask before ending the night (one accidental tap must never cost a session). */
