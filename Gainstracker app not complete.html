@@ -6094,7 +6094,7 @@ function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";
   render();}
 /* GP:ART: cinematic still behind a hero (assets/art/<n>.jpg, subject in the right ~40%, see the GP:ART css). Static, absolute, no layout; a missing file just drops the layer. */
 function gaArt(n,c){return `<div class="ga ga-${n}${c?" "+c:""}" aria-hidden="true"><img src="assets/art/${n}.jpg" alt="" width="720" height="480" decoding="async" onerror="this.parentNode.remove()"></div>`;}
-setTimeout(()=>{try{new Image().src="assets/art/finish.jpg";}catch(e){}},4000);   // warm the finish still so the 1.25 s moment never waits on it
+setTimeout(()=>{["finish","logging"].forEach(n=>{try{new Image().src="assets/art/"+n+".jpg";}catch(e){}});},4000);   // warm the two stills the live flow needs, so the workout bar and the 1.25 s finish moment never wait on them
 /* the finish moment: duration · sets · volume · PRs, one quiet gold line per PR, gone in 1.25 s (tap skips) */
 function playOutro(R){
   const old=document.getElementById("p3fin");if(old)old.remove();
