@@ -12921,19 +12921,19 @@ function ghTip(vol,day,rest){
   if(!(state.data.workouts||[]).length)return "Log your first session and I will start reading your recovery, volume and load.";
   const trained=vol.filter(t=>t.trained).sort((a,b)=>a.rec-b.rec);
   if(rest){const t=trained[0];
-    return t&&t.rec<GH_FRESH?`${MNAME[t.m]} at ${t.rec}%${t.hrs?`: about ${t.hrs}h to full recovery`:""}. Rest now.`:"Every muscle is above 85%. Resting now keeps it that way.";}
+    return t&&t.rec<GH_FRESH?`Furthest from ready: ${MNAME[t.m]}. Rest now.`:"Every muscle is recovered. Resting now keeps it that way.";}
   const prim=day?Object.keys(dayMuscles(day).prim):[],low=trained.filter(t=>!prim.length||prim.includes(t.m))[0];
-  if(low&&low.rec<60)return `${MNAME[low.m]} at ${low.rec}%: keep its sets at 2 RIR tonight.`;
+  if(low&&low.rec<60)return `${MNAME[low.m]}: still recovering. Keep those sets at 2 RIR tonight.`;
   const a=acwrInfo();
-  if(a.zone==="spike"||a.zone==="high")return `Load is ${a.ratio.toFixed(2)}x your 4-week average. Hold volume steady this week.`;
+  if(a.zone==="spike"||a.zone==="high")return "Load is running ahead of your 4-week norm. Hold volume steady this week.";
   const over=vol.filter(t=>t.zone==="bad").sort((x,y)=>(y.sets-y.L.mrv)-(x.sets-x.L.mrv))[0];
-  if(over)return `${MNAME[over.m]} is at ${over.sets} sets, past its ${over.L.mrv}-set limit. Skip extra ${MNAME[over.m].toLowerCase()} work.`;
+  if(over)return `${MNAME[over.m]}: past the weekly limit. Skip extra ${MNAME[over.m].toLowerCase()} work.`;
   const ready=day?(day.exercises||[]).filter(n=>{const p=progressionFor(n);return p&&p.add;}):[];
-  if(ready.length)return `${ready.length} lift${ready.length===1?"":"s"} hit the top of the range last time. Add weight on ${ready[0]}${ready.length>1?" and the others":""}.`;
+  if(ready.length)return `Add weight on ${ready[0]}${ready.length>1?" and the other lifts that topped their range":": it topped its range last time"}.`;
   const under=trained.filter(t=>t.zone==="warn").sort((x,y)=>(y.L.mev-y.sets)-(x.L.mev-x.sets))[0];
-  if(under)return `${MNAME[under.m]} has ${under.sets} of ${under.L.mev} minimum sets this week. Add ${under.L.mev-under.sets} more.`;
+  if(under)return `${MNAME[under.m]}: under the weekly minimum. Add ${under.L.mev-under.sets} more set${under.L.mev-under.sets===1?"":"s"}.`;
   const st=stalledLifts()[0];
-  if(st)return `${st.n} has been flat for ${st.sessions} sessions. Change the angle or rep range.`;
+  if(st)return `${st.n}: stalled. Change the angle or rep range.`;
   return patrolReadiness().sleepKnown?"Recovery and load look good. Train as planned.":"Log last night's sleep and readiness will count it.";
 }
 
@@ -13025,7 +13025,7 @@ function ghTile(t,i){   // sets this week against the landmarks; recovery lives 
 }
 function ghWeek(vol){
   const goal=state.data.u.weeklyGoal||4,w=weekCount(),ws=weeklyStreak(),has=(state.data.workouts||[]).length>0;
-  const streak=ws>0?`<div class="gh-stk">${GP.icon("flame")}${ws}-week streak</div>`:`<div class="gh-stk off">${w>=goal?"Goal met":(goal-w)+" more to hit your goal"}</div>`;
+  const streak=ws>0?`<div class="gh-stk">${GP.icon("flame")}${ws}-week streak</div>`:`<div class="gh-stk off">${w>=goal?"Goal met":(goal-w)+" more to hit goal"}</div>`;
   const vols=[7,6,5,4,3,2,1,0].map(k=>weeklyLoad(k)/1000),tn=vols[7];   // weekly tonnage trend: one small stat, the load ratio itself is a hero chip
   const ton=has&&tn>0?`<div class="gh-ton" data-hx onclick="go('case',1)" aria-label="Tonnage this week ${tn.toFixed(1)} tonnes. Open stats"><span class="num" data-roll="${tn.toFixed(1)}" data-dec="1" data-k="vol">${tn.toFixed(1)}</span><span class="u">t</span>${GP.spark(vols,{w:62,h:22,area:false})}</div>`:"";
   let map;
@@ -13064,7 +13064,7 @@ function ghLifts(){
     return `<div class="gh-row" data-hx onclick="openStalledLifts()"><span class="lead warn">${GP.icon("flat")}</span><div class="main"><div class="gh-t1">${esc(s.n)}</div><div class="gh-t2">e1RM ${Math.round(s.best)} · flat ${s.sessions} session${s.sessions===1?"":"s"}</div></div><span class="trail">${p.length>1?GP.spark(p,{w:44,h:22,color:"var(--warn)",area:false,min:b*.9,max:b*1.1}):""}${GP.icon("chevR")}</span></div>`;}).join("");
   return `<section class="s2 gh-list gh-c" style="--i:2"><div class="gh-lh"><h3>Lifts</h3><button class="gh-more" data-hx onclick="go('case',1)">All lifts</button></div>
     ${rec.length?`<div class="gh-sub"><span>Recent records</span><i>e1RM trend</i></div>${recRows}`:""}
-    ${L.length?`<div class="gh-sub" data-hx onclick="openStalledLifts()"><span>Stalled <b class="tag warn">${L.length}</b></span><i>3+ sessions flat${L.length>2?" · all "+L.length:""}</i></div>${stRows}`:""}</section>`;
+    ${L.length?`<div class="gh-sub" data-hx onclick="openStalledLifts()"><span>Stalled</span><i>3+ sessions flat${L.length>2?" · all "+L.length+" ›":""}</i></div>${stRows}`:""}</section>`;
 }
 /* ---- GOTHAM EXTRAS: the story layer (territory war, season, crate, events, siege, garage, ledger, threat, rank, infirmary) lives in one sheet; nothing is deleted, every row opens its existing screen ---- */
 function ghExtras(){   // runs on every Home render so the earned side effects (event XP, the weekly chapter toast) still fire; the cards only show inside the sheet
