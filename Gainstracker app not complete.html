@@ -122,35 +122,6 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.
 .stg-title{font-family:var(--num);font-size:40px;letter-spacing:.14em;padding-left:.14em;text-align:center;margin-top:14px;animation:stgSlam .6s .12s cubic-bezier(.2,1.4,.4,1) both}
 .stg-sub{font-size:12px;letter-spacing:.22em;padding-left:.22em;text-align:center;text-transform:uppercase;color:var(--text2);margin-top:8px;animation:stgIn .5s .4s both}
 @keyframes stgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-/* ===== OUTRO — return to the cave: doors slam shut on the night, the emblem is stamped, then the debrief ===== */
-#outro{position:fixed;inset:0;z-index:225;background:#04060a;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:outroIn .45s ease both;cursor:pointer}
-#outro.leaving{animation:outroOut .55s ease both}
-@keyframes outroIn{from{opacity:0}to{opacity:1}}
-@keyframes outroOut{from{opacity:1}to{opacity:0}}
-.out-city{position:absolute;inset:0;background:radial-gradient(ellipse 95% 60% at 50% 110%,rgba(255,166,60,.17),transparent 62%),radial-gradient(ellipse 75% 48% at 50% -10%,rgba(60,120,255,.11),transparent 65%)}
-.out-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(242,208,121,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(242,208,121,.04) 1px,transparent 1px);background-size:44px 44px}
-.out-veh{position:absolute;left:50%;bottom:26%;transform:translateX(-50%);font-size:62px;filter:drop-shadow(0 14px 22px rgba(0,0,0,.8));animation:outVeh 1.15s .1s cubic-bezier(.5,.02,.75,.4) forwards}
-@keyframes outVeh{0%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) translateY(-130px) scale(.14);opacity:0}}
-.out-ret{position:absolute;left:0;right:0;bottom:16%;text-align:center;font-size:10.5px;letter-spacing:.4em;text-transform:uppercase;color:rgba(242,208,121,.65);animation:outRet 1.2s ease both}
-@keyframes outRet{0%{opacity:0}25%,80%{opacity:1}100%{opacity:0}}
-.out-doorL,.out-doorR{position:absolute;top:0;bottom:0;width:52%;z-index:4;background:linear-gradient(90deg,#07080c,#141821 52%,#07080c);box-shadow:inset 0 0 44px rgba(0,0,0,.85)}
-.out-doorL{left:-2%;transform:translateX(-103%);animation:outShutL .55s 1.05s cubic-bezier(.75,.02,.9,.4) forwards}
-.out-doorR{right:-2%;transform:translateX(103%);animation:outShutR .55s 1.05s cubic-bezier(.75,.02,.9,.4) forwards}
-@keyframes outShutL{to{transform:translateX(0)}}
-@keyframes outShutR{to{transform:translateX(0)}}
-.out-doorL::after,.out-doorR::after{content:"";position:absolute;top:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent,rgba(242,208,121,.5),transparent)}
-.out-doorL::after{right:0}.out-doorR::after{left:0}
-.out-stamp{position:relative;z-index:6;text-align:center;padding:0 24px;animation:outStamp .6s 1.62s cubic-bezier(.2,1.5,.4,1) both}
-@keyframes outStamp{0%{opacity:0;transform:scale(2.4)}62%{opacity:1;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
-.out-stamp .os-bat{filter:drop-shadow(0 0 34px rgba(255,208,72,.8))}
-.out-stamp .os-title{font-family:var(--num);font-size:34px;letter-spacing:.14em;padding-left:.14em;color:var(--gold2);text-shadow:0 0 34px rgba(255,208,72,.7);margin-top:10px}
-.out-stamp .os-vol{font-family:var(--num);font-size:52px;line-height:1;color:#fff;text-shadow:0 0 30px rgba(255,255,255,.35);margin-top:12px}
-.out-stamp .os-volk{font-size:19px;color:var(--text2)}
-.out-stamp .os-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
-.out-stamp .os-chip{font-size:11px;font-weight:800;letter-spacing:.08em;padding:6px 13px;border-radius:18px;border:1px solid rgba(242,208,121,.4);background:rgba(242,208,121,.09);color:var(--gold2)}
-.out-stamp .os-sub{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--text3);margin-top:16px;animation:outRet 1.5s 1.5s ease both}
-/* season chapter faces stay inside their slot */
-.season-face img.vface,.season-face .vface{width:100%;height:100%;font-size:30px}
 /* ===== JUICE — impact, tension, ritual ===== */
 .prflash{position:fixed;inset:0;z-index:240;background:#fff;opacity:.85;pointer-events:none;animation:prfl .38s ease-out forwards}
 @keyframes prfl{0%{opacity:.85}100%{opacity:0}}
@@ -506,9 +477,6 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 /* Comfort: bigger set-table touch tiles */
 .stype,.sdone{width:38px;height:38px}
 /* Finish-screen hero polish */
-.sumtitle{font-size:44px;text-shadow:0 0 28px rgba(255,208,72,.45)}
-.sumstats .sv{font-size:26px}
-.prribbon{background:linear-gradient(135deg,rgba(255,208,72,.16),rgba(46,204,113,.10));border:1px solid rgba(255,208,72,.5);box-shadow:0 0 26px -10px rgba(255,208,72,.7)}
 .es-title{color:var(--gold2);text-shadow:0 0 18px rgba(255,208,72,.4)}
 /* Animated exercise demo (ExerciseDB) — REPLACES the SVG figure inside any .exwrap (never both) */
 /* ExerciseDB demos ship on a flat WHITE background — the actual problem is the white IS the
@@ -839,23 +807,6 @@ img.vface{width:96px;height:96px;border-radius:50%;object-fit:cover;object-posit
 .prpop .prchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:2px 0 11px;position:relative}
 .prpop .prchip{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;border:1px solid;border-radius:999px;padding:3px 9px;background:rgba(255,255,255,.03);white-space:nowrap}
 .prpop .prtap{text-align:center;color:var(--text3);font-size:10.5px;margin-top:10px;position:relative}
-/* ===== End-of-workout cinematic summary ===== */
-.sumtag{display:block;text-align:center;letter-spacing:3px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;animation:sumFade .6s .05s both}
-.sumtitle{position:relative;font-family:var(--num);text-align:center;font-size:42px;line-height:.98;color:var(--gold2);margin:3px 0 6px;background:linear-gradient(90deg,#b88a2e 0%,#f4d98a 45%,#fff7df 50%,#f4d98a 55%,#b88a2e 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sumFade .55s both,sumSheen 2.6s 1 .35s}
-@keyframes sumSheen{0%{background-position:120% 0}100%{background-position:-120% 0}}
-@keyframes sumFade{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
-.sumstats{display:flex;gap:8px;margin-bottom:13px}
-.sumstat{flex:1;background:rgba(255,255,255,.035);border:1px solid rgba(232,197,106,.16);border-radius:13px;padding:11px 4px 9px;text-align:center;animation:sumFade .5s both}
-.sumstat:nth-child(1){animation-delay:.1s}.sumstat:nth-child(2){animation-delay:.17s}.sumstat:nth-child(3){animation-delay:.24s}
-.sumstat .si{font-size:16px;opacity:.85}
-.sumstat .sv{font-family:var(--disp);font-weight:650;font-size:23px;color:#fff;line-height:1;margin-top:3px}
-.sumstat .sk{font-size:9.5px;letter-spacing:.5px;color:var(--text3);text-transform:uppercase;margin-top:3px}
-.sumvol{text-align:center;animation:sumFade .5s .3s both}
-.sumvol .vbig{font-family:var(--num);font-size:46px;color:var(--gold2);line-height:.92;text-shadow:0 3px 20px rgba(232,197,106,.28)}
-.prribbon{position:relative;overflow:hidden;margin-top:13px;border-radius:13px;padding:11px 13px;background:linear-gradient(120deg,rgba(46,204,113,.14),rgba(232,197,106,.12));border:1px solid rgba(46,204,113,.4);animation:sumFade .5s .38s both,prGlow 2.4s ease-in-out infinite}
-@keyframes prGlow{0%,100%{box-shadow:0 0 0 rgba(46,204,113,0)}50%{box-shadow:0 0 22px rgba(46,204,113,.28)}}
-.prribbon .prr-t{font-weight:800;color:#7ee59a;font-size:13.5px;letter-spacing:.3px}
-.prribbon .prr-s{font-size:12.5px;color:#fff;font-weight:600;margin-top:2px;line-height:1.4}
 /* ===== Cinematic Batcave garage entrance ===== */
 .entr{position:fixed;inset:0;z-index:9998;overflow:hidden;background:radial-gradient(120% 90% at 50% 12%,#11151d 0%,#080a0e 55%,#000 100%);opacity:1;transition:opacity .5s ease;perspective:560px}
 .entr.out{opacity:0}
@@ -1409,6 +1360,218 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 
 .cal-pr{color:var(--gold-ink)}
 .cal-pr .gi{width:11px;height:11px}
+
+/* ===== GP:PROFILE+FINISH (wave 3) ===== */
+/* Finish moment, summary slides, Profile tab, exercise sheet. Built on the Home primitives (.gh .s1/.s2/.s3, gh-row, gh-sec, .lmk, .tag); only the new pieces live here. */
+.gi.flip{transform:scaleX(-1)}
+@keyframes sumFade{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.gh small{margin-left:3px;font:600 12px/1 var(--body);color:var(--tx2)}
+.gh .tag{background:rgba(150,178,222,.1);color:var(--tx2)}
+.gh .p3-d{font:650 13px/1 var(--body);color:var(--ok);font-variant-numeric:tabular-nums}
+.gh .p3-d.dn{color:var(--warn)}.gh .p3-d.eq{color:var(--tx3)}
+.gh .gh-lh h3 .tag{margin-left:6px;vertical-align:2px}
+.gh .p3-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(242,193,78,.14)}
+.p3-g4>div{min-width:0}
+.p3-g4 .num{display:block;font-size:30px;line-height:.9;color:var(--tx1);white-space:nowrap}
+.p3-g4 .eyebrow{display:block;margin-top:6px;white-space:nowrap}
+
+/* finish moment: the one full-screen beat at session end (1.25 s, tap skips) */
+.p3-fin{position:fixed;inset:0;z-index:225;display:flex;align-items:center;justify-content:center;padding:24px;cursor:pointer;background:radial-gradient(90% 55% at 50% 0%,rgba(242,193,78,.13),transparent 62%),var(--g0);animation:p3In .18s var(--ease-out) both}
+.p3-fin.out{animation:p3Out .24s ease both;pointer-events:none}
+@keyframes p3In{from{opacity:0}}
+@keyframes p3Out{to{opacity:0}}
+@keyframes p3Up{from{opacity:0;transform:translateY(6px)}}
+.p3-fin .c{width:100%;max-width:340px;text-align:center}
+.p3-fin .eb{display:inline-flex;align-items:center;gap:7px;color:var(--gold-ink);font:650 11px/1 var(--body);letter-spacing:.1em;text-transform:uppercase}
+.p3-fin .eb .gi{width:16px;height:16px}
+.p3-fin .ttl{margin:12px 0 0;padding:0;font:700 27px/1.1 var(--body);letter-spacing:-.028em;text-transform:none;color:var(--tx1)}
+.p3-fin .n{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:30px;padding-top:24px;border-top:1px solid rgba(242,193,78,.18)}
+.p3-fin .n b{display:block;font:400 42px/.9 var(--num);color:var(--tx1);font-variant-numeric:tabular-nums}
+.p3-fin .n b.g{color:var(--gold-ink)}
+.p3-fin .n span{display:block;margin-top:8px;font:600 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
+.p3-fin .pr{margin-top:26px;display:flex;flex-direction:column;gap:9px}
+.p3-fin .pr div{display:flex;align-items:center;justify-content:center;gap:8px;font:600 14px/1.2 var(--body);color:var(--gold-ink);animation:p3Up .3s var(--ease-out) both;animation-delay:calc(var(--i)*90ms + 280ms)}
+.p3-fin .pr .gi{width:15px;height:15px;flex:none}
+.p3-fin .pr span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p3-fin .pr b{flex:none;font:650 14px/1 var(--body);color:var(--tx1)}
+.p3-fin .pr .mo{color:var(--tx3);font-weight:500}
+
+/* summary slides */
+.p3-eb{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 6px}
+.p3-eb .eyebrow:first-child{color:var(--gold-ink)}
+.p3-hero{padding:16px 16px 14px}
+.p3-vh{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:20px}
+.p3-vol{display:flex;align-items:baseline;gap:7px;margin:8px 0 2px}
+.gh .p3-vol .num{font-size:76px;line-height:.86;color:#FBF7EC}
+.p3-vol .u{font:600 18px/1 var(--body);color:var(--tx2)}
+.p3-hero .lg2-sumrest{margin:14px 0 0;background:rgba(8,12,20,.5);box-shadow:none}
+.p3-line{display:flex;align-items:center;gap:8px;margin:14px 4px 0;font:500 13px/1.3 var(--body);color:var(--tx2)}
+.p3-line .gi{width:16px;height:16px;color:var(--gold-ink)}
+.p3-mrow{padding:10px 14px 13px}
+.p3-mrow+.p3-mrow{border-top:1px solid var(--hair)}
+.p3-mh{display:flex;align-items:center;gap:8px;margin-bottom:9px;min-height:22px}
+.p3-mh b{font:600 14px/1 var(--body);white-space:nowrap}
+.p3-mh .tn{margin-left:auto;font:600 12px/1 var(--body);color:var(--gold-ink);white-space:nowrap}
+.gh .p3-mh .num{font-size:22px;line-height:1;margin-top:2px;min-width:24px;text-align:right}
+.p3-tgt{flex-direction:column;align-items:flex-end;gap:5px}
+.p3-tgt b{font:400 22px/1 var(--num);color:var(--tx1)}
+.p3-tgt i{margin-left:4px;font:600 12px/1 var(--body);font-style:normal;color:var(--tx2)}
+.p3-rpe{padding-bottom:14px}
+.p3-rpe #p3rpe{padding:8px 14px 0}
+.p3-rpe-g{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.p3-rpe-g button{height:48px;border:0;border-radius:13px;background:var(--g4);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);font:400 25px/1 var(--num);color:var(--tx1);display:grid;place-items:center}
+.p3-rpe-g button.on{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.p3-rpe-n{margin-top:12px;font-size:13px;line-height:18px;color:var(--tx2)}
+.p3-rpe-n b{color:var(--tx1);font-weight:600}
+.p3-al{margin-top:12px;padding:13px 14px}
+.p3-alh{display:flex;align-items:center;gap:9px;margin-bottom:8px;font:600 14px/1 var(--body)}
+.p3-alh .av{width:26px;height:26px;border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 1.5px rgba(242,193,78,.6)}
+.p3-alh .av img{width:100%;height:100%;object-fit:cover;object-position:50% 26%;display:block}
+.p3-alt{font-size:14px;line-height:1.5;color:var(--tx2);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.p3-alt.open{-webkit-line-clamp:unset}
+.p3-alt+.mini{margin-top:6px;color:var(--tx3);font-size:12px}
+.p3-nt{margin-top:12px;padding:13px 14px}
+.p3-feel{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
+.p3-nt textarea{display:block;width:100%;min-height:62px;padding:11px 12px;border:0;border-radius:var(--r-s);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx1);font:400 16px/1.4 var(--body);resize:none}
+.p3-nt textarea::placeholder{color:var(--tx3)}
+.p3-share{margin-top:12px;padding:14px}
+.p3-share img{display:block;width:100%;aspect-ratio:1080/1350;border-radius:var(--r-m);background:var(--g1);box-shadow:0 0 0 1px var(--hair2),var(--sh2)}
+.p3-sbtn{display:flex;gap:10px;margin-top:12px}
+.p3-sbtn .btn{width:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border:0}
+.p3-sbtn .btn:first-child{flex:1}
+.p3-sbtn .gi{width:18px;height:18px}
+.p3-bk{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 14px}
+.p3-bk .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--tint-warn);color:var(--warn)}
+.p3-bk .main{flex:1;min-width:0}
+.p3-bk .gh-t2{white-space:normal}
+#app:has(.p3-sum){padding-bottom:0}
+.p3-bk .btn{width:auto;flex:none;height:36px;min-height:0;padding:0 14px;border:0}
+.p3-nav{position:sticky;bottom:0;z-index:6;margin:16px -14px 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(5,7,12,0),var(--g0) 38%)}
+body:has(.p3-sum) .toast{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
+.p3-nav .dots{margin:0 0 14px}
+.p3-btns{display:flex;gap:10px}
+.p3-btns .btn{width:auto;display:inline-flex;align-items:center;justify-content:center;height:52px;padding:0 24px;border:0}
+.p3-btns .btn-1{flex:1}
+
+/* profile */
+.p3-id{padding:16px}
+.p3-idh{display:flex;align-items:center;gap:14px;position:relative}
+.p3-av{width:56px;height:56px;border-radius:50%;flex:none;overflow:hidden;background:var(--g1);box-shadow:0 0 0 1.5px var(--gold),0 0 0 5px rgba(242,193,78,.12)}
+.p3-av img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block}
+.p3-idn{flex:1;min-width:0}
+.p3-idn h1{margin:0;font-size:27px!important;line-height:1.1!important;letter-spacing:-.028em!important;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p3-idn .sub{margin-top:4px;font-size:13px;line-height:17px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p3-idh .trail{flex:none;color:var(--tx3)}
+.p3-idh .trail .gi{width:18px;height:18px}
+.p3-rank{position:relative;margin-top:16px}
+.p3-rank-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font:600 14px/1.2 var(--body);color:var(--tx1)}
+.p3-rank-h span{font-weight:500;font-size:13px;color:var(--tx2)}
+.p3-rank .bar{height:5px;margin-top:8px;border-radius:3px;background:rgba(150,178,222,.14);overflow:hidden}
+.p3-rank .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi))}
+.p3-cal{margin-top:12px;padding:14px 12px 12px}
+.p3-ch{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin:0 4px 10px}
+.p3-ch h3{margin:0;font:650 17px/1.2 var(--body);letter-spacing:-.015em}
+.p3-ch .sub{margin-top:3px;font-size:12px;line-height:16px;color:var(--tx2)}
+.p3-ch .nv{display:flex;gap:6px;flex:none}
+.p3-ch .btn-i{width:36px;height:36px}
+.p3-ch .btn-i .gi{width:18px;height:18px}
+.p3-cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.p3-cw{padding:2px 0 4px;text-align:center;font:600 11px/1 var(--body);color:var(--tx3)}
+.p3-cd{position:relative;aspect-ratio:1/1;border-radius:10px;display:grid;place-items:center;background:rgba(150,178,222,.045);font:500 13px/1 var(--body);color:var(--tx3);font-variant-numeric:tabular-nums}
+.p3-cd.blank{background:none}
+.p3-cd.fut{opacity:.4}
+.p3-cd.on{background:rgba(242,193,78,var(--h));box-shadow:inset 0 0 0 1px rgba(242,193,78,.3);color:var(--tx1);font-weight:650}
+.p3-cd.pr::after{content:"";position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 0 2px rgba(5,7,12,.55)}
+.p3-cd.today{box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--gold-ink)}
+.p3-cl{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 4px 0;font:600 11px/1 var(--body);color:var(--tx3)}
+.p3-cl span{display:inline-flex;align-items:center;gap:6px}
+.p3-cl .sw{width:12px;height:12px;border-radius:4px;background:rgba(242,193,78,.34);box-shadow:inset 0 0 0 1px rgba(242,193,78,.4)}
+.p3-cl .sw.pr{width:7px;height:7px;border-radius:50%;background:var(--gold-hi);box-shadow:none}
+.p3-cl .ht{margin-left:auto}
+.gh .gh-row.p3-otd{margin-top:12px}
+.p3-std-c{padding:4px 0 10px}
+.p3-b3{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 14px 0}
+.p3-b3c{padding:4px 14px 10px;font-size:13px;line-height:18px;color:var(--tx2)}
+.gh .p3-b3 .num{font-size:40px;line-height:.9;color:var(--gold-ink)}
+.p3-b3 .u{margin-left:4px;font:600 13px/1 var(--body);color:var(--tx2)}
+.p3-sr{padding:12px 14px}
+.p3-sr+.p3-sr,.p3-b3c+.p3-sr{border-top:1px solid var(--hair)}
+.p3-srh{display:flex;align-items:baseline;gap:6px;margin-bottom:11px}
+.p3-srh b{flex:1;min-width:0;font:600 15px/1.2 var(--body)}
+.gh .p3-srh .num{font-size:26px;line-height:.9}
+.p3-srh .u{font:600 12px/1 var(--body);color:var(--tx2)}
+.gh .lmk.p3-std .fill{background:var(--gold)}
+.p3-tl{position:relative;height:14px;margin-top:8px}
+.p3-tl span{position:absolute;top:0;transform:translateX(-50%);font:600 11px/1 var(--body);color:var(--tx3);white-space:nowrap}
+.p3-sn{margin-top:6px;font-size:12px;line-height:16px;color:var(--tx2)}
+.p3-sfoot{padding:8px 14px 0;font-size:11px;line-height:15px;color:var(--tx3)}
+.p3-empty{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:18px}
+.p3-empty .lead{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--tint-gold);color:var(--gold-ink)}
+.p3-empty b{font:650 17px/1.2 var(--body)}
+.p3-empty p{margin-top:4px;font-size:14px;line-height:1.45;color:var(--tx2)}
+.p3-empty .btn{width:100%}
+/* e1RM trend svg (Profile sparklines + exercise sheet) */
+svg.p3t{display:block;width:100%;height:auto;overflow:visible}
+svg.p3t.mini{width:64px;height:26px;flex:none}
+.p3t-l{fill:none;stroke:var(--gold);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.p3t.mini .p3t-l{stroke-width:1.8}
+.p3t-s0{stop-color:var(--gold);stop-opacity:.28}
+.p3t-s1{stop-color:var(--gold);stop-opacity:0}
+.p3t-pr{fill:var(--gold-hi)}
+.p3t-halo{fill:var(--gold);opacity:.2}
+.p3t-e{fill:var(--tx1)}
+.p3t-g{stroke:var(--hair);stroke-width:1}
+.p3t-t{fill:var(--tx3);font:600 11px var(--body)}
+
+/* exercise sheet */
+.sheet:has(.p3-xd){background:linear-gradient(180deg,#131B29,#0C121C);border-top:1px solid var(--hair2);box-shadow:0 -22px 60px -24px rgba(0,0,0,.9)}
+.sheet:has(.p3-xd)::before{width:38px;background:rgba(150,178,222,.3);box-shadow:none}
+.p3-xd{display:flex;flex-direction:column;gap:12px;padding-bottom:6px}
+.p3-xh{display:flex;align-items:center;gap:13px}
+.p3-xh .exwrap{flex:none}
+.p3-xh .mn{flex:1;min-width:0}
+.p3-xh h2{margin:0;font:700 20px/1.15 var(--body);letter-spacing:-.02em;color:var(--tx1)}
+.p3-xh .sub{margin-top:3px;font-size:13px;line-height:17px;color:var(--tx2)}
+.p3-xh .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.p3-xh .btn-i{align-self:flex-start;flex:none;width:36px;height:36px}
+.p3-n3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.p3-n3>div{padding:11px 12px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl)}
+.gh .p3-n3 .num{display:block;font-size:32px;line-height:.9}
+.p3-n3 .eyebrow{display:block;margin-top:6px;white-space:nowrap}
+.p3-card{padding:14px}
+.p3-ch2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.p3-ch2 h3{margin:0;font:650 17px/1.2 var(--body);letter-spacing:-.015em}
+.p3-lgd{display:flex;justify-content:space-between;margin-top:8px;font:600 11px/1 var(--body);color:var(--tx3)}
+.p3-lgd .dot.pr{display:inline-block;width:7px;height:7px;margin-right:5px;border-radius:50%;background:var(--gold-hi)}
+.p3-tg2{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px}
+.p3-tg2 .v{display:flex;align-items:baseline;gap:5px;margin-top:6px}
+.gh .p3-tg2 .v .num{font-size:40px;line-height:.9;color:var(--gold-ink)}
+.p3-tg2 .v i{font:600 14px/1 var(--body);font-style:normal;color:var(--tx2)}
+.p3-tg2 .why{display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-width:48%;text-align:right;font-size:12px;line-height:16px;color:var(--tx2)}
+.p3-sb{position:relative;overflow:hidden;padding-bottom:2px}
+.p3-sb::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--warn)}
+.p3-sbi{padding:0 14px 8px;font-size:13px;line-height:18px;color:var(--tx2)}
+.p3-sbo{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--hair)}
+.p3-sbo .lead{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--tint-warn);color:var(--warn)}
+.p3-sbo .main{flex:1;min-width:0}
+.p3-sbo .gh-t1{white-space:normal}
+.p3-sbs{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--tx2)}
+.p3-sbo .btn{flex:none;width:auto;height:36px;min-height:0;padding:0 14px;border:0}
+.rpb{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.rpb>div{padding:8px 2px 7px;text-align:center;border-radius:10px;background:var(--g1);box-shadow:var(--hl)}
+.rpb .k{display:block;font:600 11px/1 var(--body);color:var(--tx3)}
+.rpb b{display:block;margin-top:5px;font:400 22px/1 var(--num);color:var(--tx3)}
+.rpb .has b{color:var(--tx1)}
+.rpb .rec{background:var(--tint-gold);box-shadow:inset 0 0 0 1px rgba(242,193,78,.4)}
+.rpb .rec b{color:var(--gold-ink)}
+.gh-row.p3-hr{min-height:46px;padding-top:6px;padding-bottom:6px}
+.p3-hr .trail{gap:10px}
+.gh .p3-hr .trail .num{font-size:22px;color:var(--tx1)}
+.p3-cue{display:flex;gap:8px;align-items:flex-start;padding:7px 0;font-size:14px;line-height:1.45;color:var(--tx2)}
+.p3-cue .gi{width:15px;height:15px;margin-top:3px;color:var(--gold-ink)}
+.p3-xd .gh-row .gh-t2{white-space:normal}
+.p3-acts{display:flex;flex-direction:column;gap:8px}
+.p3-acts .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 
 /* ===== GP:HOME (wave 2) ===== */
 /* Home = header (date · cycle in the top bar, greeting under it) → Tonight (the one S3 hero) → Readiness → This week + volume map → Progress → Stalled → Lore fold.
@@ -3424,34 +3587,9 @@ function figLayerHtml(ex,fi){
 /* 🦇 SCANPANEL builder — the single source of truth for the Batcomputer target-scan picture used
    by both the exercise dossier and the active lift's focus card during logging. o: {ex, fi, id,
    height, name, tag, meta, col, tool, entrance, onclick}. */
-function scanPanelHtml(o){
-  const ex=o.ex;
-  const col=o.col||'var(--gold2)';
-  const name=o.name!=null?o.name:ex.n;
-  return `<div class="scanpanel${o.entrance?' entrance':''}" style="--fg:${col}4d;height:${o.height}px" ${o.onclick?`onclick="${o.onclick}"`:''}>
-    <div class="scanpanel-screen" id="${o.id||''}">
-      <div class="scanpanel-grid"></div>
-      <div class="figlayer">${figLayerHtml(ex,o.fi)}</div>
-      <div class="scanpanel-scan"></div>
-      <div class="scanpanel-vig"></div>
-      <div class="scanpanel-c tl"></div><div class="scanpanel-c tr"></div><div class="scanpanel-c bl"></div><div class="scanpanel-c br"></div>
-      ${o.tool||''}
-      <div class="scanpanel-cap">
-        <div class="scanpanel-tag" style="color:${col}"><i></i>${esc(o.tag||'TARGET ANALYSIS')}</div>
-        <b>${esc(name)}</b>
-        <span style="color:${col}">${esc(o.meta||'')}</span>
-      </div>
-    </div>
-  </div>`;
-}
 
 function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x[0])r=x;return{name:r[1],emoji:r[2]};}
 // Feature 15: bottom note alternates 50/50 between Batman flavour and real training science
-function gothamNote(){
-  const day=new Date().getDate();
-  if(day%2===0)return {kind:"science",label:"TRAINING INTEL",text:SCIENCE_FACTS[Math.floor(day/2)%SCIENCE_FACTS.length]};
-  return {kind:"gotham",label:"GOTHAM",text:QUOTES[day%QUOTES.length]};
-}
 function openTips(cat){
   const lib=SCIENCE_LIBRARY;
   const active=cat||state._tipCat||lib[0].cat;state._tipCat=active;
@@ -5652,31 +5790,104 @@ function omniList(){
 }
 /* Exercise detail sheet — shows big figure + cues, lets you add from there */
 function exDetClose(){const r=state._exdetReturn;state._exdetReturn=null;closeSheet();if(r==="splits")openSplitSheet();}
+/* ========================= EXERCISE DETAIL SHEET (GP:PROFILE+FINISH, wave 3) =========================
+   ONE sheet for a lift, from everywhere (Profile records, Home, summary, logging, picker, split editor):
+   header · e1RM trend (12 weeks, PR markers, slope) · next target · stall breaker · rep-PR book · history · cues, notes, picture, archive. */
+function exerciseHistory(name){openExDetail(name);}   // every legacy "history" entry point lands on the one sheet
 function openExDetail(exName){
   state._exdetReturn=(state._sheetKind==="splits")?"splits":null;  // came from the split editor → go back there on close
-  const ex=exFor(exName);
-  const col=MCOL[(ex.p||[])[0]]||'var(--gold2)';
-  const tgt=exTarget(ex);
-  const safe=ex.n.replace(/'/g,"\\'");
-  openSheet(`
-    <div style="margin:-3px -2px 14px">${scanPanelHtml({ex,id:'exdet-fig',height:200,col,entrance:true,
-      tag:'BATCOMPUTER · TARGET ANALYSIS',meta:tgt.split('·')[0].trim()+' · '+ex.eq})}</div>
-    ${(ex.c&&ex.c.length)?`
-    <div style="margin-bottom:14px">
-      <div style="font-family:var(--disp);font-weight:650;font-size:11px;letter-spacing:.06em;color:var(--gold2);margin-bottom:7px">FORM CUES</div>
-      ${ex.c.map(cue=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)">
-        <span style="color:${col};font-size:14px;margin-top:1px;flex:none">▸</span>
-        <span style="font-size:14px;line-height:1.5;color:var(--text2)">${esc(cue)}</span>
-      </div>`).join('')}
-    </div>`:''}
-    ${ex.s&&ex.s.length?`<div style="font-size:12px;color:var(--text3);margin-bottom:14px">Also trains: ${ex.s.map(m=>`<span style="color:var(--text2)">${MNAME[m]||m}</span>`).join(', ')}</div>`:''}
-    ${state._exdetReturn?'':`<button class="btn gold" style="margin-bottom:8px" onclick="pickAdd('${safe}');exDetClose()">＋ Add to session</button>`}
-    <div class="row" style="gap:7px">
-      <button class="btn ghost sm" style="flex:1;color:var(--text2)" onclick="openPicPicker('${safe}','exdet-fig')">🖼 Choose picture</button>
-      <button class="btn ghost sm" style="flex:1" onclick="exDetClose()">${state._exdetReturn?'← Back to editor':'Close'}</button>
-    </div>
-  `);
-  try{attachExGif("exdet-fig",ex.n,360);}catch(e){}
+  state._xdAll=false;
+  openSheet(p3XdHtml(exName));
+  try{attachExGif("exdet-fig",exFor(exName).n,360);}catch(e){}
+}
+function p3XdRefresh(name){const sh=$("sheet");if(!sh||!sh.classList.contains("on")||!$("exdet-fig"))return;   // only while this lift's sheet is the one on screen
+  const sc=sh.scrollTop;sh.innerHTML=p3XdHtml(name);sh.scrollTop=sc;}
+function p3XdAll(name){state._xdAll=true;p3XdRefresh(name);}
+/* ---- rep-PR book: heaviest load at each rep count, N = 1…15 (recent = gold) ---- */
+function p3RepBook(nm){
+  const ex=exFor(nm),key=nm.toLowerCase().trim(),cut=exResetAt(nm),by={},at={};
+  (state.data.workouts||[]).forEach(w=>{if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())return;
+    (w.exercises||[]).forEach(e=>{if((e.name||"").toLowerCase().trim()!==key)return;
+      (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;const r=Math.min(15,Math.floor(+s.r||0)),ld=setLoad(ex,s.w);if(r<1||!(ld>0))return;if(ld>(by[r]||0)){by[r]=ld;at[r]=w.date;}});});});
+  if(!Object.keys(by).length)return "";
+  const cells=[];for(let r=1;r<=15;r++)cells[r]={w:by[r]||0,at:at[r]};
+  const recent=now()-30*P3_DAY,lab=w=>ex.bw?(w-bodyW()>0?"+"+fmtKg(w-bodyW()):"BW"):fmtKg(w);
+  return `<section class="s2 p3-card"><div class="p3-ch2"><h3>Rep PR book</h3><span class="t-xs">heaviest load at each rep count</span></div><div class="rpb">${Array.from({length:15},(_,i)=>{const c=cells[i+1];
+    return `<div class="${c.w?"has":""}${c.w&&new Date(c.at).getTime()>=recent?" rec":""}"><span class="k">${i+1} rep${i?"s":""}</span><b>${c.w?lab(c.w):"–"}</b></div>`;}).join("")}</div></section>`;
+}
+/* ---- stall breaker: three evidence-based options, one tap writes it into the NEXT session's plan (never a deload) ---- */
+function p3Slots(nm){const d=state.data,sp=(d.splits||[]).find(s=>s.id===d.activeSplitId);return sp?(sp.days||[]).map((day,di)=>({sp,di,day})).filter(x=>!isRest(x.day)&&(x.day.exercises||[]).includes(nm)):[];}
+function p3Variant(nm){   // a sister lift: same primary muscle and movement word, ideally a different implement/angle and one you already trained
+  const ex=exFor(nm),p0=(ex.p||[])[0],mv=(nm.toLowerCase().match(/press|row|curl|extension|raise|fly|pulldown|pull-up|squat|deadlift|lunge|dip|thrust|shrug|pushdown|pullover|crunch/)||[])[0];
+  if(!p0||!mv)return null;
+  const inDay=new Set(p3Slots(nm).flatMap(s=>s.day.exercises)),logged=new Set(loggedExerciseNames()),w0=new Set(nm.toLowerCase().split(/[^a-z]+/));
+  const sc=e=>(logged.has(e.n)?3:0)+(e.eq!==ex.eq?2:0)+e.n.toLowerCase().split(/[^a-z]+/).filter(t=>t&&w0.has(t)).length*.5;
+  return EXDB.filter(e=>e.n!==nm&&(e.p||[])[0]===p0&&e.n.toLowerCase().includes(mv)&&!inDay.has(e.n)).sort((a,b)=>sc(b)-sc(a)||a.n.localeCompare(b.n))[0]||null;
+}
+function p3StallOpts(nm){
+  const ex=exFor(nm),slots=p3Slots(nm),lb=lastBestSet(nm),m=(ex.p||[])[0],sets=m?weeklySets(m):0,z=m?zoneOf(m,sets):null,alt=p3Variant(nm),heavy=!!lb&&lb.r>=8,rng=heavy?"5–8":"8–10",mn=MNAME[m]||m;
+  const free=slots.length?"":"Add this lift to a split day to apply it.";
+  return [
+    {k:"rep",ic:"sliders",ttl:`Work ${rng} reps for a block`,why:free||(heavy?"Reps are stuck high. Go heavier: 5–8 reps, the load rises sooner.":"Reps are stuck low. Own 8–10 clean reps at this load before the next jump."),off:!slots.length,rng},
+    {k:"swap",ic:"swap",ttl:alt?`Swap to ${alt.n}`:"Swap the variant",why:free||(alt?"Same muscle, new angle or implement: fresh stimulus, fresh progress.":"No close variant in your library. Shift the angle 10–15° or change grip for 3 weeks."),off:!slots.length||!alt,alt},
+    {k:"set",ic:"plus",ttl:"Add a set",why:free||(z?(sets<z.mav?`${mn} is at ${sets} of ${z.mav} weekly sets (MAV). One more set is productive volume.`:`${mn} already sits at ${sets} sets (MAV ${z.mav}). More volume only adds fatigue.`):"No muscle data for this lift."),off:!slots.length||!z||sets>=z.mav}
+  ];
+}
+function p3Applied(nm){   // which stall-breaker options are active (last 4 weeks) on this lift's plan
+  const d=state.data,sp=(d.splits||[]).find(s=>s.id===d.activeSplitId),out={};
+  ((sp&&sp.days)||[]).forEach(day=>Object.keys(day.plan||{}).forEach(k=>{const st=day.plan[k].stall;if(!st||now()-new Date(st.date).getTime()>28*P3_DAY)return;if(k===nm)out[st.k]=1;else if(st.from===nm)out.swap=k;}));
+  return out;
+}
+function p3Stall(nm,k){
+  const o=p3StallOpts(nm).find(x=>x.k===k);if(!o||o.off)return;
+  const L=cycleLen(),nd=(state.data._nextDay||0)%L,slots=p3Slots(nm).sort((a,b)=>((a.di-nd+L)%L)-((b.di-nd+L)%L));
+  const snap=slots.map(s=>({day:s.day,ex:s.day.exercises.slice(),pl:s.day.plan?JSON.parse(JSON.stringify(s.day.plan)):null}));
+  const stamp={k,date:new Date(now()).toISOString()},n0=(lastSetFor(nm)||[]).filter(s=>s.type!=="W").length||3,cur=day=>Object.assign({s:n0,r:"6-10"},day.plan&&day.plan[nm]);
+  if(k==="rep")slots.forEach(s=>{s.day.plan=s.day.plan||{};s.day.plan[nm]=Object.assign(cur(s.day),{r:o.rng,stall:stamp});});
+  else if(k==="set"){const s=slots[0],c=cur(s.day);s.day.plan=s.day.plan||{};s.day.plan[nm]=Object.assign(c,{s:Math.min(10,(+c.s||n0)+1),stall:stamp});}
+  else slots.forEach(s=>{const i=s.day.exercises.indexOf(nm);if(i<0)return;s.day.exercises[i]=o.alt.n;
+    if(s.day.plan&&s.day.plan[nm]){s.day.plan[o.alt.n]=Object.assign({},s.day.plan[nm],{stall:Object.assign({from:nm},stamp)});delete s.day.plan[nm];}});
+  const redraw=()=>{save();if(!state.step)try{render();}catch(e){}p3XdRefresh(nm);};
+  redraw();haptic("done");
+  toastUndo(k==="swap"?"Swapped in your next session":k==="rep"?"Rep range set for your next session":"Set added to your next session",()=>{snap.forEach(x=>{x.day.exercises=x.ex;if(x.pl)x.day.plan=x.pl;else delete x.day.plan;});redraw();});
+}
+function p3StallHtml(nm,intel){
+  const ap=p3Applied(nm);
+  return `<section class="s2 p3-sb"><div class="gh-lh"><h3>Stall breaker</h3><span class="t-xs">best ${Math.round(intel.bestE)} kg · flat ${intel.sinceImprove} sessions</span></div>
+    <div class="p3-sbi">Change one variable, keep the effort. It goes into your next session.</div>
+    ${p3StallOpts(nm).map(o=>{const on=ap[o.k];
+      return `<div class="p3-sbo"><span class="lead">${GP.icon(o.ic)}</span><div class="main"><div class="gh-t1">${esc(o.ttl)}</div><div class="p3-sbs">${esc(o.why)}</div></div>${on?`<span class="tag ok">${typeof on==="string"?"Swapped":"Applied"}</span>`:o.off?"":`<button class="btn sm" data-hx onclick="p3Stall(${ghJs(nm)},'${o.k}')">Apply</button>`}</div>`;}).join("")}</section>`;
+}
+/* ---- the sheet ---- */
+function p3XdHtml(name){
+  const ex=exFor(name),nm=ex.n||name,rows=exerciseRows(nm),intel=rows.length?liftIntel(nm):null,back=state._exdetReturn,J=ghJs(nm);
+  const muscles=(ex.p||[]).map(m=>MNAME[m]||m).join(" · "),also=(ex.s||[]).map(m=>MNAME[m]||m).join(", ");
+  const head=`<div class="p3-xh">${thumb(ex,1).replace('<span class="exwrap sm"','<span id="exdet-fig" class="exwrap sm"')}<div class="mn"><h2>${esc(nm)}</h2><div class="sub">${esc(muscles)}${also?` <span class="c-3">+ ${esc(also)}</span>`:""}</div><div class="tags"><span class="tag">${esc(ex.eq||"other")}</span>${intel&&intel.stalled?`<span class="tag warn">Stalled</span>`:""}</div></div><button class="btn-i" data-hx onclick="exDetClose()" aria-label="Close">${GP.icon("x")}</button></div>`;
+  let nums="",trend="",hist="";
+  if(rows.length){
+    const best=Math.max(...rows.map(r=>r.e1rm)),last=rows[rows.length-1],pv=rows[rows.length-2],dl=pv?last.e1rm-pv.e1rm:0,tr=p3Trend(nm,{});
+    nums=`<div class="p3-n3"><div><span class="num">${best}</span><span class="eyebrow">Best e1RM kg</span></div><div><span class="num">${last.e1rm}</span><span class="eyebrow">Last${dl?` <b class="${dl>0?"c-ok":"c-warn"}">${dl>0?"+":""}${dl}</b>`:""}</span></div><div><span class="num">${rows.length}</span><span class="eyebrow">Sessions</span></div></div>`;
+    trend=tr?`<section class="s2 p3-card"><div class="p3-ch2"><h3>e1RM trend</h3>${p3Slope(tr.pct)}</div>${tr.svg}<div class="p3-lgd"><span><i class="dot pr"></i>Record</span><span>${tr.n} sessions</span></div></section>`:"";
+    const hs=rows.slice().reverse(),n=state._xdAll?25:6;
+    hist=`<section class="s2 gh-list"><div class="gh-lh"><h3>History</h3><span class="t-xs">${rows.length} session${rows.length===1?"":"s"}</span></div>${hs.slice(0,n).map((r,i)=>{const o=hs[i+1],d=o?r.e1rm-o.e1rm:null;
+      return `<div class="gh-row p3-hr"><div class="main"><div class="gh-t1">${p3Date(r.date)}</div><div class="gh-t2">${r.bset?`${ex.bw?"+":""}${fmtKg(r.bset.w)} kg × ${r.bset.r}`:""}</div></div><span class="trail"><b class="num">${r.e1rm}</b>${d==null?"":`<span class="p3-d${d<-.5?" dn":d<.5?" eq":""}">${d>.5?"+":""}${d<-.5||d>.5?Math.round(d):"="}</span>`}</span></div>`;}).join("")}
+      ${hs.length>n?`<button class="btn btn-3" style="width:100%" data-hx onclick="p3XdAll(${J})">All ${hs.length} sessions</button>`:""}</section>`;
+  }
+  const pg=progressionFor(nm),target=pg?`<section class="s1 p3-tg2"><div><span class="eyebrow">Next target</span><div class="v">${(pg.w||!ex.bw)?`<b class="num">${fmtKg(pg.w)}</b><i>kg × ${pg.r}${pg.add?"":"+"}</i>`:`<b class="num">BW</b><i>× ${pg.r}+</i>`}</div></div><div class="why">${pg.add?`<span class="tag ok">+${fmtKg(pg.inc)} kg</span>`:`<span class="tag">+1 rep</span>`}<span>${esc(pg.reason)}</span></div></section>`:"";
+  const cues=!rows.length&&(ex.c||[]).length?`<section class="s2 p3-card"><div class="p3-ch2"><h3>Form cues</h3></div>${ex.c.slice(0,4).map(c=>`<div class="p3-cue">${GP.icon("chevR")}<span>${esc(c)}</span></div>`).join("")}</section>`:"";
+  const nn=((state.data.exNotes||{})[nm]||[]).length;
+  const tools=`<section class="s2 gh-list">${p3Row("note","Cues & notes",nn?nn+" note"+(nn===1?"":"s"):"Form cues and your own notes","showCues("+J+")")}${p3Row("image","Choose picture","Match the demo to your machine","openPicPicker("+J+",'exdet-fig')")}${rows.length?p3Row("lock","Archive history","New equipment? Start fresh. Nothing is deleted.","confirmArchiveExercise("+J+")"):""}</section>`;
+  const acts=`<div class="p3-acts">${back?`<button class="btn" data-hx onclick="exDetClose()">Back to editor</button>`:`<button class="btn btn-1" data-hx onclick="pickAdd(${J});exDetClose()">${GP.icon("plus")} Add to session</button>`}</div>`;
+  return `<div class="gh p3-xd">${head}${nums}${trend}${target}${intel&&intel.stalled?p3StallHtml(nm,intel):""}${p3RepBook(nm)}${hist}${cues}${tools}${acts}</div>`;
+}
+/* ---- workload ratio: session load = session RPE × minutes where the session was rated, tonnage elsewhere ---- */
+function sessLoadK(){   // the user's own median (RPE × min) ÷ tonnage over rated sessions; 0 = nothing rated yet (pure tonnage)
+  const r=(state.data.workouts||[]).filter(w=>+w.rpe>0&&w.duration>0&&w.totalVol>0).map(w=>w.rpe*p3Min(w.duration)/w.totalVol).sort((a,b)=>a-b);
+  return r.length?r[r.length>>1]:0;
+}
+function weeklyLoadS(weekIdx,k){   // like weeklyLoad, but a rated session counts as RPE × minutes; unrated ones as tonnage × k, so mixed history stays one unit
+  const s=cycleStart(weekIdx),e=weekIdx?cycleStart(weekIdx-1):Infinity;
+  return perWeek((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(+w.rpe>0&&w.duration>0?w.rpe*p3Min(w.duration):(w.totalVol||0)*(k||1)),0));
 }
 
 /* ===== CUSTOM EXERCISE CREATOR ===== */
@@ -5827,7 +6038,6 @@ function openPlateSheet(ei){
 }
 
 /* ========================= WORKOUT SUMMARY (4 cards) ========================= */
-function batCompare(v){return v<500?"a Gotham City dumpster full of evidence":v<1000?"a Batcycle with full gear":v<2500?"one full Batmobile":v<5000?"the Bat-Tank":v<10000?"Wayne Manor's main vault":v<25000?"the entire Batcave's equipment":"the Batcave filled twice over";}
 // Previous time this exact lift was logged (skips the just-finished session at workouts[0]).
 function prevExercise(name){
   const ws=state.data.workouts||[];
@@ -5836,181 +6046,182 @@ function prevExercise(name){
 }
 // Previous workout sharing this session's name (e.g. last "Chest Day") for total-volume comparison.
 function prevSameDay(wk){const ws=gymWs();for(const w of ws){if(w!==wk&&w.id!==wk.id&&w.name===wk.name&&w.totalVol)return w;}return null;}
-function summaryCardRecap(R){
-  const rows=R.wk.exercises.map(e=>{
-    const ex=exFor(e.name);let topW=0,topR=0,bestO=0,vol=0;
-    e.sets.forEach(s=>{vol+=setVolume(ex,s);const o=setE1RM(ex,s);if(o>bestO){bestO=o;topW=setLoad(ex,s.w);topR=+s.r||0;}});
-    const prev=prevExercise(e.name);let delta,ac='#8b93a3';
-    if(prev&&prev.e1>0&&bestO>0){const dp=bestO-prev.e1,up=dp>0.5,dn=dp<-0.5;ac=up?'#22E87A':dn?'#FF5545':'#8b93a3';
-      delta=`<span style="color:${ac};font-size:12.5px;font-weight:800;text-shadow:0 0 8px ${ac}66">${up?'▲':dn?'▼':'='} ${dp>0?'+':''}${Math.round(dp)}kg</span>`;}
-    else{ac='#FFD048';delta=`<span style="color:#FFD048;font-size:11.5px;font-weight:800;letter-spacing:.06em">★ FIRST TIME</span>`;}
-    const mc=MCOL[(exFor(e.name).p||[])[0]]||'#FFD048';
-    return `<div style="position:relative;margin-bottom:9px;padding:11px 13px 10px 17px;border-radius:13px;background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid ${ac}30;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 14px -8px rgba(0,0,0,.8);overflow:hidden">
-      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,${mc},${mc}22)"></div>
-      <div class="row sp"><b style="font-size:14.5px">${esc(e.name)}</b>${delta}</div>
-      <div class="row sp" style="margin-top:5px;align-items:baseline"><span style="font-family:var(--disp);font-weight:650;font-size:18px;color:var(--text)">${Math.round(topW)}<span style="font-size:11px;color:var(--text3)">kg</span> × ${topR}</span><span class="mini" style="color:var(--text3)">${e.sets.length} sets · ${fmtNum(Math.round(vol))}kg moved</span></div></div>`;
-  }).join("");
-  return sumHero("Exercise breakdown","LIFT BY LIFT","🏋️","#FFD048")+rows+lgRestSummary(R.wk)+
-    `<div class="mini center" style="color:var(--text3);margin-top:2px">▲ = beat your last estimated 1RM on that lift.</div>`;
-}
-function sessionNoteBlock(R){
-  const wk=R.wk;const feel=wk.feel||"";
-  const chips=[["drained","😫 Drained"],["ok","😐 Solid"],["fire","🔥 Dialled in"]];
-  const verdict=(()=>{try{return alfredSessionVerdict();}catch(_){return "";}})();
-  return `<div class="card"><div class="ttl">📝 Mission notes</div>
-    ${verdict?`<div class="banner" style="margin-bottom:10px"><span>🎩</span><div><b style="font-size:13px;color:var(--gold2)">Alfred's verdict</b><div class="mini" style="font-style:italic;color:var(--text2);line-height:1.45">"${esc(verdict)}"</div></div></div>`:""}
-    <div class="mini" style="margin-bottom:7px;color:var(--text2)">How did it feel? Anything to remember next time?</div>
-    <div class="row" style="gap:6px;margin-bottom:9px">${chips.map(c=>`<button class="chip feelchip ${feel===c[0]?'on':''} g" data-feel="${c[0]}" style="justify-content:center" onclick="setSessionFeel('${c[0]}')">${c[1]}</button>`).join("")}</div>
-    <textarea id="sess-note" placeholder="e.g. left shoulder cranky on incline — bumped bench to 102.5 next week" oninput="saveSessionNote(this.value)" style="width:100%;min-height:66px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font:inherit;line-height:1.5;resize:vertical;box-sizing:border-box">${esc(wk.notes||"")}</textarea>
-    <div class="mini" style="margin-top:6px;color:var(--text3)">Saved automatically · appears in this session's history.</div></div>`;
-}
 function saveSessionNote(v){if(state.lastResult){state.lastResult.wk.notes=v;save();}}
 function setSessionFeel(v){if(!state.lastResult)return;const wk=state.lastResult.wk;wk.feel=(wk.feel===v?"":v);save();haptic("tap");document.querySelectorAll(".feelchip").forEach(c=>c.classList.toggle("on",c.getAttribute("data-feel")===wk.feel));}
-function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";try{playOutro(state.lastResult);}catch(e){try{playStinger('PATROL COMPLETE','','#22E87A');}catch(_){}}
-  // Alfred speaks his verdict over the debrief (mixes with music — never pauses it)
-  setTimeout(()=>{try{if(state.step==="summary")alfredVoiceLine(alfredSessionVerdict());}catch(e){}},3200);
+/* ========================= FINISH MOMENT + SUMMARY (GP:PROFILE+FINISH, wave 3) =========================
+   One full-screen moment when a session ends (<= 1.5 s, tap to skip), then a 3-slide summary: session · muscles & lifts · next + effort.
+   Matte surfaces, SF text, Bebas numerals only, gold = records. Session RPE (1–10) is stored on the workout and feeds the workload ratio. */
+const P3_FIN_MS=1250,P3_SLIDES=3,P3_DAY=864e5;
+const p3Working=wk=>(wk.exercises||[]).reduce((a,e)=>a+(e.sets||[]).filter(s=>s.type!=="W").length,0);
+const p3Min=sec=>Math.max(1,Math.round((sec||0)/60));
+const p3Vol=kg=>kg>=1000?{v:(kg/1000).toFixed(1),n:kg/1000,dec:1,u:"t"}:{v:String(Math.round(kg)),n:Math.round(kg),dec:0,u:"kg"};
+const p3Date=t=>{const d=new Date(t);return GH_DOW[d.getDay()]+" "+d.getDate()+" "+GH_MON[d.getMonth()];};
+const p3Half=n=>String(Math.round(n*2)/2);
+function p3AvgRir(wk){const a=[];(wk.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{const r=rirOfSet(s);if(r!=null)a.push(r);}));return a.length?a.reduce((x,y)=>x+y,0)/a.length:null;}
+function p3VsLast(R){const p=prevSameDay(R.wk);return p&&p.totalVol?Math.round((R.totalVol-p.totalVol)/p.totalVol*100):null;}
+function p3TonightSets(wk){   // effective sets per muscle tonight, same credit rule as weeklySets (primary 1, secondary 0.5)
+  const out={};(wk.exercises||[]).forEach(e=>{const ex=exFor(e.name),n=(e.sets||[]).filter(s=>s.type!=="W").length;
+    M12.forEach(m=>{if((ex.p||[]).includes(m))out[m]=(out[m]||0)+n;else if((ex.s||[]).includes(m))out[m]=(out[m]||0)+n*.5;});});
+  return out;
+}
+function rankUpPending(){   // would closing the summary announce a rank-up? same rule as maybeShowRankUp, nothing saved
+  try{const sl=strengthLevel(),prev=state.data._lastRank!==undefined?state.data._lastRank:sl,idx=v=>RANKS.filter(r=>v>=r[0]).length;return idx(sl)>idx(prev);}catch(e){return false;}
+}
+function openSummary(){state.sumCard=0;state.step="summary";state.tab="gotham";
+  try{playOutro(state.lastResult);}catch(e){}
+  // Alfred speaks his verdict over the summary, unless this session earns a rank-up (that announcement owns the voice)
+  setTimeout(()=>{try{if(state.step==="summary"&&!rankUpPending())alfredVoiceLine(alfredSessionVerdict());}catch(e){}},P3_FIN_MS+450);
   render();}
-/* ===== OUTRO — the mirror of the garage-door entrance. Vehicle returns, doors slam shut on the
-   night, the emblem is stamped with the night's numbers, then it lifts to reveal the debrief. ===== */
+/* the finish moment: duration · sets · volume · PRs, one quiet gold line per PR, gone in 1.25 s (tap skips) */
 function playOutro(R){
-  const old=document.getElementById('outro');if(old)old.remove();
-  const bat="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
-  let topV={e:'🏎️'};try{const gs=gothamStats();const own=GARAGE.filter(v=>v.req(gs));if(own.length)topV=own[own.length-1];}catch(_){}
-  const vol=R?fmtNum(Math.round(R.totalVol)):'';
-  const sets=R?R.wk.exercises.reduce((a,e)=>a+e.sets.length,0):0;
-  const prN=R?(R.prsThis||[]).length:0;
-  const dur=R?fmtTime(R.dur):'';
-  const el=document.createElement('div');el.id='outro';
-  el.innerHTML=`<div class="out-city"></div><div class="out-grid"></div>
-    <div class="out-veh">${vehImg(topV.n,120,"margin:0 auto;")||topV.e}</div>
-    <div class="out-ret">RETURNING TO THE CAVE</div>
-    <div class="out-doorL"></div><div class="out-doorR"></div>
-    <div class="out-stamp">
-      <svg class="os-bat" viewBox="0 0 100 100" width="76" height="76"><path fill="#FFD048" d="${bat}"/></svg>
-      <div class="os-title">PATROL COMPLETE</div>
-      ${vol?`<div class="os-vol">${vol}<span class="os-volk"> kg</span></div>`:''}
-      <div class="os-chips">
-        ${sets?`<span class="os-chip">🎯 ${sets} SETS</span>`:''}
-        ${prN?`<span class="os-chip" style="border-color:rgba(34,232,122,.5);color:#22E87A;background:rgba(34,232,122,.09)">🏆 ${prN} RECORD${prN>1?'S':''}</span>`:''}
-        ${dur?`<span class="os-chip">⏱️ ${dur}</span>`:''}
-      </div>
-      <div class="os-sub">TAP FOR THE FULL DEBRIEF</div>
-    </div>`;
+  const old=document.getElementById("p3fin");if(old)old.remove();
+  if(!R)return;
+  const prs=R.prsThis||[],v=p3Vol(R.totalVol);
+  const cell=(n,dec,u,gold)=>`<div><b class="num${gold?" g":""}" data-to="${n}" data-dec="${dec}">0</b><span>${u}</span></div>`;
+  const el=document.createElement("div");el.id="p3fin";el.className="p3-fin";el.setAttribute("role","status");
+  el.innerHTML=`<div class="c"><div class="eb">${GP.icon("bat")}<span>Session complete</span></div><div class="ttl">${esc(R.wk.name)}</div>
+    <div class="n">${cell(p3Min(R.dur),0,"min")}${cell(p3Working(R.wk),0,"sets")}${cell(v.n,v.dec,v.u==="t"?"tonnes":"kg")}${cell(prs.length,0,prs.length===1?"PR":"PRs",prs.length>0)}</div>
+    ${prs.length?`<div class="pr">${prs.slice(0,3).map((p,i)=>`<div style="--i:${i}">${GP.icon("trophy")}<span>${esc(p.name)}</span><b>${Math.round(p.orm)} kg</b></div>`).join("")}${prs.length>3?`<div class="mo" style="--i:3">+${prs.length-3} more</div>`:""}</div>`:""}</div>`;
   document.body.appendChild(el);
-  setTimeout(()=>{try{sfx("slam");haptic("done");}catch(e){}},1100);
-  setTimeout(()=>{try{sfx("pop");}catch(e){}},1650);
-  const leave=()=>{if(el._done)return;el._done=true;el.classList.add('leaving');setTimeout(()=>{try{el.remove();}catch(_){}},560);};
-  el.onclick=leave;
-  setTimeout(leave,2800);
+  el.querySelectorAll("b[data-to]").forEach(b=>rollUp(b,+b.dataset.to,{ms:520,dec:+b.dataset.dec}));
+  try{haptic("done");sfx("pop");}catch(e){}
+  const leave=()=>{if(el._o)return;el._o=1;el.classList.add("out");setTimeout(()=>{try{el.remove();}catch(_){}},240);};
+  el.onclick=leave;setTimeout(leave,P3_FIN_MS);
 }
-/* "You lifted ≈ 2.8 Batmobiles" — session tonnage drawn as Gotham hardware, not just a number. */
-const BAT_PATH="M50 33c-3-5-8-8-13-8 2 3 2 6 1 8-4-3-9-4-14-3 4 1 7 3 9 6-6-1-11 1-15 5 7-2 13-1 18 2-3 1-6 3-7 6 4-3 9-4 14-3-1 2-1 4 0 6 2-3 5-5 8-5 3 0 6 2 8 5 1-2 1-4 0-6 5-1 10 0 14 3-1-3-4-5-7-6 5-3 11-4 18-2-4-4-9-6-15-5 2-3 5-5 9-6-5-1-10 0-14 3-1-2-1-5 1-8-5 0-10 3-13 8z";
-const LIFT_UNITS=[[25000,"GOTHAM FERRIES",`<path d="M2 13 H46 L40 19 H8 Z M10 13 V8 H34 V13 M28 8 V4 H32 V8"/>`],
-         [11000,"BATWINGS",`<g transform="translate(3,-3) scale(.44)"><path d="${BAT_PATH}"/></g>`],
-         [5000,"BAT-TANKS",`<path d="M2 13 H42 L38 18 H6 Z M14 13 V8 H26 V13 M26 9 h14 v2 h-14 z"/>`],
-         [2300,"BATMOBILES",`<path d="M1 16 L8 10 L18 9 L22 4 L30 4 L32 9 L40 10 L47 16 Z M33 9 L36 2 L38 9 Z"/><circle cx="10" cy="16" r="3"/><circle cx="38" cy="16" r="3"/>`],
-         [230,"BATCYCLES",`<circle cx="8" cy="15" r="4"/><circle cx="34" cy="15" r="4"/><path d="M8 15 L17 6 H27 L34 15 Z M27 6 L31 3 L33 5 Z"/>`]];
-function liftedVisual(v){
-  const U=LIFT_UNITS;
-  let u=null;for(const x of U){if(v>=x[0]){u=x;break;}}
-  if(!u)return "";
-  const cnt=v/u[0], full=Math.min(Math.floor(cnt),7), frac=cnt-Math.floor(cnt);
-  const ic=op=>`<svg viewBox="0 0 48 20" width="42" height="18" style="fill:#FFD048;opacity:${op};filter:drop-shadow(0 0 6px rgba(255,208,72,.45))">${u[2]}</svg>`;
-  let icons="";for(let i=0;i<full;i++)icons+=ic(.95);
-  if(cnt>7.5)icons+=`<span style="font-family:var(--disp);font-weight:650;color:var(--gold2);font-size:15px">+${Math.round(cnt-7)}</span>`;
-  else if(frac>=.15)icons+=ic(.26);
-  return `<div style="margin-top:9px"><div style="font-family:var(--disp);font-weight:650;font-size:19px;letter-spacing:.06em;color:var(--gold2)">YOU LIFTED ≈ ${cnt>=10?Math.round(cnt):cnt.toFixed(1)} ${u[1]}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:5px">${icons}</div></div>`;
+/* ===== SUMMARY: slide 1 = the session (hero numbers + new records) ===== */
+function p3SumHead(R,eb){return `<div class="p3-eb gh-c" style="--i:0"><span class="eyebrow">${eb}</span><span class="eyebrow">${p3Date(R.wk.date)}</span></div><h1 class="gh-hi gh-c" style="--i:0">${esc(R.wk.name)}</h1>`;}
+function p3SumSession(R){
+  const wk=R.wk,sets=p3Working(wk),prs=R.prsThis||[],v=p3Vol(R.totalVol),dv=p3VsLast(R),rir=p3AvgRir(wk),ws=weeklyStreak(),sl=strengthLevel();
+  const dTag=dv==null?"":`<span class="tag ${dv>=0?"ok":"warn"}">${dv>0?"+":""}${dv}% vs last</span>`;
+  const stats=[[p3Min(R.dur)+"<small>min</small>","Time"],[sets,"Sets"],[rir==null?"–":rir.toFixed(1),"Avg RIR"],[prs.length,"Records"]];
+  const prRows=prs.slice(0,6).map(p=>`<div class="gh-row" data-hx onclick="openExDetail(${ghJs(p.name)})"><span class="lead gold">${GP.icon("trophy")}</span><div class="main"><div class="gh-t1">${esc(p.name)}</div><div class="gh-t2">${fmtKg(p.w)} kg × ${p.r} · e1RM ${Math.round(p.orm)} kg</div></div><span class="trail">${p.first?`<span class="tag ok">First</span>`:`<span class="p3-d">+${(p.orm-p.prevOrm).toFixed(1)}</span>`}${GP.icon("chevR")}</span></div>`).join("");
+  return `${p3SumHead(R,"Session complete")}
+  <section class="s3 p3-hero gh-c" style="--i:1">
+    <div class="p3-vh"><span class="eyebrow">Volume</span>${dTag}</div>
+    <div class="p3-vol"><span class="num" id="p3vol">${v.v}</span><span class="u">${v.u}</span></div>
+    <div class="p3-g4">${stats.map(a=>`<div><span class="num">${a[0]}</span><span class="eyebrow">${a[1]}</span></div>`).join("")}</div>
+    ${lgRestSummary(wk)}
+  </section>
+  ${prs.length?`<section class="s2 gh-list gh-c" style="--i:2"><div class="gh-lh"><h3>New records <span class="tag ok">${prs.length}</span></h3><span class="t-xs">best e1RM</span></div>${prRows}</section>`:""}
+  <div class="p3-line gh-c" style="--i:3">${GP.icon("flame")}<span>${ws>0?ws+"-week streak · ":""}${esc(rankFor(sl).name)} · Lv ${sl}</span></div>`;
 }
-/* ===== 📸 PATROL CARD — auto-rendered shareable PNG (1080×1350) shown right on the finish screen ===== */
-function _scImg(src,ms){return new Promise(res=>{if(!src)return res(null);const im=new Image();const t=setTimeout(()=>res(null),ms||900);im.onload=()=>{clearTimeout(t);res(im);};im.onerror=()=>{clearTimeout(t);res(null);};im.src=src;});}
+/* ===== slide 2 = muscles (sets tonight vs the weekly landmarks) + lift by lift ===== */
+function p3SumMuscles(R){
+  const wk=R.wk,ton=p3TonightSets(wk),hit=M12.filter(m=>ton[m]>0).sort((a,b)=>ton[b]-ton[a]);
+  const mrows=hit.map(m=>{const s=weeklySets(m),z=zoneOf(m,s),L={mev:z.mev,mav:z.mav,mrv:z.mrv},zn=GP.zone(s,L),
+      tag=zn==="bad"?`<span class="tag bad">over MRV</span>`:zn==="warn"?`<span class="tag warn">under MEV</span>`:"";
+    return `<div class="p3-mrow"><div class="p3-mh"><b>${MNAME[m]}</b>${tag}<span class="tn">+${p3Half(ton[m])} tonight</span><span class="num">${s}</span></div>${GP.landmark(s,L)}</div>`;}).join("");
+  const lifts=(wk.exercises||[]).map(e=>{const ex=exFor(e.name);let bo=0,tw=0,tr=0,n=0;
+    (e.sets||[]).forEach(s=>{if(s.type==="W")return;n++;const o=setE1RM(ex,s);if(o>bo){bo=o;tw=+s.w||0;tr=+s.r||0;}});
+    const pv=prevExercise(e.name),d=pv&&pv.e1>0&&bo>0?bo-pv.e1:null;
+    const dl=d==null?`<span class="tag">New</span>`:d>.5?`<span class="p3-d">+${Math.round(d)} kg</span>`:d<-.5?`<span class="p3-d dn">${Math.round(d)} kg</span>`:`<span class="p3-d eq">=</span>`;
+    return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(e.name)})"><span class="lead">${GP.icon("dumbbell")}</span><div class="main"><div class="gh-t1">${esc(e.name)}</div><div class="gh-t2">${ex.bw?"+":""}${fmtKg(tw)} kg × ${tr} · ${n} set${n===1?"":"s"}</div></div><span class="trail">${dl}${GP.icon("chevR")}</span></div>`;}).join("");
+  return `${p3SumHead(R,"Muscles & lifts")}
+  <section class="s2 gh-c" style="--i:1"><div class="gh-lh"><h3>Muscles tonight</h3><span class="t-xs">weekly sets · MEV · MAV · MRV</span></div>${mrows||`<div class="gh-empty">No muscle data for this session.</div>`}</section>
+  <section class="s2 gh-list gh-c" style="--i:2"><div class="gh-lh"><h3>Lift by lift</h3><span class="t-xs">top set · vs last e1RM</span></div>${lifts}</section>`;
+}
+/* ===== slide 3 = next-session targets, session RPE, Alfred, notes, share card ===== */
+function p3RpeHtml(wk){
+  const v=+wk.rpe||0;
+  return `<div class="p3-rpe-g">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="${n===v?"on":""}" data-hx onclick="setSessionRpe(${n})" aria-label="Session RPE ${n}">${n}</button>`).join("")}</div>
+    <div class="p3-rpe-n">${v?`Session load <b>${v} × ${p3Min(wk.duration)} min = ${v*p3Min(wk.duration)}</b> · feeds your workload ratio`:"1 easy · 10 nothing left. One tap; it feeds your workload ratio."}</div>`;
+}
+function setSessionRpe(n){const R=state.lastResult;if(!R)return;const wk=R.wk;if(wk.rpe===n)delete wk.rpe;else wk.rpe=n;save();haptic("tap");const b=$("p3rpe");if(b)b.innerHTML=p3RpeHtml(wk);}
+function p3Targets(wk){
+  return (wk.exercises||[]).map(e=>{const ex=exFor(e.name),p=progressionFor(e.name);if(!p)return "";
+    const lb=lastBestSet(e.name),tgt=(p.w||!ex.bw)?`<b class="num">${fmtKg(p.w)}</b><i>kg × ${p.r}${p.add?"":"+"}</i>`:`<b class="num">BW</b><i>× ${p.r}+</i>`;
+    return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(e.name)})"><span class="lead${p.add?" gold":""}">${GP.icon(p.add?"up":"plus")}</span><div class="main"><div class="gh-t1">${esc(e.name)}</div><div class="gh-t2">${lb?`Tonight ${fmtKg(lb.w)} × ${lb.r}`:"First session"}</div></div><span class="trail p3-tgt"><span>${tgt}</span>${p.add?`<span class="tag ok">+${fmtKg(p.inc)} kg</span>`:`<span class="tag">+1 rep</span>`}</span></div>`;}).join("");
+}
+function p3Notes(wk){
+  const feel=wk.feel||"";
+  return `<section class="s2 p3-nt gh-c" style="--i:5"><span class="eyebrow">How did it feel?</span><div class="p3-feel">${[["drained","Drained"],["ok","Solid"],["fire","Dialled in"]].map(c=>`<button class="chip feelchip${feel===c[0]?" on":""}" data-feel="${c[0]}" data-hx onclick="setSessionFeel('${c[0]}')">${c[1]}</button>`).join("")}</div>
+    <textarea id="sess-note" rows="2" placeholder="Anything to remember next time?" oninput="saveSessionNote(this.value)">${esc(wk.notes||"")}</textarea></section>`;
+}
+function p3Backup(){
+  const u=state.data.u;if((state.data.workouts||[]).length<8)return "";
+  const last=u.lastBackupAt?new Date(u.lastBackupAt).getTime():0;if(now()-last<30*P3_DAY)return "";
+  return `<div class="s1 p3-bk gh-c" style="--i:7"><span class="lead">${GP.icon("alert")}</span><div class="main"><div class="gh-t1">Back up your data</div><div class="gh-t2">${u.lastBackupAt?"Last backup over a month ago.":"No backup on file."} One tap saves it to a file.</div></div><button class="btn sm" data-hx onclick="backupData();render()">Back up</button></div>`;
+}
+function p3SumNext(R){
+  const wk=R.wk,tg=p3Targets(wk);
+  return `${p3SumHead(R,"Next session")}
+  ${tg?`<section class="s2 gh-list gh-c" style="--i:1"><div class="gh-lh"><h3>Targets</h3><span class="t-xs">add weight at 10 reps</span></div>${tg}</section>`:""}
+  <section class="s2 p3-rpe gh-c" style="--i:2"><div class="gh-lh p3-rh"><h3>Session effort</h3><span class="t-xs">RPE 1–10</span></div><div id="p3rpe">${p3RpeHtml(wk)}</div></section>
+  <section class="s2 p3-al gh-c" style="--i:3"><div class="p3-alh"><span class="av"><img src="assets/alfred.png" alt=""></span><b>Alfred</b></div><div id="ai-out" class="p3-alt" onclick="this.classList.toggle('open')">Alfred is reviewing the session…</div></section>
+  ${p3Notes(wk)}
+  <section class="s2 p3-share gh-c" style="--i:6"><img id="sharecard" alt="Session card"><div class="p3-sbtn"><button class="btn" data-hx onclick="shareCardShare()">${GP.icon("share")}Save card</button><button class="btn btn-3" data-hx onclick="shareWorkout()">Share with allies</button></div></section>
+  ${p3Backup()}`;
+}
+function renderSummary(){
+  const R=state.lastResult;if(!R){state.step=null;go("gotham");return;}
+  const k=state.sumCard=clamp(state.sumCard||0,0,P3_SLIDES-1),last=k===P3_SLIDES-1;
+  $("app").innerHTML=`<div class="gh p3-sum gh-anim">${[p3SumSession,p3SumMuscles,p3SumNext][k](R)}
+    <div class="p3-nav"><div class="dots">${[0,1,2].map(i=>`<i class="${i===k?"on":""}"></i>`).join("")}</div>
+    <div class="p3-btns">${k?`<button class="btn" data-hx onclick="sumNav(-1)">Back</button>`:""}<button class="btn btn-1" data-hx onclick="${last?"closeSummary()":"sumNav(1)"}">${last?"Done":"Next"}</button></div></div></div>`;
+  if(k===0){const v=$("p3vol");if(v){const t=p3Vol(R.totalVol);rollUp(v,t.n,{ms:650,dec:t.dec});}}
+  if(k===2){setTimeout(()=>{try{renderShareCard(R);}catch(e){}},120);try{populateAlfredRead(R);}catch(e){}}
+  // swipe — handlers live on #app and are cleared at the top of render() when we leave summary
+  const app=$("app");let sx=0;
+  app.ontouchstart=e=>{sx=e.touches[0].clientX;};
+  app.ontouchend=e=>{if(state.step!=="summary")return;const dx=e.changedTouches[0].clientX-sx;if(dx<-50)sumNav(1);else if(dx>50)sumNav(-1);};
+}
+function closeSummary(){
+  try{maybeShowRankUp();}catch(e){}
+  try{checkStreakMilestone();}catch(e){}
+  try{masteryCeremonyCheck();}catch(e){}
+  state.lastResult=null;state.step=null;const a=$("app");if(a){a.ontouchstart=null;a.ontouchend=null;}go("gotham");
+}
+function sumNav(d){if(state.step!=="summary")return;state.sumCard=clamp((state.sumCard||0)+d,0,P3_SLIDES-1);renderSummary();window.scrollTo(0,0);}
+/* the share card (1080×1350): the same look as the app — matte surface, gold edge-light, SF text, Bebas numerals, no art */
 async function renderShareCard(R){
   const el=$("sharecard");if(!el||!R)return;
-  try{await document.fonts.load('90px "Bebas Neue"');}catch(e){}
-  const cv=document.createElement("canvas");cv.width=1080;cv.height=1350;const x=cv.getContext("2d");
-  const GOLD="#FFD048",W=1080;
-  x.fillStyle="#04060b";x.fillRect(0,0,W,1350);
-  const rg=x.createRadialGradient(540,140,60,540,140,940);rg.addColorStop(0,"rgba(232,168,32,.22)");rg.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=rg;x.fillRect(0,0,W,1350);
-  x.strokeStyle="rgba(60,150,255,.055)";x.lineWidth=1;
-  for(let i=0;i<=W;i+=54){x.beginPath();x.moveTo(i,0);x.lineTo(i,1350);x.stroke();}
-  for(let j=0;j<=1350;j+=54){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke();}
-  try{const bp=new Path2D(BAT_PATH);x.save();x.translate(540-50*7.6,140);x.scale(7.6,7.6);x.fillStyle="rgba(255,208,72,.06)";x.fill(bp);x.restore();}catch(e){}
-  x.textAlign="center";
-  x.fillStyle=GOLD;x.font='36px "Bebas Neue",sans-serif';try{x.letterSpacing="10px";}catch(e){}
-  x.fillText("GOTHAM IRON PROTOCOL · "+new Date(R.wk.date).toLocaleDateString().toUpperCase(),540,86);
-  try{x.letterSpacing="2px";}catch(e){}
-  x.fillStyle="#F6F2E6";x.font='120px "Bebas Neue",sans-serif';
-  x.shadowColor="rgba(255,208,72,.5)";x.shadowBlur=42;
-  x.fillText(String(R.wk.name||"PATROL").toUpperCase().slice(0,20),540,226);
-  x.shadowBlur=0;
-  // tonnage hero
-  x.fillStyle=GOLD;x.font='230px "Bebas Neue",sans-serif';x.shadowColor="rgba(232,168,32,.65)";x.shadowBlur=60;
-  x.fillText(fmtNum(Math.round(R.totalVol)),540,500);
-  x.shadowBlur=0;x.fillStyle="#98A4B4";x.font='42px "Bebas Neue",sans-serif';try{x.letterSpacing="12px";}catch(e){}
-  x.fillText("KG MOVED TONIGHT",540,556);try{x.letterSpacing="2px";}catch(e){}
-  // hardware equivalence row
-  let unit=null;for(const u of LIFT_UNITS){if(R.totalVol>=u[0]){unit=u;break;}}
-  if(unit){
-    const cnt=R.totalVol/unit[0],n=Math.min(Math.max(1,Math.floor(cnt)),6);
-    x.fillStyle=GOLD;x.font='58px "Bebas Neue",sans-serif';
-    x.fillText("≈ "+(cnt>=10?Math.round(cnt):cnt.toFixed(1))+" "+unit[1],540,648);
-    // real cinematic render of the hardware — screen-blended so the black plate melts into the card
-    const VEH_BY_UNIT={"BATMOBILES":"batmobile","BATWINGS":"batwing","BATCYCLES":"batcycle","BAT-TANKS":"tumbler","GOTHAM FERRIES":"batboat"};
-    const vf=VEH_BY_UNIT[unit[1]];
-    let drew=false;
-    if(vf){const im=await _scImg("assets/veh/"+vf+".png",900);
-      if(im){const sy=im.height*0.24,sh=im.height*0.52;
-        x.drawImage(im,0,sy,im.width,sh,290,662,500,250);drew=true;}}
-    if(!drew){
-      const gs=[];for(let i=0;i<n;i++)gs.push(`<g transform="translate(${i*52},0)">${unit[2]}</g>`);
-      const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${n*52*2}" height="40" viewBox="0 0 ${n*52} 20" fill="#FFD048">${gs.join("")}</svg>`;
-      const im2=await _scImg("data:image/svg+xml;utf8,"+encodeURIComponent(svg),700);
-      if(im2)x.drawImage(im2,540-n*52,684,n*52*2,80);}
-  }
-  // stats row
-  const sets=R.wk.exercises.reduce((a,e)=>a+e.sets.filter(s=>s.type!=="W").length,0);
-  const stats=[[fmtTime(R.dur),"TIME"],[String(R.wk.exercises.length),"LIFTS"],[String(sets),"SETS"],[String((R.prsThis||[]).length),"NEW PRS"]];
-  stats.forEach((s,i)=>{const cx=135+i*270;
-    x.fillStyle="#F6F2E6";x.font='84px "Bebas Neue",sans-serif';x.fillText(s[0],cx,900);
-    x.fillStyle="#606872";x.font='30px "Bebas Neue",sans-serif';try{x.letterSpacing="6px";}catch(e){}x.fillText(s[1],cx,944);try{x.letterSpacing="2px";}catch(e){}});
-  x.strokeStyle="rgba(255,208,72,.28)";x.lineWidth=2;x.beginPath();x.moveTo(80,985);x.lineTo(1000,985);x.stroke();
-  // PRs broken
-  let py=1026;
-  if((R.prsThis||[]).length){
-    x.fillStyle="#22E87A";x.font='44px "Bebas Neue",sans-serif';
-    x.fillText("🏆 "+R.prsThis.length+" RECORD"+(R.prsThis.length>1?"S":"")+" BROKEN",540,py);
-    x.fillStyle="#98A4B4";x.font='30px "Bebas Neue",sans-serif';
-    x.fillText(R.prsThis.map(p=>p.name).join("  ·  ").toUpperCase().slice(0,60),540,py+42);py+=96;
-  }
-  // villains booked tonight (mugshots)
-  const vs=[];const seenV={};
-  (R.prsThis||[]).forEach(p=>{try{const b=pickBoss([p]);if(b&&!seenV[b.v]){seenV[b.v]=1;vs.push(b);}}catch(e){}});
-  if(vs.length){
-    const v3=vs.slice(0,3);const imgs=await Promise.all(v3.map(b=>_scImg(villainImgUrl(b.v),900)));
-    const cw=120,gap=36,total=v3.length*cw+(v3.length-1)*gap;let vx=540-total/2+cw/2;
-    v3.forEach((b,i)=>{const im=imgs[i];
-      x.save();x.beginPath();x.arc(vx,py+60,60,0,7);x.closePath();x.clip();
-      if(im)x.drawImage(im,vx-60,py,120,150);else{x.fillStyle="#1b2234";x.fillRect(vx-60,py,120,150);x.fillStyle=GOLD;x.font='56px sans-serif';x.fillText("☠",vx,py+80);}
-      x.restore();
-      x.strokeStyle="rgba(255,54,34,.8)";x.lineWidth=4;x.beginPath();x.arc(vx,py+60,60,0,7);x.stroke();vx+=cw+gap;});
-    x.fillStyle="#FF3622";x.font='32px "Bebas Neue",sans-serif';try{x.letterSpacing="5px";}catch(e){}
-    x.fillText(vs.length+" ROGUE"+(vs.length>1?"S":"")+" BOOKED — "+vs.map(b=>b.v).join(" · ").toUpperCase().slice(0,46),540,py+152);try{x.letterSpacing="2px";}catch(e){}
-  }
-  // footer — rank + streak (streak only when it exists)
-  try{const sl=strengthLevel();const ri=Math.max(0,RANKS.map(r=>r[0]).filter(t=>sl>=t).length-1);
-    const ws=weeklyStreak();
-    x.fillStyle=GOLD;x.font='38px "Bebas Neue",sans-serif';
-    const ti=activeTitle();
-    x.fillText(RANKS[ri][2]+" "+String(RANKS[ri][1]).toUpperCase()+(ti?" · "+String(ti.n).toUpperCase():"")+" · LV "+sl+(ws>0?"     🔥 "+ws+"-WEEK STREAK":""),540,1330);}catch(e){}
+  try{await document.fonts.load('120px "Bebas Neue"');}catch(e){}
+  const W=1080,H=1350,M=84,cv=document.createElement("canvas");cv.width=W;cv.height=H;const x=cv.getContext("2d");
+  const UI='-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif',NUM='"Bebas Neue","Arial Narrow",sans-serif',GOLD="#F2C14E",TX1="#F3F0E8",TX2="#A8B3C6",TX3="#8C97AC",OK="#34D27F",WARN="#FFB224";
+  const ls=px=>{try{x.letterSpacing=px+"px";}catch(e){}};
+  const txt=(s,px,xx,y,o={})=>{x.font=(o.w||600)+" "+px+"px "+(o.num?NUM:UI);x.fillStyle=o.c||TX1;x.textAlign=o.a||"left";ls(o.ls||0);x.fillText(s,xx,y);ls(0);};
+  const fit=(s,px,maxW,o={})=>{x.font=(o.w||600)+" "+px+"px "+(o.num?NUM:UI);while(x.measureText(s).width>maxW&&px>20){px-=2;x.font=(o.w||600)+" "+px+"px "+(o.num?NUM:UI);}return px;};
+  x.fillStyle="#0C121C";x.fillRect(0,0,W,H);
+  let g=x.createRadialGradient(W,0,40,W,0,980);g.addColorStop(0,"rgba(242,193,78,.20)");g.addColorStop(1,"rgba(242,193,78,0)");x.fillStyle=g;x.fillRect(0,0,W,H);
+  g=x.createRadialGradient(0,H,40,0,H,900);g.addColorStop(0,"rgba(91,180,255,.07)");g.addColorStop(1,"rgba(91,180,255,0)");x.fillStyle=g;x.fillRect(0,0,W,H);
+  g=x.createLinearGradient(0,0,W,0);[[0,0],[.28,.9],[.72,.9],[1,0]].forEach(a=>g.addColorStop(a[0],`rgba(255,221,138,${a[1]})`));x.fillStyle=g;x.fillRect(0,0,W,3);
+  // wordmark + date
+  try{x.save();x.translate(M-6,48);x.scale(3.4,3.4);x.fillStyle=GOLD;x.fill(new Path2D("M12 8.7l.9-1.5.6-1.3.45 2.25c1.45-.65 4.65-.95 8.65-1.25-1.4 1-1.9 2.4-1.5 4.1-.9-.7-1.9-.6-2.6.9-.6-.8-1.7-1-2.6-.3-.3 1.4-1.3 1.8-1.9 1.5-.6 1.3-1.4 2.2-2 3.6-.6-1.4-1.4-2.3-2-3.6-.6.3-1.6-.1-1.9-1.5-.9-.7-2-.5-2.6.3-.7-1.5-1.7-1.6-2.6-.9.4-1.7-.1-3.1-1.5-4.1 4 .3 7.2.6 8.65 1.25l.45-2.25.6 1.3z"));x.restore();}catch(e){}
+  txt("GAINSTRACKER",28,M+92,98,{w:700,c:TX2,ls:5});
+  txt(p3Date(R.wk.date).toUpperCase(),28,W-M,98,{c:TX3,ls:4,a:"right"});
+  // title
+  const nm=String(R.wk.name||"Session");txt(nm,fit(nm,100,W-2*M,{w:700}),M,250,{w:700});
+  // hero volume
+  const v=p3Vol(R.totalVol),dv=p3VsLast(R);
+  txt("VOLUME",26,M,380,{c:TX3,ls:6});
+  if(dv!=null){const t=(dv>0?"+":"")+dv+"% vs last",tw=(x.font="600 26px "+UI,x.measureText(t).width)+36,c=dv>=0?OK:WARN;
+    x.fillStyle=dv>=0?"rgba(52,210,127,.14)":"rgba(255,178,36,.14)";x.beginPath();x.roundRect?x.roundRect(W-M-tw,350,tw,44,12):x.rect(W-M-tw,350,tw,44);x.fill();txt(t,26,W-M-tw/2,380,{c,a:"center"});}
+  x.font='330px "Bebas Neue",sans-serif';const nw=x.measureText(v.v).width;txt(v.v,330,M,640,{num:1,w:400,c:GOLD});txt(v.u,64,M+nw+22,640,{w:700,c:TX2});
+  // stat row
+  const rir=p3AvgRir(R.wk),prs=R.prsThis||[],cols=[[String(p3Min(R.dur)),"MIN"],[String(p3Working(R.wk)),"SETS"],[rir==null?"–":rir.toFixed(1),"AVG RIR"],[String(prs.length),"RECORDS"]],cw=(W-2*M)/4;
+  cols.forEach((c,i)=>{txt(c[0],132,M+i*cw,790,{num:1,w:400,c:i===3&&prs.length?GOLD:TX1});txt(c[1],24,M+i*cw,832,{c:TX3,ls:5});});
+  x.fillStyle="rgba(150,178,222,.18)";x.fillRect(M,872,W-2*M,2);
+  // records, or the three heaviest top sets
+  let rows;
+  if(prs.length)rows=prs.slice(0,3).map(p=>({n:p.name,s:fmtKg(p.w)+" kg × "+p.r,v:Math.round(p.orm),d:p.prevOrm?p.orm-p.prevOrm:null}));
+  else rows=(R.wk.exercises||[]).map(e=>{const ex=exFor(e.name);let bo=0,bs=null;(e.sets||[]).forEach(s=>{const o=setE1RM(ex,s);if(o>bo){bo=o;bs=s;}});return bs?{n:e.name,s:fmtKg(bs.w)+" kg × "+bs.r,v:Math.round(bo),d:null}:null;}).filter(Boolean).sort((a,b)=>b.v-a.v).slice(0,3);
+  txt(prs.length?"NEW RECORDS":"TOP SETS",26,M,926,{c:prs.length?GOLD:TX3,ls:6});
+  rows.forEach((r,i)=>{const y=990+i*84;txt(r.n,fit(r.n,40,W-2*M-300),M,y,{c:TX1,w:600});txt(r.s,28,M,y+34,{c:TX3,w:500});
+    txt(String(r.v),72,W-M-58,y+20,{num:1,w:400,c:GOLD,a:"right"});txt("kg",28,W-M,y+20,{c:TX2,w:600,a:"right"});
+    if(r.d!=null&&r.d>0)txt("+"+r.d.toFixed(1),26,W-M-58,y+54,{c:OK,w:700,a:"right"});});
+  // footer
+  x.fillStyle="rgba(150,178,222,.18)";x.fillRect(M,1236,W-2*M,2);
+  try{const u=state.data.u,sl=strengthLevel(),ws=weeklyStreak();txt((u.name?u.name+" · ":"")+rankFor(sl).name+" · Lv "+sl,28,M,1296,{c:TX2,w:600});if(ws>0)txt(ws+"-week streak",28,W-M,1296,{c:GOLD,w:600,a:"right"});}catch(e){}
   // earned card frame — rarest unlocked auto-applies (blood > gold leaf > foil)
   try{const fr=(state.data.prestige||0)>=1?"blood":((state.data.frames||{}).goldleaf?"goldleaf":((state.data.frames||{}).foil?"foil":""));
-    if(fr==="foil"){const g=x.createLinearGradient(0,0,W,1350);["#7fd8ff","#c9b8ff","#ffd048","#7fffc9"].forEach((c,i)=>g.addColorStop(i/3,c));x.strokeStyle=g;x.lineWidth=14;x.strokeRect(10,10,W-20,1330);}
-    else if(fr==="goldleaf"){x.strokeStyle="#FFD048";x.lineWidth=16;x.strokeRect(12,12,W-24,1326);x.strokeStyle="rgba(255,208,72,.45)";x.lineWidth=4;x.strokeRect(34,34,W-68,1282);}
-    else if(fr==="blood"){x.strokeStyle="#FF3622";x.lineWidth=14;x.strokeRect(10,10,W-20,1330);x.strokeStyle="rgba(255,54,34,.5)";x.lineWidth=4;x.strokeRect(30,30,W-60,1290);}
+    if(fr==="foil"){const gg=x.createLinearGradient(0,0,W,H);["#7fd8ff","#c9b8ff","#ffd048","#7fffc9"].forEach((c,i)=>gg.addColorStop(i/3,c));x.strokeStyle=gg;x.lineWidth=4;x.strokeRect(26,26,W-52,H-52);}
+    else if(fr==="goldleaf"){x.strokeStyle=GOLD;x.lineWidth=3;x.strokeRect(26,26,W-52,H-52);x.strokeStyle="rgba(242,193,78,.35)";x.lineWidth=1.5;x.strokeRect(38,38,W-76,H-76);}
+    else if(fr==="blood"){x.strokeStyle="#FF5A4E";x.lineWidth=3;x.strokeRect(26,26,W-52,H-52);x.strokeStyle="rgba(255,90,78,.35)";x.lineWidth=1.5;x.strokeRect(38,38,W-76,H-76);}
   }catch(e){}
   el.src=cv.toDataURL("image/png");
   cv.toBlob(b=>{state._shareBlob=b;},"image/png");
 }
+/* ===== 📸 PATROL CARD — auto-rendered shareable PNG (1080×1350) shown right on the finish screen ===== */
 function shareCardShare(){
   const b=state._shareBlob;if(!b){toast("Card is still rendering, sir…");return;}
   haptic("tap");
@@ -6020,31 +6231,6 @@ function shareCardShare(){
   }catch(e){}
   const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="gainstracker-patrol.png";a.click();
 }
-function renderSummary(){
-  const R=state.lastResult;if(!R){state.step=null;go("gotham");return;}
-  const cards=[summaryCard1,summaryCardRecap,summaryCard2,summaryCard3,summaryCard4];const last=cards.length-1;
-  $("app").innerHTML=`<div class="fade">${cards[state.sumCard](R)}
-    ${state.sumCard===0?lifeboatBanner():""}
-    <div class="dots">${cards.map((_,i)=>`<i class="${i===state.sumCard?"on":""}"></i>`).join("")}</div>
-    <div class="row" style="margin-top:14px;gap:9px">
-      ${state.sumCard>0?`<button class="btn ghost g" onclick="sumNav(-1)">← Back</button>`:""}
-      ${state.sumCard<last?`<button class="btn gold g" onclick="sumNav(1)">Next →</button>`:`<button class="btn gold g" onclick="closeSummary()">DONE</button>`}
-    </div></div>`;
-  if(state.sumCard===0){setTimeout(()=>countUpEl("sumvol",Math.round(R.totalVol)),80);setTimeout(()=>{try{renderShareCard(R);}catch(e){}},160);try{navigator.vibrate&&navigator.vibrate([30,180,30,300,30]);}catch(e){}}
-  // swipe — handlers live on #app and are cleared at the top of render() when we leave summary,
-  // so a stray swipe after dismissing the summary can never re-trigger this flow.
-  const app=$("app");let sx=0;
-  app.ontouchstart=e=>{sx=e.touches[0].clientX;};
-  app.ontouchend=e=>{if(state.step!=="summary")return;const dx=e.changedTouches[0].clientX-sx;if(dx<-50)sumNav(1);else if(dx>50)sumNav(-1);};
-  if(document.getElementById("ai-out")){try{populateAlfredRead(R);}catch(_){}}
-}
-function closeSummary(){
-  try{maybeShowRankUp();}catch(e){}
-  try{checkStreakMilestone();}catch(e){}
-  try{masteryCeremonyCheck();}catch(e){}
-  state.lastResult=null;state.step=null;const a=$("app");if(a){a.ontouchstart=null;a.ontouchend=null;}go("gotham");
-}
-function sumNav(d){if(state.step!=="summary")return;state.sumCard=clamp(state.sumCard+d,0,4);renderSummary();window.scrollTo(0,0);}
 /* Shared muscle accent palette + cinematic slide hero — every debrief slide opens like the patrol card. */
 const MCOL={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
 function sumHero(kick,title,icon,accent){
@@ -6054,100 +6240,6 @@ function sumHero(kick,title,icon,accent){
     <h1 style="font-family:var(--num);font-size:40px;line-height:.96;margin:11px 0 9px;color:${accent};text-shadow:0 0 36px ${accent}66,0 2px 14px rgba(0,0,0,.9);animation:sumFade .55s .08s both">${title}</h1>
     <div style="width:150px;height:2px;margin:0 auto;background:linear-gradient(90deg,transparent,${accent},transparent);box-shadow:0 0 12px ${accent};animation:sumFade .6s .14s both"></div>
   </div>`;
-}
-function sessionRoguesGallery(R){
-  if(!R.prsThis||!R.prsThis.length)return"";
-  const seen={};const tiles=[];
-  R.prsThis.forEach(p=>{const b=(typeof pickBoss==="function")?pickBoss([p]):null;if(!b)return;
-    if(seen[b.v])return;seen[b.v]=1;
-    tiles.push(`<div class="vmini" style="--vc:${b.c}"><div class="vmini-face">${villainImgUrl(b.v)?`<img class="vface" src="${esc(villainImgUrl(b.v))}" alt="">`:b.e}</div><div class="vmini-stamp">BOOKED</div><div class="vmini-name">${esc(b.v)}</div></div>`);});
-  if(!tiles.length)return"";
-  return `<div class="hr"></div>
-    <div class="mini" style="letter-spacing:.16em;color:var(--text3);font-family:var(--mono,monospace);margin-bottom:8px">GCPD · ROGUES BOOKED TONIGHT</div>
-    <div class="vmini-row">${tiles.join("")}</div>`;
-}
-function summaryCard1(R){
-  // Strength rank is THE overall level. Show its progress here (no separate XP level).
-  const sl=strengthLevel();const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
-  const rcur=RANKS[ri],rnext=RANKS[ri+1];
-  const rlo=rcur[0],rhi=rnext?rnext[0]:rcur[0];const pct=rnext?clamp((sl-rlo)/Math.max(1,(rhi-rlo))*100,0,100):100;
-  const sets=R.wk.exercises.reduce((a,e)=>a+e.sets.length,0);
-  const prN=R.prsThis.length;
-  const vsPrev=(()=>{const p=prevSameDay(R.wk);if(!p)return"";const dp=R.totalVol-p.totalVol;const pc=p.totalVol?Math.round(dp/p.totalVol*100):0;const up=dp>0,dn=dp<0;return `<div class="mini" style="margin-top:5px;font-weight:600;color:${up?'var(--green)':dn?'#e8453c':'var(--text3)'}">${up?'▲':dn?'▼':'='} ${dp>0?'+':''}${fmtNum(Math.round(dp))}kg (${pc>0?'+':''}${pc}%) vs last ${esc(R.wk.name)}</div>`;})();
-  return `<span class="sumtag">Mission complete · ${new Date(R.wk.date).toLocaleDateString()}</span>
-  <h1 class="sumtitle">${esc(R.wk.name)}</h1>
-  <div class="card glow" style="padding-top:15px">
-    <div class="sumstats">
-      <div class="sumstat"><div class="si">⏱️</div><div class="sv">${fmtTime(R.dur)}</div><div class="sk">time</div></div>
-      <div class="sumstat"><div class="si">🏋️</div><div class="sv">${R.wk.exercises.length}</div><div class="sk">lifts</div></div>
-      <div class="sumstat"><div class="si">🎯</div><div class="sv">${sets}</div><div class="sk">sets</div></div>
-    </div>
-    <div class="sumvol"><div class="vbig"><span id="sumvol">0</span><span style="font-size:20px;color:var(--text2)">kg</span></div>
-      ${liftedVisual(R.totalVol)||`<div class="muted" style="font-size:13px">≈ ${batCompare(R.totalVol)}</div>`}${vsPrev}</div>
-    ${prN?`<div class="prribbon"><div class="row" style="gap:10px;align-items:center"><div style="font-size:26px;filter:drop-shadow(0 0 8px rgba(46,204,113,.5))">🏆</div><div style="flex:1"><div class="prr-t">${prN} NEW PERSONAL RECORD${prN>1?"S":""}</div><div class="prr-s">${R.prsThis.map(p=>esc(p.name)).join(" · ")}</div></div></div></div>`:""}
-    <div class="hr"></div>
-    <div class="row sp" style="margin-bottom:6px"><b class="gold">${rcur[2]} ${esc(rcur[1])} · Lv ${sl}</b><span class="mini">${rnext?`${Math.max(0,rhi-sl)} level${(rhi-sl)===1?'':'s'} to ${esc(rnext[1])}`:`MAX rank · legend`}</span></div>
-    <div class="bar xpbar"><i style="width:${pct}%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></i></div>
-    <div class="center" style="margin-top:11px"><span class="chip on">🔥 ${state.data.u.streakDays} day streak</span></div>
-    ${sessionRoguesGallery(R)}
-    <div class="hr"></div>
-    <div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:8px">📸 PATROL CARD — long-press to save, or share</div>
-    <img id="sharecard" alt="Patrol card" style="width:100%;border-radius:16px;border:1px solid rgba(255,208,72,.35);box-shadow:0 16px 44px -18px rgba(0,0,0,.9);min-height:140px;background:#0a0d14">
-    <button class="btn gold" style="margin-top:10px" onclick="shareCardShare()">📤 SHARE / SAVE PATROL CARD</button>
-  </div>`;
-}
-function summaryCard2(R){
-  const hit=Object.keys(R.sessVol).sort((a,b)=>R.sessVol[b]-R.sessVol[a]);
-  const maxV=Math.max(1,...hit.map(m=>R.sessVol[m]||0));
-  return sumHero("Muscle intel","SECTORS HIT","🎯","#FF3622")
-  +`<div class="card" style="background:linear-gradient(175deg,rgba(18,10,6,.98),rgba(6,4,3,1));border:1.5px solid rgba(255,54,34,.28);position:relative;overflow:hidden;box-shadow:0 0 30px -14px rgba(255,54,34,.7)">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% 35%,rgba(255,54,34,.10),transparent 68%);pointer-events:none"></div>
-      ${miniSuit(R.musclesHit)}</div>`
-  +`<div class="card">${hit.map(m=>{const mc=MCOL[m]||'#FFD048';const pct=clamp((R.sessVol[m]||0)/maxV*100,3,100);const sec=R.musclesHit[m]<1;
-    return `<div style="margin-bottom:11px">
-      <div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px;font-weight:700;${sec?'opacity:.55':''}">${mIcon(m,15)} ${MNAME[m]}${sec?' <span class="mini" style="color:var(--text3)">(secondary)</span>':''}</span><b style="font-family:var(--disp);font-weight:650;font-size:14.5px;color:${sec?'var(--text3)':mc};text-shadow:0 0 8px ${mc}44">${fmtNum(Math.round(R.sessVol[m]))}kg</b></div>
-      <div style="height:8px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden"><i style="display:block;height:100%;width:${pct.toFixed(0)}%;background:linear-gradient(90deg,${mc}55,${mc});box-shadow:0 0 10px ${mc}88;border-radius:5px;${sec?'opacity:.45':''}"></i></div>
-    </div>`;}).join("")}</div>`;
-}
-function summaryCard3(R){
-  let bestSet=null,bestORM=0,rpeSum=0,rpeN=0;
-  R.wk.exercises.forEach(e=>{const ex=exFor(e.name);e.sets.forEach(s=>{const o=setE1RM(ex,s);if(o>bestORM){bestORM=o;bestSet={n:e.name,w:setLoad(ex,s.w),r:s.r};}if(s.rpe&&s.type!=="W"){rpeSum+=parseFloat(s.rpe)||0;rpeN++;}});});
-  const density=Math.round(R.totalVol/(R.dur/60||1));
-  const gn=gothamNote();
-  const tile=(ic,k,v,sub,ac)=>`<div style="position:relative;text-align:center;padding:14px 8px 12px;border-radius:14px;background:linear-gradient(165deg,${ac}10,rgba(255,255,255,.015));border:1px solid ${ac}38;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 20px -12px ${ac};overflow:hidden">
-    <div style="font-size:15px;margin-bottom:4px">${ic}</div>
-    <div style="font-family:var(--num);font-weight:400;font-size:23px;line-height:1;color:${ac};text-shadow:0 0 14px ${ac}66;text-transform:capitalize">${v}</div>
-    <div style="font-size:8.5px;letter-spacing:.18em;color:var(--text3);text-transform:uppercase;margin-top:5px">${k}</div>
-    ${sub?`<div class="mini" style="color:var(--text2);margin-top:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>`:""}
-  </div>`;
-  return sumHero("Performance analysis","THE NUMBERS","📊","#3C96FF")
-  +`<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px">
-    ${bestSet?tile("⚔️","best set",`${Math.round(bestSet.w)}×${bestSet.r}`,esc(bestSet.n),"#FFD048"):""}
-    ${tile("🔥","avg "+state.data.u.metric.toUpperCase(),rpeN?(rpeSum/rpeN).toFixed(1):"—","effort logged","#FF8C22")}
-    ${tile("⚡","density",density+"","kg per minute","#3C96FF")}
-    ${tile("🌙","readiness",esc(R.readiness||"—"),"tonight's state","#22E87A")}
-  </div>
-  ${R.readiness==="tired"&&rpeN&&(rpeSum/rpeN)<=7?`<div class="mini center" style="margin:-2px 0 10px;color:var(--gold2)">Batman works best under pressure.</div>`:""}
-  ${(()=>{const sug=overloadSuggestions(R.wk);return sug.length?`<div class="card"><div class="ttl">📈 Next session — progressive overload</div>${sug.map(s=>`<div style="padding:7px 0;border-top:1px solid var(--border)"><b style="font-size:13px;color:${s.tone==="up"?"var(--green)":s.tone==="hold"?"var(--gold2)":"var(--text)"}">${esc(s.name)}</b><div class="mini" style="margin-top:2px">${esc(s.text)}</div></div>`).join("")}<div class="mini" style="margin-top:8px;color:var(--text3)">Overload is the actual driver of growth — add reps or load over time, or the stimulus stops adapting.</div></div>`:"";})()}
-  <div class="card" id="ai-analysis"><div class="ttl">🤖 Alfred's read</div><div id="ai-out" class="muted" style="font-size:13.5px">Alfred is reviewing the session…</div></div>
-  <div class="card center"><div class="tag" style="color:${gn.kind==='science'?'var(--blue)':'var(--gold-dim)'};margin-bottom:5px">${gn.kind==='science'?'🧪 ':'🦇 '}${gn.label}</div><div class="muted" style="font-style:italic;font-size:13.5px">${gn.kind==='science'?esc(gn.text):'"'+esc(gn.text)+'"'}</div></div>`;
-}
-function summaryCard4(R){
-  const ready=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)>=80);
-  const rec=M12.filter(m=>(state.data.muscleVol[m]||0)&&getRecovery(m)<80).sort((a,b)=>getRecovery(a)-getRecovery(b));
-  return sumHero("Next mission","WHAT'S READY","🌅","#22E87A")
-  +`<div class="card" style="border:1.5px solid rgba(34,232,122,.28);box-shadow:0 0 26px -14px rgba(34,232,122,.8)">
-    <div class="mini" style="letter-spacing:.16em;color:#22E87A;margin-bottom:10px;font-weight:800">⚡ READY TO STRIKE (≥80%)</div>
-    ${ready.length?`<div style="display:flex;flex-wrap:wrap;gap:7px">${ready.map(m=>`<span style="font-size:12px;font-weight:800;padding:8px 13px;border-radius:19px;border:1px solid rgba(34,232,122,.45);background:rgba(34,232,122,.09);color:#7df0b0;box-shadow:0 0 12px -4px rgba(34,232,122,.6)">${mIcon(m,14)} ${MNAME[m]} · ${getRecovery(m)}%</span>`).join("")}</div>`:'<p class="muted">Everything is still recovering. Rest is a weapon.</p>'}
-  </div>
-  <div class="card">
-    <div class="mini" style="letter-spacing:.16em;color:var(--text3);margin-bottom:10px;font-weight:800">🌙 STILL RECOVERING</div>
-    ${rec.length?rec.map(m=>{const rv=getRecovery(m);const mc=rv>=50?'#E8C53C':'#E8453C';
-      return `<div style="margin-bottom:10px"><div class="row sp" style="margin-bottom:3px"><span style="font-size:12.5px;font-weight:700">${mIcon(m,15)} ${MNAME[m]}</span><span class="mini" style="color:${mc};font-weight:800">~${hoursToReady(m)}h · ${rv}%</span></div>
-      <div style="height:7px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden"><i style="display:block;height:100%;width:${rv}%;background:linear-gradient(90deg,${mc}66,${mc});border-radius:5px;box-shadow:0 0 8px ${mc}66"></i></div></div>`;}).join(""):'<p class="muted">All sectors green.</p>'}
-  </div>
-  ${sessionNoteBlock(R)}
-  <button class="btn gold" onclick="shareWorkout()">📤 SHARE WITH ALLIES</button>`;
 }
 // ===== Alfred's read (post-workout) — ALWAYS works, with or without a Gemini key. =====
 // Builds a real, data-driven verdict from the session, in Alfred's "on roids — wild but good" voice.
@@ -6374,13 +6466,6 @@ function muscleRing(m,rec,sets,mav,trained){
     <text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle"
       font-family="Bebas Neue,sans-serif" font-size="${labelSz}" fill="${trained?recCol:'#3a3e4a'}">${label}</text>
   </svg>`;
-}
-function miniSuit(hit){
-  const front=["chest","shoulders","biceps","forearms","abs","quads","calves","traps"];
-  return `<div class="grid3" style="grid-template-columns:repeat(4,1fr)">${M12.map(m=>{
-    const on=hit&&hit[m];const col=on>=1?"var(--gold2)":on?"var(--gold-dim)":"var(--text3)";
-    return `<div class="center" style="opacity:${on?1:.4}"><div style="line-height:1">${mIcon(m,22,on?'#E8C56A':'#7c7c7c')}</div><div class="mini" style="color:${col}">${MNAME[m]}</div></div>`;
-  }).join("")}</div>`;
 }
 
 /* ========================= PER-DAY TARGET FIGURES (split images) =========================
@@ -6744,84 +6829,6 @@ function exerciseRows(name){
   return rows;
 }
 /* Rep-max PRs — heaviest load lifted for at least N reps (5/8/10) from the active gym's history. */
-function repMaxes(name){
-  const ex=exFor(name),best={5:0,8:0,10:0};
-  (state.data.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{if((e.name||"").toLowerCase().trim()!==(name||"").toLowerCase().trim())return;(e.sets||[]).forEach(s=>{if(s.type==="W"||!s.done)return;const reps=+s.r||0,load=setLoad(ex,s.w);if(!load||!reps)return;[5,8,10].forEach(rm=>{if(reps>=rm&&load>best[rm])best[rm]=load;});});});});
-  return best;
-}
-function exerciseHistory(name){
-  const ex=exFor(name),rows=exerciseRows(name);
-  if(!rows.length){openSheet(`<div class="ttl">${esc(name)}</div><p class="muted">No completed sets logged for this lift yet.</p><button class="btn" onclick="closeSheet()">Close</button>`);return;}
-  const e1s=rows.map(r=>r.e1rm),tws=rows.map(r=>r.topW),vols=rows.map(r=>r.vol);
-  const first=rows[0],last=rows[rows.length-1],d=last.e1rm-first.e1rm,pct=first.e1rm?Math.round(d/first.e1rm*100):0;
-  const trend=d>0?`<span class="green">▲ +${d}kg (${pct>0?"+":""}${pct}%)</span>`:d<0?`<span class="red">▼ ${d}kg</span>`:`<span class="muted">flat</span>`;
-  const mode=state._exHistMode||"e1rm";
-  const vals=mode==="weight"?tws:mode==="vol"?vols:e1s;
-  const col=mode==="vol"?"#7FC8FF":mode==="weight"?"#E8C56A":"#2ECC71";
-  const safe=esc(name).replace(/'/g,"");
-  const intel=liftIntel(name);
-  const verdict=intel?liftVerdict(intel):"";
-  const vcol=intel&&intel.stalled?"#ff6a5e":intel&&intel.trend==="up"?"var(--green)":intel&&intel.trend==="down"?"#E8A52A":"var(--text2)";
-  const tgtBlock=(intel&&intel.tgt?`<div class="banner" style="margin:0 0 10px;border-color:var(--gold-dim)"><span>🎯</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">NEXT TIME — BEAT THIS</div><b class="gold" style="font-size:14px">${esc(intel.tgt.txt)}</b></div></div>`:"")
-    +(intel&&intel.stalled?`<div class="banner" style="margin:0 0 10px;border-color:rgba(255,106,94,.4)"><span>🩺</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">PLATEAU RX — CHANGE ONE VARIABLE</div><div class="mini" style="color:var(--text);line-height:1.5">${(f=>`<b>${f[0]}</b> — ${esc(f[1])}`)(stallFix(name))}</div></div></div>`:"");
-  // Per-lift intel folded in from the old History cards: record est-1RM, gains/session, strength forecast.
-  const recordE1=Math.max(...e1s);
-  const effPS=rows.length>1?((last.e1rm-first.e1rm)/(rows.length-1)):0;
-  const fcLift=(typeof strengthForecast==="function")?strengthForecast().find(o=>o.n===name):null;
-  const fcBlock=fcLift?`<div class="banner" style="margin:0 0 10px;background:rgba(127,200,255,.08);border-color:rgba(127,200,255,.32)"><span>🔮</span><div><div class="mini" style="color:var(--text3);letter-spacing:.06em">FORECAST — AT YOUR CURRENT PACE</div><b style="font-size:14px;color:#9fd0ff">${fcLift.cur}kg → ${fcLift.target}kg in ~${fcLift.days}d</b></div></div>`:"";
-  openSheet(`<div class="row sp"><div class="ttl">${esc(name)}</div><span class="chip">${rows.length} sessions</span></div>
-    ${verdict?`<div class="banner" style="margin:2px 0 10px"><span>🎩</span><div class="mini" style="color:${vcol}">${esc(verdict)}</div></div>`:""}
-    ${tgtBlock}
-    ${(()=>{ // rep-PR matrix — your best weight at every rep count, 12 targets to beat
-      const best={};(state.data.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{if(e.name!==name)return;
-        (e.sets||[]).forEach(s=>{if(s.type==="W")return;const r=+s.r||0,wt=setLoad(ex,s.w);if(r>=1&&r<=12&&wt>(best[r]||0))best[r]=wt;});});});
-      if(!Object.keys(best).length)return "";
-      const cells=[];for(let r=1;r<=12;r++){const b=best[r];
-        cells.push(`<div style="text-align:center;padding:7px 2px;border-radius:9px;background:${b?'rgba(255,208,72,.08)':'rgba(255,255,255,.025)'};border:1px solid ${b?'rgba(255,208,72,.28)':'rgba(255,255,255,.06)'}">
-          <div style="font-size:9px;color:var(--text3);letter-spacing:.06em">${r}RM</div>
-          <div style="font-family:var(--disp);font-weight:650;font-size:${b?'15':'12'}px;color:${b?'var(--gold2)':'var(--text3)'}">${b?Math.round(b):'—'}</div></div>`);}
-      return `<div class="card" style="padding:12px"><div class="ttl" style="font-size:13px;margin-bottom:8px">👑 Rep-max record book <span class="mini" style="color:var(--text3);letter-spacing:0">— 12 targets, beat any of them</span></div>
-        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">${cells.join("")}</div></div>`;
-    })()}
-    ${fcBlock}
-    ${(()=>{ // 🪜 PR LADDER — each rung = the session your record e1RM climbed; dashed rung = the next target
-      const steps=[];let mx=0;
-      rows.forEach(r=>{if(r.e1rm>mx){mx=r.e1rm;steps.push(r);}});
-      const shown=steps.slice(-5);
-      if(shown.length<2)return "";
-      const nxt=Math.round(mx+(mx>=100?5:2.5));
-      const blocks=shown.map((s,i)=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
-          <div style="text-align:center;font-family:var(--disp);font-weight:650;font-size:14px;color:var(--gold2)">${s.e1rm}</div>
-          <div style="height:${26+i*13}px;border-radius:8px 8px 0 0;background:linear-gradient(180deg,rgba(255,208,72,${(0.28+i*0.12).toFixed(2)}),rgba(58,42,8,.5));border:1px solid rgba(255,208,72,.4);border-bottom:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.15)"></div>
-          <div style="text-align:center;font-size:8.5px;color:var(--text3);padding-top:3px">${new Date(s.date).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div>
-        </div>`).join("");
-      const nextRung=`<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end">
-          <div style="text-align:center;font-family:var(--disp);font-weight:650;font-size:14px;color:var(--text2)">${nxt}</div>
-          <div style="height:${26+shown.length*13}px;border-radius:8px 8px 0 0;border:1.5px dashed rgba(255,208,72,.55);border-bottom:none;background:rgba(255,208,72,.04)"></div>
-          <div style="text-align:center;font-size:8.5px;color:var(--gold-dim);padding-top:3px;font-weight:700">NEXT</div>
-        </div>`;
-      return `<div class="card" style="padding:12px"><div class="ttl" style="font-size:13px;margin-bottom:8px">🪜 PR ladder <span class="mini" style="color:var(--text3);letter-spacing:0">— every rung = your record moving up (e1RM)</span></div>
-        <div style="display:flex;align-items:flex-end;gap:5px">${blocks}${nextRung}</div></div>`;
-    })()}
-    <div class="row" style="gap:16px;margin:4px 0 12px;flex-wrap:wrap">
-      <div><div class="mini">Record e1RM</div><b class="gold" style="font-size:20px">${recordE1}kg</b></div>
-      <div><div class="mini">Top weight</div><b style="font-size:20px">${Math.max(...tws)}kg</b></div>
-      <div><div class="mini">Gains/session</div><b style="font-size:18px;color:${effPS>=0?'var(--green)':'var(--red)'}">${effPS>=0?'+':''}${effPS.toFixed(1)}kg</b></div>
-      <div><div class="mini">Since start</div><b style="font-size:14px">${trend}</b></div>
-    </div>
-    ${(()=>{const rmx=repMaxes(name);return (rmx[5]||rmx[8]||rmx[10])?`<div class="row" style="gap:7px;margin:0 0 12px;flex-wrap:wrap"><span class="mini" style="color:var(--text3);align-self:center">Rep maxes:</span>${[[5,"5RM"],[8,"8RM"],[10,"10RM"]].map(a=>rmx[a[0]]?`<span class="chip" style="width:auto">${a[1]} <b class="gold">${Math.round(rmx[a[0]])}kg</b></span>`:"").join("")}</div>`:"";})()}
-    <div class="row" style="gap:6px;margin-bottom:8px">
-      <button class="chip ${mode==='e1rm'?'on':''}" onclick="setExHist('${safe}','e1rm')">Est. 1RM</button>
-      <button class="chip ${mode==='weight'?'on':''}" onclick="setExHist('${safe}','weight')">Top weight</button>
-      <button class="chip ${mode==='vol'?'on':''}" onclick="setExHist('${safe}','vol')">Volume</button>
-    </div>
-    ${trendChart(vals,{color:col})}
-    <div class="mini" style="text-align:center;color:var(--text3);margin-top:2px">${mode==="e1rm"?"Estimated 1RM per session (Epley)":mode==="weight"?"Heaviest working set per session":"Total working volume per session"}</div>
-    <div class="ttl" style="margin-top:14px">Session log</div>
-    ${rows.slice().reverse().slice(0,25).map(r=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><div><b style="font-size:13px">${new Date(r.date).toLocaleDateString()}</b><div class="mini">${r.bset?(r.bset.w+(ex.bw?"+":"")+"kg × "+r.bset.r+" reps"):""}</div></div><b class="gold">${r.e1rm}kg <span class="mini">e1RM</span></b></div>`).join("")}
-    <button class="btn" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
-}
-function setExHist(name,mode){state._exHistMode=mode;exerciseHistory(name);}
 function miniSpark(vals){
   if(!vals||vals.length<2)return "";
   const w=60,h=20,min=Math.min(...vals),max=Math.max(...vals),r=(max-min)||1,n=vals.length;
@@ -6865,13 +6872,6 @@ function liftIntel(name){
   return {bestE,last,daysAgo,stalled,sinceImprove,bestAgo,trend,d:Math.round(d),pct,tgt,sessions:rows.length};
 }
 // One-line verdict in Alfred's voice, harsh or proud as the data earns.
-function liftVerdict(intel){
-  if(!intel)return "";
-  if(intel.stalled)return `Stalled ${intel.sinceImprove} sessions, Master. Change one variable — angle, grip or rep range. Repeating it won't move it.`;
-  if(intel.trend==="up")return `Climbing — +${intel.d}kg (${intel.pct>0?"+":""}${intel.pct}%) of late. Keep the pressure on, sir.`;
-  if(intel.trend==="down")return `Going BACKWARDS, sir — ${intel.d}kg down (${intel.pct}%). I won't sugar-coat it: you were stronger than this. Eat, sleep, and reclaim that weight.`;
-  return `Holding steady. Steady isn't growth, Master — go and take the next rep.`;
-}
 // ---- weekly-set volume landmark bar (MEV/MAV/MRV) ----
 function volBar(sets,lm,m){
   const eMrv=m?effectiveMRV(m):lm.mrv;                 // spread across sub-regions raises the ceiling
@@ -7335,14 +7335,14 @@ function closeInfirmary(){state.subpage=null;go("gotham");}
 /* ===== Wave 11 — THE CAVE: injury-risk workload ratio (ACWR) =====
    Acute:Chronic Workload Ratio — this week's training load vs the rolling 4-week average.
    A genuine sports-science marker: sudden load spikes (ratio >1.5) are the strongest
-   modifiable predictor of soft-tissue injury; 0.8–1.3 is the "sweet spot". Load = tonnage. */
+   modifiable predictor of soft-tissue injury; 0.8–1.3 is the "sweet spot". Load = session RPE × minutes where the session was rated, else tonnage (see weeklyLoadS). */
 function weeklyLoad(weekIdx){   // tonnage of the weekIdx-th cycle back (0 = the cycle ending tonight), per week
   const s=cycleStart(weekIdx),e=weekIdx?cycleStart(weekIdx-1):Infinity;
   return perWeek((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0));
 }
 function acwrInfo(){
-  const acute=weeklyLoad(0);
-  const chronic=(weeklyLoad(0)+weeklyLoad(1)+weeklyLoad(2)+weeklyLoad(3))/4;
+  const k=sessLoadK(),L=i=>weeklyLoadS(i,k),acute=L(0);
+  const chronic=(L(0)+L(1)+L(2)+L(3))/4;
   const ratio=chronic>0?acute/chronic:0;
   let zone,col,msg;
   if(chronic<=0||(state.data.workouts||[]).length<3){zone="building";col="var(--text3)";msg="A couple more weeks of logging and your workload ratio comes online.";}
@@ -7350,7 +7350,7 @@ function acwrInfo(){
   else if(ratio>1.3){zone="high";col="var(--orange)";msg="Climbing fast. Fine for one planned overload week, but don't stack another jump on top of it.";}
   else if(ratio>=0.8){zone="sweet";col="var(--green)";msg="In the sweet spot (0.8–1.3). Load is progressing at a tissue-safe rate — keep nudging it.";}
   else{zone="detrain";col="var(--gold2)";msg="Below 0.8 — you're coasting / detraining slightly. Room to add work and rebuild momentum.";}
-  return {acute:Math.round(acute),chronic:Math.round(chronic),ratio,zone,col,msg};
+  return {acute:Math.round(acute),chronic:Math.round(chronic),ratio,zone,col,msg,unit:k?"AU":"kg"};
 }
 function workloadCard(){
   const a=acwrInfo();
@@ -7365,8 +7365,8 @@ function workloadCard(){
       <i style="position:absolute;left:${pos}%;top:-4px;width:3px;height:19px;border-radius:2px;background:#fff;box-shadow:0 0 7px #000;transform:translateX(-50%)"></i></div>
     <div class="row sp" style="margin-top:3px"><span class="mini" style="color:var(--text3)">detrain</span><span class="mini" style="color:var(--green)">0.8–1.3 sweet</span><span class="mini" style="color:var(--red)">spike</span></div>
     <div class="mini" style="margin-top:9px;color:var(--text2);line-height:1.5">${a.msg}</div>
-    <div class="row sp" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span class="mini">Load per week · latest cycle</span><b class="gold">${fmtNum(a.acute)}kg</b></div>
-    <div class="row sp"><span class="mini">Load per week · 4-cycle average</span><b style="color:var(--text2)">${fmtNum(a.chronic)}kg</b></div></div>`;
+    <div class="row sp" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)"><span class="mini">Load per week · latest cycle</span><b class="gold">${fmtNum(a.acute)} ${a.unit}</b></div>
+    <div class="row sp"><span class="mini">Load per week · 4-cycle average</span><b style="color:var(--text2)">${fmtNum(a.chronic)} ${a.unit}</b></div></div>`;
 }
 /* ===== Sleep debt — cumulative shortfall vs an 8h/night target over the last 7 nights ===== */
 function sleepDebt(){
@@ -7583,16 +7583,6 @@ function forgePrestige(){
     setTimeout(()=>{try{cinePush({killcam:true,hold:true,icon:"🔱",eye:"PRESTIGE "+p,title:"Beyond the Legend",titleHtml:`Beyond <span style="color:#FF3622">the Legend</span>`,bodyHtml:`<div class="mini" style="color:var(--text2);line-height:1.55">Midnight Sovereign suit, Crimson Protocol livery and the blood frame are yours. Gotham has no rank left to give — only nights left to win.</div>`,btn:"RISE",accent:"#FF3622"});}catch(e){}},1500);
     render();});
 }
-function profileIdentityStrip(){
-  try{
-    const ti=activeTitle(),p=state.data.prestige||0,bits=[];
-    if(ti)bits.push(`<span class="chip on" style="font-size:10.5px">🎖 ${esc(ti.n)}</span>`);
-    if(p)bits.push(`<span class="chip" style="font-size:10.5px;color:#ff6a5c;border-color:rgba(255,54,34,.5)">🔱 PRESTIGE ${p}</span>`);
-    if(canPrestige())bits.push(`<button class="chip g" style="font-size:10.5px;color:#ff6a5c;border-color:rgba(255,54,34,.6);box-shadow:0 0 12px -4px #FF3622" onclick="forgePrestige()">🔱 FORGE PRESTIGE ${p+1}</button>`);
-    if(!bits.length)return "";
-    return `<div class="row" style="gap:6px;flex-wrap:wrap;justify-content:center;margin:-4px 0 12px">${bits.join("")}</div>`;
-  }catch(e){return "";}
-}
 function garageCard(){
   const s2=gothamStats();const owned=GARAGE.filter(v=>v.req(s2));const top=owned[owned.length-1]||GARAGE[0];const next=GARAGE.find(v=>!v.req(s2));
   return `<div class="gtv2-panel wide" style="margin-bottom:8px;cursor:pointer;padding:0;overflow:hidden;border-color:rgba(255,208,72,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 44px -20px rgba(0,0,0,.94),0 0 28px -10px rgba(255,208,72,.6)" onclick="openGarage()">
@@ -7701,167 +7691,11 @@ function mmaRecord(){
 /* Cross-gym comparison — lifts set at 2+ gyms, side by side (machines differ). */
 
 /* ========================= PROFILE v2 — compact-by-default ========================= */
-function profileHeroHtml(d,u,sl,r,ri){
-  const cur=RANKS[ri],next=RANKS[ri+1];
-  const lo=cur[0],hi=next?next[0]:cur[0];
-  const pct=next?clamp((sl-lo)/Math.max(1,(hi-lo))*100,0,100):100;
-  const tc=["#8a8a8a","#9aa0ab","#7FC8FF","#cd7f32","#c0c0c0","#E8C56A","#E8C56A","#F0524A","#FFD36E"][clamp(ri,0,8)];
-  const wks=weeklyStreak(),bw=bodyW();
-  // 8-week volume sparkline
-  const volBars=(()=>{const bars=[];for(let i=7;i>=0;i--){const s=now()-(i+1)*7*864e5,e=now()-i*7*864e5;bars.push(state.data.workouts.filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(w.totalVol||0),0));}return bars;})();
-  const volMx=Math.max(1,...volBars);const volUp=volBars[7]>=volBars[0];
-  const sparkHtml=`<div style="display:flex;align-items:flex-end;gap:2px;height:28px;padding:0 2px">${volBars.map(v=>`<div style="flex:1;border-radius:2px 2px 0 0;background:${volUp?'var(--gold2)':'#F0524A'};opacity:${v?1:.15};height:${clamp(Math.round(v/volMx*100),4,100)}%;box-shadow:${v&&volUp?'0 0 4px rgba(232,197,106,.5)':'none'}"></div>`).join('')}</div>`;
-  return `<div style="background:linear-gradient(90deg,rgba(10,12,18,.55) 30%,rgba(10,12,18,.94)),url('Batman logo 2.png') right -34px top -30px/210px auto no-repeat,linear-gradient(170deg,rgba(10,12,18,0),rgba(10,12,18,1)),linear-gradient(135deg,rgba(232,197,106,.1),rgba(120,100,40,.03));border:1px solid ${tc}44;border-radius:20px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 0 50px -14px ${tc}55">
-    <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,${tc}1a 0%,transparent 70%);pointer-events:none"></div>
-    <div class="row" style="gap:13px;align-items:center;margin-bottom:14px;cursor:pointer" onclick="openSettings()">
-      <div class="profavatar" style="border:2px solid ${tc};box-shadow:0 0 20px ${tc}55;flex:none"><img src="Batman.jpg" alt="" onerror="this.parentNode.style.display='none'"></div>
-      <div style="flex:1;min-width:0">
-        <h1 style="font-size:28px;color:var(--gold2);line-height:.95;letter-spacing:-.01em">${u.name?esc(u.name.toUpperCase()):"VIGILANTE"}</h1>
-        <div style="font-size:11px;color:${tc};letter-spacing:.14em;text-transform:uppercase;margin-top:4px;text-shadow:0 0 10px currentColor">${cur[2]} ${esc(cur[1])} · LV ${sl}</div>
-        ${earnedTitle()?`<div class="mini" style="color:var(--text3);margin-top:2px">🎖️ ${esc(earnedTitle())}</div>`:`<div class="mini" style="color:var(--text3);margin-top:2px">tap to edit ›</div>`}
-      </div>
-    </div>
-    ${next?`<div style="margin-bottom:13px">
-      <div style="height:6px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden">
-        <div style="width:${pct}%;height:100%;border-radius:4px;background:linear-gradient(90deg,${tc}88,${tc});box-shadow:0 0 10px ${tc}77;transition:width .4s"></div>
-      </div>
-      <div class="row sp" style="margin-top:4px"><span class="mini" style="color:var(--text3)">${esc(cur[1])}</span><span class="mini" style="color:${tc}">${Math.max(0,hi-sl)} lv → ${esc(next[1])} ${next[2]}</span></div>
-    </div>`:`<div class="mini" style="color:${tc};margin-bottom:13px;text-shadow:0 0 12px currentColor">⭑ Maximum rank — Legend of Gotham.</div>`}
-    <div class="row" style="gap:7px">
-      <div style="flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
-        <div style="font-size:12px;margin-bottom:1px">🔥</div>
-        <div style="font-family:var(--disp);font-weight:650;font-size:18px;color:var(--gold2);line-height:1">${wks>0?wks:'—'}</div>
-        <div class="mini" style="color:var(--text3);line-height:1.2;margin-top:2px">wk streak</div>
-      </div>
-      <div style="flex:2;padding:8px 8px 6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
-        ${sparkHtml}
-        <div class="mini" style="color:var(--text3);text-align:center;margin-top:3px">8-wk volume ${volUp?'▲':'▼'}</div>
-      </div>
-      <div style="flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px">
-        <div style="font-size:12px;margin-bottom:1px">⚖️</div>
-        <div style="font-family:var(--disp);font-weight:650;font-size:18px;color:var(--gold2);line-height:1">${bw?bw+'kg':'—'}</div>
-        <div class="mini" style="color:var(--text3);line-height:1.2;margin-top:2px">bodyweight</div>
-      </div>
-    </div>
-  </div>`;
-}
 
 function calPrev(){state._calOff=(state._calOff||0)-1;render();}
 function calNext(){if((state._calOff||0)<0){state._calOff=(state._calOff||0)+1;render();}}
-function profileCalendarHtml(d){
-  const vols={},dayNames={},prsD={};
-  (d.workouts||[]).forEach(w=>{
-    const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toISOString().slice(0,10);
-    vols[key]=(vols[key]||0)+(w.totalVol||0);
-    prsD[key]=(prsD[key]||0)+((w.prs||[]).length);
-    if(!dayNames[key])dayNames[key]=[];
-    if(w.name&&!dayNames[key].includes(w.name))dayNames[key].push(w.name);
-  });
-  const mx=Math.max(1,...Object.values(vols).filter(v=>v>0));
-  const today=new Date();today.setHours(0,0,0,0);
-  const off=state._calOff||0;
-  const base=new Date(today.getFullYear(),today.getMonth()+off,1);
-  const yr=base.getFullYear(),mo=base.getMonth();
-  const dim=new Date(yr,mo+1,0).getDate();
-  const firstDow=(new Date(yr,mo,1).getDay()+6)%7;
-  const DAYS=['M','T','W','T','F','S','S'];
-  const MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const isCurrentMonth=off===0;
-  let cells=DAYS.map(dv=>`<div style="text-align:center;font-size:9px;color:rgba(232,197,106,.45);padding-bottom:6px;font-weight:700;letter-spacing:.07em">${dv}</div>`).join('');
-  for(let i=0;i<firstDow;i++)cells+=`<div></div>`;
-  for(let day=1;day<=dim;day++){
-    const dd=new Date(yr,mo,day);const k=dd.toISOString().slice(0,10);const v=vols[k]||0;
-    const future=dd>today;const isToday=dd.getTime()===today.getTime();
-    const t=v?Math.min(1,v/mx):0;
-    if(v&&!future){
-      const names=dayNames[k]||[];
-      const label=names.join(' · ')||'Training';
-      const prN=prsD[k]||0;
-      cells+=`<div onclick="dayDetail('${dd.toDateString()}')" style="position:relative;border-radius:10px;background:linear-gradient(170deg,rgba(235,199,107,${(0.11+t*0.13).toFixed(2)}) 0%,rgba(10,12,18,.97) 100%);border:1px solid rgba(235,199,107,${(0.12+t*0.22).toFixed(2)});cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 3px 6px;min-height:66px">
-        <span style="font-size:8px;color:rgba(255,255,255,.3);font-weight:500;line-height:1;align-self:center">${day}</span>
-        <span style="font-size:8.5px;font-weight:700;color:var(--tx1);text-align:center;line-height:1.25;letter-spacing:.02em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%;padding:0 2px">${esc(label)}</span>
-        <span class="num" style="font-size:10.5px;color:var(--gold2);line-height:1;opacity:.92">${v>=1000?(v/1000).toFixed(1)+'t':Math.round(v)+''}</span>
-        ${prN?`<span class="cal-pr" style="position:absolute;top:2px;right:3px;line-height:0">${GP.icon("trophy")}</span>`:''}
-      </div>`;
-    } else {
-      cells+=`<div style="border-radius:10px;background:${future?'transparent':'rgba(255,255,255,.02)'};border:${isToday?'1.5px solid var(--gold2)':'1px solid rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;min-height:66px">
-        <span style="font-size:${isToday?13:11}px;color:${isToday?'var(--gold2)':'rgba(255,255,255,.15)'};font-weight:${isToday?'700':'400'};line-height:1">${future?'':day}</span>
-      </div>`;
-    }
-  }
-  const inMonth=([k])=>{const dk=new Date(k);return dk.getFullYear()===yr&&dk.getMonth()===mo;};
-  const active=Object.entries(vols).filter(([k,v])=>v>0&&inMonth([k])).length;
-  const monthVol=Object.entries(vols).filter(inMonth).reduce((a,[,v])=>a+v,0);
-  const monthPRs=Object.entries(prsD).filter(inMonth).reduce((a,[,v])=>a+v,0);
-  const pm=new Date(yr,mo-1,1);
-  const prevVol=Object.entries(vols).filter(([k])=>{const dk=new Date(k);return dk.getFullYear()===pm.getFullYear()&&dk.getMonth()===pm.getMonth();}).reduce((a,[,v])=>a+v,0);
-  const dPct=prevVol>0?Math.round((monthVol-prevVol)/prevVol*100):null;
-  const navBtn=(label,fn,disabled)=>`<button onclick="${fn}()" style="background:none;border:1px solid rgba(232,197,106,${disabled?.15:.35});border-radius:8px;color:${disabled?'rgba(255,255,255,.2)':'var(--gold2)'};font-size:18px;font-weight:700;padding:0 11px;height:34px;line-height:1;cursor:${disabled?'default':'pointer'}">${label}</button>`;
-  return `<div style="background:linear-gradient(160deg,rgba(232,197,106,.07) 0%,rgba(10,12,18,.98) 55%);border:1px solid rgba(232,197,106,.28);border-radius:20px;padding:18px;margin-bottom:10px"
-    ontouchstart="state._calSwipeX=event.touches[0].clientX"
-    ontouchend="(function(){const dx=event.changedTouches[0].clientX-(state._calSwipeX||0);if(dx>55)calPrev();else if(dx<-55)calNext();})()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      ${navBtn('‹','calPrev',false)}
-      <div style="text-align:center">
-        <div style="font-family:var(--disp);font-weight:650;font-size:16px;color:var(--gold2);letter-spacing:.05em">${MON[mo].toUpperCase()} ${yr}</div>
-        <div class="mini" style="color:var(--text3);margin-top:2px">${active} session${active===1?'':'s'} · <b class="num" style="color:var(--gold2)">${monthVol>=1000?(monthVol/1000).toFixed(1)+'t':Math.round(monthVol)+'kg'}</b>${monthPRs?` · 👑 ${monthPRs}`:''}</div>
-        ${dPct!==null&&active?`<div class="mini num" style="margin-top:1px;font-weight:700;color:${dPct>=0?'var(--green)':'#ff7a6e'}">${dPct>=0?'▲ +':'▼ '}${dPct}% vs last month</div>`:''}
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
-        ${navBtn('›','calNext',isCurrentMonth)}
-        <button class="btn ghost sm" style="width:auto;border-color:rgba(232,197,106,.3);color:var(--gold2);font-size:11px;height:34px" onclick="exportICS()">Export</button>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px">${cells}</div>
-  </div>`;
-}
 
-function profileOnThisDay(d){
-  const today=new Date();const mo=today.getMonth(),day=today.getDate();
-  const past=(d.workouts||[]).filter(w=>{const dt=new Date(w.date);return dt.getMonth()===mo&&dt.getDate()===day&&dt.getFullYear()<today.getFullYear();});
-  if(!past.length)return '';
-  const w=past[past.length-1];
-  const yr=new Date(w.date).getFullYear();
-  const prs=w.prs&&w.prs.length?`<span class="chip on" style="font-size:10px;color:var(--green);padding:2px 8px">${w.prs.length} PR${w.prs.length>1?'s':''}</span>`:'';
-  return `<div style="background:linear-gradient(135deg,rgba(127,200,255,.06),rgba(10,12,18,.95));border:1px solid rgba(127,200,255,.2);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer" onclick="(function(){var k=new Date('${w.date}');k.setHours(0,0,0,0);dayDetail(k.toDateString());})()">
-    <div class="row sp" style="align-items:flex-start">
-      <div style="min-width:0">
-        <div style="font-size:10px;letter-spacing:.14em;color:#7FC8FF;text-transform:uppercase;margin-bottom:3px">⏪ On this day · ${yr}</div>
-        <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(w.name)}</div>
-        <div class="mini" style="color:var(--text2);margin-top:2px">${w.exercises.length} exercises · ${fmtNum(w.totalVol)}kg · ${w.prs&&w.prs.length?w.prs.slice(0,2).map(esc).join(', '):'no PRs'}</div>
-      </div>
-      <div style="text-align:right;flex:none;margin-left:10px">${prs}<div class="mini" style="color:var(--text3);margin-top:4px">tap ›</div></div>
-    </div>
-  </div>`;
-}
 
-function profileBossPreviewHtml(d,sl){
-  const wins=new Set((d.bossWins||[]).map(b=>b.villain));
-  const sorted=(typeof BOSSES!=='undefined'?BOSSES:[]).slice().sort((a,b)=>a.min-b.min);
-  const next=sorted.find(b=>!wins.has(b.v));
-  const defeated=wins.size;
-  if(!next)return '';
-  const locked=sl<next.min;
-  const pct=locked?clamp(Math.round(sl/next.min*100),2,98):100;
-  const barCol=locked?'#F0524A':'#2ECC71';
-  return `<div style="background:linear-gradient(135deg,rgba(240,82,74,.07),rgba(10,12,18,.95));border:1px solid rgba(240,82,74,.3);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer" onclick="openArkham()">
-    <div class="row sp" style="align-items:center;margin-bottom:9px">
-      <div style="min-width:0">
-        <div style="font-size:10px;letter-spacing:.14em;color:#F0524A;text-transform:uppercase;margin-bottom:3px">⚔️ Next target · ${defeated} felled</div>
-        <div style="font-size:15px;font-weight:700;color:var(--gold2)">${esc(next.v)}</div>
-        ${next.q?`<div class="mini" style="color:var(--text2);margin-top:2px;font-style:italic">"${esc((next.q||'').slice(0,55))}…"</div>`:''}
-      </div>
-      <div style="font-size:32px;flex:none;margin-left:10px">${(typeof villainFace==='function'?villainFace(next):next.e)||'👊'}</div>
-    </div>
-    <div style="height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden">
-      <div style="width:${pct}%;height:100%;border-radius:3px;background:${barCol};box-shadow:0 0 8px ${barCol}88;transition:width .5s"></div>
-    </div>
-    <div class="row sp" style="margin-top:4px">
-      <span class="mini" style="color:var(--text3)">Str Lv ${sl}</span>
-      ${locked?`<span class="mini" style="color:#F0524A">Lv ${next.min} to engage · ${next.min-sl} away</span>`:`<span class="mini" style="color:#2ECC71">⚡ Ready — tap to fight</span>`}
-    </div>
-  </div>`;
-}
 
 
 function shareProfilePRCard(){
@@ -7882,155 +7716,157 @@ function shareProfilePRCard(){
 
 
 
-function profileEveryLiftTile(d){
-  const exCount=loggedExerciseNames().length;
-  const prCount=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
-  const si=strengthIndexSeries();const siVals=si.vals||[];
-  const siLast=siVals.length?siVals[siVals.length-1]:0;
-  const siUp=siVals.length>=2&&siVals[siVals.length-1]>=siVals[0];
-  const siPct=siVals.length>=2&&siVals[0]?Math.round((siVals[siVals.length-1]-siVals[0])/siVals[0]*100):0;
-  return `<button onclick="renderArchive()" style="display:block;width:100%;text-align:left;cursor:pointer;background:linear-gradient(135deg,rgba(232,197,106,.12) 0%,rgba(60,40,10,.08) 50%,rgba(232,197,106,.06) 100%);border:1.5px solid rgba(232,197,106,.5);border-radius:18px;padding:18px 18px 16px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:0 0 40px -10px rgba(232,197,106,.35),inset 0 1px 0 rgba(255,255,255,.08)">
-    <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(232,197,106,.15),transparent 70%);pointer-events:none"></div>
-    <div class="row sp" style="align-items:flex-start;margin-bottom:10px">
-      <div>
-        <div style="font-size:11px;letter-spacing:.18em;color:rgba(232,197,106,.6);text-transform:uppercase;margin-bottom:4px">Your arsenal</div>
-        <div style="font-family:var(--disp);font-weight:700;font-size:22px;color:var(--tx1);letter-spacing:-.02em;line-height:1.1">Every lift</div>
-        <div class="mini" style="color:var(--text2);margin-top:4px">${exCount} exercise${exCount===1?'':'s'} · ${prCount} records · tap for full curves</div>
-      </div>
-      <div style="text-align:right;flex:none">
-        ${siLast?`<div style="font-family:var(--num);font-size:28px;color:var(--gold2);line-height:1">${siLast}</div>
-        <div class="mini" style="color:${siUp?'var(--green)':'var(--red)'}">${siUp?'▲':'▼'} ${siPct>0?'+':''}${siPct}%</div>
-        <div class="mini" style="color:var(--text3)">strength idx</div>`:`<div style="font-size:28px">📈</div>`}
-      </div>
-    </div>
-    ${siVals.length>=4?trendChart(siVals,{color:"#E8C56A",height:36}):''}
-    <div style="position:absolute;bottom:13px;right:16px;font-size:22px;color:rgba(232,197,106,.4)">›</div>
-  </button>`;
-}
 
-function profileRecordsHtml(d){
-  const _inm=new Set((d.bossWins||[]).map(w=>w.villain)).size;
-  const _esc=(d.bossReturns||[]).filter(b=>!b.defeated).length;
-  const lockupBtn=`<button class="splitday" style="width:100%;margin:0 0 10px;cursor:pointer" onclick="openArkhamLockup()">
-    <div class="splitday-main"><span style="font-size:22px;flex:none">🔒</span><div class="splitday-tx"><b>Arkham Lockup <span class="mini" style="color:var(--gold2)">›</span></b><span>${_inm} inmate${_inm===1?"":"s"}${_esc?` · <span style="color:var(--red)">${_esc} at large</span>`:""}</span></div></div></button>
-  <button class="splitday" style="width:100%;margin:0 0 10px;cursor:pointer" onclick="openGazette()">
-    <div class="splitday-main"><span style="font-size:22px;flex:none">🗞</span><div class="splitday-tx"><b>The Gotham Gazette <span class="mini" style="color:var(--gold2)">›</span></b><span>this month's front page — your numbers as news</span></div></div></button>`;
-  const prs=Object.entries(d.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>b[1].orm-a[1].orm);
-  const volPRs={};
-  (d.workouts||[]).forEach(w=>{(w.exercises||[]).forEach(e=>{const v=(e.sets||[]).filter(s=>s.done&&s.type!=="W").reduce((a,s)=>a+((+s.w||0)*(+s.r||0)),0);if(v>(volPRs[e.name]||0))volPRs[e.name]=Math.round(v);});});
-  const bw=bodyW();
-  let html=lockupBtn;
-  // --- PR feed ---
-  if(!prs.length){html+=`<p class="muted" style="margin:0 0 12px">No records yet. Log your first session and records appear here.</p>`;}
-  else{
-    html+=`<div class="row sp" style="margin-bottom:8px"><b style="font-size:13px">🏆 Top lifts · ${d.u.activeGym?esc(d.u.activeGym):'all gyms'}</b><span class="mini" style="color:var(--text3)">${prs.length} records</span></div>`;
-    html+=prs.slice(0,10).map(([n,p],i)=>{
-      const vol=volPRs[n];
-      return `<div style="padding:8px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(n).replace(/'/g,"")}')">
-        <div class="row sp">
-          <div class="row" style="gap:7px;min-width:0;align-items:center"><span style="font-size:11px;color:var(--text3);min-width:18px">#${i+1}</span><b style="font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n)} ›</b></div>
-          <b class="gold" style="white-space:nowrap;flex:none">${Math.round(p.orm)}kg</b>
-        </div>
-        <div class="row" style="gap:10px;margin-top:2px;padding-left:25px">
-          ${p.w&&p.r?`<span class="mini" style="color:var(--text3)">${Math.round(p.w)}kg×${p.r}</span>`:''}
-          ${vol?`<span class="mini" style="color:var(--text2)">📦 ${fmtNum(vol)}kg vol</span>`:''}
-          ${bw&&p.orm?`<span class="mini" style="color:var(--text3)">${(p.orm/bw).toFixed(2)}×BW</span>`:''}
-        </div>
-      </div>`;
-    }).join('');
-    if(prs.length>10)html+=`<div class="mini" style="color:var(--text3);text-align:center;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">+${prs.length-10} more in Every Lift ▲</div>`;
-    html+=`<button class="btn ghost sm" style="width:100%;margin-top:10px;border-color:rgba(232,197,106,.3);color:var(--gold2)" onclick="shareProfilePRCard()">📤 Share PR Card</button>`;
-  }
-  // --- Title belts (compact) ---
-  if(bw&&prs.length){
-    const belts=prs.map(([n,p])=>({n,p,ratio:p.orm/bw,t:beltTier(p.orm/bw)})).sort((a,b)=>b.ratio-a.ratio).slice(0,4);
-    html+=`<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(232,197,106,.15)">
-      <div class="mini" style="color:var(--gold-dim);letter-spacing:.1em;margin-bottom:8px">🎖️ TITLE BELTS</div>
-      ${belts.map(r=>{const[,label,emoji,col]=r.t;return `<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border);cursor:pointer" onclick="exerciseHistory('${esc(r.n).replace(/'/g,"")}')"><div class="row" style="gap:9px;min-width:0"><span style="font-size:18px">${emoji}</span><div><b style="font-size:13px">${esc(r.n)}</b><div class="mini" style="color:${col}">${label}</div></div></div><div style="text-align:right;flex:none"><b class="gold">${Math.round(r.p.orm)}kg</b><div class="mini" style="color:var(--text3)">${r.ratio.toFixed(2)}×BW</div></div></div>`;}).join('')}
-    </div>`;
-  }
-  // --- Fight record (compact) ---
-  const rec=mmaRecord();
-  if(rec&&rec.weeks>=2){
-    html+=`<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(232,197,106,.15)">
-      <div class="mini" style="color:var(--gold-dim);letter-spacing:.1em;margin-bottom:8px">🥊 FIGHT RECORD · week vs week</div>
-      <div class="row" style="align-items:flex-end;gap:16px">
-        <div class="big" style="font-size:38px;color:var(--gold2)">${rec.wins}<span style="font-size:18px;color:var(--text3)"> – ${rec.losses}${rec.draws?' – '+rec.draws:''}</span></div>
-        <div style="text-align:right"><div class="big" style="font-size:26px;color:#ff6a5e">${rec.kos}</div><div class="mini">KOs</div></div>
-      </div>
-      <div class="mini" style="color:var(--text2);margin-top:4px">Out-train last week = win. Villains felled = KO.</div>
-    </div>`;
-  }
-  return html;
-}
 
 /* ⚖️ Relative strength — the SAME barbell-equivalent big-3 the Strength standards card uses (liftEstimate converts machine/Smith/variation
    lifts), total vs bodyweight, with a 4-week delta. Needs 2 of the 3 lifts; the card says which are in the total. */
-function relStrengthCard(){
-  const d=state.data,bw=bodyW();if(!bw)return "";
-  const tops=["Bench Press","Squat","Deadlift"].map(l=>({l,e:liftEstimate(l)})).filter(x=>x.e);
-  if(tops.length<2)return "";
-  const cutoff=Date.now()-28*864e5;
-  let nowT=0,nowC=0,thenT=0;
-  // f = converter from the underlying PR lift to its barbell-equivalent (1 for the real barbell lift). Floor the lift at its own
-  // recorded PR — exerciseRows() reads state.data.workouts, which can have no matching entry for a real PR (per-gym pointer, import).
-  tops.forEach(({e})=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;let a=0,b=0;
-    exerciseRows(e.name).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cutoff&&r.e1rm>b)b=r.e1rm;});
-    const now1=Math.max(a*f,e.orm);nowT+=now1;if(b>0){nowC+=now1;thenT+=b*f;}});   // delta only over lifts that existed 4 weeks ago
-  if(!nowT)return "";
-  const dPct=thenT>0?Math.round((nowC-thenT)/thenT*100):null;
-  return `<div class="card" style="padding:13px">
-    <div class="ttl" style="font-size:13px;margin-bottom:6px">⚖️ Relative strength <span class="mini" style="color:var(--text3);letter-spacing:0">— ${tops.length===3?"big-3":"big-3 ("+tops.length+" of 3 logged)"}, barbell-equivalent e1RM vs bodyweight</span></div>
-    <div class="row" style="gap:14px;align-items:flex-end">
-      <div><div class="big" style="font-size:34px;color:var(--gold2)">${(nowT/bw).toFixed(2)}×</div><div class="mini">bodyweight — ${fmtNum(Math.round(nowT))}kg ÷ ${bw}kg</div></div>
-      ${dPct!==null&&dPct!==0?`<div class="mini num" style="font-weight:800;color:${dPct>=0?'var(--green)':'#ff7a6e'}">${dPct>=0?'▲ +':'▼ '}${dPct}% / 4 wk</div>`:''}
-    </div>
-    <div class="mini" style="margin-top:6px;color:var(--text3)">${tops.map(({l,e})=>esc(l)+" "+Math.round(e.orm)+"kg"+(e.est?" (est. from "+esc(e.via)+")":"")).join(" · ")}</div>
-  </div>`;
-}
-function profileStrengthHtml(){
-  const std=strengthStandardsCard();
-  const combat=combatRatingCard();
-  let html='';
-  try{html+=relStrengthCard();}catch(e){}
-  if(std)html+=std;
-  if(combat){html+=`<div style="margin-top:4px">${combat}</div>`;}
-  if(!std&&!combat&&!html)html=`<p class="muted" style="margin:0">Log sessions with bodyweight set to unlock strength analysis.</p>`;
-  return html;
-}
 
-function profileBasesToolsHtml(d,u){
-  let html=gymCampaignsCard();
-  html+=`<div class="grid2" style="margin-top:10px">
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openBatcomputer()"><div style="font-size:20px">🖥️</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Batcomputer</div><div class="mini" style="color:var(--text3)">Analytics</div></button>
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openArkham()"><div style="font-size:20px">🃏</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Rogues Gallery</div><div class="mini" style="color:var(--text3)">Villains</div></button>
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openMeasure()"><div style="font-size:20px">📐</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Measurements</div><div class="mini" style="color:var(--text3)">Body trends</div></button>
-    <button class="card" style="text-align:left;padding:13px;cursor:pointer;margin:0" onclick="openTrophyRoom()"><div style="font-size:20px">🏆</div><div class="ttl" style="margin:4px 0 1px;font-size:12px">Trophy Room</div><div class="mini" style="color:var(--text3)">Honors</div></button>
-  </div>
-  <button class="btn ghost sm" style="width:100%;margin-top:8px;border-color:rgba(232,197,106,.2);color:var(--gold2)" onclick="exportICS()">📅 Export calendar</button>`;
-  return html;
-}
 
-function renderProfile(){
-  const d=state.data,u=d.u;
-  const sl=strengthLevel(),r=rankFor(sl);
-  const ri=Math.max(0,RANKS.map(x=>x[0]).filter(t=>sl>=t).length-1);
-  let html=profileHeroHtml(d,u,sl,r,ri);
-  html+=profileIdentityStrip();
-  if(!d.workouts.length){
-    html+=`<div class="empty-state"><div class="es-icon">🦇</div><div class="es-title">PROFILE AWAITS</div><div class="es-body">Your profile, rank, and combat record fill in as you train. Log your first session, sir.</div><button class="btn gold" style="margin-top:10px" onclick="go('mission')">GO TO MISSION →</button></div>`;
-    $("app").innerHTML=html;return;
+/* ========================= PROFILE TAB (GP:PROFILE+FINISH, wave 3) =========================
+   identity strip (the one hero) → calendar → records → strength standards → two folded rows (trophies, gyms & data). */
+let _p3Uid=0;
+/* e1RM trend: time-scaled line over the last `days`, PR markers = sessions that beat every earlier one, slope in %/month (least squares).
+   mini = the sparkline for lists (no labels). Returns {svg,pct,n,hi,lo,last} or null when there are fewer than 2 sessions. */
+function p3Trend(name,o={}){
+  const rows=exerciseRows(name);if(rows.length<2)return null;
+  const T=r=>new Date(r.date).getTime(),t1=now(),days=o.days||84,from=t1-days*P3_DAY;
+  let win=rows.filter(r=>T(r)>=from);const full=win.length>=2;if(!full)win=rows.slice(-Math.min(rows.length,6));
+  let run=0;const pr=new Set();rows.forEach((r,i)=>{if(i&&r.e1rm>run+.4)pr.add(r.date);run=Math.max(run,r.e1rm);});
+  const a=full?Math.max(from,T(win[0])-2*P3_DAY):T(win[0]),b=Math.max(t1,T(win[win.length-1])+P3_DAY),ys=win.map(r=>r.e1rm),lo=Math.min(...ys),hi=Math.max(...ys);
+  const rg=Math.max(hi-lo,Math.max(4,hi*.04)),mn=lo-rg*.2,mx=hi+rg*.2,mini=!!o.mini,w=o.w||320,h=o.h||140;
+  const pl=mini?3:34,pr_=mini?3:10,pt=mini?3:16,pb=mini?3:24;
+  const X=r=>pl+(T(r)-a)/(b-a)*(w-pl-pr_),Y=v=>pt+(1-(v-mn)/(mx-mn))*(h-pt-pb);
+  const line=win.map((r,i)=>(i?"L":"M")+X(r).toFixed(1)+" "+Y(r.e1rm).toFixed(1)).join(" "),lr=win[win.length-1],id="p3g"+(++_p3Uid);
+  const n=win.length,t0=T(win[0]),xs=win.map(r=>(T(r)-t0)/P3_DAY),mxs=xs.reduce((s,v)=>s+v,0)/n,mys=ys.reduce((s,v)=>s+v,0)/n;
+  let num=0,den=0;xs.forEach((x,i)=>{num+=(x-mxs)*(ys[i]-mys);den+=(x-mxs)*(x-mxs);});
+  const pct=den>0&&xs[n-1]>=10?num/den*30/mys*100:null;
+  const dots=mini?"":win.filter(r=>pr.has(r.date)).map(r=>`<circle cx="${X(r).toFixed(1)}" cy="${Y(r.e1rm).toFixed(1)}" r="7" class="p3t-halo"/><circle cx="${X(r).toFixed(1)}" cy="${Y(r.e1rm).toFixed(1)}" r="3.6" class="p3t-pr"/>`).join("");
+  const axis=mini?"":`<line x1="${pl}" x2="${w-pr_}" y1="${Y(hi).toFixed(1)}" y2="${Y(hi).toFixed(1)}" class="p3t-g"/><line x1="${pl}" x2="${w-pr_}" y1="${Y(lo).toFixed(1)}" y2="${Y(lo).toFixed(1)}" class="p3t-g"/>
+    <text x="${pl-7}" y="${(Y(hi)+4).toFixed(1)}" text-anchor="end" class="p3t-t">${Math.round(hi)}</text><text x="${pl-7}" y="${(Y(lo)+4).toFixed(1)}" text-anchor="end" class="p3t-t">${Math.round(lo)}</text>
+    <text x="${pl}" y="${h-6}" class="p3t-t">${a<=from+1?Math.round(days/7)+" wk ago":new Date(a).getDate()+" "+GH_MON[new Date(a).getMonth()]}</text><text x="${w-pr_}" y="${h-6}" text-anchor="end" class="p3t-t">now</text>`;
+  const svg=`<svg class="p3t${mini?" mini":""}" ${mini?`width="${w}" height="${h}" `:""}viewBox="0 0 ${w} ${h}" role="img" aria-label="e1RM trend"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="p3t-s0"/><stop offset="1" class="p3t-s1"/></linearGradient></defs>${axis}
+    <path d="${line} L${X(lr).toFixed(1)} ${h-pb} L${X(win[0]).toFixed(1)} ${h-pb}Z" fill="url(#${id})"/><path d="${line}" class="p3t-l"/>${dots}
+    <circle cx="${X(lr).toFixed(1)}" cy="${Y(lr.e1rm).toFixed(1)}" r="${mini?2.6:3.6}" class="p3t-e"/></svg>`;
+  return {svg,pct,n,hi,lo,last:lr.e1rm};
+}
+const p3Slope=pct=>pct==null?"":`<span class="tag ${pct>=.5?"ok":pct<=-.5?"warn":""}">${pct>0?"+":""}${pct.toFixed(1)} %/mo</span>`;
+function p3Fold(id){   // toggle a folded row in place (state kept in accOpen like the Home lore row)
+  const b=$("p3b-"+id),r=$("p3r-"+id);if(!b)return;
+  const open=b.classList.contains("hide");b.classList.toggle("hide",!open);if(r)r.classList.toggle("open",open);
+  state.accOpen=state.accOpen||{};state.accOpen["p3-"+id]=open;
+}
+const p3Row=(icon,title,sub,fn,gold)=>`<div class="gh-row" ${fn?`data-hx onclick="${fn}"`:""}><span class="lead${gold?" gold":""}">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${fn?GP.icon("chevR"):""}</span></div>`;
+function p3FoldRow(id,icon,title,sub,body){
+  const open=accIsOpen("p3-"+id,false);
+  return `<div class="s1 gh-lore p3-fr gh-c${open?" open":""}" id="p3r-${id}" data-hx onclick="p3Fold('${id}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
+    <div id="p3b-${id}" class="gh-lore-body${open?"":" hide"}"><section class="s2 gh-list">${body}</section></div>`;
+}
+function p3Identity(){
+  const d=state.data,u=d.u,ws=d.workouts||[],sl=strengthLevel(),ri=Math.max(0,RANKS.filter(r=>sl>=r[0]).length-1),cur=RANKS[ri],next=RANKS[ri+1];
+  const pct=next?clamp((sl-cur[0])/Math.max(1,next[0]-cur[0])*100,0,100):100,vol=p3Vol(lifetimeVolume());
+  const first=ws.length?Math.min(...ws.map(w=>new Date(w.date).getTime())):now(),mo=Math.max(0,Math.round((now()-first)/(30.44*P3_DAY)));
+  const age=mo<1?"<1 mo training":mo<24?mo+" mo training":(mo/12).toFixed(1)+" yr training",wk=weeklyStreak();
+  const prN=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
+  const st=[[Math.max(ws.length,u.totalWorkouts||0),"Sessions",""],[wk>0?wk+"<small>wk</small>":"–","Streak",""],[vol.v+"<small>"+vol.u+"</small>","Lifetime","openIronLedger()"],[prN,"Records",""]];
+  return `<section class="s3 p3-id gh-c" style="--i:0">
+    <div class="p3-idh" data-hx onclick="openSettings()"><span class="p3-av"><img src="Batman.jpg" alt="" onerror="this.parentNode.style.display='none'"></span>
+      <div class="p3-idn"><h1>${u.name?esc(u.name):"Athlete"}</h1><div class="sub">${esc(u.activeGym||"")}${u.activeGym?" · ":""}${bodyW()} kg · ${age}</div></div><span class="trail">${GP.icon("sliders")}</span></div>
+    <div class="p3-rank" data-hx onclick="openRankLadder()"><div class="p3-rank-h"><b>${esc(cur[1])} · Lv ${sl}</b><span>${next?(next[0]-sl)+" lv to "+esc(next[1]):"Top rank"}</span></div><div class="bar"><i style="width:${pct.toFixed(0)}%"></i></div></div>
+    <div class="p3-g4">${st.map(a=>`<div${a[2]?` data-hx onclick="${a[2]}"`:""}><span class="num">${a[0]}</span><span class="eyebrow">${a[1]}</span></div>`).join("")}</div></section>`;
+}
+function p3Calendar(){
+  const d=state.data,vols={},prsD={};
+  (d.workouts||[]).forEach(w=>{const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toDateString();vols[key]=(vols[key]||0)+(w.totalVol||0);prsD[key]=(prsD[key]||0)+((w.prs||[]).length);});
+  const mx=Math.max(1,...Object.values(vols)),today=new Date(now());today.setHours(0,0,0,0);
+  const off=state._calOff||0,base=new Date(today.getFullYear(),today.getMonth()+off,1),yr=base.getFullYear(),mo=base.getMonth();
+  const dim=new Date(yr,mo+1,0).getDate(),lead=(new Date(yr,mo,1).getDay()+6)%7;
+  const MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  let cells="MTWTFSS".split("").map(c=>`<div class="p3-cw">${c}</div>`).join("")+'<div class="p3-cd blank"></div>'.repeat(lead);
+  for(let day=1;day<=dim;day++){
+    const dd=new Date(yr,mo,day),key=dd.toDateString(),v=vols[key]||0,fut=dd>today,td=dd.getTime()===today.getTime();
+    cells+=v&&!fut?`<div class="p3-cd on${prsD[key]?" pr":""}${td?" today":""}" style="--h:${(.1+.42*Math.min(1,v/mx)).toFixed(2)}" data-hx onclick="dayDetail('${key}')" aria-label="${esc(key)}">${day}</div>`:`<div class="p3-cd${td?" today":""}${fut?" fut":""}">${day}</div>`;
   }
-  html+=profileCalendarHtml(d);
-  const otd=profileOnThisDay(d);if(otd)html+=otd;
-  html+=profileBossPreviewHtml(d,sl);
-  html+=profileEveryLiftTile(d);
-  try{html+=titleBeltsCard();}catch(e){}
-  const prCount=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length;
-  html+=acc('prf-rec','🏆','Records & Ranks',profileRecordsHtml(d),false,prCount+' PRs · belts · fight record');
-  html+=acc('prf-str','📊','Strength Analysis',profileStrengthHtml(),false,'standards · combat rating');
-  html+=acc('prf-bases','🏛️','Bases & Tools',profileBasesToolsHtml(d,u),false,(u.gyms||[]).length+' gym'+(((u.gyms||[]).length)===1?'':'s')+' · tools');
-  $("app").innerHTML=html;
+  const pm=new Date(yr,mo-1,1),inM=(w,y,m)=>{const t=new Date(w.date);return t.getFullYear()===y&&t.getMonth()===m;};
+  const mw=(d.workouts||[]).filter(w=>inM(w,yr,mo)),pw=(d.workouts||[]).filter(w=>inM(w,pm.getFullYear(),pm.getMonth()));
+  const tot=a=>a.reduce((s,w)=>s+(w.totalVol||0),0),sess=new Set(mw.map(w=>new Date(w.date).toDateString())).size,mv=tot(mw),pv=tot(pw);
+  const mp=mw.reduce((s,w)=>s+((w.prs||[]).length),0),dp=pv>0&&sess?Math.round((mv-pv)/pv*100):null,vv=p3Vol(mv);
+  return `<section class="s2 p3-cal gh-c" style="--i:1" ontouchstart="state._calSwipeX=event.touches[0].clientX" ontouchend="(function(){const dx=event.changedTouches[0].clientX-(state._calSwipeX||0);if(dx>55)calPrev();else if(dx<-55)calNext();})()">
+    <div class="p3-ch"><div><h3>${MON[mo]} ${yr}</h3><div class="sub">${sess} session${sess===1?"":"s"} · ${vv.v} ${vv.u}${mp?` · ${mp} PR${mp>1?"s":""}`:""}${dp!=null?` · <b class="${dp>=0?"c-ok":"c-warn"}">${dp>=0?"+":""}${dp}%</b>`:""}</div></div>
+      <div class="nv"><button class="btn-i" data-hx onclick="calPrev()" aria-label="Previous month">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><button class="btn-i" data-hx onclick="calNext()" aria-label="Next month"${off>=0?" disabled":""}>${GP.icon("chevR")}</button></div></div>
+    <div class="p3-cg">${cells}</div>
+    <div class="p3-cl"><span><i class="sw"></i>Session</span><span><i class="sw pr"></i>Record</span><span class="ht">Brighter = more volume</span></div></section>`;
+}
+function p3OnThisDay(){
+  const t=new Date(now()),past=(state.data.workouts||[]).filter(w=>{const x=new Date(w.date);return x.getMonth()===t.getMonth()&&x.getDate()===t.getDate()&&x.getFullYear()<t.getFullYear();});
+  if(!past.length)return "";
+  const w=past[past.length-1],k=new Date(w.date);k.setHours(0,0,0,0);
+  return `<div class="s1 gh-row p3-otd gh-c" style="--i:1" data-hx onclick="dayDetail('${k.toDateString()}')"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">On this day · ${new Date(w.date).getFullYear()}</div><div class="gh-t2">${esc(w.name)} · ${fmtNum(w.totalVol)} kg${w.prs&&w.prs.length?" · "+w.prs.length+" PR":""}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+}
+function p3ToggleRec(){state._p3AllRec=!state._p3AllRec;render();}
+function p3Records(){
+  const d=state.data,all=!!state._p3AllRec;
+  const list=Object.entries(d.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>(new Date(b[1].date||0)-new Date(a[1].date||0))||(b[1].orm-a[1].orm));
+  if(!list.length)return "";
+  const recent=now()-30*P3_DAY;
+  const rows=(all?list:list.slice(0,6)).map(([n,p])=>{const tr=p3Trend(n,{w:64,h:26,mini:1}),fresh=new Date(p.date||0).getTime()>=recent;
+    return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(n)})"><span class="lead${fresh?" gold":""}">${GP.icon(fresh?"trophy":"dumbbell")}</span><div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">e1RM <b>${Math.round(p.orm)} kg</b> · PR ${p.date?ghAgo(p.date):"–"}</div></div><span class="trail">${tr?tr.svg:""}${GP.icon("chevR")}</span></div>`;}).join("");
+  return `<div class="gh-sec gh-c" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
+    <section class="s2 gh-list gh-c" style="--i:2">${rows}${p3Row("chart","Every lift",loggedExerciseNames().length+" exercises · full curves","renderArchive()")}</section>`;
+}
+function p3BigThree(){   // barbell-equivalent bench + squat + deadlift vs bodyweight (liftEstimate converts machine/Smith lifts), 4-week delta
+  const d=state.data,bw=bodyW(),tops=["Bench Press","Squat","Deadlift"].map(l=>({l,e:liftEstimate(l)})).filter(x=>x.e);
+  if(tops.length<2)return null;
+  const cut=now()-28*P3_DAY;let nowT=0,nowC=0,thenT=0;
+  tops.forEach(({e})=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;let a=0,b=0;
+    exerciseRows(e.name).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cut&&r.e1rm>b)b=r.e1rm;});
+    const cur=Math.max(a*f,e.orm);nowT+=cur;if(b>0){nowC+=cur;thenT+=b*f;}});
+  return {ratio:nowT/bw,n:tops.length,d:thenT>0?Math.round((nowC-thenT)/thenT*100):null};
+}
+function p3Strength(){
+  const bw=bodyW(),rows=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].map(l=>({l,s:STD[l],e:liftEstimate(l)})).filter(x=>x.e);
+  if(!rows.length)return "";
+  const b3=p3BigThree(),full=t=>({"Inter.":"Intermediate","Adv.":"Advanced"})[t]||t;
+  const body=rows.map(({l,s,e})=>{
+    const r=e.orm/bw,tiers=[["Novice",s.b],["Inter.",s.i],["Adv.",s.a],["Elite",s.e]],lvl=tiers.slice().reverse().find(t=>r>=t[1]),nxt=tiers.find(t=>r<t[1]),max=s.e*1.18,p=v=>clamp(v/max*100,0,100).toFixed(1)+"%";
+    return `<div class="p3-sr"><div class="p3-srh"><b>${l}</b><span class="num">${r.toFixed(2)}</span><span class="u">× BW</span></div>
+      <div class="lmk p3-std" style="--v:${p(r)}"><i class="fill"></i>${tiers.map(t=>`<i class="tk" style="left:${p(t[1])}"></i>`).join("")}</div>
+      <div class="p3-tl">${tiers.map(t=>`<span style="left:${p(t[1])}">${t[0]}</span>`).join("")}</div>
+      <div class="p3-sn">${Math.round(e.orm)} kg e1RM · ${lvl?full(lvl[0]):"Below novice"}${nxt?` · ${full(nxt[0])} in +${fmtKg(Math.ceil((nxt[1]*bw-e.orm)*2)/2)} kg`:""}${e.est?` · est. from ${esc(e.via)}`:""}</div></div>`;}).join("");
+  return `<div class="gh-sec gh-c" style="--i:3"><h2>Strength</h2><span class="t-xs">e1RM ÷ ${bw} kg bodyweight</span></div>
+    <section class="s2 p3-std-c gh-c" style="--i:3">${b3?`<div class="p3-b3"><div><span class="num">${b3.ratio.toFixed(2)}</span><span class="u">× BW</span></div>${b3.d?`<span class="tag ${b3.d>0?"ok":"warn"}">${b3.d>0?"+":""}${b3.d}% / 4 wk</span>`:""}</div><div class="p3-b3c">Big-3 total, barbell-equivalent${b3.n<3?" · "+b3.n+" of 3 lifts":""}</div>`:""}${body}
+      <div class="p3-sfoot">Machine, Smith and variation lifts are converted to a barbell estimate. e1RM is a guide, not a verdict.</div></section>`;
+}
+function openBelts(){openSheet(`<div class="ttl">Title belts</div>${titleBeltsCard()||'<p class="muted" style="margin:6px 0">No belts yet. Lift to claim one.</p>'}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
+function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
+function p3Trophies(){
+  const d=state.data,won=new Set((d.bossWins||[]).map(b=>b.villain)),esc2=(d.bossReturns||[]).filter(b=>!b.defeated).length;
+  let belts=0;try{belts=Object.keys(titleBelts()).length;}catch(e){}
+  let rec=null;try{rec=mmaRecord();}catch(e){}
+  const next=(typeof BOSSES!=="undefined"?BOSSES:[]).slice().sort((a,b)=>a.min-b.min).find(b=>!won.has(b.v));
+  const body=p3Row("crown","Title belts",belts?belts+" held":"Lift to claim one","openBelts()")
+    +p3Row("lock","Arkham lockup",won.size+" inmate"+(won.size===1?"":"s")+(esc2?" · "+esc2+" escaped":""),"openArkhamLockup()")
+    +p3Row("flag","Rogues gallery",next?"Next: "+esc(next.v)+(next.min?" · Lv "+next.min:""):"All felled","openArkham()")
+    +p3Row("news","Gotham Gazette","This month's front page","openGazette()")
+    +p3Row("trophy","Badges","The trophy room","openTrophyRoom()")
+    +(rec&&rec.weeks>=2?p3Row("target","Fight record",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · "+rec.kos+" KO · week vs week",""):"");
+  return p3FoldRow("troph","trophy","Trophies","Belts · Arkham · Gazette · badges",body);
+}
+function p3Tools(){
+  const u=state.data.u,g=(u.gyms||[]).length;
+  const body=p3Row("map","Gyms",g+" gym"+(g===1?"":"s")+" · "+esc(u.activeGym||""),"openGyms()")
+    +p3Row("scan","Batcomputer","Physique and tools","openBatcomputer()")
+    +p3Row("scale","Measurements","Body log","openMeasure()")
+    +p3Row("share","Share PR card","Your top five lifts","shareProfilePRCard()")
+    +p3Row("calendar","Export calendar","Every session as .ics","exportICS()")
+    +p3Row("lock","Data control","Backup, restore, archive lifts","openDataControl()")
+    +p3Row("sliders","Settings","Name, bodyweight, rest, metric","openSettings()");
+  return p3FoldRow("tools","sliders","Gyms & data","Backup · measurements · settings",body);
+}
+function renderProfile(){
+  if(!(state.data.workouts||[]).length){
+    $("app").innerHTML=`<div class="gh p3-pf"><h1 class="gh-hi">Profile</h1><section class="s2 p3-empty"><span class="lead gold">${GP.icon("bat")}</span><div><b>Your record starts here</b><p>Rank, records and strength standards fill in as you train.</p></div><button class="btn btn-1" data-hx onclick="go('mission',1)">Plan a session</button></section></div>`;return;
+  }
+  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Trophies()}${p3Tools()}</div>`;
 }
 /* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, Threat/consistency, the Evidence Crate, Alfred and the weekly streak.
    Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
@@ -13384,7 +13220,7 @@ function confirmUnarchiveAll(){
 }
 function confirmArchiveExercise(name){
   appConfirm({title:"Archive "+name+"?",body:"Tonight's first set won't be compared to old numbers, and \"last time\" starts fresh from here. Every set you've already logged stays in your record — nothing is deleted.",ok:"Archive",danger:false}).then(ok=>{
-    if(!ok)return;archiveExercise(name);haptic("done");toast("🗄️ "+name+" archived — starting fresh next time");refreshDataControl();
+    if(!ok)return;archiveExercise(name);haptic("done");toast("🗄️ "+name+" archived — starting fresh next time");if($("dc-search"))refreshDataControl();else p3XdRefresh(name);
   });
 }
 function u_set(k,v){state.data.u[k]=v;save();}
@@ -13395,22 +13231,6 @@ function importRival(){appPrompt({title:"Add rival",body:"Paste a rival's sparri
 function backupData(){const blob=new Blob([JSON.stringify(state.data)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gainstracker-backup.json";a.click();state.data.u.lastBackupAt=new Date().toISOString();save();try{toast("💾 Backup saved — store it in iCloud/Files");}catch(e){}}
 /* Data lifeboat — iOS can evict PWA localStorage under storage pressure. Nudge a backup
    AFTER a workout (contextual, never on launch) when none exists for 30+ days. */
-function lifeboatBanner(){
-  const u=state.data.u;
-  if((state.data.workouts||[]).length<8)return "";
-  const last=u.lastBackupAt?new Date(u.lastBackupAt).getTime():0;
-  if(now()-last<30*864e5)return "";
-  return `<div class="card" style="border-color:rgba(60,150,255,.4);box-shadow:0 0 24px -12px rgba(60,150,255,.6);padding:13px 14px;margin-top:12px">
-    <div class="row" style="gap:10px;align-items:flex-start">
-      <span style="font-size:22px;filter:drop-shadow(0 0 10px rgba(60,150,255,.7))">🛟</span>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:var(--disp);font-weight:650;font-size:14px;color:#9fc1f2;letter-spacing:.06em">PROTECT THE CAVE</div>
-        <div class="mini" style="color:var(--text2);line-height:1.5">${u.lastBackupAt?"Your last backup is over a month old.":"No backup on file."} iPhone can purge app storage — one tap saves every workout, PR and split to a file. Keep it in iCloud.</div>
-      </div>
-      <button class="btn gold sm" style="width:auto;flex:none" onclick="backupData();render()">💾 Back up</button>
-    </div>
-  </div>`;
-}
 function exportCSV(){
   const rows=[["date","exercise","set","weight_kg","reps","type","est_1rm_kg"]];
   (state.data.workouts||[]).slice().reverse().forEach(w=>{
