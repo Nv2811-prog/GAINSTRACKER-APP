@@ -179,7 +179,7 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(38,42,54,.5),rgba(20,24,32,.4));backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:600;width:auto;flex:none;white-space:nowrap;transition:transform .12s,filter .12s}
 .chip.on{background:linear-gradient(180deg,rgba(50,32,4,.75),rgba(32,20,2,.65));border-color:rgba(255,208,72,.6);color:var(--gold2);box-shadow:0 0 18px -3px rgba(255,208,72,.6)}
 /* TAPTIC: invisible real <input switch> over a tappable — iOS buzzes only for a FINGER tap on one (see hxHost) */
-.hx{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:.01;z-index:6;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hx{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:.01;z-index:6;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:pan-x pan-y}
 .exrow,.sdone,#nav button,.stype{position:relative;overflow:hidden}
 /* premium static sheen across primary gold CTAs */
 .btn.gold::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(118deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 26%,rgba(255,255,255,0) 70%,rgba(255,255,255,.16) 100%);mix-blend-mode:overlay}
@@ -13463,13 +13463,20 @@ function boot(){
    tappables carry an invisible switch over their own face (.hx): the tap toggles it (native Taptic tick) and the click
    is handed to the host on the next tick, after the native toggle finished, so the host's own onclick runs exactly as
    before. Hosts with nested controls are skipped. Hosts are found by a MutationObserver, so every render() is covered. */
-const HX_SEL=".btn,.chip,.sdone,.stype,#nav button,[data-hx],.rs-btn,.log-ex-pill,.gtv2-panel,.splitday-start,.mb-start,.restbtn";
+/* Only small, high-value controls where a scroll never starts (bottom tabs, the set ✓). A switch also answers a finger
+   DRAG on iOS, so overlays on cards/chips/big buttons turned scroll gestures into taps — the "can't scroll past buttons" bug. */
+const HX_SEL="#nav button,.sdone";   /* data-hx marks in templates are inert on purpose: rows/buttons are scroll origins */
+/* Scroll guard: a touch that moved (> 8 px) or scrolled the page is a scroll, never a tap — the switch reverts and nothing opens. */
+let _hxT=null;
+document.addEventListener("touchstart",e=>{const t=e.touches[0];_hxT=t?{x:t.clientX,y:t.clientY,s:window.scrollY,m:false}:null;},{passive:true,capture:true});
+document.addEventListener("touchmove",e=>{const t=e.touches[0];if(_hxT&&t&&(Math.abs(t.clientX-_hxT.x)>8||Math.abs(t.clientY-_hxT.y)>8))_hxT.m=true;},{passive:true,capture:true});
+const hxScrolled=()=>!!_hxT&&(_hxT.m||Math.abs(window.scrollY-_hxT.s)>4);
 function hxHost(el,isStatic){
   el._hx=1;
   if(isStatic)el.style.position="relative";
   const i=document.createElement("input");
   i.type="checkbox";i.setAttribute("switch","");i.className="hx";i.tabIndex=-1;i.setAttribute("aria-hidden","true");
-  i.addEventListener("click",e=>{e.stopPropagation();if(!el.disabled)setTimeout(()=>el.click(),0);});
+  i.addEventListener("click",e=>{e.stopPropagation();if(hxScrolled()){e.preventDefault();return;}if(!el.disabled)setTimeout(()=>el.click(),0);});
   el.prepend(i);
 }
 function hxScan(n){
