@@ -64,6 +64,8 @@ export async function launch({ file = DEFAULT_FILE, fixture = null, fakeNow = nu
     if (u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com' || u.hostname === 'raw.githubusercontent.com') return req.continue();
     if (u.hostname === 'exercisedb.p.rapidapi.com') {
       log.blocked++;
+      // the preflight for the x-rapidapi-key header must pass, or the page logs a CORS error that is the harness's fault
+      if (req.method() === 'OPTIONS') return req.respond({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': '*' } });
       if (u.pathname.startsWith('/image')) return req.respond({ status: 200, contentType: 'image/svg+xml', body: DEMO_SVG, headers: { 'Access-Control-Allow-Origin': '*' } });
       return req.respond({ status: 200, contentType: 'application/json', body: '[]', headers: { 'Access-Control-Allow-Origin': '*' } });
     }

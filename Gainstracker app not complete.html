@@ -702,7 +702,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .af-ask{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:18px;min-height:54px;padding:0 7px 0 18px;border-radius:999px;background:rgba(7,10,16,.76);box-shadow:inset 0 0 0 1px rgba(242,193,78,.36);color:var(--tx3);font:500 16px/1 var(--body);text-align:left}
 .af-ask i{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(180deg,var(--gold-hi),var(--gold) 46%,var(--gold-lo));color:var(--on-gold)}
 .af-ask i .gi{width:20px;height:20px;stroke-width:2.4}
-.af-sug,.af-last,.af-read,.af-dos{margin-top:12px;overflow:hidden}
+.af-sug,.af-last,.af-read{margin-top:12px;overflow:hidden}
 .af-q{cursor:pointer}
 .af-q .gh-t1{white-space:normal}
 .af-last{display:block;padding-bottom:13px;cursor:pointer}
@@ -718,7 +718,6 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .af-rr.ok .lead{background:var(--tint-ok);color:var(--ok)}.af-rr.warn .lead{background:var(--tint-warn);color:var(--warn)}.af-rr.bad .lead{background:var(--tint-bad);color:#FF786D}.af-rr.rest .lead{background:var(--tint-rest);color:var(--rest)}
 .af-rr p{flex:1;min-width:0;padding-top:4px;font-size:14px;line-height:20px;color:var(--tx2)}
 .af-rr p b{color:var(--tx1);font-weight:600}
-.af-chips{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 14px}
 
 /* SETTINGS + DATA CONTROL (also the field rows of Onboarding) */
 .st-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px}
@@ -794,6 +793,13 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .ob-cta{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom,0px));margin-top:auto;padding-top:24px}
 .ob-cta .btn{width:100%}
 
+/* Find anything (the search sheet): one field, rows are the Home rows */
+.ix-q{display:flex;align-items:center;gap:10px;margin:2px 0 12px;padding:0 14px;height:48px;border-radius:var(--r-m);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair2)}
+.ix-q:focus-within{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.ix-q .gi{width:18px;height:18px;color:var(--tx3);flex:none}
+.ix-q input{flex:1;min-width:0;height:100%;margin:0;padding:0;border:0;background:none;box-shadow:none;color:var(--tx1);font:500 16px/1 var(--body);outline:none;-webkit-appearance:none;appearance:none}
+.ix-q input::-webkit-search-cancel-button{display:none}
+.ix-none{margin:0;padding:16px 14px}
 /* ===== GP:DOCKS (wave 6) ===== */
 /* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
    Tile = square still (assets/art/tile-*.jpg, or a header crop via --pos) under a dark vignette, an icon chip, a label and a live one-line sub.
@@ -1208,6 +1214,17 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-fc{display:inline-flex;flex:none;color:var(--warn)}
 .gh-fc .gi{width:13px;height:13px}
 .gh-empty{margin:14px 0 6px;padding-top:12px;border-top:1px solid var(--hair);font-size:13px;line-height:18px;color:var(--tx2)}
+.gh-allok{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:var(--r-m);background:var(--tint-ok);font:500 14px/19px var(--body);color:var(--tx1)}
+.gh-allok .ok{display:grid;place-items:center;flex:none;color:var(--ok)}.gh-allok .gi{width:18px;height:18px}
+.gh-mall{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;margin-top:6px;padding:0 2px;background:none;border:0;border-top:1px solid var(--hair);font:600 14px/1 var(--body);color:var(--gold-ink);text-align:left}
+.gh-mall .gi{width:16px;height:16px;flex:none}
+/* small text controls keep a 44px hit without growing: the hit area is a pseudo-element (the gh-more / gh-cyc / gh-ton / gh-next links, the chat's Open Settings link, the logging progress strip) */
+.gh-cyc::after,.gh-ton::after,.gh-next::after{content:"";position:absolute;inset:-9px -6px}
+.gh-lh .gh-more{padding:12px 0 12px 16px;margin:-12px 0}
+.gh .gh-sub[onclick]{min-height:40px;box-sizing:border-box;padding-top:12px;padding-bottom:6px}
+.ac-link::after{content:"";position:absolute;inset:-14px -8px}
+.lg2-segw::after{content:"";position:absolute;inset:-14px -6px -10px}
+.ac-link,.lg2-segw{position:relative}
 /* landmark bar (GP.landmark) */
 .gh .lmk{position:relative;height:6px;border-radius:3px;background:rgba(150,178,222,.11)}
 .gh .lmk .band{position:absolute;top:0;bottom:0;left:var(--mev);width:calc(var(--mav) - var(--mev));background:rgba(52,210,127,.20)}
@@ -1393,13 +1410,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gm-ff{margin:12px 14px 0;padding-top:9px;border-top:1px solid var(--hair)}
 
 /* frequency chips */
-.gm-freq{margin-top:12px;padding-bottom:14px}
-.gm-fb{display:grid;gap:12px;padding:4px 14px 0}
-.gm-fr{display:grid;gap:7px}
-.gm-fq{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:999px;font:600 13px/1 var(--body);color:var(--tx1);background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair)}
-.gm-fq i{font-style:normal;font-weight:500;color:var(--tx3)}
-.gm-fq.train{background:var(--tint-bad);color:#FF9A90;box-shadow:inset 0 0 0 1px rgba(255,90,78,.28)}
-.gm-fq.soon{background:var(--tint-warn);color:var(--warn);box-shadow:inset 0 0 0 1px rgba(255,178,36,.28)}
 .gm-bench .btn.sm{min-height:34px;height:34px;padding:0 14px}
 
 /* folded rows + the Lab body (old cards keep their logic; this puts them on the calm surfaces) */
@@ -1525,9 +1535,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gm-ms{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 10px}
 .gm-ms>div{display:flex;flex-direction:column;gap:4px}
 .gm-ms .num{font-size:30px;line-height:.9}
-.gm-mastery{margin-top:12px;padding-bottom:12px}
-.gm-mastery .gm-fig2{margin:0 12px}
-.gm-mastery .gm-leg{margin:6px 14px 0}
 
 /* MUSCLE DOSSIER sheet */
 .gm-dos .s2{margin-top:12px}
@@ -1582,6 +1589,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
   .gm-day{padding:11px 12px}
 }
 
+.gm-tier{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;flex:none;font:700 13px/1 var(--body)}
+.gm-sfr>p{margin-top:2px;margin-bottom:10px}
 /* ===== GP:PHOTOS (wave 7) ===== */
 /* Progress photos: the Suit card (Add tile + one thumbnail strip), the single-photo sheet and Compare (slide / side by side). Every <img> starts on the small thumbnail and swaps to the full photo once the vault returns it.
    Calm surfaces, hairline rings and ONE gold ring = the selection. Rings sit on ::after because an inset shadow on the parent is hidden by the photo inside it. */
@@ -1708,8 +1717,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .sp-hd h1{margin:0;color:var(--tx1)}
 .sp-hd .t-xs{margin-top:3px}
 .sp-hd .btn-i{flex:none}
-.gh .inf-c,.gh .fu-c,.gh .ar-si,.gh .gar-nx,.gh .sp-cal{margin-top:12px;padding-bottom:14px}
-.inf-c>:not(.gh-lh):not(.gh-row),.fu-c>:not(.gh-lh):not(.gh-row),.ar-si>:not(.gh-lh),.gar-nx>*,.sp-cal>:not(.gh-lh){margin-left:14px;margin-right:14px}
+.gh .inf-c,.gh .fu-c,.gh .ar-si,.gh .gar-nx,.gh .gm-sfr{margin-top:12px;padding-bottom:14px}
+.inf-c>:not(.gh-lh):not(.gh-row),.fu-c>:not(.gh-lh):not(.gh-row),.ar-si>:not(.gh-lh),.gar-nx>*,.gm-sfr>:not(.gh-lh):not(.gh-row){margin-left:14px;margin-right:14px}
 .gh .inf-p,.gh .fu-p,.gh .ar-p{margin:8px 14px 0}
 .inf-big{font-size:28px;color:var(--tx1)}.inf-big small{font-size:14px;color:var(--tx2);margin-left:2px}
 .inf-seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
@@ -1752,8 +1761,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gar-v2 .sx-bar{margin-top:5px;height:4px}
 .gh-xs .lead.car img{filter:brightness(1.5) contrast(1.06) drop-shadow(0 3px 6px rgba(0,0,0,.5))!important;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 14%,#000 84%,transparent 100%);-webkit-mask-composite:source-in;mask-composite:intersect}
 .sp-pg .gh-sec{margin:22px 4px 10px}
-.sp-calb{padding:10px 14px 0;overflow-x:auto}
-.sp-tools .gh-t2{white-space:normal}
 .gh .fu-hero{position:relative;margin-top:2px;padding:14px}
 .fu-kcal{display:flex;align-items:baseline;gap:8px;margin:8px 0 2px}
 .fu-kcal .num{font-size:52px;line-height:.95;color:var(--gold-ink)}
@@ -1778,7 +1785,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .fu-gl{display:flex;gap:5px;margin-top:12px}
 .fu-gl i{flex:1;height:24px;max-width:28px;border-radius:7px;background:rgba(150,178,222,.1)}
 .fu-gl i.on{background:linear-gradient(180deg,#9AD6FF,#2E86FF)}
-.fu-btns{display:flex;gap:8px;margin-top:12px}.fu-btns .btn{flex:1}.fu-btns .btn+.btn{flex:0 0 52px}
+.fu-btns{display:flex;gap:8px;margin-top:12px}.fu-btns .btn{flex:1}
 .fu-stack .gh-row.fu-tg{width:100%;text-align:left;color:var(--tx1);background:none;border:0}
 .fu-ck{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 1.5px var(--hair2);color:var(--on-gold)}
 .fu-tg.on .fu-ck{background:var(--gold-ink);box-shadow:none}.fu-ck .gi{width:16px;height:16px;stroke-width:3}
@@ -4406,7 +4413,7 @@ function render(){
   else if(state.subpage==="infirmary"){renderInfirmary();subTop();renderNav();}
   else if(state.subpage==="lab"){renderLab();subTop();renderNav();}
   else{
-    const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderProfile,allies:renderAllies,history:renderProfile,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
+    const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderProfile,allies:renderAllies,history:renderProfile,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit}[state.tab]||renderGotham;
     fn();
     const app=$("app");if(app){app.insertAdjacentHTML("afterbegin",topBar(state.tab==="gotham"?ghEyebrow():""));const rb=state.tab==="gotham"?"":resumeBar();if(rb)app.insertAdjacentHTML("beforeend",rb);}
     renderNav();
@@ -5711,7 +5718,7 @@ function symmetryCard(){
 }
 /* ========================= THE SUIT TAB (wave 3) =========================
    Recovery figure (anatomy stays grey, the worked muscle lights) with a counted legend → 12-muscle grid (GP.muscleTile: recovery %, hours to ready,
-   weekly sets vs MEV/MAV/MRV in zoneOf colours; tap = dossier) → Effort numbers → one folded row (time-lapse · mastery · radar) → Body (measurements, Infirmary, symmetry, photos).
+   weekly sets vs MEV/MAV/MRV in zoneOf colours; tap = dossier) → Effort numbers → Measurements (tape, symmetry, progress photos); the dock holds Infirmary, Fuel, Time-lapse and Photos.
    Read-only over getRecovery / hoursToReady / weeklySets / zoneOf / rirIntel. Scoped under .gh.gm like Mission. */
 const GS_FRESH=80,GS_MID=50;   // recovery bands, identical to the figure's colours: fresh >= 80, 50-79, fatigued < 50
 const GS_BAND={"NO EFFORT DATA":["No data",""],REDLINING:["Near failure","warn"],"THE KILL ZONE":["On target","ok"],EFFECTIVE:["Effective","ok"],SANDBAGGING:["Too easy","warn"]};
@@ -5724,13 +5731,18 @@ function gsHero(){
     <div class="gm-fig2">${buildSuit()}</div>
     <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
 }
-/* Suit dock: Infirmary and Time-lapse open their own page/sheet, Photos opens Compare (2+ photos) or scrolls to the card at the bottom of Body. The infirmary summary row and the time-lapse fold became these tiles. */
+/* Suit dock: Infirmary, Fuel and Time-lapse open their own page/sheet; Photos opens Compare (2+ photos) or scrolls to the card at the bottom. Fuel lives here: nutrition is body state, next to sleep and recovery. */
+function gsFuelSub(){
+  const n=state.data.u.nutrition;if(!(n&&n.cals))return "Set up";
+  try{const tg=cycledTargets(n,isTrainingToday()?"train":"rest"),fl=(state.data.foodLog||{})[todayKey()];return `<b>${fl?foodTotals(fl).k:0}</b> / ${tg.cals} kcal`;}catch(e){return "Calories · macros";}
+}
 function gsDock(){
   const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,ph=(state.data.photos||[]).length;
   const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load";
   return gdDock("Suit tools",[
     {art:"tile-infirmary",ic:"pulse",t:"Infirmary",s:inf,fn:"openInfirmary()"},
-    {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Mastery · radar",fn:"openMastery()"},
+    {art:"tile-lab",pos:"80% 50%",ic:"flame",t:"Fuel",s:gsFuelSub(),fn:"go('fuel',1)"},
+    {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Replay · radar",fn:"openMastery()"},
     {art:"tile-photos",ic:"image",t:"Photos",s:ph>=2?`Compare · <b>${ph}</b>`:ph?`<b>${ph}</b> photo`:"Add your first",fn:"photosOpen()"}]);
 }
 function openMastery(){openSheet(`<div class="gh gm st-pg"><div class="st-h"><h2>Time-lapse</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>${gsFoldHtml()}</div>`);}
@@ -5750,20 +5762,15 @@ function gsEffort(){
     <div class="gm-rir${pos==null?" is-empty":""}" role="img" aria-label="Average reps in reserve ${avg} on a 0 to 4 scale">${pos==null?"":`<i style="left:${pos.toFixed(1)}%"></i>`}</div>
     <div class="gm-rirk"><span>0</span><span>1</span><span>2</span><span>3</span><span>4+</span></div><div class="t-xs gm-effn">${I.n} sets with RIR · last 30 days · tap for every muscle</div></section>`;
 }
-function gsFoldHtml(){   // time-lapse, mastery figure, coverage radar: all one tap down
-  const sl=strengthLevel(),r=rankFor(sl),dot=(c,t)=>`<span><i style="background:${c}"></i>${t}</span>`;
-  const prev=state._figColor;let fig="";
-  state._figColor=m=>{const v=state.data.muscleVol[m]||0;return v?{fill:masteryOf(m)[1],op:".92"}:{fill:"#E8C56A",op:".07"};};
-  try{fig=buildSuit();}finally{state._figColor=prev;}
+function gsFoldHtml(){   // time-lapse and coverage radar. The suit figure lives on the Suit tab only; mastery is the Lv chip in each muscle dossier
   let tl="";try{tl=timeLapseCard();}catch(e){}
-  return `<div class="gm-lab">${tl}<section class="s2 gm-mastery"><div class="gh-lh"><h3>Mastery</h3><span class="t-xs">${esc(r.name)} · Str ${sl}</span></div><div class="gm-fig2">${fig}</div>
-    <div class="gm-leg">${[["#FFD048","Legendary"],["#9840F8","Epic"],["#3C96FF","Rare"],["#22E87A","Honed"],["#9aa0ab","Trained"]].map(x=>dot(x[0],x[1])).join("")}</div></section>
-    ${coverageRadar()}</div>`;
+  return `<div class="gm-lab">${tl}${coverageRadar()}</div>`;
 }
-function gsBody(){
-  const me=state.data.u.measurements||{},cells=[["chest","Chest"],["waist","Waist"],["leftArm","L arm"],["rightArm","R arm"],["leftThigh","L thigh"],["rightThigh","R thigh"]];
-  return `<div class="gh-sec"><h2>Body</h2><button class="gh-more" data-hx onclick="openMeasure()">Edit</button></div>
-    <section class="s2 gm-meas"><div class="gm-ms">${cells.map(([k,l])=>`<div><b class="num">${me[k]||"—"}</b><span class="eyebrow">${l}${me[k]?" cm":""}</span></div>`).join("")}</div></section>
+function gsBody(){   // tape measurements, symmetry and progress photos (the weigh-in and its trend are Profile's Body section)
+  const me=state.data.u.measurements||{},cells=[["chest","Chest"],["waist","Waist"],["leftArm","L arm"],["rightArm","R arm"],["leftThigh","L thigh"],["rightThigh","R thigh"]],has=cells.some(([k])=>me[k]);
+  return `<div class="gh-sec"><h2>Measurements</h2><button class="gh-more" data-hx onclick="openMeasure()">${has?"Edit":"Add"}</button></div>
+    ${has?`<section class="s2 gm-meas"><div class="gm-ms">${cells.map(([k,l])=>`<div><b class="num">${me[k]||"—"}</b><span class="eyebrow">${l}${me[k]?" cm":""}</span></div>`).join("")}</div></section>`
+    :`<div class="s1 gh-row" role="button" tabindex="0" onclick="openMeasure()"><span class="lead">${GP.icon("scale")}</span><div class="main"><div class="gh-t1">Add your measurements</div><div class="gh-t2">Chest, waist, arms and thighs, in cm</div></div><span class="trail">${GP.icon("chevR")}</span></div>`}
     ${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
 }
 function renderSuit(){
@@ -5776,9 +5783,8 @@ function suitPhysiqueAlfredCard(){
   const stored=state.data.u.lastPhysiqueAnalysis;
   const hasKey=!!geminiKey();
   let inner='';
-  if(!last){
-    inner=`<div class="mini" style="color:var(--text3);line-height:1.6">Add a progress photo above. Alfred will assess your muscle development, symmetry, weak points, and what to prioritise in the next training block.</div>`;
-  } else if(!hasKey){
+  if(!last)return "";   // nothing to review yet: the photo card is the one call to action
+  if(!hasKey){
     inner=`<div class="mini" style="color:var(--text3);line-height:1.6">Add a Gemini API key in Settings to let Alfred analyse your physique photos.</div>`;
   } else if(stored){
     inner=`<div style="font-size:13.5px;line-height:1.65;color:var(--text2)">${esc(stored.text).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div>
@@ -6301,7 +6307,7 @@ function archExerciseList(){
 }
 function archiveCardsHtml(){
   const si=strengthIndexSeries();
-  let html=`<section class="s2 ar-si"><div class="gh-lh"><h3>Strength index</h3><span class="t-xs">Combined e1RM of your top lifts</span></div>`;
+  let html=`<section class="s2 ar-si"><div class="gh-lh"><h3>Strength index</h3><span class="t-xs">Combined top-lift e1RM</span></div>`;
   if(si.vals.length>=2){const first=si.vals[0],last=si.vals[si.vals.length-1],up=last>=first,pct=first?Math.round((last-first)/first*100):0;
     html+=`<div class="ar-sih"><b class="num">${last}<small>idx</small></b><span class="tag ${up?"ok":"warn"}">${pct>0?"+":""}${pct}% since the start</span></div><div class="ar-chart">${trendChart(si.vals,{color:"#F2C14E"})}</div><p class="t-xs ar-p">Sum of your best e1RM across up to 8 top lifts, tracked every session.</p>`;
   }else html+=`<p class="t-s ar-p">Log a few sessions across your main lifts and the strength index will rise here.</p>`;
@@ -6640,46 +6646,46 @@ function renderInfirmary(){
 /* ========================================================================
    COMMAND CENTER — a searchable index of every feature so nothing is buried.
    ======================================================================== */
-const INDEX_ITEMS=[
-  ["🦇","Gotham home","Tonight's mission, readiness, daily challenges","go('gotham')"],
-  ["⚔️","Mission / log a workout","Start or log tonight's session","go('mission')"],
-  ["📈","Profile","Records, ranks, history & analytics","go('case')"],
-  ["📋","Plan & schedule","Splits, training days, forecast","goPlan()"],
-  ["🧪","Lab","Efficiency, balance, plateaus, calculators","openLab()"],
-  ["📥","Import or share a split","Paste a Split Card or send yours","openSplitExchange()"],
-  ["🤖","Alfred","AI coach, physique scan, weekly review","go('alfred')"],
-  ["💪","The Suit","Your muscle figure & recovery map","go('suit')"],
-  ["🦾","WAYNE TECH","The gadget hub — every tool in one tab","go('tech')"],
-  ["🗓️","Patrol Calendar","26-week training heatmap","go('tech')"],
-  ["🔮","Oracle","Rank & lift projections, ETAs","openOracle()"],
-  ["🏆","Trophy Room","All honors & progress to locked ones","openTrophyRoom()"],
-  ["📜","Contracts","Set custom goals & track to target","openContracts()"],
-  ["🧪","Strength Simulator","Model future gains from consistency","openSimulator()"],
-  ["💻","Batcomputer Terminal","Query your data by command","openTerminal()"],
-  ["🧘","Bat-Focus","Box-breathing orb for between sets","openFocus()"],
-  ["📊","THE ARCHIVE","Strength curves, PR timeline, forecasts","openArchive()"],
-  ["🛠️","THE FORGE","1RM, percentage loading & next plate jump","openForge()"],
-  ["🚗","THE GARAGE","Vehicles you've unlocked by milestones","openGarage()"],
-  ["🚑","THE INFIRMARY","Sleep, soreness, workload, injuries (Suit · Body)","openInfirmary()"],
-  ["🍽️","FUEL","Calories, macros, food log, hydration","go('fuel')"],
-  ["📡","Batcomputer","Full analytics dashboard","openBatcomputer()"],
-  ["📂","Batcomputer report","30-day · 90-day · yearly review","periodReport(30)"],
-  ["🤝","Justice League","Compare with allies' Patrol Cards","openJusticeLeague()"],
-  ["🏆","Leaderboard","Rank yourself vs allies by Vigilante Score","openLeaderboard()"],
-  ["⚔️","Co-op Raid","Team up on a boss; pool your tonnage","openRaid()"],
-  ["📐","Measurements","Log body measurements","openMeasure()"],
-  ["💡","Training tips","The full tips & science library","openTips()"],
-  ["⚙️","Settings","Profile, equipment, data backup","openSettings()"]
+const INDEX_ITEMS=[   // [GP icon, title, one line, onclick]: every destination once, the tabs first, then the pages and tools behind them
+  ["gotham","Home","Tonight, readiness, this week","go('gotham')"],
+  ["mission","Mission","Plan, cycle days, volume forecast","go('mission')"],
+  ["suit","Suit","Recovery, muscles, effort, measurements","go('suit')"],
+  ["profile","Profile","Records, standards, calendar, bodyweight","go('case')"],
+  ["allies","Allies","League, chat, duels, raids","go('allies')"],
+  ["chat","Alfred","Today's read and things to ask","go('alfred')"],
+  ["flame","Fuel","Calories, macros, food log, hydration","go('fuel')"],
+  ["calendar","Plan & schedule","Splits, training days, set targets","goPlan()"],
+  ["down","Import or share a split","Paste a Split Card or send yours","openSplitExchange()"],
+  ["flask","Lab","Efficiency, balance, plateaus, tools","openLab()"],
+  ["wrench","Forge","1RM, percentage loading, plate jumps","openForge()"],
+  ["up","Oracle","Rank and lift projections, ETAs","openOracle()"],
+  ["chart","Strength simulator","Model future gains from consistency","openSimulator()"],
+  ["target","Contracts","Custom goals tracked to a target","openContracts()"],
+  ["note","Terminal","Query your data by command","openTerminal()"],
+  ["timer","Bat-Focus","Box breathing between sets","openFocus()"],
+  ["pulse","Infirmary","Sleep, soreness, workload, injuries","openInfirmary()"],
+  ["book","Lift history","Strength curves and every lift","openArchive()"],
+  ["trophy","Trophy room","Badges and progress to the locked ones","openTrophyRoom()"],
+  ["scan","Batcomputer","Volume, balance and trend analytics","openBatcomputer()"],
+  ["news","Period report","30-day, 90-day and yearly review","periodReport(30)"],
+  ["map","Garage","Vehicles unlocked by milestones","openGarage()"],
+  ["allies","Justice League","Manage allies and your snapshot code","openJusticeLeague()"],
+  ["crown","Leaderboard","Rank yourself against allies","openLeaderboard()"],
+  ["flag","Co-op raid","Team up on a boss","openRaid()"],
+  ["scale","Measurements","Chest, waist, arms, thighs","openMeasure()"],
+  ["bulb","Training tips","The science library","openTips()"],
+  ["sliders","Settings","Profile, equipment, data backup","openSettings()"]
 ];
-function openIndex(){state._idxQ="";drawIndex();openSheet($("sheet").innerHTML);}
-function drawIndex(){
-  const q=(state._idxQ||"").toLowerCase();
-  const list=INDEX_ITEMS.filter(i=>!q||(i[1]+" "+i[2]).toLowerCase().includes(q));
-  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center;gap:6px">🧭 FIND ANYTHING</div>
-    <div class="mini" style="margin-bottom:8px">Every screen and tool in one place — search or tap to jump.</div>
-    <input placeholder="🔍 Search features…" value="${esc(state._idxQ||"")}" oninput="state._idxQ=this.value;drawIndex()" autofocus/>
-    <div id="idx-list" style="margin-top:6px">${list.length?list.map(i=>`<button class="row sp" onclick="closeSheet();${i[3]}" style="width:100%;background:none;border:none;border-top:1px solid var(--border);padding:11px 0;cursor:pointer;text-align:left"><div class="row g" style="gap:11px;min-width:0"><span style="font-size:22px;flex:none">${i[0]}</span><div style="min-width:0"><b style="font-size:13.5px;display:block">${esc(i[1])}</b><span class="mini">${esc(i[2])}</span></div></div><span style="color:var(--gold2);flex:none">›</span></button>`).join(""):'<p class="muted" style="padding:12px 0">Nothing matches.</p>'}</div>
-    <button class="btn" style="margin-top:10px" onclick="closeSheet()">Close</button>`;
+function idxRows(){
+  const q=(state._idxQ||"").trim().toLowerCase(),list=INDEX_ITEMS.filter(i=>!q||(i[1]+" "+i[2]).toLowerCase().includes(q));
+  return list.length?list.map(i=>`<div class="gh-row" role="button" tabindex="0" onclick="closeSheet();${i[3]}"><span class="lead">${GP.icon(i[0])}</span><div class="main"><div class="gh-t1">${i[1]}</div><div class="gh-t2">${i[2]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join(""):`<p class="t-s ix-none">No match. Try "plan", "sleep" or "records".</p>`;
+}
+function idxFilter(v){state._idxQ=v;const l=$("idx-list");if(l)l.innerHTML=idxRows();}   // only the list repaints, so the field keeps focus while typing
+function openIndex(){
+  state._idxQ="";
+  openSheet(`<div class="gh st-pg"><div class="st-h"><h2>Find anything</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <label class="ix-q">${GP.icon("search")}<input type="search" placeholder="Search features" aria-label="Search features" autocomplete="off" oninput="idxFilter(this.value)"/></label>
+    <section class="s2 gh-list ix-l" id="idx-list">${idxRows()}</section></div>`);
 }
 
 /* ===== Shared milestone stats for garage/most-wanted ===== */
@@ -6999,12 +7005,10 @@ function p3Tools(){
   const u=state.data.u,g=(u.gyms||[]).length;let rec=null,wf="";try{rec=mmaRecord();wf=weeklyFightCard();}catch(e){}
   const body=p3Row("map","Gyms",g+" gym"+(g===1?"":"s")+" · "+esc(u.activeGym||""),"openGyms()")
     +p3Row("scan","Batcomputer","Physique and tools","openBatcomputer()")
-    +p3Row("scale","Measurements","Chest, waist, arms, thighs","openMeasure()")
     +p3Row("share","Share PR card","Your top five lifts","shareProfilePRCard()")
     +p3Row("calendar","Export calendar","Every session as .ics","exportICS()")
-    +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · against the week before",wf?"alOpenFightCard()":""):"")
-    +p3Row("sliders","Settings","Name, bodyweight, rest, metric","openSettings()");
-  return p3FoldRow("tools","sliders","Gyms & tools","Gyms · measurements · settings",body);
+    +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · against the week before",wf?"alOpenFightCard()":""):"");
+  return p3FoldRow("tools","sliders","Gyms & tools","Gyms · analytics · sharing",body);
 }
 function renderProfile(){
   if(!(state.data.workouts||[]).length){
@@ -7101,7 +7105,7 @@ function splitsChanged(){save();try{refreshSplitSheet();}catch(e){}render();}
 
 /* ========================= MISSION TAB (wave 3) =========================
    Mission = the plan. Hero (active split + cycle position) → cycle days (tonight highlighted: START / RESUME) → volume forecast with a one-tap trim
-   → frequency chips → other plans → Lab fold. Read-only over the science helpers (ghPlanSets, perWeek, zoneOf, freqInfo); the only writes are
+   → other plans; the tool dock (Edit plan, New split, Import split, Lab) sits under the hero. Read-only over the science helpers (ghPlanSets, perWeek, zoneOf); the only writes are
    plan edits (trim, sets × reps targets), each through splitsChanged() and each undoable. Scoped under .gh.gm: Home's primitives + the GP:MISSION+SUIT CSS. */
 const GM_REPS="5–10",GM_REP_PRESETS=["5–10","8–12","12–15"],GM_MIN_SETS=2,GM_MAX_SETS=10;   // plan default 5–10: add weight at 10; a trim never takes a lift under 2 sets
 const GM_IC={
@@ -7230,15 +7234,6 @@ function gmDayRow(sp,i,cur,live){
   return `<div class="gm-day${tn?" is-tonight":""}${rest?" is-rest":""}${done?" is-done":""}"${go.startsWith("<button")?"":" data-hx"} onclick="openDayBriefing('${sp.id}',${i})"><span class="lead">${lead}</span><div class="main">${tn?'<div class="gm-tn">Tonight</div>':""}<div class="gh-t1"><span class="nm">${esc(day.name)}</span></div>${sub}</div><span class="trail">${go||GP.icon("chevR")}</span></div>`;
 }
 
-/* ---- frequency coach as chips (freqInfo: days since last hit, sets vs MEV) ---- */
-function gmFreq(){
-  const it=M12.map(freqInfo),by=s=>it.filter(x=>x.stat===s),ok=by("ok");
-  const why=x=>x.dsl==null?"new":x.stat==="train"&&x.dsl<4?`${x.sets}/${(VL[x.m]||{mev:8}).mev} sets`:x.stat==="soon"&&x.sess<2&&x.dsl<3?"1× this week":x.dsl+"d ago";
-  const chip=x=>`<button class="gm-fq ${x.stat}" onclick="muscleDrill('${x.m}')">${ghName(x.m)}<i>${why(x)}</i></button>`;
-  const row=(lab,l)=>l.length?`<div class="gm-fr"><span class="eyebrow">${lab}</span><div class="gm-chips">${l.map(chip).join("")}</div></div>`:"";
-  return `<section class="s2 gm-freq gh-c" style="--i:4"><div class="gh-lh"><h3>Frequency</h3><span class="t-xs">each muscle ~2× a week</span></div>
-    <div class="gm-fb">${row("Train next",by("train"))}${row("Due soon",by("soon"))}${ok.length?`<div class="gm-fr"><span class="eyebrow">On track</span><div class="t-s">${ok.length} of 12 muscles at a good rhythm</div></div>`:""}</div></section>`;
-}
 function gmBench(act){
   const rest=(state.data.splits||[]).filter(s=>s.id!==act.id);if(!rest.length)return "";
   return `<section class="s2 gh-list gm-bench gh-c" style="--i:5"><div class="gh-lh"><h3>Other plans</h3><span class="t-xs">${rest.length}</span></div>${rest.map(sp=>{
@@ -7248,8 +7243,8 @@ function gmBench(act){
 /* ---- Lab: everything that is not the plan, folded into one row. Cards keep their logic; .gm-lab restyles them. ---- */
 function scienceCardsHtml(){return scienceLabCard()+weeklyBalanceCard()+plateauCard();}   // per-muscle volume is the Suit grid, the workload ratio lives in the Infirmary: the Lab keeps only what is shown nowhere else
 function gmLabHtml(){
-  const tools=[["scale","Plate calculator","openPlateSheet(-1)"],["bolt","1RM calculator","open1RM()"],["target","1RM test day","openTestDay()"],["wrench","Forge","openForge()"],["note","Measure","openMeasure()"]];
-  return `<div class="gm-lab">${contractCard()}${scienceCardsHtml()}<section class="s2 gh-list"><div class="gh-lh"><h3>Tools</h3></div>${tools.map(t=>`<div class="gh-row" data-hx onclick="${t[2]}"><span class="lead">${GP.icon(t[0])}</span><div class="main"><div class="gh-t1">${t[1]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`;
+  const tools=[["wrench","Forge","1RM, percentages, ramp, plate jumps","openForge()"],["scale","Plate calculator","Plates per side for any weight","openPlateSheet(-1)"],["target","1RM test day","Work up to a tested max","openTestDay()"],["up","Oracle","Rank and lift projections, ETAs","openOracle()"],["chart","Strength simulator","Model gains from consistency","openSimulator()"],["note","Contracts","Custom goals tracked to a target","openContracts()"],["timer","Bat-Focus","Box breathing between sets","openFocus()"]];
+  return `<div class="gm-lab">${contractCard()}${scienceCardsHtml()}<section class="s2 gh-list"><div class="gh-lh"><h3>Tools</h3></div>${tools.map(t=>`<div class="gh-row" role="button" tabindex="0" onclick="${t[3]}"><span class="lead">${GP.icon(t[0])}</span><div class="main"><div class="gh-t1">${t[1]}</div><div class="gh-t2">${t[2]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`;
 }
 /* Lab sub-page (the Lab dock tile). Same shell as the Infirmary: back arrow, one scroll, tools open sheets over it. */
 function openLab(){state.subpage="lab";render();window.scrollTo(0,0);}
@@ -7265,7 +7260,7 @@ function renderMission(){
   if(!cur)h+=gmEmpty()+gmDock(null);
   else h+=gmHero(cur)+gmDock(cur)
     +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
-    +gmSuggest()+gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
+    +gmSuggest()+gmForecast(cur.sp)+gmBench(cur.sp);
   h+=`</div>`;
   $("app").innerHTML=h;
 }
@@ -7769,16 +7764,16 @@ function importAllySplit(i){
   save();haptic("done");closeSheet();render();
   toast(`Copied ${a.n}'s split — ${sp.days.length} days ready to train.`);
 }
-function openJusticeLeague(){   // "Splits & backups": share/import a split, the offline snapshot, and who is in your league
+function openJusticeLeague(){   // "Manage allies": invite, the offline snapshot, and who is in your league (a split is shared from Mission, Import split, or the plan editor)
   const allies=state.data.allies||[],code=encodeCard(myPatrolCard());
   const cloudOn=(typeof cloud!=="undefined"&&cloud.ready);
   const row=(ic,t1,t2,fn)=>`<div class="gh-row" onclick="${fn}" role="button" tabindex="0"><span class="lead">${GP.icon(ic)}</span><div class="main"><div class="gh-t1">${t1}</div><div class="gh-t2">${t2}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
   const mem=allies.length?allies.map((a,i)=>`<div class="gh-row"><span class="al-av">${alInitial(a.n)}</span><div class="main"><div class="gh-t1">${esc(a.n)}</div><div class="gh-t2">${esc(a.rk||"")}${a._uid?" · live":" · snapshot"}</div></div><button class="btn sm" onclick="confirmDelAlly(${i})" aria-label="Remove ${esc(a.n)}">Remove</button></div>`).join("")
     :`<div class="st-empty">No allies yet.</div>`;
   openSheet(`<div class="gh st-pg">
-    <div class="st-h"><h2>Splits &amp; backups</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
-    <span class="eyebrow st-g">Share</span>
-    <section class="s2 st-list">${row("share","Share or import a split","Send a plan to an ally or paste one","openSplitExchange()")}${row("plus","Invite an ally",cloudOn?"Swap friend codes":"Offline · codes still work","openAllyInvite()")}</section>
+    <div class="st-h"><h2>Manage allies</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <span class="eyebrow st-g">Invite</span>
+    <section class="s2 st-list">${row("plus","Invite an ally",cloudOn?"Swap friend codes":"Offline · codes still work","openAllyInvite()")}</section>
     <span class="eyebrow st-g">Offline snapshot</span>
     <section class="s2 st-list"><div class="st-note" style="padding-top:12px">A one-time copy of your card for allies who are not live. It does not update.</div>
       <div style="padding:0 14px 14px"><button class="btn sm" onclick="shareMyCard()">${GP.icon("share")}Copy snapshot code</button><textarea id="my-code" readonly onclick="this.select()" class="st-ta">${code}</textarea></div></section>
@@ -7974,12 +7969,12 @@ function tlUpdate(){
 function tlScrub(v){state._tlWeek=+v;tlUpdate();}
 function tlStep(d){const W=tlBuildWeeks();if(!W)return;state._tlWeek=clamp((+state._tlWeek||W.n)+d,1,W.n);
   const s=document.getElementById("tl-range");if(s)s.value=state._tlWeek;tlUpdate();haptic("tap");}
-function tlStopPlay(){if(state._tlTimer){clearInterval(state._tlTimer);state._tlTimer=null;}const b=document.getElementById("tl-play");if(b)b.innerHTML="▶ Play";}
+function tlStopPlay(){if(state._tlTimer){clearInterval(state._tlTimer);state._tlTimer=null;}const b=document.getElementById("tl-play");if(b)b.innerHTML=GP.icon("play")+"Play";}
 function tlPlay(){
   if(state._tlTimer){tlStopPlay();return;}
   const W=tlBuildWeeks();if(!W)return;
   state._tlWeek=1;const s=document.getElementById("tl-range");if(s)s.value=1;tlUpdate();
-  const b=document.getElementById("tl-play");if(b)b.innerHTML="⏸ Stop";
+  const b=document.getElementById("tl-play");if(b)b.innerHTML=GP.icon("x")+"Stop";
   state._tlTimer=setInterval(()=>{
     state._tlWeek=(+state._tlWeek||1)+1;
     const ss=document.getElementById("tl-range");if(ss)ss.value=state._tlWeek;
@@ -7996,14 +7991,14 @@ function timeLapseCard(){
   if(!state._tlWeek||state._tlWeek>W.n)state._tlWeek=W.n;
   const init=tlCompute(state._tlWeek)||{fig:"",label:""};
   return `<div class="card glow"><div class="row sp"><div class="ttl" style="margin:0;display:flex;align-items:center">${secIcon('film')}Training time-lapse</div>
-      <button id="tl-play" class="btn ghost sm" style="width:auto" onclick="tlPlay()">▶ Play</button></div>
+      <button id="tl-play" class="btn ghost sm" style="width:auto" onclick="tlPlay()">${GP.icon("play")}Play</button></div>
     <div class="mini" style="margin:2px 0 9px;color:var(--text2)">Drag the slider to scrub your weekly muscle heat across your whole history — or hit Play to watch it animate.</div>
     <div id="tl-fig" class="stage" style="border-radius:14px;overflow:hidden;padding:6px 6px 2px">${init.fig}</div>
     <div id="tl-label" class="mini center" style="margin:9px 0 7px;color:var(--text)">${init.label}</div>
     <div class="row" style="gap:9px;align-items:center">
-      <button class="btn ghost sm" style="width:auto;padding:6px 11px" onclick="tlStep(-1)">‹</button>
+      <button class="btn ghost sm" style="width:auto;padding:6px 11px" onclick="tlStep(-1)" aria-label="Previous week">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button>
       <input id="tl-range" type="range" min="1" max="${W.n}" value="${state._tlWeek}" oninput="tlScrub(this.value)" style="flex:1;accent-color:var(--gold2)"/>
-      <button class="btn ghost sm" style="width:auto;padding:6px 11px" onclick="tlStep(1)">›</button>
+      <button class="btn ghost sm" style="width:auto;padding:6px 11px" onclick="tlStep(1)" aria-label="Next week">${GP.icon("chevR")}</button>
     </div>
     <div class="row sp mini" style="margin-top:3px;color:var(--text3)"><span>first week</span><span>now</span></div></div>`;
 }
@@ -8020,15 +8015,10 @@ function weeklyBalanceCard(){
     ${rowR("Push : Pull sets",push,pull)}${rowR("Quad : Hamstring sets",quad,ham)}
     ${flags.map(([k,t])=>`<div class="banner" style="margin-top:6px;${k==="ok"?"background:rgba(46,204,113,.10);border-color:rgba(46,204,113,.32)":""}"><span>${k==="warn"?GP.icon("alert"):GP.icon("check")}</span><div class="mini">${esc(t)}</div></div>`).join("")}</div>`;
 }
-// Plateau breaker: the stalled lifts (ONE detector — liftIntel), each with one suggested change.
+// Plateau breaker: ONE detail (the Stalled lifts sheet, which Home's Lifts card opens too); the Lab keeps a link to it.
 function plateauCard(){
-  const stalled=stalledLifts();if(!stalled.length)return "";
-  let h=`<div class="card" style="border-color:rgba(232,69,60,.4);background:linear-gradient(180deg,rgba(232,69,60,.07),transparent)"><div class="ttl" style="color:#ff6b5c;display:flex;align-items:center">${secIcon('plateau','#ff6b5c')}Plateau breaker</div><div class="mini" style="margin-bottom:10px;color:var(--text2)">Best estimated 1RM not beaten for 3+ sessions. Change one variable — keep the effort.</div>`;
-  stalled.slice(0,3).forEach((s,k)=>{const f=stallFix(s.n,k);h+=`<div style="border-top:1px solid var(--border);padding:9px 0">
-    <div class="row sp"><b>${esc(s.n)}</b><span class="chip" style="font-size:11px">flat ${s.sessions} session${s.sessions===1?"":"s"} · ${fmtKg(s.best)}kg</span></div>
-    <div class="mini" style="margin-top:5px;color:var(--gold2);line-height:1.45"><b>${f[0]}</b> — ${f[1]}</div></div>`;});
-  if(stalled.length>3)h+=`<div class="mini" style="border-top:1px solid var(--border);padding-top:9px;color:var(--gold2);cursor:pointer" onclick="openStalledLifts()">All ${stalled.length} stalled lifts ›</div>`;
-  h+=`</div>`;return h;
+  const n=stalledLifts().length;if(!n)return "";
+  return `<section class="s2 gh-list"><div class="gh-row" role="button" tabindex="0" onclick="openStalledLifts()"><span class="lead">${GP.icon("plateau")}</span><div class="main"><div class="gh-t1">Plateau breaker</div><div class="gh-t2"><b>${n}</b> stalled lift${n===1?"":"s"} · one change for each</div></div><span class="trail">${GP.icon("chevR")}</span></div></section>`;
 }
 /* ===== Wave J — Sports Science Lab: junk-volume detector + stimulus-to-fatigue (SFR) ratings ===== */
 // Aggregate each exercise's effective hard-set stimulus over the last N days.
@@ -8053,42 +8043,17 @@ function sfrScore(a){
   const systemic=1+0.16*sec+0.22*(prim-1)+axial;
   return (a.stim/Math.max(1,a.sets))/systemic;
 }
-function scienceLabCard(){
-  const trained=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
-  if(trained.length<3)return "";
-  let below=0,growth=0; const junk=[];
-  M12.forEach(m=>{const s=weeklySets(m),lm=VL[m]||{mev:8,mav:16,mrv:20},eMrv=effectiveMRV(m);
-    if(s<=0)return;
-    if(s<lm.mev)below++;
-    else if(s<=eMrv)growth++;          // volume spread across sub-regions earns a higher ceiling
-    else junk.push({m,s,mrv:eMrv});});
-  let verdict,vc;
-  if(junk.length>=2){verdict=`Junk-volume risk — ${junk.length} muscles past MRV. Recovery, not more sets, is the limiter now.`;vc="var(--red)";}
-  else if(junk.length===1){verdict=`${MNAME[junk[0].m]} has crept past MRV. Trim ~2 sets to keep every rep productive.`;vc="var(--orange)";}
-  else if(below>=4){verdict=`${below} muscles sit below MEV — clean runway to add productive volume.`;vc="var(--gold2)";}
-  else {verdict="Volume is well-distributed across the growth zone. Textbook week, sir.";vc="var(--green)";}
-  const dist=`<div class="row" style="gap:6px;margin:9px 0 4px">
-    <div style="flex:${Math.max(below,0.001)};height:9px;border-radius:5px;background:#3a3a44"></div>
-    <div style="flex:${Math.max(growth,0.001)};height:9px;border-radius:5px;background:var(--green)"></div>
-    <div style="flex:${Math.max(junk.length,0.001)};height:9px;border-radius:5px;background:var(--red)"></div></div>
-    <div class="row sp"><span class="mini" style="color:var(--text3)">${below} maintaining</span><span class="mini" style="color:var(--green)">${growth} growing</span><span class="mini" style="color:var(--red)">${junk.length} over MRV</span></div>`;
-  const junkHtml=junk.length?`<div class="banner" style="margin-top:9px;background:rgba(232,69,60,.10);border-color:rgba(232,69,60,.4)"><span>${GP.icon("alert")}</span><div class="mini">Past MRV: ${junk.map(j=>`<b>${MNAME[j.m]}</b> (${j.s}/${j.mrv})`).join(", ")}. Extra sets here add fatigue, not muscle — bank them for a lagging group.</div></div>`:"";
-  // SFR leaderboard over last 14 days
+function scienceLabCard(){   // stimulus-to-fatigue ratings: the one science card nothing else shows (the weekly verdict and zone counts are the Suit grid and the Mission forecast)
+  if(M12.filter(m=>(state.data.muscleVol[m]||0)>0).length<3)return "";
   const lab=recentExerciseStim(14).filter(a=>a.sets>=2);
+  if(!lab.length)return "";
   lab.forEach(a=>a.sfr=sfrScore(a));
   lab.sort((a,b)=>b.sfr-a.sfr);
   const tier=v=>v>=1.05?["S","#E8C56A"]:v>=0.85?["A","#2ECC71"]:v>=0.62?["B","#7FC8FF"]:["C","#9aa0ab"];
-  const sfrRows=lab.slice(0,6).map(a=>{const[t,tc]=tier(a.sfr);
-    return `<div class="row sp" style="padding:7px 0;border-top:1px solid var(--border)">
-      <span style="font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.name)} <span class="mini">${a.sets} set${a.sets===1?"":"s"}</span></span>
-      <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:${tc}22;border:1px solid ${tc}66;color:${tc};font-family:var(--disp);font-weight:650;font-size:13px;flex:none">${t}</span></div>`;}).join("");
-  const sfrBlock=sfrRows?`<div class="ttl" style="margin:13px 0 0;display:flex;align-items:center">${secIcon('bolt')}Stimulus-to-fatigue ratings <span class="mini" style="font-weight:400;margin-left:4px">— last 14 days</span></div>
-    <div class="mini" style="margin:4px 0 2px;color:var(--text2)">Localized stimulus per unit of systemic fatigue. <b style="color:#E8C56A">S/A</b> = high bang-for-buck (taken close to failure, low whole-body tax). <b style="color:#9aa0ab">C</b> = costly — worth it only if it's a priority lift.</div>
-    ${sfrRows}`:"";
-  return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center">${secIcon('bolt')}Sports science lab</div>
-    <div class="mini" style="color:var(--text2)">Weekly verdict across all 12 sectors:</div>
-    <div style="font-family:var(--disp);font-weight:650;font-size:15px;color:${vc};line-height:1.35;margin:5px 0 2px">${esc(verdict)}</div>
-    ${dist}${junkHtml}${sfrBlock}</div>`;
+  const rows=lab.slice(0,6).map(a=>{const[t,tc]=tier(a.sfr);
+    return `<div class="gh-row"><div class="main"><div class="gh-t1">${esc(a.name)}</div><div class="gh-t2">${a.sets} set${a.sets===1?"":"s"}</div></div><span class="gm-tier" style="color:${tc};background:${tc}22;box-shadow:inset 0 0 0 1px ${tc}66" aria-label="Rating ${t}">${t}</span></div>`;}).join("");
+  return `<section class="s2 gh-list gm-sfr"><div class="gh-lh"><h3>Stimulus-to-fatigue</h3><span class="t-xs">last 14 days</span></div>
+    <p class="t-s">Localized stimulus per unit of whole-body fatigue. <b class="c-gold">S/A</b> = high bang for the buck (close to failure, low whole-body tax). <b>C</b> = costly: worth it only for a priority lift.</p>${rows}</section>`;
 }
 /* ===== PLAN EDITOR (wave 3): the same editor functions, restyled. Schedule · splits · days · lifts; a lift's sets × reps target opens inline (5–10 default). ===== */
 function gmPlanEd(spId,i,j){const k=spId+"|"+i+"|"+j;state._gmPlanEd=state._gmPlanEd===k?null:k;haptic("tap");refreshSplitSheet();}
@@ -8829,7 +8794,7 @@ function alDock(myRank,boardN){
     {art:"tile-duel",ic:"target",t:"Duel",s:D?(D.pending?"Waiting for them":left+"d left"):"7-night bounty",fn:"gdAllyPick('duel')"},
     {art:"tile-raid",ic:"flag",t:"Raid",s:r?`<b>${Math.round(rp.pct)}%</b> · ${esc(r.boss)}`:"Team up on a boss",fn:"openRaid()"},
     {art:"tile-leaderboard",ic:"trophy",t:"Leaderboard",s:boardN>1?`<b>#${myRank}</b> of ${boardN}`:"Just you so far",fn:"openLeaderboard()"},
-    {art:"tile-split-share",ic:"share",t:"Splits",s:"Share · import",fn:"openJusticeLeague()"}]);
+    {art:"tile-split-share",ic:"share",t:"Manage",s:"Snapshot · remove",fn:"openJusticeLeague()"}]);
 }
 function gdAllyPick(kind){
   const d=state.data,live=(d.allies||[]).map((a,i)=>({a,i})).filter(x=>x.a&&x.a._uid);
@@ -9151,7 +9116,10 @@ GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN tar
 const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
 FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
 const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
-Five tabs along the bottom. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and one tile per muscle: sets this week against MEV, MAV and MRV, under- and over-range muscles listed first. From 16:00 on Sundays a Sunday review card adds my three lines and next week's one change; tap it for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Edit plan, Free session, Start), Cycle days (the active split day by day, tonight marked), the Volume forecast against MEV, MAV and MRV, Frequency, and Other plans when you keep more than one. The Lab fold holds the volume map, SFR, workload and Tools: Plate calculator, 1RM calculator, 1RM test day, Forge and Measure. SUIT is the muscle map: the recovery figure and a tile per muscle (tap one for its dossier: recovery, weekly sets against the landmarks, what to train next), the Effort section (average RIR and sets at RIR 0–3), a fold with the time-lapse, mastery and coverage, and the Body section: measurements, the Infirmary (sleep, soreness, injury board, workload), symmetry and progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Body (a one-tap weigh-in prefilled with your last weight, the 12-week trend of weekly averages, and relative strength over time: Big-3 e1RM divided by that week's bodyweight), Every lift, Badges, Week vs week and a Gyms & data fold (gyms, Batcomputer physique tools, measurements, Share PR card, calendar export, Data control, Settings). ALLIES is your friends: your league rank, Leaderboard, Co-op raid, Sparring, Splits & backups and a More from Gotham fold (Fight Night, Week vs last week). Settings and Search sit in the top bar; the round Alfred button opens my page (today's read, things to try asking, your last conversation, muscle dossiers) with this chat one tap away.
+Five tabs along the bottom; Search (the magnifier), Settings (the sliders) and my avatar sit in the top bar. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and only the muscles that need attention: those under their weekly MEV or over their MRV, each with its sets against MEV, MAV and MRV; "All 12 muscles" opens the full map on the Suit tab. From 16:00 on Sundays a Sunday review card adds my volume line and next week's one-tap changes; tap the card for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Free session), a dock of tiles, Cycle days (the active split day by day, tonight marked, Start or Resume), a Suggested this week row (opens the week in review), the Volume forecast against MEV, MAV and MRV (planned sets per muscle, with a one-tap trim) and Other plans when you keep more than one. SUIT is the body: the recovery figure, a dock, a tile per muscle (recovery, hours to ready, weekly sets against the landmarks; tap one for its dossier), the Effort section (average RIR and sets at RIR 0–3), Measurements (tape, in cm), symmetry and Progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), a dock, the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Body (weigh-in, 12-week trend, relative strength), Every lift and a Gyms & tools fold (gyms, Batcomputer, Share PR card, calendar export, Week vs week). ALLIES is your friends: your league rank, a dock, and Your league (tap an ally for their sheet). Search lists every screen and tool once; I also have a page there (today's read, things to ask, my last answer), and this chat is one tap away on my avatar.
+
+## FEATURE DOCKS (THE TILE ROW UNDER EACH TAB)
+A dock is one sideways-scrolling row of tiles under a tab's hero, each with a picture, a label and a live line of status, so nothing needs searching for. MISSION: Edit plan (the plan editor), New split, Import split (paste or share a Split Card) and Lab (stimulus-to-fatigue ratings, balance, the plateau breaker and the tools: Forge, Plate calculator, 1RM test day, Oracle, Strength simulator, Contracts, Bat-Focus). SUIT: Infirmary (sleep, soreness, workload, injuries), Fuel (calories, macros, food log, hydration), Time-lapse (replay your muscle heat week by week, plus the coverage radar) and Photos (Before & after when you have two or more, otherwise add your first). PROFILE: History (the calendar), Records, Standards (lifts against bodyweight), Body (weigh-in and trend), Badges (the trophy room) and Backup (Data control). ALLIES: Add ally, Chat, Duel, Raid, Leaderboard and Manage (your offline snapshot code, and removing allies). A tile for a section on the same page scrolls to it; the others open a sheet or a page.
 
 ## A SESSION FROM START TO FINISH
 Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
@@ -9169,13 +9137,22 @@ Each set becomes an estimated one-rep max (e1RM, Epley: weight × (1 + reps/30))
 Recovery %: each muscle has its own window (72 h for back and legs, 48 h for chest, shoulders and arms, less for small muscles). Hard sets from the last seven days create fatigue that fades across that window — sets close to failure (low RIR) weigh more than easy ones — and recovery % = 100 minus the fatigue left. Green 80+, yellow 50–79, red below 50; a muscle's dossier shows the hours until ready. Gotham's Readiness is built only from what is known: the recovery of tonight's planned muscles (on a rest day, your three most fatigued muscles) plus freshness (falls with consecutive training days). Sleep joins only when TODAY's sleep is logged — tap the Sleep chip on Gotham (two taps: hours, then Poor / OK / Great); until then the chip says "Not logged" and nothing is assumed. With sleep the weights are recovery 45%, sleep 30%, freshness 25%. A brand-new user with no sessions sees "—" and "Log a session to unlock". PRIMED 80+, READY 60+, GUARDED 40+, DEPLETED below. Weekly sets count working sets (secondary muscles half) over one full cycle of your active split — 8 days for the 8-Day Cycle, rest days included, or 7 days with no split — and are shown as a per-week number, so a muscle's figure doesn't swing with where you are in the cycle. They are read on one scale: Below MEV (minimum effective volume — not enough to grow), Growth zone (MEV to MAV, the maximum adaptive volume), High — recoverable (MAV up to MRV, the maximum recoverable volume; the ceiling rises a little when the volume is spread over sub-regions), Over MRV (sets beyond it turn to junk). Chest: MEV 8, MAV 16, MRV 22.
 
 ## STALLED LIFTS AND THE WEEKLY LANDMARK TILES
-One detector: a lift is stalled when its best estimated 1RM hasn't been beaten for 3 or more sessions and you trained it in the last 3 weeks. Gotham's Lifts card lists the stalled lifts; opening them shows each lift's best e1RM, how many sessions it has been flat and ONE suggested change — the angle, the grip or the rep range — never a deload. The muscle tiles on Gotham put the muscles furthest below their weekly MEV (sets short) and any past their MRV first. Sessions this week and the weekly streak read the same calendar week (Monday to Sunday).
+One detector: a lift is stalled when its best estimated 1RM hasn't been beaten for 3 or more sessions and you trained it in the last 3 weeks. Gotham's Lifts card lists the stalled lifts; tap one (or the Plateau breaker row in the Lab) to open the Stalled lifts sheet with each lift's best e1RM, how many sessions it has been flat and ONE suggested change: the angle, the grip or the rep range, never a deload. The muscle tiles on Gotham show only the muscles furthest below their weekly MEV (sets short) and any past their MRV, worst first; the Suit tab lists all twelve. Sessions this week and the weekly streak read the same calendar week (Monday to Sunday).
 
-## THE SUNDAY REVIEW
-From 16:00 on Sundays Gotham shows a Sunday review card: muscles under MEV or over MRV, the records of the week, stalled lifts, and next week's adjustment as one-tap buttons (add or trim sets on the lifts that train a muscle, or add a stretch-position lift) that edit your active plan and offer Undo. Tapping the card opens the full week in review (sessions, hard sets, tonnage, records, push against pull, recovery).
+## THE SUNDAY REVIEW AND THE ONE-TAP WEEKLY ADJUST
+From 16:00 on Sundays Gotham shows a Sunday review card: one line on volume (muscles under MEV or over MRV) and next week's changes as up to three one-tap buttons. Apply edits your ACTIVE plan: it adds or trims sets on the lifts that train that muscle (2 to 10 sets per lift, at most 3 sets per tap) or adds a stretch-position lift; the row then turns green and offers Undo, which restores the exact previous days. Each change can be applied once per week, never touches logged sessions and never deloads. Tapping the card opens the full week in review (sessions, hard sets, tonnage, records, stalled lifts, push against pull, recovery); the Suggested this week row on Mission opens the same sheet.
 
-## THE INFIRMARY (SUIT → BODY)
-Sleep (hours and quality), a soreness map, the workload watch (the load ratio against your 4-week norm) and an injury board. Sleep feeds Readiness; a flagged injury puts a caution on lifts that hit that muscle. Tapping the Readiness ring on Gotham opens it too.
+## THE INFIRMARY (SUIT DOCK)
+Sleep (hours and quality), a soreness map, the workload watch (the load ratio against your 4-week norm) and an injury board. Sleep feeds Readiness; a flagged injury puts a caution on lifts that hit that muscle. Open it from the Suit tab's Infirmary tile, or tap the Readiness ring on Gotham.
+
+## FUEL (SUIT DOCK)
+The Fuel tile on the Suit tab opens the Fuel page (Back returns to Suit): the Fuel protocol (calories and macros matched to your goal; Set up), Today's intake with Quick add and the Mess Hall for the full log, Hydration (+ Glass or − Glass), the Daily stack (creatine, protein target, omega-3, vitamin D) and a Bodyweight row that jumps to Profile → Body.
+
+## BODY (PROFILE) AND MEASUREMENTS (SUIT)
+Profile → Body (or the Body tile) is the one place for bodyweight: nudge today's weight by 0.1 kg with − and +, starting from your last weight, then Log today (Update today once logged). The chart is the weekly average over 12 weeks; Relative strength divides your Big-3 e1RM by that week's bodyweight. Settings, Fuel and the standards all read the same number. Tape measurements (chest, waist, arms, thighs) live on the Suit tab under Measurements.
+
+## PROGRESS PHOTOS AND BEFORE & AFTER
+Suit → Progress photos (or the Photos tile): Add photo, then tap a photo to view or delete it. With two or more photos, Before & after opens: Slide drags one over the other, Side by side shows both; tap a photo to set Before or After (Before is always the older one). Photos are private and stay on this device in their own vault, not in the main data; a backup carries them at full size. My physique review card appears under them once a photo exists.
 
 ## THE GARAGE AND SEASONAL EVENTS
 The Garage is a fleet that unlocks with real milestones (sessions, streak, lifetime volume, records, strength level). Seasonal events are short training challenges inside fixed date windows (for example the Long Halloween, 24–31 October): a progress row appears on Gotham while one runs, and clearing it pays XP once.
@@ -9187,13 +9164,13 @@ The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower 
 The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (save seat, pin, pad), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. When a lift trains a muscle that is still cold, the menu suggests a warm-up ramp built from your working weight (about 40/60/80% on the first lift of the night, two lighter steps later) and lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
 
 ## DATA CONTROL: ARCHIVING OLD MACHINE WEIGHTS, BACKUP, RESTORE AND CSV EXPORT
-Settings → Data control (also Profile → Gyms & data). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now (progress photos go into the file at full size), Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first; photos included).
+Settings → Data control (also Profile → the Backup tile). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now (progress photos go into the file at full size), Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first; photos included).
 
 ## PICTURES AND CUSTOM EXERCISES
 In an exercise's detail, Choose picture browses the demo library (filter with your own words) or picks the plain anatomy figure. For a missing lift, use the dashed custom-exercise button in the exercise picker: name, equipment, muscles, bodyweight or not, cues, picture.
 
 ## ALLIES AND FRIEND CODES
-ALLIES → Invite an ally opens a two-step sheet: 1 · Send them your code (it starts with GTUID:, with a Copy button) and 2 · Paste theirs (Paste & add, or paste it in the box and tap Add); their card then updates live. Tap an ally for their top lifts and split, Head to head, a Gauntlet (challenge their numbers) or Send a signal (nudge them to train).
+ALLIES → Add ally opens a two-step sheet: 1 · Send them your code (it starts with GTUID:, with a Copy button) and 2 · Paste theirs (Paste & add, or paste it in the box and tap Add); their card then updates live. Tap an ally for their top lifts and split, Head to head, a Gauntlet (challenge their numbers) or Send a signal (nudge them to train). Chat, Duel, Raid and Leaderboard have their own tiles; Manage holds your offline snapshot code (for allies who are not live) and Remove.
 
 ## SETTINGS
 Top-bar Settings: name, bodyweight, Goal & experience, weekly goal, rest timer, bar weight, current gym, Autoregulation metric (RPE or RIR), Alfred's voice, the Gemini API key behind my live chat (kept on this device only), and Data control.
@@ -9689,7 +9666,7 @@ function _alfredNav(q){
     leaderboard:"openLeaderboard()",ranking:"openLeaderboard()",rankings:"openLeaderboard()",
     raid:"openRaid()",allies:"go('allies')",friends:"go('allies')",league:"openJusticeLeague()",
     suit:"go('suit')",figure:"go('suit')",muscles:"go('suit')",recovery:"go('suit')",
-    settings:"openSettings()",tech:"go('tech')",gadgets:"go('tech')",
+    settings:"openSettings()",tech:"openLab()",gadgets:"openLab()",
     focus:"openFocus()",breathing:"openFocus()",report:"periodReport(30)",
     plan:"goPlan()",split:"goPlan()",splits:"goPlan()",schedule:"goPlan()",
     oracle:"openOracle()",contracts:"openContracts()",trophies:"openTrophyRoom()",trophy:"openTrophyRoom()",
@@ -10294,7 +10271,7 @@ function openMessHall(){
   // Food log
   const logRows=(day.items||[]).length?day.items.map((it,i)=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)">
       <div class="g"><b style="font-size:13.5px">${esc(it.n)}</b><div class="mini" style="color:var(--text3)">${it.k}kcal · P${it.p} C${it.c} F${it.f}</div></div>
-      <button class="btn ghost sm" style="width:auto;padding:5px 9px;color:#ff8a7a" onclick="removeFood(${i})">✕</button></div>`).join("")
+      <button class="btn ghost sm" style="width:auto;padding:5px 9px;color:#ff8a7a" onclick="removeFood(${i})" aria-label="Remove food">${GP.icon("x")}</button></div>`).join("")
     :`<p class="mini" style="color:var(--text3);padding:8px 0">No food logged yet today. Add from the list below, sir.</p>`;
   // Quick-add chips
   const chips=FOODS.map((fd,i)=>`<button class="chip g" style="margin:0 5px 6px 0;text-align:left" onclick="addFood(${i})">+ ${esc(fd.n)} <span class="mini" style="color:var(--text3)">${fd.s} · ${fd.p}p</span></button>`).join("");
@@ -10343,7 +10320,7 @@ function openMessHall(){
    ======================================================================== */
 function renderFuel(){   // Fuel: the protocol up top, then today's intake, hydration, the daily stack and bodyweight
   const d=state.data,u=d.u,n=u.nutrition;
-  let html=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Fuel</h1><div class="t-xs">Calories, macros, hydration, supplements</div></div></div>`;
+  let html=`<div class="gh sp-pg"><div class="sp-hd"><button class="btn-i" onclick="go('suit',1)" aria-label="Back to Suit">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><div><h1>Fuel</h1><div class="t-xs">Calories, macros, hydration, supplements</div></div></div>`;
   html+=fuelProtocolCard();
   if(n&&n.cals){
     const day=foodDay(),tot=foodTotals(day),train=isTrainingToday(),tgt=cycledTargets(n,train?"train":"rest");
@@ -10355,8 +10332,8 @@ function renderFuel(){   // Fuel: the protocol up top, then today's intake, hydr
   const day2=foodDay(),wT=waterTargetGlasses(n),wHave=day2.water||0;
   html+=`<section class="s2 fu-c"><div class="gh-lh"><h3>Hydration</h3><span class="t-xs">${wHave} / ${wT} glasses · ${(wHave*0.25).toFixed(2)} L</span></div>
     <div class="fu-gl" role="img" aria-label="${wHave} of ${wT} glasses">${Array.from({length:wT},(_,i)=>`<i class="${i<wHave?"on":""}"></i>`).join("")}</div>
-    <div class="fu-btns"><button class="btn" onclick="addWater(1)">${GP.icon("plus")}Glass</button><button class="btn" onclick="addWater(-1)" aria-label="Remove a glass">−</button></div></section>`;
-  const supp=suppToday(),cStreak=creatineStreak(),items=[["creatine","Creatine 5 g"],["protein","Protein target"],["omega","Omega-3"],["vitd","Vitamin D"],["water","Hydration"]];
+    <div class="fu-btns"><button class="btn" onclick="addWater(1)">${GP.icon("plus")}Glass</button><button class="btn" onclick="addWater(-1)">${gmIc("minus")}Glass</button></div></section>`;
+  const supp=suppToday(),cStreak=creatineStreak(),items=[["creatine","Creatine 5 g"],["protein","Protein target"],["omega","Omega-3"],["vitd","Vitamin D"]];
   html+=`<section class="s2 gh-list fu-stack"><div class="gh-lh"><h3>Daily stack</h3>${cStreak?`<span class="tag ok">${cStreak} d creatine streak</span>`:""}</div>
     ${items.map(([k,l])=>{const on=!!supp[k];return `<button class="gh-row fu-tg${on?" on":""}" aria-pressed="${on}" onclick="toggleSupp('${k}')"><div class="main"><div class="gh-t1">${l}</div></div><span class="fu-ck">${on?GP.icon("check"):""}</span></button>`;}).join("")}
     <p class="t-xs fu-p">Creatine monohydrate, 3 to 5 g daily, is the best-evidenced legal supplement. Consistency is the whole game.</p></section>`;
@@ -10417,7 +10394,7 @@ function openRankLadder(){
     if(isCur&&next){const pct=clamp((lvl-r[0])/(next[0]-r[0])*100,0,100);prog=`<div style="height:5px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:7px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--gold2)"></div></div><div class="mini" style="color:var(--text3);margin-top:3px">Level ${lvl} · ${next[0]} unlocks ${esc(next[1])}</div>`;}
     return `<div class="rl-row ${isCur?'cur':reached?'done':''}"><div style="font-size:26px">${r[2]}</div><div class="g"><b style="font-size:15px;color:${isCur?'var(--gold2)':'var(--text)'}">${esc(r[1])}</b><div class="mini" style="color:var(--text3)">Strength level ${r[0]}+</div>${prog}</div>${isCur?'<span class="mini" style="color:var(--gold2)">◄ YOU</span>':reached?'<span style="color:#2ECC71;font-size:17px">✓</span>':'<span style="font-size:14px">🔒</span>'}</div>`;
   }).join("");
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🎖️ Rank Ladder</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🎖️ Rank Ladder</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 12px">Nine ranks, Street Thug to Legend. Your strength level decides where you stand tonight.</div>${rows}`;
 }
 
@@ -10429,59 +10406,6 @@ function openRankLadder(){
 
 
 
-/* =================================================================================
-   ===== WAVE 7 — WAYNE TECH: the gadget hub tab (no-mess launcher + 6 new tools) =====
-   Tools: Patrol Calendar (heatmap) · Trophy Room (badge gallery) · Oracle (projections)
-          · Contracts (custom goals) · Strength Simulator · Batcomputer Terminal · Bat-Focus
-   ================================================================================= */
-function renderTech(){   // Wayne Tech: the training tools in one place. The calendar first, then every tool as a row.
-  const tools=[
-    ["openOracle","up","Oracle","Rank and lift projections with an ETA"],
-    ["openSimulator","flask","Strength simulator","Model future gains from consistency"],
-    ["openContracts","target","Contracts","Custom goals tracked to a target"],
-    ["openForge","scale","Plate forge","1RM, percentage loading, the next plate jump"],
-    ["openBatcomputer","chart","Batcomputer","Volume, balance and trend analytics"],
-    ["openTerminal","note","Terminal","Query your data by command"],
-    ["openArchive","book","Every lift","Strength curves and history for each lift"],
-    ["openTrophyRoom","trophy","Trophy room","Badges and progress to the locked ones"],
-    ["openFocus","moon","Bat-Focus","Box breathing between sets"]
-  ];
-  const rows=tools.map(t=>`<div class="gh-row" role="button" tabindex="0" onclick="${t[0]}()"><span class="lead">${GP.icon(t[1])}</span><div class="main"><div class="gh-t1">${t[2]}</div><div class="gh-t2">${t[3]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("");
-  $("app").innerHTML=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Wayne Tech</h1><div class="t-xs">Training tools in one place</div></div></div>
-    <section class="s2 sp-cal"><div class="gh-lh"><h3>Patrol calendar</h3><span class="t-xs">Last 26 weeks</span></div><div class="sp-calb">${patrolCalendar()}</div></section>
-    <section class="s2 gh-list sp-tools"><div class="gh-lh"><h3>Tools</h3></div>${rows}</section></div>`;
-}
-/* ---- Patrol heatmap ---- */
-function dayVolMap(){
-  const map={};
-  (state.data.workouts||[]).forEach(w=>{const k=new Date(w.date).toISOString().slice(0,10);map[k]=(map[k]||0)+(w.totalVol||0);});
-  return map;
-}
-function patrolCalendar(){
-  const map=dayVolMap();const vals=Object.values(map).filter(v=>v>0);
-  const max=vals.length?Math.max(...vals):1;
-  const today=new Date();today.setHours(0,0,0,0);
-  // align to the most recent Sunday so columns are clean weeks
-  const end=new Date(today);end.setDate(end.getDate()+(6-end.getDay()));
-  const weeks=26,cells=weeks*7;
-  let cols="";
-  for(let w=weeks-1;w>=0;w--){
-    let col="";
-    for(let dow=0;dow<7;dow++){
-      const dt=new Date(end);dt.setDate(end.getDate()-(w*7)+(dow-6));
-      const k=dt.toISOString().slice(0,10);const v=map[k]||0;
-      const future=dt>today;
-      let bg="rgba(255,255,255,.04)";
-      if(future)bg="transparent";
-      else if(v>0){const t=Math.min(1,v/max);const a=(0.25+t*0.75).toFixed(2);bg=`rgba(235,199,107,${a})`;}
-      col+=`<div title="${k}${v?` · ${fmtNum(Math.round(v))}kg`:''}" style="width:9px;height:9px;border-radius:2px;background:${bg}"></div>`;
-    }
-    cols+=`<div style="display:flex;flex-direction:column;gap:3px">${col}</div>`;
-  }
-  return `<div style="overflow-x:auto"><div style="display:flex;gap:3px;min-width:max-content">${cols}</div></div>
-    <div class="row sp" style="margin-top:8px"><span class="mini" style="color:var(--text3)">${vals.length} active days</span>
-    <span class="mini" style="color:var(--text3)">less <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:rgba(255,255,255,.06);margin:0 2px"></span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:rgba(235,199,107,.4);margin:0 2px"></span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:rgba(235,199,107,1);margin:0 2px"></span> more</span></div>`;
-}
 /* ---- Trophy Room ---- */
 const ACH_REQ={firstnight:"Log 1 workout",swornin:"Log 10 workouts",guardian:"Log 50 workouts",darkknight:"Log 100 workouts",firststrike:"Set 1 PR",villainslayer:"Set 25 PRs",arkham:"Set 100 PRs",warmup:"50,000kg lifetime volume",batmobile:"100,000kg lifetime volume",wayne:"500,000kg lifetime volume",skyline:"1,000,000kg lifetime volume",week:"7-day streak",alfredapp:"30-day streak",discipline:"60-day streak",upgrade:"Any muscle to level 5",elite:"Any muscle to level 10",aboveavg:"1RM = bodyweight",batstd:"1RM = 2× bodyweight",edge:"50 sets to failure",connected:"Use Alfred AI 10×",fullsuit:"Train all 12 muscles in one week",league:"Add 1 ally to your League",assembled:"Add 3 allies",sparring:"Import a rival to spar",tale:"Log your body measurements",casephoto:"Add 1 progress photo",nightpatrol:"Log 5 cardio sessions",stack:"7-day creatine streak",mealprep:"Log food on 7 days",gauntlet:"5-day Gauntlet streak"};
 function achProgress(a,w){
@@ -10508,7 +10432,7 @@ function openTrophyRoom(){
       <div class="mini" style="color:var(--text3);line-height:1.35;min-height:26px">${esc(ACH_REQ[a.id]||"")}</div>
       ${got?`<div class="mini" style="color:var(--gold2);margin-top:5px">✓ EARNED</div>`:bar}</div>`;
   }).join("");
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🏆 Trophy Room</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🏆 Trophy Room</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 12px">${earned.length} of ${ACHIEVEMENTS.length} honors claimed. The locked ones show how close you are.</div>
     <div class="grid2">${cards}</div>
     <button class="btn" style="margin-top:14px" onclick="closeOverlay()">Close</button>`;
@@ -10538,7 +10462,7 @@ function openOracle(){
   }
   const fcRows=fc.length?fc.map(f=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${esc(f.n)} → <b style="color:var(--gold2)">${f.target}kg</b></span><span class="mini" style="color:var(--text2)">~${f.days}d</span></div>`).join(""):`<p class="mini" style="color:var(--text3)">Log 3+ sessions of a lift to forecast milestones.</p>`;
   const projRows=proj.length?proj.map(p=>`<div class="row sp" style="padding:6px 0;border-top:1px solid var(--border)"><span style="font-size:13px">${esc(p.n)}</span><span class="mini"><span style="color:var(--text3)">${p.cur}</span> → <b style="color:#2ECC71">${p.p90}kg</b> <span style="color:#2ECC71">(+${p.gain})</span></span></div>`).join(""):`<p class="mini" style="color:var(--text3)">Not enough trend data yet — keep logging.</p>`;
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🔮 Oracle</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🔮 Oracle</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 12px">Forward projections from your real trend lines. The future, predicted.</div>
     <div class="card" style="padding:14px"><div class="ttl" style="margin:0 0 3px;font-size:14px">${rk.emoji} Current rank: ${esc(rk.name)}</div>
       ${nextRank?`<div class="mini" style="color:var(--text2)">Next: <b style="color:var(--gold2)">${nextRank[2]} ${esc(nextRank[1])}</b> at strength level ${nextRank[0]} — you're at ${lvl}.</div>`:`<div class="mini" style="color:var(--gold2)">Maximum rank achieved. You are the Legend.</div>`}</div>
@@ -10601,11 +10525,11 @@ function openContracts(){
     const pct=contractPct(c);const lb=contractLabel(c);const done=pct>=100;
     return `<div class="card" style="padding:13px;border-color:${done?'var(--gold-dim)':'var(--border)'}">
       <div class="row sp"><div class="g"><b style="font-size:14px">${lb.icon} ${esc(c.name)}</b><div class="mini" style="color:var(--text3)">${fmtNum(Math.round(lb.cur))}${lb.unit} → target ${fmtNum(c.target)}${lb.unit}</div></div>
-        <button class="btn ghost sm" style="width:auto;padding:5px 9px;color:#ff8a7a" onclick="delContract('${c.id}')">✕</button></div>
+        <button class="btn ghost sm" style="width:auto;padding:5px 9px;color:#ff8a7a" onclick="delContract('${c.id}')" aria-label="Delete contract">${GP.icon("x")}</button></div>
       <div style="height:7px;background:rgba(255,255,255,.07);border-radius:4px;margin-top:9px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${done?'var(--green,#2ECC71)':'var(--gold2)'};transition:.4s"></div></div>
       <div class="mini" style="margin-top:4px;color:${done?'var(--gold2)':'var(--text3)'}">${done?'✓ CONTRACT FULFILLED':pct+'% complete'}</div></div>`;
   }).join(""):`<p class="mini" style="color:var(--text3);padding:8px 0">No active contracts. Pick a type above and sign one — Gotham's counting on you.</p>`;
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">📜 Contracts</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">📜 Contracts</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 10px">Self-set goals tracked against your real numbers. Sign a contract, fulfill it.</div>
     <div class="row wrap">${typeChips}</div>
     <button class="btn gold sm" style="margin:4px 0 12px" onclick="addContract()">+ Sign a new contract</button>
@@ -10641,7 +10565,7 @@ function drawSim(){
 }
 function openSimulator(){
   state._sim=state._sim||{sessions:4,weeks:12,intensity:1};const s=state._sim;
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🧪 Strength Simulator</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🧪 Strength Simulator</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 12px">Model the future. Slide the dials — see where consistency takes you. (Accounts for your training age & diminishing returns.)</div>
     <div class="card" style="padding:14px">
       <div class="row sp"><span class="mini">Sessions / week</span><span class="mini" id="sim-sessions-v" style="color:var(--gold2)">${s.sessions}×</span></div>
@@ -10685,7 +10609,7 @@ function drawTerminal(){
 }
 function openTerminal(){
   state._term=state._term||[];
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">💻 Batcomputer Terminal</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">💻 Batcomputer Terminal</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
     <div class="mini" style="color:var(--text2);margin:2px 0 10px">Query your own data by command. Type <b style="color:var(--gold2)">help</b> to begin.</div>
     <div id="term-log" style="background:#06070a;border:1px solid var(--border);border-radius:12px;padding:13px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;height:230px;overflow-y:auto"></div>
     <div class="row g" style="gap:7px;margin-top:9px"><input id="term-in" placeholder="command…" autocomplete="off" onkeydown="if(event.key==='Enter')runTerminal()" style="flex:1;font-family:ui-monospace,monospace;background:#06070a;border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--gold2)"><button class="btn gold sm" style="width:auto" onclick="runTerminal()">Run</button></div>
@@ -10695,14 +10619,14 @@ function openTerminal(){
 }
 /* ---- Bat-Focus: box-breathing orb ---- */
 function openFocus(){
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🧘 Bat-Focus</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()">✕</button></div>
+  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🧘 Bat-Focus</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
     <div class="mini center" style="text-align:center;color:var(--text2);margin:2px 0 4px">Box breathing — 4 in · 4 hold · 4 out · 4 hold. Sync to the orb. Center yourself between sets.</div>
     <div class="focus-orb"><div class="focus-phase">BREATHE</div></div>
     <div class="center" style="text-align:center"><div class="mini" style="color:var(--text3);line-height:1.6">Expand → inhale &nbsp;·&nbsp; Full → hold<br>Contract → exhale &nbsp;·&nbsp; Empty → hold</div></div>
     <button class="btn" style="margin-top:18px" onclick="closeOverlay()">Done</button>`;
 }
 
-/* ===== ALFRED PAGE (GP:TABS, wave 5) — a premium entry to the ONE text-first chat (#ac-panel): hero · suggestions · last conversation · today's read · dossiers · lore fold. No second chat UI. ===== */
+/* ===== ALFRED PAGE (GP:TABS, wave 5) — a premium entry to the ONE text-first chat (#ac-panel): hero · suggestions · last conversation · today's read. No second chat UI. ===== */
 function alfSuggest(){   // one source for the page and the chat's empty state
   const cur=_alfCurLift();
   const tr=cur?["What weight next on "+cur+"?","Is "+cur+" progressing?","How many sets for "+_alfCurMuscle(cur)+"?"]:["What should I hit tonight?","Why is my press stalling?","How many sets for chest?"];
@@ -10758,8 +10682,7 @@ function renderAlfred(){
   const key=has?"":`<div class="s1 gh-row af-key gh-c" style="--i:1" onclick="openSettings('alfred')" role="button" tabindex="0"><span class="lead">${GP.icon("bolt")}</span><div class="main"><div class="gh-t1">Unlock live coaching</div><div class="gh-t2">Add a free Gemini key · takes 30 seconds</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
   const sug=`<section class="s2 gh-list af-sug gh-c" style="--i:2"><div class="gh-lh"><h3>Try asking</h3></div>${qs.map(q=>`<div class="gh-row af-q" role="button" tabindex="0" data-q="${esc(q)}" onclick="alfPageAsk(this.dataset.q)"><span class="lead">${GP.icon("chat")}</span><div class="main"><div class="gh-t1">${esc(q)}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section>`;
   const conv=last?`<section class="s2 af-last gh-c" style="--i:3" onclick="openAlfredChat()" role="button" tabindex="0"><div class="gh-lh"><h3>Last conversation</h3><span class="gh-more">Continue</span></div>${last.q?`<p class="af-lq"><b>You</b><span>${esc(last.q)}</span></p>`:""}<p class="af-la"><b>Alfred</b><span>${esc(last.a)}</span></p></section>`:"";
-  const dos=`<section class="s2 af-dos gh-c" style="--i:5"><div class="gh-lh"><h3>Muscle dossiers</h3></div><div class="af-chips">${M12.map(m=>`<button class="chip" onclick="muscleDrill('${m}')">${MNAME[m]}</button>`).join("")}</div></section>`;
-  $("app").innerHTML=`<div class="gh af-pg${state._same?"":" gh-anim"}"><h1 class="gh-hi">Alfred</h1>${hero}${key}${sug}${conv}${alfredBriefing()}${dos}</div>`;
+  $("app").innerHTML=`<div class="gh af-pg${state._same?"":" gh-anim"}"><h1 class="gh-hi">Alfred</h1>${hero}${key}${sug}${conv}${alfredBriefing()}</div>`;
 }
 /* ========================= GOTHAM IRON PROTOCOL v2 =========================
    A read-only command deck over the existing data model. It deliberately avoids save()
@@ -11036,9 +10959,10 @@ function ghWeek(vol){
   let map;
   if(!has)map=`<div class="gh-empty">Weekly volume for every muscle appears after your first session: sets against the minimum, productive and maximum landmarks.</div>`;
   else{
-    const flagged=vol.some(x=>x.zone!=="ok");
-    map=`<div class="gh-lgd"><span class="eyebrow">Sets vs MEV · MAV · MRV</span><span class="k">${flagged?"":`<span class="c-ok">all in range</span>`}${vol.some(x=>x.plan>0)?`<span><i class="sw"></i>tonight</span>`:""}</span></div>
-      <div class="gh-mgrid">${ghAttention(vol).map(ghTile).join("")}</div>`;
+    const hot=ghAttention(vol).filter(t=>t.zone!=="ok"||GP.zone(t.sets+t.plan,t.L)==="bad");   // the exceptions only: the full 12-muscle map is the Suit grid
+    map=`<div class="gh-lgd"><span class="eyebrow">Volume vs MEV · MAV · MRV</span><span class="k">${vol.some(x=>x.plan>0)?`<span><i class="sw"></i>tonight</span>`:""}</span></div>
+      ${hot.length?`<div class="gh-mgrid">${hot.map(ghTile).join("")}</div>`:`<div class="gh-allok"><span class="ok">${GP.icon("check")}</span>Every muscle is in range this week</div>`}
+      <button class="gh-mall" onclick="go('suit',1)" aria-label="Open all ${vol.length} muscles on the Suit tab"><span>All ${vol.length} muscles</span>${GP.icon("chevR")}</button>`;
   }
   return `<section class="s2 gh-week gh-c" style="--i:1"><div class="gh-wk-h"><div class="gh-wk-l" data-hx onclick="goPlan()"><div class="eyebrow">This week</div><div class="gh-wk-t"><span class="num" data-roll="${w}" data-k="wk">${w}</span><span>/ ${goal} sessions</span></div>${streak}</div>
     <div class="gh-wk-r"><div class="gh-wk-d" data-hx onclick="go('case',1)" aria-label="Open the training calendar">${GP.weekDots(ghWeekDots())}</div>${ton}</div></div>${map}</section>`;
@@ -11213,16 +11137,14 @@ function ghWeekReview(vol){
   return {ws,prs,under,over,stalled,adj,acts:wkActions(under,over),sets:Math.round(sets),tonnage:ws.reduce((s,w)=>s+(+w.totalVol||0),0)};
 }
 const ghList=(arr,f,max=3)=>arr.slice(0,max).map(f).join(", ")+(arr.length>max?" +"+(arr.length-max)+" more":"");
-/* ---- SUNDAY REVIEW: Sundays from 16:00, below the week card. Three lines and next week's one change; never a pop-up. ---- */
+/* ---- SUNDAY REVIEW: Sundays from 16:00, below the week card. One volume line and next week's changes; never a pop-up. ---- */
 function ghSunday(vol){
   const t=new Date(now());if(t.getDay()!==0||t.getHours()<16)return "";
   const r=ghWeekReview(vol);if(!r.ws.length)return "";
-  const l1=r.under.length||r.over.length?[r.under.length?`Under the minimum: ${ghList(r.under,x=>MNAME[x.m],2)}.`:"",r.over.length?`Over the limit: ${ghList(r.over,x=>MNAME[x.m],2)}.`:""].filter(Boolean).join(" "):"Volume is in range on every trained muscle.",
-    l2=r.prs.length?`${r.prs.length} record${r.prs.length===1?"":"s"} this week, led by ${esc(r.prs[0])}.`:"No new records this week.",
-    l3=r.stalled.length?`Stalled: ${ghList(r.stalled,s=>esc(s.n),2)}.`:"No stalled lifts.";
+  const l1=r.under.length||r.over.length?[r.under.length?`Under the minimum: ${ghList(r.under,x=>MNAME[x.m],2)}.`:"",r.over.length?`Over the limit: ${ghList(r.over,x=>MNAME[x.m],2)}.`:""].filter(Boolean).join(" "):"Volume is in range on every trained muscle.";   // records and stalled lifts are the Lifts card right below; the sheet has the whole week
   const line=(ic,tone,tx)=>`<li><span class="lead ${tone}">${GP.icon(ic)}</span><span>${tx}</span></li>`;
   return `<div class="s2 gh-sun gh-c" style="--i:2"><div class="gh-sun-hit" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
-    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul></div>
+    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}</ul></div>
     <div class="gh-sun-n"><span class="eyebrow">Next week</span>${wkNext(r)}</div></div>`;
 }
 /* the detail behind the Sunday card: the week in numbers, Alfred's flags, the one change */
@@ -11759,11 +11681,11 @@ function gpVtTag(on){
 /* every section header = one line icon + one area accent, the same everywhere: records gold · volume green · recovery blue · plan amber · the rest steel.
    Matched on the title's own words (first hit wins), so a new section picks its icon up by name. [pattern, GP.icon name, area] */
 const GP_SEC=[
-  [/stall|plateau/i,"plateau","rec"],[/record|mastery|standard|belt|\bpr\b/i,"trophy","rec"],[/strength|e1rm|target|progress/i,"up","rec"],[/\blifts?\b|exercise/i,"dumbbell","rec"],
+  [/stimulus/i,"bolt","vol"],[/stall|plateau/i,"plateau","rec"],[/record|mastery|standard|belt|\bpr\b/i,"trophy","rec"],[/strength|e1rm|target|progress/i,"up","rec"],[/\blifts?\b|exercise/i,"dumbbell","rec"],
   [/sleep/i,"moon","rcv"],[/hydrat/i,"drop","rcv"],[/infirm|injur/i,"cross","rcv"],[/recover|sore|readiness|fatigue/i,"pulse","rcv"],
   [/effort|rpe|rir|intensity/i,"bolt","vol"],[/dossier/i,"scan","n"],[/muscle|coverage|sets|volume|forecast|landmark/i,"chart","vol"],[/frequen/i,"calendar","vol"],
   [/calendar|cycle|days?\b|schedule|next up|week|patrol/i,"calendar","pln"],[/plan|split|\blab\b|generator|import/i,"map","pln"],[/fuel|intake|stack|nutrition|macro/i,"flask","pln"],
-  [/body|weight/i,"scale","n"],[/league|duel|ally|allies|invite/i,"allies","n"],[/try asking|suggest/i,"bulb","n"],[/alfred|conversation/i,"chat","n"],[/tool/i,"wrench","n"],[/history|session|archive|log\b/i,"book","n"],[/cue|form|tip/i,"bulb","n"]
+  [/body|weight|measure/i,"scale","n"],[/league|duel|ally|allies|invite/i,"allies","n"],[/try asking|suggest/i,"bulb","n"],[/alfred|conversation/i,"chat","n"],[/tool/i,"wrench","n"],[/history|session|archive|log\b/i,"book","n"],[/cue|form|tip/i,"bulb","n"]
 ];
 const GP_SEC_SEL=".gh-lh h3,.gh-sec h2,.p3-ch2 h3";
 function gpSec(n){
@@ -11857,7 +11779,7 @@ function lgBar(ses,fei){
       <div class="st"><b id="wt-display">${fmtTime(Math.floor((Date.now()-ses.startedAt)/1000))}</b><span>Elapsed</span></div>
       <div class="lg2-restwrap ${state.restRunning?"is-run":state._restGo?"is-go":"is-idle"}" id="lgrest">${lgRestInner()}</div>
     </div>
-    <div class="lg2-segw" onclick="lgSegTap(event)">${GP.seg(items)}</div>
+    <div class="lg2-segw" role="group" aria-label="Session progress by exercise. Tap a segment to jump to that lift" onclick="lgSegTap(event)">${GP.seg(items)}</div>
   </div>`;
 }
 /* ---- completed lift: one compact summary row (tap to reopen) ---- */
