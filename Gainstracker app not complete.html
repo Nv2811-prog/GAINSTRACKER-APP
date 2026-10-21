@@ -948,6 +948,12 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .gm-cyc .num{font-size:26px;line-height:.86;color:var(--tx1)}
 .gm-cyc .c span{font:600 10px/1 var(--body);letter-spacing:.03em;color:var(--tx2)}
 @media (prefers-reduced-motion:reduce){.lg2-sr.tickfx .sdone.lg2-ck.on,.lg2-sr.tickfx .lg2-ck.on .gi path,.lg2-sr.tickfx::after,.tk-up,.tk-dn{animation:none}.lg2-sr.tickfx .lg2-ck.on .gi path{stroke-dasharray:none;stroke-dashoffset:0}}
+/* compact option row (the skip reasons); an emoji swapped for a line icon inside a sheet chip or button */
+.rd-o.sm{min-height:54px;margin:0 0 6px;padding:8px 12px}
+.rd-o.sm .lead{width:34px;height:34px;border-radius:11px}
+.rd-o.sm .lead .gi{width:18px;height:18px}
+.rd-o.sm b{font-size:16px}
+.chip .gi-t,.btn .gi-t{flex:none;width:16px;height:16px;margin:0;vertical-align:0;color:currentColor}
 /* /GP:POLISH */
 /* ===== GP:DOCKS (wave 6) ===== */
 /* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
@@ -4214,7 +4220,7 @@ function finishWorkout(){
   if(ses.split&&ses.split!=="Free Session")advanceDay();
   save();
   // store result for the summary
-  try{const sk=(ses.exercises||[]).filter(e=>e._skip);if(sk.length){const line="Skipped: "+sk.map(e=>e.name+" ("+String(e._skip).replace(/^[^\s]+\s/,"")+")").join(", ");wk.notes=(wk.notes?wk.notes+"\n":"")+line;}}catch(e){}
+  try{const sk=(ses.exercises||[]).filter(e=>e._skip);if(sk.length){const line="Skipped: "+sk.map(e=>e.name+" ("+String(e._skip).replace(/^\p{Extended_Pictographic}️?\s*/u,"")+")").join(", ");wk.notes=(wk.notes?wk.notes+"\n":"")+line;}}catch(e){}
   state.lastResult={wk,totalVol,xpGain,prsThis,sessVol,musclesHit,dur,readiness:ses.readiness,notes:wk.notes};
   // Smart profile capture: carry any "suspicious leap" flags out of the session so Alfred can offer
   // to file them once the summary is up (the session object is about to be cleared).
@@ -4583,6 +4589,11 @@ function render(){
 /* ===== GP:POLISH (wave 8) · shared sheet pieces: header, search field, number tick ===== */
 const PLATE_COL={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};   // real plate colours are content, not chrome
 const PX_CAP=120;   // the unfiltered "All" list stops here; a muscle filter or a search shows every match
+/* one exercise row for every picker (add, swap): picture, name, muscles + equipment + your PR, one round action. o: on, open / act (js literal of the name -> onclick), openLabel, actLabel, icon */
+function pxRow(e,o){
+  const J=ghJs(e.n),pr=(state.data.prs||{})[e.n],mus=(e.p||[]).map(m=>MNAME[m]||m).join(" · ");
+  return `<div class="px-row${o.on?" added":""}"><div class="px-open" role="button" tabindex="0" onclick="${o.open(J)}" aria-label="${o.openLabel}: ${esc(e.n)}">${thumb(e,2)}<div class="px-main"><div class="px-n">${esc(e.n)}</div><div class="px-m"><span>${esc(mus)}</span><span class="tag">${esc(e.eq)}</span>${pr&&pr.w?`<span class="px-pr">${GP.icon("trophy")}${fmtKg(pr.w)} kg</span>`:""}</div></div></div><button class="btn-i px-add${o.on?" on":""}" onclick="${o.act(J)}" aria-label="${o.actLabel} ${esc(e.n)}">${GP.icon(o.icon)}</button></div>`;
+}
 /* the ONE sheet header: [back] [icon chip] title + sub [Done | X]. Callers pass already-escaped text. o: ic, sub, back (onclick), backLabel, act ("x" default | "done" | "none"), fn (onclick of Done/X), doneHtml, closeLabel */
 function shHd(title,o={}){
   const fn=o.fn||"closeSheet()",flip=GP.icon("chevR").replace('class="gi ','class="gi flip ');
@@ -4607,7 +4618,7 @@ function shHead(n){
   const last=host.lastElementChild;
   if(last&&last!==hd&&last.tagName==="BUTTON"&&/^\s*Close\s*$/.test(last.textContent)&&shut.test(last.getAttribute("onclick")||""))last.remove();
 }
-/* a number that changed by a stepper slides in from the direction it moved (transform + opacity, 180 ms, still under reduced motion) */
+/* a number that changed by a stepper slides in from the direction it moved (transform + opacity, 180 ms, quiet under reduced motion) */
 function tickNum(el,dir){if(!el)return;el.classList.remove("tk-up","tk-dn");void el.offsetWidth;el.classList.add(dir>0?"tk-up":"tk-dn");}
 /* ========================= READINESS ========================= */
 function renderReadiness(){
@@ -4775,17 +4786,16 @@ function dismissWarm(ei){
 function openSwap(ei){
   const e=state.session.exercises[ei];if(!e)return;const cur=exFor(e.name);const prim=(cur.p&&cur.p[0])||null;
   state._swapEi=ei;state._swapPrim=prim;state._swapQ="";
-  const total=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim).length;
-  openSheet(`<div class="ttl">⇄ Swap ${esc(e.name)}</div>
-    <div class="mini" style="color:var(--text2);margin:-2px 0 8px">Same primary muscle (${prim?MNAME[prim]:"—"}) — ${total} option${total===1?'':'s'}. Your logged sets stay put.</div>
-    <input id="swap-search" placeholder="🔍 Search ${prim?MNAME[prim].toLowerCase():''} movements…" autocomplete="off" oninput="drawSwapList()"/>
-    <div id="swap-list" style="max-height:54vh;overflow:auto;margin-top:8px"></div>
-    <button class="btn" style="margin-top:10px" onclick="closeSheet()">Cancel</button>`);
+  const total=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim).length,mn=prim?MNAME[prim].toLowerCase():"";
+  openSheet(`${shHd("Swap lift",{ic:"swap",sub:esc(e.name),closeLabel:"Close swap list"})}
+    <div class="gh"><p class="t-s px-lede">${total} option${total===1?"":"s"} with the same primary muscle${mn?` (${mn})`:""}. Your logged sets stay put.</p>
+      ${shSearch("swap-search",`Search ${mn?mn+" ":""}movements`,"drawSwapList()")}
+      <div id="swap-list" class="px-list"></div></div>`);
   drawSwapList();
 }
 function drawSwapList(){
   const ei=state._swapEi,prim=state._swapPrim;const e=state.session&&state.session.exercises[ei];if(!e)return;
-  const cur=exFor(e.name);const q=($("swap-search")?$("swap-search").value:"").toLowerCase().trim();
+  const cur=exFor(e.name),raw=($("swap-search")?$("swap-search").value:"").trim(),q=raw.toLowerCase();
   const inSession=new Set(state.session.exercises.map(x=>x.name));
   let alts=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim&&!inSession.has(x.n));
   const gymOn=state.gymFilter&&!!((state.data.gymEquipment||{})[state.data.u.activeGym||""]||{}).equip;
@@ -4793,9 +4803,9 @@ function drawSwapList(){
   if(q)alts=alts.filter(x=>x.n.toLowerCase().includes(q));
   alts.sort((a,b)=>{const sa=a.eq===cur.eq?0:1,sb=b.eq===cur.eq?0:1;return sa-sb||a.n.localeCompare(b.n);});
   const el=$("swap-list");if(!el)return;
-  el.innerHTML=alts.length?alts.map(x=>`<div class="exrow" onclick="swapExercise(${ei},'${x.n.replace(/'/g,"\\'")}')">
-    ${thumb(x)}<div class="g"><div class="exname">${esc(x.n)}</div><div class="exmeta">${exTarget(x)} · ${esc(x.eq)}</div></div>
-    <span class="gold" style="font-size:20px">⇄</span></div>`).join(""):`<p class="muted center" style="padding:20px">No ${q?`matches for "${esc(q)}"`:`alternatives${gymOn?" in your gym — turn off the 🏠 filter":""}`}.</p>`;
+  const go=J=>`swapExercise(${ei},${J})`;
+  el.innerHTML=alts.length?alts.map(x=>pxRow(x,{open:go,openLabel:"Swap to",act:go,actLabel:"Swap to",icon:"swap"})).join("")
+    :`<div class="px-empty">${GP.icon("search")}<b>${q?`No match for "${esc(raw)}"`:"No alternatives"}</b><span>${q?"Try another word.":gymOn?"Nothing else in your gym trains this muscle.":"Every other option is already in tonight's session."}</span></div>`;
 }
 function swapExercise(ei,name){
   const e=state.session.exercises[ei];if(!e)return;e.name=name;
@@ -5305,9 +5315,9 @@ function updateExList(){
   const el=$("ex-list");if(!el)return;
   const cn=$("ex-count");if(cn)cn.textContent=filtered?`${total} match${total===1?"":"es"}`:`${EXDB.length} movements`;
   const st=el.scrollTop;                       // preserve scroll so the list doesn't jump on each add
-  const added=pickerAddedList(),prs=state.data.prs||{};
-  el.innerHTML=list.length?list.map(e=>{const on=!!(added&&added.includes(e.n)),J=ghJs(e.n),pr=prs[e.n],mus=(e.p||[]).map(m=>MNAME[m]||m).join(" · ");
-    return `<div class="px-row${on?" added":""}"><div class="px-open" role="button" tabindex="0" onclick="openExDetail(${J})" aria-label="Details: ${esc(e.n)}">${thumb(e,2)}<div class="px-main"><div class="px-n">${esc(e.n)}</div><div class="px-m"><span>${esc(mus)}</span><span class="tag">${esc(e.eq)}</span>${pr&&pr.w?`<span class="px-pr">${GP.icon("trophy")}${fmtKg(pr.w)} kg</span>`:""}</div></div></div><button class="btn-i px-add${on?" on":""}" onclick="pickAdd(${J})" aria-label="${on?"Added":"Add"} ${esc(e.n)}">${GP.icon(on?"check":"plus")}</button></div>`;}).join("")
+  const added=pickerAddedList();
+  el.innerHTML=list.length?list.map(e=>{const on=!!(added&&added.includes(e.n));
+    return pxRow(e,{on,open:J=>`openExDetail(${J})`,openLabel:"Details",act:J=>`pickAdd(${J})`,actLabel:on?"Added":"Add",icon:on?"check":"plus"});}).join("")
     :`<div class="px-empty">${GP.icon("search")}<b>${q?`No match for "${esc(raw)}"`:"Nothing here yet"}</b><span>${q?"Check the spelling, or add it as your own lift.":"Try another muscle, or clear the gym filter."}</span>${q?`<button class="btn sm" onclick="openCustomCreator(${ghJs(raw)})">${GP.icon("plus")}Create "${esc(raw)}"</button>`:""}</div>`;
   el.scrollTop=st;
   const cnt=$("picker-cnt");if(cnt&&added)cnt.textContent=added.length?`· ${added.length}`:"";
@@ -6628,7 +6638,7 @@ function drawForge(){
       ${j.rungs.map(rung).join("")}
       <div class="mini" style="margin-top:7px;color:var(--text3)">Add load only once you own the top of your rep range with clean form — the bar doesn't care about ego.</div></div>`;
   }
-  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center;gap:6px">🛠️ THE FORGE <span class="mini" style="font-weight:400;color:var(--text2)">load lab</span></div>
+  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center;gap:6px">🛠️ Forge <span class="mini" style="font-weight:400;color:var(--text2)">load lab</span></div>
     <div class="mini" style="margin-bottom:8px">Enter a real set. The Forge estimates your 1RM and lays out every training percentage — rounded to weight you can actually load.</div>
     <div class="row g" style="gap:8px">
       <div style="flex:1"><label class="mini">Weight (kg)</label><input inputmode="decimal" value="${state._forgeW}" oninput="state._forgeW=this.value;drawForge()" placeholder="100"/></div>
@@ -10536,7 +10546,7 @@ function openRankLadder(){
     const i=RANKS.length-1-ri,reached=lvl>=r[0],isCur=i===idx;
     return `<div class="rk-r ${isCur?"cur":reached?"done":"lock"}"><span class="rk-n">${isCur?`<b class="num">${lvl}</b>`:GP.icon(reached?"check":"lock")}</span><div class="main"><div class="gh-t1">${esc(r[1])}</div><div class="gh-t2">Strength level ${r[0]}+</div></div>${isCur?`<span class="tag gold">You</span>`:reached?`<span class="tag ok">Reached</span>`:`<span class="tag">${r[0]-lvl} to go</span>`}</div>`;
   }).join("");
-  openOverlay();$("ovcard").innerHTML=`${shHd("Rank ladder",{ic:"crown",sub:"Nine ranks, set by your strength level",fn:"closeOverlay()"})}
+  openOverlay();$("ovcard").innerHTML=`${shHd("Rank ladder",{ic:"crown",sub:"Nine ranks by strength level",fn:"closeOverlay()"})}
     <div class="gh"><div class="rk-now"><div class="rk-ring">${GP.ring(pct,100,{size:76,stroke:7,c1:"var(--gold)",c2:"var(--gold-hi)"})}<div class="c"><b class="num">${lvl}</b></div></div>
       <div class="main"><div class="eyebrow">Current rank</div><div class="rk-nm">${esc(cur[1])}</div><div class="t-s">${next?`<b>${next[0]-lvl}</b> more levels to ${esc(next[1])}`:"Top of the ladder"}</div></div></div>
       <div class="rk-ladder">${rows}</div></div>`;
@@ -11756,15 +11766,17 @@ function hxScan(n){
   ok.forEach((el,k)=>hxHost(el,st[k]));
 }
 /* Section titles still carry a leading emoji in ~170 templates; swap it for a GP line icon the moment the node lands (before paint). */
-const EMO_ICON={"🗺":"map","⚙":"sliders","🎩":"chat","🤖":"chat","⚡":"bolt","🦇":"bat","🥊":"flag","🧤":"flag","🎯":"target","🧘":"target","🎞":"film","🪜":"ramp","🩻":"pulse","🩹":"cross","🩸":"cross","🚑":"cross","💊":"cross","🧭":"search","🔍":"search","🧪":"flask","🧠":"bulb","🛠":"wrench","🔧":"wrench","🚨":"alert","⚠":"alert","😴":"moon","🌒":"moon","😤":"bolt","🗓":"calendar","🗄":"note","🗂":"note","📝":"note","📜":"note","📋":"note","🖼":"image","🕸":"scan","🔮":"scan","📡":"scan","🔥":"flame","🔗":"link","🔒":"lock","📰":"news","📥":"down","📤":"share","📚":"book","🏛":"book","📈":"up","💻":"chart","📊":"chart","💧":"drop","💠":"suit","👑":"crown","🏆":"trophy","🎖":"trophy","🦹":"bat","⚖":"scale","🏋":"dumbbell","💪":"dumbbell","⏭":"skip","↕":"swap","⇄":"swap","🃏":"star","🎲":"star","\u{1FA7B}":"pulse"};
+const EMO_ICON={"🗺":"map","⚙":"sliders","🎩":"chat","🤖":"chat","⚡":"bolt","🦇":"bat","🥊":"flag","🧤":"flag","🎯":"target","🧘":"target","🎞":"film","🪜":"ramp","🩻":"pulse","🩹":"cross","🩸":"cross","🚑":"cross","💊":"cross","🧭":"search","🔍":"search","🧪":"flask","🧠":"bulb","🛠":"wrench","🔧":"wrench","🚨":"alert","⚠":"alert","😴":"moon","🌒":"moon","😤":"bolt","🗓":"calendar","🗄":"note","🗂":"note","📝":"note","📜":"note","📋":"note","🖼":"image","🕸":"scan","🔮":"scan","📡":"scan","🔥":"flame","🔗":"link","🔒":"lock","📰":"news","📥":"down","📤":"share","📚":"book","🏛":"book","📈":"up","💻":"chart","📊":"chart","💧":"drop","💠":"suit","👑":"crown","🏆":"trophy","🎖":"trophy","🦹":"bat","⚖":"scale","🏋":"dumbbell","💪":"dumbbell","⏭":"skip","↕":"swap","⇄":"swap","🃏":"star","🎲":"star","\u{1FA7B}":"pulse","⚔":"flag","💬":"chat","📅":"calendar","📦":"chart","🍽":"flask"};
 const EMO_RE=/^\s*(?:\p{Extended_Pictographic}|\u21C4)[\uFE0F\u200D]*(?:\p{Extended_Pictographic}\uFE0F*)*\s*/u;
+const ICONIZE_SEL=".ttl,.acc-ttl,#sheet .chip,#sheet .btn,#ovcard .chip,#ovcard .btn";   // titles always; chips and buttons inside sheets and overlays too
 function iconize(n){
   if(n.nodeType!==1)return;
-  const hs=n.matches(".ttl,.acc-ttl")?[n]:[];n.querySelectorAll(".ttl,.acc-ttl").forEach(e=>hs.push(e));
+  const hs=n.matches(ICONIZE_SEL)?[n]:[];n.querySelectorAll(ICONIZE_SEL).forEach(e=>hs.push(e));
   hs.forEach(el=>{
     const t=el.firstChild;if(!t||t.nodeType!==3)return;
     const m=EMO_RE.exec(t.nodeValue);if(!m)return;
     const nm=EMO_ICON[String.fromCodePoint(m[0].trim().codePointAt(0))];
+    if(!nm&&!el.matches(".ttl,.acc-ttl"))return;   // a chip's or button's emoji may be content (an ally's avatar): only swap the ones that have a line icon
     t.nodeValue=t.nodeValue.slice(m[0].length);
     if(nm)el.insertAdjacentHTML("afterbegin",GP.icon(nm,"gi-t"));
   });
@@ -12130,18 +12142,18 @@ function focusEx(ei){
 /* ⏭ Skip an exercise — no forcing, no guilt. Reason optional, noted in tonight's log. */
 function openSkipEx(ei){
   const e=state.session&&state.session.exercises[ei];if(!e)return;
-  openSheet(`<div class="ttl">⏭ Skip ${esc(e.name)} tonight?</div>
-    <p class="mini" style="color:var(--text2);line-height:1.5;margin:5px 0 12px">No forcing, sir. Pick a reason — it goes in tonight's log and the night moves on.</p>
-    ${["🏃 Cardio instead","⏰ Short on time","🩹 Not feeling it","🗓 Schedule","🤫 No reason"].map(r=>`<button class="btn ghost" style="margin-bottom:7px;text-align:left" onclick="skipExercise(${ei},this.textContent)">${r}</button>`).join("")}
-    <button class="btn ghost sm" onclick="closeSheet()">← Back to it</button>`);
+  openSheet(`${shHd("Skip this lift?",{ic:"skip",sub:esc(e.name),closeLabel:"Keep this lift"})}
+    <div class="gh"><p class="t-s px-lede">Pick a reason. It goes in tonight's log and the session moves on.</p>
+      ${SKIP_WHY.map(r=>`<button class="rd-o sm" onclick="skipExercise(${ei},${ghJs(r[0])})"><span class="lead">${GP.icon(r[1])}</span><span class="main"><b>${r[0]}</b></span>${GP.icon("chevR")}</button>`).join("")}</div>`);
 }
+const SKIP_WHY=[["Cardio instead","pulse"],["Short on time","timer"],["Not feeling it","moon"],["Schedule","calendar"],["No reason","flat"]];
 function skipExercise(ei,reason){
   const ses=state.session;const e=ses&&ses.exercises[ei];if(!e)return;
   e._skip=String(reason||"skipped").trim();e._open=false;
   let nxt=null;const N=ses.exercises;
   for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){nxt=j;break;}}
   ses._focusEi=nxt;
-  closeSheet();haptic("tap");toast("⏭ "+e.name+" skipped — logged, not judged.");
+  closeSheet();haptic("tap");toast(e.name+" skipped. Logged, not judged.");
   saveSession();render();
 }
 

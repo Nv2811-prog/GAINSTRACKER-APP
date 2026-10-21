@@ -63,8 +63,9 @@ only in the anatomy figures so worked muscles read bright red.
 
 **Every tappable is identifiable** (the quality-pass rule, enforced by `node scripts/qa/layout.mjs`): a text label, or a line icon **and** an `aria-label`; never a bare glyph
 ("−", "‹", "▶", an emoji) as the only content. Rows pair a `.lead` icon chip with a title and a one-line sub. The same action looks the same everywhere (one chevron icon, one
-Back arrow `.btn-i` + `GP.icon("chevR")` flipped, one "Done" `.btn.sm` at the top right of a settings-style sheet, one X `.btn-i` on a detail sheet). Known legacy: the older `.ttl` sheets
-(Batcomputer, Forge, Stalled lifts, Tips ...) still end in a full-width B2 "Close", and a few legacy overlays keep an emoji in their title; convert one to the Done / X pattern whenever you touch it.
+Back arrow `.btn-i` + `GP.icon("chevR")` flipped, one "Done" `.btn.sm` at the top right of a settings-style sheet, one X `.btn-i` on a detail sheet).
+**Sheet header (wave 8, §19):** every sheet and overlay opens with ONE header, `shHd(title,{ic,sub,back,act})`: an optional Back `.btn-i`, a 34px gold-tint icon chip, the title (17/650) over a one-line sub, and at the right a "Done" `.btn.sm`
+(settings-style sheets, multi-step pickers) or an X `.btn-i` (everything else), sticky while the body scrolls. Never a full-width "Close" at the bottom, never an emoji in the title.
 
 **Press recipe (the only one):** `scale(.97)` + `brightness(1.08)` in 90ms (`--d-in`), released on `--spring` over 280ms (`--d-out`);
 big surfaces (`.card[onclick]`, `.exrow`, `.acc-head`, `.tap.big`) use `.985`. No glow, no ripple, no per-component `:active` scale.
@@ -79,7 +80,7 @@ Pure functions that return SVG/HTML strings. Use them; never hand-roll a ring or
 `GP.e1rm(kg,reps)` Epley, must equal the app's `setE1RM()` · `GP.fmt(n,d)`.
 Icon names: search calendar play chevR chevD check plus x timer moon pulse bolt up flat trophy skip more flame map flag ramp swap gotham mission suit profile allies bat sliders
 target flask bulb dumbbell book note drop image link lock crown chart scan cross alert wrench news film chat down share star scale plateau (Mission adds `gmIc`: up down minus copy trash).
-Other shared pieces: `openSheet(html)` / `closeSheet()`, `toast(msg)`, `topBar(left)` (brand mark left; search, settings (sliders icon) and the Alfred avatar with a gold hairline ring right),
+Other shared pieces: `openSheet(html)` / `closeSheet()`, `shHd(title,opts)` (the one sheet header) + `shSearch(id,placeholder,onInput)` + `pxRow(ex,opts)` (one exercise row for the add and swap pickers) + `tickNum(el,dir)`, `toast(msg)`, `topBar(left)` (brand mark left; search, settings (sliders icon) and the Alfred avatar with a gold hairline ring right),
 `gaArt(name,cls)` (cinematic still), `figLayerHtml(ex, fi)` (exactly one base layer per exercise picture: curated PNG or anatomy SVG), `gmFoldRow` (collapsed row that builds on first open),
 `gdDock` / `gdJump` (feature docks, §12), `openIndex()` (the Search sheet, §10).
 
@@ -211,6 +212,7 @@ Checked per screen by `node scripts/qa/perf.mjs [--throttle 4]` (4x CPU throttle
 | `GP:CHARM (wave 6)` ... `/GP:CHARM` | scroll-driven hero art, `.gp-sw` sweep, `.gp-first` draw-ins, section header icons (`.gp-ic`, `data-ac`), tab-switch morph |
 | `GP:WEEKLY+BODY (wave 7)` ... `/GP:WEEKLY+BODY` | `.wk-*` one-tap adjust buttons and `.bd-*` the Profile Body section |
 | `GP:PHOTOS (wave 7)` ... `/GP:PHOTOS` | `.pc-*` Suit photo card, single-photo sheet, Compare |
+| `GP:POLISH (wave 8)` ... `/GP:POLISH` | `.sh-*` the sheet header + search field, `.px-*` picker rows, plate calculator and warm-up ramp, `.cx-*` custom exercise creator, `.rd-*` readiness check-in and option rows, `.rk-*` rank ladder, the micro-moments (`.tickfx`, `.tk-up` / `.tk-dn`, `.gm-cyc`) |
 The JS has matching banners (`/* ===== ... (GP:TABS, wave 5) ===== */`, `GP:CHARM`, `FEATURE DOCK (GP:DOCKS)`, `ONE-TAP WEEKLY ADJUST`, `BODY (Profile, wave 7)`, `PROGRESS PHOTOS (GP:PHOTOS)`). Scoped primitives live under `.gh` (+ `.gm` / `.p3-pf` / `.al-pg` ...) so a tab can restyle without leaking. Do not add a new wave-layer that overrides an old rule: edit the rule in place and delete what it replaced.
 
 ## 17 · Mobile rules (iPhone Safari PWA first)
@@ -224,3 +226,14 @@ The JS has matching banners (`/* ===== ... (GP:TABS, wave 5) ===== */`, `GP:CHAR
 - No overlay haptic hosts beyond `#nav button` and `.sdone`. No more than one infinite animation or three backdrop-filters per screen.
 - No second copy of something that already has a home (§10); no icon-only control without an `aria-label`; no glyph-only button.
 - Never edit `index.html` (generated deploy copy) and never break or erase `localStorage` data.
+
+## 19 · Polish layer (GP:POLISH, wave 8)
+The older surfaces now speak the same language as the tabs: one header, one picker row, option rows with a lead icon, no emoji in chrome.
+- **Sheet header** (§5): `shHd(title,{ic,sub,back,act:"x"|"done"|"none",fn,doneHtml,closeLabel})`, sticky inside `#sheet`. A legacy sheet or overlay that still opens with `<div class="ttl">` (or a `.row` holding it) is upgraded the moment it lands (`shHead`: header, X, the bottom "Close" removed);
+  `iconize` swaps a leading emoji in titles, and in chips and buttons inside sheets, for a GP line icon from `EMO_ICON` (a new emoji gets a row there, never a bare glyph). `node scripts/qa/layout.mjs` fails a sheet that opens with a bare title row, ends in a full-width "Close" or has an emoji title.
+- **Readiness check-in** (`renderReadiness`): the Tonight hero (day, lifts, sets, minutes, the gym chips) over one card of three one-tap rows (Fresh / Okay / Tired, `.rd-o`); one tap sets the readiness and starts. The recovery line is real (`patrolReadiness`), never an invented sleep number. The compact row `.rd-o.sm` is the skip reasons.
+- **Pickers**: Add exercise and Swap lift share `shSearch` + `pxRow` and a fixed-height list (`.px-list`) so the sheet never jumps while filtering; an empty search offers "Create <typed name>". The custom exercise creator is three grouped cards, an optional fold and one sticky Save, and it keeps its draft across the picture picker (`_picPickBack`).
+- **Tools**: the plate calculator has steppers (`_plateStep`, one step = twice the smallest plate), a to-scale bar and the real plate colours (`PLATE_COL`: content, not chrome); the warm-up ramp lists four steps with plate chips per side; the rank ladder shows the current rank in a ring with the levels to the next, then nine rungs (You / Reached / N to go).
+- **Micro-moments** (each has a purpose; transform / opacity only, <= 400 ms, silent under `prefers-reduced-motion`): the set tick draws its check and the row takes one gold edge pulse (`.tickfx`, set by `toggleDone` for that one render); a record from the last 24 h wears the crown and "New record 3h ago" in Profile Records (`p3Records`);
+  the Mission hero shows the cycle position as a ring (`.gm-cyc`, `GP.ring`); a number moved by a stepper slides in from the direction it moved (`tickNum`, `.tk-up` / `.tk-dn`: the Mission plan editor and the plate calculator).
+- Skipping a lift stores a plain-text reason (`SKIP_WHY`); the session summary strips a leading emoji from reasons stored by older builds.

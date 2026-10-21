@@ -61,6 +61,7 @@ const COMMON = [
 const LIVE = [
   ['step readiness', '(()=>{const {sp,i}=__qa.nextDay();startWorkout(sp.id,i);})()', 'step'], ['step logging', '__qa.startLogging(2)', 'step'],
   ['step logging + exercise sheet', '__qa.startLogging(2);openExDetail(state.session.exercises[0].name)', SHEET], ['step logging + plate sheet', '__qa.startLogging(1);openPlateSheet(0)', SHEET], ['step logging + warm-up ramp sheet', '__qa.startLogging(1);openRamp(0)', SHEET],
+  ['step logging + swap sheet', '__qa.startLogging(2);openSwap(0)', SHEET], ['step logging + running order sheet', '__qa.startLogging(2);openReorder()', SHEET], ['step logging + skip sheet', '__qa.startLogging(2);openSkipEx(0)', SHEET],
   ['home with a live session', "__qa.startLogging(2);state.minimized=true;state.step=null;go('gotham')", TAB], ['mission with a live session', "__qa.startLogging(2);state.minimized=true;state.step=null;go('mission')", TAB],
   ['step summary', '__qa.startLogging(3);__qa.finish()', 'step']
 ];
@@ -147,6 +148,15 @@ function rules(name, kind) {
   if (name === 'tab suit') {
     const t = heads('.gd .gd-t1'); if (!t.includes('Fuel')) bad.push('Suit dock has no Fuel tile');
     if (heads('.gh-sec h2').includes('Body')) bad.push('Suit still has a "Body" header (Profile owns Body; Suit shows Measurements)');
+  }
+  if (kind === 'sheet' || kind === 'overlay') {   // wave 8: one header pattern, no emoji titles, no trailing full-width Close
+    const host = document.getElementById(kind === 'overlay' ? 'ovcard' : 'sheet'), first = host && host.firstElementChild, last = host && host.lastElementChild;
+    if (first) {
+      if (!first.classList.contains('sh-hd') && (first.classList.contains('ttl') || (first.classList.contains('row') && first.querySelector(':scope > .ttl')))) bad.push('a bare title row opens this sheet: it needs the shared header (shHd / shHead)');
+      if (last !== first && last.tagName === 'BUTTON' && /^\s*Close\s*$/.test(last.textContent)) bad.push('the sheet still ends in a full-width Close');
+      const t = host.querySelector('.sh-hd h2,.sh-hd .ttl,.ttl');
+      if (t && /\p{Extended_Pictographic}/u.test(t.textContent)) bad.push('the sheet title still has an emoji: ' + t.textContent.trim().slice(0, 24));
+    }
   }
   if (name === 'sheet time-lapse' && q('#sheet .gm-mastery').length) bad.push('Time-lapse still has the Mastery suit');
   if (name === 'sheet search') {
