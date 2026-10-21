@@ -6159,7 +6159,7 @@ const pcIco=path=>`<svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${path
 function progressPhotosCard(){
   const ph=pcSorted().reverse();
   const cmp=ph.length>=2?`<button class="btn sm pc-cmp" onclick="openPhotoCompare()">${GP.icon("swap")}Compare</button>`:"";
-  const add=`<label class="pc-th pc-add" aria-label="Add a progress photo"><input type="file" accept="image/*" capture="environment" hidden onchange="addProgress(this)">${GP.icon("plus")}<span>Add photo</span></label>`;
+  const add=`<label class="pc-th pc-add" aria-label="Add a progress photo"><input type="file" accept="image/*" hidden onchange="addProgress(this)">${GP.icon("plus")}<span>Add photo</span></label>`;
   const cells=ph.map(p=>`<button class="pc-th" onclick="viewProgress(${ghJs(p.id)})" aria-label="Photo from ${pcDate(p.date)}"><img src="${p.img}" alt="" decoding="async"><span class="pc-cap"><b>${pcDate(p.date)}</b>${p.bw?`<i>${p.bw} kg</i>`:""}</span></button>`).join("");
   return `<section class="s2 pc-card" id="gs-photos"><div class="gh-lh"><h3 data-ac="n"><span class="gp-ic" aria-hidden="true">${GP.icon("image")}</span>Progress photos</h3>${cmp}</div>
     <p class="t-xs pc-note">${ph.length?ph.length+" photo"+(ph.length===1?"":"s")+" · private, stored on this device only":"Private, stored on this device only"}</p>
