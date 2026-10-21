@@ -606,9 +606,9 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 .tbtn::after{content:"";position:absolute;inset:-4px}
 .tbtn.tb-alf{background:#0B0F16;box-shadow:0 0 0 1.5px rgba(242,193,78,.75)}
 .tbtn.tb-alf img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 26%;display:block}
-/* tab switch = View Transition: old view fades in 90ms, new one fades up 6px over 200ms; the tab bar stays put */
+/* tab switch = View Transition: the old view fades out in 90ms, the new one rises 8px over 200ms; the hero is its own group (see GP:CHARM, 6) and the tab bar stays put */
 @keyframes vtOut{to{opacity:0}}
-@keyframes vtIn{from{opacity:0;transform:translateY(6px)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(8px)}}
 ::view-transition-old(root){animation:vtOut 90ms linear both}
 ::view-transition-new(root){animation:vtIn 200ms var(--ease-out) both}
 ::view-transition-group(nav){animation-duration:.01s}
@@ -665,11 +665,8 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .al-hero .gh-cta{margin-top:16px}
 
 /* ALLIES: league rows, duel, tools, ally sheet, invite */
-.al-list,.al-tools,.al-duel{margin-top:12px;overflow:hidden}
+.al-list,.al-duel{margin-top:12px;overflow:hidden}
 .al-list .gh-lh{padding-bottom:6px}
-.al-inv{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 2px 0 8px;font:650 14px/1 var(--body);color:var(--gold-ink)}
-.al-inv .gi{width:15px;height:15px;stroke-width:2.2}
-.al-inv::after{content:"";position:absolute;inset:-8px -6px}
 .af-read .gh-more,.af-last .gh-more{display:inline-flex;align-items:center;min-height:36px;padding-top:0;padding-bottom:0}
 .al-row{position:relative;display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer}
 .al-row+.al-row{border-top:1px solid var(--hair)}
@@ -696,8 +693,6 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .al-dbar{height:6px;margin:12px 14px 10px;border-radius:3px;background:var(--rest);overflow:hidden}
 .al-dbar i{display:block;height:100%;background:var(--gold)}
 .al-dst{padding:0 14px 14px;font:650 13px/1 var(--body)}
-.al-tools .gh-row,.al-fold{cursor:pointer}
-.al-fold.open .trail .gi{transform:rotate(180deg)}
 .al-sh-h{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
 .al-sh-h .main{flex:1;min-width:0}
 .al-sh-h h2{font:700 22px/1.1 var(--body);letter-spacing:-.02em;color:var(--tx1)}
@@ -812,6 +807,26 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .ob-lv i.on{background:var(--gold-ink)}
 .ob-cta{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom,0px));margin-top:auto;padding-top:24px}
 .ob-cta .btn{width:100%}
+
+/* ===== GP:DOCKS (wave 6) ===== */
+/* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
+   Tile = square still (assets/art/tile-*.jpg, or a header crop via --pos) under a dark vignette, an icon chip, a label and a live one-line sub.
+   Plain <button>s on purpose: no .hx haptic overlay (a scrolling row must stay a scroll on iOS). Press = the global recipe + a 1px gold hairline. */
+.gd{display:flex;gap:10px;margin:14px -14px 0;padding:2px 14px 8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.gd::-webkit-scrollbar{display:none}
+.gd-t{flex:none;width:124px;display:flex;flex-direction:column;align-items:stretch;min-height:0;padding:0 0 12px;text-align:left;color:var(--tx1);background:var(--g1);border:0;border-radius:var(--r-m);box-shadow:inset 0 0 0 1px var(--hair),var(--hl),0 14px 24px -18px #000;overflow:hidden;scroll-snap-align:start;cursor:pointer}
+.gd-t:active{box-shadow:inset 0 0 0 1px var(--gold),var(--hl),0 14px 24px -18px #000}
+.gd-a{position:relative;display:block;height:96px;margin-bottom:10px;background:radial-gradient(circle at 50% 46%,rgba(5,7,12,0) 52%,rgba(5,7,12,.5) 100%),var(--art) var(--pos,center)/cover no-repeat,var(--g3)}
+.gd-a::after{content:"";position:absolute;inset:auto 0 0;height:30px;background:linear-gradient(0deg,var(--g1),rgba(12,18,28,0))}
+.gd-i{position:absolute;z-index:1;left:9px;top:9px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--gold-ink);background:rgba(5,7,12,.74);box-shadow:inset 0 0 0 1px rgba(242,193,78,.32)}
+.gd-i .gi{width:16px;height:16px}
+.gd-t1,.gd-t2{display:block;padding:0 11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gd-t1{font:650 14px/1.2 var(--body);letter-spacing:-.01em}
+.gd-t2{margin-top:3px;font:500 12px/1.25 var(--body);color:var(--tx2)}
+.gd-t2 b{font-weight:650;color:var(--tx1)}
+.gd-hit{outline:2px solid transparent;outline-offset:6px;animation:gdHit 1.3s ease-out}
+@keyframes gdHit{0%,35%{outline-color:var(--gold)}100%{outline-color:transparent}}
+@media (prefers-reduced-motion:reduce){.gd-hit{animation:none}}
 
 /* ===== GP:PROFILE+FINISH (wave 3) ===== */
 /* Finish moment, summary slides, Profile tab, exercise sheet. Built on the Home primitives (.gh .s1/.s2/.s3, gh-row, gh-sec, .lmk, .tag); only the new pieces live here. */
@@ -1057,10 +1072,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-hero{padding:12px 16px 10px}
 .gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
-.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
-.s3.is-live .gh-art{opacity:.5;animation:none}   /* live hero: the pulsing dot is the one moving thing */
-@keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
-@media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
+.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08)}
+.s3.is-live .gh-art{opacity:.5}   /* live hero: dimmed; the pulsing live dot is the one time-based motion */
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
 .gh-live{display:inline-flex;align-items:center;gap:7px;color:var(--gold-ink)}
 .gh-live::before{content:"";width:7px;height:7px;border-radius:9px;background:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.2)}
@@ -1171,7 +1184,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh svg.ring{display:block}
 
 /* SECTION HEADER: title left, caption or action right on ONE row (Profile Records, Mission/Suit/Garage headers). The action keeps a 44px tap target without growing the row. */
-.gh-sec{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 4px 10px}
+.gh-sec{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:26px 4px 10px}
 .gh-sec h2{flex:none;margin:0;font:700 20px/1.2 var(--body);letter-spacing:-.02em}
 .gh-sec .t-xs{min-width:0;text-align:right}
 .gh-sec .gh-more{flex:none;align-self:center;padding:12px 0 12px 16px;margin:-12px 0}
@@ -1204,8 +1217,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 @keyframes ghRing{from{stroke-dasharray:0 999}}
 @keyframes ghFill{from{clip-path:inset(0 100% 0 0)}}
 .gh-anim .gh-c{animation:ghIn .3s var(--ease-out) both;animation-delay:calc(var(--i,0)*40ms)}
-.gh-anim .ring-v{animation:ghRing .7s var(--ease-out) both}
-.gh-anim .lmk .fill{animation:ghFill .5s var(--ease-out) both;animation-delay:calc(var(--k,0)*30ms)}
+.gp-first .ring-v{animation:ghRing .6s var(--ease-out) both}   /* rings and bars draw in the first time a view shows in a session (gpLive() adds .gp-first), never on a repeat visit or an in-place re-render */
+.gp-first .lmk .fill,.gp-first .p3-rank .bar i{animation:ghFill .36s var(--ease-out) both;animation-delay:calc(var(--k,0)*20ms)}
 .toast .tundo{min-height:28px;height:28px;margin-left:12px;padding:0 10px;color:var(--gold-ink)}
 .gh-ring.empty .ring-v{display:none}
 
@@ -1229,6 +1242,48 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ga-finish.fin img{--o:.9;object-position:68% 30%;-webkit-mask-image:linear-gradient(180deg,#000 44%,transparent 100%);mask-image:linear-gradient(180deg,#000 44%,transparent 100%)}
 .ga-finish.fin::after{background:radial-gradient(75% 60% at 50% 100%,rgba(5,7,12,.85),rgba(5,7,12,0) 100%),linear-gradient(90deg,rgba(5,7,12,.5),rgba(5,7,12,0) 70%)}
 .lg2-bar::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:url(assets/art/logging.jpg) right 55%/cover no-repeat;opacity:.85;-webkit-mask-image:linear-gradient(90deg,transparent 24%,#000 88%);mask-image:linear-gradient(90deg,transparent 24%,#000 88%)}
+
+/* ===== GP:CHARM (wave 6) ===== */
+/* The charm layer: hero art that lives (scroll-driven, transform only), a one-shot gold light sweep per tab, art in the sheets and the Alfred chat, a line icon + accent on every section header, live numbers, and the tab-switch morph.
+   Time-based motion stays at <= 1 infinite animation per screen: the hero art is driven by SCROLL (animation-timeline), never by a clock. */
+/* 1 · living hero art: while the page scrolls the still lags behind and pushes in (translateY 7% + scale 1.1 around its lower right, so no edge ever shows). Feature-detected; elsewhere the still simply holds. */
+@keyframes gpPar{to{transform:translate3d(0,7%,0) scale(1.1)}}
+@keyframes gpParBar{to{transform:scale(1.1)}}
+@keyframes gpPush{from{transform:scale(1)}to{transform:scale(1.08)}}
+@supports (animation-timeline:scroll()){
+  .gh-art,.ga:not(.fin):not(.hd) img,.al-bg img,.af-bg img{transform-origin:72% 100%;animation:gpPar linear both;animation-timeline:scroll(root block);animation-range:0px 340px}
+  .lg2-bar::before{transform-origin:72% 50%;animation:gpParBar linear both;animation-timeline:scroll(root block);animation-range:0px 700px}
+}
+.p3-fin .ga img{transform-origin:68% 30%;animation:gpPush 1.4s var(--ease-out) both}   /* the finish moment: one slow push-in, once */
+/* 2 · light sweep: one gold glint across the hero the first time a tab shows in a session (gpSweep() adds the <i>, it removes itself; clipped by the hero's overflow, above the art and text, under the top hairline) */
+@keyframes gpSweep{from{transform:translate3d(-37.5%,0,0);opacity:0}16%{opacity:1}82%{opacity:1}to{transform:translate3d(37.5%,0,0);opacity:0}}
+.gp-sw{position:absolute;top:0;bottom:0;left:-30%;right:-30%;z-index:1;pointer-events:none;background:linear-gradient(104deg,transparent 38%,rgba(255,214,120,.18) 45%,rgba(255,240,200,.42) 50%,rgba(255,214,120,.18) 55%,transparent 62%);animation:gpSweep .78s cubic-bezier(.3,.55,.25,1) .08s both}
+.gp-sw::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent 41%,rgba(255,244,214,.95) 50%,transparent 59%)}
+/* 3 · art in the places you tap into: the exercise sheet and the muscle dossier open under a darkened still (the hero recipe: right-aligned, dark on the left and bottom, art reaches the sheet's top edge behind the grabber), the Alfred chat header carries a dim band. Titles keep a soft shadow so they stay crisp. */
+.p3-xh,.gm-dos .gm-bh{position:relative}
+.p3-xh::before,.gm-dos .gm-bh::before{content:"";position:absolute;z-index:-1;pointer-events:none;left:-16px;right:-16px;top:-29px;bottom:-16px}
+.p3-xh::before{background:linear-gradient(180deg,rgba(19,27,41,.6),rgba(19,27,41,0) 36%),linear-gradient(90deg,#131B29 14%,rgba(19,27,41,.6) 50%,rgba(19,27,41,0) 86%),linear-gradient(0deg,#131B29 0%,rgba(19,27,41,0) 55%),url(assets/art/head-exercise.jpg) right center/cover no-repeat}
+.gm-dos .gm-bh::before{background:linear-gradient(180deg,rgba(23,33,49,.6),rgba(23,33,49,0) 36%),linear-gradient(90deg,#172131 14%,rgba(23,33,49,.6) 50%,rgba(23,33,49,0) 86%),linear-gradient(0deg,#172131 0%,rgba(23,33,49,0) 55%),url(assets/art/head-muscle.jpg) right center/cover no-repeat}
+.p3-xh h2,.p3-xh .sub,.gm-bt,.gm-bh .eyebrow{text-shadow:0 1px 12px rgba(8,12,20,.95)}
+.ac-head{position:relative;isolation:isolate}
+.ac-head::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;background:linear-gradient(90deg,rgba(12,18,28,.98) 22%,rgba(12,18,28,.5) 62%,rgba(12,18,28,.1)),url(assets/art/profile.jpg) right 22%/cover no-repeat}
+.af-key{margin-top:12px}   /* the Alfred key row sat flush under the hero once it became a real .gh-row */
+/* 4 · section headers: one line icon + one area accent. rec = records gold, vol = volume green, rcv = recovery blue, pln = plan amber, n = steel; gpSec() adds the chip by title, nothing is hand-placed */
+.gp-ic{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:8px;color:var(--ac,var(--tx2));background:var(--act,rgba(150,178,222,.08));box-shadow:inset 0 0 0 1px var(--acr,var(--hair))}
+.gp-ic .gi{width:14px;height:14px;margin:0;stroke-width:2}
+[data-ac=rec]{--ac:var(--gold-ink);--act:var(--tint-gold);--acr:rgba(242,193,78,.3)}
+[data-ac=vol]{--ac:var(--ok);--act:var(--tint-ok);--acr:rgba(52,210,127,.3)}
+[data-ac=rcv]{--ac:var(--rest);--act:var(--tint-rest);--acr:rgba(91,180,255,.3)}
+[data-ac=pln]{--ac:var(--warn);--act:var(--tint-warn);--acr:rgba(255,178,36,.3)}
+.gh-sec h2,.p3-ch2 h3{display:flex;align-items:center;gap:9px}
+.gh-lh h3 .gp-ic,.p3-ch2 h3 .gp-ic{width:22px;height:22px;border-radius:7px}
+.gh-lh h3 .gp-ic .gi,.p3-ch2 h3 .gp-ic .gi{width:13px;height:13px}
+/* 5 · live numbers: no css of its own beyond the draw-in rules .gp-first .ring-v / .lmk .fill (HOME block, ghRing/ghFill); gpLive() adds .gp-first on the first view of a view per session and counts the key numbers up */
+/* 6 · tab switch (View Transition): the hero is its own group, so it cross-fades and morphs between the two tabs inside the same 200ms while the page rises 8px (vtIn) and the tab bar stays put. gpVtTag() names the hero just for the transition. */
+::view-transition-group(root),::view-transition-group(gp-hero){animation-duration:200ms}   /* the whole transition ends with the rise, no 250ms default tail */
+::view-transition-group(gp-hero){animation-timing-function:var(--ease-out);overflow:clip;border-radius:var(--r-l)}
+@media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}.gp-sw{display:none}}
+/* ===== /GP:CHARM ===== */
 
 /* ===== GP:MISSION+SUIT (wave 3) ===== */
 /* Mission, Suit and the muscle dossier run on Home's primitives (.gh .s1/.s2/.s3, .gh-row, .gh-lh, .gh-lore, .lmk, .ring, .tag) plus the rules below, all scoped under .gm.
@@ -1308,7 +1363,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gm-bench .btn.sm{min-height:34px;height:34px;padding:0 14px}
 
 /* folded rows + the Lab body (old cards keep their logic; this puts them on the calm surfaces) */
-.gm-fold .gh-t1{font-size:15px}
 .gm-lab>.card,.gm .gm-lab .card.glow{margin:12px 0 0}
 .gm .gm-lab .card,.gm .gm-lab .card.glow{background:linear-gradient(180deg,#131B29,#0F1621);border:1px solid var(--hair);border-radius:var(--r-l);box-shadow:var(--hl),var(--sh2);padding:15px}
 .gm .gm-lab .card.glow::before,.gm .gm-lab .card::after{content:none}
@@ -1438,7 +1492,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 /* MUSCLE DOSSIER sheet */
 .gm-dos .s2{margin-top:12px}
 .gm-dhead{display:flex;align-items:center;gap:14px;padding:14px;margin-top:4px}
-.gm-dhead .gh-ring{width:84px;height:84px}
+.gm-dhead .gh-ring{position:relative;flex:none;width:84px;height:84px}
 .gm-dhead .gh-rc .num{font-size:34px}
 .gm-dm{flex:1;min-width:0;display:grid;gap:6px;align-content:center}
 .gm-dr{font:650 17px/1.2 var(--body);letter-spacing:-.01em}
@@ -1538,14 +1592,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh .inf-c,.gh .fu-c,.gh .ar-si,.gh .gar-nx,.gh .sp-cal{margin-top:12px;padding-bottom:14px}
 .inf-c>:not(.gh-lh):not(.gh-row),.fu-c>:not(.gh-lh):not(.gh-row),.ar-si>:not(.gh-lh),.gar-nx>*,.sp-cal>:not(.gh-lh){margin-left:14px;margin-right:14px}
 .gh .inf-p,.gh .fu-p,.gh .ar-p{margin:8px 14px 0}
-.gh .gm-inf{margin-top:12px;margin-bottom:12px;padding-bottom:13px;cursor:pointer}
-.gm-inf-g .num.c-ok{color:var(--ok)}.gm-inf-g .num.c-warn{color:var(--warn)}.gm-inf-g .num.c-bad{color:#FF786D}.gm-inf-g .num.c-3{color:var(--tx3)}
-.gm-inf .gh-lh .trail{display:flex;color:var(--tx3)}.gm-inf .gh-lh .gi{width:16px;height:16px}
-.gm-inf-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 0}
-.gm-inf-g>div{min-width:0}
-.gm-inf-g .num{display:block;font-size:26px;line-height:.95;color:var(--tx1);white-space:nowrap}
-.gm-inf-g .num small{font-size:13px;color:var(--tx2);margin-left:1px}
-.gm-inf-g .eyebrow{display:block;margin-top:6px;font-size:10px;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .inf-big{font-size:28px;color:var(--tx1)}.inf-big small{font-size:14px;color:var(--tx2);margin-left:2px}
 .inf-seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
 .inf-seg button{min-height:52px;border-radius:12px;background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:500 11px/1 var(--body)}
@@ -1631,7 +1677,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 
 /* ===== GP:LOGGING (wave 2) ===== */
 /* sticky bar: title row folds on scroll, the strip + segments stay pinned (≈64–100px) */
-.lg2-bar{position:sticky;top:0;z-index:30;margin:calc(-20px - env(safe-area-inset-top,0px)) -14px 0;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px 0;background:rgba(5,7,12,.9);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-bottom:1px solid var(--hair)}
+.lg2-bar{position:sticky;top:0;z-index:30;overflow:hidden;margin:calc(-20px - env(safe-area-inset-top,0px)) -14px 0;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px 0;background:rgba(5,7,12,.9);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-bottom:1px solid var(--hair)}
 .lg2-title{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;height:44px;overflow:hidden}
 .lg2-title .lt{min-width:0}
 .lg2-eyebrow{display:flex;align-items:center;gap:6px;font:600 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink);white-space:nowrap}
@@ -4215,7 +4261,7 @@ function go(tab,vt){
   const fi=_TAB_ORDER.indexOf(prevTab),ti=_TAB_ORDER.indexOf(tab);
   state._tabDir=(fi>=0&&ti>=0&&fi!==ti)?(ti>fi?"right":"left"):null;
   const swap=q=>{state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}state._noEnter=q?1:0;render();state._noEnter=0;window.scrollTo(0,0);};
-  if(vt&&prevTab!==tab&&document.startViewTransition&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)){try{document.startViewTransition(()=>swap(1));return;}catch(e){}}
+  if(vt&&prevTab!==tab&&document.startViewTransition&&!gpReduced()){try{gpVtTag(1);const t=document.startViewTransition(()=>{swap(1);gpVtTag(1);}),untag=()=>gpVtTag(0);t.finished.then(untag,untag);return;}catch(e){}}
   swap(0);}
 
 /* ========================= ROUTER ========================= */
@@ -4241,6 +4287,7 @@ function render(){
   else if(state.subpage==="archive"){renderArchive();subTop();renderNav();}
   else if(state.subpage==="garage"){renderGarage();subTop();renderNav();}
   else if(state.subpage==="infirmary"){renderInfirmary();subTop();renderNav();}
+  else if(state.subpage==="lab"){renderLab();subTop();renderNav();}
   else{
     const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderProfile,allies:renderAllies,history:renderProfile,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
     fn();
@@ -4260,6 +4307,7 @@ function render(){
     const dir=state._tabDir;state._tabDir=null;
     _a.classList.remove("view-enter","view-enter-soft","view-enter-right","view-enter-left");void _a.offsetWidth;
     _a.classList.add(soft?"view-enter-soft":dir==="right"?"view-enter-right":dir==="left"?"view-enter-left":"view-enter");}}
+  try{gpEnter();}catch(e){console.error("gpEnter",e);}   // GP:CHARM: first-view sweep + live numbers (never blocks the render)
 }
 
 /* ========================= READINESS ========================= */
@@ -5090,7 +5138,7 @@ function p3SumSession(R){
   return `${p3SumHead(R,"Session complete")}
   <section class="s3 p3-hero gh-c" style="--i:1">${gaArt("finish","sum")}
     <div class="p3-vh"><span class="eyebrow">Volume</span>${dTag}</div>
-    <div class="p3-vol"><span class="num" id="p3vol">${v.v}</span><span class="u">${v.u}</span></div>
+    <div class="p3-vol"><span class="num">${v.v}</span><span class="u">${v.u}</span></div>
     <div class="p3-g4">${stats.map(a=>`<div><span class="num">${a[0]}</span><span class="eyebrow">${a[1]}</span></div>`).join("")}</div>
     ${lgRestSummary(wk)}
   </section>
@@ -5150,7 +5198,7 @@ function renderSummary(){
   $("app").innerHTML=`<div class="gh p3-sum gh-anim">${[p3SumSession,p3SumMuscles,p3SumNext][k](R)}
     <div class="p3-nav"><div class="dots">${[0,1,2].map(i=>`<i class="${i===k?"on":""}"></i>`).join("")}</div>
     <div class="p3-btns">${k?`<button class="btn" data-hx onclick="sumNav(-1)">Back</button>`:""}<button class="btn btn-1" data-hx onclick="${last?"closeSummary()":"sumNav(1)"}">${last?"Done":"Next"}</button></div></div></div>`;
-  if(k===0){const v=$("p3vol");if(v){const t=p3Vol(R.totalVol);rollUp(v,t.n,{ms:650,dec:t.dec});}}
+  gpEnter();   // GP:CHARM live numbers: the first view of each slide counts up and draws in (sumNav calls renderSummary directly, not render)
   if(k===2){setTimeout(()=>{try{renderShareCard(R);}catch(e){}},120);try{populateAlfredRead(R);}catch(e){}}
   // swipe — handlers live on #app and are cleared at the top of render() when we leave summary
   const app=$("app");let sx=0;
@@ -5559,6 +5607,16 @@ function gsHero(){
     <div class="gm-fig2">${buildSuit()}</div>
     <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
 }
+/* Suit dock: Infirmary and Time-lapse open their own page/sheet, Photos scrolls to the card at the bottom of Body. The infirmary summary row and the time-lapse fold became these tiles. */
+function gsDock(){
+  const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,ph=(state.data.photos||[]).length;
+  const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load";
+  return gdDock("Suit tools",[
+    {art:"tile-infirmary",ic:"pulse",t:"Infirmary",s:inf,fn:"openInfirmary()"},
+    {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Mastery · radar",fn:"openMastery()"},
+    {art:"tile-photos",ic:"image",t:"Photos",s:ph?`<b>${ph}</b> photo${ph===1?"":"s"}`:"Add your first",fn:"gdJump('#gs-photos')"}]);
+}
+function openMastery(){openSheet(`<div class="gh gm st-pg"><div class="st-h"><h2>Time-lapse</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>${gsFoldHtml()}</div>`);}
 function gsGrid(){
   const tile=m=>{
     const trained=(state.data.muscleVol[m]||0)>0,rec=getRecovery(m),hrs=trained&&rec<100?hoursToReady(m):0,sets=weeklySets(m),z=zoneOf(m,sets);
@@ -5589,12 +5647,10 @@ function gsBody(){
   const me=state.data.u.measurements||{},cells=[["chest","Chest"],["waist","Waist"],["leftArm","L arm"],["rightArm","R arm"],["leftThigh","L thigh"],["rightThigh","R thigh"]];
   return `<div class="gh-sec"><h2>Body</h2><button class="gh-more" data-hx onclick="openMeasure()">Edit</button></div>
     <section class="s2 gm-meas"><div class="gm-ms">${cells.map(([k,l])=>`<div><b class="num">${me[k]||"—"}</b><span class="eyebrow">${l}${me[k]?" cm":""}</span></div>`).join("")}</div></section>
-    ${gsInfirmary()}${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
+    ${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
 }
 function renderSuit(){
-  const sl=strengthLevel(),r=rankFor(sl);
-  $("app").innerHTML=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Suit</h1>${gsHero()}${gsGrid()}${gsEffort()}`
-    +gmFoldRow("suit-fold","film","Time-lapse · mastery · coverage",`${esc(r.name)} · Str ${sl} · radar`,"gsFoldHtml")+gsBody()+`</div>`;
+  $("app").innerHTML=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Suit</h1>${gsHero()}${gsDock()}${gsGrid()}${gsEffort()}${gsBody()}</div>`;
 }
 
 function suitPhysiqueAlfredCard(){
@@ -5650,7 +5706,7 @@ function progressPhotosCard(){
   const cmp=ph.length>=2?`<span class="row" style="gap:6px"><button class="btn ghost sm" style="width:auto" onclick="openPhotoTimeline()">Timeline</button><button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button></span>`:"";
   const cells=ph.map(p=>`<div class="pcell" onclick="viewProgress('${p.id}')"><img src="${p.img}" alt=""><div class="pdate">${fmtP(p.date)}${p.bw?" · "+p.bw+"kg":""}</div></div>`).join("");
   const add=`<label class="pcell add"><input type="file" accept="image/*" capture="environment" style="display:none" onchange="addProgress(this)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#E8C56A" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg><span class="mini">Add photo</span></label>`;
-  return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
+  return `<div class="card" id="gs-photos"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
     <div class="mini" style="margin:-2px 0 8px;color:var(--text2)">Your transformation, framed. Stored only on this device — nothing leaves the cave.</div>
     <div class="pgrid">${add}${cells}</div></div>`;
 }
@@ -6208,13 +6264,6 @@ function openInjuryPicker(){
 function addInjury(m){state.data.injuries=state.data.injuries||{};state.data.injuries[m]={since:new Date().toISOString(),note:""};save();haptic("done");closeSheet();renderInfirmary();}
 function clearInjury(m){if(state.data.injuries)delete state.data.injuries[m];save();haptic("done");toast(MNAME[m]+" cleared — back in action");renderInfirmary();}
 /* The Infirmary: a body page inside Suit (Body section). Sleep, soreness, the workload watch and the injury board. */
-function gsInfirmary(){   // Suit → Body: one row of today's numbers; tap opens the page
-  const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,a=acwrInfo();
-  const cell=(v,l,c)=>`<div><b class="num${c?" c-"+c:""}">${v}</b><span class="eyebrow">${l}</span></div>`;
-  const z={sweet:["sweet","ok"],high:["climbing","warn"],spike:["spike","bad"],detrain:["low",""]}[a.zone];
-  return `<section class="s2 gm-inf" role="button" tabindex="0" onclick="openInfirmary()" aria-label="Open the Infirmary: sleep, soreness, workload, injuries"><div class="gh-lh"><h3>Infirmary</h3><span class="trail">${GP.icon("chevR")}</span></div>
-    <div class="gm-inf-g">${cell(sl&&sl.hours?sl.hours+"<small>h</small>":"—","Sleep",sl&&sl.hours?"":"3")}${cell(sore||"0","Sore today",sore?"warn":"")}${cell(inj||"0","Injuries",inj?"bad":"")}${cell(a.zone==="building"?"—":a.ratio.toFixed(2),"Load ratio",z?z[1]:"3")}</div></section>`;
-}
 function renderInfirmary(){
   const d=state.data,r=patrolReadiness(),sl=sleepToday(),sore=soreToday(),inj=d.injuries||{},injKeys=Object.keys(inj),sd=sleepDebt();
   const QL=["Poor","Light","OK","Good","Great"],SL=["","mild","moderate","severe"],soreList=Object.keys(sore);
@@ -6242,7 +6291,9 @@ const INDEX_ITEMS=[
   ["🦇","Gotham home","Tonight's mission, readiness, daily challenges","go('gotham')"],
   ["⚔️","Mission / log a workout","Start or log tonight's session","go('mission')"],
   ["📈","Profile","Records, ranks, history & analytics","go('case')"],
-  ["📋","Plan & schedule","Splits, training days, volume map","goPlan()"],
+  ["📋","Plan & schedule","Splits, training days, forecast","goPlan()"],
+  ["🧪","Lab","Efficiency, balance, plateaus, calculators","openLab()"],
+  ["📥","Import or share a split","Paste a Split Card or send yours","openSplitExchange()"],
   ["🤖","Alfred","AI coach, physique scan, weekly review","go('alfred')"],
   ["💪","The Suit","Your muscle figure & recovery map","go('suit')"],
   ["🦾","WAYNE TECH","The gadget hub — every tool in one tab","go('tech')"],
@@ -6448,7 +6499,7 @@ function p3Calendar(){
   const mw=(d.workouts||[]).filter(w=>inM(w,yr,mo)),pw=(d.workouts||[]).filter(w=>inM(w,pm.getFullYear(),pm.getMonth()));
   const tot=a=>a.reduce((s,w)=>s+(w.totalVol||0),0),sess=new Set(mw.map(w=>new Date(w.date).toDateString())).size,mv=tot(mw),pv=tot(pw);
   const mp=mw.reduce((s,w)=>s+((w.prs||[]).length),0),dp=pv>0&&sess?Math.round((mv-pv)/pv*100):null,vv=p3Vol(mv);
-  return `<section class="s2 p3-cal gh-c" style="--i:1" ontouchstart="state._calSwipeX=event.touches[0].clientX" ontouchend="(function(){const dx=event.changedTouches[0].clientX-(state._calSwipeX||0);if(dx>55)calPrev();else if(dx<-55)calNext();})()">
+  return `<section class="s2 p3-cal gh-c" id="p3-cal" style="--i:1" ontouchstart="state._calSwipeX=event.touches[0].clientX" ontouchend="(function(){const dx=event.changedTouches[0].clientX-(state._calSwipeX||0);if(dx>55)calPrev();else if(dx<-55)calNext();})()">
     <div class="p3-ch"><div><h3>${MON[mo]} ${yr}</h3><div class="sub">${sess} session${sess===1?"":"s"} · ${vv.v} ${vv.u}${mp?` · ${mp} PR${mp>1?"s":""}`:""}${dp!=null?` · <b class="${dp>=0?"c-ok":"c-warn"}">${dp>=0?"+":""}${dp}%</b>`:""}</div></div>
       <div class="nv"><button class="btn-i" data-hx onclick="calPrev()" aria-label="Previous month">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><button class="btn-i" data-hx onclick="calNext()" aria-label="Next month"${off>=0?" disabled":""}>${GP.icon("chevR")}</button></div></div>
     <div class="p3-cg">${cells}</div>
@@ -6468,7 +6519,7 @@ function p3Records(){
   const recent=now()-30*P3_DAY;
   const rows=(all?list:list.slice(0,6)).map(([n,p])=>{const tr=p3Trend(n,{w:64,h:26,mini:1}),fresh=new Date(p.date||0).getTime()>=recent;
     return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(n)})"><span class="lead${fresh?" gold":""}">${GP.icon(fresh?"trophy":"dumbbell")}</span><div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">e1RM <b>${Math.round(p.orm)} kg</b> · PR ${p.date?ghAgo(p.date):"–"}</div></div><span class="trail">${tr?tr.svg:""}${GP.icon("chevR")}</span></div>`;}).join("");
-  return `<div class="gh-sec gh-c" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
+  return `<div class="gh-sec gh-c" id="p3-rec" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
     <section class="s2 gh-list gh-c" style="--i:2">${rows}${p3Row("chart","Every lift",loggedExerciseNames().length+" exercises · full curves","openArchive()")}</section>`;
 }
 function p3BigThree(){   // barbell-equivalent bench + squat + deadlift vs bodyweight (liftEstimate converts machine/Smith lifts), 4-week delta
@@ -6490,33 +6541,39 @@ function p3Strength(){
       <div class="lmk p3-std" style="--v:${p(r)}"><i class="fill"></i>${tiers.map(t=>`<i class="tk" style="left:${p(t[1])}"></i>`).join("")}</div>
       <div class="p3-tl">${tiers.map(t=>`<span style="left:${p(t[1])}">${t[0]}</span>`).join("")}</div>
       <div class="p3-sn">${Math.round(e.orm)} kg e1RM · ${lvl?full(lvl[0]):"Below novice"}${nxt?` · ${full(nxt[0])} in +${fmtKg(Math.ceil((nxt[1]*bw-e.orm)*2)/2)} kg`:""}${e.est?` · est. from ${esc(e.via)}`:""}</div></div>`;}).join("");
-  return `<div class="gh-sec gh-c" style="--i:3"><h2>Strength</h2><span class="t-xs">e1RM ÷ ${bw} kg bodyweight</span></div>
+  return `<div class="gh-sec gh-c" id="p3-std" style="--i:3"><h2>Strength</h2><span class="t-xs">e1RM ÷ ${bw} kg bodyweight</span></div>
     <section class="s2 p3-std-c gh-c" style="--i:3">${b3?`<div class="p3-b3"><div><span class="num">${b3.ratio.toFixed(2)}</span><span class="u">× BW</span></div>${b3.d?`<span class="tag ${b3.d>0?"ok":"warn"}">${b3.d>0?"+":""}${b3.d}% / 4 wk</span>`:""}</div><div class="p3-b3c">Big-3 total, barbell-equivalent${b3.n<3?" · "+b3.n+" of 3 lifts":""}</div>`:""}${body}
       <div class="p3-sfoot">Machine, Smith and variation lifts are converted to a barbell estimate. e1RM is a guide, not a verdict.</div></section>`;
 }
 function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
-function p3Trophies(){
-  let rec=null;try{rec=mmaRecord();}catch(e){}
-  const body=p3Row("trophy","Badges","The trophy room","openTrophyRoom()")
-    +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · weekly volume against the week before",""):"");
-  return p3FoldRow("troph","trophy","Badges","Trophy room · week-vs-week record",body);
+/* Profile dock: History, Records and Strength standards sit inline on this page, so their tiles scroll to them; Badges and Backup open their own sheet.
+   Backup moved here from the "Gyms & tools" fold, Badges from its own fold. */
+function p3Dock(){
+  const d=state.data,ws=d.workouts||[],prN=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length,b3=p3BigThree(),lb=d.u.lastBackupAt;
+  const std=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].some(l=>liftEstimate(l));
+  return gdDock("Profile tools",[
+    {art:"tile-history",ic:"calendar",t:"History",s:`<b>${ws.length}</b> sessions`,fn:"gdJump('#p3-cal')"},
+    ...(prN?[{art:"tile-records",ic:"trophy",t:"Records",s:`<b>${prN}</b> records`,fn:"gdJump('#p3-rec')"}]:[]),
+    ...(std?[{art:"tile-standards",ic:"chart",t:"Standards",s:b3?`Big-3 <b>${b3.ratio.toFixed(2)}</b>× BW`:"Lifts vs bodyweight",fn:"gdJump('#p3-std')"}]:[]),
+    {art:"tile-badges",ic:"crown",t:"Badges",s:`<b>${(d.u.earnedBadges||[]).length}</b> of ${ACHIEVEMENTS.length}`,fn:"openTrophyRoom()"},
+    {art:"tile-backup",ic:"lock",t:"Backup",s:lb?"Backed up "+ghAgo(lb):"Never backed up",fn:"openDataControl()"}]);
 }
 function p3Tools(){
-  const u=state.data.u,g=(u.gyms||[]).length;
+  const u=state.data.u,g=(u.gyms||[]).length;let rec=null,wf="";try{rec=mmaRecord();wf=weeklyFightCard();}catch(e){}
   const body=p3Row("map","Gyms",g+" gym"+(g===1?"":"s")+" · "+esc(u.activeGym||""),"openGyms()")
     +p3Row("scan","Batcomputer","Physique and tools","openBatcomputer()")
     +p3Row("scale","Measurements","Body log","openMeasure()")
     +p3Row("share","Share PR card","Your top five lifts","shareProfilePRCard()")
     +p3Row("calendar","Export calendar","Every session as .ics","exportICS()")
-    +p3Row("lock","Data control","Backup, restore, archive lifts","openDataControl()")
+    +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · against the week before",wf?"alOpenFightCard()":""):"")
     +p3Row("sliders","Settings","Name, bodyweight, rest, metric","openSettings()");
-  return p3FoldRow("tools","sliders","Gyms & data","Backup · measurements · settings",body);
+  return p3FoldRow("tools","sliders","Gyms & tools","Gyms · measurements · settings",body);
 }
 function renderProfile(){
   if(!(state.data.workouts||[]).length){
     $("app").innerHTML=`<div class="gh p3-pf"><h1 class="gh-hi">Profile</h1><section class="s2 p3-empty"><span class="lead gold">${GP.icon("bat")}</span><div><b>Your record starts here</b><p>Rank, records and strength standards fill in as you train.</p></div><button class="btn btn-1" data-hx onclick="go('mission',1)">Plan a session</button></section></div>`;return;
   }
-  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Trophies()}${p3Tools()}</div>`;
+  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Dock()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Tools()}</div>`;
 }
 /* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, consistency, Alfred and the weekly streak.
    Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
@@ -6618,19 +6675,37 @@ const GM_IC={
 const gmIc=(n,c="")=>`<svg class="gi ${c}" viewBox="0 0 24 24" aria-hidden="true">${GM_IC[n]||""}</svg>`;
 const gmTop=(day,k)=>{const p=dayMuscles(day).prim;return Object.keys(p).sort((a,b)=>p[b]-p[a]).slice(0,k);};
 const gmChips=(day,k)=>gmTop(day,k).map(m=>`<span class="gm-chip">${ghName(m)}</span>`).join("");
-/* a fold row + body (Lab on Mission, time-lapse/mastery on Suit): the body is built on first open, so a folded section costs nothing per render */
-function gmFold(id,buildName){
-  const b=$(id),r=$(id+"-row");if(!b)return;
-  const open=b.classList.contains("hide");
-  if(open&&!b.dataset.f){b.innerHTML=window[buildName]();b.dataset.f="1";}
-  b.classList.toggle("hide",!open);if(r)r.classList.toggle("open",open);
-  state.accOpen=state.accOpen||{};state.accOpen[id]=open;haptic("tap");
-  if(open)setTimeout(()=>{try{b.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}},60);
+/* ===== FEATURE DOCK (GP:DOCKS, wave 6) =====
+   ONE reusable row of art tiles directly under a tab hero (Mission, Suit, Profile, Allies): every feature the tab owns is one tap away, nothing is searched for or folded.
+   A tile = {art: assets/art/<art>.jpg, ic: GP icon, t: label, s: live one-line sub (a number or a state, <= ~16 chars), fn: onclick, pos?: background-position}.
+   Plain <button>s, no .hx haptic overlay (a scrolling row must stay a scroll on iOS). A tile either opens its feature (sheet / sub-page) or, for a section that lives
+   inline on the page, scrolls to it (gdJump). The dock replaces the folds and tool lists it came from: a feature appears once per tab. */
+const GD_JUMP_TOP=76;   // px of sticky top bar a scroll-to-section tile has to clear
+function gdDock(label,tiles){
+  const plain=s=>String(s).replace(/<[^>]*>/g,"");
+  return `<div class="gd gh-c" style="--i:1" role="group" aria-label="${esc(label)}">${tiles.map(t=>`<button class="gd-t" onclick="${t.fn}" aria-label="${esc(t.t+", "+plain(t.s))}"><span class="gd-a" style="--art:url(assets/art/${t.art}.jpg)${t.pos?";--pos:"+t.pos:""}"><span class="gd-i">${GP.icon(t.ic)}</span></span><span class="gd-t1">${t.t}</span><span class="gd-t2">${t.s}</span></button>`).join("")}</div>`;
 }
-function gmFoldRow(id,icon,title,sub,buildName){
-  const open=accIsOpen(id,false);
-  return `<div class="s1 gh-lore gm-fold gh-c${open?" open":""}" id="${id}-row" data-hx onclick="gmFold('${id}','${buildName}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
-    <div id="${id}" class="gh-lore-body${open?"":" hide"}"${open?' data-f="1"':""}>${open?window[buildName]():""}</div>`;
+function gdJump(sel){   // smooth-scroll to a section of the current tab and ring it in gold for a moment
+  const el=document.querySelector(sel);if(!el)return;
+  haptic("tap");el.style.scrollMarginTop=GD_JUMP_TOP+"px";
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+  el.classList.remove("gd-hit");void el.offsetWidth;el.classList.add("gd-hit");
+  setTimeout(()=>el.classList.remove("gd-hit"),1400);
+}
+/* Mission dock: the plan tools. The generator never shipped, so there is no tile for it. */
+function gmDock(cur){
+  const d=state.data,n=(d.splits||[]).length;let stalled=0;try{stalled=stalledLifts().length;}catch(e){}
+  const lifts=cur?cur.sp.days.reduce((a,x)=>a+(x.exercises||[]).length,0):0;
+  const own=cur?[{art:"tile-plan-edit",ic:"sliders",t:"Edit plan",s:`${cur.sp.days.length} days · ${lifts} lifts`,fn:"openSplitSheet()"},
+    {art:"tile-split-new",ic:"plus",t:"New split",s:n===1?"1 split":n+" splits",fn:"gdNewSplit()"}]:[];
+  return gdDock("Mission tools",own.concat([
+    {art:"tile-split-import",ic:"down",t:"Import split",s:d.splitImportAt?"Imported "+ghAgo(d.splitImportAt):"Share or paste",fn:"openSplitExchange()"},
+    {art:"tile-lab",ic:"flask",t:"Lab",s:stalled?`<b>${stalled}</b> stalled lift${stalled===1?"":"s"}`:"SFR · balance · tools",fn:"openLab()"}]));
+}
+function gdNewSplit(){   // New split tile: add the split, open the plan editor scrolled to it
+  newSplit();openSplitSheet();haptic("done");
+  const cards=$("sheet").querySelectorAll(".gm-sp"),last=cards[cards.length-1];
+  if(last)last.scrollIntoView({block:"start"});
 }
 
 /* ---- volume forecast: planned working sets per muscle per week, running through the cycle. Same credit rule + per-week normalising as Home's tonight forecast (ghPlanSets, perWeek). ---- */
@@ -6700,7 +6775,7 @@ function gmHero(cur){
     <h2 class="num gh-title">${esc(sp.name)}</h2>
     <div class="gm-rail" role="img" aria-label="Cycle position: day ${cur.i+1} of ${n}">${rail}</div>
     <div class="gh-meta"><span><b>${tr.length}</b> training</span><span><b>${n-tr.length}</b> rest</span><span><b>${sets}</b> sets / cycle</span>${min?`<span>~<b>${min}</b> min a day</span>`:""}</div>
-    <div class="gh-cta gm-cta"><button class="btn" onclick="openSplitSheet()">${GP.icon("sliders")}Edit plan</button><button class="btn" onclick="freeWorkout()">${GP.icon("bolt")}Free session</button></div></section>`;
+    <div class="gh-cta gm-cta"><button class="btn" onclick="freeWorkout()">${GP.icon("bolt")}Free session</button></div></section>`;
 }
 function gmDayRow(sp,i,cur,live){
   const day=sp.days[i],rest=isRest(day),tn=cur.i===i,done=i<cur.i;
@@ -6734,21 +6809,27 @@ function gmBench(act){
     return `<div class="gh-row"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">${esc(sp.name)}</div><div class="gh-t2">${sp.days.length} days · ${ex} lifts</div></div><span class="trail"><button class="btn sm" onclick="setActiveSplit('${sp.id}')">Use</button></span></div>`;}).join("")}</section>`;
 }
 /* ---- Lab: everything that is not the plan, folded into one row. Cards keep their logic; .gm-lab restyles them. ---- */
-function scienceCardsHtml(){return volMapCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+plateauCard();}
+function scienceCardsHtml(){return scienceLabCard()+weeklyBalanceCard()+plateauCard();}   // per-muscle volume is the Suit grid, the workload ratio lives in the Infirmary: the Lab keeps only what is shown nowhere else
 function gmLabHtml(){
   const tools=[["scale","Plate calculator","openPlateSheet(-1)"],["bolt","1RM calculator","open1RM()"],["target","1RM test day","openTestDay()"],["wrench","Forge","openForge()"],["note","Measure","openMeasure()"]];
   return `<div class="gm-lab">${contractCard()}${scienceCardsHtml()}<section class="s2 gh-list"><div class="gh-lh"><h3>Tools</h3></div>${tools.map(t=>`<div class="gh-row" data-hx onclick="${t[2]}"><span class="lead">${GP.icon(t[0])}</span><div class="main"><div class="gh-t1">${t[1]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`;
+}
+/* Lab sub-page (the Lab dock tile). Same shell as the Infirmary: back arrow, one scroll, tools open sheets over it. */
+function openLab(){state.subpage="lab";render();window.scrollTo(0,0);}
+function closeLab(){state.subpage=null;go("mission");}
+function renderLab(){
+  $("app").innerHTML=`<div class="gh gm"><div class="sp-hd"><button class="btn-i" onclick="closeLab()" aria-label="Back to Mission">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><div><h1>Lab</h1><div class="t-xs">Efficiency · balance · plateaus · tools</div></div></div>${gmLabHtml()}</div>`;
 }
 const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0">${gaArt("mission","dim")}<div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
   <div class="gh-cta"><button class="btn btn-1" onclick="newSplit();openSplitSheet()">${GP.icon("plus")}New split</button><button class="btn" onclick="freeWorkout()">Free session</button></div></section>`;
 function renderMission(){
   const cur=currentPlanDay(),live=!!state.session;
   let h=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Mission</h1>`;
-  if(!cur)h+=gmEmpty();
-  else h+=gmHero(cur)
+  if(!cur)h+=gmEmpty()+gmDock(null);
+  else h+=gmHero(cur)+gmDock(cur)
     +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
     +gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
-  h+=gmFoldRow("mission-lab","flask","Lab","Volume map · SFR · workload · tools","gmLabHtml")+`</div>`;
+  h+=`</div>`;
   $("app").innerHTML=h;
 }
 /* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
@@ -7260,7 +7341,7 @@ function openJusticeLeague(){   // "Splits & backups": share/import a split, the
   openSheet(`<div class="gh st-pg">
     <div class="st-h"><h2>Splits &amp; backups</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
     <span class="eyebrow st-g">Share</span>
-    <section class="s2 st-list">${row("share","Share a split","Send one of your plans to an ally","openShareSplitPicker()")}${row("down","Import a split","Paste a plan an ally sent you","openImportSplit()")}${row("plus","Invite an ally",cloudOn?"Swap friend codes":"Offline · codes still work","openAllyInvite()")}</section>
+    <section class="s2 st-list">${row("share","Share or import a split","Send a plan to an ally or paste one","openSplitExchange()")}${row("plus","Invite an ally",cloudOn?"Swap friend codes":"Offline · codes still work","openAllyInvite()")}</section>
     <span class="eyebrow st-g">Offline snapshot</span>
     <section class="s2 st-list"><div class="st-note" style="padding-top:12px">A one-time copy of your card for allies who are not live. It does not update.</div>
       <div style="padding:0 14px 14px"><button class="btn sm" onclick="shareMyCard()">${GP.icon("share")}Copy snapshot code</button><textarea id="my-code" readonly onclick="this.select()" class="st-ta">${code}</textarea></div></section>
@@ -7296,7 +7377,8 @@ function openLeaderboard(){
     <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — driven by <b>strength</b> and <b>world optimality</b> (how good your lifts truly are). Quality over quantity: grinding more, sloppier sets won't out-rank a cleaner, stronger lifter.</div>
     <div class="banner" style="margin-bottom:4px"><span>🦇</span><div class="mini">${board.length<2?"Add allies in the Justice League to fill the board — for now the cave is yours alone.":myRank===1?"You sit at the top of the League. Defend the cowl.":`You're ranked #${myRank} of ${board.length}. ${fmtNum((board[myRank-2]._score-me._score))} points behind the vigilante above you.`}</div></div>
     ${rows}
-    <button class="btn" style="margin-top:13px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
+    <div class="gh" style="margin-top:14px"><section class="s2 gh-list">${alTool("flame","Fight Night","Most records this week","alOpenFightNight()")}${alTool("swap","Sparring","1-on-1 head to head","openSparring()")}</section></div>
+    <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
 }
 /* ===== CO-OP RAIDS (#26): team with an ally against a boss; combined PRs pool =====
    The boss falls when the two of you LAND a set number of records together (not tonnage —
@@ -7407,11 +7489,6 @@ function defaultSplits(){
 /* ========================= STRATEGY TAB ========================= */
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 /* ===== Wave 2: Strategy = weekly volume map (MEV/MAV/MRV), balance & plateau tools ===== */
-// Full-body heat map: every muscle tinted by its weekly working-set volume.
-function volMapBodies(){
-  const col=m=>{const s=weeklySets(m);return s>0?{fill:heatColor(m),op:".95"}:{fill:"#E8C56A",op:".06"};};
-  return `<div class="stage" style="border-radius:14px;overflow:hidden;padding:6px 6px 2px">${suitFigureFB(col)}</div>`;
-}
 /* Section-title icons: thin line glyphs from the shared GP icon set (no coloured glow, no emoji). */
 const SEC_ICON={volume:"chart",balance:"scale",plateau:"plateau",strength:"dumbbell",schedule:"calendar",suit:"suit",radar:"scan",plate:"dumbbell",link:"link",bolt:"bolt",flame:"flame"};
 function secIcon(key){return GP.icon(SEC_ICON[key]||key,"gi-sec");}
@@ -7492,25 +7569,6 @@ function timeLapseCard(){
       <button class="btn ghost sm" style="width:auto;padding:6px 11px" onclick="tlStep(1)">›</button>
     </div>
     <div class="row sp mini" style="margin-top:3px;color:var(--text3)"><span>first week</span><span>now</span></div></div>`;
-}
-function volMapCard(){
-  const rows=M12.map(m=>({m,s:weeklySets(m),lm:VL[m]||{mev:8,mav:14,mrv:20}}))
-    .sort((a,b)=>(a.s/a.lm.mav)-(b.s/b.lm.mav));
-  const rowHtml=rows.map(({m,s,lm})=>{
-    const [lab,lc]=heatLabel(m), pct=clamp(s/lm.mrv*100,2,100);
-    const mev=clamp(lm.mev/lm.mrv*100,0,100), mav=clamp(lm.mav/lm.mrv*100,0,100);
-    return `<div onclick="muscleDrill('${m}')" style="cursor:pointer;padding:8px 0;border-top:1px solid var(--border)">
-      <div class="row sp"><span style="font-size:13px">${mIcon(m,16)} ${MNAME[m]} ›</span><span class="mini" style="color:${lc};font-weight:700">${s} set${s===1?"":"s"} · ${lab}</span></div>
-      <div style="position:relative;height:9px;border-radius:5px;margin-top:5px;background:#15171d;overflow:hidden">
-        <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${lc}"></div>
-        <i style="position:absolute;left:${mev}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28)"></i>
-        <i style="position:absolute;left:${mav}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45)"></i></div></div>`;
-  }).join("");
-  return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center">${secIcon('volume')}Weekly volume map</div>
-    <div class="mini" style="margin-bottom:10px;color:var(--text2)">Brighter red = more hard sets this week. Faint lines mark each muscle's MEV (minimum to grow) and MAV (top of the growth zone). Tap a muscle for its dossier.</div>
-    ${volMapBodies()}
-    <div style="margin-top:10px">${rowHtml}</div>
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Below the first line = below MEV (not enough to grow) · between the lines = the growth zone · past the bar end = pushing MRV.</div></div>`;
 }
 function weeklyBalanceCard(){
   const ws=m=>weeklySets(m);
@@ -7640,7 +7698,7 @@ function splitsEditorHtml(){
       ${sp.days.map((_,i)=>gmDayEd(sp,i)).join("")}
       <div class="gm-drow gm-acts"><button class="btn sm" onclick="addDay('${id}')">${GP.icon("plus")}Training day</button><button class="btn sm" onclick="addRestDay('${id}')">${GP.icon("plus")}Rest day</button></div></section>`;
   }).join("");
-  return cards+`<div class="gm-drow gm-acts gm-bot"><button class="btn" onclick="newSplit()">${GP.icon("plus")}New split</button><button class="btn" onclick="openImportSplit()">${GP.icon("down")}Import a split</button></div>`;
+  return cards+`<div class="gm-drow gm-acts gm-bot"><button class="btn" onclick="newSplit()">${GP.icon("plus")}New split</button><button class="btn" onclick="openSplitExchange()">${GP.icon("down")}Share / import</button></div>`;
 }
 function renderStrategy(){
   // STRATEGY is now merged into MISSION — render the merged tab in place (no nested render()).
@@ -7698,22 +7756,19 @@ function openSplitShareSheet(sp,code){
     <button class="btn gold" style="margin-top:9px" onclick="(function(){var t=document.getElementById('split-code');if(t){t.select();}if(navigator.clipboard){navigator.clipboard.writeText('${code}').then(()=>toast('Copied — send it over.'));}else toast('Select the code and copy it.');})()">📋 Copy code</button>
     <button class="btn ghost" style="margin-top:7px" onclick="closeSheet()">Close</button>`);
 }
-function openShareSplitPicker(){
-  const sps=state.data.splits||[];
-  if(!sps.length){toast("No splits to share yet.");return;}
-  if(sps.length===1){shareSplit(sps[0].id);return;}
-  openSheet(`<div class="ttl">📤 Share which split?</div>
-    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Pick the routine to send. Your friend pastes the code and trains it instantly.</div>
-    ${sps.map(sp=>{const ex=(sp.days||[]).reduce((a,d)=>a+(d.exercises||[]).length,0);
-      return `<button class="row sp" onclick="shareSplit('${sp.id}')" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:11px;margin-bottom:7px;cursor:pointer;text-align:left"><div style="min-width:0"><b style="font-size:14px;color:var(--gold2)">${esc(sp.name)}</b><div class="mini" style="color:var(--text3)">${sp.days.length} days · ${ex} exercises</div></div><span style="color:var(--gold2);flex:none">📤</span></button>`;}).join("")}
-    <button class="btn ghost" style="margin-top:4px" onclick="openJusticeLeague()">‹ Back</button>`);
-}
-function openImportSplit(){
-  openSheet(`<div class="ttl">📥 Import a split</div>
-    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Paste a Split Card code a friend sent you. Their whole routine — days and every exercise — lands in your splits, ready to train.</div>
-    <textarea id="import-split-code" placeholder="Paste the GTSPL1:… code here…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:88px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none"></textarea>
-    <div class="row" style="gap:6px;margin-top:8px"><button class="btn gold sm g" onclick="pasteImportSplit()">📥 Paste &amp; Import</button><button class="btn sm" style="width:auto" onclick="doImportSplit()">Import</button></div>
-    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
+/* Share or import a split: ONE sheet for both directions (Mission dock "Import split", the plan editor, Allies "Splits"). Each of your splits copies as a Split Card in one tap; a pasted code becomes a new split. */
+function openSplitExchange(){
+  const sps=state.data.splits||[],exN=sp=>(sp.days||[]).reduce((a,d)=>a+(d.exercises||[]).length,0);
+  const mine=sps.length?sps.map(sp=>`<div class="gh-row"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">${esc(sp.name)}</div><div class="gh-t2">${sp.days.length} days · ${exN(sp)} lifts</div></div><button class="btn sm" onclick="shareSplit('${sp.id}')">${GP.icon("share")}Copy code</button></div>`).join(""):`<div class="st-note" style="padding:12px 14px">No splits to send yet.</div>`;
+  openSheet(`<div class="gh st-pg">
+    <div class="st-h"><h2>Share or import</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <span class="eyebrow st-g">Import a split</span>
+    <section class="s2 st-list"><div class="st-note" style="padding-top:12px">Paste a Split Card code a friend sent. The days and every lift land in your splits, ready to train.</div>
+      <div style="padding:0 14px 14px"><textarea id="import-split-code" class="st-ta" style="height:84px;font-size:16px;color:var(--tx1)" placeholder="Paste the GTSPL1:… code here" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Split Card code"></textarea>
+        <div class="al-cta2"><button class="btn gold" onclick="pasteImportSplit()">${GP.icon("down")}Paste &amp; import</button><button class="btn" onclick="doImportSplit()">Import</button></div></div></section>
+    <span class="eyebrow st-g">Send one of yours</span>
+    <section class="s2 gh-list">${mine}</section></div>`);
+  const sh=$("sheet");if(sh)sh.scrollTop=0;
 }
 function pasteImportSplit(){
   if(navigator.clipboard&&navigator.clipboard.readText){
@@ -7726,7 +7781,7 @@ function doImportSplit(){
   if(!sp){toast((inp.value||"").trim()?"That code didn't read — copy the whole thing again.":"Paste a Split Card code first.");return;}
   const dupe=(state.data.splits||[]).find(x=>x.name===sp.name&&splitSig(x)===splitSig(sp));
   if(dupe){toast(`"${sp.name}" is already in your splits — nothing added.`);closeSheet();return;}
-  state.data.splits.push(sp);if(!state.data.activeSplitId)state.data.activeSplitId=sp.id;
+  state.data.splits.push(sp);if(!state.data.activeSplitId)state.data.activeSplitId=sp.id;state.data.splitImportAt=now();
   save();haptic("done");closeSheet();render();
   toast(`"${sp.name}" imported — ${sp.days.length} days ready to train.`);
 }
@@ -8304,7 +8359,6 @@ function alRow(a,i,dd){
     <div class="al-st"><span><b class="num">${alWeekCount(a)}</b><i>this wk</i></span><span><b class="num">${a.streak||0}</b><i>streak</i></span></div></div>`;
 }
 const alTool=(ic,t1,t2,fn)=>`<div class="gh-row" onclick="${fn}" role="button" tabindex="0"><span class="lead">${GP.icon(ic)}</span><div class="main"><div class="gh-t1">${t1}</div><div class="gh-t2">${t2}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
-function alFold(id){toggleAcc(id);const h=$(id+"-h");if(h)h.classList.toggle("open",accIsOpen(id,false));}
 function alOpenFightNight(){openSheet(`<div class="gh">${fightNightCard()}<button class="btn" style="margin-top:12px;width:100%" onclick="closeSheet()">Close</button></div>`);}
 function alOpenFightCard(){openSheet(`<div class="gh">${weeklyFightCard()}<button class="btn" style="margin-top:12px;width:100%" onclick="closeSheet()">Close</button></div>`);}
 function renderAllies(){
@@ -8324,20 +8378,30 @@ function renderAllies(){
     <div class="al-top"><span class="eyebrow gh-live">League</span>${live}</div>${heroBody}</section>`;
   let duel="";try{duel=duelCard();}catch(e){}
   const rows=allies.map((a,i)=>({a,i,dd:alDays(a.recent&&a.recent[0]&&a.recent[0].t)})).sort((x,y)=>(x.dd==null?9e3:x.dd)-(y.dd==null?9e3:y.dd));
-  const league=allies.length?`<section class="s2 al-list gh-c" style="--i:1"><div class="gh-lh"><h3>Your league<span class="tag">${allies.length}</span></h3><button class="al-inv" onclick="openAllyInvite()">${GP.icon("plus")}Invite</button></div>${rows.map(x=>alRow(x.a,x.i,x.dd)).join("")}</section>`:"";
-  const r=d.raid,rp=r?raidProgress():null,rv=d.rival;
-  const more=[];
-  more.push(alTool("flame","Fight Night","Most records this week","alOpenFightNight()"));
-  try{if(weeklyFightCard())more.push(alTool("chart","Week vs last week","Your weekly fight card","alOpenFightCard()"));}catch(e){}
-  const mo=accIsOpen("al-more",false);
-  const tools=`<section class="s2 al-tools gh-c" style="--i:2">
-    ${alTool("trophy","Leaderboard",board.length>1?"#"+myRank+" of "+board.length:"Just you so far","openLeaderboard()")}
-    ${alTool("flag","Co-op raid",r?Math.round(rp.pct)+"% vs "+esc(r.boss):"Team up on a boss","openRaid()")}
-    ${alTool("swap","Sparring",rv?"Vs "+esc(rv.name||"rival"):"1-on-1 head to head","openSparring()")}
-    ${alTool("share","Splits &amp; backups",(allies.length===1?"1 ally":allies.length+" allies")+" · share a split","openJusticeLeague()")}
-    <div class="gh-row al-fold${mo?" open":""}" id="al-more-h" onclick="alFold('al-more')" role="button" tabindex="0"><span class="lead">${GP.icon("more")}</span><div class="main"><div class="gh-t1">More from Gotham</div><div class="gh-t2">${more.length} extras</div></div><span class="trail">${GP.icon("chevD")}</span></div>
-    <div id="al-more" class="${mo?"":"hide"}">${more.join("")}</div></section>`;
-  $("app").innerHTML=`<div class="gh al-pg${state._same?"":" gh-anim"}"><h1 class="gh-hi">Allies</h1>${hero}${duel}${league}${tools}</div>`;
+  const league=allies.length?`<section class="s2 al-list gh-c" style="--i:1"><div class="gh-lh"><h3>Your league<span class="tag">${allies.length}</span></h3></div>${rows.map(x=>alRow(x.a,x.i,x.dd)).join("")}</section>`:"";
+  $("app").innerHTML=`<div class="gh al-pg${state._same?"":" gh-anim"}"><h1 class="gh-hi">Allies</h1>${hero}${alDock(myRank,board.length)}${duel}${league}</div>`;
+}
+/* Allies dock: the whole social toolkit in one row. Chat and Duel belong to one ally, so a single live ally opens straight in, several get a picker, none gets the invite sheet.
+   "Add ally" only shows once there is a league (the empty hero already carries the Invite button). Fight Night and Sparring sit inside the Leaderboard sheet. */
+function alDock(myRank,boardN){
+  const d=state.data,allies=d.allies||[],live=allies.filter(a=>a&&a._uid).length,D=d.duel,r=d.raid,rp=r?raidProgress():null;
+  const ub=Object.values(d.chatUnread||{}).reduce((a,v)=>a+(+v||0),0),left=D?Math.max(0,Math.ceil((D.end-Date.now())/864e5)):0;
+  return gdDock("Allies tools",[
+    ...(allies.length?[{art:"tile-ally-add",ic:"plus",t:"Add ally",s:allies.length+(allies.length===1?" ally":" allies"),fn:"openAllyInvite()"}]:[]),
+    {art:"tile-chat",ic:"chat",t:"Chat",s:ub?`<b>${ub}</b> unread`:live?live+" live "+(live===1?"ally":"allies"):"Needs a live ally",fn:"gdAllyPick('chat')"},
+    {art:"tile-duel",ic:"target",t:"Duel",s:D?(D.pending?"Waiting for them":left+"d left"):"7-night bounty",fn:"gdAllyPick('duel')"},
+    {art:"tile-raid",ic:"flag",t:"Raid",s:r?`<b>${Math.round(rp.pct)}%</b> · ${esc(r.boss)}`:"Team up on a boss",fn:"openRaid()"},
+    {art:"tile-leaderboard",ic:"trophy",t:"Leaderboard",s:boardN>1?`<b>#${myRank}</b> of ${boardN}`:"Just you so far",fn:"openLeaderboard()"},
+    {art:"tile-split-share",ic:"share",t:"Splits",s:"Share · import",fn:"openJusticeLeague()"}]);
+}
+function gdAllyPick(kind){
+  const d=state.data,live=(d.allies||[]).map((a,i)=>({a,i})).filter(x=>x.a&&x.a._uid);
+  if(kind==="duel"&&d.duel){gdJump(".al-duel");return;}   // one bounty at a time: show the one that is running
+  if(!live.length){toast("Add a live ally first.");openAllyInvite();return;}
+  if(live.length===1){(kind==="chat"?openChat:openDuel)(live[0].i);return;}
+  const fn=kind==="chat"?"openChat":"openDuel";
+  openSheet(`<div class="gh al-sh"><div class="st-h"><h2>${kind==="chat"?"Chat with":"Duel"}</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <section class="s2 gh-list">${live.map(({a,i})=>`<div class="gh-row" onclick="${fn}(${i})" role="button" tabindex="0"><span class="al-av">${alInitial(a.n)}${alOnPatrol(a)?'<i class="pd"></i>':""}</span><div class="main"><div class="gh-t1">${esc(a.n)}</div><div class="gh-t2">${alOnPatrol(a)?"On patrol":esc(a.rk||"Live ally")}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`);
 }
 function openAllySheet(i){
   const a=(state.data.allies||[])[i];if(!a)return;
@@ -10265,7 +10329,7 @@ function renderAlfred(){
     <h2 class="af-title">${hi}${nm?", "+esc(nm):""}.</h2>
     <p class="af-sub">Ask about your training, your numbers or the app.</p>
     <button class="af-ask" onclick="openAlfredChat()" aria-label="Ask Alfred"><span>Ask Alfred…</span><i><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></i></button></section>`;
-  const key=has?"":`<div class="s1 gh-x af-key gh-c" style="--i:1" onclick="openSettings('alfred')" role="button" tabindex="0"><span class="lead">${GP.icon("bolt")}</span><div class="main"><div class="gh-t1">Unlock live coaching</div><div class="gh-t2">Add a free Gemini key · takes 30 seconds</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+  const key=has?"":`<div class="s1 gh-row af-key gh-c" style="--i:1" onclick="openSettings('alfred')" role="button" tabindex="0"><span class="lead">${GP.icon("bolt")}</span><div class="main"><div class="gh-t1">Unlock live coaching</div><div class="gh-t2">Add a free Gemini key · takes 30 seconds</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
   const sug=`<section class="s2 gh-list af-sug gh-c" style="--i:2"><div class="gh-lh"><h3>Try asking</h3></div>${qs.map(q=>`<div class="gh-row af-q" role="button" tabindex="0" data-q="${esc(q)}" onclick="alfPageAsk(this.dataset.q)"><span class="lead">${GP.icon("chat")}</span><div class="main"><div class="gh-t1">${esc(q)}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section>`;
   const conv=last?`<section class="s2 af-last gh-c" style="--i:3" onclick="openAlfredChat()" role="button" tabindex="0"><div class="gh-lh"><h3>Last conversation</h3><span class="gh-more">Continue</span></div>${last.q?`<p class="af-lq"><b>You</b><span>${esc(last.q)}</span></p>`:""}<p class="af-la"><b>Alfred</b><span>${esc(last.a)}</span></p></section>`:"";
   const dos=`<section class="s2 af-dos gh-c" style="--i:5"><div class="gh-lh"><h3>Muscle dossiers</h3></div><div class="af-chips">${M12.map(m=>`<button class="chip" onclick="muscleDrill('${m}')">${MNAME[m]}</button>`).join("")}</div></section>`;
@@ -10396,14 +10460,6 @@ function rollUp(el,to,o={}){
   const t0=performance.now();el.textContent=fmt(from);
   const step=t=>{const p=Math.min(1,(t-t0)/ms);el.textContent=fmt(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1&&el.isConnected)requestAnimationFrame(step);else el.textContent=fmt(to);};
   requestAnimationFrame(step);
-}
-/* first view of the day (or a changed value) counts up; revisiting the tab with the same numbers leaves them alone */
-function ghRoll(){
-  const day=new Date().toDateString(),st=state._ghRoll=state._ghRoll&&state._ghRoll.day===day?state._ghRoll:{day,v:{}};
-  document.querySelectorAll("#app [data-roll]").forEach(el=>{
-    const to=+el.dataset.roll,k=el.dataset.k,had=st.v[k];st.v[k]=to;
-    if(had!==to)rollUp(el,to,{dec:+el.dataset.dec||0,from:had==null?0:had});
-  });
 }
 /* live session on Home: elapsed time and rest countdown tick while the hero is on screen, then the timer retires itself */
 function ghTick(){
@@ -10715,7 +10771,7 @@ function renderGotham(){
   const cur=currentPlanDay(),day=cur&&cur.day,rest=!!(day&&isRest(day)),vol=ghVol(day&&!rest?day:null);
   const hero=state.session?ghHeroLive(state.session):!cur?ghHeroFree(vol):rest?ghHeroRest(cur,vol):ghHeroTonight(cur,vol);
   $("app").innerHTML=`<div class="gh${state._same?"":" gh-anim"}">${hero}${ghWeek(vol)}${ghSunday(vol)}${ghLifts()}${ghRecap()}${ghNext(cur)}${ghExtrasRow()}</div>`;
-  ghRoll();ghTick();
+  ghTick();
 }
 
 /* ========================= SETTINGS (GP:TABS, wave 5) ========================= */
@@ -11145,8 +11201,64 @@ function calmGlow(n){
     const f=st.filter;if(f&&/drop-shadow/.test(f)){const g=f.replace(/drop-shadow\((?:[^()]|\([^()]*\))*\)/g,m=>_isGlow(m.slice(12,-1))?"":m).trim();if(g!==f)st.filter=g||"none";}
   });
 }
-new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);}))).observe(document.body,{childList:true,subtree:true});
-hxScan(document.body);iconize(document.body);calmGlow(document.body);
+/* ===== GP:CHARM (wave 6) · the charm layer: first-view light sweep · section icons · live numbers · tab-switch hero ===== */
+const GP_FIRST_MS=800,GP_SEEN=new Map();
+const gpReduced=()=>!!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches);
+/* a view is "first" the first time it shows in this session, and for 0.8 s after (a quick second render keeps the moment alive instead of killing it) */
+function gpFirst(vk){const t=performance.now(),s=GP_SEEN.get(vk);if(s==null){GP_SEEN.set(vk,t);return true;}return t-s<GP_FIRST_MS;}
+/* one gold glint across the hero (title and top edge), once per tab per session. The <i> removes itself; transform/opacity only; never takes a tap. */
+function gpSweep(root){
+  const h=root.querySelector(".s3");if(!h||gpReduced())return;
+  const i=document.createElement("i");i.className="gp-sw";i.setAttribute("aria-hidden","true");
+  i.addEventListener("animationend",()=>i.remove());h.appendChild(i);
+}
+/* live numbers · ONE helper for the whole app. The first time a view shows in a session its rings and bars draw in (css .gp-first) and its key numbers count up (<= 600 ms);
+   afterwards a number only moves when its value changed. Never replays on an in-place re-render. Any other number can opt in with data-roll. */
+const GP_NUM=".gh-mt-t .num,.mc-v .num,.gm-nums .num,.p3-g4 .num,.p3-vol .num,[data-roll]",GP_ROLL_MS=560,GP_VAL=new Map();
+function gpLive(root,first,vk){
+  root.classList.toggle("gp-first",first);
+  root.querySelectorAll(GP_NUM).forEach((el,i)=>{
+    const tn=el.firstChild,m=tn&&tn.nodeType===3&&/^(\d+)(?:\.(\d+))?$/.exec(tn.nodeValue.trim());if(!m)return;
+    const to=+tn.nodeValue,key=vk+"#"+i,had=GP_VAL.get(key);GP_VAL.set(key,to);
+    if(first||(had!=null&&had!==to))rollUp(tn,to,{ms:GP_ROLL_MS,dec:(m[2]||"").length,from:first||had==null?0:had});
+  });
+}
+/* runs at the end of render() (and renderSummary): works out "first" for this view, then hands the root to each charm helper; once per freshly rendered root */
+function gpEnter(){
+  const app=$("app"),root=app&&app.querySelector(":scope>.gh");if(!root||root.dataset.gp)return;
+  root.dataset.gp="1";
+  if(state._noEnter)root.classList.remove("gh-anim");   // a tab switch by View Transition: the transition does the rising, the cards must not stagger on top of it
+  const R=state.lastResult,vk=state.step==="summary"&&R?"sum"+(state.sumCard||0)+":"+((R.wk&&R.wk.date)||""):state._vk||"",first=gpFirst(vk);
+  gpLive(root,first,vk);
+  if(first&&vk.startsWith("tab:"))gpSweep(root);
+}
+/* tab switch: the hero joins the View Transition as its own group, named only for the length of the transition and only while it is on screen (go() calls this) */
+function gpVtTag(on){
+  const h=document.querySelector("#app>.gh .s3");if(!h)return;
+  if(on&&h.getBoundingClientRect().bottom<60)return;   // scrolled away: nothing to morph
+  h.style.viewTransitionName=on?"gp-hero":"";
+}
+/* every section header = one line icon + one area accent, the same everywhere: records gold · volume green · recovery blue · plan amber · the rest steel.
+   Matched on the title's own words (first hit wins), so a new section picks its icon up by name. [pattern, GP.icon name, area] */
+const GP_SEC=[
+  [/stall|plateau/i,"plateau","rec"],[/record|mastery|standard|belt|\bpr\b/i,"trophy","rec"],[/strength|e1rm|target|progress/i,"up","rec"],[/\blifts?\b|exercise/i,"dumbbell","rec"],
+  [/sleep/i,"moon","rcv"],[/hydrat/i,"drop","rcv"],[/infirm|injur/i,"cross","rcv"],[/recover|sore|readiness|fatigue/i,"pulse","rcv"],
+  [/effort|rpe|rir|intensity/i,"bolt","vol"],[/dossier/i,"scan","n"],[/muscle|coverage|sets|volume|forecast|landmark/i,"chart","vol"],[/frequen/i,"calendar","vol"],
+  [/calendar|cycle|days?\b|schedule|next up|week|patrol/i,"calendar","pln"],[/plan|split|\blab\b|generator|import/i,"map","pln"],[/fuel|intake|stack|nutrition|macro/i,"flask","pln"],
+  [/body|weight/i,"scale","n"],[/league|duel|ally|allies|invite/i,"allies","n"],[/try asking|suggest/i,"bulb","n"],[/alfred|conversation/i,"chat","n"],[/tool/i,"wrench","n"],[/history|session|archive|log\b/i,"book","n"],[/cue|form|tip/i,"bulb","n"]
+];
+const GP_SEC_SEL=".gh-lh h3,.gh-sec h2,.p3-ch2 h3";
+function gpSec(n){
+  if(n.nodeType!==1)return;
+  const hs=n.matches(GP_SEC_SEL)?[n]:[];n.querySelectorAll(GP_SEC_SEL).forEach(e=>hs.push(e));
+  hs.forEach(el=>{
+    if(el.dataset.ac||el.querySelector(".gi,.gp-ic"))return;
+    const own=[...el.childNodes].filter(c=>c.nodeType===3).map(c=>c.nodeValue).join(" "),hit=GP_SEC.find(r=>r[0].test(own))||[0,"note","n"];
+    el.dataset.ac=hit[2];el.insertAdjacentHTML("afterbegin",`<span class="gp-ic" aria-hidden="true">${GP.icon(hit[1])}</span>`);
+  });
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);gpSec(n);}))).observe(document.body,{childList:true,subtree:true});
+hxScan(document.body);iconize(document.body);calmGlow(document.body);gpSec(document.body);
 document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 /* ===== GP:LOGGING (wave 2) — the live workout screen: header strip · focus card · set grid · up next ===== */
 const LG_RX={iso:{lo:60,hi:90,tgt:75},cmp:{lo:120,hi:180,tgt:150},low:{lo:150,hi:180,tgt:180}};
