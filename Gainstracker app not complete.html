@@ -4074,7 +4074,7 @@ function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Different
 /* ========================= LOGGING INTERACTIONS ========================= */
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;saveSessionSoon();} // no render (Rule 1 spirit); debounced backup
 function setSessionNotes(v){if(state.session)state.session.notes=v;} // no render — keep textarea focus
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){state.session._tick=ei+":"+si;haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();state.session._tick=null;saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){state.session._tick=ei+":"+si;haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")prfSay(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();state.session._tick=null;saveSession();}
 // Real-time PR check: the moment a working set is completed and beats your record, it is flagged in its row.
 function liveCheckPR(ei,si){
   const exObj=state.session.exercises[ei];const s=exObj.sets[si];
@@ -9718,7 +9718,7 @@ function alfMic(){
 }
 function _alfSpeak(t){
   try{
-    if(!window.speechSynthesis)return;
+    if(!window.speechSynthesis||prfBusy())return;
     let s=String(t||"").replace(/\*\*/g,"").replace(/\n+/g,". ");
     if(s.length>320){const c=s.lastIndexOf(". ",320);s=s.slice(0,c>80?c+1:320);}
     window.speechSynthesis.cancel();
@@ -10351,7 +10351,7 @@ function _alfredVoiceClip(text){
 /* Auto-coaching voice — fires after a logged set. Cancels any in-flight line, never toggles. Silent if disabled/unsupported. */
 function alfredVoiceLine(text){
   try{
-    if(!state.data.u.coachVoice)return;
+    if(!state.data.u.coachVoice||prfBusy())return;   // never over a record clip
     if(!("speechSynthesis" in window))return;
     const synth=window.speechSynthesis;synth.cancel();
     synth.speak(_alfredUtter(_alfredVoiceClip(text),1.12,0.97)); // quick, punchy delivery — not a monologue between sets
@@ -11774,7 +11774,7 @@ function maybeShowRankUp(){
     const q=RANK_QUOTES[ri%RANK_QUOTES.length];
     // Ceremony 2.0: bat-slam stinger → Alfred speaks → full case-file → rank accent bleeds into the app
     setTimeout(()=>{try{playStinger(curRank[2]+" RANK UP",String(curRank[1]).toUpperCase(),"#FFD048");}catch(e){}},400);
-    try{if(state.data.u.coachVoice&&window.speechSynthesis){window.speechSynthesis.cancel();window.speechSynthesis.speak(_alfredUtter("Rank up, sir. "+q,0.92,0.95));}}catch(e){}
+    try{if(state.data.u.coachVoice&&window.speechSynthesis&&!prfBusy()){window.speechSynthesis.cancel();window.speechSynthesis.speak(_alfredUtter("Rank up, sir. "+q,0.92,0.95));}}catch(e){}
     setTimeout(()=>{try{haptic("pr");cinePush({eye:"RANK UP · GOTHAM IRON PROTOCOL",icon:curRank[2],accent:"var(--gold2)",title:`${curRank[2]} ${curRank[1]}`,titleHtml:`<span style="color:var(--gold2);font-size:1.12em">${curRank[2]} ${esc(curRank[1])}</span>`,bodyHtml:`<div style="font-size:15px;line-height:1.6;color:var(--text);margin-bottom:8px">"${esc(q)}"</div><div class="mini" style="color:var(--gold2)">Strength Level ${sl} · Rank ${ri+1}/${RANKS.length}</div>`,btn:"THE ASCENT CONTINUES"});}catch(e){}},2100);
     applyRankAccent();
   }catch(e){}
@@ -12004,8 +12004,14 @@ function lgPrMoment(ei,si){state._lgPrFresh=ei+":"+si;try{sfx("pop");}catch(e){}
 const PRF_CLIPS=[["joker",1.4],["bane",1.3],["two-face",1.3],["penguin",1.3],["scarecrow",1.4]];   // [id, impact seconds] from assets/pr/README.md
 const PRF_WAIT_MS=400,PRF_LEAD_S=.3,PRF_STAMP_S=1,PRF_HOLD_MS=800,PRF_STILL_MS=1200,PRF_GRACE_MS=250,PRF_START_MS=1600,PRF_GUARD_MS=2500;
 const prfBlank=()=>({i:-1,still:false,b:null,p:null});
-let _prf=prfBlank(),_prfOpen=false;   // the clip being held ({i: rotation index, b: Blob, p: its promise}); an overlay is up
+let _prf=prfBlank(),_prfOpen=false,_prfWait=null;   // the clip being held ({i: rotation index, b: Blob, p: its promise}); an overlay is up
 const prfIdx=()=>((state.data.prFin&&state.data.prFin.i)|0)%PRF_CLIPS.length;
+const prfBusy=()=>_prfOpen||!!document.getElementById("prfin");   // a record clip is up (or fading out): Alfred stays silent
+function prfSay(line){   // Alfred's spoken record line. The clip owns the moment, so he speaks only when no clip plays: none ready, offline, no standing record
+  if(prfBusy())return;
+  if(_prfWait){_prfWait.then(shown=>{if(!shown)alfredVoiceLine(line);});return;}   // a clip may start within PRF_WAIT_MS: decide when it has
+  alfredVoiceLine(line);
+}
 async function prfGet(url,type){
   let r=null;
   try{r=await caches.match(url,{ignoreVary:true});}catch(e){}   // the service worker kept it from an earlier boot: no network at all
@@ -12027,7 +12033,7 @@ function prfStart(key){   // called inside the ✓ tap by lgPrMoment
     if(!f||f.k!==key||_prfOpen)return;                  // e1RM over a standing record only; one finisher at a time
     const me=_prf;if(me.i!==prfIdx())return;            // nothing fetched for this turn (offline, not warmed yet): the in-row crown is the whole moment
     if(me.b){prfShow(me,f);return;}                     // ready: start inside this very tap, so the clip may play with sound
-    if(me.p)Promise.race([me.p,new Promise(r=>setTimeout(r,PRF_WAIT_MS))]).then(r=>{if(r&&!_prfOpen&&state.session&&state.step==="logging")prfShow(r,f);}).catch(()=>{});
+    if(me.p)_prfWait=Promise.race([me.p,new Promise(r=>setTimeout(r,PRF_WAIT_MS))]).then(r=>{_prfWait=null;if(r&&!_prfOpen&&state.session&&state.step==="logging"){prfShow(r,f);return true;}return false;}).catch(()=>{_prfWait=null;return false;});
   }catch(e){}
 }
 function prfHtml(f,dt,url,still){
@@ -12037,7 +12043,8 @@ function prfHtml(f,dt,url,still){
 }
 function prfShow(me,f){
   const ses=state.session,id=PRF_CLIPS[me.i][0],at=PRF_CLIPS[me.i][1],short=(ses._finN|0)>0,t0=performance.now();
-  _prfOpen=true;_prf=prfBlank();ses._finN=(ses._finN|0)+1;state.data.prFin={i:(me.i+1)%PRF_CLIPS.length};   // advance now: a skip, an error or a kill never replays this clip next
+  _prfOpen=true;_prf=prfBlank();try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}   // Alfred stops mid-word: the clip is the whole moment
+  ses._finN=(ses._finN|0)+1;state.data.prFin={i:(me.i+1)%PRF_CLIPS.length};   // advance now: a skip, an error or a kill never replays this clip next
   const url=URL.createObjectURL(me.b),d=f.val-f.prev,dt=d>=1?Math.round(d):(Math.round(d*10)/10||.1);
   const el=document.createElement("div");el.id="prfin";el.dataset.clip=id;if(short)el.dataset.short="1";
   el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","New record, "+f.name+". Tap to skip.");

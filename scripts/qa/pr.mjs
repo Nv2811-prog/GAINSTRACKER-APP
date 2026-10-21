@@ -32,6 +32,10 @@ async function waitFor(P, fn, { timeout = 8000, step = 60 } = {}, ...args) {
   }
 }
 const INSTALL = () => {
+  // Alfred's voice is spied on (the harness already makes speech a silent no-op): every utterance he is asked to speak, and every cancel.
+  window.__say = []; window.__cancel = 0;
+  try { speechSynthesis.speak = (u) => { window.__say.push({ t: u && u.text, open: !!document.getElementById('prfin') }); }; const oc = speechSynthesis.cancel.bind(speechSynthesis); speechSynthesis.cancel = () => { window.__cancel++; return oc(); }; } catch (e) {}
+  try { state.data.u.coachVoice = true; } catch (e) {}
   window.__probe = () => {
     const el = document.getElementById('prfin'); if (!el) return null;
     const v = el.querySelector('video'), r = el.getBoundingClientRect();
@@ -113,11 +117,15 @@ try {
   const before = await P.evaluate(() => __snap());
 
   // record 1: a real tap, full cut
+  await P.evaluate(() => { window.__say.length = 0; window.__cancel = 0; alfredVoiceLine('A line Alfred is still speaking when the clip starts'); });   // one in-flight line the finisher must cancel
   const t1 = Date.now();
   const hit = await tapSdone(P, L.ei, L.work[0]);
   check('realTapOnSwitch', hit === 'own-hx' || hit === 'host', hit);
   const o1 = await waitFor(P, playing, { timeout: 3000, step: 30 });
   check('overlayPlays', !!o1, o1);
+  const v1 = await P.evaluate(() => { const n0 = window.__say.length; try { alfredVoiceLine('queued while the clip plays'); _alfSpeak('a chat reply while the clip plays'); } catch (e) {} return { say: window.__say.map((x) => x.t), cancels: window.__cancel, added: window.__say.length - n0 }; });
+  check('A_voice_inFlightLineCancelledWhenClipStarts', v1.cancels >= 1, v1.cancels);
+  check('A_voice_silentWhileClipPlays', v1.say.length === 1 && v1.added === 0, v1);
   if (o1) {
     check('blobVideo', o1.video.src === 'blob:', o1.video.src);
     check('aboveEverything', o1.full && o1.top && +o1.z >= 10000, { full: o1.full, top: o1.top, z: o1.z });
@@ -148,6 +156,7 @@ try {
   const dur1 = (Date.now() - t1) / 1000;
   const ended1 = await P.evaluate(() => (window.__pf ? window.__pf.ended : null));
   check('closesItself', !!closed1 && dur1 > 6 && dur1 < 9.5 && ended1 === true, { seconds: dur1, ended: ended1 });
+  check('A_voice_recordLineNeverSpokenOverClip', (await P.evaluate(() => window.__say.length)) === 1);
   await sleep(300);
   const after1 = await P.evaluate(() => __snap());
   await shot(P, '1-after-crown');
@@ -248,6 +257,7 @@ try {
   let sb = await B.evaluate(() => __snap());
   await shot(B, 'offline-crown');
   check('B_offlineNoOverlayCrownShown', !sawOverlay && sb.crowns >= 1 && sb.sets[LB.ei][LB.work[0]][2] === true, { sawOverlay, crowns: sb.crowns });
+  check('B_voice_shortRecordLineStillSpokenWithoutClip', (await B.evaluate(() => window.__say.length)) === 1, await B.evaluate(() => window.__say.map((x) => x.t)));
   check('B_rotationNotAdvanced', await B.evaluate(() => !state.data.prFin && !state.session._finN));
   await B.evaluate(() => { window.__prfMode = 'slow'; prfWarm(); });
   check('B_slowIsLoading', await B.evaluate(() => _prf.i === 0 && _prf.b === null && !!_prf.p));
@@ -257,12 +267,14 @@ try {
   for (let k = 0; k < 10; k++) { await sleep(100); if (await B.evaluate(() => !!document.getElementById('prfin'))) sawOverlay = true; }
   sb = await B.evaluate(() => __snap());
   check('B_slowSkipsFinisherKeepsCrown', !sawOverlay && sb.crowns >= 2 && sb.sets[LB.ei][LB.work[1]][2] === true, { sawOverlay, crowns: sb.crowns });
+  check('B_voice_slowMissSpeaksAfterTheWait', (await B.evaluate(() => window.__say.length)) === 2, await B.evaluate(() => window.__say.map((x) => x.t)));
   const rdy = await waitFor(B, () => _prf.b && _prf.i === 0, { timeout: 5000 });
   check('B_readyAfterWaiting', !!rdy);
   await arm(B, LB.ei, LB.work[2], 1.14);
   await tapSdone(B, LB.ei, LB.work[2]);
   const ob = await waitFor(B, playing, { timeout: 3000, step: 30 });
   check('B_nextRecordPlaysJokerFullCut', !!ob && ob.clip === 'joker' && !ob.short && ob.video.t < 1.0, ob);
+  check('B_voice_silentWhenTheClipPlays', (await B.evaluate(() => window.__say.length)) === 2);
   await sleep(600); await tapMiddle(B); await waitFor(B, gone, { timeout: 1500, step: 30 });
   check('B_noConsoleErrors', cb.log.errors.length === 0, cb.log.errors.slice(0, 3));
   await cb.close();
