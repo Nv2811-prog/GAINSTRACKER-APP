@@ -49,6 +49,7 @@ const res = await ctx.page.evaluate(async (START, REF_NOW, DAY) => {
   }
   // bodyweight trend + a couple of extras the home screen reads
   d.bwLog = Array.from({ length: 8 }, (_, i) => ({ date: new Date(START + i * 7 * DAY).toISOString(), kg: +(84.6 - i * 0.25).toFixed(1) }));
+  d.u.bodyweight = d.bwLog[d.bwLog.length - 1].kg;   // one number everywhere: the profile weight is the latest weigh-in
   __qaSetNow(REF_NOW);
   try { d._nextDay = computeNextDay(sp); } catch (e) {}
   save(); await wait(300); __qa.clear();
