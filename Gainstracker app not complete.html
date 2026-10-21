@@ -1202,8 +1202,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 @keyframes ghRing{from{stroke-dasharray:0 999}}
 @keyframes ghFill{from{clip-path:inset(0 100% 0 0)}}
 .gh-anim .gh-c{animation:ghIn .3s var(--ease-out) both;animation-delay:calc(var(--i,0)*40ms)}
-.gh-anim .ring-v{animation:ghRing .7s var(--ease-out) both}
-.gh-anim .lmk .fill{animation:ghFill .5s var(--ease-out) both;animation-delay:calc(var(--k,0)*30ms)}
+.gp-first .ring-v{animation:ghRing .6s var(--ease-out) both}   /* rings and bars draw in the first time a view shows in a session (gpLive() adds .gp-first), never on a repeat visit or an in-place re-render */
+.gp-first .lmk .fill,.gp-first .p3-rank .bar i{animation:ghFill .36s var(--ease-out) both;animation-delay:calc(var(--k,0)*20ms)}
 .toast .tundo{min-height:28px;height:28px;margin-left:12px;padding:0 10px;color:var(--gold-ink)}
 .gh-ring.empty .ring-v{display:none}
 
@@ -5126,7 +5126,7 @@ function p3SumSession(R){
   return `${p3SumHead(R,"Session complete")}
   <section class="s3 p3-hero gh-c" style="--i:1">${gaArt("finish","sum")}
     <div class="p3-vh"><span class="eyebrow">Volume</span>${dTag}</div>
-    <div class="p3-vol"><span class="num" id="p3vol">${v.v}</span><span class="u">${v.u}</span></div>
+    <div class="p3-vol"><span class="num">${v.v}</span><span class="u">${v.u}</span></div>
     <div class="p3-g4">${stats.map(a=>`<div><span class="num">${a[0]}</span><span class="eyebrow">${a[1]}</span></div>`).join("")}</div>
     ${lgRestSummary(wk)}
   </section>
@@ -5186,7 +5186,7 @@ function renderSummary(){
   $("app").innerHTML=`<div class="gh p3-sum gh-anim">${[p3SumSession,p3SumMuscles,p3SumNext][k](R)}
     <div class="p3-nav"><div class="dots">${[0,1,2].map(i=>`<i class="${i===k?"on":""}"></i>`).join("")}</div>
     <div class="p3-btns">${k?`<button class="btn" data-hx onclick="sumNav(-1)">Back</button>`:""}<button class="btn btn-1" data-hx onclick="${last?"closeSummary()":"sumNav(1)"}">${last?"Done":"Next"}</button></div></div></div>`;
-  if(k===0){const v=$("p3vol");if(v){const t=p3Vol(R.totalVol);rollUp(v,t.n,{ms:650,dec:t.dec});}}
+  gpEnter();   // GP:CHARM live numbers: the first view of each slide counts up and draws in (sumNav calls renderSummary directly, not render)
   if(k===2){setTimeout(()=>{try{renderShareCard(R);}catch(e){}},120);try{populateAlfredRead(R);}catch(e){}}
   // swipe — handlers live on #app and are cleared at the top of render() when we leave summary
   const app=$("app");let sx=0;
@@ -10433,14 +10433,6 @@ function rollUp(el,to,o={}){
   const step=t=>{const p=Math.min(1,(t-t0)/ms);el.textContent=fmt(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1&&el.isConnected)requestAnimationFrame(step);else el.textContent=fmt(to);};
   requestAnimationFrame(step);
 }
-/* first view of the day (or a changed value) counts up; revisiting the tab with the same numbers leaves them alone */
-function ghRoll(){
-  const day=new Date().toDateString(),st=state._ghRoll=state._ghRoll&&state._ghRoll.day===day?state._ghRoll:{day,v:{}};
-  document.querySelectorAll("#app [data-roll]").forEach(el=>{
-    const to=+el.dataset.roll,k=el.dataset.k,had=st.v[k];st.v[k]=to;
-    if(had!==to)rollUp(el,to,{dec:+el.dataset.dec||0,from:had==null?0:had});
-  });
-}
 /* live session on Home: elapsed time and rest countdown tick while the hero is on screen, then the timer retires itself */
 function ghTick(){
   clearInterval(state._ghTick);
@@ -10751,7 +10743,7 @@ function renderGotham(){
   const cur=currentPlanDay(),day=cur&&cur.day,rest=!!(day&&isRest(day)),vol=ghVol(day&&!rest?day:null);
   const hero=state.session?ghHeroLive(state.session):!cur?ghHeroFree(vol):rest?ghHeroRest(cur,vol):ghHeroTonight(cur,vol);
   $("app").innerHTML=`<div class="gh${state._same?"":" gh-anim"}">${hero}${ghWeek(vol)}${ghSunday(vol)}${ghLifts()}${ghRecap()}${ghNext(cur)}${ghExtrasRow()}</div>`;
-  ghRoll();ghTick();
+  ghTick();
 }
 
 /* ========================= SETTINGS (GP:TABS, wave 5) ========================= */
@@ -11192,10 +11184,23 @@ function gpSweep(root){
   const i=document.createElement("i");i.className="gp-sw";i.setAttribute("aria-hidden","true");
   i.addEventListener("animationend",()=>i.remove());h.appendChild(i);
 }
-/* runs at the end of every render(): works out "first", then hands the root to each charm helper */
+/* live numbers · ONE helper for the whole app. The first time a view shows in a session its rings and bars draw in (css .gp-first) and its key numbers count up (<= 600 ms);
+   afterwards a number only moves when its value changed. Never replays on an in-place re-render. Any other number can opt in with data-roll. */
+const GP_NUM=".gh-mt-t .num,.mc-v .num,.gm-nums .num,.p3-g4 .num,.p3-vol .num,[data-roll]",GP_ROLL_MS=560,GP_VAL=new Map();
+function gpLive(root,first,vk){
+  root.classList.toggle("gp-first",first);
+  root.querySelectorAll(GP_NUM).forEach((el,i)=>{
+    const tn=el.firstChild,m=tn&&tn.nodeType===3&&/^(\d+)(?:\.(\d+))?$/.exec(tn.nodeValue.trim());if(!m)return;
+    const to=+tn.nodeValue,key=vk+"#"+i,had=GP_VAL.get(key);GP_VAL.set(key,to);
+    if(first||(had!=null&&had!==to))rollUp(tn,to,{ms:GP_ROLL_MS,dec:(m[2]||"").length,from:first||had==null?0:had});
+  });
+}
+/* runs at the end of render() (and renderSummary): works out "first" for this view, then hands the root to each charm helper; once per freshly rendered root */
 function gpEnter(){
-  const app=$("app"),root=app&&app.querySelector(":scope>.gh");if(!root)return;
-  const vk=state._vk||"",first=gpFirst(vk);
+  const app=$("app"),root=app&&app.querySelector(":scope>.gh");if(!root||root.dataset.gp)return;
+  root.dataset.gp="1";
+  const R=state.lastResult,vk=state.step==="summary"&&R?"sum"+(state.sumCard||0)+":"+((R.wk&&R.wk.date)||""):state._vk||"",first=gpFirst(vk);
+  gpLive(root,first,vk);
   if(first&&vk.startsWith("tab:"))gpSweep(root);
 }
 /* every section header = one line icon + one area accent, the same everywhere: records gold · volume green · recovery blue · plan amber · the rest steel.
