@@ -246,6 +246,7 @@ try {
   let sawOverlay = false;
   for (let k = 0; k < 12; k++) { await sleep(100); if (await B.evaluate(() => !!document.getElementById('prfin'))) sawOverlay = true; }
   let sb = await B.evaluate(() => __snap());
+  await shot(B, 'offline-crown');
   check('B_offlineNoOverlayCrownShown', !sawOverlay && sb.crowns >= 1 && sb.sets[LB.ei][LB.work[0]][2] === true, { sawOverlay, crowns: sb.crowns });
   check('B_rotationNotAdvanced', await B.evaluate(() => !state.data.prFin && !state.session._finN));
   await B.evaluate(() => { window.__prfMode = 'slow'; prfWarm(); });
