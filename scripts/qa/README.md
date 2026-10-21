@@ -11,6 +11,7 @@ in headless Google Chrome at iPhone size (393x852 @2x), with realistic seeded da
     node scripts/qa/smoke.mjs                          # real taps through the haptic switches: nav, set ✓, RESUME, finish, Alfred chat
     node scripts/qa/flow.mjs [--width 375|393] [--out dir]  # the whole loop with real touch taps: 5 tabs, start, one-tap ghost ticks, PR row, finish, summary slides, session RPE, Done > Home, Profile "Records" header on one row, Alfred chat (screenshots to --out)
     node scripts/qa/perf.mjs [--throttle 4] [--width 393]   # budget per screen: size, DOM nodes, render() ms, infinite animations (<= 1), backdrop-filter (<= 3), first paint
+    node scripts/qa/charm.mjs                          # GP:CHARM (wave 6) pass/fail: light sweep once per tab per session, count-ups + ring draw-ins on the first view only (never on revisit / re-render), section-header icons, hero View Transition <= 220 ms, scroll-driven hero art, art behind the sheets, reduced motion stays quiet
     node scripts/qa/home.mjs [--tab] / tab.mjs --tab mission|suit [--fixture train|rest|none] [--width 375]  # tap every control on one tab, report console errors
     node scripts/migrations-check (see scripts/test-migrations.cjs)
     node scripts/qa/onboarding.mjs [--out dir]         # new-user flow: welcome > you > goal > experience > Home, guards, persistence, Settings edit mode
