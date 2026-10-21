@@ -212,6 +212,7 @@ Checked per screen by `node scripts/qa/perf.mjs [--throttle 4]` (4x CPU throttle
 | `GP:WEEKLY+BODY (wave 7)` ... `/GP:WEEKLY+BODY` | `.wk-*` one-tap adjust buttons and `.bd-*` the Profile Body section |
 | `GP:PHOTOS (wave 7)` ... `/GP:PHOTOS` | `.pc-*` Suit photo card, single-photo sheet, Compare |
 | `GP:STRENGTH+SUIT (wave 8)` ... `/GP:STRENGTH+SUIT` | `.ga-suit-hero` (the Suit hero still + veil), the Strength rows' via line (`.p3-sv`, `.p3-go`) and the variations sheet (`.sv-*`) |
+**Cascade gotcha:** a rule added in an early block (the wave-7/8 blocks sit before GP:ART) loses to an equal-specificity rule further down, so a per-hero override of `.ga img` / `.ga::after` must use two classes (`.ga.ga-suit-hero img`); check it with `getComputedStyle`, not by eye (the wave-8 first draft silently lost its opacity, mask and veil overrides this way).
 The JS has matching banners (`/* ===== ... (GP:TABS, wave 5) ===== */`, `GP:CHARM`, `FEATURE DOCK (GP:DOCKS)`, `ONE-TAP WEEKLY ADJUST`, `BODY (Profile, wave 7)`, `PROGRESS PHOTOS (GP:PHOTOS)`). Scoped primitives live under `.gh` (+ `.gm` / `.p3-pf` / `.al-pg` ...) so a tab can restyle without leaking. Do not add a new wave-layer that overrides an old rule: edit the rule in place and delete what it replaced.
 
 ## 17 · Mobile rules (iPhone Safari PWA first)
@@ -234,6 +235,6 @@ optimality score (`myPatrolCard`) and the bodyweight badges (`achStats().bwRatio
   The comment above the table documents every factor and why. Factor = barbell-equivalent / logged e1RM.
 - **Conservative by construction:** a conversion may understate a lift, never flatter it, and a converted lift (factor != 1) is capped at the Elite tier x bodyweight (shown as "capped at Elite"); a real barbell lift is never capped.
   Leg press x0.50 (45°, horizontal, plate-loaded, lying squat machine), hack / V-squat / belt squat x0.85, pendulum x0.75, Smith x0.90, front squat x1.15; machine presses and rows x0.85, incline x1.12, floor press x0.95;
-  RDL / stiff-leg x1.10, rack pull x0.80, trap bar x0.95, hip-hinge machines x0.85; push press x0.80.
+  RDL / stiff-leg x1.10, rack pull x0.80, trap bar x0.92, hip-hinge machines x0.85; push press x0.80. Every factor is documented, with its reason, in the comment above `SV`.
 - **UI:** a Strength row is a `role=button` that says `est. · via <exercise> · <raw> kg × <factor>` and opens `openStrengthLift(lift)` (strongest first, then the rest with their conversion). That sheet is the only place the table is visible.
   `node scripts/qa/strength.mjs` covers the ranking, the exclusions, the cap, one-number-everywhere and the sheet.

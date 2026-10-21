@@ -152,5 +152,6 @@ Same pipeline as above (`scripts/gen-image.mjs`, gemini-2.5-flash-image, about $
 
 ### Wired in (wave 8)
 
-`gsHero()` places `suit-hero.jpg` with `gaArt("suit-hero")`; the lighter veil lives in `.ga-suit-hero` (GP:STRENGTH+SUIT) and the scroll parallax and first-view sweep come from GP:CHARM like every other hero.
+`gsHero()` places `suit-hero.jpg` with `gaArt("suit-hero")`; the lighter veil lives in `.ga.ga-suit-hero` (GP:STRENGTH+SUIT) and the scroll parallax and first-view sweep come from GP:CHARM like every other hero.
+The rule needs TWO classes: the wave-8 CSS block sits before GP:ART in the source, so a one-class `.ga-suit-hero img` loses to the later `.ga img` (opacity .8 and the left mask) and `.ga::after` (the standard veil). It also lifts the still (`brightness(1.3) saturate(1.2) contrast(1.05)`, which the low-key art needs to read as bright as the other heroes) and gives the status line a dark text halo, because the gold shaft and a glass edge cross it (amber text: 5.5+ contrast on the average background, about 2.5 on the thin glass highlights).
 `gsDock()` uses `tile-fuel` for the Fuel tile. `suit.jpg` stays only because the Profile Body dock tile crops it.

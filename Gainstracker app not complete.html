@@ -1045,9 +1045,11 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh .sv-eq.is-top .num{color:var(--gold-ink)}
 .sv-eq small{font:600 12px/1 var(--body);color:var(--tx2)}
 .sv-note{margin:10px 2px 0}
-/* Suit hero: the vault still (assets/art/suit-hero.jpg). It is low-key by design, so it gets the lighter veil from assets/art/README.md (the standard left feather would swallow the glass case); the recovery figure and its legend sit on top, the legend on the floor fade. */
-.ga-suit-hero img{opacity:1;filter:brightness(1.2);-webkit-mask-image:none;mask-image:none}
-.ga-suit-hero::after{background:linear-gradient(180deg,rgba(11,13,18,.45),rgba(11,13,18,0) 18%),linear-gradient(90deg,#0b0d12 4%,rgba(11,13,18,.45) 30%,rgba(11,13,18,0) 54%),linear-gradient(0deg,#0b0d12 0%,rgba(11,13,18,0) 28%)}
+/* Suit hero: the vault still (assets/art/suit-hero.jpg). It is low-key by design, so it gets the lighter veil from assets/art/README.md (the standard left feather would swallow the glass case) and a lift in brightness / colour; the recovery figure and its legend sit on top, the legend on the floor fade.
+   `.ga.ga-suit-hero` (two classes) on purpose: this block sits BEFORE GP:ART in the source, and a one-class `.ga-suit-hero img` loses to the later `.ga img` (opacity .8 + left mask) and `.ga::after` (standard veil). */
+.ga.ga-suit-hero img{opacity:1;filter:brightness(1.3) saturate(1.2) contrast(1.05);-webkit-mask-image:none;mask-image:none}
+.ga.ga-suit-hero::after{background:linear-gradient(180deg,rgba(11,13,18,.45),rgba(11,13,18,0) 18%),linear-gradient(90deg,#0b0d12 4%,rgba(11,13,18,.45) 30%,rgba(11,13,18,0) 54%),linear-gradient(0deg,#0b0d12 0%,rgba(11,13,18,0) 28%)}
+.gm-suit .gm-st{text-shadow:0 1px 3px rgba(5,7,12,.9),0 0 14px rgba(5,7,12,.9)}   /* the gold shaft and a glass edge cross the status line (amber text: 5.5+ contrast on the average background, 2.5 on the thin glass highlights): a dark halo behind the glyphs covers those */
 /* ===== /GP:STRENGTH+SUIT ===== */
 /* ===== GP:WEEKLY+BODY (wave 7) ===== */
 /* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
@@ -6907,7 +6909,7 @@ function p3Strength(){
   if(!rows.length)return "";
   const b3=p3BigThree(),full=t=>({"Inter.":"Intermediate","Adv.":"Advanced"})[t]||t;
   const body=rows.map(({l,s,e})=>{
-    const r=e.orm/bw,tiers=[["Novice",s.b],["Inter.",s.i],["Adv.",s.a],["Elite",s.e]],lvl=tiers.slice().reverse().find(t=>r>=t[1]),nxt=tiers.find(t=>r<t[1]),max=s.e*1.18,p=v=>clamp(v/max*100,0,100).toFixed(1)+"%";
+    const r=e.orm/bw,tiers=[["Novice",s.b],["Inter.",s.i],["Adv.",s.a],["Elite",s.e]],lvl=tiers.slice().reverse().find(t=>r>=t[1]-SV_EPS),nxt=tiers.find(t=>r<t[1]-SV_EPS),max=s.e*1.18,p=v=>clamp(v/max*100,0,100).toFixed(1)+"%";
     const via=e.est?`<div class="p3-sv"><span>est. · via</span><b>${esc(e.name)}</b><span>${e.capped?"· capped at Elite":"· "+fmtKg(Math.round(e.raw))+" kg × "+e.f.toFixed(2)}</span></div>`:"";
     return `<div class="p3-sr" role="button" tabindex="0" aria-label="${l}, ${r.toFixed(2)} times bodyweight. Show your ${SV[l].pattern} variations" onclick="openStrengthLift('${l}')"><div class="p3-srh"><b>${l}</b><span class="num">${r.toFixed(2)}</span><span class="u">× BW</span><span class="p3-go">${GP.icon("chevR")}</span></div>
       <div class="lmk p3-std" style="--v:${p(r)}"><i class="fill"></i>${tiers.map(t=>`<i class="tk" style="left:${p(t[1])}"></i>`).join("")}</div>
@@ -6920,11 +6922,13 @@ function p3Strength(){
 function openStrengthLift(l){   // the variations behind one Strength row: what was logged, the conservative factor, the barbell equivalent that counts
   const c=SV[l],s=STD[l];if(!c||!s)return;
   const bw=bodyW(),rank=svRank(l,Object.keys(state.data.prs||{}),svPR,bw),top=rank[0];
+  const nx=top&&[["Novice",s.b],["Intermediate",s.i],["Advanced",s.a],["Elite",s.e]].find(t=>top.orm/bw<t[1]-SV_EPS),   // the next tier, also in the units you train: target / factor = the e1RM on the lift itself
+    goal=nx?` Next, <b>${nx[0]}</b> at ${fmtKg(Math.ceil(nx[1]*bw))} kg${top.est?`, about ${fmtKg(Math.ceil(nx[1]*bw/top.f))} kg on the ${esc(top.name)}`:""}.`:"";
   const rows=rank.slice(0,8).map((x,i)=>`<div class="gh-row"><span class="lead${i?"":" gold"}">${GP.icon(i?"dumbbell":"trophy")}</span><div class="main"><div class="gh-t1">${esc(x.name)}</div><div class="gh-t2">${Math.round(x.raw)} kg e1RM${x.est?" × "+x.f.toFixed(2)+(x.capped?" · capped":""):" · the lift itself"}</div></div><span class="trail"><span class="sv-eq${i?"":" is-top"}"><b class="num">${Math.round(x.orm)}</b><small>kg</small></span></span></div>`).join("");
   openSheet(`<div class="gh st-pg sv-pg"><div class="st-h"><h2>${l}</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
-    <p class="t-s sv-lede">${top?`Your strongest ${c.pattern} lift, as a ${c.ref}. Today that is <b>${esc(top.name)}</b>: ${Math.round(top.orm)} kg, ${(top.orm/bw).toFixed(2)}× your ${bw} kg bodyweight.`:`Log a ${c.pattern} lift and your strongest variation counts here, as a ${c.ref}.`}</p>
+    <p class="t-s sv-lede">${top?`Your strongest ${c.pattern} lift, as a ${c.ref}. Today that is <b>${esc(top.name)}</b>: ${Math.round(top.orm)} kg, ${(top.orm/bw).toFixed(2)}× your ${bw} kg bodyweight.${goal}`:`Log a ${c.pattern} lift and your strongest variation counts here, as a ${c.ref}.`}</p>
     ${rows?`<section class="s2 gh-list">${rows}</section>`:""}
-    <p class="t-xs sv-note">Factors are conservative: a machine can understate your lift, never flatter it, and a converted lift stops at the Elite tier. Dumbbell, cable and single-leg lifts are not converted.</p></div>`);
+    <p class="t-xs sv-note">Factors are cautious: a machine is more likely to understate your lift than to flatter it, and a converted lift stops at the Elite tier. Dumbbell, cable and single-leg lifts are not converted.</p></div>`);
 }
 function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
 /* ===== BODY (Profile, wave 7) =====
@@ -8297,7 +8301,7 @@ function undoRestDay(){   // reverses today's log: drops the entry and steps the
    liftEstimateAt(lift,t,rows) (history); both go through svRank, so a number can never differ between two screens.
    - Each lift owns a table: `yes` says which names belong to the pattern, `no` drops lifts whose load is not comparable to a barbell (dumbbells are logged per hand, cable stacks have
      pulley ratios, single-leg and bodyweight work, accessories), and the FIRST matching row of `v` gives [factor, label]. factor = barbell-equivalent / logged e1RM.
-   - Every factor sits at or below the low end of the ratios lifters report, so a conversion can understate a lift but never flatter it.
+   - Every factor sits at the cautious end of the ratios lifters report, so a conversion understates a lift rather than flatters it.
    - A converted lift (factor != 1) is capped at the Elite tier x bodyweight, so a machine can never produce an absurd standard. A real barbell lift is never capped.
    Coefficients (documented once, here; the sheet and the footer only point at them):
    BENCH   smith .90 - the guided bar needs no stabilising and many Smith rigs are counterbalanced: the same lifter moves 5-15% more than on a free bar
@@ -8309,12 +8313,13 @@ function undoRestDay(){   // reverses today's log: drops the entry and steps the
            standard (0.45-0.55), the sled angle alone cuts the load by ~30%; one factor for every press because angle, stack ratio and carriage weight differ per machine
            belt squat .85 · pendulum squat .75 (the lever arm lightens the plates) · hack squat / V-squat / reverse hack .85 · Smith squat .90 (guided, feet forward)
            front squat 1.15 - front squats run 80-85% of a back squat (1/.85 = 1.18) · box squat .95 · any other machine squat .75 · back squat 1.00
-   DEADLIFT conventional / sumo / snatch-grip 1.00 · trap bar .95 (reported 5-10% heavier than a conventional pull) · deficit 1.05 (harder than the floor, so a little credit)
+   DEADLIFT conventional / sumo / snatch-grip 1.00 · trap bar .92 (reported 5-10% heavier than a conventional pull: 1/1.05 = .95 down to 1/1.10 = .91, so .92 is the cautious end) · deficit 1.05 (harder than the floor, so a little credit)
            rack pull .80 (a shortened pull runs 10-25% heavier than the floor) · Romanian / stiff-leg 1.10 (they run 70-85% of a deadlift, so 1.10 is conservative) · Smith RDL .99 (.90 x 1.10)
            hip-hinge machines (Machine Deadlift, Hip Hinge) .85 - the generic machine factor, no lever data to justify more
    PRESS   barbell standing / seated 1.00 · push press .80 (a push press is ~125% of a strict press) · Smith .90 · machine / Viking .85
    ROW     barbell bent-over / Pendlay / underhand / Yates 1.00 · T-bar .92 · Smith .90 · machine row .85 · chest-supported .85 (no body English, so it runs lighter than a free row) */
 const SV_STD=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"],SV_BIG3=["Bench Press","Squat","Deadlift"];
+const SV_EPS=1e-9;   // a capped lift sits exactly ON its tier: (tier x bw) / bw lands a hair under the tier in floating point (50.3 kg x 1.5 -> 1.4999999999999998), which read "Advanced, Elite in +0 kg"
 const SV_RDL=t=>/romanian|\brdl\b|stiff|straight.?leg/.test(t.ln);
 const SV={
  "Bench Press":{ref:"flat barbell bench press",pattern:"press",
@@ -8328,9 +8333,9 @@ const SV={
      [t=>/floor press/.test(t.ln),.95,"floor press"],
      [t=>true,1.00,"bench press"]]},
  "Squat":{ref:"barbell back squat",pattern:"squat",
-  yes:/squat|leg press/,
+  yes:/squat|leg (?:wide )?press/,
   no:/dumbbell|cable|kettlebell|\bbands?\b|single|unilateral|one.?leg|alternat|split|bulgarian|lunge|step.?up|pistol|goblet|sissy|zercher|landmine|cyclist|overhead|calf|jump|spanish/,
-  v:[[t=>/leg press|lying squat/.test(t.ln),.50,"leg press"],
+  v:[[t=>/leg (?:wide )?press|lying squat/.test(t.ln),.50,"leg press"],
      [t=>/belt squat/.test(t.ln),.85,"belt squat"],
      [t=>/pendulum/.test(t.ln),.75,"pendulum squat"],
      [t=>/hack|v-squat|v squat/.test(t.ln),.85,"hack squat"],
@@ -8345,7 +8350,7 @@ const SV={
   v:[[t=>t.smith&&SV_RDL(t),.99,"Smith RDL"],
      [SV_RDL,1.10,"Romanian / stiff-leg deadlift"],
      [t=>/rack pull|block pull/.test(t.ln),.80,"rack pull"],
-     [t=>/trap|hex/.test(t.ln),.95,"trap-bar deadlift"],
+     [t=>/trap|hex/.test(t.ln),.92,"trap-bar deadlift"],
      [t=>/deficit/.test(t.ln),1.05,"deficit deadlift"],
      [t=>t.mach,.85,"hip-hinge machine"],
      [t=>true,1.00,"deadlift"]]},

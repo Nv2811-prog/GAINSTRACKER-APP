@@ -101,6 +101,7 @@ try {
   const sh = await ev(() => { const s = document.getElementById('sheet'), r = [...s.querySelectorAll('.gh-row')]; return { on: s.classList.contains('on'), pg: !!s.querySelector('.sv-pg'), h: (s.querySelector('.st-h h2') || { textContent: '' }).textContent, done: !!s.querySelector('.st-h .btn.sm'), names: r.map((x) => x.querySelector('.gh-t1').textContent), nums: r.map((x) => +x.querySelector('.sv-eq .num').textContent), lede: (s.querySelector('.sv-lede') || { textContent: '' }).textContent, over: s.scrollWidth > s.clientWidth + 1 }; });
   ok('sheet: a tap opens the Squat variations, strongest first, with a Done button', sh.on && sh.pg && sh.h === 'Squat' && sh.done && sh.names[0] === 'Hack Squat Machine' && sh.names[1] === 'Leg Press (45°)' && sh.nums[0] === 170 && sh.nums[1] === Math.round(lp * 0.5) && sh.nums.every((v, i, a) => !i || a[i - 1] >= v), sh);
   ok('sheet: the lede names the lift that counts and the bodyweight ratio; nothing overflows', /Hack Squat Machine/.test(sh.lede) && /82\.8 kg/.test(sh.lede) && !sh.over, sh);
+  ok('sheet: the lede also names the next tier, in kg and in the units you train (target / factor)', /Next, Elite at 207 kg, about 244 kg on the Hack Squat Machine\./.test(sh.lede), sh.lede);
   await page('variation-sheet');
   await tap('#sheet .st-h .btn.sm'); await sleep(300);
   ok('sheet: Done closes it', !(await ev(() => document.getElementById('sheet').classList.contains('on'))), null);
@@ -109,6 +110,29 @@ try {
   await reset(snap); await sleep(400);
   const fit = await ev(() => { const card = document.querySelector('.p3-std-c').getBoundingClientRect(), bad = []; document.querySelectorAll('.p3-sr').forEach((r) => { const b = r.getBoundingClientRect(); if (r.scrollWidth > r.clientWidth + 1 || b.right > card.right + 1) bad.push(r.querySelector('.p3-srh b').textContent); r.querySelectorAll('.p3-sv, .p3-sn, .p3-srh').forEach((x) => { if (x.getBoundingClientRect().right > card.right - 8) bad.push('inner ' + x.className); }); }); return { bad, h: Math.min(...[...document.querySelectorAll('.p3-sr')].map((r) => r.getBoundingClientRect().height)) }; });
   ok('fit: every Strength row, its via line included, stays inside the card; rows are >= 44px', !fit.bad.length && fit.h >= 44, fit);
+
+  /* ---------- 9 · the cautious end of the table: a trap bar is not flattered, a wide-stance sled is still a leg press ---------- */
+  const rules = await ev(() => ({ trap: svRule('Deadlift', 'Trap Bar Deadlift'), wide: svRule('Squat', 'Machine 45° Leg Wide Press'), single: svRule('Squat', 'Machine 45 Degrees One Leg Press'), calf: svRule('Squat', 'Machine 45° Calf Press'), hinge: svRule('Deadlift', 'Hip Hinge (Erectors)') }));
+  ok('factors: trap bar x0.92, a "Leg Wide Press" counts as a leg press x0.50, a one-leg press and a calf press never count', rules.trap && rules.trap.f === 0.92 && rules.wide && rules.wide.f === 0.5 && !rules.single && !rules.calf && rules.hinge && rules.hinge.f === 0.85, rules);
+
+  await reset(snap); await ev(() => { state.data.u.bodyweight = 50.3; }); await addPR('Machine Chest Press', 900);
+  const capRow = await ev(() => { const r = [...document.querySelectorAll('.p3-sr')].find((x) => x.querySelector('.p3-srh b').textContent === 'Bench Press'); return r && { sn: r.querySelector('.p3-sn').textContent, num: r.querySelector('.num').textContent, via: r.querySelector('.p3-sv').textContent }; });
+  ok('cap: a capped lift sits ON its tier at any bodyweight (50.3 kg x Elite 1.5 reads Elite, not "Advanced, Elite in +0 kg")', capRow && capRow.num === '1.50' && /Elite/.test(capRow.sn) && !/ in \+/.test(capRow.sn) && /capped at Elite/.test(capRow.via), capRow);
+
+  /* ---------- 10 · the Suit hero: the vault still, its own look (a one-class override loses to GP:ART, so read the COMPUTED style), the parallax, the Fuel tile ---------- */
+  await reset(snap); await ev(() => { state.tab = 'suit'; render(); window.scrollTo(0, 0); }); await sleep(900);
+  const hero = await ev(() => {
+    const a = document.querySelector('.gm-suit .ga-suit-hero'), i = a && a.querySelector('img');
+    if (!i) return null;
+    const cs = getComputedStyle(i), af = getComputedStyle(a, '::after'), fuel = [...document.querySelectorAll('.gd-t')].find((b) => /^Fuel/.test(b.textContent)), lab = document.querySelector('.gd-t .gd-a');
+    return { src: i.getAttribute('src'), loaded: i.complete && i.naturalWidth === 720, heroes: document.querySelectorAll('.gm-suit .ga').length, pos: cs.objectPosition, op: cs.opacity, mask: cs.webkitMaskImage || cs.maskImage, filter: cs.filter, veil: af.backgroundImage, anim: cs.animationName, halo: getComputedStyle(document.querySelector('.gm-suit .gm-st')).textShadow, fig: !!document.querySelector('.gm-suit .gm-fig2 svg'), legend: !!document.querySelector('.gm-suit .gm-leg'), fuelArt: fuel && fuel.querySelector('.gd-a').getAttribute('style'), firstArt: lab && lab.getAttribute('style') };
+  });
+  ok('Suit hero: the vault still (suit-hero.jpg) is loaded, right aligned, placed once; the figure and the legend sit on top', hero && /suit-hero\.jpg$/.test(hero.src) && hero.loaded && hero.pos === '100% 50%' && hero.heroes === 1 && hero.fig && hero.legend, hero);
+  ok('Suit hero: its own look wins over the standard art rules (full opacity, no left mask, the lighter #0b0d12 veil, brightness lift)', hero && hero.op === '1' && hero.mask === 'none' && /brightness\(1\.3\)/.test(hero.filter) && /rgb\(11, 13, 18\)/.test(hero.veil) && !/rgb\(17, 25, 39\)/.test(hero.veil), hero);
+  ok('Suit hero: the scroll-driven push-in from GP:CHARM still runs on it, and the status line has a dark halo', hero && hero.anim === 'gpPar' && /rgba?\(5, 7, 12/.test(hero.halo), hero);
+  ok('Suit dock: the Fuel tile has its own still (tile-fuel), not the Lab art', hero && /tile-fuel\.jpg/.test(hero.fuelArt || '') && !/tile-lab/.test(hero.fuelArt || ''), hero && hero.fuelArt);
+  await shot('.gm-suit', 'suit-hero');
+  await page('suit-top');
 } catch (e) { checks.push({ name: 'fatal', pass: false, info: String(e && e.stack || e).slice(0, 500) }); }
 const failed = checks.filter((c) => !c.pass);
 console.log(JSON.stringify({ width: A.width || 393, passed: checks.length - failed.length, ...(A.v ? { names: checks.map((c) => (c.pass ? 'ok  ' : 'FAIL ') + c.name) } : {}), failed, consoleErrors: ctx.log.errors, failedRequests: ctx.log.failed }, null, 1));
