@@ -6466,7 +6466,7 @@ function p3Calendar(){
   const mw=(d.workouts||[]).filter(w=>inM(w,yr,mo)),pw=(d.workouts||[]).filter(w=>inM(w,pm.getFullYear(),pm.getMonth()));
   const tot=a=>a.reduce((s,w)=>s+(w.totalVol||0),0),sess=new Set(mw.map(w=>new Date(w.date).toDateString())).size,mv=tot(mw),pv=tot(pw);
   const mp=mw.reduce((s,w)=>s+((w.prs||[]).length),0),dp=pv>0&&sess?Math.round((mv-pv)/pv*100):null,vv=p3Vol(mv);
-  return `<section class="s2 p3-cal gh-c" style="--i:1" ontouchstart="state._calSwipeX=event.touches[0].clientX" ontouchend="(function(){const dx=event.changedTouches[0].clientX-(state._calSwipeX||0);if(dx>55)calPrev();else if(dx<-55)calNext();})()">
+  return `<section class="s2 p3-cal gh-c" id="p3-cal" style="--i:1" ontouchstart="state._calSwipeX=event.touches[0].clientX" ontouchend="(function(){const dx=event.changedTouches[0].clientX-(state._calSwipeX||0);if(dx>55)calPrev();else if(dx<-55)calNext();})()">
     <div class="p3-ch"><div><h3>${MON[mo]} ${yr}</h3><div class="sub">${sess} session${sess===1?"":"s"} · ${vv.v} ${vv.u}${mp?` · ${mp} PR${mp>1?"s":""}`:""}${dp!=null?` · <b class="${dp>=0?"c-ok":"c-warn"}">${dp>=0?"+":""}${dp}%</b>`:""}</div></div>
       <div class="nv"><button class="btn-i" data-hx onclick="calPrev()" aria-label="Previous month">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><button class="btn-i" data-hx onclick="calNext()" aria-label="Next month"${off>=0?" disabled":""}>${GP.icon("chevR")}</button></div></div>
     <div class="p3-cg">${cells}</div>
@@ -6486,7 +6486,7 @@ function p3Records(){
   const recent=now()-30*P3_DAY;
   const rows=(all?list:list.slice(0,6)).map(([n,p])=>{const tr=p3Trend(n,{w:64,h:26,mini:1}),fresh=new Date(p.date||0).getTime()>=recent;
     return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(n)})"><span class="lead${fresh?" gold":""}">${GP.icon(fresh?"trophy":"dumbbell")}</span><div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">e1RM <b>${Math.round(p.orm)} kg</b> · PR ${p.date?ghAgo(p.date):"–"}</div></div><span class="trail">${tr?tr.svg:""}${GP.icon("chevR")}</span></div>`;}).join("");
-  return `<div class="gh-sec gh-c" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
+  return `<div class="gh-sec gh-c" id="p3-rec" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
     <section class="s2 gh-list gh-c" style="--i:2">${rows}${p3Row("chart","Every lift",loggedExerciseNames().length+" exercises · full curves","openArchive()")}</section>`;
 }
 function p3BigThree(){   // barbell-equivalent bench + squat + deadlift vs bodyweight (liftEstimate converts machine/Smith lifts), 4-week delta
@@ -6508,33 +6508,39 @@ function p3Strength(){
       <div class="lmk p3-std" style="--v:${p(r)}"><i class="fill"></i>${tiers.map(t=>`<i class="tk" style="left:${p(t[1])}"></i>`).join("")}</div>
       <div class="p3-tl">${tiers.map(t=>`<span style="left:${p(t[1])}">${t[0]}</span>`).join("")}</div>
       <div class="p3-sn">${Math.round(e.orm)} kg e1RM · ${lvl?full(lvl[0]):"Below novice"}${nxt?` · ${full(nxt[0])} in +${fmtKg(Math.ceil((nxt[1]*bw-e.orm)*2)/2)} kg`:""}${e.est?` · est. from ${esc(e.via)}`:""}</div></div>`;}).join("");
-  return `<div class="gh-sec gh-c" style="--i:3"><h2>Strength</h2><span class="t-xs">e1RM ÷ ${bw} kg bodyweight</span></div>
+  return `<div class="gh-sec gh-c" id="p3-std" style="--i:3"><h2>Strength</h2><span class="t-xs">e1RM ÷ ${bw} kg bodyweight</span></div>
     <section class="s2 p3-std-c gh-c" style="--i:3">${b3?`<div class="p3-b3"><div><span class="num">${b3.ratio.toFixed(2)}</span><span class="u">× BW</span></div>${b3.d?`<span class="tag ${b3.d>0?"ok":"warn"}">${b3.d>0?"+":""}${b3.d}% / 4 wk</span>`:""}</div><div class="p3-b3c">Big-3 total, barbell-equivalent${b3.n<3?" · "+b3.n+" of 3 lifts":""}</div>`:""}${body}
       <div class="p3-sfoot">Machine, Smith and variation lifts are converted to a barbell estimate. e1RM is a guide, not a verdict.</div></section>`;
 }
 function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
-function p3Trophies(){
-  let rec=null;try{rec=mmaRecord();}catch(e){}
-  const body=p3Row("trophy","Badges","The trophy room","openTrophyRoom()")
-    +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · weekly volume against the week before",""):"");
-  return p3FoldRow("troph","trophy","Badges","Trophy room · week-vs-week record",body);
+/* Profile dock: History, Records and Strength standards sit inline on this page, so their tiles scroll to them; Badges and Backup open their own sheet.
+   Backup moved here from the "Gyms & tools" fold, Badges from its own fold. */
+function p3Dock(){
+  const d=state.data,ws=d.workouts||[],prN=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length,b3=p3BigThree(),lb=d.u.lastBackupAt;
+  const std=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].some(l=>liftEstimate(l));
+  return gdDock("Profile tools",[
+    {art:"tile-history",ic:"calendar",t:"History",s:`<b>${ws.length}</b> sessions`,fn:"gdJump('#p3-cal')"},
+    ...(prN?[{art:"tile-records",ic:"trophy",t:"Records",s:`<b>${prN}</b> records`,fn:"gdJump('#p3-rec')"}]:[]),
+    ...(std?[{art:"tile-standards",ic:"chart",t:"Standards",s:b3?`Big-3 <b>${b3.ratio.toFixed(2)}</b>× BW`:"Lifts vs bodyweight",fn:"gdJump('#p3-std')"}]:[]),
+    {art:"tile-badges",ic:"crown",t:"Badges",s:"Trophy room",fn:"openTrophyRoom()"},
+    {art:"tile-backup",ic:"lock",t:"Backup",s:lb?"Backed up "+ghAgo(lb):"Never backed up",fn:"openDataControl()"}]);
 }
 function p3Tools(){
-  const u=state.data.u,g=(u.gyms||[]).length;
+  const u=state.data.u,g=(u.gyms||[]).length;let rec=null,wf="";try{rec=mmaRecord();wf=weeklyFightCard();}catch(e){}
   const body=p3Row("map","Gyms",g+" gym"+(g===1?"":"s")+" · "+esc(u.activeGym||""),"openGyms()")
     +p3Row("scan","Batcomputer","Physique and tools","openBatcomputer()")
     +p3Row("scale","Measurements","Body log","openMeasure()")
     +p3Row("share","Share PR card","Your top five lifts","shareProfilePRCard()")
     +p3Row("calendar","Export calendar","Every session as .ics","exportICS()")
-    +p3Row("lock","Data control","Backup, restore, archive lifts","openDataControl()")
+    +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · against the week before",wf?"alOpenFightCard()":""):"")
     +p3Row("sliders","Settings","Name, bodyweight, rest, metric","openSettings()");
-  return p3FoldRow("tools","sliders","Gyms & data","Backup · measurements · settings",body);
+  return p3FoldRow("tools","sliders","Gyms & tools","Gyms · measurements · settings",body);
 }
 function renderProfile(){
   if(!(state.data.workouts||[]).length){
     $("app").innerHTML=`<div class="gh p3-pf"><h1 class="gh-hi">Profile</h1><section class="s2 p3-empty"><span class="lead gold">${GP.icon("bat")}</span><div><b>Your record starts here</b><p>Rank, records and strength standards fill in as you train.</p></div><button class="btn btn-1" data-hx onclick="go('mission',1)">Plan a session</button></section></div>`;return;
   }
-  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Trophies()}${p3Tools()}</div>`;
+  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Dock()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Tools()}</div>`;
 }
 /* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, consistency, Alfred and the weekly streak.
    Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
