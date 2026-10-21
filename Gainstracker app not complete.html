@@ -1224,6 +1224,30 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ga.ga-suit-hero::after{background:linear-gradient(180deg,rgba(11,13,18,.45),rgba(11,13,18,0) 18%),linear-gradient(90deg,#0b0d12 4%,rgba(11,13,18,.45) 30%,rgba(11,13,18,0) 54%),linear-gradient(0deg,#0b0d12 0%,rgba(11,13,18,0) 28%)}
 .gm-suit .gm-st{text-shadow:0 1px 3px rgba(5,7,12,.9),0 0 14px rgba(5,7,12,.9)}   /* the gold shaft and a glass edge cross the status line (amber text: 5.5+ contrast on the average background, 2.5 on the thin glass highlights): a dark halo behind the glyphs covers those */
 /* ===== /GP:STRENGTH+SUIT ===== */
+/* ===== GP:QUICKLOG (wave 10) ===== */
+/* Mark a split day done without logging: the Home link under the Tonight buttons, the sheet (day, when, why, what gets counted) and the history tag. Built on the Home primitives; colours keep their one meaning (gold = the action and the chosen chip, green = done, amber = the duplicate note). */
+.gh-hero .ql-link{position:relative;display:flex;align-items:center;gap:7px;width:100%;min-height:36px;margin:6px 0 -4px;padding:0;background:none;border:0;border-radius:var(--r-s);text-align:left;font:600 13.5px/1 var(--body);color:var(--gold-ink)}
+.gh-hero .ql-link .gi{flex:none;width:16px;height:16px}
+.gh-hero .ql-link span{white-space:nowrap}
+.gh-hero .ql-link i{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-weight:500;color:var(--tx3)}
+.gh-hero .ql-link::after{content:"";position:absolute;inset:-4px 0}
+.ql .ql-sec{display:flex;align-items:baseline;gap:8px;margin:16px 2px 8px}
+.ql .ql-sec:first-of-type{margin-top:4px}
+.ql-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ql-chips .chip{max-width:100%;min-height:38px;padding:7px 15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ql-date{display:block;width:100%;height:44px;margin-top:10px;padding:0 14px;border:0;border-radius:var(--r-s);background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2);color:var(--tx1);font:500 16px var(--body);color-scheme:dark}
+.ql .ql-sum{margin-top:18px;padding:13px 14px 12px}
+.ql-tot{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 18px;margin-top:4px;font-size:13px;line-height:18px;color:var(--tx2)}
+.ql-tot b{margin-right:5px;font-size:26px;color:var(--tx1)}
+.ql-sum .gm-chips{margin-top:10px}
+.ql-sum p{margin:10px 0 0}
+.ql-sum .ql-dup{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;color:var(--tx2);font-size:12.5px;line-height:17px}
+.ql .ql-go{width:100%;margin-top:16px}
+.tag.ql-tag{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:5px;background:var(--tint-ok);color:var(--ok);font:700 11px/1 var(--body);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}   /* the same green tag in the legacy day-detail card, which sits outside .gh */
+.p3-cd.on.qk{background:rgba(242,193,78,.07);box-shadow:inset 0 0 0 1px rgba(242,193,78,.14);outline:1.5px dashed rgba(242,193,78,.6);outline-offset:-3px}
+.p3-cd.on.qk.today{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.p3-cl .sw.qk{background:none;box-shadow:none;outline:1.5px dashed rgba(242,193,78,.75);outline-offset:-2px}
+/* ===== /GP:QUICKLOG ===== */
 /* ===== GP:WEEKLY+BODY (wave 7) ===== */
 /* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
 /* 1 · one-tap weekly adjust: a button = tinted icon chip + what changes + where, "Apply" in gold; the result row turns green with a check */
@@ -3652,7 +3676,7 @@ function lastSetFor(name){
   for(let i=0;i<ws.length;i++){
     if(cut&&new Date(ws[i].date).getTime()<new Date(cut).getTime())break; // newest-first — once we hit the cutoff, everything after is pre-reset too
     const e=(ws[i].exercises||[]).find(x=>(x.name||"").toLowerCase().trim()===key);
-    if(e&&e.sets&&e.sets.length)return e.sets;
+    if(e&&e.sets&&e.sets.length&&!e.sets.some(s=>s.est))return e.sets;   // a marked-done session (est sets) is never "last time"
   }
   return null;
 }
@@ -4286,6 +4310,101 @@ function finishWorkout(){
   try{setTimeout(maybeOfferProfile,900);}catch(e){}
 }
 function endSession(){stopTimers();try{cloudPresence(false);}catch(e){}state.session=null;state.step=null;state.minimized=false;clearSavedSession();state.tab="gotham";render();}
+/* ===== MARK A DAY DONE (GP:QUICKLOG, wave 10) =====
+   "I trained but did not log it" (a dead battery, a trial session, forgot): one sheet marks a day of the ACTIVE split as done from the plan.
+   It writes the same state as finishWorkout (a workout tagged splitId + dayIdx, so computeNextDay advances; muscleVol / muscleLastTrained; sessions; streak) with two flags:
+   the workout is quick:1 and every set is est:1 (the PLANNED number of working sets, each with last time's numbers, or none). Estimated sets count for weekly sets, the volume
+   landmarks, recovery and consistency, and are EXCLUDED wherever a number is read as performance: records, e1RM, progression, "last time", the rep-PR book, strength rows and the
+   stall detector (lastSetFor, lastBestSet, exerciseRows, loggedExerciseNames, lgLast, prevExercise, p3RepBook, rirIntel, gmTopLifts, the ally card, the CSV).
+   No XP, tonnage, lifetime volume, summary, PR finisher, feed post or achievement banner: a toast with Undo. Undo puts back every top-level key the write touched from a JSON
+   snapshot taken just before, so the stored data returns byte for byte. A date older than the newest session leaves the streak, the last-trained date and the cycle pointer alone. */
+const QL_WHY=[["battery","Low battery"],["trial","Trial session"],["forgot","Forgot to log"],["other","Other"]];
+const QL_BACK_DAYS=60;   // how far back the optional date can reach
+const qlWhyLabel=k=>(QL_WHY.find(x=>x[0]===k)||[])[1]||"";
+const qlDayKey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const qlPlanned=w=>{const n=(w.exercises||[]).reduce((a,e)=>a+(e.sets||[]).length,0);return n+" set"+(n===1?"":"s")+" from your plan";};
+function qlDay(spId,di){const sp=(state.data.splits||[]).find(s=>s.id===spId),day=sp&&sp.days[di];return sp&&day&&!isRest(day)&&(day.exercises||[]).length?{sp,day}:null;}
+function qlWhenDate(st){   // the chosen day at the current time of day: today, yesterday or the picked date (never in the future)
+  const t=new Date(now());
+  if(st.when==="yesterday")t.setDate(t.getDate()-1);
+  else if(st.when==="date"&&/^\d{4}-\d{2}-\d{2}$/.test(st.date||"")){const p=st.date.split("-");t.setFullYear(+p[0],+p[1]-1,+p[2]);}
+  return t.getTime()>now()?new Date(now()):t;
+}
+function qlPlanSets(day){   // [{name,sets:[{w,r,type,done:true,est:1}]}]: the Preview's planned count per lift, each set with last time's numbers (none when the lift has no history)
+  return (day.exercises||[]).map(n=>{
+    const work=(lastSetFor(n)||[]).filter(s=>s.type!=="W"),k=ghSetsOf(day,n);
+    return {name:n,sets:Array.from({length:k},(_,i)=>{const s=work[Math.min(i,work.length-1)];
+      return {w:s?s.w:"",r:s?s.r:"",type:(s&&s.type)||"NRM",done:true,est:1};})};
+  });
+}
+function qlSnap(d){const o={};Object.keys(d).forEach(k=>{o[k]=JSON.stringify(d[k]);});return o;}
+function qlDiff(d,pre){const set={},del=[];   // the top-level keys the write changed (their JSON before) or added
+  Object.keys(d).forEach(k=>{if(!(k in pre))del.push(k);else if(JSON.stringify(d[k])!==pre[k])set[k]=pre[k];});
+  return {set,del};
+}
+function qlUndo(df){
+  const d=state.data;
+  Object.keys(df.set).forEach(k=>{if(df.set[k]===undefined)delete d[k];else d[k]=JSON.parse(df.set[k]);});
+  df.del.forEach(k=>{delete d[k];});
+  save();render();toast("Undone");
+}
+function qlCommit(){
+  const st=state._ql,hit=st&&qlDay(st.sp,st.di);
+  if(!hit){toast("That day has no lifts to count");return;}
+  const d=state.data,sp=hit.sp,day=hit.day,when=qlWhenDate(st),t=when.toISOString(),tm=when.getTime(),pre=qlSnap(d);
+  const done=qlPlanSets(day),sessVol={},musclesHit={};
+  done.forEach(e=>{const ex=exFor(e.name);e.sets.forEach(s=>{const v=setVolume(ex,s);   // finishWorkout's credit rule: primary 1, secondary 0.4 of the volume
+    (ex.p||[]).forEach(m=>{sessVol[m]=(sessVol[m]||0)+v;musclesHit[m]=Math.max(musclesHit[m]||0,1);});
+    (ex.s||[]).forEach(m=>{sessVol[m]=(sessVol[m]||0)+v*0.4;musclesHit[m]=Math.max(musclesHit[m]||0,.5);});});});
+  const why=st.why||"",wk={id:"w"+now(),date:t,name:day.name,split:sp.name,splitId:sp.id,dayIdx:st.di,muscles:Object.keys(musclesHit),exercises:done,xp:0,totalVol:0,duration:0,readiness:null,
+    gym:d.u.activeGym||"",prs:[],notes:"Marked done"+(why?" · "+qlWhyLabel(why):""),quick:1,why};
+  const ws=d.workouts=d.workouts||[];let at=ws.findIndex(w=>new Date(w.date).getTime()<=tm);if(at<0)at=ws.length;ws.splice(at,0,wk);   // history stays newest-first
+  Object.keys(sessVol).forEach(m=>{d.muscleVol[m]=(d.muscleVol[m]||0)+sessVol[m];const seen=d.muscleLastTrained[m];
+    if((musclesHit[m]>=1||sessVol[m]>500)&&(!seen||new Date(seen).getTime()<=tm)){d.muscleLastTrained[m]=t;d.muscleLastVol[m]=sessVol[m];d.muscleLastFails[m]=0;}});
+  const u=d.u;u.totalWorkouts++;
+  if(at===0){   // the newest session: streak, last-trained date and the stored cycle pointer follow it
+    if(u.lastTrainedDate){if(new Date(u.lastTrainedDate).toDateString()!==when.toDateString())u.streakDays=Math.round((tm-new Date(u.lastTrainedDate).getTime())/864e5)<=1?u.streakDays+1:1;}
+    else u.streakDays=1;
+    u.lastTrainedDate=t;
+    if(sp.id===d.activeSplitId)d._nextDay=(st.di+1)%sp.days.length;
+  }
+  save();
+  const df=qlDiff(d,pre);
+  state._ql=null;closeSheet();render();
+  toastUndo(String(day.name).split(" · ")[0]+" marked done · counted from your plan",()=>qlUndo(df));
+  haptic("done");
+}
+function openQuickLog(spId,di){
+  if(!qlDay(spId,di)){toast("Rest days have nothing to count");return;}
+  state._ql={sp:spId,di,when:"today",date:"",why:""};qlSheet(true);
+}
+function qlSet(k,v){if(!state._ql)return;state._ql[k]=v;if(k==="when"&&v!=="date")state._ql.date="";qlSheet();}
+function qlWhy(k){if(!state._ql)return;state._ql.why=state._ql.why===k?"":k;qlSheet();}
+function qlSheet(fresh){
+  const st=state._ql,hit=st&&qlDay(st.sp,st.di);if(!hit)return;
+  const d=state.data,sp=hit.sp,day=hit.day,when=qlWhenDate(st),stats=ghDayStats(day),plan=ghPlanSets(day);
+  const short=n=>String(n||"").split(" · ")[0],ids=sp.days.map((_,i)=>i).filter(i=>qlDay(sp.id,i));
+  const lbl=i=>{const s=short(sp.days[i].name);return ids.filter(j=>short(sp.days[j].name)===s).length>1?sp.days[i].name:s;};
+  const chip=(on,fn,txt)=>`<button type="button" class="chip${on?" on":""}" aria-pressed="${on}" onclick="${fn}">${txt}</button>`;
+  const dup=(d.workouts||[]).some(w=>w.splitId===sp.id&&w.dayIdx===st.di&&ghSameDay(w.date,when)),need=st.when==="date"&&!st.date;
+  const mus=Object.keys(plan).filter(m=>MNAME[m]&&plan[m]>0).sort((a,b)=>plan[b]-plan[a]).slice(0,6).map(m=>`<span class="gm-chip on">${MNAME[m]}<i>${p3Half(plan[m])}</i></span>`).join("");
+  const html=`<div class="gh ql">${shHd("Mark as done",{ic:"check",sub:esc(sp.name)+" · day "+(st.di+1)})}
+    <div class="eyebrow ql-sec">Which day</div>
+    <div class="ql-chips">${ids.map(i=>chip(i===st.di,"qlSet('di',"+i+")",esc(lbl(i)))).join("")}</div>
+    <div class="eyebrow ql-sec">When</div>
+    <div class="ql-chips">${chip(st.when==="today","qlSet('when','today')","Today")}${chip(st.when==="yesterday","qlSet('when','yesterday')","Yesterday")}${chip(st.when==="date","qlSet('when','date')","Other date")}</div>
+    ${st.when==="date"?`<input class="ql-date" type="date" min="${qlDayKey(new Date(now()-QL_BACK_DAYS*864e5))}" max="${qlDayKey(new Date(now()))}" value="${esc(st.date)}" onchange="qlSet('date',this.value)" aria-label="Date you trained">`:""}
+    <div class="eyebrow ql-sec">Why <span class="t-xs">optional</span></div>
+    <div class="ql-chips">${QL_WHY.map(x=>chip(st.why===x[0],"qlWhy('"+x[0]+"')",x[1])).join("")}</div>
+    <section class="s1 ql-sum" aria-live="polite"><div class="gh-t1">${esc(day.name)}</div>
+      <div class="ql-tot"><span><b class="num">${stats.lifts}</b>lifts</span><span><b class="num">${stats.sets}</b>sets</span><span>${need?"pick a date":esc(p3Date(when.getTime()))}</span></div>
+      ${mus?`<div class="gm-chips">${mus}</div>`:""}
+      <p class="t-xs">Counts toward weekly sets, recovery and your streak. Weights come from your last session and never change records, e1RM or progression.</p>
+      ${dup?`<p class="ql-dup"><span class="tag warn">Already in history</span>This day is already logged for that date. Marking it adds a second session.</p>`:""}</section>
+    <button class="btn btn-1 ql-go" onclick="qlCommit()"${need?" disabled":""}>${GP.icon("check")}Mark as done</button></div>`;
+  const sh=$("sheet");
+  if(!fresh&&state._sheetKind==="ql"&&sh.classList.contains("on"))sh.innerHTML=html;else{openSheet(html);state._sheetKind="ql";}
+}
 // Minimise the live workout: keep the session + timers running, drop back to the tabs so you can
 // check history, fuel, etc. A floating resume bar lets you jump straight back into logging.
 function minimizeWorkout(){if(!state.session)return;state.minimized=true;releaseWakeLock();state.step=null;haptic("tap");if(!state.tab)state.tab="gotham";render();window.scrollTo(0,0);saveSession();}
@@ -4750,7 +4869,7 @@ function lastBestSet(name){
     if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())break; // newest-first — archived, stop here
     const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;
     let best=null,bv=-1;
-    (e.sets||[]).forEach(s=>{if(s.type==="W")return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
+    (e.sets||[]).forEach(s=>{if(s.type==="W"||s.est)return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
     if(best)return {w:+best.w||0,r:+best.r||0,date:w.date,e1:bv};
   }
   return null;
@@ -5047,7 +5166,7 @@ function rirIntel(days){
   const per={};let sum=0,n=0,eff=0,work=0;
   gymWs().forEach(w=>{if(new Date(w.date).getTime()<cut)return;
     (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);const m=(ex.p||[])[0];
-      (e.sets||[]).forEach(s=>{if(s.type==="W")return;work++;
+      (e.sets||[]).forEach(s=>{if(s.type==="W"||s.est)return;work++;
         const r=rirOfSet(s);if(r==null)return;
         sum+=r;n++;if(r<=3)eff++;
         if(m){per[m]=per[m]||{sum:0,n:0};per[m].sum+=r;per[m].n++;}
@@ -5199,7 +5318,7 @@ function p3RepBook(nm){
   const ex=exFor(nm),key=nm.toLowerCase().trim(),cut=exResetAt(nm),by={},at={};
   (state.data.workouts||[]).forEach(w=>{if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())return;
     (w.exercises||[]).forEach(e=>{if((e.name||"").toLowerCase().trim()!==key)return;
-      (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;const r=Math.min(15,Math.floor(+s.r||0)),ld=setLoad(ex,s.w);if(r<1||!(ld>0))return;if(ld>(by[r]||0)){by[r]=ld;at[r]=w.date;}});});});
+      (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W"||s.est)return;const r=Math.min(15,Math.floor(+s.r||0)),ld=setLoad(ex,s.w);if(r<1||!(ld>0))return;if(ld>(by[r]||0)){by[r]=ld;at[r]=w.date;}});});});
   if(!Object.keys(by).length)return "";
   const cells=[];for(let r=1;r<=15;r++)cells[r]={w:by[r]||0,at:at[r]};
   const recent=now()-30*P3_DAY,lab=w=>ex.bw?(w-bodyW()>0?"+"+fmtKg(w-bodyW()):"BW"):fmtKg(w);
@@ -5413,7 +5532,7 @@ function openPlateSheet(ei){
 // Previous time this exact lift was logged (skips the just-finished session at workouts[0]).
 function prevExercise(name){
   const ws=state.data.workouts||[];
-  for(let i=1;i<ws.length;i++){const e=(ws[i].exercises||[]).find(x=>x.name===name);if(!e)continue;const ex=exFor(name);let bo=0,bw=0,br=0;(e.sets||[]).forEach(s=>{if(s.type==="W")return;const o=setE1RM(ex,s);if(o>bo){bo=o;bw=setLoad(ex,s.w);br=+s.r||0;}});if(bo>0)return {e1:bo,w:bw,r:br,date:ws[i].date};}
+  for(let i=1;i<ws.length;i++){const e=(ws[i].exercises||[]).find(x=>x.name===name);if(!e)continue;const ex=exFor(name);let bo=0,bw=0,br=0;(e.sets||[]).forEach(s=>{if(s.type==="W"||s.est)return;const o=setE1RM(ex,s);if(o>bo){bo=o;bw=setLoad(ex,s.w);br=+s.r||0;}});if(bo>0)return {e1:bo,w:bw,r:br,date:ws[i].date};}
   return null;
 }
 // Previous workout sharing this session's name (e.g. last "Chest Day") for total-volume comparison.
@@ -5877,7 +5996,7 @@ function openDayBriefing(splitId,dayIdx){
     <div class="gm-chips">${chips}</div>
     <div class="eyebrow gm-sec">The plan</div>
     <div class="s2 gh-list gm-pl2">${rows||'<div class="gh-empty" style="margin:12px 14px">No lifts yet. Add some in the plan editor.</div>'}</div>
-    <div class="gm-cta2">${cta}</div></div>`);
+    <div class="gm-cta2">${cta}<button class="btn ql-mark" style="margin-top:8px" onclick="openQuickLog('${splitId}',${dayIdx})">${GP.icon("check")}Mark as done</button></div></div>`);
 }
 
 /* ========================= THE SUIT TAB ========================= */
@@ -6348,7 +6467,7 @@ function gmTopLifts(m){   // the muscle's main lifts over the last 4 weeks: work
   (state.data.workouts||[]).forEach(w=>{if(new Date(w.date).getTime()<cut)return;
     (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);if(!(ex.p||[]).includes(m))return;
       const a=agg[e.name]||(agg[e.name]={n:e.name,sets:0,e1:0});
-      (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;a.sets++;const v=setE1RM(ex,s);if(v>a.e1)a.e1=v;});});});
+      (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;a.sets++;if(s.est)return;const v=setE1RM(ex,s);if(v>a.e1)a.e1=v;});});});
   return Object.values(agg).filter(a=>a.sets).sort((a,b)=>b.sets-a.sets||b.e1-a.e1).slice(0,4);
 }
 function gmDosTip(o){   // one line, first rule that matches
@@ -6423,21 +6542,21 @@ function exerciseRows(name){
     if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())return; // archived — old equipment, don't count toward "last time"/trend
     const e=(w.exercises||[]).find(x=>(x.name||"").toLowerCase().trim()===key);if(!e)return;
     let bestE=0,topW=0,vol=0,bset=null;
-    (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;const e1=setE1RM(ex,s);if(e1>bestE){bestE=e1;bset=s;}const ld=setLoad(ex,s.w);if(ld>topW)topW=ld;vol+=setVolume(ex,s);});
+    (e.sets||[]).forEach(s=>{if(!s.done||s.type==="W"||s.est)return;const e1=setE1RM(ex,s);if(e1>bestE){bestE=e1;bset=s;}const ld=setLoad(ex,s.w);if(ld>topW)topW=ld;vol+=setVolume(ex,s);});
     if(bestE>0)rows.push({date:w.date,e1rm:Math.round(bestE),topW:Math.round(topW),vol:Math.round(vol),bset});
   });
   return rows;
 }
 function loggedExerciseNames(){
   const m=new Map();
-  state.data.workouts.forEach(w=>(w.exercises||[]).forEach(e=>{if((e.sets||[]).some(s=>s.done&&s.type!=="W"))m.set(e.name,(m.get(e.name)||0)+1);}));
+  state.data.workouts.forEach(w=>(w.exercises||[]).forEach(e=>{if((e.sets||[]).some(s=>s.done&&s.type!=="W"&&!s.est))m.set(e.name,(m.get(e.name)||0)+1);}));
   return [...m.entries()].sort((a,b)=>b[1]-a[1]).map(([n])=>n);
 }
 // Most-recent-first ordering for the history/progress lists (what the user actually scans).
 function loggedExerciseNamesByRecency(){
   const seen=new Map();
   state.data.workouts.forEach(w=>{const t=new Date(w.date).getTime();(w.exercises||[]).forEach(e=>{
-    if((e.sets||[]).some(s=>s.done&&s.type!=="W")){if(!seen.has(e.name)||t>seen.get(e.name))seen.set(e.name,t);}});});
+    if((e.sets||[]).some(s=>s.done&&s.type!=="W"&&!s.est)){if(!seen.has(e.name)||t>seen.get(e.name))seen.set(e.name,t);}});});
   return [...seen.entries()].sort((a,b)=>b[1]-a[1]).map(([n])=>n);
 }
 // Per-lift coaching read: trend verdict, stall detection and the weight/reps to beat next time.
@@ -7032,8 +7151,8 @@ function p3Identity(){
     <div class="p3-g4">${st.map(a=>`<div${a[2]?` data-hx onclick="${a[2]}"`:""}><span class="num">${a[0]}</span><span class="eyebrow">${a[1]}</span></div>`).join("")}</div></section>`;
 }
 function p3Calendar(){
-  const d=state.data,vols={},prsD={};
-  (d.workouts||[]).forEach(w=>{const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toDateString();vols[key]=(vols[key]||0)+(w.totalVol||0);prsD[key]=(prsD[key]||0)+((w.prs||[]).length);});
+  const d=state.data,vols={},prsD={},days={},real={};
+  (d.workouts||[]).forEach(w=>{const k=new Date(w.date);k.setHours(0,0,0,0);const key=k.toDateString();vols[key]=(vols[key]||0)+(w.totalVol||0);prsD[key]=(prsD[key]||0)+((w.prs||[]).length);days[key]=1;if(!w.quick)real[key]=1;});
   const mx=Math.max(1,...Object.values(vols)),today=new Date(now());today.setHours(0,0,0,0);
   const off=state._calOff||0,base=new Date(today.getFullYear(),today.getMonth()+off,1),yr=base.getFullYear(),mo=base.getMonth();
   const dim=new Date(yr,mo+1,0).getDate(),lead=(new Date(yr,mo,1).getDay()+6)%7;
@@ -7041,7 +7160,7 @@ function p3Calendar(){
   let cells="MTWTFSS".split("").map(c=>`<div class="p3-cw">${c}</div>`).join("")+'<div class="p3-cd blank"></div>'.repeat(lead);
   for(let day=1;day<=dim;day++){
     const dd=new Date(yr,mo,day),key=dd.toDateString(),v=vols[key]||0,fut=dd>today,td=dd.getTime()===today.getTime();
-    cells+=v&&!fut?`<div class="p3-cd on${prsD[key]?" pr":""}${td?" today":""}" style="--h:${(.1+.42*Math.min(1,v/mx)).toFixed(2)}" data-hx onclick="dayDetail('${key}')" aria-label="${esc(key)}">${day}</div>`:`<div class="p3-cd${td?" today":""}${fut?" fut":""}">${day}</div>`;
+    cells+=(v||days[key])&&!fut?`<div class="p3-cd on${prsD[key]?" pr":""}${real[key]?"":" qk"}${td?" today":""}" style="--h:${(.1+.42*Math.min(1,v/mx)).toFixed(2)}" data-hx onclick="dayDetail('${key}')" aria-label="${esc(key)}${real[key]?"":", marked done"}">${day}</div>`:`<div class="p3-cd${td?" today":""}${fut?" fut":""}">${day}</div>`;
   }
   const pm=new Date(yr,mo-1,1),inM=(w,y,m)=>{const t=new Date(w.date);return t.getFullYear()===y&&t.getMonth()===m;};
   const mw=(d.workouts||[]).filter(w=>inM(w,yr,mo)),pw=(d.workouts||[]).filter(w=>inM(w,pm.getFullYear(),pm.getMonth()));
@@ -7051,13 +7170,13 @@ function p3Calendar(){
     <div class="p3-ch"><div><h3>${MON[mo]} ${yr}</h3><div class="sub">${sess} session${sess===1?"":"s"} · ${vv.v} ${vv.u}${mp?` · ${mp} PR${mp>1?"s":""}`:""}${dp!=null?` · <b class="${dp>=0?"c-ok":"c-warn"}">${dp>=0?"+":""}${dp}%</b>`:""}</div></div>
       <div class="nv"><button class="btn-i" data-hx onclick="calPrev()" aria-label="Previous month">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><button class="btn-i" data-hx onclick="calNext()" aria-label="Next month"${off>=0?" disabled":""}>${GP.icon("chevR")}</button></div></div>
     <div class="p3-cg">${cells}</div>
-    <div class="p3-cl"><span><i class="sw"></i>Session</span><span><i class="sw pr"></i>Record</span><span class="ht">Brighter = more volume</span></div></section>`;
+    <div class="p3-cl"><span><i class="sw"></i>Session</span><span><i class="sw pr"></i>Record</span>${mw.some(w=>w.quick)?`<span><i class="sw qk"></i>Marked done</span>`:""}<span class="ht">Brighter = more volume</span></div></section>`;
 }
 function p3OnThisDay(){
   const t=new Date(now()),past=(state.data.workouts||[]).filter(w=>{const x=new Date(w.date);return x.getMonth()===t.getMonth()&&x.getDate()===t.getDate()&&x.getFullYear()<t.getFullYear();});
   if(!past.length)return "";
   const w=past[past.length-1],k=new Date(w.date);k.setHours(0,0,0,0);
-  return `<div class="s1 gh-row p3-otd gh-c" style="--i:1" data-hx onclick="dayDetail('${k.toDateString()}')"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">On this day · ${new Date(w.date).getFullYear()}</div><div class="gh-t2">${esc(w.name)} · ${fmtNum(w.totalVol)} kg${w.prs&&w.prs.length?" · "+w.prs.length+" PR":""}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+  return `<div class="s1 gh-row p3-otd gh-c" style="--i:1" data-hx onclick="dayDetail('${k.toDateString()}')"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">On this day · ${new Date(w.date).getFullYear()}</div><div class="gh-t2">${esc(w.name)} · ${w.quick?"Marked done":fmtNum(w.totalVol)+" kg"}${w.prs&&w.prs.length?" · "+w.prs.length+" PR":""}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
 }
 function p3ToggleRec(){state._p3AllRec=!state._p3AllRec;render();}
 function p3Records(){
@@ -7457,7 +7576,7 @@ function renderMission(){
   let h=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Mission</h1>`;
   if(!cur)h+=gmEmpty()+gmDock(null);
   else h+=gmHero(cur)+gmDock(cur)
-    +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
+    +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview or mark done</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
     +gmSuggest()+gmForecast(cur.sp)+gmBench(cur.sp);
   h+=`</div>`;
   $("app").innerHTML=h;
@@ -7814,8 +7933,8 @@ function myPatrolCard(){
     Object.entries(bigKeys).forEach(([k,L])=>{const est=liftEstimate(L);if(est)big[k]=Math.round(est.orm);});
   }catch(e){}
   // Recent patrols — the async "see each other's past workouts": last 5 sessions, compact for sharing.
-  const recent=(d.workouts||[]).slice(0,5).map(w=>{
-    let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{const o=epley(+s.w||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
+  const recent=(d.workouts||[]).filter(w=>!w.quick).slice(0,5).map(w=>{
+    let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{if(s.est)return;const o=epley(+s.w||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
     return {n:(w.name||"Session").slice(0,16),v:Math.round(w.totalVol||0),t:(w.date||"").slice(0,10),top:top.slice(0,18)};
   });
   const prTot=(d.workouts||[]).reduce((n,w)=>n+((w.prs||[]).length),0); // cumulative PR events ever — lets Fight Night score progress, not tonnage
@@ -8912,7 +9031,7 @@ function weeklyFightCard(){
   const agg=arr=>{let vol=0,prs=0,sets=0;arr.forEach(w=>{vol+=w.totalVol||0;prs+=(w.prs||[]).length;(w.exercises||[]).forEach(e=>sets+=(e.sets||[]).filter(s=>s.type!=="W").length);});return {sessions:arr.length,vol:Math.round(vol),prs,sets};};
   const T=agg(thisW),L=agg(lastW);
   if(!T.sessions&&!L.sessions)return "";
-  let best=null,bestO=0;thisW.forEach(w=>{(w.exercises||[]).forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{const o=setE1RM(ex,s);if(o>bestO){bestO=o;best={n:e.name,o:Math.round(o)};}});});});
+  let best=null,bestO=0;thisW.forEach(w=>{(w.exercises||[]).forEach(e=>{const ex=exFor(e.name);(e.sets||[]).forEach(s=>{if(s.est)return;const o=setE1RM(ex,s);if(o>bestO){bestO=o;best={n:e.name,o:Math.round(o)};}});});});
   const sc=x=>x.sessions*3+x.prs*4+x.vol/2000;
   const mine=sc(T),theirs=sc(L);
   const verdict=!L.sessions?{t:"OPENING BOUT",c:"var(--gold2)",d:"First week on the card — set the bar to beat."}
@@ -9150,12 +9269,12 @@ function dayDetail(key){
     const allMuscles=[...new Set((w.exercises||[]).flatMap(e=>(exFor(e.name).p||[])))];
     const muscleRow=allMuscles.length?`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin:12px -2px 8px"><div style="display:flex;gap:10px;padding:0 2px;width:max-content">${allMuscles.map(m=>`<div style="flex:none;text-align:center;width:72px"><div style="position:relative;width:72px;height:88px;border-radius:10px;overflow:hidden;border:2px solid ${MC_COL[m]||'rgba(255,255,255,.2)'};box-shadow:0 0 12px ${MC_COL[m]||'transparent'}55"><img src="${MUSCLE_IMG[m]||''}" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover;object-position:top" loading="lazy"><div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.7) 100%)"></div><div style="position:absolute;bottom:5px;left:0;right:0;text-align:center;font-size:9px;font-weight:900;color:${MC_COL[m]||'#fff'};text-shadow:0 1px 4px rgba(0,0,0,.9);letter-spacing:.04em;text-transform:uppercase">${MNAME[m]||m}</div></div></div>`).join('')}</div></div>`:'';
     body+=`<div class="card" style="margin:9px 0;padding:13px;border-color:rgba(232,197,106,.2)">
-      <div class="row sp"><b style="font-size:15px">${esc(w.name)}</b><b class="gold">${fmtNum(w.totalVol)}kg</b></div>
-      <div class="mini" style="margin:3px 0;color:var(--text2)">${w.exercises.length} exercises · ${fmtTime(w.duration)}${w.prs&&w.prs.length?` · <span style="color:var(--green)">${w.prs.length} PR</span>`:""}</div>
+      <div class="row sp"><b style="font-size:15px">${esc(w.name)}</b>${w.quick?`<span class="tag ok ql-tag">Marked done</span>`:`<b class="gold">${fmtNum(w.totalVol)}kg</b>`}</div>
+      <div class="mini" style="margin:3px 0;color:var(--text2)">${w.exercises.length} exercises · ${w.quick?qlPlanned(w)+(w.why?" · "+esc(qlWhyLabel(w.why)):""):fmtTime(w.duration)}${w.prs&&w.prs.length?` · <span style="color:var(--green)">${w.prs.length} PR</span>`:""}</div>
       ${muscleRow}
       <div class="mini" style="margin-top:4px;line-height:1.7">${(w.exercises||[]).map(e=>`<span style="color:var(--text)">${esc(e.name)}</span> <span style='color:var(--text3)'>${(e.sets||[]).filter(s=>s.done&&s.type!=="W").length}×</span>`).join(' · ')}</div>
       ${w.feel?`<div class="mini" style="margin-top:6px;color:var(--gold2)">${({drained:"😫 Felt drained",ok:"😐 Felt solid",fire:"🔥 Dialled in"})[w.feel]||""}</div>`:""}
-      ${w.notes?`<div class="mini" style="margin-top:6px;font-style:italic;color:var(--text2)">📝 ${esc(w.notes)}</div>`:""}</div>`;
+      ${w.notes&&!w.quick?`<div class="mini" style="margin-top:6px;font-style:italic;color:var(--text2)">📝 ${esc(w.notes)}</div>`:""}</div>`;
   });
   body+=`<button class="btn" style="margin-top:4px" onclick="closeSheet()">Close</button>`;
   openSheet(body);
@@ -11168,6 +11287,7 @@ function ghHeroTonight(cur,vol){
     <div class="gh-meta"><span><b>${st.lifts}</b> lifts</span><span><b>${st.sets}</b> sets</span><span>~<b>${st.min}</b> min</span>${st.up?`<span class="up">${GP.icon("up")}${st.up} ready for +kg</span>`:""}</div>
     ${ghBand(top,"Recovery of tonight's muscles")}
     <div class="gh-cta"><button class="btn btn-1" onclick="startWorkout('${cur.sp.id}',${cur.i})">${GP.icon("play")}Start Patrol</button><button class="btn" onclick="openDayBriefing('${cur.sp.id}',${cur.i})">Preview</button></div>
+    <button class="ql-link" onclick="openQuickLog('${cur.sp.id}',${cur.i})">${GP.icon("check")}<span>Mark as done</span><i>trained without logging</i></button>
     ${ghCoach(vol,day,false)}</section>`;
 }
 function ghHeroRest(cur,vol){
@@ -11251,7 +11371,7 @@ function ghRecap(){
   const ws=state.data.workouts||[],w=ws[0];if(!w)return "";
   const vol=+w.totalVol||0,prev=ws.slice(1).find(x=>x.name===w.name&&(+x.totalVol||0)>0),
     d=prev&&vol>0?Math.round((vol-prev.totalVol)/prev.totalVol*100):null,prs=(w.prs||[]).length,v=p3Vol(vol),k=new Date(w.date);k.setHours(0,0,0,0);
-  const bits=[ghAgo(w.date),`${v.v} ${v.u}`];
+  const bits=w.quick?[ghAgo(w.date),`<span class="tag ok ql-tag">Marked done</span>`+(w.why?" "+esc(qlWhyLabel(w.why)):"")]:[ghAgo(w.date),`${v.v} ${v.u}`];
   if(d!=null)bits.push(`<b class="${d>=0?"c-ok":"c-warn"}">${d>=0?"+":"−"}${Math.abs(d)}%</b>`);
   if(prs)bits.push(`${prs} PR${prs===1?"":"s"}`);
   const nm=String(w.name||"Session").split(" · ")[0];
@@ -11612,8 +11732,8 @@ function exportCSV(){
     const d=(w.date||"").slice(0,10);
     (w.exercises||[]).forEach(e=>{
       (e.sets||[]).forEach((s,i)=>{
-        const ex=exFor(e.name);let e1="";try{e1=setE1RM(ex,s);}catch(err){}
-        rows.push([d,e.name,i+1,s.w||"",s.r||"",s.type||"NRM",e1?Math.round(e1):""]);
+        const ex=exFor(e.name);let e1="";try{e1=s.est?0:setE1RM(ex,s);}catch(err){}
+        rows.push([d,e.name,i+1,s.w||"",s.r||"",s.est?"EST":(s.type||"NRM"),e1?Math.round(e1):""]);
       });
     });
   });
@@ -11966,7 +12086,7 @@ function lgRx(name){if(LG_ISO.test(name))return LG_RX.iso;return["quads","hamstr
 function lgCap(e){const m=lgMuscle(e);return !!m&&getRecovery(m)<60;}
 function lgPlan(e){const n=(e.sets||[]).filter(s=>s.type!=="W").length;return e.plan?`${+e.plan.s||n} × ${e.plan.r||""}${e.plan.opt?" · optional":""}`:`${n} set${n===1?"":"s"}`;}
 /* last outing of a lift on this gym (working sets, newest first, respects the archive cut) */
-function lgLast(name){const cut=exResetAt(name);for(const w of gymWs()){if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())break;const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;const sets=(e.sets||[]).filter(s=>s.type!=="W"&&+s.r>0);if(sets.length)return{date:w.date,sets};}return null;}
+function lgLast(name){const cut=exResetAt(name);for(const w of gymWs()){if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())break;const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;const sets=(e.sets||[]).filter(s=>s.type!=="W"&&+s.r>0&&!s.est);if(sets.length)return{date:w.date,sets};}return null;}
 function lgSessionSets(m){let c=0;(state.session.exercises||[]).forEach(e=>{if(e._skip)return;const ex=exFor(e.name),n=(e.sets||[]).filter(s=>s.type!=="W"&&s.done).length;if((ex.p||[]).map(MM_NORM).includes(m))c+=n;else if((ex.s||[]).map(MM_NORM).includes(m))c+=n*.5;});return c;}
 const lgWeekly=m=>Math.round(weeklySets(m)+perWeek(lgSessionSets(m)));
 function lgDayInfo(ses){const sp=(state.data.splits||[]).find(s=>s.id===ses.srcSplit);return sp&&ses.srcDay!=null?`Day ${ses.srcDay+1} of ${sp.days.length}`:"Free session";}
