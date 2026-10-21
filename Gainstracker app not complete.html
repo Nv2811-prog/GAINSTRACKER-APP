@@ -606,9 +606,9 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 .tbtn::after{content:"";position:absolute;inset:-4px}
 .tbtn.tb-alf{background:#0B0F16;box-shadow:0 0 0 1.5px rgba(242,193,78,.75)}
 .tbtn.tb-alf img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 26%;display:block}
-/* tab switch = View Transition: old view fades in 90ms, new one fades up 6px over 200ms; the tab bar stays put */
+/* tab switch = View Transition: the old view fades out in 90ms, the new one rises 8px over 200ms; the hero is its own group (see GP:CHARM, 6) and the tab bar stays put */
 @keyframes vtOut{to{opacity:0}}
-@keyframes vtIn{from{opacity:0;transform:translateY(6px)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(8px)}}
 ::view-transition-old(root){animation:vtOut 90ms linear both}
 ::view-transition-new(root){animation:vtIn 200ms var(--ease-out) both}
 ::view-transition-group(nav){animation-duration:.01s}
@@ -1072,10 +1072,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-hero{padding:12px 16px 10px}
 .gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
-.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08);transform-origin:68% 38%;animation:ghDrift 12s ease-in-out infinite alternate}
-.s3.is-live .gh-art{opacity:.5;animation:none}   /* live hero: the pulsing dot is the one moving thing */
-@keyframes ghDrift{to{transform:scale(1.05) translate3d(-5px,0,0)}}
-@media (prefers-reduced-motion:reduce){.gh-art{animation:none}}
+.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08)}
+.s3.is-live .gh-art{opacity:.5}   /* live hero: dimmed; the pulsing live dot is the one time-based motion */
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
 .gh-live{display:inline-flex;align-items:center;gap:7px;color:var(--gold-ink)}
 .gh-live::before{content:"";width:7px;height:7px;border-radius:9px;background:var(--gold);box-shadow:0 0 0 3px rgba(242,193,78,.2)}
@@ -1186,7 +1184,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh svg.ring{display:block}
 
 /* SECTION HEADER: title left, caption or action right on ONE row (Profile Records, Mission/Suit/Garage headers). The action keeps a 44px tap target without growing the row. */
-.gh-sec{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 4px 10px}
+.gh-sec{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:26px 4px 10px}
 .gh-sec h2{flex:none;margin:0;font:700 20px/1.2 var(--body);letter-spacing:-.02em}
 .gh-sec .t-xs{min-width:0;text-align:right}
 .gh-sec .gh-more{flex:none;align-self:center;padding:12px 0 12px 16px;margin:-12px 0}
@@ -1219,8 +1217,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 @keyframes ghRing{from{stroke-dasharray:0 999}}
 @keyframes ghFill{from{clip-path:inset(0 100% 0 0)}}
 .gh-anim .gh-c{animation:ghIn .3s var(--ease-out) both;animation-delay:calc(var(--i,0)*40ms)}
-.gh-anim .ring-v{animation:ghRing .7s var(--ease-out) both}
-.gh-anim .lmk .fill{animation:ghFill .5s var(--ease-out) both;animation-delay:calc(var(--k,0)*30ms)}
+.gp-first .ring-v{animation:ghRing .6s var(--ease-out) both}   /* rings and bars draw in the first time a view shows in a session (gpLive() adds .gp-first), never on a repeat visit or an in-place re-render */
+.gp-first .lmk .fill,.gp-first .p3-rank .bar i{animation:ghFill .36s var(--ease-out) both;animation-delay:calc(var(--k,0)*20ms)}
 .toast .tundo{min-height:28px;height:28px;margin-left:12px;padding:0 10px;color:var(--gold-ink)}
 .gh-ring.empty .ring-v{display:none}
 
@@ -1244,6 +1242,48 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ga-finish.fin img{--o:.9;object-position:68% 30%;-webkit-mask-image:linear-gradient(180deg,#000 44%,transparent 100%);mask-image:linear-gradient(180deg,#000 44%,transparent 100%)}
 .ga-finish.fin::after{background:radial-gradient(75% 60% at 50% 100%,rgba(5,7,12,.85),rgba(5,7,12,0) 100%),linear-gradient(90deg,rgba(5,7,12,.5),rgba(5,7,12,0) 70%)}
 .lg2-bar::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:url(assets/art/logging.jpg) right 55%/cover no-repeat;opacity:.85;-webkit-mask-image:linear-gradient(90deg,transparent 24%,#000 88%);mask-image:linear-gradient(90deg,transparent 24%,#000 88%)}
+
+/* ===== GP:CHARM (wave 6) ===== */
+/* The charm layer: hero art that lives (scroll-driven, transform only), a one-shot gold light sweep per tab, art in the sheets and the Alfred chat, a line icon + accent on every section header, live numbers, and the tab-switch morph.
+   Time-based motion stays at <= 1 infinite animation per screen: the hero art is driven by SCROLL (animation-timeline), never by a clock. */
+/* 1 · living hero art: while the page scrolls the still lags behind and pushes in (translateY 7% + scale 1.1 around its lower right, so no edge ever shows). Feature-detected; elsewhere the still simply holds. */
+@keyframes gpPar{to{transform:translate3d(0,7%,0) scale(1.1)}}
+@keyframes gpParBar{to{transform:scale(1.1)}}
+@keyframes gpPush{from{transform:scale(1)}to{transform:scale(1.08)}}
+@supports (animation-timeline:scroll()){
+  .gh-art,.ga:not(.fin):not(.hd) img,.al-bg img,.af-bg img{transform-origin:72% 100%;animation:gpPar linear both;animation-timeline:scroll(root block);animation-range:0px 340px}
+  .lg2-bar::before{transform-origin:72% 50%;animation:gpParBar linear both;animation-timeline:scroll(root block);animation-range:0px 700px}
+}
+.p3-fin .ga img{transform-origin:68% 30%;animation:gpPush 1.4s var(--ease-out) both}   /* the finish moment: one slow push-in, once */
+/* 2 · light sweep: one gold glint across the hero the first time a tab shows in a session (gpSweep() adds the <i>, it removes itself; clipped by the hero's overflow, above the art and text, under the top hairline) */
+@keyframes gpSweep{from{transform:translate3d(-37.5%,0,0);opacity:0}16%{opacity:1}82%{opacity:1}to{transform:translate3d(37.5%,0,0);opacity:0}}
+.gp-sw{position:absolute;top:0;bottom:0;left:-30%;right:-30%;z-index:1;pointer-events:none;background:linear-gradient(104deg,transparent 38%,rgba(255,214,120,.18) 45%,rgba(255,240,200,.42) 50%,rgba(255,214,120,.18) 55%,transparent 62%);animation:gpSweep .78s cubic-bezier(.3,.55,.25,1) .08s both}
+.gp-sw::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent 41%,rgba(255,244,214,.95) 50%,transparent 59%)}
+/* 3 · art in the places you tap into: the exercise sheet and the muscle dossier open under a darkened still (the hero recipe: right-aligned, dark on the left and bottom, art reaches the sheet's top edge behind the grabber), the Alfred chat header carries a dim band. Titles keep a soft shadow so they stay crisp. */
+.p3-xh,.gm-dos .gm-bh{position:relative}
+.p3-xh::before,.gm-dos .gm-bh::before{content:"";position:absolute;z-index:-1;pointer-events:none;left:-16px;right:-16px;top:-29px;bottom:-16px}
+.p3-xh::before{background:linear-gradient(180deg,rgba(19,27,41,.6),rgba(19,27,41,0) 36%),linear-gradient(90deg,#131B29 14%,rgba(19,27,41,.6) 50%,rgba(19,27,41,0) 86%),linear-gradient(0deg,#131B29 0%,rgba(19,27,41,0) 55%),url(assets/art/head-exercise.jpg) right center/cover no-repeat}
+.gm-dos .gm-bh::before{background:linear-gradient(180deg,rgba(23,33,49,.6),rgba(23,33,49,0) 36%),linear-gradient(90deg,#172131 14%,rgba(23,33,49,.6) 50%,rgba(23,33,49,0) 86%),linear-gradient(0deg,#172131 0%,rgba(23,33,49,0) 55%),url(assets/art/head-muscle.jpg) right center/cover no-repeat}
+.p3-xh h2,.p3-xh .sub,.gm-bt,.gm-bh .eyebrow{text-shadow:0 1px 12px rgba(8,12,20,.95)}
+.ac-head{position:relative;isolation:isolate}
+.ac-head::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;background:linear-gradient(90deg,rgba(12,18,28,.98) 22%,rgba(12,18,28,.5) 62%,rgba(12,18,28,.1)),url(assets/art/profile.jpg) right 22%/cover no-repeat}
+.af-key{margin-top:12px}   /* the Alfred key row sat flush under the hero once it became a real .gh-row */
+/* 4 · section headers: one line icon + one area accent. rec = records gold, vol = volume green, rcv = recovery blue, pln = plan amber, n = steel; gpSec() adds the chip by title, nothing is hand-placed */
+.gp-ic{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:8px;color:var(--ac,var(--tx2));background:var(--act,rgba(150,178,222,.08));box-shadow:inset 0 0 0 1px var(--acr,var(--hair))}
+.gp-ic .gi{width:14px;height:14px;margin:0;stroke-width:2}
+[data-ac=rec]{--ac:var(--gold-ink);--act:var(--tint-gold);--acr:rgba(242,193,78,.3)}
+[data-ac=vol]{--ac:var(--ok);--act:var(--tint-ok);--acr:rgba(52,210,127,.3)}
+[data-ac=rcv]{--ac:var(--rest);--act:var(--tint-rest);--acr:rgba(91,180,255,.3)}
+[data-ac=pln]{--ac:var(--warn);--act:var(--tint-warn);--acr:rgba(255,178,36,.3)}
+.gh-sec h2,.p3-ch2 h3{display:flex;align-items:center;gap:9px}
+.gh-lh h3 .gp-ic,.p3-ch2 h3 .gp-ic{width:22px;height:22px;border-radius:7px}
+.gh-lh h3 .gp-ic .gi,.p3-ch2 h3 .gp-ic .gi{width:13px;height:13px}
+/* 5 · live numbers: no css of its own beyond the draw-in rules .gp-first .ring-v / .lmk .fill (HOME block, ghRing/ghFill); gpLive() adds .gp-first on the first view of a view per session and counts the key numbers up */
+/* 6 · tab switch (View Transition): the hero is its own group, so it cross-fades and morphs between the two tabs inside the same 200ms while the page rises 8px (vtIn) and the tab bar stays put. gpVtTag() names the hero just for the transition. */
+::view-transition-group(root),::view-transition-group(gp-hero){animation-duration:200ms}   /* the whole transition ends with the rise, no 250ms default tail */
+::view-transition-group(gp-hero){animation-timing-function:var(--ease-out);overflow:clip;border-radius:var(--r-l)}
+@media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}.gp-sw{display:none}}
+/* ===== /GP:CHARM ===== */
 
 /* ===== GP:MISSION+SUIT (wave 3) ===== */
 /* Mission, Suit and the muscle dossier run on Home's primitives (.gh .s1/.s2/.s3, .gh-row, .gh-lh, .gh-lore, .lmk, .ring, .tag) plus the rules below, all scoped under .gm.
@@ -1452,7 +1492,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 /* MUSCLE DOSSIER sheet */
 .gm-dos .s2{margin-top:12px}
 .gm-dhead{display:flex;align-items:center;gap:14px;padding:14px;margin-top:4px}
-.gm-dhead .gh-ring{width:84px;height:84px}
+.gm-dhead .gh-ring{position:relative;flex:none;width:84px;height:84px}
 .gm-dhead .gh-rc .num{font-size:34px}
 .gm-dm{flex:1;min-width:0;display:grid;gap:6px;align-content:center}
 .gm-dr{font:650 17px/1.2 var(--body);letter-spacing:-.01em}
@@ -1637,7 +1677,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 
 /* ===== GP:LOGGING (wave 2) ===== */
 /* sticky bar: title row folds on scroll, the strip + segments stay pinned (≈64–100px) */
-.lg2-bar{position:sticky;top:0;z-index:30;margin:calc(-20px - env(safe-area-inset-top,0px)) -14px 0;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px 0;background:rgba(5,7,12,.9);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-bottom:1px solid var(--hair)}
+.lg2-bar{position:sticky;top:0;z-index:30;overflow:hidden;margin:calc(-20px - env(safe-area-inset-top,0px)) -14px 0;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px 0;background:rgba(5,7,12,.9);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border-bottom:1px solid var(--hair)}
 .lg2-title{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;height:44px;overflow:hidden}
 .lg2-title .lt{min-width:0}
 .lg2-eyebrow{display:flex;align-items:center;gap:6px;font:600 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink);white-space:nowrap}
@@ -4221,7 +4261,7 @@ function go(tab,vt){
   const fi=_TAB_ORDER.indexOf(prevTab),ti=_TAB_ORDER.indexOf(tab);
   state._tabDir=(fi>=0&&ti>=0&&fi!==ti)?(ti>fi?"right":"left"):null;
   const swap=q=>{state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}state._noEnter=q?1:0;render();state._noEnter=0;window.scrollTo(0,0);};
-  if(vt&&prevTab!==tab&&document.startViewTransition&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)){try{document.startViewTransition(()=>swap(1));return;}catch(e){}}
+  if(vt&&prevTab!==tab&&document.startViewTransition&&!gpReduced()){try{gpVtTag(1);const t=document.startViewTransition(()=>{swap(1);gpVtTag(1);}),untag=()=>gpVtTag(0);t.finished.then(untag,untag);return;}catch(e){}}
   swap(0);}
 
 /* ========================= ROUTER ========================= */
@@ -4267,6 +4307,7 @@ function render(){
     const dir=state._tabDir;state._tabDir=null;
     _a.classList.remove("view-enter","view-enter-soft","view-enter-right","view-enter-left");void _a.offsetWidth;
     _a.classList.add(soft?"view-enter-soft":dir==="right"?"view-enter-right":dir==="left"?"view-enter-left":"view-enter");}}
+  try{gpEnter();}catch(e){console.error("gpEnter",e);}   // GP:CHARM: first-view sweep + live numbers (never blocks the render)
 }
 
 /* ========================= READINESS ========================= */
@@ -5097,7 +5138,7 @@ function p3SumSession(R){
   return `${p3SumHead(R,"Session complete")}
   <section class="s3 p3-hero gh-c" style="--i:1">${gaArt("finish","sum")}
     <div class="p3-vh"><span class="eyebrow">Volume</span>${dTag}</div>
-    <div class="p3-vol"><span class="num" id="p3vol">${v.v}</span><span class="u">${v.u}</span></div>
+    <div class="p3-vol"><span class="num">${v.v}</span><span class="u">${v.u}</span></div>
     <div class="p3-g4">${stats.map(a=>`<div><span class="num">${a[0]}</span><span class="eyebrow">${a[1]}</span></div>`).join("")}</div>
     ${lgRestSummary(wk)}
   </section>
@@ -5157,7 +5198,7 @@ function renderSummary(){
   $("app").innerHTML=`<div class="gh p3-sum gh-anim">${[p3SumSession,p3SumMuscles,p3SumNext][k](R)}
     <div class="p3-nav"><div class="dots">${[0,1,2].map(i=>`<i class="${i===k?"on":""}"></i>`).join("")}</div>
     <div class="p3-btns">${k?`<button class="btn" data-hx onclick="sumNav(-1)">Back</button>`:""}<button class="btn btn-1" data-hx onclick="${last?"closeSummary()":"sumNav(1)"}">${last?"Done":"Next"}</button></div></div></div>`;
-  if(k===0){const v=$("p3vol");if(v){const t=p3Vol(R.totalVol);rollUp(v,t.n,{ms:650,dec:t.dec});}}
+  gpEnter();   // GP:CHARM live numbers: the first view of each slide counts up and draws in (sumNav calls renderSummary directly, not render)
   if(k===2){setTimeout(()=>{try{renderShareCard(R);}catch(e){}},120);try{populateAlfredRead(R);}catch(e){}}
   // swipe — handlers live on #app and are cleared at the top of render() when we leave summary
   const app=$("app");let sx=0;
@@ -10288,7 +10329,7 @@ function renderAlfred(){
     <h2 class="af-title">${hi}${nm?", "+esc(nm):""}.</h2>
     <p class="af-sub">Ask about your training, your numbers or the app.</p>
     <button class="af-ask" onclick="openAlfredChat()" aria-label="Ask Alfred"><span>Ask Alfred…</span><i><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></i></button></section>`;
-  const key=has?"":`<div class="s1 gh-x af-key gh-c" style="--i:1" onclick="openSettings('alfred')" role="button" tabindex="0"><span class="lead">${GP.icon("bolt")}</span><div class="main"><div class="gh-t1">Unlock live coaching</div><div class="gh-t2">Add a free Gemini key · takes 30 seconds</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+  const key=has?"":`<div class="s1 gh-row af-key gh-c" style="--i:1" onclick="openSettings('alfred')" role="button" tabindex="0"><span class="lead">${GP.icon("bolt")}</span><div class="main"><div class="gh-t1">Unlock live coaching</div><div class="gh-t2">Add a free Gemini key · takes 30 seconds</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
   const sug=`<section class="s2 gh-list af-sug gh-c" style="--i:2"><div class="gh-lh"><h3>Try asking</h3></div>${qs.map(q=>`<div class="gh-row af-q" role="button" tabindex="0" data-q="${esc(q)}" onclick="alfPageAsk(this.dataset.q)"><span class="lead">${GP.icon("chat")}</span><div class="main"><div class="gh-t1">${esc(q)}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section>`;
   const conv=last?`<section class="s2 af-last gh-c" style="--i:3" onclick="openAlfredChat()" role="button" tabindex="0"><div class="gh-lh"><h3>Last conversation</h3><span class="gh-more">Continue</span></div>${last.q?`<p class="af-lq"><b>You</b><span>${esc(last.q)}</span></p>`:""}<p class="af-la"><b>Alfred</b><span>${esc(last.a)}</span></p></section>`:"";
   const dos=`<section class="s2 af-dos gh-c" style="--i:5"><div class="gh-lh"><h3>Muscle dossiers</h3></div><div class="af-chips">${M12.map(m=>`<button class="chip" onclick="muscleDrill('${m}')">${MNAME[m]}</button>`).join("")}</div></section>`;
@@ -10419,14 +10460,6 @@ function rollUp(el,to,o={}){
   const t0=performance.now();el.textContent=fmt(from);
   const step=t=>{const p=Math.min(1,(t-t0)/ms);el.textContent=fmt(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1&&el.isConnected)requestAnimationFrame(step);else el.textContent=fmt(to);};
   requestAnimationFrame(step);
-}
-/* first view of the day (or a changed value) counts up; revisiting the tab with the same numbers leaves them alone */
-function ghRoll(){
-  const day=new Date().toDateString(),st=state._ghRoll=state._ghRoll&&state._ghRoll.day===day?state._ghRoll:{day,v:{}};
-  document.querySelectorAll("#app [data-roll]").forEach(el=>{
-    const to=+el.dataset.roll,k=el.dataset.k,had=st.v[k];st.v[k]=to;
-    if(had!==to)rollUp(el,to,{dec:+el.dataset.dec||0,from:had==null?0:had});
-  });
 }
 /* live session on Home: elapsed time and rest countdown tick while the hero is on screen, then the timer retires itself */
 function ghTick(){
@@ -10738,7 +10771,7 @@ function renderGotham(){
   const cur=currentPlanDay(),day=cur&&cur.day,rest=!!(day&&isRest(day)),vol=ghVol(day&&!rest?day:null);
   const hero=state.session?ghHeroLive(state.session):!cur?ghHeroFree(vol):rest?ghHeroRest(cur,vol):ghHeroTonight(cur,vol);
   $("app").innerHTML=`<div class="gh${state._same?"":" gh-anim"}">${hero}${ghWeek(vol)}${ghSunday(vol)}${ghLifts()}${ghRecap()}${ghNext(cur)}${ghExtrasRow()}</div>`;
-  ghRoll();ghTick();
+  ghTick();
 }
 
 /* ========================= SETTINGS (GP:TABS, wave 5) ========================= */
@@ -11168,8 +11201,64 @@ function calmGlow(n){
     const f=st.filter;if(f&&/drop-shadow/.test(f)){const g=f.replace(/drop-shadow\((?:[^()]|\([^()]*\))*\)/g,m=>_isGlow(m.slice(12,-1))?"":m).trim();if(g!==f)st.filter=g||"none";}
   });
 }
-new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);}))).observe(document.body,{childList:true,subtree:true});
-hxScan(document.body);iconize(document.body);calmGlow(document.body);
+/* ===== GP:CHARM (wave 6) · the charm layer: first-view light sweep · section icons · live numbers · tab-switch hero ===== */
+const GP_FIRST_MS=800,GP_SEEN=new Map();
+const gpReduced=()=>!!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches);
+/* a view is "first" the first time it shows in this session, and for 0.8 s after (a quick second render keeps the moment alive instead of killing it) */
+function gpFirst(vk){const t=performance.now(),s=GP_SEEN.get(vk);if(s==null){GP_SEEN.set(vk,t);return true;}return t-s<GP_FIRST_MS;}
+/* one gold glint across the hero (title and top edge), once per tab per session. The <i> removes itself; transform/opacity only; never takes a tap. */
+function gpSweep(root){
+  const h=root.querySelector(".s3");if(!h||gpReduced())return;
+  const i=document.createElement("i");i.className="gp-sw";i.setAttribute("aria-hidden","true");
+  i.addEventListener("animationend",()=>i.remove());h.appendChild(i);
+}
+/* live numbers · ONE helper for the whole app. The first time a view shows in a session its rings and bars draw in (css .gp-first) and its key numbers count up (<= 600 ms);
+   afterwards a number only moves when its value changed. Never replays on an in-place re-render. Any other number can opt in with data-roll. */
+const GP_NUM=".gh-mt-t .num,.mc-v .num,.gm-nums .num,.p3-g4 .num,.p3-vol .num,[data-roll]",GP_ROLL_MS=560,GP_VAL=new Map();
+function gpLive(root,first,vk){
+  root.classList.toggle("gp-first",first);
+  root.querySelectorAll(GP_NUM).forEach((el,i)=>{
+    const tn=el.firstChild,m=tn&&tn.nodeType===3&&/^(\d+)(?:\.(\d+))?$/.exec(tn.nodeValue.trim());if(!m)return;
+    const to=+tn.nodeValue,key=vk+"#"+i,had=GP_VAL.get(key);GP_VAL.set(key,to);
+    if(first||(had!=null&&had!==to))rollUp(tn,to,{ms:GP_ROLL_MS,dec:(m[2]||"").length,from:first||had==null?0:had});
+  });
+}
+/* runs at the end of render() (and renderSummary): works out "first" for this view, then hands the root to each charm helper; once per freshly rendered root */
+function gpEnter(){
+  const app=$("app"),root=app&&app.querySelector(":scope>.gh");if(!root||root.dataset.gp)return;
+  root.dataset.gp="1";
+  if(state._noEnter)root.classList.remove("gh-anim");   // a tab switch by View Transition: the transition does the rising, the cards must not stagger on top of it
+  const R=state.lastResult,vk=state.step==="summary"&&R?"sum"+(state.sumCard||0)+":"+((R.wk&&R.wk.date)||""):state._vk||"",first=gpFirst(vk);
+  gpLive(root,first,vk);
+  if(first&&vk.startsWith("tab:"))gpSweep(root);
+}
+/* tab switch: the hero joins the View Transition as its own group, named only for the length of the transition and only while it is on screen (go() calls this) */
+function gpVtTag(on){
+  const h=document.querySelector("#app>.gh .s3");if(!h)return;
+  if(on&&h.getBoundingClientRect().bottom<60)return;   // scrolled away: nothing to morph
+  h.style.viewTransitionName=on?"gp-hero":"";
+}
+/* every section header = one line icon + one area accent, the same everywhere: records gold · volume green · recovery blue · plan amber · the rest steel.
+   Matched on the title's own words (first hit wins), so a new section picks its icon up by name. [pattern, GP.icon name, area] */
+const GP_SEC=[
+  [/stall|plateau/i,"plateau","rec"],[/record|mastery|standard|belt|\bpr\b/i,"trophy","rec"],[/strength|e1rm|target|progress/i,"up","rec"],[/\blifts?\b|exercise/i,"dumbbell","rec"],
+  [/sleep/i,"moon","rcv"],[/hydrat/i,"drop","rcv"],[/infirm|injur/i,"cross","rcv"],[/recover|sore|readiness|fatigue/i,"pulse","rcv"],
+  [/effort|rpe|rir|intensity/i,"bolt","vol"],[/dossier/i,"scan","n"],[/muscle|coverage|sets|volume|forecast|landmark/i,"chart","vol"],[/frequen/i,"calendar","vol"],
+  [/calendar|cycle|days?\b|schedule|next up|week|patrol/i,"calendar","pln"],[/plan|split|\blab\b|generator|import/i,"map","pln"],[/fuel|intake|stack|nutrition|macro/i,"flask","pln"],
+  [/body|weight/i,"scale","n"],[/league|duel|ally|allies|invite/i,"allies","n"],[/try asking|suggest/i,"bulb","n"],[/alfred|conversation/i,"chat","n"],[/tool/i,"wrench","n"],[/history|session|archive|log\b/i,"book","n"],[/cue|form|tip/i,"bulb","n"]
+];
+const GP_SEC_SEL=".gh-lh h3,.gh-sec h2,.p3-ch2 h3";
+function gpSec(n){
+  if(n.nodeType!==1)return;
+  const hs=n.matches(GP_SEC_SEL)?[n]:[];n.querySelectorAll(GP_SEC_SEL).forEach(e=>hs.push(e));
+  hs.forEach(el=>{
+    if(el.dataset.ac||el.querySelector(".gi,.gp-ic"))return;
+    const own=[...el.childNodes].filter(c=>c.nodeType===3).map(c=>c.nodeValue).join(" "),hit=GP_SEC.find(r=>r[0].test(own))||[0,"note","n"];
+    el.dataset.ac=hit[2];el.insertAdjacentHTML("afterbegin",`<span class="gp-ic" aria-hidden="true">${GP.icon(hit[1])}</span>`);
+  });
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);gpSec(n);}))).observe(document.body,{childList:true,subtree:true});
+hxScan(document.body);iconize(document.body);calmGlow(document.body);gpSec(document.body);
 document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 /* ===== GP:LOGGING (wave 2) — the live workout screen: header strip · focus card · set grid · up next ===== */
 const LG_RX={iso:{lo:60,hi:90,tgt:75},cmp:{lo:120,hi:180,tgt:150},low:{lo:150,hi:180,tgt:180}};
