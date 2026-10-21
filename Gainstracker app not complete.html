@@ -1045,6 +1045,9 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh .sv-eq.is-top .num{color:var(--gold-ink)}
 .sv-eq small{font:600 12px/1 var(--body);color:var(--tx2)}
 .sv-note{margin:10px 2px 0}
+/* Suit hero: the vault still (assets/art/suit-hero.jpg). It is low-key by design, so it gets the lighter veil from assets/art/README.md (the standard left feather would swallow the glass case); the recovery figure and its legend sit on top, the legend on the floor fade. */
+.ga-suit-hero img{opacity:1;filter:brightness(1.2);-webkit-mask-image:none;mask-image:none}
+.ga-suit-hero::after{background:linear-gradient(180deg,rgba(11,13,18,.45),rgba(11,13,18,0) 18%),linear-gradient(90deg,#0b0d12 4%,rgba(11,13,18,.45) 30%,rgba(11,13,18,0) 54%),linear-gradient(0deg,#0b0d12 0%,rgba(11,13,18,0) 28%)}
 /* ===== /GP:STRENGTH+SUIT ===== */
 /* ===== GP:WEEKLY+BODY (wave 7) ===== */
 /* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
@@ -1303,8 +1306,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ga-rest img{width:calc(100% + 60px);object-position:right 38%}   /* skyline pushed past the right edge so the moon clears the Next row */
 .ga-mission{--o:.66;--v:linear-gradient(180deg,rgba(17,25,39,.62),rgba(17,25,39,0) 34%)}   /* top veil keeps "Day 7 of 8" crisp */
 .ga-mission.dim{--o:.4}   /* the no-plan hero runs a paragraph across the full width */
-.ga-suit{top:auto;height:44%;--o:.9}   /* the quietest still: a carbon-plate band under the legend, the figure stays on clean matte */
-.ga-suit img{object-position:right bottom;filter:brightness(1.7);-webkit-mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%);mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%)}
 .ga-profile{--o:.8}
 .ga-profile img{width:calc(100% + 24px);object-position:right 14%}
 .p3-id .sub,.p3-id .p3-rank-h span{text-shadow:0 1px 10px rgba(5,7,12,.95)}
@@ -5595,10 +5596,9 @@ function buildSuit(){
   const P=suitProps();
   const cxF=125,cxB=375;
   const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
-  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#8B6B2A">${t}</text>`;
-  const div=`<line x1="250" y1="12" x2="250" y2="418" stroke="#2A2520" stroke-width="1" stroke-dasharray="4,4"/>`;
+  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#C29A45">${t}</text>`;
   const svg=`<svg viewBox="0 0 500 430" class="suit-breathe" style="width:100%;display:block">` +
-    SUIT_DEFS+lbl(cxF,"FRONT")+lbl(cxB,"BACK")+div+
+    SUIT_DEFS+lbl(cxF,"FRONT")+lbl(cxB,"BACK")+
     _frontBody(cxF,P)+_backBody(cxB,P)+
     `</svg>`;
   state._figShade=ps;state._figGlow=pg;
@@ -5741,7 +5741,7 @@ function gsHero(){
   const n=(a,b)=>rows.filter(x=>x.r>=a&&x.r<b).length,low=rows.filter(x=>x.r<GS_MID).map(x=>ghName(x.m));
   const dot=(c,t,k)=>`<span><i style="background:${c}"></i>${t} <b>${k}</b></span>`;
   const status=!rows.length?"Log a session and the figure lights up.":low.length?`<span class="c-warn">${low.join(", ")} below ${GS_MID}%</span>`:rows.every(x=>x.r>=GS_FRESH)?`<span class="c-ok">All trained muscles above ${GS_FRESH}%</span>`:"Tap a muscle for its dossier";
-  return `<section class="s3 gm-suit gh-c" style="--i:0">${gaArt("suit")}<div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
+  return `<section class="s3 gm-suit gh-c" style="--i:0">${gaArt("suit-hero")}<div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
     <div class="gm-fig2">${buildSuit()}</div>
     <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
 }
@@ -5755,7 +5755,7 @@ function gsDock(){
   const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load";
   return gdDock("Suit tools",[
     {art:"tile-infirmary",ic:"pulse",t:"Infirmary",s:inf,fn:"openInfirmary()"},
-    {art:"tile-lab",pos:"80% 50%",ic:"flame",t:"Fuel",s:gsFuelSub(),fn:"go('fuel',1)"},
+    {art:"tile-fuel",ic:"flame",t:"Fuel",s:gsFuelSub(),fn:"go('fuel',1)"},
     {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Replay · radar",fn:"openMastery()"},
     {art:"tile-photos",ic:"image",t:"Photos",s:ph>=2?`Compare · <b>${ph}</b>`:ph?`<b>${ph}</b> photo`:"Add your first",fn:"photosOpen()"}]);
 }
