@@ -929,6 +929,25 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .rk-r.cur .rk-n{color:var(--on-gold);background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:none}
 .rk-r.lock .gh-t1{color:var(--tx2)}
 .px-lede{margin:0 0 10px}
+/* nice touches: the set-complete moment, the stepper tick, the Mission cycle ring. All transform / opacity, all quiet under reduced motion. */
+.lg2-sr.tickfx .sdone.lg2-ck.on{animation:lg2-pop .28s var(--spring) 1}
+.lg2-sr.tickfx .lg2-ck.on .gi path{stroke-dasharray:24;stroke-dashoffset:24;animation:px-draw .24s .05s cubic-bezier(.3,.7,.2,1) forwards}
+.lg2-sr.tickfx:not(.pr)::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 1.5px var(--gold);opacity:0;pointer-events:none;animation:px-edge .38s ease-out 1}
+@keyframes px-draw{to{stroke-dashoffset:0}}
+@keyframes px-edge{0%{opacity:0;transform:scale(1)}30%{opacity:.9}100%{opacity:0;transform:scale(1.035)}}
+@keyframes px-tk-up{from{transform:translateY(55%);opacity:.15}to{transform:none;opacity:1}}
+@keyframes px-tk-dn{from{transform:translateY(-55%);opacity:.15}to{transform:none;opacity:1}}
+.tk-up{animation:px-tk-up .18s cubic-bezier(.2,.8,.2,1) 1}
+.tk-dn{animation:px-tk-dn .18s cubic-bezier(.2,.8,.2,1) 1}
+.gm-step .num,.px-st input{display:inline-block}
+.gm-hrow{display:flex;align-items:center;gap:14px}
+.gm-ht{flex:1;min-width:0}
+.gm-cyc{position:relative;flex:none;width:64px;height:64px;border-radius:99px;background:radial-gradient(circle,rgba(7,9,13,.6) 56%,transparent 71%)}
+.gm-cyc .ring{display:block}
+.gm-cyc .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.gm-cyc .num{font-size:26px;line-height:.86;color:var(--tx1)}
+.gm-cyc .c span{font:600 10px/1 var(--body);letter-spacing:.03em;color:var(--tx2)}
+@media (prefers-reduced-motion:reduce){.lg2-sr.tickfx .sdone.lg2-ck.on,.lg2-sr.tickfx .lg2-ck.on .gi path,.lg2-sr.tickfx::after,.tk-up,.tk-dn{animation:none}.lg2-sr.tickfx .lg2-ck.on .gi path{stroke-dasharray:none;stroke-dashoffset:0}}
 /* /GP:POLISH */
 /* ===== GP:DOCKS (wave 6) ===== */
 /* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
@@ -1489,10 +1508,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 
 /* MISSION hero: active plan, cycle rail, stats, two actions */
 .gm-hero .gh-title{margin-top:10px}
-.gm-rail{display:flex;gap:4px;margin:12px 0 14px}
-.gm-rail i{flex:1;max-width:30px;height:4px;border-radius:2px;background:rgba(150,178,222,.17)}
-.gm-rail i.d{background:rgba(242,193,78,.45)}
-.gm-rail i.t{flex:1.6;max-width:46px;background:var(--gold)}
+
 .gm-hero .gh-meta{margin-bottom:16px}
 .gm-cta .btn{flex:1;padding:0 12px;width:auto}
 
@@ -2041,7 +2057,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .lg2-dlt.up{color:var(--ok);background:var(--tint-ok)}.lg2-dlt.dn{color:var(--warn);background:var(--tint-warn)}.lg2-dlt.eq{color:var(--tx2);background:rgba(150,178,222,.1)}
 .lg2-sr .sdone.lg2-ck,.lg2-ck{width:52px;height:48px;border-radius:14px;display:grid;place-items:center;color:var(--tx3);background:rgba(150,178,222,.07);border:0;box-shadow:inset 0 0 0 1px var(--hair2);cursor:pointer;animation:none;font-size:15px}
 .lg2-ck .gi{width:24px;height:24px;stroke-width:2.6}
-.lg2-sr .sdone.lg2-ck.on{background:var(--ok);color:#04210F;border:0;box-shadow:0 0 0 4px rgba(52,210,127,.12),0 8px 18px -8px rgba(52,210,127,.9);animation:lg2-pop .28s var(--spring) 1}
+.lg2-sr .sdone.lg2-ck.on{background:var(--ok);color:#04210F;border:0;box-shadow:0 0 0 4px rgba(52,210,127,.12),0 8px 18px -8px rgba(52,210,127,.9)}
 @keyframes lg2-pop{from{transform:scale(.86)}to{transform:scale(1)}}
 .lg2-sr.dn{background:rgba(52,210,127,.075)}
 .lg2-sr.dn .lg2-sn{background:rgba(52,210,127,.16);color:var(--ok)}
@@ -3998,7 +4014,7 @@ function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Different
 /* ========================= LOGGING INTERACTIONS ========================= */
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;saveSessionSoon();} // no render (Rule 1 spirit); debounced backup
 function setSessionNotes(v){if(state.session)state.session.notes=v;} // no render — keep textarea focus
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){state.session._tick=ei+":"+si;haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")alfredVoiceLine(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();state.session._tick=null;saveSession();}
 // Real-time PR check: the moment a working set is completed and beats your record, it is flagged in its row.
 function liveCheckPR(ei,si){
   const exObj=state.session.exercises[ei];const s=exObj.sets[si];
@@ -7007,8 +7023,8 @@ function p3Records(){
   const list=Object.entries(d.prs||{}).filter(([n,p])=>p&&p.orm>0).sort((a,b)=>(new Date(b[1].date||0)-new Date(a[1].date||0))||(b[1].orm-a[1].orm));
   if(!list.length)return "";
   const recent=now()-30*P3_DAY;
-  const rows=(all?list:list.slice(0,6)).map(([n,p])=>{const tr=p3Trend(n,{w:64,h:26,mini:1}),fresh=new Date(p.date||0).getTime()>=recent;
-    return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(n)})"><span class="lead${fresh?" gold":""}">${GP.icon(fresh?"trophy":"dumbbell")}</span><div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">e1RM <b>${Math.round(p.orm)} kg</b> · PR ${p.date?ghAgo(p.date):"–"}</div></div><span class="trail">${tr?tr.svg:""}${GP.icon("chevR")}</span></div>`;}).join("");
+  const rows=(all?list:list.slice(0,6)).map(([n,p])=>{const tr=p3Trend(n,{w:64,h:26,mini:1}),fresh=new Date(p.date||0).getTime()>=recent,crown=new Date(p.date||0).getTime()>=now()-P3_DAY;   // a record from the last 24 h wears the crown
+    return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(n)})"><span class="lead${fresh?" gold":""}">${GP.icon(crown?"crown":fresh?"trophy":"dumbbell")}</span><div class="main"><div class="gh-t1">${esc(n)}</div><div class="gh-t2">e1RM <b>${Math.round(p.orm)} kg</b> · ${crown?`<span class="c-gold">New record ${ghAgo(p.date)}</span>`:`PR ${p.date?ghAgo(p.date):"–"}`}</div></div><span class="trail">${tr?tr.svg:""}${GP.icon("chevR")}</span></div>`;}).join("");
   return `<div class="gh-sec gh-c" id="p3-rec" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
     <section class="s2 gh-list gh-c" style="--i:2">${rows}${p3Row("chart","Every lift",loggedExerciseNames().length+" exercises · full curves","openArchive()")}</section>`;
 }
@@ -7340,13 +7356,12 @@ function gmForecast(sp){
 
 /* ---- hero + cycle days ---- */
 function gmHero(cur){
-  const sp=cur.sp,n=sp.days.length,tr=sp.days.filter(d=>!isRest(d)),st=tr.map(ghDayStats),sets=st.reduce((a,x)=>a+x.sets,0),
+  const sp=cur.sp,n=sp.days.length,tr=sp.days.filter(d=>!isRest(d)),st=tr.map(ghDayStats),sets=st.reduce((a,x)=>a+x.sets,0),day=cur.i+1,
     min=tr.length?Math.round(st.reduce((a,x)=>a+x.min,0)/tr.length/GH_MIN_STEP)*GH_MIN_STEP:0;
-  const rail=sp.days.map((_,i)=>`<i class="${i<cur.i?"d":i===cur.i?"t":""}"></i>`).join("");
-  return `<section class="s3 gh-hero gm-hero gh-c" style="--i:0">${gaArt("mission")}<div class="gh-top"><span class="eyebrow gh-live">Active plan</span><span class="gh-cnt">Day <b class="num">${cur.i+1}</b> of ${n}</span></div>
-    <h2 class="num gh-title">${esc(sp.name)}</h2>
-    <div class="gm-rail" role="img" aria-label="Cycle position: day ${cur.i+1} of ${n}">${rail}</div>
-    <div class="gh-meta"><span><b>${tr.length}</b> training</span><span><b>${n-tr.length}</b> rest</span><span><b>${sets}</b> sets / cycle</span>${min?`<span>~<b>${min}</b> min a day</span>`:""}</div>
+  return `<section class="s3 gh-hero gm-hero gh-c" style="--i:0">${gaArt("mission")}<div class="gh-top"><span class="eyebrow gh-live">Active plan</span></div>
+    <div class="gm-hrow"><div class="gm-ht"><h2 class="num gh-title">${esc(sp.name)}</h2>
+      <div class="gh-meta"><span><b>${tr.length}</b> training</span><span><b>${n-tr.length}</b> rest</span><span><b>${sets}</b> sets / cycle</span>${min?`<span>~<b>${min}</b> min a day</span>`:""}</div></div>
+      <div class="gm-cyc" role="img" aria-label="Cycle position: day ${day} of ${n}">${GP.ring(day,n,{size:64,stroke:6,c1:"var(--gold)",c2:"var(--gold-hi)"})}<div class="c"><b class="num" data-roll>${day}</b><span>of ${n}</span></div></div></div>
     <div class="gh-cta gm-cta"><button class="btn" onclick="freeWorkout()">${GP.icon("bolt")}Free session</button></div></section>`;
 }
 function gmDayRow(sp,i,cur,live){
@@ -8192,14 +8207,15 @@ function gmPlanSet(spId,i,j,patch){   // sets 1–10, reps range, optional flag;
   const sp=state.data.splits.find(s=>s.id===spId),day=sp&&sp.days[i],n=day&&day.exercises[j];if(!n)return;
   const cur=Object.assign({s:ghSetsOf(day,n),r:GM_REPS},day.plan&&day.plan[n]||{}),nx=Object.assign({},cur,patch);
   nx.s=clamp(Math.round(+nx.s)||cur.s,1,GM_MAX_SETS);if(!nx.opt)delete nx.opt;
-  haptic("tap");gmWritePlan(spId,i,n,nx);
+  state._gmTick={k:spId+"|"+i+"|"+j,d:Math.sign((+nx.s||0)-(+cur.s||0))};   // the sets number slides the way it moved (gmLiftRow reads this once)
+  haptic("tap");gmWritePlan(spId,i,n,nx);state._gmTick=null;
 }
 function gmMoveEx(spId,i,j,dir){state._gmPlanEd=spId+"|"+i+"|"+(j+dir);moveDayEx(spId,i,j,dir);}   // the open panel follows the lift
 function gmRmEx(spId,i,j){state._gmPlanEd=null;rmDayEx(spId,i,j);}
 function gmLiftRow(sp,i,day,j){
   const n=day.exercises[j],ex=exFor(n),pl=day.plan&&day.plan[n],id=sp.id,js=`'${id}',${i},${j}`,open=state._gmPlanEd===id+"|"+i+"|"+j,
     s=ghSetsOf(day,n),r=(pl&&pl.r)||GM_REPS,safe=esc(n).replace(/'/g,""),last=day.exercises.length-1;
-  const panel=open?`<div class="gm-pe"><div class="gm-step"><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s-1}})" aria-label="Fewer sets"${s<=1?" disabled":""}>${gmIc("minus")}</button><span><b class="num">${s}</b> sets</span><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s+1}})" aria-label="More sets"${s>=GM_MAX_SETS?" disabled":""}>${GP.icon("plus")}</button></div>
+  const panel=open?`<div class="gm-pe"><div class="gm-step"><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s-1}})" aria-label="Fewer sets"${s<=1?" disabled":""}>${gmIc("minus")}</button><span><b class="num${state._gmTick&&state._gmTick.k===id+"|"+i+"|"+j&&state._gmTick.d?(state._gmTick.d>0?" tk-up":" tk-dn"):""}">${s}</b> sets</span><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s+1}})" aria-label="More sets"${s>=GM_MAX_SETS?" disabled":""}>${GP.icon("plus")}</button></div>
       <div class="gm-chips">${GM_REP_PRESETS.map(p=>`<button class="chip${r===p?" on":""}" onclick="gmPlanSet(${js},{r:'${p}'})">${p} reps</button>`).join("")}<button class="chip${pl&&pl.opt?" on":""}" onclick="gmPlanSet(${js},{opt:${pl&&pl.opt?0:1}})">Optional</button></div>
       <div class="gm-drow"><span class="t-xs">Order · remove</span><div class="gm-mv"><button class="btn-i sm" onclick="gmMoveEx(${js},-1)" aria-label="Move lift up"${j===0?" disabled":""}>${gmIc("up")}</button><button class="btn-i sm" onclick="gmMoveEx(${js},1)" aria-label="Move lift down"${j===last?" disabled":""}>${gmIc("down")}</button><button class="btn-i sm" onclick="gmRmEx(${js})" aria-label="Remove lift">${GP.icon("x")}</button></div></div></div>`:"";
   return `<div class="gm-lift"><div class="gm-lh"><div class="gm-lm" onclick="openExDetail('${safe}')">${thumb(ex,2)}<div class="gm-ln"><div class="gh-t1">${esc(n)}</div>${splitExHint(n)}</div></div>
@@ -11947,7 +11963,7 @@ function lgRows(e,ei,ex){
   e.sets.forEach((s,si)=>{
     const isW=s.type==="W";if(!isW)wn++;
     const g=gs[si],pr=(ses._prRows||{})[ei+":"+si],fresh=state._lgPrFresh===ei+":"+si,dl=s.done&&!isW?lgDelta(s):null;
-    const cls=`lg2-sr ${s.done?"dn":si===act?"act":"up"}${isW?" w":""}${pr?" pr":""}${fresh?" pr-fresh":""}`;
+    const cls=`lg2-sr ${s.done?"dn":si===act?"act":"up"}${isW?" w":""}${pr?" pr":""}${fresh?" pr-fresh":""}${ses._tick===ei+":"+si?" tickfx":""}`;
     const dchip=k=>dl&&dl.k===k?`<i class="lg2-dlt ${dl.c}" onclick="lgToggleRir(${ei},${si})">${dl.t}</i>`:"";
     const ty=s.type||"NRM",tag=isW?"W":ty==="NRM"?String(wn):ty;
     h+=`<div class="${cls}">
