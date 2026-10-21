@@ -15,6 +15,7 @@ in headless Google Chrome at iPhone size (393x852 @2x), with realistic seeded da
     node scripts/qa/home.mjs [--tab] / tab.mjs --tab mission|suit [--fixture train|rest|none] [--width 375]  # tap every control on one tab, report console errors
     node scripts/migrations-check (see scripts/test-migrations.cjs)
     node scripts/qa/onboarding.mjs [--out dir]         # new-user flow: welcome > you > goal > experience > Home, guards, persistence, Settings edit mode
+    node scripts/qa/photos.mjs [--out dir]             # progress photos (wave 7): failed read-back leaves a photo untouched, move into IndexedDB behind a safety copy (byte-identical), thumbnails + idb flags in gt_data, reboot idempotence, Compare (drag/tap/touch/keys, side by side, pick, fits without scrolling), single view + delete from both stores, add, backup carries FULL photos, restore round-trip + prune, erase, a full phone still moves (safety copy falls back to IndexedDB)
     node scripts/qa/settings.mjs [--out dir]           # Settings + Data control: field validation, archive, restore guards, two-step erase, backup/CSV hooks
     # tab.mjs also taps sheets: --open "openSettings()" --scope "#sheet [onclick]"; --inject-file scripts/qa/seed-allies.js (three seeded allies: one on patrol, one streak at risk, one idle; pair with --tab allies and --open "openAllySheet(0)"); --skip "backupData|exportCSV"
     # Every script defaults to the app file of the repo it lives in (works in worktrees); pass --file <html> (smoke/syncheck: a positional path) to test another build.
