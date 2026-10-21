@@ -6923,7 +6923,7 @@ function openStrengthLift(l){   // the variations behind one Strength row: what 
   const c=SV[l],s=STD[l];if(!c||!s)return;
   const bw=bodyW(),rank=svRank(l,Object.keys(state.data.prs||{}),svPR,bw),top=rank[0];
   const nx=top&&[["Novice",s.b],["Intermediate",s.i],["Advanced",s.a],["Elite",s.e]].find(t=>top.orm/bw<t[1]-SV_EPS),   // the next tier, also in the units you train: target / factor = the e1RM on the lift itself
-    goal=nx?` Next, <b>${nx[0]}</b> at ${fmtKg(Math.ceil(nx[1]*bw))} kg${top.est?`, about ${fmtKg(Math.ceil(nx[1]*bw/top.f))} kg on the ${esc(top.name)}`:""}.`:"";
+    goal=nx?` Next, <b>${nx[0]}</b> at ${fmtKg(Math.ceil(nx[1]*bw-SV_EPS))} kg${top.est?`, about ${fmtKg(Math.ceil(nx[1]*bw/top.f-SV_EPS))} kg on the ${esc(top.name)}`:""}.`:"";
   const rows=rank.slice(0,8).map((x,i)=>`<div class="gh-row"><span class="lead${i?"":" gold"}">${GP.icon(i?"dumbbell":"trophy")}</span><div class="main"><div class="gh-t1">${esc(x.name)}</div><div class="gh-t2">${Math.round(x.raw)} kg e1RM${x.est?" × "+x.f.toFixed(2)+(x.capped?" · capped":""):" · the lift itself"}</div></div><span class="trail"><span class="sv-eq${i?"":" is-top"}"><b class="num">${Math.round(x.orm)}</b><small>kg</small></span></span></div>`).join("");
   openSheet(`<div class="gh st-pg sv-pg"><div class="st-h"><h2>${l}</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
     <p class="t-s sv-lede">${top?`Your strongest ${c.pattern} lift, as a ${c.ref}. Today that is <b>${esc(top.name)}</b>: ${Math.round(top.orm)} kg, ${(top.orm/bw).toFixed(2)}× your ${bw} kg bodyweight.${goal}`:`Log a ${c.pattern} lift and your strongest variation counts here, as a ${c.ref}.`}</p>
