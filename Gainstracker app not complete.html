@@ -1125,7 +1125,7 @@ body:has(.p3-sum) .toast{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 .p3-b3c{padding:4px 14px 10px;font-size:13px;line-height:18px;color:var(--tx2)}
 .gh .p3-b3 .num{font-size:40px;line-height:.9;color:var(--gold-ink)}
 .p3-b3 .u{margin-left:4px;font:600 13px/1 var(--body);color:var(--tx2)}
-.p3-sr{padding:12px 14px}
+.p3-sr{padding:12px 14px;cursor:pointer}
 .p3-sr+.p3-sr,.p3-b3c+.p3-sr{border-top:1px solid var(--hair)}
 .p3-srh{display:flex;align-items:baseline;gap:6px;margin-bottom:11px}
 .p3-srh b{flex:1;min-width:0;font:600 15px/1.2 var(--body)}
@@ -1204,6 +1204,26 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-acts{display:flex;flex-direction:column;gap:8px}
 .p3-acts .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 
+/* ===== GP:STRENGTH+SUIT (wave 8) ===== */
+/* Strength: a row opens the variations behind its number, and one quiet line says which lift it came from (est. · via Leg Press (45°) · 263 kg × 0.50). */
+.p3-sr:active{background:rgba(150,178,222,.05)}
+.p3-go{display:inline-flex;align-self:center;margin-left:2px;color:var(--tx3)}
+.p3-go .gi{width:16px;height:16px}
+.p3-sv{display:flex;align-items:baseline;gap:4px;min-width:0;margin-top:3px;font-size:12px;line-height:16px;color:var(--tx3)}
+.p3-sv span{flex:none;white-space:nowrap}
+.p3-sv b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--tx2)}
+.sv-lede{margin:0 0 12px}
+.sv-eq{display:inline-flex;align-items:baseline;gap:3px}
+.gh .sv-eq .num{font-size:24px;line-height:.9;color:var(--tx1)}
+.gh .sv-eq.is-top .num{color:var(--gold-ink)}
+.sv-eq small{font:600 12px/1 var(--body);color:var(--tx2)}
+.sv-note{margin:10px 2px 0}
+/* Suit hero: the vault still (assets/art/suit-hero.jpg). It is low-key by design, so it gets the lighter veil from assets/art/README.md (the standard left feather would swallow the glass case) and a lift in brightness / colour; the recovery figure and its legend sit on top, the legend on the floor fade.
+   `.ga.ga-suit-hero` (two classes) on purpose: this block sits BEFORE GP:ART in the source, and a one-class `.ga-suit-hero img` loses to the later `.ga img` (opacity .8 + left mask) and `.ga::after` (standard veil). */
+.ga.ga-suit-hero img{opacity:1;filter:brightness(1.3) saturate(1.2) contrast(1.05);-webkit-mask-image:none;mask-image:none}
+.ga.ga-suit-hero::after{background:linear-gradient(180deg,rgba(11,13,18,.45),rgba(11,13,18,0) 18%),linear-gradient(90deg,#0b0d12 4%,rgba(11,13,18,.45) 30%,rgba(11,13,18,0) 54%),linear-gradient(0deg,#0b0d12 0%,rgba(11,13,18,0) 28%)}
+.gm-suit .gm-st{text-shadow:0 1px 3px rgba(5,7,12,.9),0 0 14px rgba(5,7,12,.9)}   /* the gold shaft and a glass edge cross the status line (amber text: 5.5+ contrast on the average background, 2.5 on the thin glass highlights): a dark halo behind the glyphs covers those */
+/* ===== /GP:STRENGTH+SUIT ===== */
 /* ===== GP:WEEKLY+BODY (wave 7) ===== */
 /* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
 /* 1 · one-tap weekly adjust: a button = tinted icon chip + what changes + where, "Apply" in gold; the result row turns green with a check */
@@ -1461,8 +1481,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ga-rest img{width:calc(100% + 60px);object-position:right 38%}   /* skyline pushed past the right edge so the moon clears the Next row */
 .ga-mission{--o:.66;--v:linear-gradient(180deg,rgba(17,25,39,.62),rgba(17,25,39,0) 34%)}   /* top veil keeps "Day 7 of 8" crisp */
 .ga-mission.dim{--o:.4}   /* the no-plan hero runs a paragraph across the full width */
-.ga-suit{top:auto;height:44%;--o:.9}   /* the quietest still: a carbon-plate band under the legend, the figure stays on clean matte */
-.ga-suit img{object-position:right bottom;filter:brightness(1.7);-webkit-mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%);mask-image:radial-gradient(115% 135% at 100% 100%,#000 32%,transparent 80%)}
 .ga-profile{--o:.8}
 .ga-profile img{width:calc(100% + 24px);object-position:right 14%}
 .p3-id .sub,.p3-id .p3-rank-h span{text-shadow:0 1px 10px rgba(5,7,12,.95)}
@@ -3833,8 +3851,7 @@ function suggestForSub(m,id,n){
 function achStats(){
   const d=state.data;
   let maxLevel=0,bwRatio=0;M12.forEach(m=>maxLevel=Math.max(maxLevel,muscleLevel(m)));
-  let bestORM=0;Object.values(d.prs).forEach(p=>bestORM=Math.max(bestORM,p.orm||0));
-  bwRatio=bestORM/bodyW();
+  bwRatio=Math.max(0,...SV_STD.map(l=>{const e=liftEstimate(l);return e?e.orm:0;}))/bodyW();   // the best standard lift as a barbell equivalent ÷ bodyweight (a leg press or a hip thrust is not a 2x bodyweight badge)
   // all 12 trained this week?
   const allTrainedWeek=M12.every(m=>weeklySets(m)>0);
   // ── feature-tracking stats (allies, sparring, measurements, photos, cardio, supps, food, gauntlet) ──
@@ -5756,10 +5773,9 @@ function buildSuit(){
   const P=suitProps();
   const cxF=125,cxB=375;
   const ps=state._figShade,pg=state._figGlow;state._figShade=true;state._figGlow=true;
-  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#8B6B2A">${t}</text>`;
-  const div=`<line x1="250" y1="12" x2="250" y2="418" stroke="#2A2520" stroke-width="1" stroke-dasharray="4,4"/>`;
+  const lbl=(cx,t)=>`<text x="${cx}" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="12" letter-spacing="3" fill="#C29A45">${t}</text>`;
   const svg=`<svg viewBox="0 0 500 430" class="suit-breathe" style="width:100%;display:block">` +
-    SUIT_DEFS+lbl(cxF,"FRONT")+lbl(cxB,"BACK")+div+
+    SUIT_DEFS+lbl(cxF,"FRONT")+lbl(cxB,"BACK")+
     _frontBody(cxF,P)+_backBody(cxB,P)+
     `</svg>`;
   state._figShade=ps;state._figGlow=pg;
@@ -5902,7 +5918,7 @@ function gsHero(){
   const n=(a,b)=>rows.filter(x=>x.r>=a&&x.r<b).length,low=rows.filter(x=>x.r<GS_MID).map(x=>ghName(x.m));
   const dot=(c,t,k)=>`<span><i style="background:${c}"></i>${t} <b>${k}</b></span>`;
   const status=!rows.length?"Log a session and the figure lights up.":low.length?`<span class="c-warn">${low.join(", ")} below ${GS_MID}%</span>`:rows.every(x=>x.r>=GS_FRESH)?`<span class="c-ok">All trained muscles above ${GS_FRESH}%</span>`:"Tap a muscle for its dossier";
-  return `<section class="s3 gm-suit gh-c" style="--i:0">${gaArt("suit")}<div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
+  return `<section class="s3 gm-suit gh-c" style="--i:0">${gaArt("suit-hero")}<div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
     <div class="gm-fig2">${buildSuit()}</div>
     <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
 }
@@ -5916,7 +5932,7 @@ function gsDock(){
   const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load";
   return gdDock("Suit tools",[
     {art:"tile-infirmary",ic:"pulse",t:"Infirmary",s:inf,fn:"openInfirmary()"},
-    {art:"tile-lab",pos:"80% 50%",ic:"flame",t:"Fuel",s:gsFuelSub(),fn:"go('fuel',1)"},
+    {art:"tile-fuel",ic:"flame",t:"Fuel",s:gsFuelSub(),fn:"go('fuel',1)"},
     {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Replay · radar",fn:"openMastery()"},
     {art:"tile-photos",ic:"image",t:"Photos",s:ph>=2?`Compare · <b>${ph}</b>`:ph?`<b>${ph}</b> photo`:"Add your first",fn:"photosOpen()"}]);
 }
@@ -7035,28 +7051,38 @@ function p3Records(){
   return `<div class="gh-sec gh-c" id="p3-rec" style="--i:2"><h2>Records</h2>${list.length>6?`<button class="gh-more" data-hx onclick="p3ToggleRec()">${all?"Top 6":"All "+list.length}</button>`:""}</div>
     <section class="s2 gh-list gh-c" style="--i:2">${rows}${p3Row("chart","Every lift",loggedExerciseNames().length+" exercises · full curves","openArchive()")}</section>`;
 }
-function p3BigThree(){   // barbell-equivalent bench + squat + deadlift vs bodyweight (liftEstimate converts machine/Smith lifts), 4-week delta
-  const d=state.data,bw=bodyW(),tops=["Bench Press","Squat","Deadlift"].map(l=>({l,e:liftEstimate(l)})).filter(x=>x.e);
+function p3BigThree(){   // Big-3 total = the Strength card's bench + squat + deadlift (each your strongest variation as a barbell equivalent) ÷ bodyweight; the dock tile and the Body trend's last point sum the same liftEstimate numbers. 4-week delta
+  const bw=bodyW(),tops=SV_BIG3.map(l=>({l,e:liftEstimate(l)})).filter(x=>x.e);
   if(tops.length<2)return null;
   const cut=now()-28*P3_DAY;let nowT=0,nowC=0,thenT=0;
-  tops.forEach(({e})=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;let a=0,b=0;
-    exerciseRows(e.name).forEach(r=>{if(r.e1rm>a)a=r.e1rm;if(new Date(r.date).getTime()<=cut&&r.e1rm>b)b=r.e1rm;});
-    const cur=Math.max(a*f,e.orm);nowT+=cur;if(b>0){nowC+=cur;thenT+=b*f;}});
+  tops.forEach(({l,e})=>{nowT+=e.orm;const then=liftEstimateAt(l,cut,svRows(l),bw);if(then){nowC+=e.orm;thenT+=then.orm;}});
   return {ratio:nowT/bw,n:tops.length,d:thenT>0?Math.round((nowC-thenT)/thenT*100):null};
 }
 function p3Strength(){
-  const bw=bodyW(),rows=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].map(l=>({l,s:STD[l],e:liftEstimate(l)})).filter(x=>x.e);
+  const bw=bodyW(),rows=SV_STD.map(l=>({l,s:STD[l],e:liftEstimate(l)})).filter(x=>x.e);
   if(!rows.length)return "";
   const b3=p3BigThree(),full=t=>({"Inter.":"Intermediate","Adv.":"Advanced"})[t]||t;
   const body=rows.map(({l,s,e})=>{
-    const r=e.orm/bw,tiers=[["Novice",s.b],["Inter.",s.i],["Adv.",s.a],["Elite",s.e]],lvl=tiers.slice().reverse().find(t=>r>=t[1]),nxt=tiers.find(t=>r<t[1]),max=s.e*1.18,p=v=>clamp(v/max*100,0,100).toFixed(1)+"%";
-    return `<div class="p3-sr"><div class="p3-srh"><b>${l}</b><span class="num">${r.toFixed(2)}</span><span class="u">× BW</span></div>
+    const r=e.orm/bw,tiers=[["Novice",s.b],["Inter.",s.i],["Adv.",s.a],["Elite",s.e]],lvl=tiers.slice().reverse().find(t=>r>=t[1]-SV_EPS),nxt=tiers.find(t=>r<t[1]-SV_EPS),max=s.e*1.18,p=v=>clamp(v/max*100,0,100).toFixed(1)+"%";
+    const via=e.est?`<div class="p3-sv"><span>est. · via</span><b>${esc(e.name)}</b><span>${e.capped?"· capped at Elite":"· "+fmtKg(Math.round(e.raw))+" kg × "+e.f.toFixed(2)}</span></div>`:"";
+    return `<div class="p3-sr" role="button" tabindex="0" aria-label="${l}, ${r.toFixed(2)} times bodyweight. Show your ${SV[l].pattern} variations" onclick="openStrengthLift('${l}')"><div class="p3-srh"><b>${l}</b><span class="num">${r.toFixed(2)}</span><span class="u">× BW</span><span class="p3-go">${GP.icon("chevR")}</span></div>
       <div class="lmk p3-std" style="--v:${p(r)}"><i class="fill"></i>${tiers.map(t=>`<i class="tk" style="left:${p(t[1])}"></i>`).join("")}</div>
       <div class="p3-tl">${tiers.map(t=>`<span style="left:${p(t[1])}">${t[0]}</span>`).join("")}</div>
-      <div class="p3-sn">${Math.round(e.orm)} kg e1RM · ${lvl?full(lvl[0]):"Below novice"}${nxt?` · ${full(nxt[0])} in +${fmtKg(Math.ceil((nxt[1]*bw-e.orm)*2)/2)} kg`:""}${e.est?` · est. from ${esc(e.via)}`:""}</div></div>`;}).join("");
+      <div class="p3-sn">${Math.round(e.orm)} kg e1RM · ${lvl?full(lvl[0]):"Below novice"}${nxt?` · ${full(nxt[0])} in +${fmtKg(Math.ceil((nxt[1]*bw-e.orm)*2)/2)} kg`:""}</div>${via}</div>`;}).join("");
   return `<div class="gh-sec gh-c" id="p3-std" style="--i:3"><h2>Strength</h2><span class="t-xs">e1RM ÷ ${bw} kg bodyweight</span></div>
     <section class="s2 p3-std-c gh-c" style="--i:3">${b3?`<div class="p3-b3"><div><span class="num">${b3.ratio.toFixed(2)}</span><span class="u">× BW</span></div>${b3.d?`<span class="tag ${b3.d>0?"ok":"warn"}">${b3.d>0?"+":""}${b3.d}% / 4 wk</span>`:""}</div><div class="p3-b3c">Big-3 total, barbell-equivalent${b3.n<3?" · "+b3.n+" of 3 lifts":""}</div>`:""}${body}
-      <div class="p3-sfoot">Machine, Smith and variation lifts are converted to a barbell estimate. e1RM is a guide, not a verdict.</div></section>`;
+      <div class="p3-sfoot">Each lift uses your strongest variation, converted to a barbell equivalent (a leg press counts about half). Tap a lift to see them. e1RM is a guide, not a verdict.</div></section>`;
+}
+function openStrengthLift(l){   // the variations behind one Strength row: what was logged, the conservative factor, the barbell equivalent that counts
+  const c=SV[l],s=STD[l];if(!c||!s)return;
+  const bw=bodyW(),rank=svRank(l,Object.keys(state.data.prs||{}),svPR,bw),top=rank[0];
+  const nx=top&&[["Novice",s.b],["Intermediate",s.i],["Advanced",s.a],["Elite",s.e]].find(t=>top.orm/bw<t[1]-SV_EPS),   // the next tier, also in the units you train: target / factor = the e1RM on the lift itself
+    goal=nx?` Next, <b>${nx[0]}</b> at ${fmtKg(Math.ceil(nx[1]*bw-SV_EPS))} kg${top.est?`, about ${fmtKg(Math.ceil(nx[1]*bw/top.f-SV_EPS))} kg on the ${esc(top.name)}`:""}.`:"";
+  const rows=rank.slice(0,8).map((x,i)=>`<div class="gh-row"><span class="lead${i?"":" gold"}">${GP.icon(i?"dumbbell":"trophy")}</span><div class="main"><div class="gh-t1">${esc(x.name)}</div><div class="gh-t2">${Math.round(x.raw)} kg e1RM${x.est?" × "+x.f.toFixed(2)+(x.capped?" · capped":""):" · the lift itself"}</div></div><span class="trail"><span class="sv-eq${i?"":" is-top"}"><b class="num">${Math.round(x.orm)}</b><small>kg</small></span></span></div>`).join("");
+  openSheet(`<div class="gh st-pg sv-pg"><div class="st-h"><h2>${l}</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <p class="t-s sv-lede">${top?`Your strongest ${c.pattern} lift, as a ${c.ref}. Today that is <b>${esc(top.name)}</b>: ${Math.round(top.orm)} kg, ${(top.orm/bw).toFixed(2)}× your ${bw} kg bodyweight.${goal}`:`Log a ${c.pattern} lift and your strongest variation counts here, as a ${c.ref}.`}</p>
+    ${rows?`<section class="s2 gh-list">${rows}</section>`:""}
+    <p class="t-xs sv-note">Factors are cautious: a machine is more likely to understate your lift than to flatter it, and a converted lift stops at the Elite tier. Dumbbell, cable and single-leg lifts are not converted.</p></div>`);
 }
 function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
 /* ===== BODY (Profile, wave 7) =====
@@ -7080,14 +7106,14 @@ function bdWeekly(es){   // [{i,avg,n}] over the last BD_WEEKS calendar weeks (M
   }
   return out;
 }
-function bdRel(es){   // [{i,v}] Big-3 barbell-equivalent total ÷ the bodyweight of each week's end; a week counts only once every current lift has a log (like for like); the last point is p3BigThree()
-  const d=state.data,tops=["Bench Press","Squat","Deadlift"].map(l=>liftEstimate(l)).filter(Boolean);
-  if(tops.length<2)return [];
-  const ls=tops.map(e=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;return {orm:e.orm,rows:exerciseRows(e.name).map(r=>({t:new Date(r.date).getTime(),v:r.e1rm*f}))};}),out=[];
+function bdRel(es){   // [{i,v}] Big-3 barbell-equivalent total ÷ the bodyweight of each week's end (the strongest variation of each lift as of that week); a week counts only once every current lift has a log (like for like); the last point IS p3BigThree().ratio: same liftEstimate sum, same bodyweight
+  const lifts=SV_BIG3.filter(l=>liftEstimate(l));
+  if(lifts.length<2)return [];
+  const rows=lifts.map(svRows),out=[];
   for(let k=BD_WEEKS-1;k>=0;k--){
-    const t=k?weekStartK(k-1)-1:now();let tot=0,ok=true;
-    ls.forEach(l=>{const best=l.rows.reduce((m,r)=>r.t<=t&&r.v>m?r.v:m,k?0:l.orm);if(best>0)tot+=best;else ok=false;});
-    if(ok)out.push({i:BD_WEEKS-1-k,v:tot/(k?(bdAt(es,t)||{kg:bodyW()}).kg:bodyW())});
+    const T=k?weekStartK(k-1)-1:now(),bw=k?(bdAt(es,T)||{kg:bodyW()}).kg:bodyW();let tot=0,ok=true;
+    lifts.forEach((l,j)=>{const e=k?liftEstimateAt(l,T,rows[j],bw):liftEstimate(l);if(e)tot+=e.orm;else ok=false;});
+    if(ok)out.push({i:BD_WEEKS-1-k,v:tot/bw});
   }
   return out;
 }
@@ -7130,7 +7156,7 @@ function p3Body(){
     const r0=rel[0],r1=rel[rel.length-1],pct=(r1.v-r0.v)/r0.v*100,sp=r1.i-r0.i;
     rs=`<div class="bd-rs"><div class="bd-rs-h"><span class="eyebrow">Relative strength</span><span class="tag ${pct>=.5?"ok":pct<=-.5?"warn":""}">${Math.abs(pct)<.5?"Steady":(pct>0?"+":"−")+Math.abs(pct).toFixed(0)+"%"} / ${sp} wk</span></div>
       ${bdSvg(rel,{dec:2,pad:.04,cls:"bd-r",label:"Relative strength, Big-3 over bodyweight, last "+BD_WEEKS+" weeks"})}
-      <div class="p3-sfoot">Big-3 barbell-equivalent e1RM ÷ that week's bodyweight, in × BW.</div></div>`;
+      <div class="p3-sfoot">Big-3 (your strongest variation of each lift, as a barbell equivalent) ÷ that week's bodyweight, in × BW.</div></div>`;
   }
   return `<div class="gh-sec gh-c" id="p3-body" style="--i:4"><h2>Body</h2><span class="t-xs">weigh-in · ${BD_WEEKS}-week trend</span></div>
     <section class="s2 bd-c gh-c" style="--i:4"><div class="bd-top"><div class="bd-now"><b class="num" data-roll>${bw.toFixed(1)}</b><small>kg</small></div><div class="bd-meta">${tag}${avg}</div></div>
@@ -7146,7 +7172,7 @@ function p3Body(){
    Backup moved here from the "Gyms & tools" fold, Badges from its own fold. */
 function p3Dock(){
   const d=state.data,ws=d.workouts||[],prN=Object.keys(d.prs||{}).filter(n=>(d.prs[n]||{}).orm>0).length,b3=p3BigThree(),lb=d.u.lastBackupAt;
-  const std=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].some(l=>liftEstimate(l));
+  const std=SV_STD.some(l=>liftEstimate(l));
   return gdDock("Profile tools",[
     {art:"tile-history",ic:"calendar",t:"History",s:`<b>${ws.length}</b> sessions`,fn:"gdJump('#p3-cal')"},
     ...(prN?[{art:"tile-records",ic:"trophy",t:"Records",s:`<b>${prN}</b> records`,fn:"gdJump('#p3-rec')"}]:[]),
@@ -7763,7 +7789,7 @@ function myPatrolCard(){
   // Optimality = how good (vs the world) your big lifts are, regardless of sheer tonnage. Avg world
   // percentile across the standard lifts you've logged (machine/variation estimates included).
   let opt=0,bw=bodyW();const bigKeys={b:"Bench Press",s:"Squat",d:"Deadlift"};const big={};
-  try{const pcts=[];["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"].forEach(L=>{
+  try{const pcts=[];SV_STD.forEach(L=>{
       const est=liftEstimate(L),std=STD[L];if(est&&std){pcts.push(worldPercentile(est.orm/bw,std));}});
     if(pcts.length)opt=Math.round(pcts.reduce((x,y)=>x+y,0)/pcts.length);
     Object.entries(bigKeys).forEach(([k,L])=>{const est=liftEstimate(L);if(est)big[k]=Math.round(est.orm);});
@@ -8422,40 +8448,112 @@ function undoRestDay(){   // reverses today's log: drops the entry and steps the
 }
 
 // ---- strength standards (bodyweight-relative, evidence-based multipliers) ----
-const STD_MATCH={"Bench Press":["bench press"],"Squat":["squat"],"Deadlift":["deadlift"],"Overhead Press":["overhead press","shoulder press","military press","strict press"],"Barbell Row":["barbell row","bent over row","pendlay","bent-over row"]};
-function bestPRMatching(keys){let best=0,nm=null;Object.entries(state.data.prs).forEach(([n,p])=>{const ln=n.toLowerCase();if(keys.some(k=>ln.includes(k))&&p.orm>best){best=p.orm;nm=n;}});return best?{orm:best,name:nm}:null;}
-// Machine/variation → barbell conversion. When you never log the actual barbell lift but DO train a
-// machine/Smith/variation that builds the same pattern, estimate the equivalent barbell 1RM so it still
-// counts toward your standards. Factor multiplies that lift's e1RM to a barbell-equivalent. Each entry
-// requires the PR's primary muscle to match (m), so e.g. leg press can't masquerade as a bench.
-const STD_LIFT={
- "Bench Press":{m:"chest",conv:[
-   {kw:["smith"],f:.92,l:"Smith bench"},
-   {kw:["incline"],f:1.12,l:"incline press"},
-   {kw:["machine","hammer","iso-lateral","iso lateral","plate-loaded","chest press"],f:.85,l:"machine press"},
-   {kw:["floor press"],f:.95,l:"floor press"}]},
- "Squat":{m:"quads",conv:[
-   {kw:["smith"],f:.90,l:"Smith squat"},
-   {kw:["hack"],f:.85,l:"hack squat"},
-   {kw:["front squat"],f:1.18,l:"front squat"},
-   {kw:["belt squat"],f:.88,l:"belt squat"},
-   {kw:["leg press"],f:.42,l:"leg press"}]},
- "Deadlift":{m:"back",conv:[
-   {kw:["trap bar","trap-bar","hex bar"],f:.95,l:"trap-bar pull"},
-   {kw:["rack pull"],f:.80,l:"rack pull"},
-   {kw:["deficit"],f:1.08,l:"deficit pull"},
-   {kw:["sumo"],f:1.0,l:"sumo pull"}]},
- "Overhead Press":{m:"shoulders",conv:[
-   {kw:["smith"],f:.90,l:"Smith press"},
-   {kw:["machine","hammer","iso-lateral","iso lateral","plate-loaded"],f:.85,l:"machine press"},
-   {kw:["push press"],f:.80,l:"push press"},
-   {kw:["seated barbell"],f:1.0,l:"seated press"}]},
- "Barbell Row":{m:"back",conv:[
-   {kw:["pendlay"],f:1.0,l:"Pendlay row"},
-   {kw:["t-bar","t bar","landmine row"],f:.92,l:"T-bar row"},
-   {kw:["chest-supported","chest supported","seal row"],f:.90,l:"supported row"},
-   {kw:["machine row","hammer"],f:.88,l:"machine row"}]}
+/* ===== STRONGEST VARIATION (GP:STRENGTH+SUIT, wave 8) =====
+   A standard lift is a movement PATTERN, not one exercise. For Bench Press, Squat, Deadlift, Overhead Press and Barbell Row the Strength standards, the Big-3 total, the Body trend,
+   the Profile dock tile, the ally optimality score and the bodyweight badges all read ONE number: your strongest logged variation of that pattern, converted to the reference barbell
+   lift (flat bench, back squat, conventional deadlift, standing press, bent-over row) by a conservative factor. The one reader is liftEstimate(lift) (now, from the PR records) and
+   liftEstimateAt(lift,t,rows) (history); both go through svRank, so a number can never differ between two screens.
+   - Each lift owns a table: `yes` says which names belong to the pattern, `no` drops lifts whose load is not comparable to a barbell (dumbbells are logged per hand, cable stacks have
+     pulley ratios, single-leg and bodyweight work, accessories), and the FIRST matching row of `v` gives [factor, label]. factor = barbell-equivalent / logged e1RM.
+   - Every factor sits at the cautious end of the ratios lifters report, so a conversion understates a lift rather than flatters it.
+   - A converted lift (factor != 1) is capped at the Elite tier x bodyweight, so a machine can never produce an absurd standard. A real barbell lift is never capped.
+   Coefficients (documented once, here; the sheet and the footer only point at them):
+   BENCH   smith .90 - the guided bar needs no stabilising and many Smith rigs are counterbalanced: the same lifter moves 5-15% more than on a free bar
+           machine / plate-loaded press .85 - lever and stack ratios differ per machine, typically 10-25% easier than a free bar; the low end wins
+           incline 1.12 - an incline press is ~80-85% of a flat bench (1/.82 = 1.22); 1.12 stays well under. Smith incline = .90 x 1.12 = 1.00, machine incline = .85 x 1.12 = .95
+           floor press .95 - no leg drive but a short range, usually within 5% of the bench
+           flat / decline / close-grip / wide / reverse-grip barbell press 1.00 - the true equivalent is 1.0 or more, so it is taken at face value, never uplifted
+   SQUAT   leg press .50 (45 degree sled, horizontal, plate-loaded, narrow / wide stance, lying squat machine) - lifter tables put a leg press at ~1.8-2.2x the back squat at the same
+           standard (0.45-0.55), the sled angle alone cuts the load by ~30%; one factor for every press because angle, stack ratio and carriage weight differ per machine
+           belt squat .85 · pendulum squat .75 (the lever arm lightens the plates) · hack squat / V-squat / reverse hack .85 · Smith squat .90 (guided, feet forward)
+           front squat 1.15 - front squats run 80-85% of a back squat (1/.85 = 1.18) · box squat .95 · any other machine squat .75 · back squat 1.00
+   DEADLIFT conventional / sumo / snatch-grip 1.00 · trap bar .92 (reported 5-10% heavier than a conventional pull: 1/1.05 = .95 down to 1/1.10 = .91, so .92 is the cautious end) · deficit 1.05 (harder than the floor, so a little credit)
+           rack pull .80 (a shortened pull runs 10-25% heavier than the floor) · Romanian / stiff-leg 1.10 (they run 70-85% of a deadlift, so 1.10 is conservative) · Smith RDL .99 (.90 x 1.10)
+           hip-hinge machines (Machine Deadlift, Hip Hinge) .85 - the generic machine factor, no lever data to justify more
+   PRESS   barbell standing / seated 1.00 · push press .80 (a push press is ~125% of a strict press) · Smith .90 · machine / Viking .85
+   ROW     barbell bent-over / Pendlay / underhand / Yates 1.00 · T-bar .92 · Smith .90 · machine row .85 · chest-supported .85 (no body English, so it runs lighter than a free row) */
+const SV_STD=["Bench Press","Squat","Deadlift","Overhead Press","Barbell Row"],SV_BIG3=["Bench Press","Squat","Deadlift"];
+const SV_EPS=1e-9;   // a capped lift sits exactly ON its tier: (tier x bw) / bw lands a hair under the tier in floating point (50.3 kg x 1.5 -> 1.4999999999999998), which read "Advanced, Elite in +0 kg"
+const SV_RDL=t=>/romanian|\brdl\b|stiff|straight.?leg/.test(t.ln);
+const SV={
+ "Bench Press":{ref:"flat barbell bench press",pattern:"press",
+  yes:/bench press|chest press|floor press|incline press|decline press/,
+  no:/dumbbell|cable|kettlebell|\bbands?\b|landmine|\bflye?s?\b|pec deck|pullover|\bdips?\b|push.?up|svend|squeeze|one.?arm|single|unilateral|jm press|california|\btate\b|skull|triceps/,
+  v:[[t=>t.smith&&/incline/.test(t.ln),1.00,"Smith incline press"],
+     [t=>t.smith,.90,"Smith bench"],
+     [t=>t.mach&&/incline/.test(t.ln),.95,"machine incline press"],
+     [t=>t.mach||(/chest press/.test(t.ln)&&!/barbell/.test(t.ln)),.85,"machine press"],
+     [t=>/incline/.test(t.ln),1.12,"incline bench"],
+     [t=>/floor press/.test(t.ln),.95,"floor press"],
+     [t=>true,1.00,"bench press"]]},
+ "Squat":{ref:"barbell back squat",pattern:"squat",
+  yes:/squat|leg (?:wide )?press/,
+  no:/dumbbell|cable|kettlebell|\bbands?\b|single|unilateral|one.?leg|alternat|split|bulgarian|lunge|step.?up|pistol|goblet|sissy|zercher|landmine|cyclist|overhead|calf|jump|spanish/,
+  v:[[t=>/leg (?:wide )?press|lying squat/.test(t.ln),.50,"leg press"],
+     [t=>/belt squat/.test(t.ln),.85,"belt squat"],
+     [t=>/pendulum/.test(t.ln),.75,"pendulum squat"],
+     [t=>/hack|v-squat|v squat/.test(t.ln),.85,"hack squat"],
+     [t=>t.smith,.90,"Smith squat"],
+     [t=>/front squat/.test(t.ln),1.15,"front squat"],
+     [t=>/box squat/.test(t.ln),.95,"box squat"],
+     [t=>t.mach,.75,"machine squat"],
+     [t=>true,1.00,"back squat"]]},
+ "Deadlift":{ref:"conventional deadlift",pattern:"hinge",
+  yes:/deadlift|rack pull|block pull|hip hinge/,
+  no:/dumbbell|cable|kettlebell|\bbands?\b|single|unilateral|one.?leg|b-stance|stepbox|extension|hyperext|thrust|good morning|pull.?through/,
+  v:[[t=>t.smith&&SV_RDL(t),.99,"Smith RDL"],
+     [SV_RDL,1.10,"Romanian / stiff-leg deadlift"],
+     [t=>/rack pull|block pull/.test(t.ln),.80,"rack pull"],
+     [t=>/trap|hex/.test(t.ln),.92,"trap-bar deadlift"],
+     [t=>/deficit/.test(t.ln),1.05,"deficit deadlift"],
+     [t=>t.mach,.85,"hip-hinge machine"],
+     [t=>true,1.00,"deadlift"]]},
+ "Overhead Press":{ref:"standing barbell press",pattern:"press",
+  yes:/overhead press|shoulder press|military press|strict press|push press|viking press/,
+  no:/dumbbell|cable|kettlebell|\bbands?\b|arnold|landmine|one.?arm|single|unilateral|z press|triceps|extension/,
+  v:[[t=>/push press/.test(t.ln),.80,"push press"],
+     [t=>t.smith,.90,"Smith press"],
+     [t=>t.mach||/viking/.test(t.ln),.85,"machine press"],
+     [t=>true,1.00,"overhead press"]]},
+ "Barbell Row":{ref:"bent-over barbell row",pattern:"row",
+  yes:/\brow\b/,
+  no:/dumbbell|cable|kettlebell|\bbands?\b|inverted|one.?arm|single|unilateral|alternat|meadows|kroc|seal|rear.?delt|upright|trap bar/,
+  v:[[t=>/chest.?supported/.test(t.ln),.85,"chest-supported row"],
+     [t=>/t-bar|t bar/.test(t.ln),.92,"T-bar row"],
+     [t=>t.smith,.90,"Smith row"],
+     [t=>t.mach,.85,"machine row"],
+     [t=>true,1.00,"barbell row"]]}
 };
+// {f,l} for a logged exercise name under one standard lift, or null when it does not count toward that lift
+function svRule(lift,name){
+  const c=SV[lift],ln=String(name||"").toLowerCase();
+  if(!c||!c.yes.test(ln)||c.no.test(ln))return null;
+  const eq=exFor(name).eq||"",smith=/smith/.test(ln)||eq==="smith",
+    t={ln,smith,mach:!smith&&(/machine|plate.?loaded|hammer|iso.?lateral|lever/.test(ln)||eq==="machine")},hit=c.v.find(r=>r[0](t));
+  return hit?{f:hit[1],l:hit[2]}:null;
+}
+// every counting variation as a barbell equivalent, strongest first. src(name) = that lift's e1RM in kg (0 = not logged)
+function svRank(lift,names,src,bw){
+  const cap=STD[lift].e*bw,out=[];
+  names.forEach(n=>{
+    const r=svRule(lift,n),raw=r?src(n):0;if(!(raw>0))return;
+    const est=r.f!==1,v=raw*r.f;
+    out.push({name:n,raw,f:r.f,via:r.l,est,capped:est&&v>cap,orm:est?Math.min(v,cap):raw});
+  });
+  return out.sort((a,b)=>b.orm-a.orm);
+}
+const svBest=(lift,names,src,bw)=>svRank(lift,names,src,bw)[0]||null;
+const svPR=n=>{const p=(state.data.prs||{})[n];return p&&+p.orm>0?+p.orm:0;};
+// your strongest variation now (PR records of the active gym): {orm,name,est,f,raw,via,capped}
+function liftEstimate(lift,bw){return svBest(lift,Object.keys(state.data.prs||{}),svPR,bw||bodyW());}
+// history: svRows(lift) = {name:[{t,v}]} e1RM per session of every counting variation; liftEstimateAt reads it as of time T
+function svRows(lift){
+  const out={};
+  loggedExerciseNames().forEach(n=>{if(!svRule(lift,n))return;const r=exerciseRows(n);if(r.length)out[n]=r.map(x=>({t:new Date(x.date).getTime(),v:x.e1rm}));});
+  return out;
+}
+const svAt=(rows,T)=>n=>(rows[n]||[]).reduce((m,r)=>r.t<=T&&r.v>m?r.v:m,0);
+const liftEstimateAt=(lift,T,rows,bw)=>svBest(lift,Object.keys(rows),svAt(rows,T),bw||bodyW());
 // World percentile from a bodyweight-ratio, anchored to the strength-standard tiers
 // (Beginner≈20th, Intermediate≈50th, Advanced≈80th, Elite≈95th of trained lifters), interpolated.
 function worldPercentile(ratio,std){
@@ -8463,20 +8561,6 @@ function worldPercentile(ratio,std){
   if(ratio<=0)return 1;
   for(let i=1;i<pts.length;i++){const r1=pts[i][0],p1=pts[i][1];if(ratio<=r1){const r0=pts[i-1][0],p0=pts[i-1][1];return p0+(p1-p0)*(ratio-r0)/((r1-r0)||1);}}
   return 99.5;
-}
-// Best available estimate for a standard lift: the real barbell PR if logged, else the strongest
-// machine/variation converted to a barbell-equivalent (flagged est).
-function liftEstimate(lift){
-  const direct=bestPRMatching(STD_MATCH[lift]);
-  if(direct)return {orm:direct.orm,name:direct.name,est:false};
-  const cfg=STD_LIFT[lift];if(!cfg)return null;
-  let best=null;
-  Object.entries(state.data.prs||{}).forEach(([n,p])=>{if(!p||!(p.orm>0))return;
-    const ex=exFor(n);const pm=MM_NORM((ex.p&&ex.p[0])||"");if(pm!==cfg.m)return;
-    const ln=n.toLowerCase();
-    cfg.conv.forEach(c=>{if(c.kw.some(k=>ln.includes(k))){const e=p.orm*c.f;if(!best||e>best.orm)best={orm:e,name:n,est:true,via:c.l};}});
-  });
-  return best;
 }
 /* ===== Batcomputer — full analytics dashboard ===== */
 function weeklySeries(weeks,fn){const out=[];for(let i=weeks-1;i>=0;i--){const s=now()-(i+1)*7*864e5,e=now()-i*7*864e5;const ws=state.data.workouts.filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;});out.push(fn(ws));}return out;}
@@ -9267,7 +9351,7 @@ GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN tar
 const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
 FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
 const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
-Five tabs along the bottom; Search (the magnifier), Settings (the sliders) and my avatar sit in the top bar. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and only the muscles that need attention: those under their weekly MEV or over their MRV, each with its sets against MEV, MAV and MRV; "All 12 muscles" opens the full map on the Suit tab. From 16:00 on Sundays a Sunday review card adds my volume line and next week's one-tap changes; tap the card for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Free session), a dock of tiles, Cycle days (the active split day by day, tonight marked, Start or Resume), a Suggested this week row (opens the week in review), the Volume forecast against MEV, MAV and MRV (planned sets per muscle, with a one-tap trim) and Other plans when you keep more than one. SUIT is the body: the recovery figure, a dock, a tile per muscle (recovery, hours to ready, weekly sets against the landmarks; tap one for its dossier), the Effort section (average RIR and sets at RIR 0–3), Measurements (tape, in cm), symmetry and Progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), a dock, the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Body (weigh-in, 12-week trend, relative strength), Every lift and a Gyms & tools fold (gyms, Batcomputer, Share PR card, calendar export, Week vs week). ALLIES is your friends: your league rank, a dock, and Your league (tap an ally for their sheet). Search lists every screen and tool once; I also have a page there (today's read, things to ask, my last answer), and this chat is one tap away on my avatar.
+Five tabs along the bottom; Search (the magnifier), Settings (the sliders) and my avatar sit in the top bar. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and only the muscles that need attention: those under their weekly MEV or over their MRV, each with its sets against MEV, MAV and MRV; "All 12 muscles" opens the full map on the Suit tab. From 16:00 on Sundays a Sunday review card adds my volume line and next week's one-tap changes; tap the card for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Free session), a dock of tiles, Cycle days (the active split day by day, tonight marked, Start or Resume), a Suggested this week row (opens the week in review), the Volume forecast against MEV, MAV and MRV (planned sets per muscle, with a one-tap trim) and Other plans when you keep more than one. SUIT is the body: the recovery figure, a dock, a tile per muscle (recovery, hours to ready, weekly sets against the landmarks; tap one for its dossier), the Effort section (average RIR and sets at RIR 0–3), Measurements (tape, in cm), symmetry and Progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), a dock, the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight, each lift from your strongest variation; tap a lift to see them), Body (weigh-in, 12-week trend, relative strength), Every lift and a Gyms & tools fold (gyms, Batcomputer, Share PR card, calendar export, Week vs week). ALLIES is your friends: your league rank, a dock, and Your league (tap an ally for their sheet). Search lists every screen and tool once; I also have a page there (today's read, things to ask, my last answer), and this chat is one tap away on my avatar.
 
 ## FEATURE DOCKS (THE TILE ROW UNDER EACH TAB)
 A dock is one sideways-scrolling row of tiles under a tab's hero, each with a picture, a label and a live line of status, so nothing needs searching for. MISSION: Edit plan (the plan editor), New split, Import split (paste or share a Split Card) and Lab (stimulus-to-fatigue ratings, balance, the plateau breaker and the tools: Forge, Plate calculator, 1RM test day, Oracle, Strength simulator, Contracts, Bat-Focus). SUIT: Infirmary (sleep, soreness, workload, injuries), Fuel (calories, macros, food log, hydration), Time-lapse (replay your muscle heat week by week, plus the coverage radar) and Photos (Before & after when you have two or more, otherwise add your first). PROFILE: History (the calendar), Records, Standards (lifts against bodyweight), Body (weigh-in and trend), Badges (the trophy room) and Backup (Data control). ALLIES: Add ally, Chat, Duel, Raid, Leaderboard and Manage (your offline snapshot code, and removing allies). A tile for a section on the same page scrolls to it; the others open a sheet or a page.
@@ -9300,7 +9384,7 @@ Sleep (hours and quality), a soreness map, the workload watch (the load ratio ag
 The Fuel tile on the Suit tab opens the Fuel page (Back returns to Suit): the Fuel protocol (calories and macros matched to your goal; Set up), Today's intake with Quick add and the Mess Hall for the full log, Hydration (+ Glass or − Glass), the Daily stack (creatine, protein target, omega-3, vitamin D) and a Bodyweight row that jumps to Profile → Body.
 
 ## BODY (PROFILE) AND MEASUREMENTS (SUIT)
-Profile → Body (or the Body tile) is the one place for bodyweight: nudge today's weight by 0.1 kg with − and +, starting from your last weight, then Log today (Update today once logged). The chart is the weekly average over 12 weeks; Relative strength divides your Big-3 e1RM by that week's bodyweight. Settings, Fuel and the standards all read the same number. Tape measurements (chest, waist, arms, thighs) live on the Suit tab under Measurements.
+Profile → Body (or the Body tile) is the one place for bodyweight: nudge today's weight by 0.1 kg with − and +, starting from your last weight, then Log today (Update today once logged). The chart is the weekly average over 12 weeks; Relative strength divides your Big-3 e1RM (for each lift your strongest variation, converted to a barbell equivalent, so a leg press counts about half toward your squat) by that week's bodyweight. Settings, Fuel and the standards all read the same number. Tape measurements (chest, waist, arms, thighs) live on the Suit tab under Measurements.
 
 ## PROGRESS PHOTOS AND BEFORE & AFTER
 Suit → Progress photos (or the Photos tile): Add photo, then tap a photo to view or delete it. With two or more photos, Before & after opens: Slide drags one over the other, Side by side shows both; tap a photo to set Before or After (Before is always the older one). Photos are private and stay on this device in their own vault, not in the main data; a backup carries them at full size. My physique review card appears under them once a photo exists.
@@ -10558,7 +10642,7 @@ function openRankLadder(){
 
 
 /* ---- Trophy Room ---- */
-const ACH_REQ={firstnight:"Log 1 workout",swornin:"Log 10 workouts",guardian:"Log 50 workouts",darkknight:"Log 100 workouts",firststrike:"Set 1 PR",villainslayer:"Set 25 PRs",arkham:"Set 100 PRs",warmup:"50,000kg lifetime volume",batmobile:"100,000kg lifetime volume",wayne:"500,000kg lifetime volume",skyline:"1,000,000kg lifetime volume",week:"7-day streak",alfredapp:"30-day streak",discipline:"60-day streak",upgrade:"Any muscle to level 5",elite:"Any muscle to level 10",aboveavg:"1RM = bodyweight",batstd:"1RM = 2× bodyweight",edge:"50 sets to failure",connected:"Use Alfred AI 10×",fullsuit:"Train all 12 muscles in one week",league:"Add 1 ally to your League",assembled:"Add 3 allies",sparring:"Import a rival to spar",tale:"Log your body measurements",casephoto:"Add 1 progress photo",nightpatrol:"Log 5 cardio sessions",stack:"7-day creatine streak",mealprep:"Log food on 7 days",gauntlet:"5-day Gauntlet streak"};
+const ACH_REQ={firstnight:"Log 1 workout",swornin:"Log 10 workouts",guardian:"Log 50 workouts",darkknight:"Log 100 workouts",firststrike:"Set 1 PR",villainslayer:"Set 25 PRs",arkham:"Set 100 PRs",warmup:"50,000kg lifetime volume",batmobile:"100,000kg lifetime volume",wayne:"500,000kg lifetime volume",skyline:"1,000,000kg lifetime volume",week:"7-day streak",alfredapp:"30-day streak",discipline:"60-day streak",upgrade:"Any muscle to level 5",elite:"Any muscle to level 10",aboveavg:"Big-lift 1RM = bodyweight",batstd:"Big-lift 1RM = 2× bodyweight",edge:"50 sets to failure",connected:"Use Alfred AI 10×",fullsuit:"Train all 12 muscles in one week",league:"Add 1 ally to your League",assembled:"Add 3 allies",sparring:"Import a rival to spar",tale:"Log your body measurements",casephoto:"Add 1 progress photo",nightpatrol:"Log 5 cardio sessions",stack:"7-day creatine streak",mealprep:"Log food on 7 days",gauntlet:"5-day Gauntlet streak"};
 function achProgress(a,w){
   // returns {cur,goal} where parseable, else null
   const reqNum=(s)=>{const m=(""+s).replace(/,/g,"").match(/[\d.]+/);return m?parseFloat(m[0]):null;};

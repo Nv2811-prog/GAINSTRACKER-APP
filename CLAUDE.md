@@ -52,6 +52,9 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
 - **Wave 6-7 systems:** GP:CHARM (`gpEnter` → `gpFirst` / `gpLive` / `gpSweep`, `GP_SEC` section-header icon table, scroll-driven hero art, hero View Transition), GP:WEEKLY+BODY
   (`ghWeekReview`, `wkApply` / `wkUndo`, `d.weekAdj`; the Profile Body section), GP:PHOTOS (full photos in the IndexedDB vault `gainstracker/photos`, thumbnails + `idb:1` in `gt_data`,
   put → read back → byte-compare → swap, safety copy `gt_photos_backup`; Compare is the one before/after view). Details and budgets in DESIGN.md §11-§15.
+- **Wave 8 (GP:STRENGTH+SUIT):** the Suit hero is the vault still (`gaArt("suit-hero")`, lighter veil) and the Suit dock Fuel tile has its own still (`tile-fuel`). Strength standards use the user's STRONGEST variation of each pattern
+  as a barbell equivalent: `liftEstimate(lift)` / `liftEstimateAt` over the `SV` table are the only readers (Strength card, Big-3, Body trend, dock tile, ally optimality, badges); factors are conservative, documented per row, and capped at
+  the Elite tier. A machine or leg press is never counted at face value, a dumbbell / cable / single-leg lift never counts. DESIGN.md §19, `node scripts/qa/strength.mjs`.
 - **Alfred = the header avatar (gold-ring) + ONE text-first chat** (`openAlfredChat()`, `#ac-panel`, `.ac-*`) and an Alfred page (`go('alfred')`, reached from Search: today's read, suggestions,
   last conversation). No floating button, no second chat UI. His app knowledge is `ALFRED_APP_GUIDE` (+ `ALFRED_PERSONA`, `ALFRED_CHAT_RULES`): every label in it must exist in the UI, so grep
   the code before changing one and update it whenever a screen or rule changes (docks.mjs checks it names every dock tile).
