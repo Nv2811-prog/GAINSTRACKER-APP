@@ -1250,9 +1250,9 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-xh::before{background:linear-gradient(180deg,rgba(19,27,41,.6),rgba(19,27,41,0) 36%),linear-gradient(90deg,#131B29 14%,rgba(19,27,41,.6) 50%,rgba(19,27,41,0) 86%),linear-gradient(0deg,#131B29 0%,rgba(19,27,41,0) 55%),url(assets/art/head-exercise.jpg) right center/cover no-repeat}
 .gm-dos .gm-bh::before{background:linear-gradient(180deg,rgba(23,33,49,.6),rgba(23,33,49,0) 36%),linear-gradient(90deg,#172131 14%,rgba(23,33,49,.6) 50%,rgba(23,33,49,0) 86%),linear-gradient(0deg,#172131 0%,rgba(23,33,49,0) 55%),url(assets/art/head-muscle.jpg) right center/cover no-repeat}
 .p3-xh h2,.p3-xh .sub,.gm-bt,.gm-bh .eyebrow{text-shadow:0 1px 12px rgba(8,12,20,.95)}
-/* 6 · tab switch (View Transition): the hero is its own group, so it cross-fades and morphs between the two tabs inside the same 200ms while the page rises 8px (vtIn) and the tab bar stays put. gpVtTag() names the hero just for the transition. */
-::view-transition-group(root),::view-transition-group(gp-hero){animation-duration:200ms}   /* the whole transition ends with the rise, no 250ms default tail */
-::view-transition-group(gp-hero){animation-timing-function:var(--ease-out);overflow:clip;border-radius:var(--r-l)}
+.ac-head{position:relative;isolation:isolate}
+.ac-head::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;background:linear-gradient(90deg,rgba(12,18,28,.98) 22%,rgba(12,18,28,.5) 62%,rgba(12,18,28,.1)),url(assets/art/profile.jpg) right 22%/cover no-repeat}
+.af-key{margin-top:12px}   /* the Alfred key row sat flush under the hero once it became a real .gh-row */
 /* 4 · section headers: one line icon + one area accent. rec = records gold, vol = volume green, rcv = recovery blue, pln = plan amber, n = steel; gpSec() adds the chip by title, nothing is hand-placed */
 .gp-ic{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:8px;color:var(--ac,var(--tx2));background:var(--act,rgba(150,178,222,.08));box-shadow:inset 0 0 0 1px var(--acr,var(--hair))}
 .gp-ic .gi{width:14px;height:14px;margin:0;stroke-width:2}
@@ -1263,8 +1263,10 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh-sec h2,.p3-ch2 h3{display:flex;align-items:center;gap:9px}
 .gh-lh h3 .gp-ic,.p3-ch2 h3 .gp-ic{width:22px;height:22px;border-radius:7px}
 .gh-lh h3 .gp-ic .gi,.p3-ch2 h3 .gp-ic .gi{width:13px;height:13px}
-.ac-head{position:relative;isolation:isolate}
-.ac-head::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;background:linear-gradient(90deg,rgba(12,18,28,.98) 22%,rgba(12,18,28,.5) 62%,rgba(12,18,28,.1)),url(assets/art/profile.jpg) right 22%/cover no-repeat}
+/* 5 · live numbers: no css of its own beyond the draw-in rules .gp-first .ring-v / .lmk .fill (HOME block, ghRing/ghFill); gpLive() adds .gp-first on the first view of a view per session and counts the key numbers up */
+/* 6 · tab switch (View Transition): the hero is its own group, so it cross-fades and morphs between the two tabs inside the same 200ms while the page rises 8px (vtIn) and the tab bar stays put. gpVtTag() names the hero just for the transition. */
+::view-transition-group(root),::view-transition-group(gp-hero){animation-duration:200ms}   /* the whole transition ends with the rise, no 250ms default tail */
+::view-transition-group(gp-hero){animation-timing-function:var(--ease-out);overflow:clip;border-radius:var(--r-l)}
 @media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}.gp-sw{display:none}}
 /* ===== /GP:CHARM ===== */
 
@@ -10304,7 +10306,7 @@ function renderAlfred(){
     <h2 class="af-title">${hi}${nm?", "+esc(nm):""}.</h2>
     <p class="af-sub">Ask about your training, your numbers or the app.</p>
     <button class="af-ask" onclick="openAlfredChat()" aria-label="Ask Alfred"><span>Ask Alfred…</span><i><svg class="gi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg></i></button></section>`;
-  const key=has?"":`<div class="s1 gh-x af-key gh-c" style="--i:1" onclick="openSettings('alfred')" role="button" tabindex="0"><span class="lead">${GP.icon("bolt")}</span><div class="main"><div class="gh-t1">Unlock live coaching</div><div class="gh-t2">Add a free Gemini key · takes 30 seconds</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+  const key=has?"":`<div class="s1 gh-row af-key gh-c" style="--i:1" onclick="openSettings('alfred')" role="button" tabindex="0"><span class="lead">${GP.icon("bolt")}</span><div class="main"><div class="gh-t1">Unlock live coaching</div><div class="gh-t2">Add a free Gemini key · takes 30 seconds</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
   const sug=`<section class="s2 gh-list af-sug gh-c" style="--i:2"><div class="gh-lh"><h3>Try asking</h3></div>${qs.map(q=>`<div class="gh-row af-q" role="button" tabindex="0" data-q="${esc(q)}" onclick="alfPageAsk(this.dataset.q)"><span class="lead">${GP.icon("chat")}</span><div class="main"><div class="gh-t1">${esc(q)}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section>`;
   const conv=last?`<section class="s2 af-last gh-c" style="--i:3" onclick="openAlfredChat()" role="button" tabindex="0"><div class="gh-lh"><h3>Last conversation</h3><span class="gh-more">Continue</span></div>${last.q?`<p class="af-lq"><b>You</b><span>${esc(last.q)}</span></p>`:""}<p class="af-la"><b>Alfred</b><span>${esc(last.a)}</span></p></section>`:"";
   const dos=`<section class="s2 af-dos gh-c" style="--i:5"><div class="gh-lh"><h3>Muscle dossiers</h3></div><div class="af-chips">${M12.map(m=>`<button class="chip" onclick="muscleDrill('${m}')">${MNAME[m]}</button>`).join("")}</div></section>`;
@@ -11220,7 +11222,7 @@ const GP_SEC=[
   [/sleep/i,"moon","rcv"],[/hydrat/i,"drop","rcv"],[/infirm|injur/i,"cross","rcv"],[/recover|sore|readiness|fatigue/i,"pulse","rcv"],
   [/effort|rpe|rir|intensity/i,"bolt","vol"],[/dossier/i,"scan","n"],[/muscle|coverage|sets|volume|forecast|landmark/i,"chart","vol"],[/frequen/i,"calendar","vol"],
   [/calendar|cycle|days?\b|schedule|next up|week|patrol/i,"calendar","pln"],[/plan|split|\blab\b|generator|import/i,"map","pln"],[/fuel|intake|stack|nutrition|macro/i,"flask","pln"],
-  [/body|weight/i,"scale","n"],[/league|duel|ally|allies|invite/i,"allies","n"],[/alfred|ask|conversation/i,"chat","n"],[/tool/i,"wrench","n"],[/history|session|archive|log\b/i,"book","n"],[/cue|form|tip/i,"bulb","n"]
+  [/body|weight/i,"scale","n"],[/league|duel|ally|allies|invite/i,"allies","n"],[/try asking|suggest/i,"bulb","n"],[/alfred|conversation/i,"chat","n"],[/tool/i,"wrench","n"],[/history|session|archive|log\b/i,"book","n"],[/cue|form|tip/i,"bulb","n"]
 ];
 const GP_SEC_SEL=".gh-lh h3,.gh-sec h2,.p3-ch2 h3";
 function gpSec(n){
