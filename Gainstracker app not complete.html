@@ -1323,7 +1323,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gm-bench .btn.sm{min-height:34px;height:34px;padding:0 14px}
 
 /* folded rows + the Lab body (old cards keep their logic; this puts them on the calm surfaces) */
-.gm-fold .gh-t1{font-size:15px}
 .gm-lab>.card,.gm .gm-lab .card.glow{margin:12px 0 0}
 .gm .gm-lab .card,.gm .gm-lab .card.glow{background:linear-gradient(180deg,#131B29,#0F1621);border:1px solid var(--hair);border-radius:var(--r-l);box-shadow:var(--hl),var(--sh2);padding:15px}
 .gm .gm-lab .card.glow::before,.gm .gm-lab .card::after{content:none}
@@ -1553,14 +1552,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh .inf-c,.gh .fu-c,.gh .ar-si,.gh .gar-nx,.gh .sp-cal{margin-top:12px;padding-bottom:14px}
 .inf-c>:not(.gh-lh):not(.gh-row),.fu-c>:not(.gh-lh):not(.gh-row),.ar-si>:not(.gh-lh),.gar-nx>*,.sp-cal>:not(.gh-lh){margin-left:14px;margin-right:14px}
 .gh .inf-p,.gh .fu-p,.gh .ar-p{margin:8px 14px 0}
-.gh .gm-inf{margin-top:12px;margin-bottom:12px;padding-bottom:13px;cursor:pointer}
-.gm-inf-g .num.c-ok{color:var(--ok)}.gm-inf-g .num.c-warn{color:var(--warn)}.gm-inf-g .num.c-bad{color:#FF786D}.gm-inf-g .num.c-3{color:var(--tx3)}
-.gm-inf .gh-lh .trail{display:flex;color:var(--tx3)}.gm-inf .gh-lh .gi{width:16px;height:16px}
-.gm-inf-g{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 0}
-.gm-inf-g>div{min-width:0}
-.gm-inf-g .num{display:block;font-size:26px;line-height:.95;color:var(--tx1);white-space:nowrap}
-.gm-inf-g .num small{font-size:13px;color:var(--tx2);margin-left:1px}
-.gm-inf-g .eyebrow{display:block;margin-top:6px;font-size:10px;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .inf-big{font-size:28px;color:var(--tx1)}.inf-big small{font-size:14px;color:var(--tx2);margin-left:2px}
 .inf-seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
 .inf-seg button{min-height:52px;border-radius:12px;background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:500 11px/1 var(--body)}
@@ -5575,6 +5566,16 @@ function gsHero(){
     <div class="gm-fig2">${buildSuit()}</div>
     <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
 }
+/* Suit dock: Infirmary and Time-lapse open their own page/sheet, Photos scrolls to the card at the bottom of Body. The infirmary summary row and the time-lapse fold became these tiles. */
+function gsDock(){
+  const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,ph=(state.data.photos||[]).length;
+  const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load · injuries";
+  return gdDock("Suit tools",[
+    {art:"tile-infirmary",ic:"pulse",t:"Infirmary",s:inf,fn:"openInfirmary()"},
+    {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Mastery · radar",fn:"openMastery()"},
+    {art:"tile-photos",ic:"image",t:"Photos",s:ph?`<b>${ph}</b> photo${ph===1?"":"s"}`:"Add your first",fn:"gdJump('#gs-photos')"}]);
+}
+function openMastery(){openSheet(`<div class="gh gm st-pg"><div class="st-h"><h2>Time-lapse</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>${gsFoldHtml()}</div>`);}
 function gsGrid(){
   const tile=m=>{
     const trained=(state.data.muscleVol[m]||0)>0,rec=getRecovery(m),hrs=trained&&rec<100?hoursToReady(m):0,sets=weeklySets(m),z=zoneOf(m,sets);
@@ -5605,12 +5606,10 @@ function gsBody(){
   const me=state.data.u.measurements||{},cells=[["chest","Chest"],["waist","Waist"],["leftArm","L arm"],["rightArm","R arm"],["leftThigh","L thigh"],["rightThigh","R thigh"]];
   return `<div class="gh-sec"><h2>Body</h2><button class="gh-more" data-hx onclick="openMeasure()">Edit</button></div>
     <section class="s2 gm-meas"><div class="gm-ms">${cells.map(([k,l])=>`<div><b class="num">${me[k]||"—"}</b><span class="eyebrow">${l}${me[k]?" cm":""}</span></div>`).join("")}</div></section>
-    ${gsInfirmary()}${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
+    ${symmetryCard()}${progressPhotosCard()}${suitPhysiqueAlfredCard()}`;
 }
 function renderSuit(){
-  const sl=strengthLevel(),r=rankFor(sl);
-  $("app").innerHTML=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Suit</h1>${gsHero()}${gsGrid()}${gsEffort()}`
-    +gmFoldRow("suit-fold","film","Time-lapse · mastery · coverage",`${esc(r.name)} · Str ${sl} · radar`,"gsFoldHtml")+gsBody()+`</div>`;
+  $("app").innerHTML=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Suit</h1>${gsHero()}${gsDock()}${gsGrid()}${gsEffort()}${gsBody()}</div>`;
 }
 
 function suitPhysiqueAlfredCard(){
@@ -5666,7 +5665,7 @@ function progressPhotosCard(){
   const cmp=ph.length>=2?`<span class="row" style="gap:6px"><button class="btn ghost sm" style="width:auto" onclick="openPhotoTimeline()">Timeline</button><button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button></span>`:"";
   const cells=ph.map(p=>`<div class="pcell" onclick="viewProgress('${p.id}')"><img src="${p.img}" alt=""><div class="pdate">${fmtP(p.date)}${p.bw?" · "+p.bw+"kg":""}</div></div>`).join("");
   const add=`<label class="pcell add"><input type="file" accept="image/*" capture="environment" style="display:none" onchange="addProgress(this)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#E8C56A" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg><span class="mini">Add photo</span></label>`;
-  return `<div class="card"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
+  return `<div class="card" id="gs-photos"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
     <div class="mini" style="margin:-2px 0 8px;color:var(--text2)">Your transformation, framed. Stored only on this device — nothing leaves the cave.</div>
     <div class="pgrid">${add}${cells}</div></div>`;
 }
@@ -6224,13 +6223,6 @@ function openInjuryPicker(){
 function addInjury(m){state.data.injuries=state.data.injuries||{};state.data.injuries[m]={since:new Date().toISOString(),note:""};save();haptic("done");closeSheet();renderInfirmary();}
 function clearInjury(m){if(state.data.injuries)delete state.data.injuries[m];save();haptic("done");toast(MNAME[m]+" cleared — back in action");renderInfirmary();}
 /* The Infirmary: a body page inside Suit (Body section). Sleep, soreness, the workload watch and the injury board. */
-function gsInfirmary(){   // Suit → Body: one row of today's numbers; tap opens the page
-  const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,a=acwrInfo();
-  const cell=(v,l,c)=>`<div><b class="num${c?" c-"+c:""}">${v}</b><span class="eyebrow">${l}</span></div>`;
-  const z={sweet:["sweet","ok"],high:["climbing","warn"],spike:["spike","bad"],detrain:["low",""]}[a.zone];
-  return `<section class="s2 gm-inf" role="button" tabindex="0" onclick="openInfirmary()" aria-label="Open the Infirmary: sleep, soreness, workload, injuries"><div class="gh-lh"><h3>Infirmary</h3><span class="trail">${GP.icon("chevR")}</span></div>
-    <div class="gm-inf-g">${cell(sl&&sl.hours?sl.hours+"<small>h</small>":"—","Sleep",sl&&sl.hours?"":"3")}${cell(sore||"0","Sore today",sore?"warn":"")}${cell(inj||"0","Injuries",inj?"bad":"")}${cell(a.zone==="building"?"—":a.ratio.toFixed(2),"Load ratio",z?z[1]:"3")}</div></section>`;
-}
 function renderInfirmary(){
   const d=state.data,r=patrolReadiness(),sl=sleepToday(),sore=soreToday(),inj=d.injuries||{},injKeys=Object.keys(inj),sd=sleepDebt();
   const QL=["Poor","Light","OK","Good","Great"],SL=["","mild","moderate","severe"],soreList=Object.keys(sore);
@@ -6642,21 +6634,6 @@ const GM_IC={
 const gmIc=(n,c="")=>`<svg class="gi ${c}" viewBox="0 0 24 24" aria-hidden="true">${GM_IC[n]||""}</svg>`;
 const gmTop=(day,k)=>{const p=dayMuscles(day).prim;return Object.keys(p).sort((a,b)=>p[b]-p[a]).slice(0,k);};
 const gmChips=(day,k)=>gmTop(day,k).map(m=>`<span class="gm-chip">${ghName(m)}</span>`).join("");
-/* a fold row + body (Lab on Mission, time-lapse/mastery on Suit): the body is built on first open, so a folded section costs nothing per render */
-function gmFold(id,buildName){
-  const b=$(id),r=$(id+"-row");if(!b)return;
-  const open=b.classList.contains("hide");
-  if(open&&!b.dataset.f){b.innerHTML=window[buildName]();b.dataset.f="1";}
-  b.classList.toggle("hide",!open);if(r)r.classList.toggle("open",open);
-  state.accOpen=state.accOpen||{};state.accOpen[id]=open;haptic("tap");
-  if(open)setTimeout(()=>{try{b.scrollIntoView({behavior:"smooth",block:"start"});}catch(e){}},60);
-}
-function gmFoldRow(id,icon,title,sub,buildName){
-  const open=accIsOpen(id,false);
-  return `<div class="s1 gh-lore gm-fold gh-c${open?" open":""}" id="${id}-row" data-hx onclick="gmFold('${id}','${buildName}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
-    <div id="${id}" class="gh-lore-body${open?"":" hide"}"${open?' data-f="1"':""}>${open?window[buildName]():""}</div>`;
-}
-
 /* ===== FEATURE DOCK (GP:DOCKS, wave 6) =====
    ONE reusable row of art tiles directly under a tab hero (Mission, Suit, Profile, Allies): every feature the tab owns is one tap away, nothing is searched for or folded.
    A tile = {art: assets/art/<art>.jpg, ic: GP icon, t: label, s: live one-line sub (a number or a state, <= ~16 chars), fn: onclick, pos?: background-position}.
