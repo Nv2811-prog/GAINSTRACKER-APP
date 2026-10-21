@@ -1039,6 +1039,27 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-acts{display:flex;flex-direction:column;gap:8px}
 .p3-acts .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 
+/* ===== GP:WEEKLY+BODY (wave 7) ===== */
+/* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
+/* 1 · one-tap weekly adjust: a button = tinted icon chip + what changes + where, "Apply" in gold; the result row turns green with a check */
+.gh .s2.gh-sun{cursor:default}
+.gh-sun-hit{cursor:pointer;border-radius:var(--r-s)}
+.wk-acts{display:grid;gap:8px;margin-top:4px}
+.wk-act{display:flex;align-items:center;gap:11px;width:100%;min-height:56px;padding:9px 12px 9px 10px;border:0;border-radius:var(--r-m);background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);text-align:left;font:inherit;cursor:pointer}
+.wk-act.warn{--ac:var(--warn);--act:var(--tint-warn);--acr:rgba(255,178,36,.36)}
+.wk-act.bad{--ac:#FF786D;--act:var(--tint-bad);--acr:rgba(255,90,78,.36)}
+.wk-act.is-done{--ac:var(--ok);--act:var(--tint-ok);--acr:rgba(52,210,127,.36);background:var(--g1);box-shadow:inset 0 0 0 1px rgba(52,210,127,.24),var(--hl);cursor:default}
+.wk-ic{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--act);color:var(--ac);box-shadow:inset 0 0 0 1px var(--acr)}
+.wk-ic .gi{width:18px;height:18px;stroke-width:2.4}
+.wk-act .wk-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.wk-act .wk-tx b{display:block;font:650 15px/1.2 var(--body);letter-spacing:-.01em;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wk-act .wk-tx i{display:block;font:500 12.5px/1.25 var(--body);font-style:normal;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wk-go{flex:none;padding:10px 2px 10px 8px;font:650 13.5px/1 var(--body);color:var(--gold-ink)}
+.gm .wk-sug{margin-top:12px;cursor:pointer}
+.gm .wk-sug:active{background:rgba(150,178,222,.05)}
+.gh-row .lead.warn .gi,.gh-row .lead.bad .gi{stroke-width:2.2}
+/* ===== /GP:WEEKLY+BODY ===== */
+
 /* ===== GP:HOME (wave 2) ===== */
 /* Home = header (date · cycle in the top bar, greeting under it) → ONE hero (Tonight / Rest / Live / Free, readiness folded in) → This week + volume map → Sunday review → Lifts (records + stalled) → Last session → Next up → extras row (Garage, events).
    Everything is scoped under .gh so the other tabs keep their look; the primitives GP.* emit (ring, lmk, wk, seg, spark) are styled here. */
@@ -2610,6 +2631,7 @@ dismissed:{},nemesis:null,aiKeySet:false,
 // ---- extended (Batch 3+) persistent state; back-filled by Object.assign on load ----
 sleepLog:[],            // {date, quality:1-5, hours, note}
 bwLog:[],              // {date, kg} bodyweight trend
+weekAdj:null,          // {wk, done:{"add:calves":{label,past,at}}} one-tap weekly adjustments applied this calendar week (wave 7)
 patrol:[],             // {date, mood:1-5, energy:1-5, note, day} session journal
 templates:[],          // {id, name, exercises:[{name, setCount}]}
 contracts:[],          // {id, type:lift|bw|vol|sessions, name, start, target, created, deadline}
@@ -6828,7 +6850,7 @@ function renderMission(){
   if(!cur)h+=gmEmpty()+gmDock(null);
   else h+=gmHero(cur)+gmDock(cur)
     +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
-    +gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
+    +gmSuggest()+gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
   h+=`</div>`;
   $("app").innerHTML=h;
 }
@@ -8735,7 +8757,7 @@ Recovery %: each muscle has its own window (72 h for back and legs, 48 h for che
 One detector: a lift is stalled when its best estimated 1RM hasn't been beaten for 3 or more sessions and you trained it in the last 3 weeks. Gotham's Lifts card lists the stalled lifts; opening them shows each lift's best e1RM, how many sessions it has been flat and ONE suggested change — the angle, the grip or the rep range — never a deload. The muscle tiles on Gotham put the muscles furthest below their weekly MEV (sets short) and any past their MRV first. Sessions this week and the weekly streak read the same calendar week (Monday to Sunday).
 
 ## THE SUNDAY REVIEW
-From 16:00 on Sundays Gotham shows a Sunday review card: muscles under MEV or over MRV, the records of the week, stalled lifts, and next week's one adjustment. Tapping it opens the full week in review (sessions, hard sets, tonnage, records, push against pull, recovery).
+From 16:00 on Sundays Gotham shows a Sunday review card: muscles under MEV or over MRV, the records of the week, stalled lifts, and next week's adjustment as one-tap buttons (add or trim sets on the lifts that train a muscle, or add a stretch-position lift) that edit your active plan and offer Undo. Tapping the card opens the full week in review (sessions, hard sets, tonnage, records, push against pull, recovery).
 
 ## THE INFIRMARY (SUIT → BODY)
 Sleep (hours and quality), a soreness map, the workload watch (the load ratio against your 4-week norm) and an injury board. Sleep feeds Readiness; a flagged injury puts a caution on lifts that hit that muscle. Tapping the Readiness ring on Gotham opens it too.
@@ -10688,12 +10710,113 @@ function ghNext(cur){
   return rows.length?`<section class="s2 gh-list gh-c" style="--i:5"><div class="gh-lh"><h3>Next up</h3></div>${rows.join("")}</section>`:"";
 }
 
+/* ===== ONE-TAP WEEKLY ADJUST (wave 7) =====
+   The Sunday review's advice as 1–3 buttons. Each one edits the ACTIVE split's plan targets (day.plan[lift]={s,r,opt}: the plan editor's own data and the shape Mission's trim writes),
+   snapshots every day it touches so Undo puts the exact previous day back, and is remembered for the calendar week in d.weekAdj so a second tap cannot stack the same change.
+   Sets only: 2..10 per lift (GM_MIN_SETS / GM_MAX_SETS), a new target starts at the 5–10 rep default. Never a deload, never a logged session. */
+const WK_STEP=3,WK_ACTIONS=3,WK_NEW_SETS=2;   // most sets one tap moves for a muscle, buttons shown, sets on a lift added from the library
+const wkClone=o=>JSON.parse(JSON.stringify(o));
+function wkWeekKey(){const t=new Date(weekStartK(0));return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
+function wkDone(){const w=state.data.weekAdj;return w&&w.wk===wkWeekKey()&&w.done?w.done:{};}
+function wkUO(vol){   // the two lists the advice is built from: trained muscles under MEV (furthest first) and over MRV (worst first)
+  const tr=vol.filter(t=>t.trained);
+  return {under:tr.filter(t=>t.zone==="warn").sort((a,b)=>(b.L.mev-b.sets)-(a.L.mev-a.sets)),over:tr.filter(t=>t.zone==="bad").sort((a,b)=>(b.sets-b.L.mrv)-(a.sets-a.L.mrv))};
+}
+function wkDayOrder(cur){   // training days in cycle order from tonight's slot, so the next sessions get the sets first
+  const n=cur.sp.days.length;
+  return Array.from({length:n},(_,k)=>(cur.i+k)%n).filter(i=>!isRest(cur.sp.days[i]));
+}
+function wkPlanAdd(cur,m,k){   // [{i,n,from,to}]: +1 set at a time, round-robin over the lifts that train m as a primary mover (next days first), each capped at GM_MAX_SETS; null when nothing has room
+  const rows=[];
+  wkDayOrder(cur).forEach(i=>{const day=cur.sp.days[i];(day.exercises||[]).forEach(n=>{
+    const pl=day.plan&&day.plan[n];if(!(exFor(n).p||[]).includes(m)||(pl&&pl.opt))return;
+    const s=ghSetsOf(day,n);rows.push({i,n,from:s,to:s});});});
+  let left=k,moved=true;
+  while(left>0&&moved){moved=false;rows.forEach(r=>{if(left>0&&r.to<GM_MAX_SETS){r.to++;left--;moved=true;}});}
+  const ch=rows.filter(r=>r.to>r.from);return ch.length?ch:null;
+}
+function wkPlanTrim(cur,m,k){   // [{i,n,from,to}]: -1 set at a time from the day that carries the most of m (gmTrimPick picks the lift); a lift never goes under GM_MIN_SETS; null when nothing can give
+  const days=cur.sp.days.map(d=>isRest(d)?d:Object.assign({},d,{plan:Object.assign({},d.plan||{})})),ch=new Map();
+  for(let t=0;t<k;t++){
+    const tg=days.map((d,i)=>isRest(d)?null:{i,pick:gmTrimPick(d,m),w:ghPlanSets(d)[m]||0}).filter(x=>x&&x.pick).sort((a,b)=>b.w-a.w)[0];
+    if(!tg)break;
+    const d=days[tg.i],n=tg.pick.n,s=ghSetsOf(d,n),key=tg.i+"|"+n,was=ch.get(key);
+    d.plan[n]=Object.assign({r:GM_REPS},d.plan[n],{s:s-1});ch.set(key,{i:tg.i,n,from:was?was.from:s,to:s-1});
+  }
+  return ch.size?[...ch.values()]:null;
+}
+function wkPlanLift(cur,m,k){   // a library lift for m worked at long length that this plan does not use yet; goes on the next day that already trains m (else the next training day); null when none fits
+  const sp=cur.sp,used=new Set(sp.days.flatMap(d=>d.exercises||[])),seen=new Set(loggedExerciseNames()),order=wkDayOrder(cur),
+    pool=EXDB.filter(ex=>ex&&ex.n&&(ex.p||[])[0]===m&&!used.has(ex.n)&&isLengthened(ex)&&gymAllows(ex.eq)),
+    ex=pool.find(x=>seen.has(x.n))||pool[0],at=order.find(i=>(ghPlanSets(sp.days[i])[m]||0)>0);
+  if(!ex||!order.length)return null;
+  return [{i:at!=null?at:order[0],n:ex.n,from:0,to:clamp(k,WK_NEW_SETS,WK_STEP),add:true}];
+}
+function wkActions(under,over){   // 0..3 buttons: over-MRV muscles get a trim, under-MEV ones a set bump (or a stretch lift when no lift has room); none while load is spiking
+  const cur=currentPlanDay();if(!cur||!cur.sp)return [];
+  const done=wkDone(),len=cycleLen(),hot=["spike","high"].includes(acwrInfo().zone),out=[],sets=x=>clamp(Math.round(x*len/7),1,WK_STEP);
+  const act=(kind,t,ch)=>{
+    const n=ch.reduce((s,c)=>s+Math.abs(c.to-c.from),0),nm=ghName(t.m),ss=n+" set"+(n===1?"":"s"),names=[...new Set(ch.map(c=>c.n))],
+      days=[...new Set(ch.map(c=>"D"+(c.i+1)))].join(", "),lead=names.slice(0,2).join(", ")+(names.length>2?" +"+(names.length-2):"");
+    return {key:kind+":"+t.m,kind,m:t.m,tone:kind==="trim"?"bad":"warn",ch,
+      label:kind==="trim"?`Trim ${ss} · ${nm}`:kind==="lift"?`Add a stretch lift · ${nm}`:`Add ${ss} · ${nm}`,
+      past:kind==="trim"?`Trimmed ${ss} · ${nm}`:kind==="lift"?`Added ${names[0]} · ${nm}`:`Added ${ss} · ${nm}`,
+      sub:kind==="lift"?`${names[0]} · ${ss} · ${days}`:`${lead} · ${days}`};
+  };
+  const take=(t,make)=>{   // a muscle already adjusted this week shows its result instead of a new button
+    if(out.length>=WK_ACTIONS)return;
+    const k=["trim","add","lift"].find(x=>done[x+":"+t.m]);
+    if(k){const m=done[k+":"+t.m];out.push({key:k+":"+t.m,kind:k,m:t.m,applied:true,label:m.label,past:m.past||m.label});return;}
+    const r=make();if(r)out.push(act(r.kind,t,r.ch));
+  };
+  over.slice(0,2).forEach(t=>take(t,()=>{const ch=wkPlanTrim(cur,t.m,sets(t.sets-t.L.mrv));return ch&&{kind:"trim",ch};}));
+  if(!hot)under.forEach(t=>take(t,()=>{const k=sets(t.L.mev-t.sets),ch=wkPlanAdd(cur,t.m,k);if(ch)return {kind:"add",ch};const l=wkPlanLift(cur,t.m,k);return l&&{kind:"lift",ch:l};}));
+  return out;
+}
+function wkWrite(sp,ch){   // new day objects, never in place: exercises gets an added lift, plan[lift] keeps its reps and optional flag (a new target starts at GM_REPS)
+  const byDay=new Map();ch.forEach(c=>byDay.set(c.i,(byDay.get(c.i)||[]).concat(c)));
+  byDay.forEach((list,i)=>{
+    const day=sp.days[i],ex=(day.exercises||[]).slice(),plan=Object.assign({},day.plan||{});
+    list.forEach(c=>{if(c.add&&!ex.includes(c.n))ex.push(c.n);plan[c.n]=Object.assign({r:GM_REPS},plan[c.n],{s:c.to});});
+    sp.days[i]=Object.assign({},day,{exercises:ex,plan});
+  });
+}
+function wkApply(key){
+  const cur=currentPlanDay(),uo=wkUO(ghVol(null)),a=cur&&wkActions(uo.under,uo.over).find(x=>x.key===key);   // rebuilt from live data: the plan may have moved since the card was drawn
+  if(!a||a.applied||!a.ch){wkRefresh();return;}
+  const id=cur.sp.id,snap=[...new Set(a.ch.map(c=>c.i))].map(i=>[i,wkClone(cur.sp.days[i])]),prev=state.data.weekAdj;
+  wkWrite(cur.sp,a.ch);
+  state.data.weekAdj={wk:wkWeekKey(),done:Object.assign({},wkDone(),{[key]:{label:a.label,past:a.past,at:now()}})};
+  haptic("tap");splitsChanged();wkRefresh();
+  toastUndo(a.past,()=>{   // the exact previous days go back, and the week forgets it was applied
+    const sp=(state.data.splits||[]).find(s=>s.id===id);if(!sp)return;
+    snap.forEach(([i,day])=>{sp.days[i]=day;});state.data.weekAdj=prev;
+    splitsChanged();wkRefresh();toast("Plan restored");
+  },"Undo");
+}
+function wkRefresh(){   // the review sheet is open over the tab: repaint it in place (scroll kept) so the button flips to its result
+  const sh=$("sheet");if(state._sheetKind!=="review"||!sh||!sh.classList.contains("on"))return;
+  const sc=sh.scrollTop;sh.innerHTML=ghReviewSheet();sh.scrollTop=sc;
+}
+const wkIc=a=>a.kind==="trim"?gmIc("minus"):GP.icon("plus");
+function wkBtn(a){
+  if(a.applied)return `<div class="wk-act is-done" role="status"><span class="wk-ic">${GP.icon("check")}</span><span class="wk-tx"><b>${esc(a.past||a.label)}</b><i>Plan updated for the next cycle</i></span></div>`;
+  return `<button class="wk-act ${a.tone}" onclick="wkApply('${a.key}')" aria-label="${esc(a.label+". "+a.sub+". Edits your plan, with undo.")}"><span class="wk-ic">${wkIc(a)}</span><span class="wk-tx"><b>${esc(a.label)}</b><i>${esc(a.sub)}</i></span><span class="wk-go">Apply</span></button>`;
+}
+const wkNext=r=>r.acts.length?`<div class="wk-acts">${r.acts.map(wkBtn).join("")}</div>`:`<b>${esc(r.adj)}</b>`;
+function gmSuggest(){   // Mission's door to the same buttons: one link row into the review sheet (which owns them), shown while something is left to apply
+  if(!(state.data.workouts||[]).some(w=>new Date(w.date).getTime()>=weekStartK(0)))return "";
+  const uo=wkUO(ghVol(null)),left=wkActions(uo.under,uo.over).filter(a=>!a.applied);
+  if(!left.length)return "";
+  const a=left[0],more=left.length>1?` · +${left.length-1} more`:"";
+  return `<div class="s1 gh-row wk-sug gh-c" style="--i:2" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Suggested this week: ${esc(a.label)}${left.length>1?", and "+(left.length-1)+" more":""}. Opens the week review."><span class="lead ${a.tone}">${wkIc(a)}</span><div class="main"><div class="gh-t1">Suggested this week</div><div class="gh-t2">${esc(a.label)}${more}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+}
+
 /* ---- WEEK REVIEW: one computation behind the Sunday card and its detail sheet ---- */
 function ghWeekReview(vol){
   const t0=weekStartK(0),ws=(state.data.workouts||[]).filter(w=>new Date(w.date).getTime()>=t0),prs=[];
   ws.forEach(w=>(w.prs||[]).forEach(nm=>{if(!prs.includes(nm))prs.push(nm);}));
-  const tr=vol.filter(t=>t.trained),under=tr.filter(t=>t.zone==="warn").sort((a,b)=>(b.L.mev-b.sets)-(a.L.mev-a.sets)),
-    over=tr.filter(t=>t.zone==="bad").sort((a,b)=>(b.sets-b.L.mrv)-(a.sets-a.L.mrv)),stalled=stalledLifts(),a=acwrInfo();
+  const {under,over}=wkUO(vol),stalled=stalledLifts(),a=acwrInfo();
   let adj;
   if(over.length)adj=`Trim ${MNAME[over[0].m].toLowerCase()} by ${over[0].sets-over[0].L.mrv} set${over[0].sets-over[0].L.mrv===1?"":"s"}.`;
   else if(a.zone==="spike"||a.zone==="high")adj="Hold total volume steady while your load settles.";
@@ -10701,7 +10824,7 @@ function ghWeekReview(vol){
   else if(stalled.length)adj=`Change the angle or rep range on ${stalled[0].n}.`;
   else adj="Repeat the plan. Volume and load are on track.";
   const sets=ws.reduce((s,w)=>s+(w.exercises||[]).reduce((x,e)=>x+countSets(e.sets,false),0),0);
-  return {ws,prs,under,over,stalled,adj,sets:Math.round(sets),tonnage:ws.reduce((s,w)=>s+(+w.totalVol||0),0)};
+  return {ws,prs,under,over,stalled,adj,acts:wkActions(under,over),sets:Math.round(sets),tonnage:ws.reduce((s,w)=>s+(+w.totalVol||0),0)};
 }
 const ghList=(arr,f,max=3)=>arr.slice(0,max).map(f).join(", ")+(arr.length>max?" +"+(arr.length-max)+" more":"");
 /* ---- SUNDAY REVIEW: Sundays from 16:00, below the week card. Three lines and next week's one change; never a pop-up. ---- */
@@ -10712,9 +10835,9 @@ function ghSunday(vol){
     l2=r.prs.length?`${r.prs.length} record${r.prs.length===1?"":"s"} this week, led by ${esc(r.prs[0])}.`:"No new records this week.",
     l3=r.stalled.length?`Stalled: ${ghList(r.stalled,s=>esc(s.n),2)}.`:"No stalled lifts.";
   const line=(ic,tone,tx)=>`<li><span class="lead ${tone}">${GP.icon(ic)}</span><span>${tx}</span></li>`;
-  return `<div class="s2 gh-sun gh-c" style="--i:2" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
-    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul>
-    <div class="gh-sun-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></div>`;
+  return `<div class="s2 gh-sun gh-c" style="--i:2"><div class="gh-sun-hit" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
+    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul></div>
+    <div class="gh-sun-n"><span class="eyebrow">Next week</span>${wkNext(r)}</div></div>`;
 }
 /* the detail behind the Sunday card: the week in numbers, Alfred's flags, the one change */
 function ghReviewHtml(){
@@ -10732,11 +10855,12 @@ function ghReviewHtml(){
   if(fried>=4)rows.push(row("pulse","warn","Recovery",`${fried} muscle groups are under 50%. Keep 1 to 3 reps in reserve.`));
   return `<div class="gh gh-rv"><div class="gh-rv-st"><div><b class="num">${r.ws.length}<small>/${goal}</small></b><span class="eyebrow">Sessions</span></div><div><b class="num">${r.sets}</b><span class="eyebrow">Hard sets</span></div><div><b class="num">${tv.v}<small>${tv.u}</small></b><span class="eyebrow">Moved</span></div><div><b class="num">${r.prs.length}</b><span class="eyebrow">Records</span></div></div>
     <section class="s2 gh-list">${rows.join("")}</section>
-    <div class="s1 gh-rv-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></div>`;
+    <div class="s1 gh-rv-n"><span class="eyebrow">Next week</span>${wkNext(r)}</div></div>`;
 }
+const ghReviewSheet=()=>`<div class="ttl">Week in review</div>${ghReviewHtml()}<button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`;
 function openCaveReview(){
   try{haptic("tap");}catch(e){}
-  openSheet(`<div class="ttl">Week in review</div>${ghReviewHtml()}<button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
+  openSheet(ghReviewSheet());state._sheetKind="review";   // openSheet clears the kind; wkRefresh() repaints this sheet after a button is applied
 }
 
 /* ---- GOTHAM EXTRAS: the two that earn a place. The Garage always; the seasonal event only inside its dates. ---- */
