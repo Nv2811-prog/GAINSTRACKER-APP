@@ -81,6 +81,7 @@ try {
 
   /* ---------- 5 · history is read the same way ---------- */
   await reset(snap); await sleep(300);
+  await shot('.bd-c', 'body-section');
   const h = await ev(() => {
     const rows = svRows('Squat'), names = Object.keys(rows), early = liftEstimateAt('Squat', new Date('2020-01-01').getTime(), rows), mid = liftEstimateAt('Squat', now() - 21 * 864e5, rows), cur = liftEstimate('Squat');
     const rel = bdRel(bdEntries()), b3 = p3BigThree();
@@ -132,7 +133,7 @@ try {
   ok('Suit hero: the scroll-driven push-in from GP:CHARM still runs on it, and the status line has a dark halo', hero && hero.anim === 'gpPar' && /rgba?\(5, 7, 12/.test(hero.halo), hero);
   ok('Suit dock: the Fuel tile has its own still (tile-fuel), not the Lab art', hero && /tile-fuel\.jpg/.test(hero.fuelArt || '') && !/tile-lab/.test(hero.fuelArt || ''), hero && hero.fuelArt);
   await shot('.gm-suit', 'suit-hero');
-  await page('suit-top');
+  await ev(() => window.scrollTo(0, 0)); await page('suit-top');
 } catch (e) { checks.push({ name: 'fatal', pass: false, info: String(e && e.stack || e).slice(0, 500) }); }
 const failed = checks.filter((c) => !c.pass);
 console.log(JSON.stringify({ width: A.width || 393, passed: checks.length - failed.length, ...(A.v ? { names: checks.map((c) => (c.pass ? 'ok  ' : 'FAIL ') + c.name) } : {}), failed, consoleErrors: ctx.log.errors, failedRequests: ctx.log.failed }, null, 1));
