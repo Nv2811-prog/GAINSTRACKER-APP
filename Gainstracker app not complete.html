@@ -813,6 +813,26 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .ob-cta{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom,0px));margin-top:auto;padding-top:24px}
 .ob-cta .btn{width:100%}
 
+/* ===== GP:DOCKS (wave 6) ===== */
+/* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
+   Tile = square still (assets/art/tile-*.jpg, or a header crop via --pos) under a dark vignette, an icon chip, a label and a live one-line sub.
+   Plain <button>s on purpose: no .hx haptic overlay (a scrolling row must stay a scroll on iOS). Press = the global recipe + a 1px gold hairline. */
+.gd{display:flex;gap:10px;margin:14px -14px 0;padding:2px 14px 8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.gd::-webkit-scrollbar{display:none}
+.gd-t{flex:none;width:124px;display:flex;flex-direction:column;align-items:stretch;min-height:0;padding:0 0 12px;text-align:left;color:var(--tx1);background:var(--g1);border:0;border-radius:var(--r-m);box-shadow:inset 0 0 0 1px var(--hair),var(--hl),0 14px 24px -18px #000;overflow:hidden;scroll-snap-align:start;cursor:pointer}
+.gd-t:active{box-shadow:inset 0 0 0 1px var(--gold),var(--hl),0 14px 24px -18px #000}
+.gd-a{position:relative;display:block;height:96px;margin-bottom:10px;background:radial-gradient(circle at 50% 46%,rgba(5,7,12,0) 52%,rgba(5,7,12,.5) 100%),var(--art) var(--pos,center)/cover no-repeat,var(--g3)}
+.gd-a::after{content:"";position:absolute;inset:auto 0 0;height:30px;background:linear-gradient(0deg,var(--g1),rgba(12,18,28,0))}
+.gd-i{position:absolute;z-index:1;left:9px;top:9px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--gold-ink);background:rgba(5,7,12,.74);box-shadow:inset 0 0 0 1px rgba(242,193,78,.32)}
+.gd-i .gi{width:16px;height:16px}
+.gd-t1,.gd-t2{display:block;padding:0 11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gd-t1{font:650 14px/1.2 var(--body);letter-spacing:-.01em}
+.gd-t2{margin-top:3px;font:500 12px/1.25 var(--body);color:var(--tx2)}
+.gd-t2 b{font-weight:650;color:var(--tx1)}
+.gd-hit{outline:2px solid transparent;outline-offset:6px;animation:gdHit 1.3s ease-out}
+@keyframes gdHit{0%,35%{outline-color:var(--gold)}100%{outline-color:transparent}}
+@media (prefers-reduced-motion:reduce){.gd-hit{animation:none}}
+
 /* ===== GP:PROFILE+FINISH (wave 3) ===== */
 /* Finish moment, summary slides, Profile tab, exercise sheet. Built on the Home primitives (.gh .s1/.s2/.s3, gh-row, gh-sec, .lmk, .tag); only the new pieces live here. */
 .gi.flip{transform:scaleX(-1)}
@@ -4241,6 +4261,7 @@ function render(){
   else if(state.subpage==="archive"){renderArchive();subTop();renderNav();}
   else if(state.subpage==="garage"){renderGarage();subTop();renderNav();}
   else if(state.subpage==="infirmary"){renderInfirmary();subTop();renderNav();}
+  else if(state.subpage==="lab"){renderLab();subTop();renderNav();}
   else{
     const fn={gotham:renderGotham,mission:renderMission,fuel:renderFuel,case:renderProfile,allies:renderAllies,history:renderProfile,strategy:renderStrategy,alfred:renderAlfred,suit:renderSuit,tech:renderTech}[state.tab]||renderGotham;
     fn();
@@ -6242,7 +6263,9 @@ const INDEX_ITEMS=[
   ["🦇","Gotham home","Tonight's mission, readiness, daily challenges","go('gotham')"],
   ["⚔️","Mission / log a workout","Start or log tonight's session","go('mission')"],
   ["📈","Profile","Records, ranks, history & analytics","go('case')"],
-  ["📋","Plan & schedule","Splits, training days, volume map","goPlan()"],
+  ["📋","Plan & schedule","Splits, training days, forecast","goPlan()"],
+  ["🧪","Lab","Efficiency, balance, plateaus, calculators","openLab()"],
+  ["📥","Import or share a split","Paste a Split Card or send yours","openSplitExchange()"],
   ["🤖","Alfred","AI coach, physique scan, weekly review","go('alfred')"],
   ["💪","The Suit","Your muscle figure & recovery map","go('suit')"],
   ["🦾","WAYNE TECH","The gadget hub — every tool in one tab","go('tech')"],
@@ -6633,6 +6656,39 @@ function gmFoldRow(id,icon,title,sub,buildName){
     <div id="${id}" class="gh-lore-body${open?"":" hide"}"${open?' data-f="1"':""}>${open?window[buildName]():""}</div>`;
 }
 
+/* ===== FEATURE DOCK (GP:DOCKS, wave 6) =====
+   ONE reusable row of art tiles directly under a tab hero (Mission, Suit, Profile, Allies): every feature the tab owns is one tap away, nothing is searched for or folded.
+   A tile = {art: assets/art/<art>.jpg, ic: GP icon, t: label, s: live one-line sub (a number or a state, <= ~16 chars), fn: onclick, pos?: background-position}.
+   Plain <button>s, no .hx haptic overlay (a scrolling row must stay a scroll on iOS). A tile either opens its feature (sheet / sub-page) or, for a section that lives
+   inline on the page, scrolls to it (gdJump). The dock replaces the folds and tool lists it came from: a feature appears once per tab. */
+const GD_JUMP_TOP=76;   // px of sticky top bar a scroll-to-section tile has to clear
+function gdDock(label,tiles){
+  const plain=s=>String(s).replace(/<[^>]*>/g,"");
+  return `<div class="gd gh-c" style="--i:1" role="group" aria-label="${esc(label)}">${tiles.map(t=>`<button class="gd-t" onclick="${t.fn}" aria-label="${esc(t.t+", "+plain(t.s))}"><span class="gd-a" style="--art:url(assets/art/${t.art}.jpg)${t.pos?";--pos:"+t.pos:""}"><span class="gd-i">${GP.icon(t.ic)}</span></span><span class="gd-t1">${t.t}</span><span class="gd-t2">${t.s}</span></button>`).join("")}</div>`;
+}
+function gdJump(sel){   // smooth-scroll to a section of the current tab and ring it in gold for a moment
+  const el=document.querySelector(sel);if(!el)return;
+  haptic("tap");el.style.scrollMarginTop=GD_JUMP_TOP+"px";
+  el.scrollIntoView({behavior:"smooth",block:"start"});
+  el.classList.remove("gd-hit");void el.offsetWidth;el.classList.add("gd-hit");
+  setTimeout(()=>el.classList.remove("gd-hit"),1400);
+}
+/* Mission dock: the plan tools. The generator never shipped, so there is no tile for it. */
+function gmDock(cur){
+  const d=state.data,n=(d.splits||[]).length;let stalled=0;try{stalled=stalledLifts().length;}catch(e){}
+  const lifts=cur?cur.sp.days.reduce((a,x)=>a+(x.exercises||[]).length,0):0;
+  const own=cur?[{art:"tile-plan-edit",ic:"sliders",t:"Edit plan",s:`${cur.sp.days.length} days · ${lifts} lifts`,fn:"openSplitSheet()"},
+    {art:"tile-split-new",ic:"plus",t:"New split",s:n===1?"1 split":n+" splits",fn:"gdNewSplit()"}]:[];
+  return gdDock("Mission tools",own.concat([
+    {art:"tile-split-import",ic:"down",t:"Import split",s:d.splitImportAt?"Imported "+ghAgo(d.splitImportAt):"Share or paste",fn:"openSplitExchange()"},
+    {art:"tile-lab",ic:"flask",t:"Lab",s:stalled?`<b>${stalled}</b> stalled lift${stalled===1?"":"s"}`:"SFR · balance · tools",fn:"openLab()"}]));
+}
+function gdNewSplit(){   // New split tile: add the split, open the plan editor scrolled to it
+  newSplit();openSplitSheet();haptic("done");
+  const cards=$("sheet").querySelectorAll(".gm-sp"),last=cards[cards.length-1];
+  if(last)last.scrollIntoView({block:"start"});
+}
+
 /* ---- volume forecast: planned working sets per muscle per week, running through the cycle. Same credit rule + per-week normalising as Home's tonight forecast (ghPlanSets, perWeek). ---- */
 function gmFcRows(sp,sel){
   const per=sp.days.map(d=>isRest(d)?{}:ghPlanSets(d)),last=sel==="all"?sp.days.length-1:sel;
@@ -6700,7 +6756,7 @@ function gmHero(cur){
     <h2 class="num gh-title">${esc(sp.name)}</h2>
     <div class="gm-rail" role="img" aria-label="Cycle position: day ${cur.i+1} of ${n}">${rail}</div>
     <div class="gh-meta"><span><b>${tr.length}</b> training</span><span><b>${n-tr.length}</b> rest</span><span><b>${sets}</b> sets / cycle</span>${min?`<span>~<b>${min}</b> min a day</span>`:""}</div>
-    <div class="gh-cta gm-cta"><button class="btn" onclick="openSplitSheet()">${GP.icon("sliders")}Edit plan</button><button class="btn" onclick="freeWorkout()">${GP.icon("bolt")}Free session</button></div></section>`;
+    <div class="gh-cta gm-cta"><button class="btn" onclick="freeWorkout()">${GP.icon("bolt")}Free session</button></div></section>`;
 }
 function gmDayRow(sp,i,cur,live){
   const day=sp.days[i],rest=isRest(day),tn=cur.i===i,done=i<cur.i;
@@ -6734,21 +6790,27 @@ function gmBench(act){
     return `<div class="gh-row"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">${esc(sp.name)}</div><div class="gh-t2">${sp.days.length} days · ${ex} lifts</div></div><span class="trail"><button class="btn sm" onclick="setActiveSplit('${sp.id}')">Use</button></span></div>`;}).join("")}</section>`;
 }
 /* ---- Lab: everything that is not the plan, folded into one row. Cards keep their logic; .gm-lab restyles them. ---- */
-function scienceCardsHtml(){return volMapCard()+scienceLabCard()+weeklyBalanceCard()+workloadCard()+plateauCard();}
+function scienceCardsHtml(){return scienceLabCard()+weeklyBalanceCard()+plateauCard();}   // per-muscle volume is the Suit grid, the workload ratio lives in the Infirmary: the Lab keeps only what is shown nowhere else
 function gmLabHtml(){
   const tools=[["scale","Plate calculator","openPlateSheet(-1)"],["bolt","1RM calculator","open1RM()"],["target","1RM test day","openTestDay()"],["wrench","Forge","openForge()"],["note","Measure","openMeasure()"]];
   return `<div class="gm-lab">${contractCard()}${scienceCardsHtml()}<section class="s2 gh-list"><div class="gh-lh"><h3>Tools</h3></div>${tools.map(t=>`<div class="gh-row" data-hx onclick="${t[2]}"><span class="lead">${GP.icon(t[0])}</span><div class="main"><div class="gh-t1">${t[1]}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`;
+}
+/* Lab sub-page (the Lab dock tile). Same shell as the Infirmary: back arrow, one scroll, tools open sheets over it. */
+function openLab(){state.subpage="lab";render();window.scrollTo(0,0);}
+function closeLab(){state.subpage=null;go("mission");}
+function renderLab(){
+  $("app").innerHTML=`<div class="gh gm"><div class="sp-hd"><button class="btn-i" onclick="closeLab()" aria-label="Back to Mission">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}</button><div><h1>Lab</h1><div class="t-xs">Efficiency · balance · plateaus · tools</div></div></div>${gmLabHtml()}</div>`;
 }
 const gmEmpty=()=>`<section class="s3 gh-hero gh-c" style="--i:0">${gaArt("mission","dim")}<div class="gh-top"><span class="eyebrow gh-live">No plan yet</span></div><h2 class="num gh-title">Build your split</h2><div class="gh-meta"><span>Days, lifts and set targets. Volume and frequency read from it.</span></div><div style="height:16px"></div>
   <div class="gh-cta"><button class="btn btn-1" onclick="newSplit();openSplitSheet()">${GP.icon("plus")}New split</button><button class="btn" onclick="freeWorkout()">Free session</button></div></section>`;
 function renderMission(){
   const cur=currentPlanDay(),live=!!state.session;
   let h=`<div class="gh gm${state._same?"":" gh-anim"}"><h1 class="gh-hi">Mission</h1>`;
-  if(!cur)h+=gmEmpty();
-  else h+=gmHero(cur)
+  if(!cur)h+=gmEmpty()+gmDock(null);
+  else h+=gmHero(cur)+gmDock(cur)
     +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
     +gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
-  h+=gmFoldRow("mission-lab","flask","Lab","Volume map · SFR · workload · tools","gmLabHtml")+`</div>`;
+  h+=`</div>`;
   $("app").innerHTML=h;
 }
 /* ===== Wave M — Justice League: async "Patrol Card" share-codes, no backend ===== */
@@ -7260,7 +7322,7 @@ function openJusticeLeague(){   // "Splits & backups": share/import a split, the
   openSheet(`<div class="gh st-pg">
     <div class="st-h"><h2>Splits &amp; backups</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
     <span class="eyebrow st-g">Share</span>
-    <section class="s2 st-list">${row("share","Share a split","Send one of your plans to an ally","openShareSplitPicker()")}${row("down","Import a split","Paste a plan an ally sent you","openImportSplit()")}${row("plus","Invite an ally",cloudOn?"Swap friend codes":"Offline · codes still work","openAllyInvite()")}</section>
+    <section class="s2 st-list">${row("share","Share or import a split","Send a plan to an ally or paste one","openSplitExchange()")}${row("plus","Invite an ally",cloudOn?"Swap friend codes":"Offline · codes still work","openAllyInvite()")}</section>
     <span class="eyebrow st-g">Offline snapshot</span>
     <section class="s2 st-list"><div class="st-note" style="padding-top:12px">A one-time copy of your card for allies who are not live. It does not update.</div>
       <div style="padding:0 14px 14px"><button class="btn sm" onclick="shareMyCard()">${GP.icon("share")}Copy snapshot code</button><textarea id="my-code" readonly onclick="this.select()" class="st-ta">${code}</textarea></div></section>
@@ -7407,11 +7469,6 @@ function defaultSplits(){
 /* ========================= STRATEGY TAB ========================= */
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 /* ===== Wave 2: Strategy = weekly volume map (MEV/MAV/MRV), balance & plateau tools ===== */
-// Full-body heat map: every muscle tinted by its weekly working-set volume.
-function volMapBodies(){
-  const col=m=>{const s=weeklySets(m);return s>0?{fill:heatColor(m),op:".95"}:{fill:"#E8C56A",op:".06"};};
-  return `<div class="stage" style="border-radius:14px;overflow:hidden;padding:6px 6px 2px">${suitFigureFB(col)}</div>`;
-}
 /* Section-title icons: thin line glyphs from the shared GP icon set (no coloured glow, no emoji). */
 const SEC_ICON={volume:"chart",balance:"scale",plateau:"plateau",strength:"dumbbell",schedule:"calendar",suit:"suit",radar:"scan",plate:"dumbbell",link:"link",bolt:"bolt",flame:"flame"};
 function secIcon(key){return GP.icon(SEC_ICON[key]||key,"gi-sec");}
@@ -7492,25 +7549,6 @@ function timeLapseCard(){
       <button class="btn ghost sm" style="width:auto;padding:6px 11px" onclick="tlStep(1)">›</button>
     </div>
     <div class="row sp mini" style="margin-top:3px;color:var(--text3)"><span>first week</span><span>now</span></div></div>`;
-}
-function volMapCard(){
-  const rows=M12.map(m=>({m,s:weeklySets(m),lm:VL[m]||{mev:8,mav:14,mrv:20}}))
-    .sort((a,b)=>(a.s/a.lm.mav)-(b.s/b.lm.mav));
-  const rowHtml=rows.map(({m,s,lm})=>{
-    const [lab,lc]=heatLabel(m), pct=clamp(s/lm.mrv*100,2,100);
-    const mev=clamp(lm.mev/lm.mrv*100,0,100), mav=clamp(lm.mav/lm.mrv*100,0,100);
-    return `<div onclick="muscleDrill('${m}')" style="cursor:pointer;padding:8px 0;border-top:1px solid var(--border)">
-      <div class="row sp"><span style="font-size:13px">${mIcon(m,16)} ${MNAME[m]} ›</span><span class="mini" style="color:${lc};font-weight:700">${s} set${s===1?"":"s"} · ${lab}</span></div>
-      <div style="position:relative;height:9px;border-radius:5px;margin-top:5px;background:#15171d;overflow:hidden">
-        <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${lc}"></div>
-        <i style="position:absolute;left:${mev}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28)"></i>
-        <i style="position:absolute;left:${mav}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.45)"></i></div></div>`;
-  }).join("");
-  return `<div class="card glow"><div class="ttl" style="display:flex;align-items:center">${secIcon('volume')}Weekly volume map</div>
-    <div class="mini" style="margin-bottom:10px;color:var(--text2)">Brighter red = more hard sets this week. Faint lines mark each muscle's MEV (minimum to grow) and MAV (top of the growth zone). Tap a muscle for its dossier.</div>
-    ${volMapBodies()}
-    <div style="margin-top:10px">${rowHtml}</div>
-    <div class="mini" style="margin-top:8px;color:var(--text3)">Below the first line = below MEV (not enough to grow) · between the lines = the growth zone · past the bar end = pushing MRV.</div></div>`;
 }
 function weeklyBalanceCard(){
   const ws=m=>weeklySets(m);
@@ -7640,7 +7678,7 @@ function splitsEditorHtml(){
       ${sp.days.map((_,i)=>gmDayEd(sp,i)).join("")}
       <div class="gm-drow gm-acts"><button class="btn sm" onclick="addDay('${id}')">${GP.icon("plus")}Training day</button><button class="btn sm" onclick="addRestDay('${id}')">${GP.icon("plus")}Rest day</button></div></section>`;
   }).join("");
-  return cards+`<div class="gm-drow gm-acts gm-bot"><button class="btn" onclick="newSplit()">${GP.icon("plus")}New split</button><button class="btn" onclick="openImportSplit()">${GP.icon("down")}Import a split</button></div>`;
+  return cards+`<div class="gm-drow gm-acts gm-bot"><button class="btn" onclick="newSplit()">${GP.icon("plus")}New split</button><button class="btn" onclick="openSplitExchange()">${GP.icon("down")}Share / import</button></div>`;
 }
 function renderStrategy(){
   // STRATEGY is now merged into MISSION — render the merged tab in place (no nested render()).
@@ -7698,22 +7736,19 @@ function openSplitShareSheet(sp,code){
     <button class="btn gold" style="margin-top:9px" onclick="(function(){var t=document.getElementById('split-code');if(t){t.select();}if(navigator.clipboard){navigator.clipboard.writeText('${code}').then(()=>toast('Copied — send it over.'));}else toast('Select the code and copy it.');})()">📋 Copy code</button>
     <button class="btn ghost" style="margin-top:7px" onclick="closeSheet()">Close</button>`);
 }
-function openShareSplitPicker(){
-  const sps=state.data.splits||[];
-  if(!sps.length){toast("No splits to share yet.");return;}
-  if(sps.length===1){shareSplit(sps[0].id);return;}
-  openSheet(`<div class="ttl">📤 Share which split?</div>
-    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Pick the routine to send. Your friend pastes the code and trains it instantly.</div>
-    ${sps.map(sp=>{const ex=(sp.days||[]).reduce((a,d)=>a+(d.exercises||[]).length,0);
-      return `<button class="row sp" onclick="shareSplit('${sp.id}')" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:11px;padding:11px;margin-bottom:7px;cursor:pointer;text-align:left"><div style="min-width:0"><b style="font-size:14px;color:var(--gold2)">${esc(sp.name)}</b><div class="mini" style="color:var(--text3)">${sp.days.length} days · ${ex} exercises</div></div><span style="color:var(--gold2);flex:none">📤</span></button>`;}).join("")}
-    <button class="btn ghost" style="margin-top:4px" onclick="openJusticeLeague()">‹ Back</button>`);
-}
-function openImportSplit(){
-  openSheet(`<div class="ttl">📥 Import a split</div>
-    <div class="mini" style="margin:-2px 0 10px;color:var(--text2)">Paste a Split Card code a friend sent you. Their whole routine — days and every exercise — lands in your splits, ready to train.</div>
-    <textarea id="import-split-code" placeholder="Paste the GTSPL1:… code here…" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;height:88px;font-size:11px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:8px;resize:none"></textarea>
-    <div class="row" style="gap:6px;margin-top:8px"><button class="btn gold sm g" onclick="pasteImportSplit()">📥 Paste &amp; Import</button><button class="btn sm" style="width:auto" onclick="doImportSplit()">Import</button></div>
-    <button class="btn ghost" style="margin-top:10px" onclick="closeSheet()">Close</button>`);
+/* Share or import a split: ONE sheet for both directions (Mission dock "Import split", the plan editor, Allies "Splits"). Each of your splits copies as a Split Card in one tap; a pasted code becomes a new split. */
+function openSplitExchange(){
+  const sps=state.data.splits||[],exN=sp=>(sp.days||[]).reduce((a,d)=>a+(d.exercises||[]).length,0);
+  const mine=sps.length?sps.map(sp=>`<div class="gh-row"><span class="lead">${GP.icon("calendar")}</span><div class="main"><div class="gh-t1">${esc(sp.name)}</div><div class="gh-t2">${sp.days.length} days · ${exN(sp)} lifts</div></div><button class="btn sm" onclick="shareSplit('${sp.id}')">${GP.icon("share")}Copy code</button></div>`).join(""):`<div class="st-note" style="padding:12px 14px">No splits to send yet.</div>`;
+  openSheet(`<div class="gh st-pg">
+    <div class="st-h"><h2>Share or import</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <span class="eyebrow st-g">Import a split</span>
+    <section class="s2 st-list"><div class="st-note" style="padding-top:12px">Paste a Split Card code a friend sent. The days and every lift land in your splits, ready to train.</div>
+      <div style="padding:0 14px 14px"><textarea id="import-split-code" class="st-ta" placeholder="Paste the GTSPL1:… code here" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Split Card code"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px"><button class="btn gold" style="flex:1" onclick="pasteImportSplit()">${GP.icon("down")}Paste &amp; import</button><button class="btn" onclick="doImportSplit()">Import</button></div></div></section>
+    <span class="eyebrow st-g">Send one of yours</span>
+    <section class="s2 gh-list">${mine}</section></div>`);
+  const sh=$("sheet");if(sh)sh.scrollTop=0;
 }
 function pasteImportSplit(){
   if(navigator.clipboard&&navigator.clipboard.readText){
@@ -7726,7 +7761,7 @@ function doImportSplit(){
   if(!sp){toast((inp.value||"").trim()?"That code didn't read — copy the whole thing again.":"Paste a Split Card code first.");return;}
   const dupe=(state.data.splits||[]).find(x=>x.name===sp.name&&splitSig(x)===splitSig(sp));
   if(dupe){toast(`"${sp.name}" is already in your splits — nothing added.`);closeSheet();return;}
-  state.data.splits.push(sp);if(!state.data.activeSplitId)state.data.activeSplitId=sp.id;
+  state.data.splits.push(sp);if(!state.data.activeSplitId)state.data.activeSplitId=sp.id;state.data.splitImportAt=now();
   save();haptic("done");closeSheet();render();
   toast(`"${sp.name}" imported — ${sp.days.length} days ready to train.`);
 }
