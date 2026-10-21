@@ -23,6 +23,14 @@ const sets = () => ev(() => state.session.exercises.map((e) => e.sets.map((s) =>
 try {
   await open(ctx, { settle: 1600 });
   R.homeRendered = await ev(() => !!document.querySelector('#app .gh') && document.querySelector('#app').innerText.length > 100);
+  // quality pass: the hero's top row stays one line at 375 and 393, Home shows only the muscles that need attention (the full map is the Suit grid)
+  R.homeHeroOneLine = await ev(() => { const e = document.querySelector('#app .s3 .gh-top .eyebrow'); return !!e && e.getBoundingClientRect().height < 20; });
+  R.homeExceptionsOnly = await ev(() => document.querySelectorAll('#app .gh-mgrid .gh-mt').length <= 6 && !!document.querySelector('#app .gh-mall'));
+  // Search: a real tap opens Find anything; typing keeps the field focused and filters the list (it used to redraw the sheet on every key)
+  await tapAt('.topbar .tbtn', 0); await sleep(500);
+  await P.focus('#sheet .ix-q input'); await P.keyboard.type('su', { delay: 40 }); await sleep(200);
+  R.searchKeepsFocus = await ev(() => { const a = document.activeElement, n = document.querySelectorAll('#idx-list .gh-row').length; return !!a && a.tagName === 'INPUT' && a.value === 'su' && n >= 1 && n < 28; });
+  await ev(() => { closeSheet(); });
   const tabs = [];
   for (let i = 0; i < 5; i++) { await tapAt('#nav button', i); tabs.push(await ev(() => state.tab)); }
   R.navTabs = tabs.join('>'); R.navDistinct = new Set(tabs).size === 5;

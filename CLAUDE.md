@@ -10,7 +10,7 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
 
 ## THE FILE (this is the #1 thing people get wrong)
 - **Edit the source file: `Gainstracker app not complete.html`** — single-file vanilla-JS PWA, one
-  `<script>`, ~11.5k lines. ALL code changes go here.
+  `<script>`, ~12.1k lines. ALL code changes go here.
 - **`index.html` is a GENERATED DEPLOY COPY. Never hand-edit it.**
 - **Deploy / ship (run after every shippable change):**
   ```
@@ -38,34 +38,38 @@ in-app coach. Dark Gotham look: gold/red accents, tactile/embossed gym motifs.
   The `<style>` is layered per wave before the anchors `GP:HOME`, `GP:LOGGING`, `GP:PROFILE+FINISH`,
   `GP:MISSION+SUIT`, `GP:ART`, `GP:TABS`, `GP:PRUNE+HOME` — edit a rule in place, never stack an override on it.
 - **Home = `renderGotham()`**, composed from `gh*` helpers (there is no gtv2 code left): one hero
-  (`ghHeroTonight` / `ghHeroRest` / `ghHeroLive` / `ghHeroFree`, readiness folded in) → `ghWeek` (+ volume map) →
-  `ghSunday` → `ghLifts` → `ghRecap` (Last session) → `ghNext` → `ghExtrasRow` (Garage, seasonal events). Each
-  metric appears once. Only one `function renderGotham` exists; a second copy is new drift — delete the unused one.
-- **5 tabs:** GOTHAM, MISSION, SUIT, PROFILE, ALLIES (the `case` key → `renderProfile`; `TABS` drives the nav).
-  Mission + Suit are scoped under `.gm`; Profile is built by the `p3*` functions; Allies by `renderAllies`;
-  Settings, Data control and onboarding are GP:TABS pages/sheets.
-- **Alfred = the header avatar (gold-ring) + ONE text-first chat** (`openAlfredChat()`, `#ac-panel`, `.ac-*`) and an
-  Alfred page (`go('alfred')`: today's read, suggestions, last conversation, dossiers). No floating button, no second
-  chat UI. His app knowledge is `ALFRED_APP_GUIDE` (+ `ALFRED_PERSONA`, `ALFRED_CHAT_RULES`): every label in it must
-  exist in the UI, so grep the code before changing one and update it whenever a screen or rule changes.
-- **Deleted on purpose in the Gotham Pro overhaul (don't resurrect unless asked):** Territory War, Threat, Iron
-  Ledger, Chronicle/Gazette, crate, siege, season pass, villain case files/Arkham/boss fights, Wraith, title belts,
-  wardrobe/liveries/frames/prestige, the Home lore fold. **Still here:** the Garage (vehicles unlock with real
-  milestones), seasonal events, and Allies (league, leaderboard, co-op raids, sparring, Fight Night). This is the
-  executed form of the "dial back" bullet in SCIENCE > FLAVOR below; the science systems are untouched.
+  (`ghHeroTonight` / `ghHeroRest` / `ghHeroLive` / `ghHeroFree`, readiness folded in) → `ghWeek` (sessions + only the muscles under MEV / over MRV;
+  "All 12 muscles" links to the Suit grid) → `ghSunday` (one volume line + the one-tap weekly adjust buttons) → `ghLifts` → `ghRecap` (Last session) →
+  `ghNext` → `ghExtrasRow` (Garage, seasonal events). Each metric appears once. Only one `function renderGotham` exists; a second copy is new drift — delete the unused one.
+- **5 tabs:** GOTHAM, MISSION, SUIT, PROFILE, ALLIES (the `case` key → `renderProfile`; `TABS` drives the nav). Mission + Suit are scoped under `.gm`;
+  Profile is built by the `p3*` functions; Allies by `renderAllies`; Settings, Data control and onboarding are GP:TABS pages/sheets.
+  **Feature docks (GP:DOCKS):** Mission (`gmDock`: Edit plan · New split · Import split · Lab), Suit (`gsDock`: Infirmary · Fuel · Time-lapse · Photos), Profile (`p3Dock`:
+  History · Records · Standards · Body · Badges · Backup) and Allies (`alDock`: Add ally · Chat · Duel · Raid · Leaderboard · Manage) each put ONE `gdDock` row of tiles under the hero;
+  a tile opens a sheet / sub-page or scrolls to an inline section (`gdJump`). Home has none. Sub-pages (Lab, Infirmary, Garage, Archive) share the `sp-hd` Back header; Fuel and the Alfred page are `go()` pages.
+- **One home per feature (DESIGN.md §10 is the ownership map).** Full 12-muscle map = the Suit grid; planned volume = Mission's forecast; stalled-lift detail = the Stalled lifts sheet;
+  bodyweight = Profile Body (`bwSet` is the only writer); tape measurements = Suit; tools (Forge, Plate calculator, 1RM test day, Oracle, Strength simulator, Contracts, Bat-Focus) = the Lab;
+  the Search sheet (`openIndex`, `INDEX_ITEMS`) lists every destination once with line icons. Before adding a card, grep for the number it shows — if it exists, link to it.
+- **Wave 6-7 systems:** GP:CHARM (`gpEnter` → `gpFirst` / `gpLive` / `gpSweep`, `GP_SEC` section-header icon table, scroll-driven hero art, hero View Transition), GP:WEEKLY+BODY
+  (`ghWeekReview`, `wkApply` / `wkUndo`, `d.weekAdj`; the Profile Body section), GP:PHOTOS (full photos in the IndexedDB vault `gainstracker/photos`, thumbnails + `idb:1` in `gt_data`,
+  put → read back → byte-compare → swap, safety copy `gt_photos_backup`; Compare is the one before/after view). Details and budgets in DESIGN.md §11-§15.
+- **Alfred = the header avatar (gold-ring) + ONE text-first chat** (`openAlfredChat()`, `#ac-panel`, `.ac-*`) and an Alfred page (`go('alfred')`, reached from Search: today's read, suggestions,
+  last conversation). No floating button, no second chat UI. His app knowledge is `ALFRED_APP_GUIDE` (+ `ALFRED_PERSONA`, `ALFRED_CHAT_RULES`): every label in it must exist in the UI, so grep
+  the code before changing one and update it whenever a screen or rule changes (docks.mjs checks it names every dock tile).
+- **Deleted on purpose (don't resurrect unless asked):** Territory War, Threat, Iron Ledger, Chronicle/Gazette, crate, siege, season pass, villain case files/Arkham/boss fights, Wraith, title
+  belts, wardrobe/liveries/frames/prestige, the Home lore fold; and in the quality pass the Wayne Tech hub + 26-week heatmap, Mission's Frequency card, the Mastery suit in the Time-lapse sheet,
+  the Alfred page's dossier chips, the Lab's 1RM calculator / Measure rows, Home's 12-tile volume grid and the Sunday card's records / stalled lines. **Still here:** the Garage (vehicles unlock with real
+  milestones), seasonal events, and Allies (league, leaderboard, co-op raids, sparring, Fight Night). This is the executed form of the "dial back" bullet in SCIENCE > FLAVOR below; the science systems are untouched.
 - Per-gym PRs: `d.prsByGym[gym]`; `d.prs` re-points to the active gym each load. `u.gyms`,
   `u.activeGym`, `switchGym()`. Machine settings: `d.machineSettings[gym][exName]`.
 - Images: keep them tiny (downscale to ≤420px wide). NEVER embed multi-MB images → iOS memory crash. Tab heroes use
   `assets/art/*.jpg` via `gaArt()` (see `assets/art/README.md`); exercise pictures are `assets/exfig/<pattern>.png`.
-- **QA harness (`scripts/qa`, README there)** drives the REAL app in headless Chrome at iPhone size (393 default,
-  `--width 375` for the small phone) with a seeded fixture, a pinned clock and external network blocked. Every
-  script defaults to the repo's own app file, so it works in worktrees. `syncheck.mjs` (parse), `smoke.mjs`,
-  `flow.mjs` (nav → start → one-tap ghost ticks → PR row → finish → summary RPE → Home, Records header, Alfred
-  chat), `home.mjs`, `tab.mjs --tab mission|suit|case|allies|alfred [--inject-file scripts/qa/seed-allies.js]`,
-  `onboarding.mjs`, `settings.mjs`, `shoot.mjs`, `perf.mjs [--throttle 4]` (size, DOM nodes, render ms, infinite
-  animations ≤ 1 and backdrop-filters ≤ 3 per screen, first paint) and `node scripts/test-migrations.cjs <file>`.
-  Everything must end green with zero console errors; a missing style is invisible to console checks, so
-  also look at a screenshot when you touch CSS.
+- **QA harness (`scripts/qa`, README there)** drives the REAL app in headless Chrome at iPhone size (393 default, `--width 375` for the small phone) with a seeded fixture, a pinned clock and
+  external network blocked. Every script defaults to the repo's own app file, so it works in worktrees. `syncheck.mjs` (parse), `smoke.mjs`, `flow.mjs` (nav → start → one-tap ghost ticks → PR row →
+  finish → summary RPE → Home, Records header, Alfred chat), `home.mjs`, `tab.mjs --tab mission|suit|case|allies|alfred|fuel [--inject-file scripts/qa/seed-allies.js]`, `docks.mjs`, `charm.mjs`,
+  `photos.mjs`, `weekly-body.mjs`, `onboarding.mjs`, `settings.mjs`, `layout.mjs [--width 375|393] [--fixture train|rest|none|live]` (every tab, page, sub-page and sheet: overflow, clipped or wrapped
+  text, unlabeled / tiny tappables, dead handlers, backdrop strands, console errors, plus the one-home-per-feature rules), `shoot.mjs`, `perf.mjs [--throttle 4]` (size, DOM nodes, render ms, infinite
+  animations ≤ 1 and backdrop-filters ≤ 3 per screen, first paint) and `node scripts/test-migrations.cjs <file>`. Everything must end green with zero console errors; a missing style is invisible to
+  console checks, so also look at a screenshot when you touch CSS.
 
 ## HARD RULES (never violate)
 - Offline PWA on GitHub Pages • single-file vanilla JS • never break/erase `localStorage` data

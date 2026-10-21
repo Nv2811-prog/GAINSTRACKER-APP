@@ -37,6 +37,8 @@ try {
     const res = { tab, ok: true, problems: [], tiles: [] };
     if (!dock) { res.ok = false; res.problems.push('no dock on this tab'); results.push(res); failed = true; continue; }
     dock.tiles.forEach((t) => { if (t.w < MIN_W || t.h < MIN_H) res.problems.push(`${t.name}: ${t.w}x${t.h} is under ${MIN_W}x${MIN_H}`); if (!t.sub || !t.name || !t.icon) res.problems.push(`${t.name || '?'}: missing label, sub or icon`); });
+    const guide = await P.evaluate(() => ALFRED_APP_GUIDE);
+    dock.tiles.forEach((t) => { if (!guide.includes(t.name)) res.problems.push(`${t.name}: Alfred's app guide never mentions this tile`); });
     if (dock.hx) res.problems.push(`${dock.hx} haptic overlay hosts inside the dock`);
     if (dock.pageOverflow) res.problems.push('page scrolls horizontally');
     if (dock.tiles.length > 3 && !dock.scrolls) res.problems.push('4+ tiles but the row does not scroll');
@@ -47,8 +49,8 @@ try {
       const pt = await P.evaluate((i) => { const el = document.querySelectorAll('.gd .gd-t')[i], r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2; return { x, y, y0: window.scrollY, hit: (document.elementFromPoint(x, y) || document.body).closest('.gd-t') === el }; }, i);
       if (!pt.hit) res.problems.push(`${dock.tiles[i].name}: its centre is not hittable (covered or off screen)`);
       await P.touchscreen.tap(pt.x, pt.y); await sleep(900);
-      const eff = await P.evaluate(() => ({ sheet: !!document.getElementById('sheet').classList.contains('on'), overlay: !!(document.getElementById('overlay') || { classList: { contains: () => false } }).classList.contains('on'), sub: state.subpage || null, y: Math.round(window.scrollY) }));
-      const kind = eff.sheet ? 'sheet' : eff.overlay ? 'overlay' : eff.sub ? 'page:' + eff.sub : Math.abs(eff.y - pt.y0) > 40 ? 'scroll' : 'NOTHING';
+      const eff = await P.evaluate(() => ({ sheet: !!document.getElementById('sheet').classList.contains('on'), overlay: !!(document.getElementById('overlay') || { classList: { contains: () => false } }).classList.contains('on'), sub: state.subpage || null, tab: state.tab, y: Math.round(window.scrollY) }));
+      const kind = eff.sheet ? 'sheet' : eff.overlay ? 'overlay' : eff.sub ? 'page:' + eff.sub : eff.tab !== tab ? 'page:' + eff.tab : Math.abs(eff.y - pt.y0) > 40 ? 'scroll' : 'NOTHING';
       const errs = ctx.log.errors.slice(before);
       const t = dock.tiles[i];
       res.tiles.push({ tile: t.name, sub: t.sub, w: t.w, opens: kind, errors: errs.length });
