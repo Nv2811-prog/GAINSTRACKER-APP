@@ -1169,7 +1169,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gh svg.ring{display:block}
 
 /* SECTION HEADER: title left, caption or action right on ONE row (Profile Records, Mission/Suit/Garage headers). The action keeps a 44px tap target without growing the row. */
-.gh-sec{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 4px 10px}
+.gh-sec{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:26px 4px 10px}
 .gh-sec h2{flex:none;margin:0;font:700 20px/1.2 var(--body);letter-spacing:-.02em}
 .gh-sec .t-xs{min-width:0;text-align:right}
 .gh-sec .gh-more{flex:none;align-self:center;padding:12px 0 12px 16px;margin:-12px 0}
@@ -1250,6 +1250,16 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-xh::before{background:linear-gradient(180deg,rgba(19,27,41,.6),rgba(19,27,41,0) 36%),linear-gradient(90deg,#131B29 14%,rgba(19,27,41,.6) 50%,rgba(19,27,41,0) 86%),linear-gradient(0deg,#131B29 0%,rgba(19,27,41,0) 55%),url(assets/art/head-exercise.jpg) right center/cover no-repeat}
 .gm-dos .gm-bh::before{background:linear-gradient(180deg,rgba(23,33,49,.6),rgba(23,33,49,0) 36%),linear-gradient(90deg,#172131 14%,rgba(23,33,49,.6) 50%,rgba(23,33,49,0) 86%),linear-gradient(0deg,#172131 0%,rgba(23,33,49,0) 55%),url(assets/art/head-muscle.jpg) right center/cover no-repeat}
 .p3-xh h2,.p3-xh .sub,.gm-bt,.gm-bh .eyebrow{text-shadow:0 1px 12px rgba(8,12,20,.95)}
+/* 4 · section headers: one line icon + one area accent. rec = records gold, vol = volume green, rcv = recovery blue, pln = plan amber, n = steel; gpSec() adds the chip by title, nothing is hand-placed */
+.gp-ic{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:8px;color:var(--ac,var(--tx2));background:var(--act,rgba(150,178,222,.08));box-shadow:inset 0 0 0 1px var(--acr,var(--hair))}
+.gp-ic .gi{width:14px;height:14px;margin:0;stroke-width:2}
+[data-ac=rec]{--ac:var(--gold-ink);--act:var(--tint-gold);--acr:rgba(242,193,78,.3)}
+[data-ac=vol]{--ac:var(--ok);--act:var(--tint-ok);--acr:rgba(52,210,127,.3)}
+[data-ac=rcv]{--ac:var(--rest);--act:var(--tint-rest);--acr:rgba(91,180,255,.3)}
+[data-ac=pln]{--ac:var(--warn);--act:var(--tint-warn);--acr:rgba(255,178,36,.3)}
+.gh-sec h2,.p3-ch2 h3{display:flex;align-items:center;gap:9px}
+.gh-lh h3 .gp-ic,.p3-ch2 h3 .gp-ic{width:22px;height:22px;border-radius:7px}
+.gh-lh h3 .gp-ic .gi,.p3-ch2 h3 .gp-ic .gi{width:13px;height:13px}
 .ac-head{position:relative;isolation:isolate}
 .ac-head::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;background:linear-gradient(90deg,rgba(12,18,28,.98) 22%,rgba(12,18,28,.5) 62%,rgba(12,18,28,.1)),url(assets/art/profile.jpg) right 22%/cover no-repeat}
 @media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}.gp-sw{display:none}}
@@ -11188,8 +11198,27 @@ function gpEnter(){
   const vk=state._vk||"",first=gpFirst(vk);
   if(first&&vk.startsWith("tab:"))gpSweep(root);
 }
-new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);}))).observe(document.body,{childList:true,subtree:true});
-hxScan(document.body);iconize(document.body);calmGlow(document.body);
+/* every section header = one line icon + one area accent, the same everywhere: records gold · volume green · recovery blue · plan amber · the rest steel.
+   Matched on the title's own words (first hit wins), so a new section picks its icon up by name. [pattern, GP.icon name, area] */
+const GP_SEC=[
+  [/stall|plateau/i,"plateau","rec"],[/record|mastery|standard|belt|\bpr\b/i,"trophy","rec"],[/strength|e1rm|target|progress/i,"up","rec"],[/\blifts?\b|exercise/i,"dumbbell","rec"],
+  [/sleep/i,"moon","rcv"],[/hydrat/i,"drop","rcv"],[/infirm|injur/i,"cross","rcv"],[/recover|sore|readiness|fatigue/i,"pulse","rcv"],
+  [/effort|rpe|rir|intensity/i,"bolt","vol"],[/dossier/i,"scan","n"],[/muscle|coverage|sets|volume|forecast|landmark/i,"chart","vol"],[/frequen/i,"calendar","vol"],
+  [/calendar|cycle|days?\b|schedule|next up|week|patrol/i,"calendar","pln"],[/plan|split|\blab\b|generator|import/i,"map","pln"],[/fuel|intake|stack|nutrition|macro/i,"flask","pln"],
+  [/body|weight/i,"scale","n"],[/league|duel|ally|allies|invite/i,"allies","n"],[/alfred|ask|conversation/i,"chat","n"],[/tool/i,"wrench","n"],[/history|session|archive|log\b/i,"book","n"],[/cue|form|tip/i,"bulb","n"]
+];
+const GP_SEC_SEL=".gh-lh h3,.gh-sec h2,.p3-ch2 h3";
+function gpSec(n){
+  if(n.nodeType!==1)return;
+  const hs=n.matches(GP_SEC_SEL)?[n]:[];n.querySelectorAll(GP_SEC_SEL).forEach(e=>hs.push(e));
+  hs.forEach(el=>{
+    if(el.dataset.ac||el.querySelector(".gi,.gp-ic"))return;
+    const own=[...el.childNodes].filter(c=>c.nodeType===3).map(c=>c.nodeValue).join(" "),hit=GP_SEC.find(r=>r[0].test(own))||[0,"note","n"];
+    el.dataset.ac=hit[2];el.insertAdjacentHTML("afterbegin",`<span class="gp-ic" aria-hidden="true">${GP.icon(hit[1])}</span>`);
+  });
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);gpSec(n);}))).observe(document.body,{childList:true,subtree:true});
+hxScan(document.body);iconize(document.body);calmGlow(document.body);gpSec(document.body);
 document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 /* ===== GP:LOGGING (wave 2) — the live workout screen: header strip · focus card · set grid · up next ===== */
 const LG_RX={iso:{lo:60,hi:90,tgt:75},cmp:{lo:120,hi:180,tgt:150},low:{lo:150,hi:180,tgt:180}};
