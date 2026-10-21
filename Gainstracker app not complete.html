@@ -9359,7 +9359,7 @@ CLARITY: Plain language first, then the precise term in brackets — e.g. "how c
 EQUIPMENT: He trains machines and cables on purpose. Never push free weights as superior; honour what he uses.
 NEVER suggest a deload, a deload week or a planned light week. Manage fatigue with set volume (MEV/MAV/MRV), exercise choice, rest days and the firm progression rule.
 PROGRESSION: plan ranges are 5–10 reps. Add weight only after a WORKING set reaches 10+ reps; at 5–9 reps keep the load and add a rep; warm-up sets never count.
-LENGTH: casual or simple question = 1–3 sentences. Explain / why / how = up to about 150 words, bullets welcome. App how-to = at most 5 numbered steps using the real button labels.
+LENGTH: default 1–3 sentences, under 80 words. Only when he asks you to explain, plan or compare: up to about 150 words, bullets welcome. App how-to = at most 4 numbered steps using the real button labels.
 PHYSIQUE PHOTOS: If an image is attached to the user's message, that IS his current physique — look at it directly and assess development, symmetry, weak points, and the single highest-leverage training priority. Never claim you cannot view or rate a photo that has been attached — you can see it.
 ACTIONS: When the user explicitly asks you to DO something in the app, end your reply with ONE action tag on its own line, in this exact format — nothing else on that line:
 [ACTION:CREATE_SPLIT:SplitName:Day1Name:ex1,ex2,ex3|Day2Name:ex1,ex2]
@@ -9367,8 +9367,13 @@ ACTIONS: When the user explicitly asks you to DO something in the app, end your 
 [ACTION:GO:tabname]
 [ACTION:OPEN:target]
 GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN targets: settings, datacontrol, splits (the split editor), muscle:<key> (key is one of ${M12.join(", ")}), exercise:<exact exercise name>. Use the exact id shown in parentheses next to a split's name in ALL SPLITS below — never invent or guess an id; if he names a split that isn't listed, say so instead of emitting an action. Normal questions get no action tag.`;
-const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
-FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
+const ALFRED_CHAT_RULES=`CHAT MODE (these rules override the voice and length notes above):
+1. INTENT FIRST. Before you write, decide what he is really asking: a number from his data, a decision (train, rest, add weight), an explanation, how to do something in the app, or a change in the app. Answer exactly that, in your first sentence. No greeting, no restating the question.
+2. SHORT. One to three sentences and under 80 words. Go longer (up to about 150 words) only when he asks you to explain, plan or compare. App how-to: at most 4 short steps.
+3. GROUNDED. Every number, lift, muscle and date comes from the data below or from a PRE-COMPUTED line in his message (those are exact: build on them, never recompute them). App questions come from the APP GUIDE below, with its real labels. If it isn't there, say it isn't in your data; never estimate, never invent a screen or a button.
+4. ON TOPIC. Answer only what was asked: no extra tips, no pep talk, no tangents, no recap of stats he didn't ask about. Never change the subject.
+5. UNCLEAR? Ask ONE clarifying question of under 12 words instead of guessing.
+FOLLOW-UPS: add a final line [FOLLOWUPS: first | second] only when a next question genuinely helps (at most 2, 7 words each, phrased as HE would say them). Most answers need none. Never mention the line.`;
 const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
 Five tabs along the bottom; Search (the magnifier), Settings (the sliders) and my avatar sit in the top bar. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and only the muscles that need attention: those under their weekly MEV or over their MRV, each with its sets against MEV, MAV and MRV; "All 12 muscles" opens the full map on the Suit tab. From 16:00 on Sundays a Sunday review card adds my volume line and next week's one-tap changes; tap the card for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Free session), a dock of tiles, Cycle days (the active split day by day, tonight marked, Start or Resume), a Suggested this week row (opens the week in review), the Volume forecast against MEV, MAV and MRV (planned sets per muscle, with a one-tap trim) and Other plans when you keep more than one. SUIT is the body: the recovery figure, a dock, a tile per muscle (recovery, hours to ready, weekly sets against the landmarks; tap one for its dossier), the Effort section (average RIR and sets at RIR 0–3), Measurements (tape, in cm), symmetry and Progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), a dock, the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight, each lift from your strongest variation; tap a lift to see them), Body (weigh-in, 12-week trend, relative strength), Every lift and a Gyms & tools fold (gyms, Batcomputer, Share PR card, calendar export, Week vs week). ALLIES is your friends: your league rank, a dock, and Your league (tap an ally for their sheet). Search lists every screen and tool once; I also have a page there (today's read, things to ask, my last answer), and this chat is one tap away on my avatar.
 
@@ -9476,61 +9481,50 @@ ALL SPLITS:
 ${allSplitsStr||'  none yet'}
 ${planStr}${lastStr}${sessionStr}${inj?'\nFLAGGED INJURIES: '+inj:''}`;
 }
-// Current free-tier models, in preference order (verified Jun 2026). 2.0 was retired Jun 1 2026.
-// The chain self-heals: if Google retires one, the next is tried automatically.
-const GEM_MODELS=["gemini-2.5-flash","gemini-2.5-flash-lite","gemini-flash-latest"];
-function gemModel(){return localStorage.getItem("gt_gem_model")||GEM_MODELS[0];}
-async function geminiCall(parts){
+// Gemini text models, best fast one first. This key's model list (Oct 2026) carries 3.8 and 3.5 flash; 2.5 flash + flash-lite are the proven free-tier pair; the alias is the last resort.
+// ONE call path (_gemRun) for every Alfred request: a model that is gone, off this key's tier or briefly busy hands over to the next one. The model that answered after a PERMANENT miss
+// is remembered (gt_gem_model2, a new key so an old pin cannot hold the chat on 2.5); a passing 429 / 5xx is never remembered.
+const GEM_MODELS=["gemini-3.8-flash","gemini-3.5-flash","gemini-2.5-flash","gemini-2.5-flash-lite","gemini-flash-latest"];
+const GEM_PIN="gt_gem_model2";
+const gemThink=m=>/^gemini-3/.test(m)?{thinkingLevel:"low"}:/^gemini-2\.5-flash/.test(m)?{thinkingBudget:0}:null;   // a chat answer needs a glance of thought, not a long one
+function gemModel(){let p="";try{p=localStorage.getItem(GEM_PIN)||"";}catch(e){}return GEM_MODELS.includes(p)?p:GEM_MODELS[0];}
+async function _gemRun(contents,o){
   const key=geminiKey();if(!key)throw new Error("Alfred has no API key. Add a free Gemini key in Settings to activate him.");
-  // try the last-known-good model first, then the rest of the chain
-  const order=[gemModel(),...GEM_MODELS.filter(m=>m!==gemModel())];
-  let lastErr="";
+  const first=gemModel(),order=[first,...GEM_MODELS.filter(m=>m!==first)],seen=[];
+  let lim=false,busy=false;
   for(const model of order){
-    let r,j;
-    try{
-      r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(key),
-        {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts}],generationConfig:{maxOutputTokens:500,temperature:0.7}})});
-    }catch(e){throw new Error("No connection. Check your internet and try again.");}
-    try{j=await r.json();}catch(e){j={};}
-    if(r.ok){
-      if(model!==gemModel())localStorage.setItem("gt_gem_model",model); // remember the one that worked
-      return (j.candidates?.[0]?.content?.parts?.[0]?.text)||"";
+    let think=gemThink(model),cap=(o.max||500)+(think&&think.thinkingLevel?600:0);   // Gemini 3 counts its thinking inside the cap
+    for(let tries=0;tries<3;tries++){
+      const gen={maxOutputTokens:cap,temperature:o.temp==null?0.7:o.temp};if(think)gen.thinkingConfig=think;
+      const body={contents,generationConfig:gen};if(o.system)body.systemInstruction={parts:[{text:o.system}]};
+      let r,j;
+      try{r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(key),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});}
+      catch(e){throw new Error("No connection. Check your internet and try again.");}
+      try{j=await r.json();}catch(e){j={};}
+      const msg=(j.error&&j.error.message)||"";
+      if(r.ok){
+        const c=j.candidates&&j.candidates[0],txt=((c&&c.content&&c.content.parts)||[]).filter(p=>!p.thought).map(p=>p.text||"").join("").trim();
+        if(!txt&&c&&c.finishReason==="MAX_TOKENS"&&tries<2){cap*=3;continue;}   // thinking ate the whole cap: ask again with room
+        if(model!==first&&!lim&&!busy){try{localStorage.setItem(GEM_PIN,model);}catch(e){}}
+        return txt;
+      }
+      if(r.status===400&&think&&/think/i.test(msg)){think=null;continue;}   // this model doesn't take that thinking setting: same model, no setting
+      if(r.status===402)throw new Error("Your Gemini credits are used up. Top the key up at aistudio.google.com and I'm back.");
+      if(r.status===400&&/api key not valid|invalid/i.test(msg))throw new Error("That Gemini key isn't valid. Re-check it in Settings (free key at aistudio.google.com/apikey).");
+      seen.push(r.status);
+      const soft=r.status>=500||(r.status===429&&!/limit:\s*0\b/.test(msg));   // busy for a moment, not unusable
+      if(soft){if(r.status===429)lim=true;else busy=true;}
+      else if(![403,404,429].includes(r.status)&&!/not found|not supported|deprecated|retired/i.test(msg))throw new Error(msg||("Request failed ("+r.status+")."));
+      break;   // on to the next model
     }
-    const msg=(j.error&&j.error.message)||"";
-    // model retired / not found -> try next in chain
-    if(r.status===404||/not found|not supported|deprecated|retired/i.test(msg)){lastErr="model "+model+" unavailable"; continue;}
-    // key problems -> stop, tell user plainly
-    if(r.status===400&&/api key not valid|invalid/i.test(msg))throw new Error("That Gemini key isn't valid. Re-check it in Settings (free key at aistudio.google.com/apikey).");
-    if(r.status===403)throw new Error("Key rejected. Make sure the Gemini API is enabled for this key.");
-    if(r.status===429)throw new Error("Free-tier limit hit (10/min). Wait a minute and try again.");
-    if(r.status>=500){lastErr="Google server busy"; continue;}
-    throw new Error(msg||("Request failed ("+r.status+")."));
   }
-  throw new Error(lastErr?("Alfred unavailable: "+lastErr+". Try again shortly."):"Alfred couldn't reach any Gemini model. Try again later.");
+  if(lim)throw new Error("Free-tier limit hit (10/min). Wait a minute and try again.");
+  if(busy)throw new Error("Alfred unavailable: Google server busy. Try again shortly.");
+  if(seen.length&&seen.every(s=>s===403))throw new Error("Key rejected. Make sure the Gemini API is enabled for this key.");
+  throw new Error("Alfred couldn't reach any Gemini model. Try again later.");
 }
-// Multi-turn conversation call — passes full history so Alfred remembers context within the session
-async function geminiConvCall(contents){
-  const key=geminiKey();if(!key)throw new Error("Alfred has no API key. Add a free Gemini key in Settings.");
-  const order=[gemModel(),...GEM_MODELS.filter(m=>m!==gemModel())];
-  let lastErr="";
-  for(const model of order){
-    let r,j;
-    try{r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+encodeURIComponent(key),
-      {method:"POST",headers:{"Content-Type":"application/json"},
-       body:JSON.stringify({contents,generationConfig:{maxOutputTokens:1000,temperature:0.75}})});}
-    catch(e){throw new Error("No connection. Check your internet.");}
-    try{j=await r.json();}catch(e){j={};}
-    if(r.ok){if(model!==gemModel())localStorage.setItem("gt_gem_model",model);return(j.candidates?.[0]?.content?.parts?.[0]?.text)||"";}
-    const msg=(j.error&&j.error.message)||"";
-    if(r.status===404||/not found|not supported|deprecated|retired/i.test(msg)){lastErr="model "+model+" unavailable";continue;}
-    if(r.status===400&&/api key not valid|invalid/i.test(msg))throw new Error("That Gemini key isn't valid. Check Settings.");
-    if(r.status===403)throw new Error("Key rejected — make sure Gemini API is enabled.");
-    if(r.status===429)throw new Error("Free-tier limit hit (10/min). Wait a minute and try again.");
-    if(r.status>=500){lastErr="Google server busy";continue;}
-    throw new Error(msg||("Request failed ("+r.status+")."));
-  }
-  throw new Error(lastErr?("Alfred unavailable: "+lastErr):"Alfred couldn't reach any Gemini model.");
-}
+async function geminiCall(parts){return _gemRun([{role:"user",parts}],{max:500,temp:0.7});}   // one-shot remarks: pings, the post-workout read, the physique review
+async function geminiConvCall(contents,system){return _gemRun(contents,{system,max:360,temp:0.4});}   // the chat: full history; persona + rules + his data ride as the system instruction
 
 let ALFRED_PIC=null;
 function fileB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(f);});}
@@ -9750,14 +9744,15 @@ async function _alfSend(q,pic,viaMic){
 async function _alfReply(q,pic){
   const loc=_alfLocal(q,pic);if(loc)return loc;
   if(!geminiKey())return _alfOffline(q);
-  const raw=await geminiConvCall(_alfContents(q,pic));
+  const raw=await geminiConvCall(_alfContents(q,pic,""),alfredContext(true));
   state.data.u.aiUses=(state.data.u.aiUses||0)+1;try{checkAchievements();}catch(e){}
   return _alfParseReply(raw);
 }
-function _alfContents(q,pic){
-  const c=[{role:"user",parts:[{text:alfredContext(true)+"\n\nYou have been briefed. You are ready."}]},{role:"model",parts:[{text:"Understood. What do you need?"}]}];
+function _alfContents(q,pic,hint){   // the conversation so far + this question; hint = exact numbers from his own logs for it (persona, rules and data are the system instruction)
+  const c=[];
   ALFRED_MSGS.slice(0,-1).slice(-16).forEach(m=>{if(m.text&&!m.loc)c.push({role:m.role==="user"?"user":"model",parts:[{text:m.text}]});});
-  const fp=[{text:q}];
+  while(c.length&&c[0].role==="model")c.shift();   // a conversation opens with the user's turn
+  const fp=[{text:q+(hint?"\n\n[PRE-COMPUTED from his own logs, exact. Build your answer on these numbers: "+hint+"]":"")}];
   if(pic&&pic.b64)fp.push({inline_data:{mime_type:pic.mime||"image/jpeg",data:pic.b64}});
   c.push({role:"user",parts:fp});
   return c;
