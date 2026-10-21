@@ -144,9 +144,7 @@ background:linear-gradient(180deg,rgba(42,48,60,.55),rgba(20,24,32,.42));backdro
 .acc-body{padding:0 12px 13px}
 .acc-body.hide{display:none}
 /* Rank ladder */
-.rl-row{display:flex;align-items:center;gap:11px;padding:9px 11px;border:1px solid var(--border);border-radius:12px;margin-bottom:7px;background:linear-gradient(160deg,#0f0f13,#0c0c0f)}
-.rl-row.cur{border-color:var(--gold-dim);background:var(--gold-bg);box-shadow:0 0 24px rgba(235,199,107,.12)}
-.rl-row.done{opacity:.62}
+
 /* Bat-Focus breathing orb */
 .focus-orb{width:180px;height:180px;border-radius:50%;margin:24px auto;background:radial-gradient(circle at 50% 40%,rgba(235,199,107,.35),rgba(235,199,107,.05) 60%,transparent 72%);border:2px solid rgba(235,199,107,.4);box-shadow:0 0 60px rgba(235,199,107,.25),inset 0 0 50px rgba(235,199,107,.15);animation:focusBreath 16s ease-in-out infinite;display:flex;align-items:center;justify-content:center}
 @keyframes focusBreath{0%,100%{transform:scale(.62);box-shadow:0 0 30px rgba(235,199,107,.15),inset 0 0 30px rgba(235,199,107,.1)}25%{transform:scale(1);box-shadow:0 0 80px rgba(235,199,107,.4),inset 0 0 60px rgba(235,199,107,.22)}50%{transform:scale(1)}75%{transform:scale(.62)}}
@@ -179,15 +177,15 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(255,54,34,.12),0 6
 .exwrap .figlayer{position:absolute;inset:0;width:100%;height:100%;z-index:2}
 .exwrap .figlayer svg{width:100%;height:100%;display:block}
 /* 🖼 picture picker grid — filterable gallery of candidate demos, tap to choose */
-.picp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:56vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px}
-.picp-tile{cursor:pointer;border-radius:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);padding:6px 6px 8px;text-align:center;transition:border-color .12s,box-shadow .12s,background .12s}
-.picp-tile.on{border-color:rgba(255,208,72,.6);background:rgba(255,208,72,.08);box-shadow:0 0 0 1px rgba(255,208,72,.3),0 6px 18px -8px rgba(255,208,72,.5)}
+.picp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:min(56dvh,520px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:2px}
+.picp-tile{cursor:pointer;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl),inset 0 0 0 1px var(--hair);padding:6px 6px 8px;text-align:center;transition:background-color .12s,box-shadow .12s}
+.picp-tile.on{background:var(--tint-gold);box-shadow:inset 0 0 0 1.5px rgba(242,193,78,.7)}
 .picp-thumb{width:100%;aspect-ratio:1;border-radius:9px;overflow:hidden;background:#0a0c12;display:flex;align-items:center;justify-content:center;margin-bottom:5px}
 .picp-thumb img{width:100%;height:100%;object-fit:contain;background:#fff}
 .picp-thumb.picp-anat{background:radial-gradient(ellipse 80% 70% at 50% 30%,#181c2c,#05060a 90%);padding:8px}
 .picp-thumb.picp-anat svg{width:100%;height:100%}
-.picp-lbl{font-size:10px;line-height:1.25;color:var(--text2);text-transform:capitalize;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.picp-tile.on .picp-lbl{color:var(--gold2);font-weight:700}
+.picp-lbl{font-size:11px;line-height:1.25;color:var(--tx2);text-transform:capitalize;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.picp-tile.on .picp-lbl{color:var(--gold-ink);font-weight:700}
 .exname{font-weight:700;font-size:15px;line-height:1.2;letter-spacing:-.01em;color:var(--text)}
 .exmeta{font-size:12px;color:var(--text3);margin-top:3px;text-transform:capitalize;letter-spacing:.04em;font-family:var(--disp);font-weight:650}
 
@@ -912,6 +910,25 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .rd-o i{display:block;margin-top:2px;font:500 13px/1.35 var(--body);font-style:normal;color:var(--tx2)}
 .rd-o>.gi{flex:none;width:18px;height:18px;color:var(--tx3)}
 .rd-cancel{display:flex;margin:6px auto 0}
+/* rank ladder: where you stand now, then the nine rungs; shared gold tag */
+.gh .tag.gold{background:var(--tint-gold);color:var(--gold-ink)}
+.rk-now{display:flex;align-items:center;gap:14px;margin:0 0 12px;padding:14px;border-radius:var(--r-l);background:linear-gradient(180deg,#131B29,#0F1621);box-shadow:var(--hl),inset 0 0 0 1px var(--hair2)}
+.rk-ring{position:relative;flex:none;width:76px;height:76px}
+.rk-ring .c{position:absolute;inset:0;display:grid;place-items:center}
+.rk-ring .num{font-size:32px;line-height:.9;color:var(--tx1)}
+.rk-now .main{flex:1;min-width:0}
+.rk-nm{margin:2px 0 4px;font:700 22px/1.1 var(--body);letter-spacing:-.02em;color:var(--tx1)}
+.rk-ladder{display:grid;gap:8px}
+.rk-r{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl),inset 0 0 0 1px var(--hair)}
+.rk-r .main{flex:1;min-width:0}
+.rk-n{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--tx3);background:rgba(150,178,222,.07);box-shadow:inset 0 0 0 1px var(--hair)}
+.rk-n .gi{width:20px;height:20px}
+.rk-n .num{font-size:22px;line-height:.9}
+.rk-r.done .rk-n{color:var(--ok);background:var(--tint-ok);box-shadow:none}
+.rk-r.cur{background:linear-gradient(180deg,rgba(242,193,78,.1),rgba(242,193,78,.03));box-shadow:inset 0 0 0 1.5px rgba(242,193,78,.6)}
+.rk-r.cur .rk-n{color:var(--on-gold);background:linear-gradient(180deg,var(--gold-hi),var(--gold));box-shadow:none}
+.rk-r.lock .gh-t1{color:var(--tx2)}
+.px-lede{margin:0 0 10px}
 /* /GP:POLISH */
 /* ===== GP:DOCKS (wave 6) ===== */
 /* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
@@ -5198,8 +5215,9 @@ function cxSyncInputs(){
 }
 function cxChoosePic(){
   cxSyncInputs();const name=(state.cxDraft.n||"").trim();
-  if(!name){toast("Name it first, sir — the picture is filed under the name.");return;}
+  if(!name){toast("Name it first. The picture is filed under the name.");return;}
   openPicPicker(name,"cx-pic");
+  state._picPickBack=()=>renderCustomCreator();
 }
 function cxToggleMuscle(which,m){
   cxSyncInputs();const d=state.cxDraft;const other=which==="p"?"s":"p";
@@ -9131,24 +9149,21 @@ function _figApply(name,elId){
 }
 let _picPickT=null,_picPickToken=0;
 function openPicPicker(name,elId){
-  state._picPickName=name;state._picPickEl=elId;
+  state._picPickName=name;state._picPickEl=elId;state._picPickBack=null;
   state._picPickPrevHtml=$("sheet").innerHTML;   // snapshot so Cancel/Choose returns to exactly this view
   const k=(name||"").toLowerCase().trim();
   const seedQ=k.replace(/\(.*?\)/g,"").replace(/-/g," ").replace(/\s+/g," ").trim();
   try{haptic("tap");}catch(e){}
-  openSheet(`<div class="ttl">🖼 Choose a picture</div>
-    <div class="mini" style="color:var(--text2);margin:-2px 0 10px">Browse the Batcomputer's demo library for <b style="color:var(--gold2)">${esc(name)}</b> — or filter with your own words if the match is off.</div>
-    <div style="position:relative;margin-bottom:10px">
-      <input id="picp-q" value="${esc(seedQ)}" placeholder="Filter — try a different phrase…" autocomplete="off" oninput="picPickDebounce()"/>
-      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5">🔍</span>
-    </div>
-    <div id="picp-grid" class="picp-grid"></div>
-    <button class="btn ghost" style="margin-top:10px" onclick="closePicPicker()">Cancel</button>`);
-  const inp=$("picp-q");if(inp)inp.style.paddingLeft="36px";
+  openSheet(`${shHd("Choose a picture",{ic:"image",sub:esc(name),fn:"closePicPicker()",closeLabel:"Cancel and go back"})}
+    <div class="gh"><p class="t-s px-lede">Pick the demo that matches your machine, or filter with your own words if the match is off.</p>
+      ${shSearch("picp-q","Filter, try a different phrase…","picPickDebounce()")}
+      <div id="picp-grid" class="picp-grid"></div></div>`);
+  const inp=$("picp-q");if(inp)inp.value=seedQ;
   drawPicPicker(seedQ);
 }
 function closePicPicker(){
-  const prev=state._picPickPrevHtml;state._picPickPrevHtml=null;
+  const back=state._picPickBack,prev=state._picPickPrevHtml;state._picPickBack=null;state._picPickPrevHtml=null;
+  if(back){back();return;}   // the custom creator is rebuilt from its draft, so what was typed is never lost
   if(prev!=null){$("sheet").innerHTML=prev;}else closeSheet();
 }
 function picPickDebounce(){
@@ -9206,7 +9221,7 @@ function picPickChoose(id){
   try{haptic("done");}catch(e){}
   closePicPicker();
   _figApply(name,elId);
-  toast(id?"🖼 Picture updated, sir.":"🖼 Anatomy figure only — clean and simple.");
+  toast(id?"Picture updated, sir.":"Anatomy figure only. Clean and simple.");
 }
 /* ===== ALFRED PERSONA + APP GUIDE (one place to tune him). The guide below is Alfred's whole knowledge of THIS app —
    every label in it is real (grep the code before changing one). Update ALFRED_APP_GUIDE when a screen or rule changes.
@@ -10499,16 +10514,16 @@ function openOrders(){openSheet(`<div class="ttl">🎯 Wayne's Orders</div><div 
 
 /* ---- 3) Rank Ladder ---- */
 function openRankLadder(){
-  const lvl=strengthLevel();
+  const lvl=strengthLevel(),idx=RANKS.reduce((a,r,i)=>lvl>=r[0]?i:a,0),cur=RANKS[idx],next=RANKS[idx+1];
+  const pct=next?clamp((lvl-cur[0])/(next[0]-cur[0])*100,0,100):100;
   const rows=RANKS.slice().reverse().map((r,ri)=>{
-    const idx=RANKS.length-1-ri;const next=RANKS[idx+1];
-    const reached=lvl>=r[0];const isCur=reached&&(!next||lvl<next[0]);
-    let prog="";
-    if(isCur&&next){const pct=clamp((lvl-r[0])/(next[0]-r[0])*100,0,100);prog=`<div style="height:5px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:7px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--gold2)"></div></div><div class="mini" style="color:var(--text3);margin-top:3px">Level ${lvl} · ${next[0]} unlocks ${esc(next[1])}</div>`;}
-    return `<div class="rl-row ${isCur?'cur':reached?'done':''}"><div style="font-size:26px">${r[2]}</div><div class="g"><b style="font-size:15px;color:${isCur?'var(--gold2)':'var(--text)'}">${esc(r[1])}</b><div class="mini" style="color:var(--text3)">Strength level ${r[0]}+</div>${prog}</div>${isCur?'<span class="mini" style="color:var(--gold2)">◄ YOU</span>':reached?'<span style="color:#2ECC71;font-size:17px">✓</span>':'<span style="font-size:14px">🔒</span>'}</div>`;
+    const i=RANKS.length-1-ri,reached=lvl>=r[0],isCur=i===idx;
+    return `<div class="rk-r ${isCur?"cur":reached?"done":"lock"}"><span class="rk-n">${isCur?`<b class="num">${lvl}</b>`:GP.icon(reached?"check":"lock")}</span><div class="main"><div class="gh-t1">${esc(r[1])}</div><div class="gh-t2">Strength level ${r[0]}+</div></div>${isCur?`<span class="tag gold">You</span>`:reached?`<span class="tag ok">Reached</span>`:`<span class="tag">${r[0]-lvl} to go</span>`}</div>`;
   }).join("");
-  openOverlay();$("ovcard").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🎖️ Rank Ladder</div><button class="btn ghost sm" style="width:auto" onclick="closeOverlay()" aria-label="Close">${GP.icon("x")}</button></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 12px">Nine ranks, Street Thug to Legend. Your strength level decides where you stand tonight.</div>${rows}`;
+  openOverlay();$("ovcard").innerHTML=`${shHd("Rank ladder",{ic:"crown",sub:"Nine ranks, set by your strength level",fn:"closeOverlay()"})}
+    <div class="gh"><div class="rk-now"><div class="rk-ring">${GP.ring(pct,100,{size:76,stroke:7,c1:"var(--gold)",c2:"var(--gold-hi)"})}<div class="c"><b class="num">${lvl}</b></div></div>
+      <div class="main"><div class="eyebrow">Current rank</div><div class="rk-nm">${esc(cur[1])}</div><div class="t-s">${next?`<b>${next[0]-lvl}</b> more levels to ${esc(next[1])}`:"Top of the ladder"}</div></div></div>
+      <div class="rk-ladder">${rows}</div></div>`;
 }
 
 
