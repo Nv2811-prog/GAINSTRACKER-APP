@@ -1,16 +1,19 @@
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
+import path from 'node:path';
 // WAVE 8 pass/fail (GP:POLISH): real touch taps through the surfaces that were brought up to the Gotham Pro standard and the four micro-moments.
 //   readiness check-in (one tap starts) · add-exercise picker (search, empty state offers "Create <name>") · custom exercise creator (footer tells what is missing, draft survives the picture picker)
 //   swap sheet (same picker row, search, swap) · skip sheet (line-icon reasons, plain-text reason, the session summary still reads old emoji-prefixed ones) · emoji in sheet chips become line icons
 //   micro-moments: set tick draws its check + one gold edge pulse (<= 400 ms, never replays on a later render, silent under reduced motion) · crown on a record from the last 24 h ·
 //   Mission cycle ring · stepper number tick (plate calculator)
-// node polish.mjs [--width 393|375] [--file html]     exit 1 on any failed check or console error
+// node polish.mjs [--width 393|375] [--file html] [--shots dir]     exit 1 on any failed check or console error
 import { launch, open, sleep, DEFAULT_FILE } from './lib.mjs';
 const A = {}; const av = process.argv.slice(2);
 for (let i = 0; i < av.length; i++) if (av[i].startsWith('--')) { A[av[i].slice(2)] = av[i + 1]; i++; }
 const fx = (n) => fileURLToPath(new URL(n, import.meta.url));
 const ctx = await launch({ file: A.file || DEFAULT_FILE, fixture: fx('./fixture-train.json'), width: A.width || '393' });
 const P = ctx.page, out = [], taps = [];
+const shot = async (name, sel) => { if (!A.shots) return; fs.mkdirSync(A.shots, { recursive: true }); const f = path.join(A.shots, name + '.png'); if (sel) { const el = await P.$(sel); if (el) { await el.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' })); await sleep(250); await el.screenshot({ path: f }); } } else await P.screenshot({ path: f }); };
 const check = (name, cond, extra = '') => out.push({ name, ok: !!cond, ...(cond ? {} : { extra: String(extra).slice(0, 220) }) });
 const EMOJI = '\\p{Extended_Pictographic}';   // regexp source, built inside the page with the u flag
 // a real finger: scroll the element into view, let it settle, then tap its centre (haptic hosts and scroll guards behave as on the phone)
@@ -40,6 +43,7 @@ try {
   // ---- set tick micro-moment ----
   await ev(() => { __qa.startLogging(0); }); await sleep(500);
   await tap('.lg2-sr.act .sdone'); await sleep(110);
+  await shot('tick-moment');
   const m = await ev(() => { const row = document.querySelector('.lg2-sr.tickfx'); if (!row) return null; const ck = row.querySelector('.lg2-ck.on'), path = row.querySelector('.lg2-ck.on .gi path'), a = getComputedStyle(row, '::after'); return { n: document.querySelectorAll('.tickfx').length, edge: a.animationName, edgeMs: parseFloat(a.animationDuration) * 1000, pop: ck && getComputedStyle(ck).animationName, draw: path && getComputedStyle(path).animationName, drawMs: path ? parseFloat(getComputedStyle(path).animationDuration) * 1000 : 0 }; });
   check('set tick: the row that was ticked takes the moment (one row)', m && m.n === 1, JSON.stringify(m));
   check('set tick: check draws, gold edge pulses, pop on the button', m && m.edge === 'px-edge' && m.draw === 'px-draw' && m.pop === 'lg2-pop', JSON.stringify(m));
@@ -89,6 +93,16 @@ try {
   check('creator: the draft (name, muscle) survives the picture picker', cx2.name === 'Zzq' && cx2.chip, JSON.stringify(cx2));
   await reset();
 
+  // ---- Forge: the fields keep focus while typing, the results redraw in place ----
+  await ev(() => openForge()); await sleep(450);
+  await P.focus('#sheet .fg-in label:nth-child(1) input'); await P.keyboard.type('100', { delay: 30 });
+  const fg1 = await ev(() => ({ id: document.activeElement && document.activeElement.getAttribute('aria-label'), v: document.activeElement && document.activeElement.value }));
+  await P.focus('#sheet .fg-in label:nth-child(2) input'); await P.keyboard.type('5', { delay: 30 }); await sleep(200);
+  const fg2 = await ev(() => ({ big: (document.querySelector('#fg-out .fg-big .num') || {}).textContent, ramp: document.querySelectorAll('#fg-out .px-rr').length, pct: document.querySelectorAll('#fg-out .fg-row').length, head: !!document.querySelector('#sheet .sh-hd .sh-ic'), bottom: document.getElementById('sheet').lastElementChild.className }));
+  check('Forge: typing keeps focus in the field', fg1.id === 'Weight in kilograms' && fg1.v === '100', JSON.stringify(fg1));
+  check('Forge: 100 x 5 gives 117 kg, ramp and plate-jump rows, nine percentages', fg2.big === '117' && fg2.ramp === 9 && fg2.pct === 9 && fg2.head, JSON.stringify(fg2));
+  await reset();
+
   // ---- emoji in sheet chips become line icons ----
   await ev(() => openTips()); await sleep(450);
   const tp = await ev((src) => { const cs = [...document.querySelectorAll('#sheet .chip')]; return { n: cs.length, svg: cs.filter((c) => c.querySelector('svg')).length, emoji: cs.filter((c) => new RegExp(src, 'u').test(c.textContent)).length }; }, EMOJI);
@@ -106,11 +120,13 @@ try {
     return { a: !!a && a.querySelector('.lead svg').outerHTML === icon('crown') && /New record/.test(a.textContent), b: !!b && b.querySelector('.lead svg').outerHTML !== icon('crown') && !/New record/.test(b.textContent), at: a && a.textContent.slice(0, 80) };
   });
   check('crown: a 2 h old record wears it with "New record", a 4 day old one does not', cr.a && cr.b, JSON.stringify(cr));
+  await shot('crown-record', '#p3-rec + section');
   await reset();
 
   // ---- Mission cycle ring ----
   await ev(() => __qa.tab('mission')); await sleep(500);
   const cy = await ev(() => { const c = document.querySelector('.gm-hero .gm-cyc'); if (!c) return null; const sp = state.data.splits.find((s) => s.id === state.data.activeSplitId) || state.data.splits[0]; return { svg: !!c.querySelector('svg'), day: c.querySelector('.num').textContent, of: (c.querySelector('span') || {}).textContent, n: sp.days.length }; });
+  await shot('mission-hero', '.gm-hero');
   check('Mission: the hero shows the cycle position as a ring', cy && cy.svg && +cy.day >= 1 && cy.of === 'of ' + cy.n, JSON.stringify(cy));
   await reset();
 

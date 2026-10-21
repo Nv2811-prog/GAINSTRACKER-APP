@@ -954,6 +954,24 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .rd-o.sm .lead .gi{width:18px;height:18px}
 .rd-o.sm b{font-size:16px}
 .chip .gi-t,.btn .gi-t{flex:none;width:16px;height:16px;margin:0;vertical-align:0;color:currentColor}
+/* Forge: two big number fields, then results that redraw in place so the fields keep focus */
+.fg-in{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 12px}
+.fg-in label{position:relative;display:block;min-width:0}
+.fg-in label>span{display:block;margin:0 0 6px;font:650 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx2)}
+.fg-in input{display:block;width:100%;height:64px;margin:0;padding:0 40px 0 12px;text-align:center;font:400 40px/1 var(--num);color:var(--tx1);border-radius:var(--r-m)}
+.fg-in label>i{position:absolute;right:12px;bottom:14px;font:600 12px/1 var(--body);font-style:normal;color:var(--tx3);pointer-events:none}
+.fg-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 4px;padding:14px 16px}
+.fg-big{display:flex;align-items:baseline;gap:6px;flex:none}
+.fg-big .num{font-size:54px;line-height:.88;color:var(--gold-ink)}
+.fg-big span{font:600 16px/1 var(--body);color:var(--tx2)}
+.fg-row{display:flex;align-items:center;gap:12px;margin:0 0 8px;padding:10px 12px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl),inset 0 0 0 1px var(--hair)}
+.fg-row.work,.px-rr.fg-work{background:var(--tint-gold);box-shadow:inset 0 0 0 1px rgba(242,193,78,.38)}
+.fg-row .main{flex:1;min-width:0}
+.fg-w{flex:none;text-align:right;white-space:nowrap}
+.fg-w .num{font-size:28px;line-height:.9;color:var(--tx1)}
+.fg-w span{margin-left:4px;font:600 12px/1 var(--body);color:var(--tx2)}
+.fg-sq{display:flex;justify-content:flex-end;gap:2px;margin-top:3px;min-height:9px}
+.fg-sq i{width:9px;height:9px;border-radius:2px}
 /* /GP:POLISH */
 /* ===== GP:DOCKS (wave 6) ===== */
 /* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
@@ -6601,54 +6619,33 @@ function nextPlateJump(w){
 function openForge(prefW,prefR){
   state._forgeW=prefW!=null?prefW:(state._forgeW||"");
   state._forgeR=prefR!=null?prefR:(state._forgeR||"");
-  drawForge();
-  openSheet($("sheet").innerHTML);
+  openSheet(forgeFrame());
 }
-function drawForge(){
-  const w=+state._forgeW||0,r=+state._forgeR||0;
-  const bar=state.data.u.barWeight||20;
-  const orm=(w&&r)?epley(w,r):0;
-  const colors={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};
-  let rows="";
-  if(orm){
-    rows=FORGE_PCT.map(row=>{
-      const tgt=orm*row.p/100;const ld=forgeLoadable(tgt);
-      const chips=ld.used.length?ld.used.map(p=>`<span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${colors[p]||'#888'};margin-right:2px"></span>`).join(""):`<span class="mini" style="color:var(--text3)">bar</span>`;
-      const isWork=row.p===80;
-      return `<div class="row sp" style="padding:8px 0;border-top:1px solid var(--border)${isWork?';background:rgba(201,168,76,.06)':''}">
-        <div style="min-width:78px"><b class="gold" style="font-size:15px">${row.p}%</b> <span class="mini" style="color:var(--text2)">~${row.r} reps</span><div class="mini" style="color:var(--text3)">${esc(row.n)}</div></div>
-        <div style="text-align:right"><b style="font-size:16px">${Math.round(ld.w)}<span class="mini" style="font-weight:400">kg</span></b><div style="margin-top:2px">${chips}</div></div></div>`;
-    }).join("");
-  }
-  // warm-up ramp toward the entered weight (treated as working weight)
-  let warm="";
-  if(w&&w>bar){
-    const steps=[{p:0.4,r:8},{p:0.6,r:5},{p:0.75,r:3},{p:0.9,r:1}];
-    warm=`<div class="card" style="margin:10px 0 0;padding:12px"><div class="ttl" style="margin-bottom:6px">🔥 Warm-up ramp → ${w}kg</div>`+
-      steps.map((s,i)=>{const ld=forgeLoadable(w*s.p);return `<div class="row sp" style="padding:5px 0"><span class="mini">Set ${i+1} · ${Math.round(s.p*100)}%</span><b>${Math.round(ld.w)}kg × ${s.r}</b></div>`;}).join("")+
-      `<div class="row sp" style="padding:5px 0;border-top:1px solid var(--border)"><span class="mini gold">Working</span><b class="gold">${w}kg × ${r||"?"}</b></div></div>`;
-  }
-  // plate-jump ladder — smallest real progressions from the entered weight
-  let jump="";
-  if(w&&w>=bar){
-    const j=nextPlateJump(w);
-    const rung=(rg,i)=>`<div class="row sp" style="padding:6px 0${i===0?'':';border-top:1px solid var(--border)'}"><span class="mini">+${(j.step*(i+1)).toFixed(j.step%1?2:0)}kg <span style="color:var(--text3)">(${i+1}× ${j.small}kg/side)</span></span><b style="color:${i===0?'var(--gold2)':'var(--text)'}">${rg.w}kg</b></div>`;
-    jump=`<div class="card" style="margin:10px 0 0;padding:12px"><div class="ttl" style="margin-bottom:2px">📈 Next plate jump</div>
-      <div class="mini" style="margin-bottom:6px;color:var(--text2)">Smallest loadable step on your bar is <b class="gold">+${(j.step).toFixed(j.step%1?2:0)}kg</b> (one ${j.small}kg plate per side). Beat your reps, then climb a rung:</div>
-      ${j.rungs.map(rung).join("")}
-      <div class="mini" style="margin-top:7px;color:var(--text3)">Add load only once you own the top of your rep range with clean form — the bar doesn't care about ego.</div></div>`;
-  }
-  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center;gap:6px">🛠️ Forge <span class="mini" style="font-weight:400;color:var(--text2)">load lab</span></div>
-    <div class="mini" style="margin-bottom:8px">Enter a real set. The Forge estimates your 1RM and lays out every training percentage — rounded to weight you can actually load.</div>
-    <div class="row g" style="gap:8px">
-      <div style="flex:1"><label class="mini">Weight (kg)</label><input inputmode="decimal" value="${state._forgeW}" oninput="state._forgeW=this.value;drawForge()" placeholder="100"/></div>
-      <div style="flex:1"><label class="mini">Reps</label><input inputmode="numeric" value="${state._forgeR}" oninput="state._forgeR=this.value;drawForge()" placeholder="5"/></div>
-    </div>
-    ${orm?`<div class="card glow center" style="margin:12px 0 4px;padding:14px"><div class="mini">ESTIMATED 1 REP MAX</div><div class="big" style="font-size:40px;color:var(--gold2)">${Math.round(orm)}<span style="font-size:20px">kg</span></div><div class="mini">${w}kg × ${r} · Epley formula</div></div>`:`<p class="muted center" style="margin:16px 0">Enter a weight and reps to forge your numbers.</p>`}
-    ${warm}
-    ${jump}
-    ${orm?`<div class="card" style="margin:10px 0;padding:6px 14px 12px">${rows}</div>`:""}
-    <button class="btn" style="margin-top:8px" onclick="closeSheet()">Close</button>`;
+/* the frame draws once; typing only redraws #fg-out, so the fields keep focus (the old Forge rebuilt the whole sheet on every key) */
+function forgeFrame(){
+  return `${shHd("Forge",{ic:"wrench",sub:"1RM, percentages, ramp, plate jumps"})}
+    <div class="gh"><p class="t-s px-lede">Enter a real set. The Forge estimates your 1RM and lays out every training percentage, rounded to weight you can actually load.</p>
+      <div class="fg-in"><label><span>Weight</span><input inputmode="decimal" value="${esc(String(state._forgeW))}" oninput="state._forgeW=this.value;drawForge()" placeholder="100" aria-label="Weight in kilograms"/><i>kg</i></label>
+        <label><span>Reps</span><input inputmode="numeric" value="${esc(String(state._forgeR))}" oninput="state._forgeR=this.value;drawForge()" placeholder="5" aria-label="Reps"/><i>reps</i></label></div>
+      <div id="fg-out">${forgeOut()}</div></div>`;
+}
+function drawForge(){const o=$("fg-out");if(o)o.innerHTML=forgeOut();}
+function forgeOut(){
+  const w=+state._forgeW||0,r=+state._forgeR||0,bar=+state.data.u.barWeight||20,orm=(w&&r)?epley(w,r):0;
+  if(!w)return `<div class="px-empty">${GP.icon("wrench")}<b>Forge your numbers</b><span>Enter the weight and reps of a real set.</span></div>`;
+  const chips=used=>used.map(p=>`<span class="px-plate sm" style="background:${PLATE_COL[p]||"#888"}">${p}</span>`).join("");
+  const label=(t,s)=>`<div class="cx-l cx-l2">${t} <span>${s}</span></div>`;
+  const hero=orm?`<section class="s2 fg-hero"><div><div class="eyebrow">Estimated 1RM</div><div class="t-xs">${fmtKg(w)} kg × ${r} · Epley formula</div></div><div class="fg-big"><b class="num">${Math.round(orm)}</b><span>kg</span></div></section>`:"";
+  const steps=[{p:.4,r:8},{p:.6,r:5},{p:.75,r:3},{p:.9,r:1}];   // warm-up toward the entered weight, treated as the working weight
+  const warm=w>bar?label("Warm-up ramp",`toward ${fmtKg(w)} kg`)+steps.map((s,i)=>{const ld=forgeLoadable(w*s.p);
+    return `<div class="px-rr"><span class="n">${i+1}</span><div class="w"><b class="num">${Math.round(ld.w)}</b><span>kg × ${s.r}</span></div><div class="sd">${ld.used.length?chips(ld.used):`<span class="t-s">bar only</span>`}</div></div>`;}).join("")
+    +`<div class="px-rr fg-work"><span class="n">W</span><div class="w"><b class="num">${fmtKg(w)}</b><span>kg × ${r||"?"}</span></div><div class="sd"><span class="t-s">working</span></div></div>`:"";
+  const j=w>=bar?nextPlateJump(w):null;   // the smallest loadable progressions above the entered weight
+  const jump=j?label("Next plate jump",`one ${j.small} kg plate per side`)+j.rungs.map((rg,i)=>`<div class="px-rr"><span class="n">${i+1}</span><div class="w"><b class="num">${rg.w}</b><span>kg</span></div><div class="sd"><span class="t-s">+${fmtKg(j.step*(i+1))} kg</span></div></div>`).join("")
+    +`<p class="t-xs px-foot">Add load only once you own the top of your rep range with clean form.</p>`:"";
+  const pct=orm?label("Training percentages","rounded to what you can load")+FORGE_PCT.map(row=>{const ld=forgeLoadable(orm*row.p/100);
+    return `<div class="fg-row${row.p===80?" work":""}"><div class="main"><div class="gh-t1">${row.p}%</div><div class="gh-t2">~${row.r} reps · ${esc(row.n)}</div></div><div class="fg-w"><b class="num">${Math.round(ld.w)}</b><span>kg</span><div class="fg-sq">${ld.used.map(p=>`<i style="background:${PLATE_COL[p]||"#888"}"></i>`).join("")}</div></div></div>`;}).join(""):"";
+  return hero+warm+jump+pct;
 }
 
 /* ========================================================================
@@ -7959,7 +7956,7 @@ function openLeaderboard(){
     return `<div style="border:1px solid ${you?'var(--gold-dim)':'var(--border2)'};border-radius:12px;padding:10px 11px;margin-top:8px;background:${you?'var(--gold-bg)':'var(--bg2)'}">
       <div class="row sp"><div class="row g" style="gap:9px;min-width:0"><span style="font-size:20px;flex:none;width:26px;text-align:center">${medal(i)}</span><b style="font-family:var(--disp);font-weight:650;font-size:15px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.n)}${you?' <span class="mini" style="color:var(--text3)">(you)</span>':''}</b></div><b style="color:${you?'var(--gold2)':'var(--text)'}">${fmtNum(c._score)}</b></div>
       <div style="height:7px;border-radius:5px;background:var(--bg);overflow:hidden;margin-top:7px"><div style="height:100%;width:${pct}%;background:${you?'linear-gradient(90deg,var(--gold3),var(--gold))':'#3a4252'};border-radius:5px"></div></div>
-      <div class="mini" style="margin-top:5px;color:var(--text3)">${c.re} ${esc(c.rk)} · STR ${c.sl}${c.opt?` · <b style="color:var(--gold2)">Top ${Math.max(1,100-c.opt)}%</b> quality`:""} · ${c.w} sessions</div></div>`;}).join("");
+      <div class="mini" style="margin-top:5px;color:var(--text3)">${esc(c.rk)} · STR ${c.sl}${c.opt?` · <b style="color:var(--gold2)">Top ${Math.max(1,100-c.opt)}%</b> quality`:""} · ${c.w} sessions</div></div>`;}).join("");
   const myRank=board.findIndex(c=>c._you)+1;
   openSheet(`<div class="ttl" style="display:flex;align-items:center;gap:6px">🏆 League Leaderboard</div>
     <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — driven by <b>strength</b> and <b>world optimality</b> (how good your lifts truly are). Quality over quantity: grinding more, sloppier sets won't out-rank a cleaner, stronger lifter.</div>
