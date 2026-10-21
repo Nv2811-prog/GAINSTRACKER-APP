@@ -1240,7 +1240,11 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
   .lg2-bar::before{transform-origin:72% 50%;animation:gpParBar linear both;animation-timeline:scroll(root block);animation-range:0px 700px}
 }
 .p3-fin .ga img{transform-origin:68% 30%;animation:gpPush 1.4s var(--ease-out) both}   /* the finish moment: one slow push-in, once */
-@media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}}
+/* 2 · light sweep: one gold glint across the hero the first time a tab shows in a session (gpSweep() adds the <i>, it removes itself; clipped by the hero's overflow, above the art and text, under the top hairline) */
+@keyframes gpSweep{from{transform:translate3d(-37.5%,0,0);opacity:0}16%{opacity:1}82%{opacity:1}to{transform:translate3d(37.5%,0,0);opacity:0}}
+.gp-sw{position:absolute;top:0;bottom:0;left:-30%;right:-30%;z-index:1;pointer-events:none;background:linear-gradient(104deg,transparent 38%,rgba(255,214,120,.18) 45%,rgba(255,240,200,.42) 50%,rgba(255,214,120,.18) 55%,transparent 62%);animation:gpSweep .78s cubic-bezier(.3,.55,.25,1) .08s both}
+.gp-sw::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent 41%,rgba(255,244,214,.95) 50%,transparent 59%)}
+@media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}.gp-sw{display:none}}
 /* ===== /GP:CHARM ===== */
 
 /* ===== GP:MISSION+SUIT (wave 3) ===== */
@@ -4273,6 +4277,7 @@ function render(){
     const dir=state._tabDir;state._tabDir=null;
     _a.classList.remove("view-enter","view-enter-soft","view-enter-right","view-enter-left");void _a.offsetWidth;
     _a.classList.add(soft?"view-enter-soft":dir==="right"?"view-enter-right":dir==="left"?"view-enter-left":"view-enter");}}
+  try{gpEnter();}catch(e){console.error("gpEnter",e);}   // GP:CHARM: first-view sweep + live numbers (never blocks the render)
 }
 
 /* ========================= READINESS ========================= */
@@ -11157,6 +11162,23 @@ function calmGlow(n){
     ["boxShadow","textShadow"].forEach(k=>{const v=st[k];if(!v)return;const ls=v.split(/,(?![^(]*\))/),keep=ls.filter(l=>!_isGlow(l));if(keep.length<ls.length)st[k]=keep.join(",")||"none";});
     const f=st.filter;if(f&&/drop-shadow/.test(f)){const g=f.replace(/drop-shadow\((?:[^()]|\([^()]*\))*\)/g,m=>_isGlow(m.slice(12,-1))?"":m).trim();if(g!==f)st.filter=g||"none";}
   });
+}
+/* ===== GP:CHARM (wave 6) · the charm layer: first-view light sweep · section icons · live numbers · tab-switch hero ===== */
+const GP_FIRST_MS=800,GP_SEEN=new Map();
+const gpReduced=()=>!!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches);
+/* a view is "first" the first time it shows in this session, and for 0.8 s after (a quick second render keeps the moment alive instead of killing it) */
+function gpFirst(vk){const t=performance.now(),s=GP_SEEN.get(vk);if(s==null){GP_SEEN.set(vk,t);return true;}return t-s<GP_FIRST_MS;}
+/* one gold glint across the hero (title and top edge), once per tab per session. The <i> removes itself; transform/opacity only; never takes a tap. */
+function gpSweep(root){
+  const h=root.querySelector(".s3");if(!h||gpReduced())return;
+  const i=document.createElement("i");i.className="gp-sw";i.setAttribute("aria-hidden","true");
+  i.addEventListener("animationend",()=>i.remove());h.appendChild(i);
+}
+/* runs at the end of every render(): works out "first", then hands the root to each charm helper */
+function gpEnter(){
+  const app=$("app"),root=app&&app.querySelector(":scope>.gh");if(!root)return;
+  const vk=state._vk||"",first=gpFirst(vk);
+  if(first&&vk.startsWith("tab:"))gpSweep(root);
 }
 new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);}))).observe(document.body,{childList:true,subtree:true});
 hxScan(document.body);iconize(document.body);calmGlow(document.body);
