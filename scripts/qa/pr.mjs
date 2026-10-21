@@ -286,6 +286,29 @@ try {
   check('C_closesAfterAbout1_2s', !!gc && dc > 1.0 && dc < 2.6, dc);
   check('C_noConsoleErrors', cc.log.errors.length === 0, cc.log.errors.slice(0, 3));
   await cc.close();
+
+  // ───────────────────────── D: with the REAL service worker ─────────────────────────
+  // sw.js keeps the clip the first boot fetched (same-origin GET, network-first); the second boot reads it from the Cache API: no network at all.
+  const cd = await launch({ fixture: FIXTURE, clips: true, width: WIDTH });
+  const D = cd.page;
+  await D.setBypassServiceWorker(false);
+  await D.evaluateOnNewDocument(() => {
+    const of = window.fetch.bind(window); window.__prFetch = 0;
+    window.fetch = (u, ...a) => { if (/assets\/pr\//.test(String((u && u.url) || u))) window.__prFetch++; return of(u, ...a); };
+  });
+  const evalSafe = async (fn, ...args) => { try { return await D.evaluate(fn, ...args); } catch (e) { return null; } };   // the first install reloads the page once
+  const waitD = async (fn, timeout) => { const t0 = Date.now(); for (;;) { const v = await evalSafe(fn); if (v) return v; if (Date.now() - t0 > timeout) return null; await sleep(150); } };
+  await D.goto(cd.url, { waitUntil: 'domcontentloaded' }).catch(() => {});
+  const ctl = await waitD(() => !!navigator.serviceWorker.controller, 20000);
+  const boot1 = await waitD(() => (_prf.b && _prf.i === 0 ? { fetches: window.__prFetch, size: _prf.b.size } : null), 20000);
+  check('D_firstBootFetchesThroughServiceWorker', !!ctl && !!boot1 && boot1.fetches === 1, { controlled: !!ctl, boot1 });
+  const kept = await evalSafe(async () => { const r = await caches.match('assets/pr/joker.mp4', { ignoreVary: true }); return r ? (await r.blob()).size : 0; });
+  check('D_serviceWorkerKeptTheClip', kept > 1e6, kept);
+  await D.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
+  const second = await waitD(() => (_prf.b && _prf.i === 0 ? { fetches: window.__prFetch, size: _prf.b.size } : null), 20000);
+  check('D_secondBootReadsCacheNoNetwork', !!second && second.fetches === 0 && second.size === (boot1 && boot1.size), second);
+  check('D_noConsoleErrors', cd.log.errors.length === 0, cd.log.errors.slice(0, 3));
+  await cd.close();
 } catch (e) { R.fatal = String((e && e.stack) || e).slice(0, 600); fails.push('fatal'); }
 
 const passed = Object.values(R).filter((v) => v === true || (v && v.ok === true)).length;
