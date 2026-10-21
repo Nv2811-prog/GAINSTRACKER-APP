@@ -158,6 +158,20 @@ try {
   const o2 = await core();
   ok('older day: undo restores the exact stored data (the added test lift included)', o2.raw === o0.raw, { len: [o0.raw.length, o2.raw.length] });
 
+  /* ---------- 5b · Yesterday chip + the duplicate note ---------- */
+  await reset();
+  const y0 = await core();
+  await ev(() => { const sp = state.data.splits.find((s) => s.id === state.data.activeSplitId); openQuickLog(sp.id, 4); });   // Lower B: a real Lower B session sits on yesterday
+  await sleep(600);   // the sheet slides up: a tap during the slide misses
+  await tapText('#sheet .ql-chips .chip', 'Yesterday');
+  ok('yesterday: the summary shows yesterday\'s date and warns that this day is already logged then (a note, not a block)', await ev(() => { const y = new Date(now()); y.setDate(y.getDate() - 1); return document.querySelector('#sheet .ql-tot').textContent.includes(p3Date(y.getTime())) && !!document.querySelector('#sheet .ql-dup') && !document.querySelector('#sheet .ql-go').disabled; }), null);
+  await page('10-sheet-yesterday-duplicate-note');
+  await tap('#sheet .ql-go');
+  const yw =await ev(() => { const y = new Date(now()); y.setDate(y.getDate() - 1); const w = state.data.workouts.find((x) => x.quick && x.dayIdx === 4); return { same: !!w && new Date(w.date).toDateString() === y.toDateString(), n: state.data.workouts.length }; });
+  ok('yesterday: the entry lands on yesterday\'s calendar date', yw.same && yw.n === y0.n + 1, yw);
+  await tap('#toast .tundo');
+  ok('yesterday: undo is byte-identical', (await core()).raw === y0.raw, null);
+
   /* ---------- 6 · rest days ---------- */
   await ev(() => { const sp = state.data.splits.find((s) => s.id === state.data.activeSplitId); sp.days[0].exercises.pop(); save(); openDayBriefing(sp.id, sp.days.findIndex((d) => d.rest)); }); await sleep(300);
   ok('rest day: the Preview offers no Mark as done, and the entry point refuses', await ev(() => { const none = !document.querySelector('#sheet .ql-mark'); const sp = state.data.splits.find((s) => s.id === state.data.activeSplitId); const n = state.data.workouts.length; openQuickLog(sp.id, sp.days.findIndex((d) => d.rest)); return none && state.data.workouts.length === n && !document.querySelector('#sheet .ql'); }), null);
