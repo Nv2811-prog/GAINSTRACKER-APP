@@ -1025,6 +1025,60 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-acts{display:flex;flex-direction:column;gap:8px}
 .p3-acts .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 
+/* ===== GP:WEEKLY+BODY (wave 7) ===== */
+/* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
+/* 1 · one-tap weekly adjust: a button = tinted icon chip + what changes + where, "Apply" in gold; the result row turns green with a check */
+.gh .s2.gh-sun{cursor:default}
+.gh-sun-hit{cursor:pointer;border-radius:var(--r-s)}
+.wk-acts{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:4px;min-width:0}
+.wk-act{display:flex;align-items:center;gap:11px;width:100%;min-width:0;max-width:100%;min-height:56px;padding:9px 12px 9px 10px;border:0;border-radius:var(--r-m);background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);text-align:left;font:inherit;cursor:pointer}
+.wk-act.warn{--ac:var(--warn);--act:var(--tint-warn);--acr:rgba(255,178,36,.36)}
+.wk-act.bad{--ac:#FF786D;--act:var(--tint-bad);--acr:rgba(255,90,78,.36)}
+.wk-act.is-done{--ac:var(--ok);--act:var(--tint-ok);--acr:rgba(52,210,127,.36);background:var(--g1);box-shadow:inset 0 0 0 1px rgba(52,210,127,.24),var(--hl);cursor:default}
+.wk-ic{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--act);color:var(--ac);box-shadow:inset 0 0 0 1px var(--acr)}
+.wk-ic .gi{width:18px;height:18px;stroke-width:2.4}
+.wk-act .wk-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.wk-act .wk-tx b{display:block;font:650 15px/1.2 var(--body);letter-spacing:-.01em;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wk-act .wk-tx i{display:block;font:500 12.5px/1.25 var(--body);font-style:normal;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wk-go{flex:none;padding:10px 2px 10px 8px;font:650 13.5px/1 var(--body);color:var(--gold-ink)}
+.gm .wk-sug{margin-top:12px;cursor:pointer}
+.gm .wk-sug:active{background:rgba(150,178,222,.05)}
+/* 2 · Profile Body: weigh-in, 12-week trend of weekly averages, relative strength over time. Reuses the Profile trend look (.p3t-*): gold for the strength line, plain light for the weight line. */
+.bd-c{padding:14px 14px 12px}
+.bd-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.bd-now{display:flex;align-items:baseline;gap:5px;flex:none}
+.gh .bd-now .num{font-size:46px;line-height:.88;color:var(--tx1)}
+.gh .bd-now small{margin:0;font:600 14px/1 var(--body);color:var(--tx2)}
+.bd-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0;text-align:right}
+.bd-meta .t-xs b{color:var(--tx1);font-weight:650}
+.bd-c svg.p3t{margin-top:12px}
+.bd-w .p3t-l{stroke:var(--tx1)}
+.bd-w .p3t-s0{stop-color:var(--tx1);stop-opacity:.15}
+.bd-w .p3t-halo{fill:var(--tx1);opacity:.16}
+.bd-d{fill:var(--g2);stroke-width:1.4}
+.bd-w .bd-d{stroke:var(--tx1)}
+.bd-r .bd-d{stroke:var(--gold)}
+.bd-hint{margin:12px 0 0}
+.bd-log{display:flex;align-items:center;gap:8px;margin-top:14px}
+.bd-in{flex:1;min-width:0;display:flex;align-items:center;gap:6px;height:44px;padding:0 12px;border-radius:var(--r-s);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair2)}
+.bd-in:focus-within{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.bd-in input{flex:1;min-width:0;width:100%;height:100%;padding:0;border:0;border-radius:0;background:none;box-shadow:none;color:var(--tx1);font:650 20px/1 var(--body);text-align:center;font-variant-numeric:tabular-nums;outline:0}
+.bd-in u{text-decoration:none;font:600 13px/1 var(--body);color:var(--tx2)}
+.bd-log .btn-i{flex:none}
+.bd-go{flex:none;width:auto;padding-inline:14px}
+.bd-go .gi{width:18px;height:18px;stroke-width:2.4;color:var(--gold-ink)}
+.bd-tip{margin:10px 0 0}
+.bd-rs{margin-top:16px;padding-top:14px;border-top:1px solid var(--hair)}
+.bd-rs-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bd-rs .p3-sfoot{padding:8px 0 0}
+.fu-bwl{margin-top:12px}
+/* 3 · the Profile "Gyms & tools" fold row had lost its layout rules (a bare block under the Body card): it is a gh-row now, with the gap and the opening chevron back */
+.p3-fr{margin-top:12px;cursor:pointer}
+.p3-fr .trail .gi{transition:transform var(--d-out) var(--spring)}
+.p3-fr.open .trail .gi{transform:rotate(90deg)}
+.gh-lore-body{margin-top:8px}
+/* ===== /GP:WEEKLY+BODY ===== */
+
 /* ===== GP:HOME (wave 2) ===== */
 /* Home = header (date · cycle in the top bar, greeting under it) → ONE hero (Tonight / Rest / Live / Free, readiness folded in) → This week + volume map → Sunday review → Lifts (records + stalled) → Last session → Next up → extras row (Garage, events).
    Everything is scoped under .gh so the other tabs keep their look; the primitives GP.* emit (ring, lmk, wk, seg, spark) are styled here. */
@@ -1728,9 +1782,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .fu-stack .gh-row.fu-tg{width:100%;text-align:left;color:var(--tx1);background:none;border:0}
 .fu-ck{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 1.5px var(--hair2);color:var(--on-gold)}
 .fu-tg.on .fu-ck{background:var(--gold-ink);box-shadow:none}.fu-ck .gi{width:16px;height:16px;stroke-width:3}
-.fu-bw{font-size:28px;color:var(--tx1)}.fu-bw small{font-size:14px;color:var(--tx2);margin-left:2px}
-.fu-curve{margin:8px 14px 0}
-.fu-wi{display:flex;gap:8px;margin:12px 14px 0}.fu-wi input{flex:1;min-width:0}.fu-wi .btn{flex:none;min-height:46px;font-size:15px}
 .ar-sih{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:8px}
 .ar-sih .num{font-size:44px;line-height:.9;color:var(--gold-ink)}.ar-sih small{font-size:15px;color:var(--tx2);margin-left:4px}
 .ar-chart{margin-top:8px}
@@ -2675,6 +2726,7 @@ dismissed:{},nemesis:null,aiKeySet:false,
 // ---- extended (Batch 3+) persistent state; back-filled by Object.assign on load ----
 sleepLog:[],            // {date, quality:1-5, hours, note}
 bwLog:[],              // {date, kg} bodyweight trend
+weekAdj:null,          // {wk, done:{"add:calves":{label,past,at}}} one-tap weekly adjustments applied this calendar week (wave 7)
 patrol:[],             // {date, mood:1-5, energy:1-5, note, day} session journal
 templates:[],          // {id, name, exercises:[{name, setCount}]}
 contracts:[],          // {id, type:lift|bw|vol|sessions, name, start, target, created, deadline}
@@ -6609,7 +6661,7 @@ const INDEX_ITEMS=[
   ["🛠️","THE FORGE","1RM, percentage loading & next plate jump","openForge()"],
   ["🚗","THE GARAGE","Vehicles you've unlocked by milestones","openGarage()"],
   ["🚑","THE INFIRMARY","Sleep, soreness, workload, injuries (Suit · Body)","openInfirmary()"],
-  ["🍽️","FUEL","Calories, macros, food log, hydration, weigh-ins","go('fuel')"],
+  ["🍽️","FUEL","Calories, macros, food log, hydration","go('fuel')"],
   ["📡","Batcomputer","Full analytics dashboard","openBatcomputer()"],
   ["📂","Batcomputer report","30-day · 90-day · yearly review","periodReport(30)"],
   ["🤝","Justice League","Compare with allies' Patrol Cards","openJusticeLeague()"],
@@ -6733,7 +6785,7 @@ function shareProfilePRCard(){
 
 
 /* ========================= PROFILE TAB (GP:PROFILE+FINISH, wave 3) =========================
-   identity strip (the one hero) → calendar → records → strength standards → two folded rows (trophies, gyms & data). */
+   identity strip (the one hero) → calendar → records → strength standards → body (weigh-in, trend, relative strength) → two folded rows (trophies, gyms & data). */
 let _p3Uid=0;
 /* e1RM trend: time-scaled line over the last `days`, PR markers = sessions that beat every earlier one, slope in %/month (least squares).
    mini = the sparkline for lists (no labels). Returns {svg,pct,n,hi,lo,last} or null when there are fewer than 2 sessions. */
@@ -6768,7 +6820,7 @@ function p3Fold(id){   // toggle a folded row in place (state kept in accOpen li
 const p3Row=(icon,title,sub,fn,gold)=>`<div class="gh-row" ${fn?`data-hx onclick="${fn}"`:""}><span class="lead${gold?" gold":""}">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${fn?GP.icon("chevR"):""}</span></div>`;
 function p3FoldRow(id,icon,title,sub,body){
   const open=accIsOpen("p3-"+id,false);
-  return `<div class="s1 gh-lore p3-fr gh-c${open?" open":""}" id="p3r-${id}" data-hx onclick="p3Fold('${id}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
+  return `<div class="s1 gh-row gh-lore p3-fr gh-c${open?" open":""}" id="p3r-${id}" data-hx onclick="p3Fold('${id}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
     <div id="p3b-${id}" class="gh-lore-body${open?"":" hide"}"><section class="s2 gh-list">${body}</section></div>`;
 }
 function p3Identity(){
@@ -6847,6 +6899,89 @@ function p3Strength(){
       <div class="p3-sfoot">Machine, Smith and variation lifts are converted to a barbell estimate. e1RM is a guide, not a verdict.</div></section>`;
 }
 function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
+/* ===== BODY (Profile, wave 7) =====
+   ONE home for bodyweight. A one-tap weigh-in prefilled with the current value, the 12-week trend of weekly averages, and relative strength over time: the Big-3 barbell-equivalent e1RM
+   (the same liftEstimate the Strength card reads) divided by the bodyweight of that week. bwSet() is the only writer (Settings uses it too): d.bwLog keeps its {date,kg} shape with one entry
+   per local day, and u.bodyweight follows the newest weigh-in, so standards, bodyweight lifts, Alfred and Fuel all read one number. */
+const BD_WEEKS=12,BD_MIN=30,BD_MAX=300,BD_STEP=0.1;
+function bwSet(kg){
+  const d=state.data,t=now(),k=Math.round(kg*10)/10,day=new Date(t).toDateString();
+  d.bwLog=bdLogArr().filter(e=>!(e&&new Date(e.date).toDateString()===day)).concat({date:new Date(t).toISOString(),kg:k});
+  d.u.bodyweight=k;save();
+}
+const bdLogArr=()=>Array.isArray(state.data.bwLog)?state.data.bwLog:[];
+const bdEntries=()=>bdLogArr().map(e=>({t:new Date(e&&e.date).getTime(),kg:+(e&&e.kg)})).filter(e=>isFinite(e.t)&&e.kg>0).sort((a,b)=>a.t-b.t);
+const bdAt=(es,t)=>es.reduce((b,e)=>e.t<=t?e:b,null)||es[0]||null;   // the newest weigh-in at or before t, else the oldest one
+function bdWeekly(es){   // [{i,avg,n}] over the last BD_WEEKS calendar weeks (Mon–Sun): i 0 = oldest .. BD_WEEKS-1 = this week; a week without a weigh-in is left out
+  const out=[];
+  for(let k=BD_WEEKS-1;k>=0;k--){
+    const a=weekStartK(k),b=weekStartK(k-1),w=es.filter(e=>e.t>=a&&e.t<b);
+    if(w.length)out.push({i:BD_WEEKS-1-k,avg:w.reduce((s,e)=>s+e.kg,0)/w.length,n:w.length});
+  }
+  return out;
+}
+function bdRel(es){   // [{i,v}] Big-3 barbell-equivalent total ÷ the bodyweight of each week's end; a week counts only once every current lift has a log (like for like); the last point is p3BigThree()
+  const d=state.data,tops=["Bench Press","Squat","Deadlift"].map(l=>liftEstimate(l)).filter(Boolean);
+  if(tops.length<2)return [];
+  const ls=tops.map(e=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;return {orm:e.orm,rows:exerciseRows(e.name).map(r=>({t:new Date(r.date).getTime(),v:r.e1rm*f}))};}),out=[];
+  for(let k=BD_WEEKS-1;k>=0;k--){
+    const t=k?weekStartK(k-1)-1:now();let tot=0,ok=true;
+    ls.forEach(l=>{const best=l.rows.reduce((m,r)=>r.t<=t&&r.v>m?r.v:m,k?0:l.orm);if(best>0)tot+=best;else ok=false;});
+    if(ok)out.push({i:BD_WEEKS-1-k,v:tot/(k?(bdAt(es,t)||{kg:bodyW()}).kg:bodyW())});
+  }
+  return out;
+}
+function bdSvg(pts,o){   // weekly points on a fixed 12-week axis; o = {dec, pad, cls, label}
+  const w=320,h=116,pl=36,pr=10,pt=14,pb=24,hi=Math.max(...pts.map(p=>p.v)),lo=Math.min(...pts.map(p=>p.v)),pad=Math.max((hi-lo)*.3,o.pad),mn=lo-pad,mx=hi+pad,
+    X=i=>pl+i/(BD_WEEKS-1)*(w-pl-pr),Y=v=>pt+(1-(v-mn)/(mx-mn))*(h-pt-pb),P=p=>X(p.i).toFixed(1)+" "+Y(p.v).toFixed(1),id="bd"+(++_p3Uid),
+    line=pts.map((p,k)=>(k?"L":"M")+P(p)).join(" "),a=pts[0],z=pts[pts.length-1],f=v=>v.toFixed(o.dec),g=v=>`<line x1="${pl}" x2="${w-pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" class="p3t-g"/><text x="${pl-7}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end" class="p3t-t">${f(v)}</text>`;
+  return `<svg class="p3t ${o.cls}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(o.label)}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="p3t-s0"/><stop offset="1" class="p3t-s1"/></linearGradient></defs>
+    ${g(hi)}${hi-lo>1e-9?g(lo):""}<text x="${pl}" y="${h-6}" class="p3t-t">${BD_WEEKS} wk ago</text><text x="${w-pr}" y="${h-6}" text-anchor="end" class="p3t-t">now</text>
+    <path d="${line} L${X(z.i).toFixed(1)} ${h-pb} L${X(a.i).toFixed(1)} ${h-pb}Z" fill="url(#${id})"/><path d="${line}" class="p3t-l"/>
+    ${pts.map(p=>`<circle cx="${X(p.i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.4" class="bd-d"/>`).join("")}
+    <circle cx="${X(z.i).toFixed(1)}" cy="${Y(z.v).toFixed(1)}" r="7" class="p3t-halo"/><circle cx="${X(z.i).toFixed(1)}" cy="${Y(z.v).toFixed(1)}" r="3.6" class="p3t-e"/></svg>`;
+}
+const bdSign=v=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(1);
+function bdStep(dir){
+  const el=$("bd-kg");if(!el)return;
+  const v=parseFloat(String(el.value).replace(",","."));
+  el.value=(Math.round(((isFinite(v)?v:bodyW())+dir*BD_STEP)*10)/10).toFixed(1);haptic("tap");
+}
+function bdLog(){
+  const el=$("bd-kg"),v=el?parseFloat(String(el.value).replace(",",".")):NaN;
+  if(!isFinite(v)||v<BD_MIN||v>BD_MAX){toast("Enter your weight from "+BD_MIN+" to "+BD_MAX+" kg.");return;}
+  const prevLog=state.data.bwLog,prevBw=state.data.u.bodyweight;
+  bwSet(v);haptic("done");render();
+  toastUndo("Weigh-in logged · "+(Math.round(v*10)/10).toFixed(1)+" kg",()=>{state.data.bwLog=prevLog;state.data.u.bodyweight=prevBw;save();render();toast("Weigh-in removed");},"Undo");
+}
+function bdOpen(){go("case");setTimeout(()=>gdJump("#p3-body"),80);}   // other screens link here instead of keeping a second weigh-in
+function bdDockSub(){
+  const wk=bdWeekly(bdEntries()),dk=wk.length>1?wk[wk.length-1].avg-wk[0].avg:0;
+  return `<b>${bodyW().toFixed(1)}</b> kg`+(Math.abs(dk)>=.05?` · ${bdSign(dk)}`:"");
+}
+function p3Body(){
+  const es=bdEntries(),wk=bdWeekly(es),rel=bdRel(es),bw=bodyW(),day=new Date(now()).toDateString(),logged=es.some(e=>new Date(e.t).toDateString()===day);
+  const a=wk[0],z=wk[wk.length-1],span=wk.length>1?z.i-a.i:0,dk=span?z.avg-a.avg:0,ago=z?(BD_WEEKS-1-z.i===0?"this week":BD_WEEKS-1-z.i===1?"last week":(BD_WEEKS-1-z.i)+" wk ago"):"";
+  const tag=span?`<span class="tag">${Math.abs(dk)<.05?"Steady":bdSign(dk)+" kg"} / ${span} wk</span>`:"",
+    avg=z?`<span class="t-xs">Weekly avg <b>${z.avg.toFixed(1)}</b> kg · ${ago}</span>`:`<span class="t-xs">${es.length?"No weigh-in in "+BD_WEEKS+" weeks":"No weigh-ins yet"}</span>`,
+    chart=wk.length>1?bdSvg(wk.map(p=>({i:p.i,v:p.avg})),{dec:1,pad:.4,cls:"bd-w",label:"Bodyweight, weekly average, last "+BD_WEEKS+" weeks"}):`<p class="t-s bd-hint">${wk.length?"One more week of weigh-ins and the trend draws here.":"Log your weight on a few days and the 12-week trend draws here."}</p>`;
+  let rs="";
+  if(rel.length>1){
+    const r0=rel[0],r1=rel[rel.length-1],pct=(r1.v-r0.v)/r0.v*100,sp=r1.i-r0.i;
+    rs=`<div class="bd-rs"><div class="bd-rs-h"><span class="eyebrow">Relative strength</span><span class="tag ${pct>=.5?"ok":pct<=-.5?"warn":""}">${Math.abs(pct)<.5?"Steady":(pct>0?"+":"−")+Math.abs(pct).toFixed(0)+"%"} / ${sp} wk</span></div>
+      ${bdSvg(rel,{dec:2,pad:.04,cls:"bd-r",label:"Relative strength, Big-3 over bodyweight, last "+BD_WEEKS+" weeks"})}
+      <div class="p3-sfoot">Big-3 barbell-equivalent e1RM ÷ that week's bodyweight, in × BW.</div></div>`;
+  }
+  return `<div class="gh-sec gh-c" id="p3-body" style="--i:4"><h2>Body</h2><span class="t-xs">weigh-in · ${BD_WEEKS}-week trend</span></div>
+    <section class="s2 bd-c gh-c" style="--i:4"><div class="bd-top"><div class="bd-now"><b class="num" data-roll>${bw.toFixed(1)}</b><small>kg</small></div><div class="bd-meta">${tag}${avg}</div></div>
+      ${chart}
+      <div class="bd-log" role="group" aria-label="Log today's weight"><button class="btn-i" onclick="bdStep(-1)" aria-label="0.1 kg less">${gmIc("minus")}</button>
+        <label class="bd-in"><input id="bd-kg" inputmode="decimal" value="${bw.toFixed(1)}" aria-label="Today's bodyweight in kilograms" onkeydown="if(event.key==='Enter')bdLog()"><u>kg</u></label>
+        <button class="btn-i" onclick="bdStep(1)" aria-label="0.1 kg more">${GP.icon("plus")}</button>
+        <button class="btn bd-go" onclick="bdLog()">${GP.icon("check")}${logged?"Update today":"Log today"}</button></div>
+      <p class="t-xs bd-tip">Weigh first thing, same conditions. The trend is the weekly average, not the daily noise.</p>
+      ${rs}</section>`;
+}
 /* Profile dock: History, Records and Strength standards sit inline on this page, so their tiles scroll to them; Badges and Backup open their own sheet.
    Backup moved here from the "Gyms & tools" fold, Badges from its own fold. */
 function p3Dock(){
@@ -6856,6 +6991,7 @@ function p3Dock(){
     {art:"tile-history",ic:"calendar",t:"History",s:`<b>${ws.length}</b> sessions`,fn:"gdJump('#p3-cal')"},
     ...(prN?[{art:"tile-records",ic:"trophy",t:"Records",s:`<b>${prN}</b> records`,fn:"gdJump('#p3-rec')"}]:[]),
     ...(std?[{art:"tile-standards",ic:"chart",t:"Standards",s:b3?`Big-3 <b>${b3.ratio.toFixed(2)}</b>× BW`:"Lifts vs bodyweight",fn:"gdJump('#p3-std')"}]:[]),
+    {art:"suit",pos:"74% 42%",ic:"scale",t:"Body",s:bdDockSub(),fn:"gdJump('#p3-body')"},
     {art:"tile-badges",ic:"crown",t:"Badges",s:`<b>${(d.u.earnedBadges||[]).length}</b> of ${ACHIEVEMENTS.length}`,fn:"openTrophyRoom()"},
     {art:"tile-backup",ic:"lock",t:"Backup",s:lb?"Backed up "+ghAgo(lb):"Never backed up",fn:"openDataControl()"}]);
 }
@@ -6863,7 +6999,7 @@ function p3Tools(){
   const u=state.data.u,g=(u.gyms||[]).length;let rec=null,wf="";try{rec=mmaRecord();wf=weeklyFightCard();}catch(e){}
   const body=p3Row("map","Gyms",g+" gym"+(g===1?"":"s")+" · "+esc(u.activeGym||""),"openGyms()")
     +p3Row("scan","Batcomputer","Physique and tools","openBatcomputer()")
-    +p3Row("scale","Measurements","Body log","openMeasure()")
+    +p3Row("scale","Measurements","Chest, waist, arms, thighs","openMeasure()")
     +p3Row("share","Share PR card","Your top five lifts","shareProfilePRCard()")
     +p3Row("calendar","Export calendar","Every session as .ics","exportICS()")
     +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · against the week before",wf?"alOpenFightCard()":""):"")
@@ -6874,7 +7010,7 @@ function renderProfile(){
   if(!(state.data.workouts||[]).length){
     $("app").innerHTML=`<div class="gh p3-pf"><h1 class="gh-hi">Profile</h1><section class="s2 p3-empty"><span class="lead gold">${GP.icon("bat")}</span><div><b>Your record starts here</b><p>Rank, records and strength standards fill in as you train.</p></div><button class="btn btn-1" data-hx onclick="go('mission',1)">Plan a session</button></section></div>`;return;
   }
-  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Dock()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Tools()}</div>`;
+  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Dock()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Body()}${p3Tools()}</div>`;
 }
 /* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, consistency, Alfred and the weekly streak.
    Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
@@ -7129,7 +7265,7 @@ function renderMission(){
   if(!cur)h+=gmEmpty()+gmDock(null);
   else h+=gmHero(cur)+gmDock(cur)
     +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
-    +gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
+    +gmSuggest()+gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
   h+=`</div>`;
   $("app").innerHTML=h;
 }
@@ -9015,7 +9151,7 @@ GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN tar
 const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
 FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
 const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
-Five tabs along the bottom. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and one tile per muscle: sets this week against MEV, MAV and MRV, under- and over-range muscles listed first. From 16:00 on Sundays a Sunday review card adds my three lines and next week's one change; tap it for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Edit plan, Free session, Start), Cycle days (the active split day by day, tonight marked), the Volume forecast against MEV, MAV and MRV, Frequency, and Other plans when you keep more than one. The Lab fold holds the volume map, SFR, workload and Tools: Plate calculator, 1RM calculator, 1RM test day, Forge and Measure. SUIT is the muscle map: the recovery figure and a tile per muscle (tap one for its dossier: recovery, weekly sets against the landmarks, what to train next), the Effort section (average RIR and sets at RIR 0–3), a fold with the time-lapse, mastery and coverage, and the Body section: measurements, the Infirmary (sleep, soreness, injury board, workload), symmetry and progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Every lift, Badges, Week vs week and a Gyms & data fold (gyms, Batcomputer physique tools, measurements, Share PR card, calendar export, Data control, Settings). ALLIES is your friends: your league rank, Leaderboard, Co-op raid, Sparring, Splits & backups and a More from Gotham fold (Fight Night, Week vs last week). Settings and Search sit in the top bar; the round Alfred button opens my page (today's read, things to try asking, your last conversation, muscle dossiers) with this chat one tap away.
+Five tabs along the bottom. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and one tile per muscle: sets this week against MEV, MAV and MRV, under- and over-range muscles listed first. From 16:00 on Sundays a Sunday review card adds my three lines and next week's one change; tap it for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Edit plan, Free session, Start), Cycle days (the active split day by day, tonight marked), the Volume forecast against MEV, MAV and MRV, Frequency, and Other plans when you keep more than one. The Lab fold holds the volume map, SFR, workload and Tools: Plate calculator, 1RM calculator, 1RM test day, Forge and Measure. SUIT is the muscle map: the recovery figure and a tile per muscle (tap one for its dossier: recovery, weekly sets against the landmarks, what to train next), the Effort section (average RIR and sets at RIR 0–3), a fold with the time-lapse, mastery and coverage, and the Body section: measurements, the Infirmary (sleep, soreness, injury board, workload), symmetry and progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Body (a one-tap weigh-in prefilled with your last weight, the 12-week trend of weekly averages, and relative strength over time: Big-3 e1RM divided by that week's bodyweight), Every lift, Badges, Week vs week and a Gyms & data fold (gyms, Batcomputer physique tools, measurements, Share PR card, calendar export, Data control, Settings). ALLIES is your friends: your league rank, Leaderboard, Co-op raid, Sparring, Splits & backups and a More from Gotham fold (Fight Night, Week vs last week). Settings and Search sit in the top bar; the round Alfred button opens my page (today's read, things to try asking, your last conversation, muscle dossiers) with this chat one tap away.
 
 ## A SESSION FROM START TO FINISH
 Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
@@ -9036,7 +9172,7 @@ Recovery %: each muscle has its own window (72 h for back and legs, 48 h for che
 One detector: a lift is stalled when its best estimated 1RM hasn't been beaten for 3 or more sessions and you trained it in the last 3 weeks. Gotham's Lifts card lists the stalled lifts; opening them shows each lift's best e1RM, how many sessions it has been flat and ONE suggested change — the angle, the grip or the rep range — never a deload. The muscle tiles on Gotham put the muscles furthest below their weekly MEV (sets short) and any past their MRV first. Sessions this week and the weekly streak read the same calendar week (Monday to Sunday).
 
 ## THE SUNDAY REVIEW
-From 16:00 on Sundays Gotham shows a Sunday review card: muscles under MEV or over MRV, the records of the week, stalled lifts, and next week's one adjustment. Tapping it opens the full week in review (sessions, hard sets, tonnage, records, push against pull, recovery).
+From 16:00 on Sundays Gotham shows a Sunday review card: muscles under MEV or over MRV, the records of the week, stalled lifts, and next week's adjustment as one-tap buttons (add or trim sets on the lifts that train a muscle, or add a stretch-position lift) that edit your active plan and offer Undo. Tapping the card opens the full week in review (sessions, hard sets, tonnage, records, push against pull, recovery).
 
 ## THE INFIRMARY (SUIT → BODY)
 Sleep (hours and quality), a soreness map, the workload watch (the load ratio against your 4-week norm) and an injury board. Sleep feeds Readiness; a flagged injury puts a caution on lifts that hit that muscle. Tapping the Readiness ring on Gotham opens it too.
@@ -9755,7 +9891,7 @@ function alfredAsk(q){
     const c=weekCount(),g=d.u.weeklyGoal||4;
     return `<b>${c}</b> session${c===1?"":"s"} this week against a goal of <b>${g}</b>, Master.${c>=g?" Target met — excellent.":" "+(g-c)+" to go."}`;}
   // READ: bodyweight
-  if(/body\s?weight|how much do i weigh|my weight|weigh/.test(s)){const bw=bodyW();return bw?`You're <b>${bw}kg</b> on record, sir.`:"No bodyweight logged yet, Master — set it in Settings or the Infirmary.";}
+  if(/body\s?weight|how much do i weigh|my weight|weigh/.test(s)){const bw=bodyW();return bw?`You're <b>${bw}kg</b> on record, sir.`:"No bodyweight logged yet, Master — log it under Profile, Body.";}
   // READ: calories / macros
   if(/calorie|macro|protein|kcal|how much.*eat/.test(s)){const n=d.u.nutrition;if(!n||!n.cals)return "No fuel protocol set yet, sir — say <b>open fuel</b> and I'll calculate your targets.";
     return `Daily targets, Master: <b>${fmtNum(n.cals)} kcal</b> · ${n.protein}g protein · ${n.carbs}g carbs · ${n.fat}g fat.`;}
@@ -10203,17 +10339,11 @@ function openMessHall(){
 }
 /* ========================================================================
    THE FUEL TAB — nutrition's own home. Pulls together the Fuel protocol,
-   quick food logging, hydration, the daily supplement stack and a bodyweight
-   weigh-in + trend, so the whole eating side of training lives in one place.
+   quick food logging, hydration, the daily supplement stack, so the whole eating side of training lives in one place (bodyweight lives in Profile, Body).
    ======================================================================== */
-function logBW(){const el=$("fuel-bw");const v=el?parseFloat(el.value):NaN;
-  if(!v||v<20||v>400){toast("Enter your bodyweight in kg.");return;}
-  const kg=Math.round(v*10)/10;state.data.bwLog=state.data.bwLog||[];
-  state.data.bwLog.push({date:new Date().toISOString(),kg});state.data.u.bodyweight=kg;
-  save();haptic("done");toast("Weigh-in logged · "+kg+"kg");render();}
 function renderFuel(){   // Fuel: the protocol up top, then today's intake, hydration, the daily stack and bodyweight
   const d=state.data,u=d.u,n=u.nutrition;
-  let html=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Fuel</h1><div class="t-xs">Calories, macros, hydration, bodyweight</div></div></div>`;
+  let html=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Fuel</h1><div class="t-xs">Calories, macros, hydration, supplements</div></div></div>`;
   html+=fuelProtocolCard();
   if(n&&n.cals){
     const day=foodDay(),tot=foodTotals(day),train=isTrainingToday(),tgt=cycledTargets(n,train?"train":"rest");
@@ -10230,12 +10360,7 @@ function renderFuel(){   // Fuel: the protocol up top, then today's intake, hydr
   html+=`<section class="s2 gh-list fu-stack"><div class="gh-lh"><h3>Daily stack</h3>${cStreak?`<span class="tag ok">${cStreak} d creatine streak</span>`:""}</div>
     ${items.map(([k,l])=>{const on=!!supp[k];return `<button class="gh-row fu-tg${on?" on":""}" aria-pressed="${on}" onclick="toggleSupp('${k}')"><div class="main"><div class="gh-t1">${l}</div></div><span class="fu-ck">${on?GP.icon("check"):""}</span></button>`;}).join("")}
     <p class="t-xs fu-p">Creatine monohydrate, 3 to 5 g daily, is the best-evidenced legal supplement. Consistency is the whole game.</p></section>`;
-  const log=(d.bwLog||[]),vals=log.slice(-16).map(e=>+e.kg).filter(v=>v>0),first=vals.length?vals[0]:null,last=vals.length?vals[vals.length-1]:null,delta=(first!=null&&last!=null)?(last-first):null;
-  const curve=vals.length>=2&&typeof trendChart==="function"?trendChart(vals,{color:"#7cc4ff",unit:"kg"}):"";
-  html+=`<section class="s2 fu-c"><div class="gh-lh"><h3>Bodyweight</h3><b class="num fu-bw">${u.bodyweight||"—"}<small>kg</small></b></div>
-    ${curve?`<div class="fu-curve">${curve}</div><p class="t-xs fu-p">${delta?(delta>0?"Up ":"Down ")+Math.abs(delta).toFixed(1)+" kg across the last "+vals.length+" weigh-ins":"Holding steady across the last "+vals.length+" weigh-ins"}</p>`:`<p class="t-s fu-p">Log a few weigh-ins to draw your trend.</p>`}
-    <div class="fu-wi"><input id="fuel-bw" inputmode="decimal" placeholder="${u.bodyweight||75} kg" aria-label="Bodyweight in kilograms"/><button class="btn btn-1" onclick="logBW()">Log weigh-in</button></div>
-    <p class="t-xs fu-p">Weigh first thing, same conditions. Track the weekly average, not the daily noise.</p></section></div>`;
+  html+=`<div class="s1 gh-row fu-bwl" role="button" tabindex="0" onclick="bdOpen()"><span class="lead">${GP.icon("scale")}</span><div class="main"><div class="gh-t1">Bodyweight · <b>${bodyW().toFixed(1)} kg</b></div><div class="gh-t2">Weigh-in and trend live in Profile, Body</div></div><span class="trail">${GP.icon("chevR")}</span></div></div>`;
   $("app").innerHTML=html;
 }
 
@@ -10971,12 +11096,113 @@ function ghNext(cur){
   return rows.length?`<section class="s2 gh-list gh-c" style="--i:5"><div class="gh-lh"><h3>Next up</h3></div>${rows.join("")}</section>`:"";
 }
 
+/* ===== ONE-TAP WEEKLY ADJUST (wave 7) =====
+   The Sunday review's advice as 1–3 buttons. Each one edits the ACTIVE split's plan targets (day.plan[lift]={s,r,opt}: the plan editor's own data and the shape Mission's trim writes),
+   snapshots every day it touches so Undo puts the exact previous day back, and is remembered for the calendar week in d.weekAdj so a second tap cannot stack the same change.
+   Sets only: 2..10 per lift (GM_MIN_SETS / GM_MAX_SETS), a new target starts at the 5–10 rep default. Never a deload, never a logged session. */
+const WK_STEP=3,WK_ACTIONS=3,WK_NEW_SETS=2;   // most sets one tap moves for a muscle, buttons shown, sets on a lift added from the library
+const wkClone=o=>JSON.parse(JSON.stringify(o));
+function wkWeekKey(){const t=new Date(weekStartK(0));return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
+function wkDone(){const w=state.data.weekAdj;return w&&w.wk===wkWeekKey()&&w.done?w.done:{};}
+function wkUO(vol){   // the two lists the advice is built from: trained muscles under MEV (furthest first) and over MRV (worst first)
+  const tr=vol.filter(t=>t.trained);
+  return {under:tr.filter(t=>t.zone==="warn").sort((a,b)=>(b.L.mev-b.sets)-(a.L.mev-a.sets)),over:tr.filter(t=>t.zone==="bad").sort((a,b)=>(b.sets-b.L.mrv)-(a.sets-a.L.mrv))};
+}
+function wkDayOrder(cur){   // training days in cycle order from tonight's slot, so the next sessions get the sets first
+  const n=cur.sp.days.length;
+  return Array.from({length:n},(_,k)=>(cur.i+k)%n).filter(i=>!isRest(cur.sp.days[i]));
+}
+function wkPlanAdd(cur,m,k){   // [{i,n,from,to}]: +1 set at a time, round-robin over the lifts that train m as a primary mover (next days first), each capped at GM_MAX_SETS; null when nothing has room
+  const rows=[];
+  wkDayOrder(cur).forEach(i=>{const day=cur.sp.days[i];(day.exercises||[]).forEach(n=>{
+    const pl=day.plan&&day.plan[n];if(!(exFor(n).p||[]).includes(m)||(pl&&pl.opt))return;
+    const s=ghSetsOf(day,n);rows.push({i,n,from:s,to:s});});});
+  let left=k,moved=true;
+  while(left>0&&moved){moved=false;rows.forEach(r=>{if(left>0&&r.to<GM_MAX_SETS){r.to++;left--;moved=true;}});}
+  const ch=rows.filter(r=>r.to>r.from);return ch.length?ch:null;
+}
+function wkPlanTrim(cur,m,k){   // [{i,n,from,to}]: -1 set at a time from the day that carries the most of m (gmTrimPick picks the lift); a lift never goes under GM_MIN_SETS; null when nothing can give
+  const days=cur.sp.days.map(d=>isRest(d)?d:Object.assign({},d,{plan:Object.assign({},d.plan||{})})),ch=new Map();
+  for(let t=0;t<k;t++){
+    const tg=days.map((d,i)=>isRest(d)?null:{i,pick:gmTrimPick(d,m),w:ghPlanSets(d)[m]||0}).filter(x=>x&&x.pick).sort((a,b)=>b.w-a.w)[0];
+    if(!tg)break;
+    const d=days[tg.i],n=tg.pick.n,s=ghSetsOf(d,n),key=tg.i+"|"+n,was=ch.get(key);
+    d.plan[n]=Object.assign({r:GM_REPS},d.plan[n],{s:s-1});ch.set(key,{i:tg.i,n,from:was?was.from:s,to:s-1});
+  }
+  return ch.size?[...ch.values()]:null;
+}
+function wkPlanLift(cur,m,k){   // a library lift for m worked at long length that this plan does not use yet; goes on the next day that already trains m (else the next training day); null when none fits
+  const sp=cur.sp,used=new Set(sp.days.flatMap(d=>d.exercises||[])),seen=new Set(loggedExerciseNames()),order=wkDayOrder(cur),
+    pool=EXDB.filter(ex=>ex&&ex.n&&(ex.p||[])[0]===m&&!used.has(ex.n)&&isLengthened(ex)&&gymAllows(ex.eq)),
+    ex=pool.find(x=>seen.has(x.n))||pool[0],at=order.find(i=>(ghPlanSets(sp.days[i])[m]||0)>0);
+  if(!ex||!order.length)return null;
+  return [{i:at!=null?at:order[0],n:ex.n,from:0,to:clamp(k,WK_NEW_SETS,WK_STEP),add:true}];
+}
+function wkActions(under,over){   // 0..3 buttons: over-MRV muscles get a trim, under-MEV ones a set bump (or a stretch lift when no lift has room); none while load is spiking
+  const cur=currentPlanDay();if(!cur||!cur.sp)return [];
+  const done=wkDone(),len=cycleLen(),hot=["spike","high"].includes(acwrInfo().zone),out=[],sets=x=>clamp(Math.round(x*len/7),1,WK_STEP);
+  const act=(kind,t,ch)=>{
+    const n=ch.reduce((s,c)=>s+Math.abs(c.to-c.from),0),nm=ghName(t.m),ss=n+" set"+(n===1?"":"s"),names=[...new Set(ch.map(c=>c.n))],
+      days=[...new Set(ch.map(c=>"D"+(c.i+1)))].join(", "),lead=names.slice(0,2).join(", ")+(names.length>2?" +"+(names.length-2):"");
+    return {key:kind+":"+t.m,kind,m:t.m,tone:kind==="trim"?"bad":"warn",ch,
+      label:kind==="trim"?`Trim ${ss} · ${nm}`:kind==="lift"?`Add a stretch lift · ${nm}`:`Add ${ss} · ${nm}`,
+      past:kind==="trim"?`Trimmed ${ss} · ${nm}`:kind==="lift"?`Added ${names[0]} · ${nm}`:`Added ${ss} · ${nm}`,
+      sub:kind==="lift"?`${days} · ${names[0]} · ${ss}`:`${days} · ${lead}`};
+  };
+  const take=(t,make)=>{   // a muscle already adjusted this week shows its result instead of a new button
+    if(out.length>=WK_ACTIONS)return;
+    const k=["trim","add","lift"].find(x=>done[x+":"+t.m]);
+    if(k){const m=done[k+":"+t.m];out.push({key:k+":"+t.m,kind:k,m:t.m,applied:true,label:m.label,past:m.past||m.label});return;}
+    const r=make();if(r)out.push(act(r.kind,t,r.ch));
+  };
+  over.slice(0,2).forEach(t=>take(t,()=>{const ch=wkPlanTrim(cur,t.m,sets(t.sets-t.L.mrv));return ch&&{kind:"trim",ch};}));
+  if(!hot)under.forEach(t=>take(t,()=>{const k=sets(t.L.mev-t.sets),ch=wkPlanAdd(cur,t.m,k);if(ch)return {kind:"add",ch};const l=wkPlanLift(cur,t.m,k);return l&&{kind:"lift",ch:l};}));
+  return out;
+}
+function wkWrite(sp,ch){   // new day objects, never in place: exercises gets an added lift, plan[lift] keeps its reps and optional flag (a new target starts at GM_REPS)
+  const byDay=new Map();ch.forEach(c=>byDay.set(c.i,(byDay.get(c.i)||[]).concat(c)));
+  byDay.forEach((list,i)=>{
+    const day=sp.days[i],ex=(day.exercises||[]).slice(),plan=Object.assign({},day.plan||{});
+    list.forEach(c=>{if(c.add&&!ex.includes(c.n))ex.push(c.n);plan[c.n]=Object.assign({r:GM_REPS},plan[c.n],{s:c.to});});
+    sp.days[i]=Object.assign({},day,{exercises:ex,plan});
+  });
+}
+function wkApply(key){
+  const cur=currentPlanDay(),uo=wkUO(ghVol(null)),a=cur&&wkActions(uo.under,uo.over).find(x=>x.key===key);   // rebuilt from live data: the plan may have moved since the card was drawn
+  if(!a||a.applied||!a.ch){wkRefresh();return;}
+  const id=cur.sp.id,snap=[...new Set(a.ch.map(c=>c.i))].map(i=>[i,wkClone(cur.sp.days[i])]),prev=state.data.weekAdj;
+  wkWrite(cur.sp,a.ch);
+  state.data.weekAdj={wk:wkWeekKey(),done:Object.assign({},wkDone(),{[key]:{label:a.label,past:a.past,at:now()}})};
+  haptic("tap");splitsChanged();wkRefresh();
+  toastUndo(a.past,()=>{   // the exact previous days go back, and the week forgets it was applied
+    const sp=(state.data.splits||[]).find(s=>s.id===id);if(!sp)return;
+    snap.forEach(([i,day])=>{sp.days[i]=day;});state.data.weekAdj=prev;
+    splitsChanged();wkRefresh();toast("Plan restored");
+  },"Undo");
+}
+function wkRefresh(){   // the review sheet is open over the tab: repaint it in place (scroll kept) so the button flips to its result
+  const sh=$("sheet");if(state._sheetKind!=="review"||!sh||!sh.classList.contains("on"))return;
+  const sc=sh.scrollTop;sh.innerHTML=ghReviewSheet();sh.scrollTop=sc;
+}
+const wkIc=a=>a.kind==="trim"?gmIc("minus"):GP.icon("plus");
+function wkBtn(a){
+  if(a.applied)return `<div class="wk-act is-done" role="status"><span class="wk-ic">${GP.icon("check")}</span><span class="wk-tx"><b>${esc(a.past||a.label)}</b><i>Plan updated for the next cycle</i></span></div>`;
+  return `<button class="wk-act ${a.tone}" onclick="wkApply('${a.key}')" aria-label="${esc(a.label+". "+a.sub+". Edits your plan, with undo.")}"><span class="wk-ic">${wkIc(a)}</span><span class="wk-tx"><b>${esc(a.label)}</b><i>${esc(a.sub)}</i></span><span class="wk-go">Apply</span></button>`;
+}
+const wkNext=r=>r.acts.length?`<div class="wk-acts">${r.acts.map(wkBtn).join("")}</div>`:`<b>${esc(r.adj)}</b>`;
+function gmSuggest(){   // Mission's door to the same buttons: one link row into the review sheet (which owns them), shown while something is left to apply
+  if(!(state.data.workouts||[]).some(w=>new Date(w.date).getTime()>=weekStartK(0)))return "";
+  const uo=wkUO(ghVol(null)),left=wkActions(uo.under,uo.over).filter(a=>!a.applied);
+  if(!left.length)return "";
+  const a=left[0],more=left.length>1?` · +${left.length-1} more`:"";
+  return `<div class="s1 gh-row wk-sug gh-c" style="--i:2" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Suggested this week: ${esc(a.label)}${left.length>1?", and "+(left.length-1)+" more":""}. Opens the week review."><span class="lead ${a.tone}">${wkIc(a)}</span><div class="main"><div class="gh-t1">Suggested this week</div><div class="gh-t2">${esc(a.label)}${more}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+}
+
 /* ---- WEEK REVIEW: one computation behind the Sunday card and its detail sheet ---- */
 function ghWeekReview(vol){
   const t0=weekStartK(0),ws=(state.data.workouts||[]).filter(w=>new Date(w.date).getTime()>=t0),prs=[];
   ws.forEach(w=>(w.prs||[]).forEach(nm=>{if(!prs.includes(nm))prs.push(nm);}));
-  const tr=vol.filter(t=>t.trained),under=tr.filter(t=>t.zone==="warn").sort((a,b)=>(b.L.mev-b.sets)-(a.L.mev-a.sets)),
-    over=tr.filter(t=>t.zone==="bad").sort((a,b)=>(b.sets-b.L.mrv)-(a.sets-a.L.mrv)),stalled=stalledLifts(),a=acwrInfo();
+  const {under,over}=wkUO(vol),stalled=stalledLifts(),a=acwrInfo();
   let adj;
   if(over.length)adj=`Trim ${MNAME[over[0].m].toLowerCase()} by ${over[0].sets-over[0].L.mrv} set${over[0].sets-over[0].L.mrv===1?"":"s"}.`;
   else if(a.zone==="spike"||a.zone==="high")adj="Hold total volume steady while your load settles.";
@@ -10984,7 +11210,7 @@ function ghWeekReview(vol){
   else if(stalled.length)adj=`Change the angle or rep range on ${stalled[0].n}.`;
   else adj="Repeat the plan. Volume and load are on track.";
   const sets=ws.reduce((s,w)=>s+(w.exercises||[]).reduce((x,e)=>x+countSets(e.sets,false),0),0);
-  return {ws,prs,under,over,stalled,adj,sets:Math.round(sets),tonnage:ws.reduce((s,w)=>s+(+w.totalVol||0),0)};
+  return {ws,prs,under,over,stalled,adj,acts:wkActions(under,over),sets:Math.round(sets),tonnage:ws.reduce((s,w)=>s+(+w.totalVol||0),0)};
 }
 const ghList=(arr,f,max=3)=>arr.slice(0,max).map(f).join(", ")+(arr.length>max?" +"+(arr.length-max)+" more":"");
 /* ---- SUNDAY REVIEW: Sundays from 16:00, below the week card. Three lines and next week's one change; never a pop-up. ---- */
@@ -10995,9 +11221,9 @@ function ghSunday(vol){
     l2=r.prs.length?`${r.prs.length} record${r.prs.length===1?"":"s"} this week, led by ${esc(r.prs[0])}.`:"No new records this week.",
     l3=r.stalled.length?`Stalled: ${ghList(r.stalled,s=>esc(s.n),2)}.`:"No stalled lifts.";
   const line=(ic,tone,tx)=>`<li><span class="lead ${tone}">${GP.icon(ic)}</span><span>${tx}</span></li>`;
-  return `<div class="s2 gh-sun gh-c" style="--i:2" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
-    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul>
-    <div class="gh-sun-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></div>`;
+  return `<div class="s2 gh-sun gh-c" style="--i:2"><div class="gh-sun-hit" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
+    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul></div>
+    <div class="gh-sun-n"><span class="eyebrow">Next week</span>${wkNext(r)}</div></div>`;
 }
 /* the detail behind the Sunday card: the week in numbers, Alfred's flags, the one change */
 function ghReviewHtml(){
@@ -11015,11 +11241,12 @@ function ghReviewHtml(){
   if(fried>=4)rows.push(row("pulse","warn","Recovery",`${fried} muscle groups are under 50%. Keep 1 to 3 reps in reserve.`));
   return `<div class="gh gh-rv"><div class="gh-rv-st"><div><b class="num">${r.ws.length}<small>/${goal}</small></b><span class="eyebrow">Sessions</span></div><div><b class="num">${r.sets}</b><span class="eyebrow">Hard sets</span></div><div><b class="num">${tv.v}<small>${tv.u}</small></b><span class="eyebrow">Moved</span></div><div><b class="num">${r.prs.length}</b><span class="eyebrow">Records</span></div></div>
     <section class="s2 gh-list">${rows.join("")}</section>
-    <div class="s1 gh-rv-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></div>`;
+    <div class="s1 gh-rv-n"><span class="eyebrow">Next week</span>${wkNext(r)}</div></div>`;
 }
+const ghReviewSheet=()=>`<div class="ttl">Week in review</div>${ghReviewHtml()}<button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`;
 function openCaveReview(){
   try{haptic("tap");}catch(e){}
-  openSheet(`<div class="ttl">Week in review</div>${ghReviewHtml()}<button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
+  openSheet(ghReviewSheet());state._sheetKind="review";   // openSheet clears the kind; wkRefresh() repaints this sheet after a button is applied
 }
 
 /* ---- GOTHAM EXTRAS: the two that earn a place. The Garage always; the seasonal event only inside its dates. ---- */
@@ -11063,7 +11290,7 @@ function stCommit(){try{render();}catch(e){}}
 function stNum(k,el,lo,hi,def,int){
   const v=parseFloat(String(el.value).replace(",","."));
   if(!isFinite(v)||v<lo||v>hi){el.value=state.data.u[k]!=null?state.data.u[k]:def;toast("Enter a number from "+lo+" to "+hi+".");return;}
-  u_set(k,int?Math.round(v):v);el.value=state.data.u[k];stCommit();
+  if(k==="bodyweight")bwSet(v);else u_set(k,int?Math.round(v):v);el.value=state.data.u[k];stCommit();
 }
 function stSeg(b,k,v){
   u_set(k,v);haptic("tap");
