@@ -1244,6 +1244,14 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 @keyframes gpSweep{from{transform:translate3d(-37.5%,0,0);opacity:0}16%{opacity:1}82%{opacity:1}to{transform:translate3d(37.5%,0,0);opacity:0}}
 .gp-sw{position:absolute;top:0;bottom:0;left:-30%;right:-30%;z-index:1;pointer-events:none;background:linear-gradient(104deg,transparent 38%,rgba(255,214,120,.18) 45%,rgba(255,240,200,.42) 50%,rgba(255,214,120,.18) 55%,transparent 62%);animation:gpSweep .78s cubic-bezier(.3,.55,.25,1) .08s both}
 .gp-sw::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent 41%,rgba(255,244,214,.95) 50%,transparent 59%)}
+/* 3 · art in the places you tap into: the exercise sheet and the muscle dossier open under a darkened still (the hero recipe: right-aligned, dark on the left and bottom, art reaches the sheet's top edge behind the grabber), the Alfred chat header carries a dim band. Titles keep a soft shadow so they stay crisp. */
+.p3-xh,.gm-dos .gm-bh{position:relative}
+.p3-xh::before,.gm-dos .gm-bh::before{content:"";position:absolute;z-index:-1;pointer-events:none;left:-16px;right:-16px;top:-29px;bottom:-16px}
+.p3-xh::before{background:linear-gradient(180deg,rgba(19,27,41,.6),rgba(19,27,41,0) 36%),linear-gradient(90deg,#131B29 14%,rgba(19,27,41,.6) 50%,rgba(19,27,41,0) 86%),linear-gradient(0deg,#131B29 0%,rgba(19,27,41,0) 55%),url(assets/art/head-exercise.jpg) right center/cover no-repeat}
+.gm-dos .gm-bh::before{background:linear-gradient(180deg,rgba(23,33,49,.6),rgba(23,33,49,0) 36%),linear-gradient(90deg,#172131 14%,rgba(23,33,49,.6) 50%,rgba(23,33,49,0) 86%),linear-gradient(0deg,#172131 0%,rgba(23,33,49,0) 55%),url(assets/art/head-muscle.jpg) right center/cover no-repeat}
+.p3-xh h2,.p3-xh .sub,.gm-bt,.gm-bh .eyebrow{text-shadow:0 1px 12px rgba(8,12,20,.95)}
+.ac-head{position:relative;isolation:isolate}
+.ac-head::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;background:linear-gradient(90deg,rgba(12,18,28,.98) 22%,rgba(12,18,28,.5) 62%,rgba(12,18,28,.1)),url(assets/art/profile.jpg) right 22%/cover no-repeat}
 @media (prefers-reduced-motion:reduce){.gh-art,.ga img,.al-bg img,.af-bg img,.lg2-bar::before{animation:none!important}.gp-sw{display:none}}
 /* ===== /GP:CHARM ===== */
 
@@ -1455,7 +1463,7 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 /* MUSCLE DOSSIER sheet */
 .gm-dos .s2{margin-top:12px}
 .gm-dhead{display:flex;align-items:center;gap:14px;padding:14px;margin-top:4px}
-.gm-dhead .gh-ring{width:84px;height:84px}
+.gm-dhead .gh-ring{position:relative;flex:none;width:84px;height:84px}
 .gm-dhead .gh-rc .num{font-size:34px}
 .gm-dm{flex:1;min-width:0;display:grid;gap:6px;align-content:center}
 .gm-dr{font:650 17px/1.2 var(--body);letter-spacing:-.01em}
