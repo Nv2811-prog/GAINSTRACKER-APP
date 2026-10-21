@@ -665,11 +665,8 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .al-hero .gh-cta{margin-top:16px}
 
 /* ALLIES: league rows, duel, tools, ally sheet, invite */
-.al-list,.al-tools,.al-duel{margin-top:12px;overflow:hidden}
+.al-list,.al-duel{margin-top:12px;overflow:hidden}
 .al-list .gh-lh{padding-bottom:6px}
-.al-inv{position:relative;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 2px 0 8px;font:650 14px/1 var(--body);color:var(--gold-ink)}
-.al-inv .gi{width:15px;height:15px;stroke-width:2.2}
-.al-inv::after{content:"";position:absolute;inset:-8px -6px}
 .af-read .gh-more,.af-last .gh-more{display:inline-flex;align-items:center;min-height:36px;padding-top:0;padding-bottom:0}
 .al-row{position:relative;display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer}
 .al-row+.al-row{border-top:1px solid var(--hair)}
@@ -696,8 +693,6 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .al-dbar{height:6px;margin:12px 14px 10px;border-radius:3px;background:var(--rest);overflow:hidden}
 .al-dbar i{display:block;height:100%;background:var(--gold)}
 .al-dst{padding:0 14px 14px;font:650 13px/1 var(--body)}
-.al-tools .gh-row,.al-fold{cursor:pointer}
-.al-fold.open .trail .gi{transform:rotate(180deg)}
 .al-sh-h{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
 .al-sh-h .main{flex:1;min-width:0}
 .al-sh-h h2{font:700 22px/1.1 var(--body);letter-spacing:-.02em;color:var(--tx1)}
@@ -7358,7 +7353,8 @@ function openLeaderboard(){
     <div class="mini" style="margin:-2px 0 6px;color:var(--text2)">Ranked by <b class="gold">Vigilante Score</b> — driven by <b>strength</b> and <b>world optimality</b> (how good your lifts truly are). Quality over quantity: grinding more, sloppier sets won't out-rank a cleaner, stronger lifter.</div>
     <div class="banner" style="margin-bottom:4px"><span>🦇</span><div class="mini">${board.length<2?"Add allies in the Justice League to fill the board — for now the cave is yours alone.":myRank===1?"You sit at the top of the League. Defend the cowl.":`You're ranked #${myRank} of ${board.length}. ${fmtNum((board[myRank-2]._score-me._score))} points behind the vigilante above you.`}</div></div>
     ${rows}
-    <button class="btn" style="margin-top:13px" onclick="openJusticeLeague()">‹ Back to the League</button>`);
+    <div class="gh" style="margin-top:14px"><section class="s2 gh-list">${alTool("flame","Fight Night","Most records this week","alOpenFightNight()")}${alTool("swap","Sparring","1-on-1 head to head","openSparring()")}</section></div>
+    <button class="btn" style="margin-top:13px" onclick="closeSheet()">Close</button>`);
 }
 /* ===== CO-OP RAIDS (#26): team with an ally against a boss; combined PRs pool =====
    The boss falls when the two of you LAND a set number of records together (not tonnage —
@@ -8339,7 +8335,6 @@ function alRow(a,i,dd){
     <div class="al-st"><span><b class="num">${alWeekCount(a)}</b><i>this wk</i></span><span><b class="num">${a.streak||0}</b><i>streak</i></span></div></div>`;
 }
 const alTool=(ic,t1,t2,fn)=>`<div class="gh-row" onclick="${fn}" role="button" tabindex="0"><span class="lead">${GP.icon(ic)}</span><div class="main"><div class="gh-t1">${t1}</div><div class="gh-t2">${t2}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
-function alFold(id){toggleAcc(id);const h=$(id+"-h");if(h)h.classList.toggle("open",accIsOpen(id,false));}
 function alOpenFightNight(){openSheet(`<div class="gh">${fightNightCard()}<button class="btn" style="margin-top:12px;width:100%" onclick="closeSheet()">Close</button></div>`);}
 function alOpenFightCard(){openSheet(`<div class="gh">${weeklyFightCard()}<button class="btn" style="margin-top:12px;width:100%" onclick="closeSheet()">Close</button></div>`);}
 function renderAllies(){
@@ -8359,20 +8354,30 @@ function renderAllies(){
     <div class="al-top"><span class="eyebrow gh-live">League</span>${live}</div>${heroBody}</section>`;
   let duel="";try{duel=duelCard();}catch(e){}
   const rows=allies.map((a,i)=>({a,i,dd:alDays(a.recent&&a.recent[0]&&a.recent[0].t)})).sort((x,y)=>(x.dd==null?9e3:x.dd)-(y.dd==null?9e3:y.dd));
-  const league=allies.length?`<section class="s2 al-list gh-c" style="--i:1"><div class="gh-lh"><h3>Your league<span class="tag">${allies.length}</span></h3><button class="al-inv" onclick="openAllyInvite()">${GP.icon("plus")}Invite</button></div>${rows.map(x=>alRow(x.a,x.i,x.dd)).join("")}</section>`:"";
-  const r=d.raid,rp=r?raidProgress():null,rv=d.rival;
-  const more=[];
-  more.push(alTool("flame","Fight Night","Most records this week","alOpenFightNight()"));
-  try{if(weeklyFightCard())more.push(alTool("chart","Week vs last week","Your weekly fight card","alOpenFightCard()"));}catch(e){}
-  const mo=accIsOpen("al-more",false);
-  const tools=`<section class="s2 al-tools gh-c" style="--i:2">
-    ${alTool("trophy","Leaderboard",board.length>1?"#"+myRank+" of "+board.length:"Just you so far","openLeaderboard()")}
-    ${alTool("flag","Co-op raid",r?Math.round(rp.pct)+"% vs "+esc(r.boss):"Team up on a boss","openRaid()")}
-    ${alTool("swap","Sparring",rv?"Vs "+esc(rv.name||"rival"):"1-on-1 head to head","openSparring()")}
-    ${alTool("share","Splits &amp; backups",(allies.length===1?"1 ally":allies.length+" allies")+" · share a split","openJusticeLeague()")}
-    <div class="gh-row al-fold${mo?" open":""}" id="al-more-h" onclick="alFold('al-more')" role="button" tabindex="0"><span class="lead">${GP.icon("more")}</span><div class="main"><div class="gh-t1">More from Gotham</div><div class="gh-t2">${more.length} extras</div></div><span class="trail">${GP.icon("chevD")}</span></div>
-    <div id="al-more" class="${mo?"":"hide"}">${more.join("")}</div></section>`;
-  $("app").innerHTML=`<div class="gh al-pg${state._same?"":" gh-anim"}"><h1 class="gh-hi">Allies</h1>${hero}${duel}${league}${tools}</div>`;
+  const league=allies.length?`<section class="s2 al-list gh-c" style="--i:1"><div class="gh-lh"><h3>Your league<span class="tag">${allies.length}</span></h3></div>${rows.map(x=>alRow(x.a,x.i,x.dd)).join("")}</section>`:"";
+  $("app").innerHTML=`<div class="gh al-pg${state._same?"":" gh-anim"}"><h1 class="gh-hi">Allies</h1>${hero}${alDock(myRank,board.length)}${duel}${league}</div>`;
+}
+/* Allies dock: the whole social toolkit in one row. Chat and Duel belong to one ally, so a single live ally opens straight in, several get a picker, none gets the invite sheet.
+   "Add ally" only shows once there is a league (the empty hero already carries the Invite button). Fight Night and Sparring sit inside the Leaderboard sheet. */
+function alDock(myRank,boardN){
+  const d=state.data,allies=d.allies||[],live=allies.filter(a=>a&&a._uid).length,D=d.duel,r=d.raid,rp=r?raidProgress():null;
+  const ub=Object.values(d.chatUnread||{}).reduce((a,v)=>a+(+v||0),0),left=D?Math.max(0,Math.ceil((D.end-Date.now())/864e5)):0;
+  return gdDock("Allies tools",[
+    ...(allies.length?[{art:"tile-ally-add",ic:"plus",t:"Add ally",s:allies.length+(allies.length===1?" ally":" allies"),fn:"openAllyInvite()"}]:[]),
+    {art:"tile-chat",ic:"chat",t:"Chat",s:ub?`<b>${ub}</b> unread`:live?live+" live "+(live===1?"ally":"allies"):"Needs a live ally",fn:"gdAllyPick('chat')"},
+    {art:"tile-duel",ic:"target",t:"Duel",s:D?(D.pending?"Waiting for them":left+"d left"):"7-night bounty",fn:"gdAllyPick('duel')"},
+    {art:"tile-raid",ic:"flag",t:"Raid",s:r?`<b>${Math.round(rp.pct)}%</b> · ${esc(r.boss)}`:"Team up on a boss",fn:"openRaid()"},
+    {art:"tile-leaderboard",ic:"trophy",t:"Leaderboard",s:boardN>1?`<b>#${myRank}</b> of ${boardN}`:"Just you so far",fn:"openLeaderboard()"},
+    {art:"tile-split-share",ic:"share",t:"Splits",s:"Share · import",fn:"openJusticeLeague()"}]);
+}
+function gdAllyPick(kind){
+  const d=state.data,live=(d.allies||[]).map((a,i)=>({a,i})).filter(x=>x.a&&x.a._uid);
+  if(kind==="duel"&&d.duel){gdJump(".al-duel");return;}   // one bounty at a time: show the one that is running
+  if(!live.length){toast("Add a live ally first.");openAllyInvite();return;}
+  if(live.length===1){(kind==="chat"?openChat:openDuel)(live[0].i);return;}
+  const fn=kind==="chat"?"openChat":"openDuel";
+  openSheet(`<div class="gh al-sh"><div class="st-h"><h2>${kind==="chat"?"Chat with":"Duel"}</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <section class="s2 gh-list">${live.map(({a,i})=>`<div class="gh-row" onclick="${fn}(${i})" role="button" tabindex="0"><span class="al-av">${alInitial(a.n)}${alOnPatrol(a)?'<i class="pd"></i>':""}</span><div class="main"><div class="gh-t1">${esc(a.n)}</div><div class="gh-t2">${alOnPatrol(a)?"On patrol":esc(a.rk||"Live ally")}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`).join("")}</section></div>`);
 }
 function openAllySheet(i){
   const a=(state.data.allies||[])[i];if(!a)return;
