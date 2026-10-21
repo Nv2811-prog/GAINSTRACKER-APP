@@ -12061,6 +12061,7 @@ function prfShow(me,f){
 }
 function prfPlay(v,el,at,from,later,close){
   if(from)try{v.currentTime=from;}catch(e){}                          // before the metadata loads, this becomes the start position
+  if(from)v.addEventListener("loadedmetadata",()=>{if(v.currentTime<from-.05)v.currentTime=from;},{once:true});   // safety net where a pre-metadata seek is dropped
   v.addEventListener("ended",()=>{el.classList.add("pf-on");later(close,PRF_HOLD_MS);});   // hold the last frame + stamp a beat, then close itself
   v.addEventListener("error",close);
   v.addEventListener("pause",()=>{if(!v.ended)close();});             // iOS pauses it for a call, Siri or leaving the app: close, never a frozen frame
