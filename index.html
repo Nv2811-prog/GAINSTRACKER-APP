@@ -314,19 +314,6 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .mma-dots i.done{background:#ff6a5a;box-shadow:0 0 8px rgba(255,80,70,.6)}
 .mma-dots i.cur{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.7)}
 .mma-next{font-size:12.5px;color:var(--text2);letter-spacing:.05em;min-height:18px}
-/* ===== Progress photos ===== */
-.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
-.pcell{position:relative;aspect-ratio:3/4;border-radius:11px;overflow:hidden;border:1px solid var(--border);background:var(--bg2);cursor:pointer}
-.pcell img{width:100%;height:100%;object-fit:cover;display:block}
-.pcell .pdate{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;font-size:10px;color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.78),transparent);font-family:var(--disp);font-weight:650;letter-spacing:.04em}
-.pcell.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-style:dashed;border-color:rgba(201,168,76,.5);color:var(--gold2)}
-.pframe{position:relative;border-radius:14px;overflow:hidden;border:2px solid rgba(201,168,76,.55);box-shadow:0 0 30px -6px rgba(201,168,76,.4),inset 0 0 40px -10px rgba(0,0,0,.7)}
-.pframe img{width:100%;display:block}
-.pframe .pcorner{position:absolute;top:8px;left:8px;width:34px;height:34px;opacity:.92;filter:drop-shadow(0 2px 5px rgba(0,0,0,.6))}
-.pframe .pcap{position:absolute;left:0;right:0;bottom:0;padding:14px 12px 9px;background:linear-gradient(0deg,rgba(0,0,0,.82),transparent);color:#fff}
-.pcompare{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pcompare .pframe{border-width:1px}
-.pcompare .plbl{position:absolute;top:8px;right:8px;font-size:10px;font-family:var(--disp);font-weight:650;letter-spacing:.08em;padding:2px 8px;border-radius:20px;background:rgba(0,0,0,.6);color:var(--gold2);border:1px solid rgba(201,168,76,.4)}
 #voicebtn.listening{color:#ff6a5a;border-color:#5a2018;background:#1a0b0a;animation:voicepulse 1s ease-in-out infinite}
 @keyframes voicepulse{0%,100%{opacity:1}50%{opacity:.5}}
 .confetti-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:5}
@@ -548,7 +535,6 @@ button.card,.card[onclick]{cursor:pointer;border-color:var(--hair)!important;box
 /* figure stage + pop helpers + instrument panels: lit by luminance, not glow */
 .stage{border-color:var(--hair)!important;box-shadow:var(--hl)!important}
 .pop{box-shadow:var(--hl),var(--sh1)!important}
-.pcell.add{border-color:var(--hair2);color:var(--gold-ink)}
 .resumebar{border:1px solid rgba(242,193,78,.34);background:var(--g3);box-shadow:var(--sh2)}
 .resumebar .rb-ttl{color:var(--tx1)}
 /* a finished set is "done" = green; gold stays for action / selection / records */
@@ -1038,6 +1024,60 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-xd .gh-row .gh-t2{white-space:normal}
 .p3-acts{display:flex;flex-direction:column;gap:8px}
 .p3-acts .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+
+/* ===== GP:WEEKLY+BODY (wave 7) ===== */
+/* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
+/* 1 · one-tap weekly adjust: a button = tinted icon chip + what changes + where, "Apply" in gold; the result row turns green with a check */
+.gh .s2.gh-sun{cursor:default}
+.gh-sun-hit{cursor:pointer;border-radius:var(--r-s)}
+.wk-acts{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:4px;min-width:0}
+.wk-act{display:flex;align-items:center;gap:11px;width:100%;min-width:0;max-width:100%;min-height:56px;padding:9px 12px 9px 10px;border:0;border-radius:var(--r-m);background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);text-align:left;font:inherit;cursor:pointer}
+.wk-act.warn{--ac:var(--warn);--act:var(--tint-warn);--acr:rgba(255,178,36,.36)}
+.wk-act.bad{--ac:#FF786D;--act:var(--tint-bad);--acr:rgba(255,90,78,.36)}
+.wk-act.is-done{--ac:var(--ok);--act:var(--tint-ok);--acr:rgba(52,210,127,.36);background:var(--g1);box-shadow:inset 0 0 0 1px rgba(52,210,127,.24),var(--hl);cursor:default}
+.wk-ic{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--act);color:var(--ac);box-shadow:inset 0 0 0 1px var(--acr)}
+.wk-ic .gi{width:18px;height:18px;stroke-width:2.4}
+.wk-act .wk-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.wk-act .wk-tx b{display:block;font:650 15px/1.2 var(--body);letter-spacing:-.01em;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wk-act .wk-tx i{display:block;font:500 12.5px/1.25 var(--body);font-style:normal;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wk-go{flex:none;padding:10px 2px 10px 8px;font:650 13.5px/1 var(--body);color:var(--gold-ink)}
+.gm .wk-sug{margin-top:12px;cursor:pointer}
+.gm .wk-sug:active{background:rgba(150,178,222,.05)}
+/* 2 · Profile Body: weigh-in, 12-week trend of weekly averages, relative strength over time. Reuses the Profile trend look (.p3t-*): gold for the strength line, plain light for the weight line. */
+.bd-c{padding:14px 14px 12px}
+.bd-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.bd-now{display:flex;align-items:baseline;gap:5px;flex:none}
+.gh .bd-now .num{font-size:46px;line-height:.88;color:var(--tx1)}
+.gh .bd-now small{margin:0;font:600 14px/1 var(--body);color:var(--tx2)}
+.bd-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:0;text-align:right}
+.bd-meta .t-xs b{color:var(--tx1);font-weight:650}
+.bd-c svg.p3t{margin-top:12px}
+.bd-w .p3t-l{stroke:var(--tx1)}
+.bd-w .p3t-s0{stop-color:var(--tx1);stop-opacity:.15}
+.bd-w .p3t-halo{fill:var(--tx1);opacity:.16}
+.bd-d{fill:var(--g2);stroke-width:1.4}
+.bd-w .bd-d{stroke:var(--tx1)}
+.bd-r .bd-d{stroke:var(--gold)}
+.bd-hint{margin:12px 0 0}
+.bd-log{display:flex;align-items:center;gap:8px;margin-top:14px}
+.bd-in{flex:1;min-width:0;display:flex;align-items:center;gap:6px;height:44px;padding:0 12px;border-radius:var(--r-s);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair2)}
+.bd-in:focus-within{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.bd-in input{flex:1;min-width:0;width:100%;height:100%;padding:0;border:0;border-radius:0;background:none;box-shadow:none;color:var(--tx1);font:650 20px/1 var(--body);text-align:center;font-variant-numeric:tabular-nums;outline:0}
+.bd-in u{text-decoration:none;font:600 13px/1 var(--body);color:var(--tx2)}
+.bd-log .btn-i{flex:none}
+.bd-go{flex:none;width:auto;padding-inline:14px}
+.bd-go .gi{width:18px;height:18px;stroke-width:2.4;color:var(--gold-ink)}
+.bd-tip{margin:10px 0 0}
+.bd-rs{margin-top:16px;padding-top:14px;border-top:1px solid var(--hair)}
+.bd-rs-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bd-rs .p3-sfoot{padding:8px 0 0}
+.fu-bwl{margin-top:12px}
+/* 3 · the Profile "Gyms & tools" fold row had lost its layout rules (a bare block under the Body card): it is a gh-row now, with the gap and the opening chevron back */
+.p3-fr{margin-top:12px;cursor:pointer}
+.p3-fr .trail .gi{transition:transform var(--d-out) var(--spring)}
+.p3-fr.open .trail .gi{transform:rotate(90deg)}
+.gh-lore-body{margin-top:8px}
+/* ===== /GP:WEEKLY+BODY ===== */
 
 /* ===== GP:HOME (wave 2) ===== */
 /* Home = header (date · cycle in the top bar, greeting under it) → ONE hero (Tonight / Rest / Live / Free, readiness folded in) → This week + volume map → Sunday review → Lifts (records + stalled) → Last session → Next up → extras row (Garage, events).
@@ -1542,6 +1582,85 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
   .gm-day{padding:11px 12px}
 }
 
+/* ===== GP:PHOTOS (wave 7) ===== */
+/* Progress photos: the Suit card (Add tile + one thumbnail strip), the single-photo sheet and Compare (slide / side by side). Every <img> starts on the small thumbnail and swaps to the full photo once the vault returns it.
+   Calm surfaces, hairline rings and ONE gold ring = the selection. Rings sit on ::after because an inset shadow on the parent is hidden by the photo inside it. */
+.pc-card{margin:12px 0;padding-bottom:2px}
+.pc-note{padding:3px 14px 0}
+.pc-cmp{flex:none;gap:7px}
+.pc-cmp .gi,.pc-acts .gi,.pc-seg .gi,.pc-slot .gi{width:16px;height:16px}
+.pc-strip{display:flex;gap:10px;padding:12px 14px 14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pc-strip::-webkit-scrollbar{display:none}
+.pc-th{position:relative;flex:none;width:92px;aspect-ratio:3/4;padding:0;border:0;border-radius:12px;overflow:hidden;color:var(--tx1);background:var(--g1);scroll-snap-align:start;cursor:pointer}
+.pc-th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pc-th::after{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;box-shadow:inset 0 0 0 1px var(--hair2);pointer-events:none}
+.pc-th.is-b::after,.pc-th.is-a::after{box-shadow:inset 0 0 0 2px var(--gold)}
+.pc-cap{position:absolute;left:0;right:0;bottom:0;z-index:1;display:flex;flex-direction:column;gap:1px;padding:18px 7px 6px;text-align:left;background:linear-gradient(0deg,rgba(5,7,12,.9),rgba(5,7,12,0))}
+.pc-cap b{font:650 11px/1.2 var(--body);color:var(--tx1)}
+.pc-cap i{font:500 10px/1.2 var(--body);font-style:normal;color:var(--tx2)}
+.pc-tag{position:absolute;left:5px;top:5px;z-index:3;display:none;padding:3px 6px 2px;border-radius:7px;font:700 9px/1.1 var(--body);font-style:normal;letter-spacing:.07em;text-transform:uppercase;color:var(--on-gold);background:var(--gold)}
+.pc-th.is-b .pc-tag,.pc-th.is-a .pc-tag{display:block}
+.pc-th.is-b .pc-tag::after{content:"Before"}
+.pc-th.is-a .pc-tag::after{content:"After"}
+.pc-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1.5px dashed rgba(242,193,78,.42);color:var(--gold-ink);font:600 12px/1.2 var(--body)}
+.pc-add::after{display:none}
+.pc-add .gi{width:22px;height:22px}
+/* the sheets (single photo + Compare): header carries the camera still, dark on the left so the title stays crisp */
+.pc{--ph:clamp(240px,calc(92vh - 354px - env(safe-area-inset-bottom,0px)),480px)}   /* the stage takes what the sheet (max 92dvh) has left once header, switch, stats, picker and strip are in, so the picker never scrolls out of thumb reach */
+@supports (height:1dvh){.pc{--ph:clamp(240px,calc(92dvh - 354px - env(safe-area-inset-bottom,0px)),480px)}}
+.pc-hd{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;min-height:48px;margin:0 0 10px}
+.pc-hd::before{content:"";position:absolute;z-index:-1;pointer-events:none;left:-16px;right:-16px;top:-29px;bottom:-10px;background:linear-gradient(180deg,rgba(23,33,49,.6),rgba(23,33,49,0) 36%),linear-gradient(90deg,#172131 14%,rgba(23,33,49,.6) 52%,rgba(23,33,49,0) 88%),linear-gradient(0deg,#172131 0%,rgba(23,33,49,0) 55%),url(assets/art/tile-photos.jpg) right 82%/cover no-repeat}
+.pc-hd h2{font:700 22px/1.15 var(--body);letter-spacing:-.02em;color:var(--tx1)}
+.pc-hd h2,.pc-hd .eyebrow{text-shadow:0 1px 12px rgba(8,12,20,.95)}
+.pc-hd .eyebrow{display:block;color:var(--gold-ink)}
+.st-seg.pc-seg button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px}
+/* Compare: slide = both photos stacked, After clipped from --x to the right edge; the grip rides the same --x */
+.pc-stage{position:relative;height:var(--ph);width:min(100%,calc(var(--ph) * .8));margin:10px auto 0;border-radius:var(--r-l);overflow:hidden;background:var(--g1);box-shadow:var(--sh2);touch-action:pan-y;cursor:ew-resize;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pc-stage::after{content:"";position:absolute;inset:0;z-index:4;border-radius:inherit;box-shadow:inset 0 0 0 1px var(--hair2);pointer-events:none}
+.pc-ph{position:absolute;inset:0;margin:0}
+.pc-ph img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+.pc-a{-webkit-clip-path:inset(0 0 0 var(--x));clip-path:inset(0 0 0 var(--x))}
+.pc-stage:not(.drag) .pc-a{transition:clip-path .22s var(--ease-out),-webkit-clip-path .22s var(--ease-out)}
+.pc-lbl{position:absolute;top:10px;left:10px;z-index:1;padding:5px 9px 4px;border-radius:999px;font:700 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx1);background:rgba(5,7,12,.64);box-shadow:inset 0 0 0 1px var(--hair2)}
+.pc-a .pc-lbl{left:auto;right:10px}
+.pc-ph figcaption,.pc-solo figcaption{position:absolute;left:0;right:0;bottom:0;z-index:1;display:flex;flex-direction:column;gap:2px;padding:30px 12px 11px;pointer-events:none;background:linear-gradient(0deg,rgba(5,7,12,.9),rgba(5,7,12,0))}
+.pc-ph figcaption b,.pc-solo figcaption b{font:650 14px/1.15 var(--body);color:var(--tx1)}
+.pc-ph figcaption span,.pc-solo figcaption span{font:500 12px/1.2 var(--body);color:var(--tx2)}
+.pc-a figcaption{align-items:flex-end;text-align:right}
+.pc-grip{position:absolute;z-index:3;top:0;bottom:0;left:var(--x);width:56px;margin-left:-28px;outline:0;touch-action:pan-y}
+.pc-stage:not(.drag) .pc-grip{transition:left .22s var(--ease-out)}
+.pc-grip::before{content:"";position:absolute;left:27px;top:0;bottom:0;width:2px;background:var(--gold);box-shadow:0 0 0 1px rgba(5,7,12,.4)}
+.pc-grip i{position:absolute;left:50%;top:64%;display:grid;place-items:center;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;color:var(--gold-ink);background:rgba(8,12,20,.84);box-shadow:inset 0 0 0 1.5px var(--gold),0 8px 18px -6px #000}
+.pc-grip i .gi{width:20px;height:20px;stroke-width:2.2}
+.pc-grip:focus-visible i{box-shadow:inset 0 0 0 2px var(--gold-hi),0 0 0 3px rgba(242,193,78,.35)}
+/* side by side: the same two <figure>s, laid out as two portrait cards */
+.pc[data-mode=side] .pc-stage{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:auto;width:100%;overflow:visible;background:none;box-shadow:none;border-radius:0;touch-action:auto;cursor:auto}
+.pc[data-mode=side] .pc-stage::after,.pc[data-mode=side] .pc-grip{display:none}
+.pc[data-mode=side] .pc-ph{position:relative;aspect-ratio:3/4;overflow:hidden;border-radius:var(--r-m);clip-path:none;-webkit-clip-path:none;transition:none;box-shadow:0 12px 24px -16px #000}
+.pc[data-mode=side] .pc-ph::after{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;box-shadow:inset 0 0 0 1px var(--hair2);pointer-events:none}
+.pc[data-mode=side] .pc-a figcaption{align-items:flex-start;text-align:left}
+.pc[data-mode=side] .pc-a .pc-lbl{left:10px;right:auto}
+.pc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.pc-stat{display:flex;align-items:baseline;justify-content:center;gap:6px;min-width:0;height:40px;padding:9px 8px 0;border-radius:var(--r-m);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair),var(--hl)}
+.pc-stat .num{flex:none;font-size:25px;line-height:.9;color:var(--tx1)}
+.pc-stat span{min-width:0;font:600 12px/1 var(--body);color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-pick{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.pc-slots{display:flex;gap:8px}
+.pc-slot{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 14px;border-radius:12px;font:650 13px/1 var(--body);color:var(--tx2);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair)}
+.pc-slot.on{color:var(--gold-ink);background:var(--tint-gold);box-shadow:inset 0 0 0 1.5px rgba(242,193,78,.55)}
+.pc .pc-strip{margin:2px -16px 0;padding:8px 16px 4px;scroll-padding-inline:16px}
+.pc .pc-th{width:60px;border-radius:11px}
+.pc .pc-cap{padding:14px 5px 5px}
+.pc .pc-cap b{font-size:9.5px;white-space:nowrap}
+/* single photo */
+.pc-solo{position:relative;margin:12px 0 0;border-radius:var(--r-l);overflow:hidden;background:var(--g0);box-shadow:var(--sh2)}
+.pc-solo img{display:block;width:100%;max-height:calc(100dvh - 330px);object-fit:contain}
+.pc-solo figcaption .c-warn{color:var(--warn)}
+.pc-solo::after{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;box-shadow:inset 0 0 0 1px var(--hair2);pointer-events:none}
+.pc-acts{display:flex;gap:10px;margin-top:12px}
+.pc-acts .btn{flex:1;gap:8px}
+@media (prefers-reduced-motion:reduce){.pc-a,.pc-grip{transition:none!important}}
+/* ===== /GP:PHOTOS ===== */
 /* ===== GP:PRUNE+HOME (wave 5) ===== */
 /* Home below the hero (Sunday review, last session, next up, extras), the week-review sheet and the seasonal-event card. */
 .gh-row .lead.ok{background:var(--tint-ok);color:var(--ok)}.gh-row .lead.bad{background:var(--tint-bad);color:#FF786D}
@@ -1663,9 +1782,6 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .fu-stack .gh-row.fu-tg{width:100%;text-align:left;color:var(--tx1);background:none;border:0}
 .fu-ck{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 1.5px var(--hair2);color:var(--on-gold)}
 .fu-tg.on .fu-ck{background:var(--gold-ink);box-shadow:none}.fu-ck .gi{width:16px;height:16px;stroke-width:3}
-.fu-bw{font-size:28px;color:var(--tx1)}.fu-bw small{font-size:14px;color:var(--tx2);margin-left:2px}
-.fu-curve{margin:8px 14px 0}
-.fu-wi{display:flex;gap:8px;margin:12px 14px 0}.fu-wi input{flex:1;min-width:0}.fu-wi .btn{flex:none;min-height:46px;font-size:15px}
 .ar-sih{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:8px}
 .ar-sih .num{font-size:44px;line-height:.9;color:var(--gold-ink)}.ar-sih small{font-size:15px;color:var(--tx2);margin-left:4px}
 .ar-chart{margin-top:8px}
@@ -2610,6 +2726,7 @@ dismissed:{},nemesis:null,aiKeySet:false,
 // ---- extended (Batch 3+) persistent state; back-filled by Object.assign on load ----
 sleepLog:[],            // {date, quality:1-5, hours, note}
 bwLog:[],              // {date, kg} bodyweight trend
+weekAdj:null,          // {wk, done:{"add:calves":{label,past,at}}} one-tap weekly adjustments applied this calendar week (wave 7)
 patrol:[],             // {date, mood:1-5, energy:1-5, note, day} session journal
 templates:[],          // {id, name, exercises:[{name, setCount}]}
 contracts:[],          // {id, type:lift|bw|vol|sessions, name, start, target, created, deadline}
@@ -5607,14 +5724,14 @@ function gsHero(){
     <div class="gm-fig2">${buildSuit()}</div>
     <div class="gm-leg">${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot("#E8C53C","50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length):""}</div></section>`;
 }
-/* Suit dock: Infirmary and Time-lapse open their own page/sheet, Photos scrolls to the card at the bottom of Body. The infirmary summary row and the time-lapse fold became these tiles. */
+/* Suit dock: Infirmary and Time-lapse open their own page/sheet, Photos opens Compare (2+ photos) or scrolls to the card at the bottom of Body. The infirmary summary row and the time-lapse fold became these tiles. */
 function gsDock(){
   const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,ph=(state.data.photos||[]).length;
   const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load";
   return gdDock("Suit tools",[
     {art:"tile-infirmary",ic:"pulse",t:"Infirmary",s:inf,fn:"openInfirmary()"},
     {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Mastery · radar",fn:"openMastery()"},
-    {art:"tile-photos",ic:"image",t:"Photos",s:ph?`<b>${ph}</b> photo${ph===1?"":"s"}`:"Add your first",fn:"gdJump('#gs-photos')"}]);
+    {art:"tile-photos",ic:"image",t:"Photos",s:ph>=2?`Compare · <b>${ph}</b>`:ph?`<b>${ph}</b> photo`:"Add your first",fn:"photosOpen()"}]);
 }
 function openMastery(){openSheet(`<div class="gh gm st-pg"><div class="st-h"><h2>Time-lapse</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>${gsFoldHtml()}</div>`);}
 function gsGrid(){
@@ -5685,7 +5802,7 @@ async function alfredPhysiqueReview(){
   if(!last){toast('Add a progress photo first.');return;}
   if(!geminiKey()){toast('Add a Gemini API key in Settings.');return;}
   toast('Alfred is assessing your physique…');
-  const match=last.img.match(/^data:([^;]+);base64,(.+)$/);
+  const full=await phFull(last),match=full.match(/^data:([^;]+);base64,(.+)$/);
   if(!match){toast('Could not read photo data.');return;}
   const[,mime,b64]=match;
   try{
@@ -5700,62 +5817,298 @@ async function alfredPhysiqueReview(){
     render();
   }catch(e){toast('Alfred: '+e.message);}
 }
-function progressPhotosCard(){
-  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
-  const cmp=ph.length>=2?`<span class="row" style="gap:6px"><button class="btn ghost sm" style="width:auto" onclick="openPhotoTimeline()">Timeline</button><button class="btn ghost sm" style="width:auto" onclick="compareProgress()">Compare</button></span>`:"";
-  const cells=ph.map(p=>`<div class="pcell" onclick="viewProgress('${p.id}')"><img src="${p.img}" alt=""><div class="pdate">${fmtP(p.date)}${p.bw?" · "+p.bw+"kg":""}</div></div>`).join("");
-  const add=`<label class="pcell add"><input type="file" accept="image/*" capture="environment" style="display:none" onchange="addProgress(this)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#E8C56A" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg><span class="mini">Add photo</span></label>`;
-  return `<div class="card" id="gs-photos"><div class="row sp"><div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Progress photos</div>${cmp}</div>
-    <div class="mini" style="margin:-2px 0 8px;color:var(--text2)">Your transformation, framed. Stored only on this device — nothing leaves the cave.</div>
-    <div class="pgrid">${add}${cells}</div></div>`;
+/* ========================= PROGRESS PHOTOS (GP:PHOTOS, wave 7) =========================
+   Full photos live in IndexedDB ("gainstracker" / "photos", key = photo id). gt_data keeps only a small thumbnail in p.img plus p.idb=1, so photos can no longer fill localStorage.
+   Every move is put -> read back -> byte-compare -> only then is the thumbnail swapped in and saved, behind a one-time safety copy; any error leaves that photo exactly as it was and it retries next launch.
+   Backups carry the FULL photos inline (the old file shape, older builds can still restore them); a restore parks them back in the vault. Compare (below) is the one before/after view. */
+const PH_DB="gainstracker",PH_ST="photos",PH_META="meta",PH_BAK="gt_photos_backup",PH_THUMB=240,PH_FULL=820,PH_CACHE_MAX=6;
+const PH_CACHE=new Map();   // the last few full photos read from the vault (id -> dataURL)
+let _phDb=null;
+function phWarn(msg,e){console.warn("photos: "+msg,e&&e.message?e.message:(e||""));}
+/* ---- IndexedDB plumbing ---- */
+function phDb(){
+  if(_phDb)return _phDb;
+  return _phDb=new Promise((res,rej)=>{
+    if(!window.indexedDB){rej(new Error("IndexedDB unavailable"));return;}
+    const r=indexedDB.open(PH_DB,1);
+    r.onupgradeneeded=()=>{const d=r.result;[PH_ST,PH_META].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n);});};
+    r.onsuccess=()=>{const d=r.result;d.onclose=d.onversionchange=()=>{_phDb=null;try{d.close();}catch(e){}};res(d);};
+    r.onerror=()=>{_phDb=null;rej(r.error||new Error("IndexedDB open failed"));};
+  });
 }
+function phReq(store,mode,fn,retry=1){   // one transaction -> the request's result; retried once on a dead connection (iOS drops them)
+  return phDb().then(d=>new Promise((res,rej)=>{
+    const t=d.transaction(store,mode),q=fn(t.objectStore(store));
+    t.oncomplete=()=>res(q&&q.result);t.onerror=t.onabort=()=>rej(t.error||new Error("transaction aborted"));
+  })).catch(e=>{if(!retry)throw e;_phDb=null;return phReq(store,mode,fn,0);});
+}
+const phPut=(id,img)=>phReq(PH_ST,"readwrite",s=>s.put(img,id));
+const phGet=id=>phReq(PH_ST,"readonly",s=>s.get(id));
+const phKeys=()=>phReq(PH_ST,"readonly",s=>s.getAllKeys());
+function phDel(id){PH_CACHE.delete(id);return phReq(PH_ST,"readwrite",s=>s.delete(id));}
+async function phPutVerified(id,img){await phPut(id,img);if(await phGet(id)!==img)throw new Error("read-back of "+id+" differs");}
+async function phPrune(keep){const ids=new Set(keep);for(const k of await phKeys())if(!ids.has(k))await phDel(k);}
+/* ---- pictures ---- */
+const phIsInline=p=>!!p&&!p.idb&&typeof p.img==="string"&&p.img.startsWith("data:");
+function phLoadImg(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error("image decode failed"));im.src=src;});}
+async function phScale(src,max,q){   // JPEG dataURL of src with its long edge <= max
+  const im=await phLoadImg(src),sc=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement("canvas");
+  cv.width=Math.max(1,Math.round(im.naturalWidth*sc));cv.height=Math.max(1,Math.round(im.naturalHeight*sc));
+  const cx=cv.getContext("2d");cx.imageSmoothingQuality="high";cx.drawImage(im,0,0,cv.width,cv.height);
+  const out=cv.toDataURL("image/jpeg",q);
+  if(out.length<200)throw new Error("canvas returned nothing");   // never swap a real photo for an empty thumbnail
+  return out;
+}
+async function phFull(p){   // the full-size dataURL of a photo; the thumbnail when the vault cannot give it
+  if(!p)return"";
+  if(!p.idb)return p.img;
+  if(PH_CACHE.has(p.id)){const v=PH_CACHE.get(p.id);PH_CACHE.delete(p.id);PH_CACHE.set(p.id,v);return v;}
+  let f=null;try{f=await phGet(p.id);}catch(e){phWarn("vault read failed",e);}
+  if(!f)return p.img;
+  PH_CACHE.set(p.id,f);if(PH_CACHE.size>PH_CACHE_MAX)PH_CACHE.delete(PH_CACHE.keys().next().value);
+  return f;
+}
+/* ---- the one-time safety copy: localStorage when it fits, else IndexedDB (a phone whose storage is already full must still be able to move its photos) ---- */
+async function phBakRead(){
+  try{const r=localStorage.getItem(PH_BAK);if(r)return JSON.parse(r);}catch(e){}
+  try{return(await phReq(PH_META,"readonly",s=>s.get(PH_BAK)))||null;}catch(e){return null;}
+}
+async function phBakWrite(imgs){
+  const rec={at:new Date().toISOString(),imgs};
+  try{localStorage.setItem(PH_BAK,JSON.stringify(rec));return true;}catch(e){}
+  try{await phReq(PH_META,"readwrite",s=>s.put(rec,PH_BAK));return true;}catch(e){phWarn("no safety copy possible, photos stay where they are",e);return false;}
+}
+async function phBakDrop(){
+  try{localStorage.removeItem(PH_BAK);}catch(e){}
+  try{await phReq(PH_META,"readwrite",s=>s.delete(PH_BAK));}catch(e){}
+}
+async function phBakForget(id){   // a deleted photo must not linger in the safety copy
+  const b=await phBakRead();if(!b||!b.imgs||!(id in b.imgs))return;
+  const {[id]:gone,...rest}=b.imgs;
+  if(Object.keys(rest).length)await phBakWrite(rest);else await phBakDrop();
+}
+/* ---- boot: verify, then move. Idempotent; every failure leaves the data as it was ---- */
+async function phRecover(){   // true = nothing pending; false = a vaulted photo could not be verified, so nothing moves this launch
+  const bak=await phBakRead();if(!bak)return true;
+  let ok=true;
+  for(const p of (state.data.photos||[]).filter(x=>x.idb)){
+    try{
+      if(await phGet(p.id))continue;
+      const img=bak.imgs&&bak.imgs[p.id];
+      if(img)await phPutVerified(p.id,img);else ok=false;
+    }catch(e){ok=false;phWarn("could not verify "+p.id,e);}
+  }
+  if(ok)await phBakDrop();   // every vaulted photo read back after a restart: the copy has done its job
+  return ok;
+}
+async function phMove(){
+  const todo=(state.data.photos||[]).filter(phIsInline);
+  if(!todo.length)return;
+  if(!await phBakWrite(Object.fromEntries(todo.map(p=>[p.id,p.img]))))return;   // no safety copy, no move
+  for(const p of todo){
+    try{
+      await phPutVerified(p.id,p.img);
+      const thumb=await phScale(p.img,PH_THUMB,.7),cur=(state.data.photos||[]).find(x=>x.id===p.id);
+      if(!cur||cur.img!==p.img){if(!cur)await phDel(p.id);continue;}   // deleted or replaced while we worked
+      const before=state.data.photos;
+      state.data.photos=before.map(x=>x.id===p.id?{...x,img:thumb,idb:1}:x);
+      if(!save()){state.data.photos=before;throw new Error("save failed");}
+    }catch(e){phWarn("photo "+p.id+" stays in gt_data, retry next launch",e);}
+    await new Promise(r=>setTimeout(r,50));   // breathe between photos so taps stay responsive during a workout
+  }
+}
+async function phBoot(){
+  if(state._phBusy)return;state._phBusy=true;
+  try{
+    await phDb();
+    try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(e){}   // ask the browser not to evict the vault under storage pressure (best effort)
+    if(await phRecover())await phMove();
+  }
+  catch(e){phWarn("vault unavailable, photos stay in gt_data",e);}
+  finally{state._phBusy=false;}
+}
+/* ---- backup / restore / erase (Data control) ---- */
+async function phExport(){   // state.data with every vaulted photo's FULL image put back inline = the legacy backup shape
+  let lowRes=0;
+  const photos=await Promise.all((state.data.photos||[]).map(async p=>{
+    if(!p.idb)return p;
+    const f=await phFull(p),{idb,...rest}=p;
+    if(f===p.img)lowRes++;   // the vault could not give it back: the file carries the thumbnail
+    return {...rest,img:f};
+  }));
+  return {data:{...state.data,photos},lowRes};
+}
+async function phIngest(photos){   // restore: park each full photo in the vault (verified) and return the photos as gt_data should hold them; a failure leaves that one inline
+  const out=[];
+  for(const p of photos){
+    try{
+      if(p&&p.idb){const {idb,...rest}=p;out.push((await phGet(p.id))?p:rest);continue;}   // thumbnail-only record: keep the flag only if the vault still has the photo
+      if(!phIsInline(p)){out.push(p);continue;}
+      await phPutVerified(p.id,p.img);
+      out.push({...p,img:await phScale(p.img,PH_THUMB,.7),idb:1});
+    }catch(e){phWarn("restore keeps photo inline",e);out.push(p);}
+  }
+  return out;
+}
+function phWipe(){   // erase-all: nothing may linger in the vault or the safety copy
+  PH_CACHE.clear();try{localStorage.removeItem(PH_BAK);}catch(e){}
+  return phReq(PH_ST,"readwrite",s=>s.clear()).then(()=>phReq(PH_META,"readwrite",s=>s.clear())).catch(e=>phWarn("vault erase failed",e));
+}
+/* ---- the Suit card: Add tile + one thumbnail strip, Compare in the header ---- */
+const pcSorted=()=>(state.data.photos||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+const pcDate=d=>new Date(d).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"2-digit"});
+const pcFind=id=>(state.data.photos||[]).find(p=>p.id===id);
+const pcIco=path=>`<svg class="gi" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+function progressPhotosCard(){
+  const ph=pcSorted().reverse();
+  const cmp=ph.length>=2?`<button class="btn sm pc-cmp" onclick="openPhotoCompare()">${GP.icon("swap")}Compare</button>`:"";
+  const add=`<label class="pc-th pc-add" aria-label="Add a progress photo"><input type="file" accept="image/*" capture="environment" hidden onchange="addProgress(this)">${GP.icon("plus")}<span>Add photo</span></label>`;
+  const cells=ph.map(p=>`<button class="pc-th" onclick="viewProgress(${ghJs(p.id)})" aria-label="Photo from ${pcDate(p.date)}"><img src="${p.img}" alt="" decoding="async"><span class="pc-cap"><b>${pcDate(p.date)}</b>${p.bw?`<i>${p.bw} kg</i>`:""}</span></button>`).join("");
+  return `<section class="s2 pc-card" id="gs-photos"><div class="gh-lh"><h3 data-ac="n"><span class="gp-ic" aria-hidden="true">${GP.icon("image")}</span>Progress photos</h3>${cmp}</div>
+    <p class="t-xs pc-note">${ph.length?ph.length+" photo"+(ph.length===1?"":"s")+" · private, stored on this device only":"Private, stored on this device only"}</p>
+    <div class="pc-strip">${add}${cells}</div></section>`;
+}
+/* Suit dock "Photos" tile: two or more photos open Compare, otherwise it scrolls to the card to add one */
+function photosOpen(){if((state.data.photos||[]).length>=2)openPhotoCompare();else gdJump("#gs-photos");}
 function addProgress(input){
   const f=input.files&&input.files[0];if(!f)return;
   const rd=new FileReader();
-  rd.onload=e=>{
-    const im=new Image();
-    im.onload=()=>{
-      const max=820,sc=Math.min(1,max/Math.max(im.width,im.height));
-      const cw=Math.round(im.width*sc),ch=Math.round(im.height*sc);
-      const cv=document.createElement("canvas");cv.width=cw;cv.height=ch;
-      cv.getContext("2d").drawImage(im,0,0,cw,ch);
-      let img;try{img=cv.toDataURL("image/jpeg",0.72);}catch(err){img=e.target.result;}
-      state.data.photos=state.data.photos||[];
-      state.data.photos.push({id:"ph"+now(),date:new Date().toISOString(),img,bw:Math.round(state.data.u.bodyweight)||null,note:""});
+  rd.onerror=()=>toast("Couldn't read that image.");
+  rd.onload=async e=>{
+    try{
+      let full=e.target.result;try{full=await phScale(full,PH_FULL,.72);}catch(err){}   // an image the canvas cannot re-encode is kept as it came
+      let rec={id:"ph"+now(),date:new Date().toISOString(),img:full,bw:Math.round(state.data.u.bodyweight)||null,note:""};
+      try{await phPutVerified(rec.id,full);rec={...rec,img:await phScale(full,PH_THUMB,.7),idb:1};}
+      catch(err){phWarn("vault write failed, keeping the photo in gt_data",err);rec={...rec,img:full};phDel(rec.id).catch(()=>{});}
+      const before=state.data.photos||[];
+      state.data.photos=[...before,rec];
       if(save()){try{checkAchievements();}catch(err){}haptic("done");toast("Progress photo saved");}
-      else{state.data.photos.pop();haptic("warn");toast("Photo NOT saved — storage is full. Delete an old photo first.");} // banner stays up until a save succeeds again
+      else{state.data.photos=before;if(rec.idb)phDel(rec.id).catch(()=>{});haptic("warn");toast("Photo NOT saved — storage is full. Delete an old photo first.");}   // the banner stays up until a save succeeds again
       render();
-    };
-    im.onerror=()=>toast("Couldn't read that image.");
-    im.src=e.target.result;
+    }catch(err){phWarn("add failed",err);toast("Couldn't save that photo.");}
   };
   rd.readAsDataURL(f);
 }
 function viewProgress(id){
-  const p=(state.data.photos||[]).find(x=>x.id===id);if(!p)return;
+  const p=pcFind(id);if(!p)return;
   const dt=new Date(p.date).toLocaleDateString(undefined,{weekday:"short",month:"long",day:"numeric",year:"numeric"});
-  openSheet(`<div class="pframe"><img src="${p.img}" alt=""><img class="pcorner" src="logo_t.png" alt="">
-      <div class="pcap"><b style="font-size:15px">${dt}</b>${p.bw?`<div class="mini" style="color:var(--gold2)">Bodyweight ${p.bw}kg</div>`:""}</div></div>
-    <button class="btn ghost sm" style="margin-top:10px" onclick="delProgress('${p.id}')">Delete this photo</button>
-    <button class="btn" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
+  openSheet(`<div class="gh pc"><div class="pc-hd"><div><span class="eyebrow">Progress photo</span><h2>${pcDate(p.date)}</h2></div><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <figure class="pc-solo"><img id="pv-img" data-id="${esc(p.id)}" src="${p.img}" alt="Progress photo, ${dt}"><figcaption><b>${dt}</b>${p.bw?`<span>Bodyweight ${p.bw} kg</span>`:""}</figcaption></figure>
+    <div class="pc-acts"><button class="btn danger" onclick="delProgress(${ghJs(p.id)})">${GP.icon("x")}Delete photo</button></div></div>`);
+  phFull(p).then(f=>{
+    const im=$("pv-img");if(!im||im.dataset.id!==p.id)return;
+    if(f!==im.getAttribute("src"))im.src=f;
+    else if(p.idb){const c=im.parentNode.querySelector("figcaption");if(c)c.insertAdjacentHTML("beforeend",'<span class="c-warn">Thumbnail only: the full photo is missing from storage</span>');}   // the vault could not return it; say so instead of showing a blur as if it were the photo
+  });
 }
 function delProgress(id){
-  state.data.photos=(state.data.photos||[]).filter(x=>x.id!==id);
-  save();haptic("tap");closeSheet();render();
+  appConfirm({title:"Delete this photo?",body:"It is removed from this device for good. A backup file keeps it if you made one.",ok:"Delete",cancel:"Keep it",danger:true}).then(async ok=>{
+    if(!ok)return;
+    state.data.photos=(state.data.photos||[]).filter(x=>x.id!==id);
+    save();haptic("tap");closeSheet();render();
+    try{await phDel(id);await phBakForget(id);}catch(e){phWarn("vault delete failed",e);}
+  });
 }
-function compareProgress(){
-  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(ph.length<2)return;
-  const first=ph[0],last=ph[ph.length-1];
-  const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
-  const days=Math.round((new Date(last.date)-new Date(first.date))/86400000);
-  const dbw=(first.bw&&last.bw)?(last.bw-first.bw):null;
-  const cell=(p,lbl)=>`<div class="pframe"><img src="${p.img}" alt=""><span class="plbl">${lbl}</span><img class="pcorner" src="logo_t.png" alt="" style="width:24px;height:24px"><div class="pcap"><b style="font-size:12px">${fmtP(p.date)}</b>${p.bw?`<div class="mini" style="color:var(--gold2)">${p.bw}kg</div>`:""}</div></div>`;
-  openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Transformation</div>
-    <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">${days} day${days===1?"":"s"} apart${dbw!=null?` · ${dbw>0?"+":""}${dbw}kg bodyweight`:""}</div>
-    <div class="pcompare">${cell(first,"BEFORE")}${cell(last,"NOW")}</div>
-    <button class="btn" style="margin-top:11px" onclick="closeSheet()">Close</button>`);
+/* ---- Compare: ONE before/after view. Slide = a draggable divider over two stacked photos; Side by side = the same two photos next to each other.
+   Pick any two (the strip sets whichever slot is lit, Before hands over to After); Before is always the older one. Photos start as thumbnails and swap to the full image once the vault returns it. ---- */
+function pcInfo(){
+  const B=pcFind(state._pc.b),A=pcFind(state._pc.a),tB=new Date(B.date).getTime(),tA=new Date(A.date).getTime();
+  return {B,A,days:Math.round((tA-tB)/864e5),dbw:B.bw&&A.bw?Math.round((A.bw-B.bw)*10)/10:null,
+    sess:(state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=tB&&t<=tA;}).length};
+}
+const pcCap=p=>`<b>${pcDate(p.date)}</b>${p.bw?`<span>${p.bw} kg</span>`:""}`;
+function pcStats(i){
+  const t=(n,l)=>`<div class="pc-stat"><b class="num">${n}</b> <span>${l}</span></div>`;
+  const bw=i.dbw==null?"—":(i.dbw>0?"+":i.dbw<0?"−":"")+Math.abs(i.dbw);
+  return t(i.days,i.days===1?"day apart":"days apart")+t(bw,"kg weight")+t(i.sess,i.sess===1?"session":"sessions");
+}
+function pcSlots(){
+  const act=state._pc.act,slot=(k,l)=>`<button class="pc-slot${act===k?" on":""}" onclick="pcAct('${k}')" aria-pressed="${act===k}">${GP.icon("image")}<span>${l}</span></button>`;
+  return `<span class="eyebrow">Tap a photo to set</span><div class="pc-slots">${slot("b","Before")}${slot("a","After")}</div>`;
+}
+function pcStrip(){
+  const pc=state._pc;
+  return pcSorted().map(p=>`<button class="pc-th${p.id===pc.b?" is-b":""}${p.id===pc.a?" is-a":""}" data-id="${esc(p.id)}" onclick="pcPick(${ghJs(p.id)})" aria-label="${pcDate(p.date)}${p.bw?", "+p.bw+" kg":""}"><img src="${p.img}" alt="" decoding="async"><span class="pc-cap"><b>${new Date(p.date).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</b></span><em class="pc-tag"></em></button>`).join("");
+}
+function pcHtml(i,x0){
+  const pc=state._pc,fig=(p,k,l)=>`<figure class="pc-ph pc-${k}"><img data-id="${esc(p.id)}" src="${p.img}" alt="${l}, ${pcDate(p.date)}" draggable="false"><span class="pc-lbl">${l}</span><figcaption>${pcCap(p)}</figcaption></figure>`;
+  return `<div class="gh pc" data-mode="${pc.mode}">
+    <div class="pc-hd"><div><span class="eyebrow">Progress</span><h2>Before &amp; after</h2></div><button class="btn sm" onclick="closeSheet()">Done</button></div>
+    <div class="st-seg wide pc-seg" role="group" aria-label="Compare view"><button class="${pc.mode==="slide"?"on":""}" onclick="pcMode('slide')">${pcIco('<path d="M12 4v16M8 9l-4 3 4 3M16 9l4 3-4 3"/>')}Slide</button><button class="${pc.mode==="side"?"on":""}" onclick="pcMode('side')">${pcIco('<rect x="3.5" y="5" width="7.5" height="14" rx="2"/><rect x="13" y="5" width="7.5" height="14" rx="2"/>')}Side by side</button></div>
+    <div class="pc-stage" id="pc-stage" style="--x:${x0}%" onpointerdown="pcDown(event)" onpointermove="pcMove(event)" onpointerup="pcUp(event)" onpointercancel="pcUp(event)">${fig(i.B,"b","Before")}${fig(i.A,"a","After")}
+      <div class="pc-grip" id="pc-grip" role="slider" tabindex="0" aria-label="Before and after divider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(x0)}" onkeydown="pcKey(event)"><i>${pcIco('<path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/>')}</i></div></div>
+    <div class="pc-stats" id="pc-stats">${pcStats(i)}</div>
+    <div class="pc-pick" id="pc-slots">${pcSlots()}</div>
+    <div class="pc-strip" id="pc-strip">${pcStrip()}</div></div>`;
+}
+function openPhotoCompare(){
+  const ph=pcSorted();
+  if(ph.length<2){toast("Add at least two progress photos first.");return;}
+  state._pc={b:ph[0].id,a:ph[ph.length-1].id,act:"b",mode:"slide",x:50};
+  openSheet(pcHtml(pcInfo(),100));
+  pcFull();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>pcSet(state._pc.x)));   // the divider glides in from the right edge
+}
+function pcFull(){   // swap the two stage photos from thumbnail to full size (ignored if the pick changed meanwhile)
+  const i=pcInfo();
+  [[i.B,"b"],[i.A,"a"]].forEach(([p,k])=>phFull(p).then(f=>{
+    const im=document.querySelector("#pc-stage .pc-"+k+" img");
+    if(im&&im.dataset.id===p.id&&im.getAttribute("src")!==f)im.src=f;
+  }));
+}
+function pcSync(){
+  if(!$("pc-stage"))return;
+  const i=pcInfo(),pc=state._pc;
+  [[i.B,"b","Before"],[i.A,"a","After"]].forEach(([p,k,l])=>{
+    const f=document.querySelector("#pc-stage .pc-"+k),im=f.querySelector("img");
+    if(im.dataset.id!==p.id){im.dataset.id=p.id;im.src=p.img;im.alt=l+", "+pcDate(p.date);}
+    f.querySelector("figcaption").innerHTML=pcCap(p);
+  });
+  $("pc-stats").innerHTML=pcStats(i);$("pc-slots").innerHTML=pcSlots();
+  document.querySelectorAll("#pc-strip .pc-th").forEach(t=>{t.classList.toggle("is-b",t.dataset.id===pc.b);t.classList.toggle("is-a",t.dataset.id===pc.a);});
+  pcFull();
+}
+function pcAct(k){state._pc={...state._pc,act:k};if($("pc-slots"))$("pc-slots").innerHTML=pcSlots();haptic("tap");}
+function pcPick(id){
+  const pc=state._pc,k=pc.act,o=k==="b"?"a":"b";
+  let n={...pc,[k]:id};
+  if(id===pc[o])n[o]=pc[k];   // the other slot's photo: the two simply trade places
+  if(new Date(pcFind(n.b).date)>new Date(pcFind(n.a).date))n={...n,b:n.a,a:n.b};   // Before is always the older one
+  state._pc={...n,act:"a"};haptic("tap");pcSync();
+}
+function pcMode(m){
+  state._pc={...state._pc,mode:m};
+  const r=document.querySelector(".pc");if(r)r.dataset.mode=m;
+  document.querySelectorAll(".pc-seg button").forEach((b,k)=>b.classList.toggle("on",(k===0)===(m==="slide")));
+  haptic("tap");
+}
+/* the divider: drag anywhere on the photo (horizontal only, vertical drags still scroll the sheet), tap to jump, arrow keys on the handle */
+let _pcDrag=null;
+function pcSet(v){
+  const s=$("pc-stage");if(!s)return;
+  const x=Math.max(0,Math.min(100,v));state._pc={...state._pc,x};
+  s.style.setProperty("--x",x+"%");const g=$("pc-grip");if(g)g.setAttribute("aria-valuenow",String(Math.round(x)));
+}
+const pcPos=(e,s)=>{const r=s.getBoundingClientRect();return(e.clientX-r.left)/r.width*100;};
+function pcDown(e){
+  if(state._pc.mode!=="slide"||(e.pointerType==="mouse"&&e.button!==0))return;
+  _pcDrag={id:e.pointerId,x0:e.clientX,moved:false};
+  try{e.currentTarget.setPointerCapture(e.pointerId);}catch(err){}
+}
+function pcMove(e){
+  const d=_pcDrag;if(!d||e.pointerId!==d.id)return;
+  if(!d.moved&&Math.abs(e.clientX-d.x0)<4)return;
+  d.moved=true;e.currentTarget.classList.add("drag");pcSet(pcPos(e,e.currentTarget));
+}
+function pcUp(e){
+  const d=_pcDrag;if(!d||e.pointerId!==d.id)return;
+  _pcDrag=null;const s=e.currentTarget;s.classList.remove("drag");
+  if(!d.moved&&e.type==="pointerup")pcSet(pcPos(e,s));   // a tap puts the divider there
+}
+function pcKey(e){
+  const step={ArrowLeft:-5,ArrowRight:5}[e.key];
+  if(step!=null){e.preventDefault();pcSet(state._pc.x+step);}
+  else if(e.key==="Home"||e.key==="End"){e.preventDefault();pcSet(e.key==="Home"?0:100);}
 }
 /* ========================= MUSCLE DOSSIER (wave 3) =========================
    One muscle, numbers first: recovery ring + hours to ready → weekly sets on ONE landmark bar (zoneOf) → effective sets (RIR 0–3, 4+ hatched as junk)
@@ -6308,7 +6661,7 @@ const INDEX_ITEMS=[
   ["🛠️","THE FORGE","1RM, percentage loading & next plate jump","openForge()"],
   ["🚗","THE GARAGE","Vehicles you've unlocked by milestones","openGarage()"],
   ["🚑","THE INFIRMARY","Sleep, soreness, workload, injuries (Suit · Body)","openInfirmary()"],
-  ["🍽️","FUEL","Calories, macros, food log, hydration, weigh-ins","go('fuel')"],
+  ["🍽️","FUEL","Calories, macros, food log, hydration","go('fuel')"],
   ["📡","Batcomputer","Full analytics dashboard","openBatcomputer()"],
   ["📂","Batcomputer report","30-day · 90-day · yearly review","periodReport(30)"],
   ["🤝","Justice League","Compare with allies' Patrol Cards","openJusticeLeague()"],
@@ -6432,7 +6785,7 @@ function shareProfilePRCard(){
 
 
 /* ========================= PROFILE TAB (GP:PROFILE+FINISH, wave 3) =========================
-   identity strip (the one hero) → calendar → records → strength standards → two folded rows (trophies, gyms & data). */
+   identity strip (the one hero) → calendar → records → strength standards → body (weigh-in, trend, relative strength) → two folded rows (trophies, gyms & data). */
 let _p3Uid=0;
 /* e1RM trend: time-scaled line over the last `days`, PR markers = sessions that beat every earlier one, slope in %/month (least squares).
    mini = the sparkline for lists (no labels). Returns {svg,pct,n,hi,lo,last} or null when there are fewer than 2 sessions. */
@@ -6467,7 +6820,7 @@ function p3Fold(id){   // toggle a folded row in place (state kept in accOpen li
 const p3Row=(icon,title,sub,fn,gold)=>`<div class="gh-row" ${fn?`data-hx onclick="${fn}"`:""}><span class="lead${gold?" gold":""}">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${fn?GP.icon("chevR"):""}</span></div>`;
 function p3FoldRow(id,icon,title,sub,body){
   const open=accIsOpen("p3-"+id,false);
-  return `<div class="s1 gh-lore p3-fr gh-c${open?" open":""}" id="p3r-${id}" data-hx onclick="p3Fold('${id}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
+  return `<div class="s1 gh-row gh-lore p3-fr gh-c${open?" open":""}" id="p3r-${id}" data-hx onclick="p3Fold('${id}')"><span class="lead">${GP.icon(icon)}</span><div class="main"><div class="gh-t1">${title}</div><div class="gh-t2">${sub}</div></div><span class="trail">${GP.icon("chevR")}</span></div>
     <div id="p3b-${id}" class="gh-lore-body${open?"":" hide"}"><section class="s2 gh-list">${body}</section></div>`;
 }
 function p3Identity(){
@@ -6546,6 +6899,89 @@ function p3Strength(){
       <div class="p3-sfoot">Machine, Smith and variation lifts are converted to a barbell estimate. e1RM is a guide, not a verdict.</div></section>`;
 }
 function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
+/* ===== BODY (Profile, wave 7) =====
+   ONE home for bodyweight. A one-tap weigh-in prefilled with the current value, the 12-week trend of weekly averages, and relative strength over time: the Big-3 barbell-equivalent e1RM
+   (the same liftEstimate the Strength card reads) divided by the bodyweight of that week. bwSet() is the only writer (Settings uses it too): d.bwLog keeps its {date,kg} shape with one entry
+   per local day, and u.bodyweight follows the newest weigh-in, so standards, bodyweight lifts, Alfred and Fuel all read one number. */
+const BD_WEEKS=12,BD_MIN=30,BD_MAX=300,BD_STEP=0.1;
+function bwSet(kg){
+  const d=state.data,t=now(),k=Math.round(kg*10)/10,day=new Date(t).toDateString();
+  d.bwLog=bdLogArr().filter(e=>!(e&&new Date(e.date).toDateString()===day)).concat({date:new Date(t).toISOString(),kg:k});
+  d.u.bodyweight=k;save();
+}
+const bdLogArr=()=>Array.isArray(state.data.bwLog)?state.data.bwLog:[];
+const bdEntries=()=>bdLogArr().map(e=>({t:new Date(e&&e.date).getTime(),kg:+(e&&e.kg)})).filter(e=>isFinite(e.t)&&e.kg>0).sort((a,b)=>a.t-b.t);
+const bdAt=(es,t)=>es.reduce((b,e)=>e.t<=t?e:b,null)||es[0]||null;   // the newest weigh-in at or before t, else the oldest one
+function bdWeekly(es){   // [{i,avg,n}] over the last BD_WEEKS calendar weeks (Mon–Sun): i 0 = oldest .. BD_WEEKS-1 = this week; a week without a weigh-in is left out
+  const out=[];
+  for(let k=BD_WEEKS-1;k>=0;k--){
+    const a=weekStartK(k),b=weekStartK(k-1),w=es.filter(e=>e.t>=a&&e.t<b);
+    if(w.length)out.push({i:BD_WEEKS-1-k,avg:w.reduce((s,e)=>s+e.kg,0)/w.length,n:w.length});
+  }
+  return out;
+}
+function bdRel(es){   // [{i,v}] Big-3 barbell-equivalent total ÷ the bodyweight of each week's end; a week counts only once every current lift has a log (like for like); the last point is p3BigThree()
+  const d=state.data,tops=["Bench Press","Squat","Deadlift"].map(l=>liftEstimate(l)).filter(Boolean);
+  if(tops.length<2)return [];
+  const ls=tops.map(e=>{const p=(d.prs||{})[e.name],f=p&&p.orm>0?e.orm/p.orm:1;return {orm:e.orm,rows:exerciseRows(e.name).map(r=>({t:new Date(r.date).getTime(),v:r.e1rm*f}))};}),out=[];
+  for(let k=BD_WEEKS-1;k>=0;k--){
+    const t=k?weekStartK(k-1)-1:now();let tot=0,ok=true;
+    ls.forEach(l=>{const best=l.rows.reduce((m,r)=>r.t<=t&&r.v>m?r.v:m,k?0:l.orm);if(best>0)tot+=best;else ok=false;});
+    if(ok)out.push({i:BD_WEEKS-1-k,v:tot/(k?(bdAt(es,t)||{kg:bodyW()}).kg:bodyW())});
+  }
+  return out;
+}
+function bdSvg(pts,o){   // weekly points on a fixed 12-week axis; o = {dec, pad, cls, label}
+  const w=320,h=116,pl=36,pr=10,pt=14,pb=24,hi=Math.max(...pts.map(p=>p.v)),lo=Math.min(...pts.map(p=>p.v)),pad=Math.max((hi-lo)*.3,o.pad),mn=lo-pad,mx=hi+pad,
+    X=i=>pl+i/(BD_WEEKS-1)*(w-pl-pr),Y=v=>pt+(1-(v-mn)/(mx-mn))*(h-pt-pb),P=p=>X(p.i).toFixed(1)+" "+Y(p.v).toFixed(1),id="bd"+(++_p3Uid),
+    line=pts.map((p,k)=>(k?"L":"M")+P(p)).join(" "),a=pts[0],z=pts[pts.length-1],f=v=>v.toFixed(o.dec),g=v=>`<line x1="${pl}" x2="${w-pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" class="p3t-g"/><text x="${pl-7}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end" class="p3t-t">${f(v)}</text>`;
+  return `<svg class="p3t ${o.cls}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(o.label)}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="p3t-s0"/><stop offset="1" class="p3t-s1"/></linearGradient></defs>
+    ${g(hi)}${hi-lo>1e-9?g(lo):""}<text x="${pl}" y="${h-6}" class="p3t-t">${BD_WEEKS} wk ago</text><text x="${w-pr}" y="${h-6}" text-anchor="end" class="p3t-t">now</text>
+    <path d="${line} L${X(z.i).toFixed(1)} ${h-pb} L${X(a.i).toFixed(1)} ${h-pb}Z" fill="url(#${id})"/><path d="${line}" class="p3t-l"/>
+    ${pts.map(p=>`<circle cx="${X(p.i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.4" class="bd-d"/>`).join("")}
+    <circle cx="${X(z.i).toFixed(1)}" cy="${Y(z.v).toFixed(1)}" r="7" class="p3t-halo"/><circle cx="${X(z.i).toFixed(1)}" cy="${Y(z.v).toFixed(1)}" r="3.6" class="p3t-e"/></svg>`;
+}
+const bdSign=v=>(v>0?"+":v<0?"−":"")+Math.abs(v).toFixed(1);
+function bdStep(dir){
+  const el=$("bd-kg");if(!el)return;
+  const v=parseFloat(String(el.value).replace(",","."));
+  el.value=(Math.round(((isFinite(v)?v:bodyW())+dir*BD_STEP)*10)/10).toFixed(1);haptic("tap");
+}
+function bdLog(){
+  const el=$("bd-kg"),v=el?parseFloat(String(el.value).replace(",",".")):NaN;
+  if(!isFinite(v)||v<BD_MIN||v>BD_MAX){toast("Enter your weight from "+BD_MIN+" to "+BD_MAX+" kg.");return;}
+  const prevLog=state.data.bwLog,prevBw=state.data.u.bodyweight;
+  bwSet(v);haptic("done");render();
+  toastUndo("Weigh-in logged · "+(Math.round(v*10)/10).toFixed(1)+" kg",()=>{state.data.bwLog=prevLog;state.data.u.bodyweight=prevBw;save();render();toast("Weigh-in removed");},"Undo");
+}
+function bdOpen(){go("case");setTimeout(()=>gdJump("#p3-body"),80);}   // other screens link here instead of keeping a second weigh-in
+function bdDockSub(){
+  const wk=bdWeekly(bdEntries()),dk=wk.length>1?wk[wk.length-1].avg-wk[0].avg:0;
+  return `<b>${bodyW().toFixed(1)}</b> kg`+(Math.abs(dk)>=.05?` · ${bdSign(dk)}`:"");
+}
+function p3Body(){
+  const es=bdEntries(),wk=bdWeekly(es),rel=bdRel(es),bw=bodyW(),day=new Date(now()).toDateString(),logged=es.some(e=>new Date(e.t).toDateString()===day);
+  const a=wk[0],z=wk[wk.length-1],span=wk.length>1?z.i-a.i:0,dk=span?z.avg-a.avg:0,ago=z?(BD_WEEKS-1-z.i===0?"this week":BD_WEEKS-1-z.i===1?"last week":(BD_WEEKS-1-z.i)+" wk ago"):"";
+  const tag=span?`<span class="tag">${Math.abs(dk)<.05?"Steady":bdSign(dk)+" kg"} / ${span} wk</span>`:"",
+    avg=z?`<span class="t-xs">Weekly avg <b>${z.avg.toFixed(1)}</b> kg · ${ago}</span>`:`<span class="t-xs">${es.length?"No weigh-in in "+BD_WEEKS+" weeks":"No weigh-ins yet"}</span>`,
+    chart=wk.length>1?bdSvg(wk.map(p=>({i:p.i,v:p.avg})),{dec:1,pad:.4,cls:"bd-w",label:"Bodyweight, weekly average, last "+BD_WEEKS+" weeks"}):`<p class="t-s bd-hint">${wk.length?"One more week of weigh-ins and the trend draws here.":"Log your weight on a few days and the 12-week trend draws here."}</p>`;
+  let rs="";
+  if(rel.length>1){
+    const r0=rel[0],r1=rel[rel.length-1],pct=(r1.v-r0.v)/r0.v*100,sp=r1.i-r0.i;
+    rs=`<div class="bd-rs"><div class="bd-rs-h"><span class="eyebrow">Relative strength</span><span class="tag ${pct>=.5?"ok":pct<=-.5?"warn":""}">${Math.abs(pct)<.5?"Steady":(pct>0?"+":"−")+Math.abs(pct).toFixed(0)+"%"} / ${sp} wk</span></div>
+      ${bdSvg(rel,{dec:2,pad:.04,cls:"bd-r",label:"Relative strength, Big-3 over bodyweight, last "+BD_WEEKS+" weeks"})}
+      <div class="p3-sfoot">Big-3 barbell-equivalent e1RM ÷ that week's bodyweight, in × BW.</div></div>`;
+  }
+  return `<div class="gh-sec gh-c" id="p3-body" style="--i:4"><h2>Body</h2><span class="t-xs">weigh-in · ${BD_WEEKS}-week trend</span></div>
+    <section class="s2 bd-c gh-c" style="--i:4"><div class="bd-top"><div class="bd-now"><b class="num" data-roll>${bw.toFixed(1)}</b><small>kg</small></div><div class="bd-meta">${tag}${avg}</div></div>
+      ${chart}
+      <div class="bd-log" role="group" aria-label="Log today's weight"><button class="btn-i" onclick="bdStep(-1)" aria-label="0.1 kg less">${gmIc("minus")}</button>
+        <label class="bd-in"><input id="bd-kg" inputmode="decimal" value="${bw.toFixed(1)}" aria-label="Today's bodyweight in kilograms" onkeydown="if(event.key==='Enter')bdLog()"><u>kg</u></label>
+        <button class="btn-i" onclick="bdStep(1)" aria-label="0.1 kg more">${GP.icon("plus")}</button>
+        <button class="btn bd-go" onclick="bdLog()">${GP.icon("check")}${logged?"Update today":"Log today"}</button></div>
+      <p class="t-xs bd-tip">Weigh first thing, same conditions. The trend is the weekly average, not the daily noise.</p>
+      ${rs}</section>`;
+}
 /* Profile dock: History, Records and Strength standards sit inline on this page, so their tiles scroll to them; Badges and Backup open their own sheet.
    Backup moved here from the "Gyms & tools" fold, Badges from its own fold. */
 function p3Dock(){
@@ -6555,6 +6991,7 @@ function p3Dock(){
     {art:"tile-history",ic:"calendar",t:"History",s:`<b>${ws.length}</b> sessions`,fn:"gdJump('#p3-cal')"},
     ...(prN?[{art:"tile-records",ic:"trophy",t:"Records",s:`<b>${prN}</b> records`,fn:"gdJump('#p3-rec')"}]:[]),
     ...(std?[{art:"tile-standards",ic:"chart",t:"Standards",s:b3?`Big-3 <b>${b3.ratio.toFixed(2)}</b>× BW`:"Lifts vs bodyweight",fn:"gdJump('#p3-std')"}]:[]),
+    {art:"suit",pos:"74% 42%",ic:"scale",t:"Body",s:bdDockSub(),fn:"gdJump('#p3-body')"},
     {art:"tile-badges",ic:"crown",t:"Badges",s:`<b>${(d.u.earnedBadges||[]).length}</b> of ${ACHIEVEMENTS.length}`,fn:"openTrophyRoom()"},
     {art:"tile-backup",ic:"lock",t:"Backup",s:lb?"Backed up "+ghAgo(lb):"Never backed up",fn:"openDataControl()"}]);
 }
@@ -6562,7 +6999,7 @@ function p3Tools(){
   const u=state.data.u,g=(u.gyms||[]).length;let rec=null,wf="";try{rec=mmaRecord();wf=weeklyFightCard();}catch(e){}
   const body=p3Row("map","Gyms",g+" gym"+(g===1?"":"s")+" · "+esc(u.activeGym||""),"openGyms()")
     +p3Row("scan","Batcomputer","Physique and tools","openBatcomputer()")
-    +p3Row("scale","Measurements","Body log","openMeasure()")
+    +p3Row("scale","Measurements","Chest, waist, arms, thighs","openMeasure()")
     +p3Row("share","Share PR card","Your top five lifts","shareProfilePRCard()")
     +p3Row("calendar","Export calendar","Every session as .ics","exportICS()")
     +(rec&&rec.weeks>=2?p3Row("target","Week vs week",rec.wins+"–"+rec.losses+(rec.draws?"–"+rec.draws:"")+" · against the week before",wf?"alOpenFightCard()":""):"")
@@ -6573,7 +7010,7 @@ function renderProfile(){
   if(!(state.data.workouts||[]).length){
     $("app").innerHTML=`<div class="gh p3-pf"><h1 class="gh-hi">Profile</h1><section class="s2 p3-empty"><span class="lead gold">${GP.icon("bat")}</span><div><b>Your record starts here</b><p>Rank, records and strength standards fill in as you train.</p></div><button class="btn btn-1" data-hx onclick="go('mission',1)">Plan a session</button></section></div>`;return;
   }
-  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Dock()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Tools()}</div>`;
+  $("app").innerHTML=`<div class="gh p3-pf${state._same?"":" gh-anim"}">${p3Identity()}${p3Dock()}${p3Calendar()}${p3OnThisDay()}${p3Records()}${p3Strength()}${p3Body()}${p3Tools()}</div>`;
 }
 /* ONE calendar week (Mon–Sun, local time) for the Weekly Patrols tile, consistency, Alfred and the weekly streak.
    Week starts step with setDate — never k*7*864e5 — so a DST change can't shift a boundary by an hour. */
@@ -6828,7 +7265,7 @@ function renderMission(){
   if(!cur)h+=gmEmpty()+gmDock(null);
   else h+=gmHero(cur)+gmDock(cur)
     +`<section class="s2 gh-list gm-days gh-c" style="--i:1"><div class="gh-lh"><h3>Cycle days</h3><span class="t-xs">tap a day to preview</span></div>${cur.sp.days.map((_,i)=>gmDayRow(cur.sp,i,cur,live)).join("")}</section>`
-    +gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
+    +gmSuggest()+gmForecast(cur.sp)+gmFreq()+gmBench(cur.sp);
   h+=`</div>`;
   $("app").innerHTML=h;
 }
@@ -8714,7 +9151,7 @@ GO tabs: gotham, mission, suit, case (the PROFILE tab), allies, alfred. OPEN tar
 const ALFRED_CHAT_RULES=`CHAT MODE: Answer questions about the app (what a screen, number or button means, how to do something) from the APP GUIDE below, in plain words with the real labels. If the guide doesn't cover it, say you're not sure rather than inventing a screen or a button.
 FOLLOW-UPS: After your reply you may add ONE final line in exactly this format: [FOLLOWUPS: first | second | third] — up to 3 short next questions he might tap (7 words max each, phrased as HE would say them, e.g. "Why does that matter?"). Leave the line out when nothing natural follows. Never mention it.`;
 const ALFRED_APP_GUIDE=`## TABS AND SCREENS (GOTHAM, MISSION, SUIT, PROFILE, ALLIES)
-Five tabs along the bottom. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and one tile per muscle: sets this week against MEV, MAV and MRV, under- and over-range muscles listed first. From 16:00 on Sundays a Sunday review card adds my three lines and next week's one change; tap it for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Edit plan, Free session, Start), Cycle days (the active split day by day, tonight marked), the Volume forecast against MEV, MAV and MRV, Frequency, and Other plans when you keep more than one. The Lab fold holds the volume map, SFR, workload and Tools: Plate calculator, 1RM calculator, 1RM test day, Forge and Measure. SUIT is the muscle map: the recovery figure and a tile per muscle (tap one for its dossier: recovery, weekly sets against the landmarks, what to train next), the Effort section (average RIR and sets at RIR 0–3), a fold with the time-lapse, mastery and coverage, and the Body section: measurements, the Infirmary (sleep, soreness, injury board, workload), symmetry and progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Every lift, Badges, Week vs week and a Gyms & data fold (gyms, Batcomputer physique tools, measurements, Share PR card, calendar export, Data control, Settings). ALLIES is your friends: your league rank, Leaderboard, Co-op raid, Sparring, Splits & backups and a More from Gotham fold (Fight Night, Week vs last week). Settings and Search sit in the top bar; the round Alfred button opens my page (today's read, things to try asking, your last conversation, muscle dossiers) with this chat one tap away.
+Five tabs along the bottom. GOTHAM is home: the tonight card (the next plan day with Start Patrol and Preview; on a rest day Log rest day, or Train anyway; a live session shows Resume), the Readiness ring (tap it for the Infirmary) beside the recovery rings of tonight's muscles, and chips for sleep and the load ratio. The This week card shows sessions against your goal (Monday to Sunday), the week's tonnage and one tile per muscle: sets this week against MEV, MAV and MRV, under- and over-range muscles listed first. From 16:00 on Sundays a Sunday review card adds my three lines and next week's one change; tap it for the full week in review. The Lifts card lists recent records and stalled lifts. Last session recaps your latest workout against the same day last time, Next up previews the next two plan days, and Garage opens the vehicles you have unlocked (a progress row appears during a seasonal event). MISSION holds your plan: the plan hero (Edit plan, Free session, Start), Cycle days (the active split day by day, tonight marked), the Volume forecast against MEV, MAV and MRV, Frequency, and Other plans when you keep more than one. The Lab fold holds the volume map, SFR, workload and Tools: Plate calculator, 1RM calculator, 1RM test day, Forge and Measure. SUIT is the muscle map: the recovery figure and a tile per muscle (tap one for its dossier: recovery, weekly sets against the landmarks, what to train next), the Effort section (average RIR and sets at RIR 0–3), a fold with the time-lapse, mastery and coverage, and the Body section: measurements, the Infirmary (sleep, soreness, injury board, workload), symmetry and progress photos. PROFILE holds your identity strip (sessions, streak, lifetime tonnage, records), the training calendar (sessions and record days), Records (the top six, All N for the rest), Strength (e1RM against bodyweight), Body (a one-tap weigh-in prefilled with your last weight, the 12-week trend of weekly averages, and relative strength over time: Big-3 e1RM divided by that week's bodyweight), Every lift, Badges, Week vs week and a Gyms & data fold (gyms, Batcomputer physique tools, measurements, Share PR card, calendar export, Data control, Settings). ALLIES is your friends: your league rank, Leaderboard, Co-op raid, Sparring, Splits & backups and a More from Gotham fold (Fight Night, Week vs last week). Settings and Search sit in the top bar; the round Alfred button opens my page (today's read, things to try asking, your last conversation, muscle dossiers) with this chat one tap away.
 
 ## A SESSION FROM START TO FINISH
 Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
@@ -8735,7 +9172,7 @@ Recovery %: each muscle has its own window (72 h for back and legs, 48 h for che
 One detector: a lift is stalled when its best estimated 1RM hasn't been beaten for 3 or more sessions and you trained it in the last 3 weeks. Gotham's Lifts card lists the stalled lifts; opening them shows each lift's best e1RM, how many sessions it has been flat and ONE suggested change — the angle, the grip or the rep range — never a deload. The muscle tiles on Gotham put the muscles furthest below their weekly MEV (sets short) and any past their MRV first. Sessions this week and the weekly streak read the same calendar week (Monday to Sunday).
 
 ## THE SUNDAY REVIEW
-From 16:00 on Sundays Gotham shows a Sunday review card: muscles under MEV or over MRV, the records of the week, stalled lifts, and next week's one adjustment. Tapping it opens the full week in review (sessions, hard sets, tonnage, records, push against pull, recovery).
+From 16:00 on Sundays Gotham shows a Sunday review card: muscles under MEV or over MRV, the records of the week, stalled lifts, and next week's adjustment as one-tap buttons (add or trim sets on the lifts that train a muscle, or add a stretch-position lift) that edit your active plan and offer Undo. Tapping the card opens the full week in review (sessions, hard sets, tonnage, records, push against pull, recovery).
 
 ## THE INFIRMARY (SUIT → BODY)
 Sleep (hours and quality), a soreness map, the workload watch (the load ratio against your 4-week norm) and an injury board. Sleep feeds Readiness; a flagged injury puts a caution on lifts that hit that muscle. Tapping the Readiness ring on Gotham opens it too.
@@ -8750,7 +9187,7 @@ The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower 
 The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (save seat, pin, pad), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. When a lift trains a muscle that is still cold, the menu suggests a warm-up ramp built from your working weight (about 40/60/80% on the first lift of the night, two lighter steps later) and lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
 
 ## DATA CONTROL: ARCHIVING OLD MACHINE WEIGHTS, BACKUP, RESTORE AND CSV EXPORT
-Settings → Data control (also Profile → Gyms & data). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now, Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first).
+Settings → Data control (also Profile → Gyms & data). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now (progress photos go into the file at full size), Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first; photos included).
 
 ## PICTURES AND CUSTOM EXERCISES
 In an exercise's detail, Choose picture browses the demo library (filter with your own words) or picks the plain anatomy figure. For a missing lift, use the dashed custom-exercise button in the exercise picker: name, equipment, muscles, bodyweight or not, cues, picture.
@@ -9063,7 +9500,7 @@ async function _alfSend(q,pic,viaMic){
   q=(q||"").trim();
   if(!pic&&q&&/\bphysique\b|progress (photo|pic)|\bmy (photo|pic|picture)\b|rate (my|me) (body|look|photo|pic)|how (i|my body) look/i.test(q)){
     const lp=(state.data.photos||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
-    if(lp&&lp.img){const m=lp.img.match(/^data:([^;]+);base64,(.+)$/);if(m)pic={url:lp.img,b64:m[2],mime:m[1]};}
+    if(lp&&lp.img){const m=(await phFull(lp)).match(/^data:([^;]+);base64,(.+)$/);if(m)pic={url:lp.img,b64:m[2],mime:m[1]};}
   }
   const text=q||(pic?"What do you make of this physique, Alfred?":"");
   if(!text)return;
@@ -9454,7 +9891,7 @@ function alfredAsk(q){
     const c=weekCount(),g=d.u.weeklyGoal||4;
     return `<b>${c}</b> session${c===1?"":"s"} this week against a goal of <b>${g}</b>, Master.${c>=g?" Target met — excellent.":" "+(g-c)+" to go."}`;}
   // READ: bodyweight
-  if(/body\s?weight|how much do i weigh|my weight|weigh/.test(s)){const bw=bodyW();return bw?`You're <b>${bw}kg</b> on record, sir.`:"No bodyweight logged yet, Master — set it in Settings or the Infirmary.";}
+  if(/body\s?weight|how much do i weigh|my weight|weigh/.test(s)){const bw=bodyW();return bw?`You're <b>${bw}kg</b> on record, sir.`:"No bodyweight logged yet, Master — log it under Profile, Body.";}
   // READ: calories / macros
   if(/calorie|macro|protein|kcal|how much.*eat/.test(s)){const n=d.u.nutrition;if(!n||!n.cals)return "No fuel protocol set yet, sir — say <b>open fuel</b> and I'll calculate your targets.";
     return `Daily targets, Master: <b>${fmtNum(n.cals)} kcal</b> · ${n.protein}g protein · ${n.carbs}g carbs · ${n.fat}g fat.`;}
@@ -9902,17 +10339,11 @@ function openMessHall(){
 }
 /* ========================================================================
    THE FUEL TAB — nutrition's own home. Pulls together the Fuel protocol,
-   quick food logging, hydration, the daily supplement stack and a bodyweight
-   weigh-in + trend, so the whole eating side of training lives in one place.
+   quick food logging, hydration, the daily supplement stack, so the whole eating side of training lives in one place (bodyweight lives in Profile, Body).
    ======================================================================== */
-function logBW(){const el=$("fuel-bw");const v=el?parseFloat(el.value):NaN;
-  if(!v||v<20||v>400){toast("Enter your bodyweight in kg.");return;}
-  const kg=Math.round(v*10)/10;state.data.bwLog=state.data.bwLog||[];
-  state.data.bwLog.push({date:new Date().toISOString(),kg});state.data.u.bodyweight=kg;
-  save();haptic("done");toast("Weigh-in logged · "+kg+"kg");render();}
 function renderFuel(){   // Fuel: the protocol up top, then today's intake, hydration, the daily stack and bodyweight
   const d=state.data,u=d.u,n=u.nutrition;
-  let html=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Fuel</h1><div class="t-xs">Calories, macros, hydration, bodyweight</div></div></div>`;
+  let html=`<div class="gh sp-pg"><div class="sp-hd"><div><h1>Fuel</h1><div class="t-xs">Calories, macros, hydration, supplements</div></div></div>`;
   html+=fuelProtocolCard();
   if(n&&n.cals){
     const day=foodDay(),tot=foodTotals(day),train=isTrainingToday(),tgt=cycledTargets(n,train?"train":"rest");
@@ -9929,12 +10360,7 @@ function renderFuel(){   // Fuel: the protocol up top, then today's intake, hydr
   html+=`<section class="s2 gh-list fu-stack"><div class="gh-lh"><h3>Daily stack</h3>${cStreak?`<span class="tag ok">${cStreak} d creatine streak</span>`:""}</div>
     ${items.map(([k,l])=>{const on=!!supp[k];return `<button class="gh-row fu-tg${on?" on":""}" aria-pressed="${on}" onclick="toggleSupp('${k}')"><div class="main"><div class="gh-t1">${l}</div></div><span class="fu-ck">${on?GP.icon("check"):""}</span></button>`;}).join("")}
     <p class="t-xs fu-p">Creatine monohydrate, 3 to 5 g daily, is the best-evidenced legal supplement. Consistency is the whole game.</p></section>`;
-  const log=(d.bwLog||[]),vals=log.slice(-16).map(e=>+e.kg).filter(v=>v>0),first=vals.length?vals[0]:null,last=vals.length?vals[vals.length-1]:null,delta=(first!=null&&last!=null)?(last-first):null;
-  const curve=vals.length>=2&&typeof trendChart==="function"?trendChart(vals,{color:"#7cc4ff",unit:"kg"}):"";
-  html+=`<section class="s2 fu-c"><div class="gh-lh"><h3>Bodyweight</h3><b class="num fu-bw">${u.bodyweight||"—"}<small>kg</small></b></div>
-    ${curve?`<div class="fu-curve">${curve}</div><p class="t-xs fu-p">${delta?(delta>0?"Up ":"Down ")+Math.abs(delta).toFixed(1)+" kg across the last "+vals.length+" weigh-ins":"Holding steady across the last "+vals.length+" weigh-ins"}</p>`:`<p class="t-s fu-p">Log a few weigh-ins to draw your trend.</p>`}
-    <div class="fu-wi"><input id="fuel-bw" inputmode="decimal" placeholder="${u.bodyweight||75} kg" aria-label="Bodyweight in kilograms"/><button class="btn btn-1" onclick="logBW()">Log weigh-in</button></div>
-    <p class="t-xs fu-p">Weigh first thing, same conditions. Track the weekly average, not the daily noise.</p></section></div>`;
+  html+=`<div class="s1 gh-row fu-bwl" role="button" tabindex="0" onclick="bdOpen()"><span class="lead">${GP.icon("scale")}</span><div class="main"><div class="gh-t1">Bodyweight · <b>${bodyW().toFixed(1)} kg</b></div><div class="gh-t2">Weigh-in and trend live in Profile, Body</div></div><span class="trail">${GP.icon("chevR")}</span></div></div>`;
   $("app").innerHTML=html;
 }
 
@@ -10363,24 +10789,6 @@ function sendGauntlet(i,liftN,tw){
   state.data.gauntlets.push({ally:((state.data.allies||[])[i]||{}).n,ex:liftN,targetW:tw,date:new Date().toISOString()});
   save();closeSheet();toast("🧤 Gauntlet thrown. No backing out now.");
 }
-/* ===== PHOTO TIME-MACHINE — slide through your transformation ===== */
-function openPhotoTimeline(){
-  const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
-  if(ph.length<2){toast("Add at least two progress photos first.");return;}
-  state._ptIdx=ph.length-1;
-  const fmtP=d=>new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"});
-  openSheet(`<div class="ttl">🎞 Time-machine</div>
-    <div style="position:relative;border-radius:14px;overflow:hidden;background:#000">
-      <img id="pt-a" src="${ph[0].img}" style="width:100%;display:block">
-      <img id="pt-b" src="${ph[ph.length-1].img}" style="width:100%;display:block;position:absolute;inset:0;opacity:1">
-      <div id="pt-lab" style="position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-family:var(--disp);font-weight:650;font-size:15px;color:var(--gold2)"></div>
-    </div>
-    <input type="range" min="0" max="${ph.length-1}" step="1" value="${ph.length-1}" style="margin-top:12px"
-      oninput="(function(v){const ph=(state.data.photos||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));const p=ph[+v];const b=document.getElementById('pt-b');b.src=p.img;b.style.opacity=1;document.getElementById('pt-lab').textContent=new Date(p.date).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'2-digit'})+(p.bw?' · '+p.bw+'kg':'');})(this.value)">
-    <div class="row sp" style="margin-top:4px"><span class="mini">${fmtP(ph[0].date)}</span><span class="mini">${fmtP(ph[ph.length-1].date)}</span></div>
-    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);
-  setTimeout(()=>{const p=ph[ph.length-1];const l=document.getElementById("pt-lab");if(l)l.textContent=fmtP(p.date)+(p.bw?" · "+p.bw+"kg":"");},50);
-}
 /* ===== WARM-UP RAMP — tap a working weight, get the exact ramp with plates per side ===== */
 function openRamp(fei){
   const e=state.session&&state.session.exercises[fei];if(!e)return;
@@ -10688,12 +11096,113 @@ function ghNext(cur){
   return rows.length?`<section class="s2 gh-list gh-c" style="--i:5"><div class="gh-lh"><h3>Next up</h3></div>${rows.join("")}</section>`:"";
 }
 
+/* ===== ONE-TAP WEEKLY ADJUST (wave 7) =====
+   The Sunday review's advice as 1–3 buttons. Each one edits the ACTIVE split's plan targets (day.plan[lift]={s,r,opt}: the plan editor's own data and the shape Mission's trim writes),
+   snapshots every day it touches so Undo puts the exact previous day back, and is remembered for the calendar week in d.weekAdj so a second tap cannot stack the same change.
+   Sets only: 2..10 per lift (GM_MIN_SETS / GM_MAX_SETS), a new target starts at the 5–10 rep default. Never a deload, never a logged session. */
+const WK_STEP=3,WK_ACTIONS=3,WK_NEW_SETS=2;   // most sets one tap moves for a muscle, buttons shown, sets on a lift added from the library
+const wkClone=o=>JSON.parse(JSON.stringify(o));
+function wkWeekKey(){const t=new Date(weekStartK(0));return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");}
+function wkDone(){const w=state.data.weekAdj;return w&&w.wk===wkWeekKey()&&w.done?w.done:{};}
+function wkUO(vol){   // the two lists the advice is built from: trained muscles under MEV (furthest first) and over MRV (worst first)
+  const tr=vol.filter(t=>t.trained);
+  return {under:tr.filter(t=>t.zone==="warn").sort((a,b)=>(b.L.mev-b.sets)-(a.L.mev-a.sets)),over:tr.filter(t=>t.zone==="bad").sort((a,b)=>(b.sets-b.L.mrv)-(a.sets-a.L.mrv))};
+}
+function wkDayOrder(cur){   // training days in cycle order from tonight's slot, so the next sessions get the sets first
+  const n=cur.sp.days.length;
+  return Array.from({length:n},(_,k)=>(cur.i+k)%n).filter(i=>!isRest(cur.sp.days[i]));
+}
+function wkPlanAdd(cur,m,k){   // [{i,n,from,to}]: +1 set at a time, round-robin over the lifts that train m as a primary mover (next days first), each capped at GM_MAX_SETS; null when nothing has room
+  const rows=[];
+  wkDayOrder(cur).forEach(i=>{const day=cur.sp.days[i];(day.exercises||[]).forEach(n=>{
+    const pl=day.plan&&day.plan[n];if(!(exFor(n).p||[]).includes(m)||(pl&&pl.opt))return;
+    const s=ghSetsOf(day,n);rows.push({i,n,from:s,to:s});});});
+  let left=k,moved=true;
+  while(left>0&&moved){moved=false;rows.forEach(r=>{if(left>0&&r.to<GM_MAX_SETS){r.to++;left--;moved=true;}});}
+  const ch=rows.filter(r=>r.to>r.from);return ch.length?ch:null;
+}
+function wkPlanTrim(cur,m,k){   // [{i,n,from,to}]: -1 set at a time from the day that carries the most of m (gmTrimPick picks the lift); a lift never goes under GM_MIN_SETS; null when nothing can give
+  const days=cur.sp.days.map(d=>isRest(d)?d:Object.assign({},d,{plan:Object.assign({},d.plan||{})})),ch=new Map();
+  for(let t=0;t<k;t++){
+    const tg=days.map((d,i)=>isRest(d)?null:{i,pick:gmTrimPick(d,m),w:ghPlanSets(d)[m]||0}).filter(x=>x&&x.pick).sort((a,b)=>b.w-a.w)[0];
+    if(!tg)break;
+    const d=days[tg.i],n=tg.pick.n,s=ghSetsOf(d,n),key=tg.i+"|"+n,was=ch.get(key);
+    d.plan[n]=Object.assign({r:GM_REPS},d.plan[n],{s:s-1});ch.set(key,{i:tg.i,n,from:was?was.from:s,to:s-1});
+  }
+  return ch.size?[...ch.values()]:null;
+}
+function wkPlanLift(cur,m,k){   // a library lift for m worked at long length that this plan does not use yet; goes on the next day that already trains m (else the next training day); null when none fits
+  const sp=cur.sp,used=new Set(sp.days.flatMap(d=>d.exercises||[])),seen=new Set(loggedExerciseNames()),order=wkDayOrder(cur),
+    pool=EXDB.filter(ex=>ex&&ex.n&&(ex.p||[])[0]===m&&!used.has(ex.n)&&isLengthened(ex)&&gymAllows(ex.eq)),
+    ex=pool.find(x=>seen.has(x.n))||pool[0],at=order.find(i=>(ghPlanSets(sp.days[i])[m]||0)>0);
+  if(!ex||!order.length)return null;
+  return [{i:at!=null?at:order[0],n:ex.n,from:0,to:clamp(k,WK_NEW_SETS,WK_STEP),add:true}];
+}
+function wkActions(under,over){   // 0..3 buttons: over-MRV muscles get a trim, under-MEV ones a set bump (or a stretch lift when no lift has room); none while load is spiking
+  const cur=currentPlanDay();if(!cur||!cur.sp)return [];
+  const done=wkDone(),len=cycleLen(),hot=["spike","high"].includes(acwrInfo().zone),out=[],sets=x=>clamp(Math.round(x*len/7),1,WK_STEP);
+  const act=(kind,t,ch)=>{
+    const n=ch.reduce((s,c)=>s+Math.abs(c.to-c.from),0),nm=ghName(t.m),ss=n+" set"+(n===1?"":"s"),names=[...new Set(ch.map(c=>c.n))],
+      days=[...new Set(ch.map(c=>"D"+(c.i+1)))].join(", "),lead=names.slice(0,2).join(", ")+(names.length>2?" +"+(names.length-2):"");
+    return {key:kind+":"+t.m,kind,m:t.m,tone:kind==="trim"?"bad":"warn",ch,
+      label:kind==="trim"?`Trim ${ss} · ${nm}`:kind==="lift"?`Add a stretch lift · ${nm}`:`Add ${ss} · ${nm}`,
+      past:kind==="trim"?`Trimmed ${ss} · ${nm}`:kind==="lift"?`Added ${names[0]} · ${nm}`:`Added ${ss} · ${nm}`,
+      sub:kind==="lift"?`${days} · ${names[0]} · ${ss}`:`${days} · ${lead}`};
+  };
+  const take=(t,make)=>{   // a muscle already adjusted this week shows its result instead of a new button
+    if(out.length>=WK_ACTIONS)return;
+    const k=["trim","add","lift"].find(x=>done[x+":"+t.m]);
+    if(k){const m=done[k+":"+t.m];out.push({key:k+":"+t.m,kind:k,m:t.m,applied:true,label:m.label,past:m.past||m.label});return;}
+    const r=make();if(r)out.push(act(r.kind,t,r.ch));
+  };
+  over.slice(0,2).forEach(t=>take(t,()=>{const ch=wkPlanTrim(cur,t.m,sets(t.sets-t.L.mrv));return ch&&{kind:"trim",ch};}));
+  if(!hot)under.forEach(t=>take(t,()=>{const k=sets(t.L.mev-t.sets),ch=wkPlanAdd(cur,t.m,k);if(ch)return {kind:"add",ch};const l=wkPlanLift(cur,t.m,k);return l&&{kind:"lift",ch:l};}));
+  return out;
+}
+function wkWrite(sp,ch){   // new day objects, never in place: exercises gets an added lift, plan[lift] keeps its reps and optional flag (a new target starts at GM_REPS)
+  const byDay=new Map();ch.forEach(c=>byDay.set(c.i,(byDay.get(c.i)||[]).concat(c)));
+  byDay.forEach((list,i)=>{
+    const day=sp.days[i],ex=(day.exercises||[]).slice(),plan=Object.assign({},day.plan||{});
+    list.forEach(c=>{if(c.add&&!ex.includes(c.n))ex.push(c.n);plan[c.n]=Object.assign({r:GM_REPS},plan[c.n],{s:c.to});});
+    sp.days[i]=Object.assign({},day,{exercises:ex,plan});
+  });
+}
+function wkApply(key){
+  const cur=currentPlanDay(),uo=wkUO(ghVol(null)),a=cur&&wkActions(uo.under,uo.over).find(x=>x.key===key);   // rebuilt from live data: the plan may have moved since the card was drawn
+  if(!a||a.applied||!a.ch){wkRefresh();return;}
+  const id=cur.sp.id,snap=[...new Set(a.ch.map(c=>c.i))].map(i=>[i,wkClone(cur.sp.days[i])]),prev=state.data.weekAdj;
+  wkWrite(cur.sp,a.ch);
+  state.data.weekAdj={wk:wkWeekKey(),done:Object.assign({},wkDone(),{[key]:{label:a.label,past:a.past,at:now()}})};
+  haptic("tap");splitsChanged();wkRefresh();
+  toastUndo(a.past,()=>{   // the exact previous days go back, and the week forgets it was applied
+    const sp=(state.data.splits||[]).find(s=>s.id===id);if(!sp)return;
+    snap.forEach(([i,day])=>{sp.days[i]=day;});state.data.weekAdj=prev;
+    splitsChanged();wkRefresh();toast("Plan restored");
+  },"Undo");
+}
+function wkRefresh(){   // the review sheet is open over the tab: repaint it in place (scroll kept) so the button flips to its result
+  const sh=$("sheet");if(state._sheetKind!=="review"||!sh||!sh.classList.contains("on"))return;
+  const sc=sh.scrollTop;sh.innerHTML=ghReviewSheet();sh.scrollTop=sc;
+}
+const wkIc=a=>a.kind==="trim"?gmIc("minus"):GP.icon("plus");
+function wkBtn(a){
+  if(a.applied)return `<div class="wk-act is-done" role="status"><span class="wk-ic">${GP.icon("check")}</span><span class="wk-tx"><b>${esc(a.past||a.label)}</b><i>Plan updated for the next cycle</i></span></div>`;
+  return `<button class="wk-act ${a.tone}" onclick="wkApply('${a.key}')" aria-label="${esc(a.label+". "+a.sub+". Edits your plan, with undo.")}"><span class="wk-ic">${wkIc(a)}</span><span class="wk-tx"><b>${esc(a.label)}</b><i>${esc(a.sub)}</i></span><span class="wk-go">Apply</span></button>`;
+}
+const wkNext=r=>r.acts.length?`<div class="wk-acts">${r.acts.map(wkBtn).join("")}</div>`:`<b>${esc(r.adj)}</b>`;
+function gmSuggest(){   // Mission's door to the same buttons: one link row into the review sheet (which owns them), shown while something is left to apply
+  if(!(state.data.workouts||[]).some(w=>new Date(w.date).getTime()>=weekStartK(0)))return "";
+  const uo=wkUO(ghVol(null)),left=wkActions(uo.under,uo.over).filter(a=>!a.applied);
+  if(!left.length)return "";
+  const a=left[0],more=left.length>1?` · +${left.length-1} more`:"";
+  return `<div class="s1 gh-row wk-sug gh-c" style="--i:2" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Suggested this week: ${esc(a.label)}${left.length>1?", and "+(left.length-1)+" more":""}. Opens the week review."><span class="lead ${a.tone}">${wkIc(a)}</span><div class="main"><div class="gh-t1">Suggested this week</div><div class="gh-t2">${esc(a.label)}${more}</div></div><span class="trail">${GP.icon("chevR")}</span></div>`;
+}
+
 /* ---- WEEK REVIEW: one computation behind the Sunday card and its detail sheet ---- */
 function ghWeekReview(vol){
   const t0=weekStartK(0),ws=(state.data.workouts||[]).filter(w=>new Date(w.date).getTime()>=t0),prs=[];
   ws.forEach(w=>(w.prs||[]).forEach(nm=>{if(!prs.includes(nm))prs.push(nm);}));
-  const tr=vol.filter(t=>t.trained),under=tr.filter(t=>t.zone==="warn").sort((a,b)=>(b.L.mev-b.sets)-(a.L.mev-a.sets)),
-    over=tr.filter(t=>t.zone==="bad").sort((a,b)=>(b.sets-b.L.mrv)-(a.sets-a.L.mrv)),stalled=stalledLifts(),a=acwrInfo();
+  const {under,over}=wkUO(vol),stalled=stalledLifts(),a=acwrInfo();
   let adj;
   if(over.length)adj=`Trim ${MNAME[over[0].m].toLowerCase()} by ${over[0].sets-over[0].L.mrv} set${over[0].sets-over[0].L.mrv===1?"":"s"}.`;
   else if(a.zone==="spike"||a.zone==="high")adj="Hold total volume steady while your load settles.";
@@ -10701,7 +11210,7 @@ function ghWeekReview(vol){
   else if(stalled.length)adj=`Change the angle or rep range on ${stalled[0].n}.`;
   else adj="Repeat the plan. Volume and load are on track.";
   const sets=ws.reduce((s,w)=>s+(w.exercises||[]).reduce((x,e)=>x+countSets(e.sets,false),0),0);
-  return {ws,prs,under,over,stalled,adj,sets:Math.round(sets),tonnage:ws.reduce((s,w)=>s+(+w.totalVol||0),0)};
+  return {ws,prs,under,over,stalled,adj,acts:wkActions(under,over),sets:Math.round(sets),tonnage:ws.reduce((s,w)=>s+(+w.totalVol||0),0)};
 }
 const ghList=(arr,f,max=3)=>arr.slice(0,max).map(f).join(", ")+(arr.length>max?" +"+(arr.length-max)+" more":"");
 /* ---- SUNDAY REVIEW: Sundays from 16:00, below the week card. Three lines and next week's one change; never a pop-up. ---- */
@@ -10712,9 +11221,9 @@ function ghSunday(vol){
     l2=r.prs.length?`${r.prs.length} record${r.prs.length===1?"":"s"} this week, led by ${esc(r.prs[0])}.`:"No new records this week.",
     l3=r.stalled.length?`Stalled: ${ghList(r.stalled,s=>esc(s.n),2)}.`:"No stalled lifts.";
   const line=(ic,tone,tx)=>`<li><span class="lead ${tone}">${GP.icon(ic)}</span><span>${tx}</span></li>`;
-  return `<div class="s2 gh-sun gh-c" style="--i:2" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
-    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul>
-    <div class="gh-sun-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></div>`;
+  return `<div class="s2 gh-sun gh-c" style="--i:2"><div class="gh-sun-hit" role="button" tabindex="0" onclick="openCaveReview()" aria-label="Open the week review"><div class="gh-sun-h"><span class="eyebrow">Sunday review</span><span class="trail">${GP.icon("chevR")}</span></div>
+    <ul class="gh-sun-l">${line("scale",r.over.length?"bad":r.under.length?"warn":"ok",l1)}${line("trophy",r.prs.length?"gold":"",l2)}${line("flat",r.stalled.length?"warn":"",l3)}</ul></div>
+    <div class="gh-sun-n"><span class="eyebrow">Next week</span>${wkNext(r)}</div></div>`;
 }
 /* the detail behind the Sunday card: the week in numbers, Alfred's flags, the one change */
 function ghReviewHtml(){
@@ -10732,11 +11241,12 @@ function ghReviewHtml(){
   if(fried>=4)rows.push(row("pulse","warn","Recovery",`${fried} muscle groups are under 50%. Keep 1 to 3 reps in reserve.`));
   return `<div class="gh gh-rv"><div class="gh-rv-st"><div><b class="num">${r.ws.length}<small>/${goal}</small></b><span class="eyebrow">Sessions</span></div><div><b class="num">${r.sets}</b><span class="eyebrow">Hard sets</span></div><div><b class="num">${tv.v}<small>${tv.u}</small></b><span class="eyebrow">Moved</span></div><div><b class="num">${r.prs.length}</b><span class="eyebrow">Records</span></div></div>
     <section class="s2 gh-list">${rows.join("")}</section>
-    <div class="s1 gh-rv-n"><span class="eyebrow">Next week</span><b>${esc(r.adj)}</b></div></div>`;
+    <div class="s1 gh-rv-n"><span class="eyebrow">Next week</span>${wkNext(r)}</div></div>`;
 }
+const ghReviewSheet=()=>`<div class="ttl">Week in review</div>${ghReviewHtml()}<button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`;
 function openCaveReview(){
   try{haptic("tap");}catch(e){}
-  openSheet(`<div class="ttl">Week in review</div>${ghReviewHtml()}<button class="btn" style="margin-top:14px" onclick="closeSheet()">Close</button>`);
+  openSheet(ghReviewSheet());state._sheetKind="review";   // openSheet clears the kind; wkRefresh() repaints this sheet after a button is applied
 }
 
 /* ---- GOTHAM EXTRAS: the two that earn a place. The Garage always; the seasonal event only inside its dates. ---- */
@@ -10780,7 +11290,7 @@ function stCommit(){try{render();}catch(e){}}
 function stNum(k,el,lo,hi,def,int){
   const v=parseFloat(String(el.value).replace(",","."));
   if(!isFinite(v)||v<lo||v>hi){el.value=state.data.u[k]!=null?state.data.u[k]:def;toast("Enter a number from "+lo+" to "+hi+".");return;}
-  u_set(k,int?Math.round(v):v);el.value=state.data.u[k];stCommit();
+  if(k==="bodyweight")bwSet(v);else u_set(k,int?Math.round(v):v);el.value=state.data.u[k];stCommit();
 }
 function stSeg(b,k,v){
   u_set(k,v);haptic("tap");
@@ -10909,12 +11419,16 @@ function setGemKey(v){if(v.trim())localStorage.setItem("gt_gemini",v.trim());els
 function exportRival(){const d=state.data;const code=btoa(unescape(encodeURIComponent(JSON.stringify({name:d.u.name||"Vigilante",totalVol:d.u.totalVolume,totalWorkouts:d.u.totalWorkouts,streak:d.u.streakDays,prs:d.prs}))));
   if(navigator.clipboard)navigator.clipboard.writeText(code);appAlert({title:"Sparring code",ok:"Done",html:`Copied to your clipboard. Send this to a rival:<input readonly value="${esc(code)}" style="margin-top:10px" onclick="this.select()"/>`});}
 function importRival(){appPrompt({title:"Add rival",body:"Paste a rival's sparring code:",ok:"Spar"}).then(c=>{if(!c)return;try{const clean=(c||"").replace(/\s+/g,"");const r=JSON.parse(decodeURIComponent(escape(atob(clean))));if(!r||typeof r!=="object"){toast("Invalid code.");return;}state.data.rival=r;save();checkAchievements();toast("Now sparring with "+(r.name||"your rival"));closeOverlay();render();}catch(e){toast("Invalid code.");}});}
-function backupData(){
-  const url=URL.createObjectURL(new Blob([JSON.stringify(state.data)],{type:"application/json"}));
+function backupData(){   // vaulted photos are read back first so the file carries every FULL photo; with none in the vault it stays synchronous
+  if(!(state.data.photos||[]).some(p=>p.idb))return downloadBackup(state.data,0);
+  phExport().then(r=>downloadBackup(r.data,r.lowRes)).catch(e=>{phWarn("backup failed",e);toast("Backup failed: the photos could not be read. Try again.");});
+}
+function downloadBackup(data,lowRes){
+  const url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:"application/json"}));
   const a=document.createElement("a");a.href=url;a.download="gainstracker-backup.json";a.click();
   setTimeout(()=>URL.revokeObjectURL(url),4000);
   state.data.u.lastBackupAt=new Date().toISOString();save();
-  toast("Backup saved. Keep it in iCloud or Files.");
+  toast(lowRes?`Backup saved, but ${lowRes} photo${lowRes===1?"":"s"} could only be saved as a thumbnail.`:"Backup saved. Keep it in iCloud or Files.");
   if($("dc-list"))refreshDataControl();
 }
 /* Data lifeboat — iOS can evict PWA localStorage under storage pressure. Nudge a backup
@@ -10944,11 +11458,14 @@ function restoreData(){   // a restore replaces everything, so it reads and chec
       let p=null;try{p=JSON.parse(r.result);}catch(e){}
       if(!p||typeof p!=="object"||!p.u||typeof p.u!=="object"){toast("That is not a GainsTracker backup.");return;}
       const n=Array.isArray(p.workouts)?p.workouts.length:0;
-      appConfirm({title:"Restore this backup?",body:"Everything on this device is replaced by the backup ("+n+" sessions). Back up first if you are unsure.",ok:"Restore",cancel:"Keep current data",danger:true}).then(ok=>{
+      appConfirm({title:"Restore this backup?",body:"Everything on this device is replaced by the backup ("+n+" sessions). Back up first if you are unsure.",ok:"Restore",cancel:"Keep current data",danger:true}).then(async ok=>{
         if(!ok)return;
         const d=Object.assign(blankData(),p);d.u=Object.assign(blankData().u,p.u);
+        try{if(Array.isArray(d.photos)&&d.photos.length){toast("Restoring "+d.photos.length+" photo"+(d.photos.length===1?"":"s")+"…");d.photos=await phIngest(d.photos);}}catch(e){phWarn("restore keeps the photos inline",e);}   // photos reach the vault BEFORE the save, so a backup full of photos cannot hit the localStorage quota
         if(d.prsByGym&&d.u.activeGym)d.prs=d.prsByGym[d.u.activeGym]=d.prsByGym[d.u.activeGym]||{};
-        state.data=d;try{runMigrations();}catch(e){}save();toast("Backup restored.");closeSheet();render();
+        state.data=d;try{runMigrations();}catch(e){}
+        const saved=save();toast("Backup restored.");closeSheet();render();
+        if(saved)phPrune((state.data.photos||[]).map(x=>x.id)).then(phBakDrop).catch(e=>phWarn("vault clean-up failed",e));   // the replaced data's photos leave the vault with it
       });
     };
     r.readAsText(f);
@@ -10960,7 +11477,7 @@ function wipeData(){   // two steps: confirm, then type ERASE
     if(!ok)return;
     appPrompt({title:"Type ERASE to confirm",body:"Last step. There is no undo.",placeholder:"ERASE",ok:"Erase all"}).then(v=>{
       if((v||"").trim().toUpperCase()!=="ERASE"){toast("Nothing erased.");return;}
-      localStorage.removeItem("gt_data");state.data=blankData();save();
+      localStorage.removeItem("gt_data");state.data=blankData();save();phWipe();
       state.showOnboarding=true;state.obStep=0;state.obTmp={};state.obEdit=false;closeSheet();closeOverlay();render();
     });
   });
@@ -11137,6 +11654,7 @@ function boot(){
   }
   // cloud sync — go online for live Allies (deferred so it never blocks first paint)
   try{if(state.data.onboardingDone)setTimeout(()=>{try{cloudInit();}catch(e){}},800);}catch(e){}
+  setTimeout(()=>{try{phBoot();}catch(e){}},600);   // progress photos: verify the vault, then move any full photo into it (async, idempotent)
   // offline indicator: reflects real connectivity, reassures data is local
   const offUI=()=>{const p=$("offline-pill");if(p)p.classList.toggle("on",!navigator.onLine);};
   window.addEventListener("online",offUI);window.addEventListener("offline",offUI);offUI();
