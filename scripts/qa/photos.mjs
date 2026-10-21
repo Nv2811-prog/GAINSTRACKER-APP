@@ -40,6 +40,11 @@ const IDB_CLEAR = (stray) => new Promise((res, rej) => {
   r.onsuccess = () => { const d = r.result, t = d.transaction(['photos', 'meta'], 'readwrite'); t.objectStore('photos').clear(); t.objectStore('meta').clear(); if (stray) t.objectStore('photos').put('data:image/jpeg;base64,AAAA', stray); t.oncomplete = () => { d.close(); res(); }; t.onerror = () => rej(t.error); };
 });
 
+const IDB_DEL = (id) => new Promise((res, rej) => {
+  const r = indexedDB.open('gainstracker'); r.onerror = () => rej(r.error);
+  r.onsuccess = () => { const d = r.result, t = d.transaction('photos', 'readwrite'); t.objectStore('photos').delete(id); t.oncomplete = () => { d.close(); res(); }; t.onerror = () => rej(t.error); };
+});
+
 async function mk() {
   const ctx = await launch({ file: A.file || DEFAULT_FILE, fixture: FIXTURE, width: A.width || null });
   // QA hook: sessionStorage.__corrupt = "<id>" makes the vault read that photo back with one byte changed (proves a failed verify leaves the photo alone)
@@ -92,8 +97,10 @@ try {
   R.gtDataShrank = sizeAfter < sizeBefore - 100000; R.gtDataBytes = { before: sizeBefore, after: sizeAfter };
   R.metadataKept = gt.every((p, i) => p.id === IDS[i] && p.bw === BW[i] && !!p.date);
 
-  // ---- boot 3: nothing left to do; the safety copy is dropped once every vaulted photo reads back
+  // ---- boot 3: the vault lost phq1 in between -> it is restored from the safety copy, then the copy is dropped once every vaulted photo reads back
+  await ev(IDB_DEL, 'phq1');
   await open(ctx, { settle: 300 }); await sleep(1800);
+  R.lostVaultPhotoRestoredFromSafetyCopy = (await M.idb()).photos.phq1 === orig[1];
   const gt3 = await M.gtPhotos();
   R.idempotentReboot = JSON.stringify(gt3) === JSON.stringify(gt);
   R.safetyCopyDropped = (await ev(() => localStorage.getItem('gt_photos_backup'))) === null && Object.keys((await M.idb()).meta).length === 0;
@@ -204,7 +211,7 @@ try {
   // ---- the vault lost one photo (evicted, say): the single view says "thumbnail only" and the backup toast warns instead of silently shrinking the file
   await ev(() => { closeSheet(); PH_CACHE.clear(); });
   const lostId = await ev(() => state.data.photos[0].id);
-  await ev((id) => new Promise((res) => { const r = indexedDB.open('gainstracker'); r.onsuccess = () => { const d = r.result, t = d.transaction('photos', 'readwrite'); t.objectStore('photos').delete(id); t.oncomplete = () => { d.close(); res(); }; }; }), lostId);
+  await ev(IDB_DEL, lostId);
   await ev((id) => viewProgress(id), lostId);
   R.missingFullPhotoIsSaid = !!(await waitFor(() => /Thumbnail only/.test((document.querySelector('.pc-solo figcaption') || {}).textContent || ''), [], 4000));
   await ev(() => { closeSheet(); window.__blobs = []; _toastQ.length = 0; _toastBusy = false; const t = document.getElementById('toast'); clearTimeout(t._t); t.textContent = ''; backupData(); });
