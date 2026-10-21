@@ -92,3 +92,60 @@ Same pipeline as above (`scripts/gen-image.mjs`, gemini-2.5-flash-image, about $
 were cropped to a hand-chosen square and exported with `sips -s format jpeg -s formatOptions 72 -Z 360`; headers were
 cropped to a hand-chosen 1024x683 window, resized to 720x480 and exported at quality 72. 13 first-pass drafts plus 6
 redos (standards, exercise header, infirmary, split-new, plan-edit, muscle header) = 19 generations.
+
+## Art set 3 - Suit hero + Fuel tile
+
+The Suit tab hero was only the faint carbon-plate band (`suit.jpg`, the most subtle still of set 1, left in place
+untouched). `suit-hero.jpg` is the real cinematic replacement in the same film-still language as the other tab heroes,
+and `tile-fuel.jpg` is the feature tile for Fuel (the Suit dock). No text, no logos, no faces. 6 generations; total about
+57 KB (hero 33 KB, tile 24 KB).
+
+### Hero - `suit-hero.jpg`, 720x480 (3:2) JPEG (33 KB)
+
+| File | Surface | Scene |
+|---|---|---|
+| `suit-hero.jpg` | Suit tab hero (suit + grey anatomy figure + legend) | Matte black armoured bat-suit seen from behind (cowl and cape, no face) on a headless mannequin stand inside a tall glass display case, on a polished obsidian floor in a dark cave vault; one volumetric warm-gold spotlight falls from the top edge and rim-lights the cowl, shoulder plates and gauntlet fins, gold reflections run down the glass, low gold-lit mist at the base |
+
+Composition: the glass case spans about x 51-83% and y 11-91% of the frame (the suit itself x 59-76%), the gold shaft
+enters from the top edge over x 53-81%, and the left ~50% is empty black cave, so the grey figure and the legend sit on
+the left and centre. Palette: deep navy/teal black, one warm gold light.
+
+**Use a lighter veil than the standard recipe above.** This still is low-key by design, so the standard left gradient
+(fully clear only at 85%) swallows the left half of the case. Tested in headless Chrome with a grey figure + legend on
+top: this veil keeps the legend legible and lets the suit, the shaft and the floor mist glow:
+
+```css
+background:
+  linear-gradient(90deg, #0b0d12 12%, rgba(11,13,18,.5) 40%, rgba(11,13,18,0) 60%),
+  linear-gradient(0deg,  #0b0d12 0%,  rgba(11,13,18,0) 28%),
+  url(assets/art/suit-hero.jpg) right center / cover no-repeat;
+```
+
+Keep `right center`. In a box taller than 3:2, `cover` scales by height and crops the left side, which moves the case
+toward the middle (a 1:1 box shows only the right 67% of the frame, so the case lands at about x 27-75%); the cropped
+part is only dark void. On a very wide, short banner (wider than about 1.8:1) `cover` starts clipping the case base.
+
+### Tile - `tile-fuel.jpg`, 360x360 JPEG (24 KB)
+
+Same rules as the set-2 tiles: shown about 110 px with the subtle dark vignette, `center / cover`, no left/bottom
+gradient, a rounded-corner clip is safe.
+
+| File | Feature | Scene |
+|---|---|---|
+| `tile-fuel.jpg` | Fuel | Premium athlete meal prep: fanned seared steak, a mound of white rice and steamed greens in a dark matte rounded-square bowl on a dark slate counter, one warm gold key light from the upper left and a wisp of steam |
+
+The bowl is centred and spans about 80% of the width, the corners are dark and expendable, and it holds up at 110 px
+beside `tile-lab` and `tile-history` (checked with the vignette, an icon chip and a label on top).
+
+### Provenance (set 3)
+
+Same pipeline as above (`scripts/gen-image.mjs`, gemini-2.5-flash-image, about $0.04 per draft, 1024x1024 output).
+6 generations: 4 for the hero, 2 for the tile.
+
+- Hero: draft A (case too tall for a 3:2 window), B (clean and matte but dim, with a lamp fixture in frame), C (a nice
+  beam, but the suit turned bronze and two gold slivers floated inside the glass), D picked. Cropped to a hand-chosen
+  1024x683 window starting at row 270 of the 1024x1024 draft (keeps the beam in and leaves floor under the base),
+  resized to 720x480 and exported at quality 72 (`sips -c 683 1024 --cropOffset 270 0`, `sips -z 480 720`,
+  `sips -s format jpeg -s formatOptions 72`).
+- Tile: draft A (bowl seen edge-on, the food hidden behind the rim), B picked; cropped to a 1000x1000 window at
+  (12, 12), resized to 360x360 and exported at quality 72.
