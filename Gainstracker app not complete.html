@@ -5569,7 +5569,7 @@ function gsHero(){
 /* Suit dock: Infirmary and Time-lapse open their own page/sheet, Photos scrolls to the card at the bottom of Body. The infirmary summary row and the time-lapse fold became these tiles. */
 function gsDock(){
   const sl=sleepToday(),sore=Object.keys(soreToday()).length,inj=Object.keys(state.data.injuries||{}).length,ph=(state.data.photos||[]).length;
-  const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load · injuries";
+  const inf=inj?`<b>${inj}</b> injur${inj===1?"y":"ies"}`:sore?`<b>${sore}</b> sore today`:sl&&sl.hours?`<b>${sl.hours}h</b> sleep`:"Sleep · load";
   return gdDock("Suit tools",[
     {art:"tile-infirmary",ic:"pulse",t:"Infirmary",s:inf,fn:"openInfirmary()"},
     {art:"tile-timelapse",ic:"film",t:"Time-lapse",s:"Mastery · radar",fn:"openMastery()"},
@@ -6514,7 +6514,7 @@ function p3Dock(){
     {art:"tile-history",ic:"calendar",t:"History",s:`<b>${ws.length}</b> sessions`,fn:"gdJump('#p3-cal')"},
     ...(prN?[{art:"tile-records",ic:"trophy",t:"Records",s:`<b>${prN}</b> records`,fn:"gdJump('#p3-rec')"}]:[]),
     ...(std?[{art:"tile-standards",ic:"chart",t:"Standards",s:b3?`Big-3 <b>${b3.ratio.toFixed(2)}</b>× BW`:"Lifts vs bodyweight",fn:"gdJump('#p3-std')"}]:[]),
-    {art:"tile-badges",ic:"crown",t:"Badges",s:"Trophy room",fn:"openTrophyRoom()"},
+    {art:"tile-badges",ic:"crown",t:"Badges",s:`<b>${(d.u.earnedBadges||[]).length}</b> of ${ACHIEVEMENTS.length}`,fn:"openTrophyRoom()"},
     {art:"tile-backup",ic:"lock",t:"Backup",s:lb?"Backed up "+ghAgo(lb):"Never backed up",fn:"openDataControl()"}]);
 }
 function p3Tools(){
@@ -7723,8 +7723,8 @@ function openSplitExchange(){
     <div class="st-h"><h2>Share or import</h2><button class="btn sm" onclick="closeSheet()">Done</button></div>
     <span class="eyebrow st-g">Import a split</span>
     <section class="s2 st-list"><div class="st-note" style="padding-top:12px">Paste a Split Card code a friend sent. The days and every lift land in your splits, ready to train.</div>
-      <div style="padding:0 14px 14px"><textarea id="import-split-code" class="st-ta" placeholder="Paste the GTSPL1:… code here" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Split Card code"></textarea>
-        <div style="display:flex;gap:8px;margin-top:10px"><button class="btn gold" style="flex:1" onclick="pasteImportSplit()">${GP.icon("down")}Paste &amp; import</button><button class="btn" onclick="doImportSplit()">Import</button></div></div></section>
+      <div style="padding:0 14px 14px"><textarea id="import-split-code" class="st-ta" style="height:84px;font-size:16px;color:var(--tx1)" placeholder="Paste the GTSPL1:… code here" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Split Card code"></textarea>
+        <div class="al-cta2"><button class="btn gold" onclick="pasteImportSplit()">${GP.icon("down")}Paste &amp; import</button><button class="btn" onclick="doImportSplit()">Import</button></div></div></section>
     <span class="eyebrow st-g">Send one of yours</span>
     <section class="s2 gh-list">${mine}</section></div>`);
   const sh=$("sheet");if(sh)sh.scrollTop=0;
