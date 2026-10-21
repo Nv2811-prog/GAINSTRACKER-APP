@@ -1044,8 +1044,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 /* 1 · one-tap weekly adjust: a button = tinted icon chip + what changes + where, "Apply" in gold; the result row turns green with a check */
 .gh .s2.gh-sun{cursor:default}
 .gh-sun-hit{cursor:pointer;border-radius:var(--r-s)}
-.wk-acts{display:grid;gap:8px;margin-top:4px}
-.wk-act{display:flex;align-items:center;gap:11px;width:100%;min-height:56px;padding:9px 12px 9px 10px;border:0;border-radius:var(--r-m);background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);text-align:left;font:inherit;cursor:pointer}
+.wk-acts{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:4px;min-width:0}
+.wk-act{display:flex;align-items:center;gap:11px;width:100%;min-width:0;max-width:100%;min-height:56px;padding:9px 12px 9px 10px;border:0;border-radius:var(--r-m);background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);text-align:left;font:inherit;cursor:pointer}
 .wk-act.warn{--ac:var(--warn);--act:var(--tint-warn);--acr:rgba(255,178,36,.36)}
 .wk-act.bad{--ac:#FF786D;--act:var(--tint-bad);--acr:rgba(255,90,78,.36)}
 .wk-act.is-done{--ac:var(--ok);--act:var(--tint-ok);--acr:rgba(52,210,127,.36);background:var(--g1);box-shadow:inset 0 0 0 1px rgba(52,210,127,.24),var(--hl);cursor:default}
@@ -6605,10 +6605,11 @@ function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<
 const BD_WEEKS=12,BD_MIN=30,BD_MAX=300,BD_STEP=0.1;
 function bwSet(kg){
   const d=state.data,t=now(),k=Math.round(kg*10)/10,day=new Date(t).toDateString();
-  d.bwLog=(d.bwLog||[]).filter(e=>!(e&&new Date(e.date).toDateString()===day)).concat({date:new Date(t).toISOString(),kg:k});
+  d.bwLog=bdLogArr().filter(e=>!(e&&new Date(e.date).toDateString()===day)).concat({date:new Date(t).toISOString(),kg:k});
   d.u.bodyweight=k;save();
 }
-const bdEntries=()=>(state.data.bwLog||[]).map(e=>({t:new Date(e&&e.date).getTime(),kg:+(e&&e.kg)})).filter(e=>isFinite(e.t)&&e.kg>0).sort((a,b)=>a.t-b.t);
+const bdLogArr=()=>Array.isArray(state.data.bwLog)?state.data.bwLog:[];
+const bdEntries=()=>bdLogArr().map(e=>({t:new Date(e&&e.date).getTime(),kg:+(e&&e.kg)})).filter(e=>isFinite(e.t)&&e.kg>0).sort((a,b)=>a.t-b.t);
 const bdAt=(es,t)=>es.reduce((b,e)=>e.t<=t?e:b,null)||es[0]||null;   // the newest weigh-in at or before t, else the oldest one
 function bdWeekly(es){   // [{i,avg,n}] over the last BD_WEEKS calendar weeks (Mon–Sun): i 0 = oldest .. BD_WEEKS-1 = this week; a week without a weigh-in is left out
   const out=[];
@@ -6661,7 +6662,7 @@ function p3Body(){
   const es=bdEntries(),wk=bdWeekly(es),rel=bdRel(es),bw=bodyW(),day=new Date(now()).toDateString(),logged=es.some(e=>new Date(e.t).toDateString()===day);
   const a=wk[0],z=wk[wk.length-1],span=wk.length>1?z.i-a.i:0,dk=span?z.avg-a.avg:0,ago=z?(BD_WEEKS-1-z.i===0?"this week":BD_WEEKS-1-z.i===1?"last week":(BD_WEEKS-1-z.i)+" wk ago"):"";
   const tag=span?`<span class="tag">${Math.abs(dk)<.05?"Steady":bdSign(dk)+" kg"} / ${span} wk</span>`:"",
-    avg=z?`<span class="t-xs">Weekly avg <b>${z.avg.toFixed(1)}</b> kg · ${ago}</span>`:`<span class="t-xs">No weigh-ins yet</span>`,
+    avg=z?`<span class="t-xs">Weekly avg <b>${z.avg.toFixed(1)}</b> kg · ${ago}</span>`:`<span class="t-xs">${es.length?"No weigh-in in "+BD_WEEKS+" weeks":"No weigh-ins yet"}</span>`,
     chart=wk.length>1?bdSvg(wk.map(p=>({i:p.i,v:p.avg})),{dec:1,pad:.4,cls:"bd-w",label:"Bodyweight, weekly average, last "+BD_WEEKS+" weeks"}):`<p class="t-s bd-hint">${wk.length?"One more week of weigh-ins and the trend draws here.":"Log your weight on a few days and the 12-week trend draws here."}</p>`;
   let rs="";
   if(rel.length>1){
@@ -10863,7 +10864,7 @@ function wkActions(under,over){   // 0..3 buttons: over-MRV muscles get a trim, 
     return {key:kind+":"+t.m,kind,m:t.m,tone:kind==="trim"?"bad":"warn",ch,
       label:kind==="trim"?`Trim ${ss} · ${nm}`:kind==="lift"?`Add a stretch lift · ${nm}`:`Add ${ss} · ${nm}`,
       past:kind==="trim"?`Trimmed ${ss} · ${nm}`:kind==="lift"?`Added ${names[0]} · ${nm}`:`Added ${ss} · ${nm}`,
-      sub:kind==="lift"?`${names[0]} · ${ss} · ${days}`:`${lead} · ${days}`};
+      sub:kind==="lift"?`${days} · ${names[0]} · ${ss}`:`${days} · ${lead}`};
   };
   const take=(t,make)=>{   // a muscle already adjusted this week shows its result instead of a new button
     if(out.length>=WK_ACTIONS)return;
