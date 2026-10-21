@@ -5,7 +5,7 @@ window.__qa = {
   // screenshot shows the underlying screen. Never touches data.
   clear() {
     try { document.querySelectorAll('.ripple').forEach((n) => n.remove()); } catch (e) {}
-    try { ['stinger','outro'].forEach((id) => { const n = document.getElementById(id); if (n) n.remove(); }); } catch (e) {}
+    try { ['stinger','outro','prfin'].forEach((id) => { const n = document.getElementById(id); if (n) n.remove(); }); } catch (e) {}
     try { if (typeof cineDismiss === 'function') cineDismiss(); } catch (e) {}
     try { state._cineQ = []; state._cineOn = false; } catch (e) {}
     try { const c = document.getElementById('cine'); if (c) c.classList.remove('on'); } catch (e) {}

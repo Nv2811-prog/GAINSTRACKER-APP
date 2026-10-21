@@ -12,7 +12,7 @@ export const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chr
 export const DEFAULT_FILE = fileURLToPath(new URL('../../Gainstracker app not complete.html', import.meta.url));
 export const VIEWPORT = { width: 393, height: 852, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1';
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml', '.gif': 'image/gif' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml', '.gif': 'image/gif', '.mp4': 'video/mp4' };
 
 // Stand-in for an ExerciseDB demo: flat WHITE plate with a grey figure, like the real GIFs.
 const DEMO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360"><rect width="360" height="360" fill="#fff"/><g fill="#8a8f96"><circle cx="180" cy="84" r="26"/><rect x="150" y="114" width="60" height="110" rx="22"/><rect x="104" y="122" width="40" height="16" rx="8" transform="rotate(-28 124 130)"/><rect x="216" y="122" width="40" height="16" rx="8" transform="rotate(28 236 130)"/><rect x="152" y="218" width="22" height="96" rx="10"/><rect x="186" y="218" width="22" height="96" rx="10"/></g><rect x="60" y="300" width="240" height="10" rx="5" fill="#c9cdd2"/></svg>`;
@@ -46,7 +46,9 @@ function fakeClock(fakeNow) {
   try { if (window.speechSynthesis) { window.speechSynthesis.speak = () => {}; } } catch (e) {}
 }
 
-export async function launch({ file = DEFAULT_FILE, fixture = null, fakeNow = null, storage = null, headful = false, width = null } = {}) {
+// clips: the PR finisher's 2.7 MB takedown clips (assets/pr/) are BLOCKED by default so no other test is ever interrupted by the overlay or
+// downloads them (the app's preload just fails quietly, as it does offline). Pass clips:true to let them through (pr.mjs does).
+export async function launch({ file = DEFAULT_FILE, fixture = null, fakeNow = null, storage = null, headful = false, width = null, clips = false } = {}) {
   const rootDir = path.dirname(path.resolve(file));
   const { srv, port } = await startServer(rootDir);
   const browser = await puppeteer.launch({ executablePath: CHROME, headless: headful ? false : 'new', args: ['--no-first-run', '--no-default-browser-check', '--autoplay-policy=no-user-gesture-required', '--disable-features=Translate'] });
@@ -60,6 +62,7 @@ export async function launch({ file = DEFAULT_FILE, fixture = null, fakeNow = nu
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const u = new URL(req.url());
+    if (!clips && u.hostname === '127.0.0.1' && u.pathname.includes('/assets/pr/')) { log.blocked++; return req.abort('blockedbyclient'); }
     if (u.hostname === '127.0.0.1' || u.protocol === 'data:' || u.protocol === 'blob:') return req.continue();
     if (u.hostname === 'fonts.googleapis.com' || u.hostname === 'fonts.gstatic.com' || u.hostname === 'raw.githubusercontent.com') return req.continue();
     if (u.hostname === 'exercisedb.p.rapidapi.com') {
