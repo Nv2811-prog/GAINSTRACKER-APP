@@ -800,6 +800,119 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .ix-q input{flex:1;min-width:0;height:100%;margin:0;padding:0;border:0;background:none;box-shadow:none;color:var(--tx1);font:500 16px/1 var(--body);outline:none;-webkit-appearance:none;appearance:none}
 .ix-q input::-webkit-search-cancel-button{display:none}
 .ix-none{margin:0;padding:16px 14px}
+/* ===== GP:POLISH (wave 8) ===== */
+/* The one sheet header: [back] [icon chip] title + sub [Done | X]. shHd() builds it; shHead() gives legacy sheets and overlays the same one (and drops their bottom "Close"). */
+.sh-hd{display:flex;align-items:center;gap:10px;min-height:44px;margin:0 0 12px}
+.sheet .sh-hd{position:sticky;top:-8px;z-index:4;margin:0 -16px 12px;padding:4px 16px 10px;background:#172131;box-shadow:0 1px 0 var(--hair)}
+.sh-ic{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.22)}
+.sh-ic .gi{width:18px;height:18px}
+.sh-tt{flex:1;min-width:0}
+.sh-tt h2,.sh-hd>.ttl{margin:0;font:650 17px/1.2 var(--body);letter-spacing:-.01em;text-transform:none;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh-hd>.ttl{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:0}
+.sh-hd>.ttl .gi,.sh-hd>.ttl .gi-t{flex:none;width:20px;height:20px;color:var(--gold-ink)}
+.sh-sub{margin-top:2px;font:500 12px/1.3 var(--body);color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh-hd .btn-i,.sh-hd .sh-done{flex:none}
+.sh-hd .sh-done{min-width:68px}
+.sh-search{position:relative;margin:0 0 10px}
+.sh-search .gi{position:absolute;left:14px;top:50%;width:18px;height:18px;margin-top:-9px;color:var(--tx3);pointer-events:none}
+.sh-search input{padding-left:42px;height:48px;border-radius:var(--r-m);font-size:16px}
+/* add-exercise picker: search, muscle chips, create row, a fixed-height list so the sheet never jumps while filtering */
+.px-chips{margin:0 -16px 10px;padding:0 16px 2px}
+.px-new{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;margin:0 0 10px;padding:0 14px;border-radius:var(--r-m);background:transparent;box-shadow:inset 0 0 0 1px var(--hair2);color:var(--gold-ink);font:600 15px/1.2 var(--body);text-align:left}
+.px-new>span{flex:1}
+.px-new .gi{width:18px;height:18px;flex:none}
+.px-new .gi:last-child{color:var(--tx3)}
+.px-list{height:min(calc(92dvh - 300px),560px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin:0 -4px;padding:0 4px}
+.px-row{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:8px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl),inset 0 0 0 1px var(--hair)}
+.px-row.added{background:var(--tint-ok);box-shadow:inset 0 0 0 1px rgba(52,210,127,.35)}
+.px-open{flex:1;min-width:0;display:flex;align-items:center;gap:12px;cursor:pointer}
+.px-open .exwrap{flex:none}
+.px-main{flex:1;min-width:0}
+.px-n{font:600 15px/1.25 var(--body);color:var(--tx1);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.px-m{display:flex;align-items:center;gap:6px;margin-top:3px;min-width:0;font:500 12px/1.3 var(--body);color:var(--tx2)}
+.px-m>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.px-m .tag{flex:none}
+.px-pr{flex:none;display:inline-flex;align-items:center;gap:3px;color:var(--gold-ink);font-weight:600}
+.px-pr .gi{width:12px;height:12px}
+.px-add{flex:none;color:var(--gold-ink);background:var(--tint-gold);box-shadow:inset 0 0 0 1px rgba(242,193,78,.38)}
+.px-add.on{color:var(--ok);background:var(--tint-ok);box-shadow:inset 0 0 0 1px rgba(52,210,127,.4)}
+.px-empty{display:grid;justify-items:center;gap:6px;padding:30px 12px;text-align:center}
+.px-empty .gi{width:30px;height:30px;color:var(--tx3)}
+.px-empty b{font:650 16px/1.3 var(--body);color:var(--tx1)}
+.px-empty span{max-width:30ch;font:500 13px/1.4 var(--body);color:var(--tx2)}
+.px-empty .btn{margin-top:8px}
+/* custom exercise creator: three grouped cards, an optional fold, one sticky Save */
+.cx-f{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.cx-s{min-width:0;padding:14px 14px 16px}
+.cx-l{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px;font:650 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx2)}
+.cx-l span{letter-spacing:0;text-transform:none;font-weight:500;color:var(--tx3)}
+.cx-l2{margin-top:14px}
+.cx-name{height:50px;border-radius:var(--r-m);font-size:17px;font-weight:600}
+.cx-pic{display:flex;align-items:center;gap:14px;margin-top:14px}
+.cx-pic .exwrap{flex:none}
+.cx-pm{display:grid;gap:3px;justify-items:start;min-width:0}
+.cx-pm b{font:650 15px/1.2 var(--body);color:var(--tx1)}
+.cx-pm span{margin-bottom:6px;font:500 12px/1.35 var(--body);color:var(--tx3)}
+.cx-chips{display:flex;flex-wrap:wrap;gap:6px}
+.cx-bw{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:10px 12px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl),inset 0 0 0 1px var(--hair);text-align:left;color:var(--tx1)}
+.cx-bw .lead{flex:none;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(150,178,222,.1);color:var(--tx2)}
+.cx-bw .lead .gi{width:18px;height:18px}
+.cx-bwt{flex:1;min-width:0}
+.cx-bwt b{display:block;font:600 14px/1.25 var(--body)}
+.cx-bwt i{display:block;font:500 12px/1.35 var(--body);font-style:normal;color:var(--tx3)}
+.cx-chk{flex:none;width:24px;height:24px;border-radius:8px;display:grid;place-items:center;box-shadow:inset 0 0 0 1.5px var(--hair2);color:var(--on-gold)}
+.cx-chk .gi{width:16px;height:16px;stroke-width:3}
+.cx-bw.on .cx-chk{background:var(--gold);box-shadow:none}
+.cx-opt>summary{display:flex;align-items:center;gap:8px;min-height:30px;font:650 14px/1.2 var(--body);color:var(--tx1);cursor:pointer;list-style:none}
+.cx-opt>summary::-webkit-details-marker{display:none}
+.cx-opt>summary span{margin-left:auto;font-weight:500;font-size:12px;color:var(--tx3)}
+.cx-opt>summary .gi{width:16px;height:16px;color:var(--tx3);transition:transform .2s}
+.cx-opt[open]>summary .gi{transform:rotate(180deg)}
+.cx-opt>.cx-l{margin-top:14px}
+.cx-opt textarea{width:100%;border-radius:var(--r-m)}
+.cx-foot{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom));z-index:3;display:grid;gap:8px;margin:2px -16px calc(-18px - env(safe-area-inset-bottom));padding:18px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(15,22,33,0),#0F1621 16px)}
+.cx-foot .t-xs{text-align:center}
+.cx-foot:not(.ready) .btn-1{opacity:.55}
+/* plate calculator + warm-up ramp */
+.px-st{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
+.px-st label{flex:1;position:relative;display:block;min-width:0}
+.px-st input{display:block;width:100%;height:68px;padding:0 44px 0 0;text-align:center;font:400 46px/1 var(--num);letter-spacing:.01em;color:var(--tx1);border-radius:var(--r-m)}
+.px-st label>span{position:absolute;right:14px;bottom:12px;font:600 12px/1 var(--body);color:var(--tx3);pointer-events:none}
+.px-bar{padding:12px 8px 8px;margin:0 0 12px}
+.px-plates{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:0 0 10px}
+.px-plate{display:inline-grid;place-items:center;min-width:40px;height:30px;padding:0 9px;border-radius:8px;font:700 13px/1 var(--body);color:#0B0D12;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.px-plate.sm{min-width:30px;height:24px;padding:0 6px;font-size:12px;border-radius:6px}
+.px-sum{text-align:center;font:500 13px/1.45 var(--body);color:var(--tx2)}
+.px-sum b{color:var(--tx1);font-weight:650}
+.px-note{display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;padding:12px 14px;font:500 13px/1.45 var(--body);color:var(--tx2)}
+.px-note .gi{flex:none;width:18px;height:18px;margin-top:1px;color:var(--gold-ink)}
+.px-note b{color:var(--tx1)}
+.px-rr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:12px;margin:0 0 8px;padding:10px 12px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl),inset 0 0 0 1px var(--hair)}
+.px-rr .n{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--tint-gold);color:var(--gold-ink);font:400 18px/1 var(--num)}
+.px-rr .w{display:flex;align-items:baseline;gap:6px;min-width:0;white-space:nowrap}
+.px-rr .w .num{font-size:30px;line-height:.9;color:var(--tx1)}
+.px-rr .w span{font:600 14px/1 var(--body);color:var(--tx2)}
+.px-rr .sd{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:150px}
+.px-foot{margin:6px 2px 0;text-align:center}
+/* readiness check-in: hero with the gym, one card of three one-tap rows */
+.rd{padding-top:4px}
+.rd-hero{margin:0 0 12px;padding-bottom:14px}
+.rd-gym{display:flex;gap:8px;margin:14px -16px 0;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.rd-gym::-webkit-scrollbar{display:none}
+.rd-card{padding:16px 14px 8px;margin:0 0 6px}
+.rd-read{display:flex;align-items:center;gap:8px;margin:10px 2px 12px;font:500 13px/1.4 var(--body);color:var(--tx2)}
+.rd-read b{color:var(--tx1);font-weight:650}
+.rd-o{display:flex;align-items:center;gap:14px;width:100%;min-height:68px;margin:0 0 8px;padding:12px 14px;border-radius:var(--r-m);background:var(--g1);box-shadow:var(--hl),inset 0 0 0 1px var(--hair);text-align:left;color:var(--tx1)}
+.rd-o .lead{flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(150,178,222,.1);color:var(--tx2)}
+.rd-o .lead .gi{width:22px;height:22px}
+.rd-o.fresh .lead{background:var(--tint-ok);color:var(--ok)}
+.rd-o.tired .lead{background:var(--tint-warn);color:var(--warn)}
+.rd-o .main{flex:1;min-width:0}
+.rd-o b{display:block;font:650 17px/1.2 var(--body)}
+.rd-o i{display:block;margin-top:2px;font:500 13px/1.35 var(--body);font-style:normal;color:var(--tx2)}
+.rd-o>.gi{flex:none;width:18px;height:18px;color:var(--tx3)}
+.rd-cancel{display:flex;margin:6px auto 0}
+/* /GP:POLISH */
 /* ===== GP:DOCKS (wave 6) ===== */
 /* Feature dock: ONE row of art tiles directly under a tab hero, every feature the tab owns one tap away (nothing searched for, nothing folded).
    Tile = square still (assets/art/tile-*.jpg, or a header crop via --pos) under a dark vignette, an icon chip, a label and a live one-line sub.
@@ -4434,23 +4547,55 @@ function render(){
   try{gpEnter();}catch(e){console.error("gpEnter",e);}   // GP:CHARM: first-view sweep + live numbers (never blocks the render)
 }
 
+/* ===== GP:POLISH (wave 8) · shared sheet pieces: header, search field, number tick ===== */
+const PLATE_COL={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};   // real plate colours are content, not chrome
+const PX_CAP=120;   // the unfiltered "All" list stops here; a muscle filter or a search shows every match
+/* the ONE sheet header: [back] [icon chip] title + sub [Done | X]. Callers pass already-escaped text. o: ic, sub, back (onclick), backLabel, act ("x" default | "done" | "none"), fn (onclick of Done/X), doneHtml, closeLabel */
+function shHd(title,o={}){
+  const fn=o.fn||"closeSheet()",flip=GP.icon("chevR").replace('class="gi ','class="gi flip ');
+  const end=o.act==="none"?"":o.act==="done"?`<button class="btn sm sh-done" onclick="${fn}">${o.doneHtml||"Done"}</button>`:`<button class="btn-i" onclick="${fn}" aria-label="${o.closeLabel||"Close"}">${GP.icon("x")}</button>`;
+  return `<header class="sh-hd">${o.back?`<button class="btn-i" onclick="${o.back}" aria-label="${o.backLabel||"Back"}">${flip}</button>`:""}${o.ic?`<span class="sh-ic" aria-hidden="true">${GP.icon(o.ic)}</span>`:""}<div class="sh-tt"><h2>${title}</h2>${o.sub?`<div class="sh-sub">${o.sub}</div>`:""}</div>${end}</header>`;
+}
+const shSearch=(id,ph,on)=>`<div class="sh-search">${GP.icon("search")}<input id="${id}" inputmode="search" enterkeyhint="search" placeholder="${ph}" autocomplete="off" autocapitalize="off" spellcheck="false" oninput="${on}" aria-label="${ph}"/></div>`;
+/* Legacy sheets and overlays open with a bare .ttl (or a .row.sp holding it) and end with a full-width "Close". The moment the node lands they get the shared header
+   (X at the right, same size, same place) and lose the Close button. Sheets that already carry their own header or Done are left alone. */
+function shHead(n){
+  if(n.nodeType!==1||n.classList.contains("sh-hd"))return;
+  const host=n.parentNode;if(!host||(host.id!=="sheet"&&host.id!=="ovcard")||host.firstElementChild!==n)return;
+  const shut=/close(Sheet|Overlay)\(\)/,fn=host.id==="sheet"?"closeSheet()":"closeOverlay()",X=`<button class="btn-i" onclick="${fn}" aria-label="Close">${GP.icon("x")}</button>`;
+  let hd=null;
+  if(n.classList.contains("ttl")){hd=document.createElement("div");hd.className="sh-hd";host.insertBefore(hd,n);hd.appendChild(n);hd.insertAdjacentHTML("beforeend",X);}
+  else if(n.classList.contains("row")&&n.firstElementChild&&n.firstElementChild.classList.contains("ttl")){
+    hd=n;hd.classList.add("sh-hd");const b=hd.querySelector("button");
+    if(!b)hd.insertAdjacentHTML("beforeend",X);
+    else if(shut.test(b.getAttribute("onclick")||"")&&b.querySelector(".gi")&&!b.textContent.trim()){b.className="btn-i";b.removeAttribute("style");}
+  }
+  if(!hd||![...hd.querySelectorAll("button")].some(b=>shut.test(b.getAttribute("onclick")||"")))return;
+  const last=host.lastElementChild;
+  if(last&&last!==hd&&last.tagName==="BUTTON"&&/^\s*Close\s*$/.test(last.textContent)&&shut.test(last.getAttribute("onclick")||""))last.remove();
+}
+/* a number that changed by a stepper slides in from the direction it moved (transform + opacity, 180 ms, still under reduced motion) */
+function tickNum(el,dir){if(!el)return;el.classList.remove("tk-up","tk-dn");void el.offsetWidth;el.classList.add(dir>0?"tk-up":"tk-dn");}
 /* ========================= READINESS ========================= */
 function renderReadiness(){
-  $("app").innerHTML=`<div class="fade" style="padding-top:24px">
-    <div class="tag center">${esc(state.session.split)}</div>
-    <h1 style="font-size:40px;text-align:center;color:var(--gold2);margin:4px 0 18px">${esc(state.session.day)}</h1>
-    <div class="card"><div class="ttl">🏋️ Which gym tonight?</div>
-      <p class="muted" style="margin-bottom:11px;font-size:13px">Different machines, different records — your PRs are tracked separately per gym.</p>
-      <div class="row" style="gap:7px;flex-wrap:wrap">${(state.data.u.gyms||[]).map(g=>{const on=(state.session.gym||state.data.u.activeGym)===g;return `<button class="chip ${on?"on":""}" style="width:auto" onclick="setSessionGym('${esc(g).replace(/'/g,"\\'")}')">${esc(g)}</button>`;}).join("")}
-        <button class="chip" style="width:auto" onclick="promptAddGym(false)">＋ Add gym</button></div>
-    </div>
-    <div class="card"><div class="ttl">Mission readiness check</div>
-      <p class="muted" style="margin-bottom:14px;font-size:13.5px">How's the body tonight? Alfred adjusts the overload intel accordingly.</p>
-      <button class="btn" style="margin-bottom:9px" onclick="setReadiness('fresh')">🟢 &nbsp;FRESH — full send</button>
-      <button class="btn" style="margin-bottom:9px" onclick="setReadiness('okay')">🟡 &nbsp;OKAY — standard patrol</button>
-      <button class="btn" onclick="setReadiness('tired')">🔴 &nbsp;TIRED — keep it tactical</button>
-    </div>
-    <button class="btn ghost" onclick="endSession()">← Cancel mission</button>
+  const ses=state.session,d=state.data,gym=ses.gym||d.u.activeGym,sp=ses.srcSplit?(d.splits||[]).find(s=>s.id===ses.srcSplit):null,day=sp&&sp.days&&sp.days[ses.srcDay];
+  const st=day?ghDayStats(day):{lifts:(ses.exercises||[]).length,sets:(ses.exercises||[]).reduce((a,e)=>a+(e.sets||[]).filter(s=>s.type!=="W").length,0),min:0};
+  let pr=null;try{pr=patrolReadiness();}catch(e){}
+  const read=pr&&pr.score!=null&&pr.rec!=null?`<div class="rd-read">${GP.recRing(pr.rec,16)}<span><b>${pr.rec}%</b> recovered${pr.scope==="tonight"?" in tonight's muscles":""} · ${esc(String(pr.label).toLowerCase())}</span></div>`:"";
+  const meta=`<span><b>${st.lifts}</b> lift${st.lifts===1?"":"s"}</span>${st.sets?`<span><b>${st.sets}</b> sets</span>`:""}${st.min?`<span>~<b>${st.min}</b> min</span>`:""}`;
+  const gyms=(d.u.gyms||[]).map(g=>`<button class="chip${g===gym?" on":""}" onclick="setSessionGym(${ghJs(g)})" aria-pressed="${g===gym}">${esc(g)}</button>`).join("");
+  const OPT=[["fresh","bolt","Fresh","Full send. Plan as written."],["okay","flat","Okay","Standard session. Plan as written."],["tired","moon","Tired","Alfred eases off: lighter ramps, no PR push."]];
+  $("app").innerHTML=`<div class="gh rd">
+    <section class="s3 gh-hero rd-hero">${gaArt("logging")}
+      <div class="gh-top"><span class="eyebrow gh-live">${esc(ses.split)}</span></div>
+      <h2 class="num gh-title">${esc(ses.day)}</h2>
+      <div class="gh-meta">${meta}</div>
+      <div class="rd-gym" role="group" aria-label="Gym tonight">${gyms}<button class="chip" onclick="promptAddGym(false)" aria-label="Add a gym">${GP.icon("plus")}Add gym</button></div>
+    </section>
+    <section class="s2 rd-card"><div class="gh-lh"><h3>Readiness check</h3><span class="t-xs">One tap starts</span></div>
+      ${read}${OPT.map(o=>`<button class="rd-o ${o[0]}" onclick="setReadiness('${o[0]}')"><span class="lead">${GP.icon(o[1])}</span><span class="main"><b>${o[2]}</b><i>${o[3]}</i></span>${GP.icon("chevR")}</button>`).join("")}
+    </section>
+    <button class="btn btn-3 rd-cancel" onclick="endSession()">${GP.icon("chevR").replace('class="gi ','class="gi flip ')}Cancel session</button>
   </div>`;
 }
 
@@ -4926,29 +5071,17 @@ function openPicker(multi){
   const hasEquipProfile=!!(((state.data.gymEquipment||{})[gymNm]||{}).equip);
   state.gymFilter=hasEquipProfile; // default: only show what YOUR gym has, when a profile exists
   const mm=!!state.pickerMulti;
-  $("sheet").innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-      <div style="flex:1">
-        <div style="font-family:var(--disp);font-weight:650;font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold2);line-height:1;text-shadow:0 0 16px rgba(255,208,72,.45)">
-          ${mm?'Build split':'Add exercise'}
-        </div>
-        <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:2px">${EXDB.length} movements · tap to add</div>
-      </div>
-      ${mm?`<button class="btn gold sm" style="width:auto;min-width:80px" onclick="finishMultiAdd()">Done <span id="picker-cnt"></span></button>`:''}
-    </div>
-    <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,208,72,.4),transparent);margin:-4px 0 12px"></div>
-    <div style="position:relative;margin-bottom:10px">
-      <input id="ex-search" placeholder="Search — bench, squat, curl, row…" autocomplete="off" oninput="updateExList()"
-        style="padding-left:36px;background:linear-gradient(180deg,rgba(20,26,40,.9),rgba(12,15,22,.9));border-color:rgba(255,208,72,.22)"/>
-      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5">🔍</span>
-    </div>
-    <div class="scroll-x" id="ex-musc" style="margin-bottom:10px;gap:6px">${hasEquipProfile?`<button class="chip ${state.gymFilter?'on':''}" id="gymfchip" onclick="toggleGymFilter()" style="font-family:var(--disp);font-weight:650;letter-spacing:.06em;border-color:rgba(255,208,72,.4)">🏛 ${esc(gymNm.toUpperCase())} ONLY</button>`:''}${["all"].concat(M12).map(m=>`<button class="chip ${m==='all'?'on':''}" data-m="${m}" onclick="pickMuscle('${m}')" style="font-family:var(--disp);font-weight:650;letter-spacing:.06em">${m==='all'?'ALL':MNAME[m].toUpperCase()}</button>`).join("")}</div>
-    <button class="btn" style="margin:0 0 10px;border:1px dashed rgba(255,208,72,.22);background:rgba(255,208,72,.04);color:var(--gold2);font-family:var(--disp);font-weight:650;letter-spacing:.06em" onclick="openCustomCreator()">⚙ CREATE CUSTOM LIFT</button>
-    <div id="ex-list" style="max-height:50vh;overflow-y:auto;overflow-x:hidden;margin:0 -2px;padding:0 2px"></div>`;
+  const chips=(hasEquipProfile?`<button class="chip${state.gymFilter?" on":""}" id="gymfchip" onclick="toggleGymFilter()" aria-pressed="${state.gymFilter}">${GP.icon("map")}${esc(gymNm)} only</button>`:"")
+    +["all"].concat(M12).map(m=>`<button class="chip${m==="all"?" on":""}" data-m="${m}" onclick="pickMuscle('${m}')">${m==="all"?"All":MNAME[m]}</button>`).join("");
+  $("sheet").innerHTML=`${shHd(mm?"Build split":"Add exercise",{ic:"plus",sub:`<span id="ex-count">${EXDB.length} movements</span>`,act:mm?"done":"x",fn:mm?"finishMultiAdd()":"closeSheet()",doneHtml:`Done <span id="picker-cnt"></span>`,closeLabel:"Close exercise list"})}
+    <div class="gh">${shSearch("ex-search","Search bench, squat, curl, row…","updateExList()")}
+      <div class="scroll-x px-chips" id="ex-musc">${chips}</div>
+      <button class="px-new" onclick="openCustomCreator()">${GP.icon("plus")}<span>Create custom lift</span>${GP.icon("chevR")}</button>
+      <div id="ex-list" class="px-list"></div></div>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");
   updateExList();
 }
-function toggleGymFilter(){state.gymFilter=!state.gymFilter;const c=$("gymfchip");if(c)c.classList.toggle("on",state.gymFilter);try{haptic("tap");}catch(e){}updateExList();}
+function toggleGymFilter(){state.gymFilter=!state.gymFilter;const c=$("gymfchip");if(c){c.classList.toggle("on",state.gymFilter);c.setAttribute("aria-pressed",state.gymFilter);}try{haptic("tap");}catch(e){}updateExList();}
 /* Exercise detail sheet — shows big figure + cues, lets you add from there */
 function exDetClose(){const r=state._exdetReturn;state._exdetReturn=null;closeSheet();if(r==="splits")openSplitSheet();}
 /* ========================= EXERCISE DETAIL SHEET (GP:PROFILE+FINISH, wave 3) =========================
@@ -5052,9 +5185,9 @@ function weeklyLoadS(weekIdx,k){   // like weeklyLoad, but a rated session count
 }
 
 /* ===== CUSTOM EXERCISE CREATOR ===== */
-function openCustomCreator(){
+function openCustomCreator(prefill){
   state.cxReturnMulti=state.pickerMulti||null;   // remember multi-add context to restore after saving
-  state.cxDraft={n:"",eq:"dumbbell",p:[],s:[],bw:0,c:[],note:"",picId:undefined};
+  state.cxDraft={n:String(prefill||"").trim().replace(/\b[a-z]/g,c=>c.toUpperCase()).slice(0,60),eq:"dumbbell",p:[],s:[],bw:0,c:[],note:"",picId:undefined};
   state.pickerOpen=false;
   renderCustomCreator();
 }
@@ -5077,33 +5210,31 @@ function cxToggleMuscle(which,m){
 function cxSetEq(eq){cxSyncInputs();state.cxDraft.eq=eq;renderCustomCreator();}
 function cxToggleBw(){cxSyncInputs();state.cxDraft.bw=state.cxDraft.bw?0:1;renderCustomCreator();}
 function renderCustomCreator(){
-  const d=state.cxDraft;
-  const chip=(m,on,which)=>`<button class="chip ${on?'on':''}" onclick="cxToggleMuscle('${which}','${m}')">${MNAME[m]}</button>`;
-  const previewName=(d.n||"").trim();
-  $("sheet").innerHTML=`<div class="row sp"><div class="ttl" style="margin:0">🛠️ Custom exercise</div>
-      <button class="btn sm" style="width:auto" onclick="closeCustomCreator()">← Back</button></div>
-    <div class="mini" style="color:var(--text2);margin:2px 0 8px">Build a movement that isn't in the library. It saves to your collection and shows up in the picker.</div>
-    <label class="lbl">Name</label>
-    <input id="cx-name" placeholder="e.g. Cable Y-Raise" autocomplete="off" value="${esc(d.n||"")}"/>
-    <label class="lbl" style="margin-top:10px">Picture</label>
-    <div class="row" style="gap:10px;align-items:center;margin:4px 0">
-      <span class="exwrap sm" id="cx-pic">${figureSVG(previewName?exFor(previewName):{p:d.p,s:d.s})}</span>
-      <button class="btn ghost sm" style="width:auto;flex:1" onclick="cxChoosePic()">🖼 Choose from database</button>
-    </div>
-    <label class="lbl" style="margin-top:10px">Equipment</label>
-    <div class="scroll-x" style="margin:4px 0">${GYM_EQUIP.map(g=>`<button class="chip ${d.eq===g[0]?'on':''}" onclick="cxSetEq('${g[0]}')">${g[1]}</button>`).join("")}</div>
-    <label class="lbl" style="margin-top:10px">Primary muscle(s) <span class="muted">— what it mainly hits</span></label>
-    <div style="display:flex;flex-wrap:wrap;gap:5px;margin:4px 0">${M12.map(m=>chip(m,d.p.includes(m),"p")).join("")}</div>
-    <label class="lbl" style="margin-top:8px">Secondary muscle(s) <span class="muted">— optional assist</span></label>
-    <div style="display:flex;flex-wrap:wrap;gap:5px;margin:4px 0">${M12.map(m=>chip(m,d.s.includes(m),"s")).join("")}</div>
-    <button class="chip ${d.bw?'on':''}" style="margin:8px 0" onclick="cxToggleBw()">${d.bw?'✓ ':''}Bodyweight movement</button>
-    <label class="lbl" style="margin-top:6px">Form cues <span class="muted">— optional, one per line, shown as coaching tips</span></label>
-    <textarea id="cx-cues" rows="3" placeholder="Squeeze at the top\nControl the negative" style="width:100%">${esc((d.c||[]).join("\n"))}</textarea>
-    <label class="lbl" style="margin-top:8px">Your notes <span class="muted">— optional, private, stored with any others you add later</span></label>
-    <textarea id="cx-note" rows="2" placeholder="e.g. Seat on 4, wide grip feels best" style="width:100%">${esc(d.note||"")}</textarea>
-    <button class="btn gold" style="width:100%;margin-top:12px" onclick="saveCustomEx()">Save exercise</button>`;
-  $("sheet").classList.add("on");$("sheetbg").classList.add("on");
+  const d=state.cxDraft,previewName=(d.n||"").trim(),sc=$("sheet").scrollTop;
+  const chip=(m,on,which)=>`<button class="chip${on?" on":""}" onclick="cxToggleMuscle('${which}','${m}')" aria-pressed="${on}">${MNAME[m]}</button>`;
+  const opt=!!(d.optOpen||(d.c||[]).length||d.note);
+  $("sheet").innerHTML=`${shHd("Custom exercise",{ic:"wrench",sub:"Added to your library",back:"closeCustomCreator()",backLabel:"Back to exercise list",act:"none"})}
+    <div class="gh cx-f">
+      <section class="s2 cx-s"><label class="cx-l" for="cx-name">Name</label>
+        <input id="cx-name" class="cx-name" placeholder="e.g. Cable Y-Raise" autocomplete="off" maxlength="60" value="${esc(d.n||"")}" oninput="cxLive()"/>
+        <div class="cx-pic"><span class="exwrap sm" id="cx-pic">${figureSVG(previewName?exFor(previewName):{p:d.p,s:d.s})}</span><div class="cx-pm"><b>Picture</b><span>Match the demo to your machine</span><button class="btn sm" onclick="cxChoosePic()">${GP.icon("image")}Choose picture</button></div></div></section>
+      <section class="s2 cx-s"><div class="cx-l">Equipment</div><div class="scroll-x">${GYM_EQUIP.map(g=>`<button class="chip${d.eq===g[0]?" on":""}" onclick="cxSetEq('${g[0]}')" aria-pressed="${d.eq===g[0]}">${g[1]}</button>`).join("")}</div></section>
+      <section class="s2 cx-s"><div class="cx-l">Primary muscles <span>what it mainly hits</span></div><div class="cx-chips">${M12.map(m=>chip(m,d.p.includes(m),"p")).join("")}</div>
+        <div class="cx-l cx-l2">Secondary muscles <span>optional assist</span></div><div class="cx-chips">${M12.map(m=>chip(m,d.s.includes(m),"s")).join("")}</div>
+        <button class="cx-bw${d.bw?" on":""}" onclick="cxToggleBw()" aria-pressed="${!!d.bw}"><span class="lead">${GP.icon("profile")}</span><span class="cx-bwt"><b>Bodyweight movement</b><i>Load counts bodyweight plus added weight</i></span><span class="cx-chk" aria-hidden="true">${d.bw?GP.icon("check"):""}</span></button></section>
+      <details class="s2 cx-s cx-opt"${opt?" open":""} ontoggle="if(state.cxDraft)state.cxDraft.optOpen=this.open"><summary>Cues and notes<span>optional</span>${GP.icon("chevD")}</summary>
+        <label class="cx-l" for="cx-cues">Form cues <span>one per line</span></label><textarea id="cx-cues" rows="3" placeholder="Squeeze at the top&#10;Control the negative" oninput="cxSyncInputs()">${esc((d.c||[]).join("\n"))}</textarea>
+        <label class="cx-l" for="cx-note">Your notes <span>private</span></label><textarea id="cx-note" rows="2" placeholder="e.g. Seat on 4, wide grip feels best" oninput="cxSyncInputs()">${esc(d.note||"")}</textarea></details>
+      <div class="cx-foot${cxReady(d)?" ready":""}" id="cx-foot"><div class="t-xs" id="cx-hint"></div><button class="btn btn-1" onclick="saveCustomEx()">${GP.icon("check")}Save exercise</button></div>
+    </div>`;
+  $("sheet").classList.add("on");$("sheetbg").classList.add("on");$("sheet").scrollTop=sc;
   if(previewName)_figApply(previewName,"cx-pic");
+  cxLive();
+}
+const cxReady=d=>!!(d.n||"").trim()&&d.p.length>0;
+function cxLive(){   // keeps the footer honest while typing: what is still missing before Save works
+  cxSyncInputs();const f=$("cx-foot");if(!f)return;const d=state.cxDraft,ok=cxReady(d),h=$("cx-hint");
+  f.classList.toggle("ready",ok);if(h)h.textContent=ok?"Saved to your library and the picker.":!(d.n||"").trim()?"Name it to continue.":"Pick at least one primary muscle.";
 }
 function closeCustomCreator(){const m=state.cxReturnMulti;state.cxReturnMulti=null;openPicker(m);}
 function saveCustomEx(){
@@ -5126,76 +5257,58 @@ function saveCustomEx(){
 // exercises already in the split-day being edited (multi-add highlight)
 function pickerAddedList(){if(!state.pickerMulti)return null;const s=state.data.splits.find(x=>x.id===state.pickerMulti.id);return (s&&s.days[state.pickerMulti.i])?s.days[state.pickerMulti.i].exercises:[];}
 function finishMultiAdd(){const ret=state._pickerReturn;state._pickerReturn=null;state.pickerMulti=null;closeSheet();render();if(ret==="splits")openSplitSheet();/* land back in the editor, not on the tab */}
-function pickMuscle(m){state.pickerMuscle=m;document.querySelectorAll("#ex-musc .chip").forEach(c=>c.classList.toggle("on",c.dataset.m===m));updateExList();}
+function pickMuscle(m){state.pickerMuscle=m;document.querySelectorAll("#ex-musc .chip").forEach(c=>{if(c.dataset.m)c.classList.toggle("on",c.dataset.m===m);});updateExList();}   // the gym chip has no data-m: it is a filter of its own, not a muscle
 function updateExList(){
-  const q=($("ex-search")?$("ex-search").value:"").toLowerCase().trim();
+  const raw=($("ex-search")?$("ex-search").value:"").trim(),q=raw.toLowerCase();
   state.pickerQuery=q;
   let list=EXDB;
   if(state.pickerMuscle!=="all")list=list.filter(e=>(e.p||[]).includes(state.pickerMuscle));
   if(state.gymFilter)list=list.filter(e=>gymAllows(e.eq));
   if(q)list=list.filter(e=>e.n.toLowerCase().includes(q));
+  const filtered=state.pickerMuscle!=="all"||!!q||!!state.gymFilter,total=list.length;
   // Cap only the unfiltered "all" view (perf); when a muscle filter or search is active, show every match so new exercises at the end of the list are never hidden.
-  if(state.pickerMuscle==="all"&&!q)list=list.slice(0,120);
+  if(state.pickerMuscle==="all"&&!q)list=list.slice(0,PX_CAP);
   const el=$("ex-list");if(!el)return;
+  const cn=$("ex-count");if(cn)cn.textContent=filtered?`${total} match${total===1?"":"es"}`:`${EXDB.length} movements`;
   const st=el.scrollTop;                       // preserve scroll so the list doesn't jump on each add
-  const added=pickerAddedList();
-  el.innerHTML=list.length?list.map(e=>{const on=added&&added.includes(e.n);const safe=e.n.replace(/'/g,"\\'");return `<div class="exrow${on?' added':''}">
-    <div style="display:contents" onclick="openExDetail('${safe}')">
-      ${thumb(e)}
-      <div class="g" style="min-width:0">
-        <div class="exname">${esc(e.n)}</div>
-        <div class="exmeta">${exTarget(e).split('·')[0].trim()}</div>
-        <div style="font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-top:1px">${esc(e.eq)}</div>
-      </div>
-    </div>
-    <button onclick="pickAdd('${safe}')" style="flex:none;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;border:1px solid ${on?'rgba(34,232,122,.5)':'rgba(255,208,72,.35)'};background:${on?'rgba(34,232,122,.12)':'rgba(255,208,72,.1)'};color:${on?'var(--green)':'var(--gold2)'};transition:all .12s">${on?'✓':'＋'}</button>
-    </div>`;}).join(""):`<p class="muted center" style="padding:24px 0">No exercises match "${esc(q)}".</p>`;
+  const added=pickerAddedList(),prs=state.data.prs||{};
+  el.innerHTML=list.length?list.map(e=>{const on=!!(added&&added.includes(e.n)),J=ghJs(e.n),pr=prs[e.n],mus=(e.p||[]).map(m=>MNAME[m]||m).join(" · ");
+    return `<div class="px-row${on?" added":""}"><div class="px-open" role="button" tabindex="0" onclick="openExDetail(${J})" aria-label="Details: ${esc(e.n)}">${thumb(e,2)}<div class="px-main"><div class="px-n">${esc(e.n)}</div><div class="px-m"><span>${esc(mus)}</span><span class="tag">${esc(e.eq)}</span>${pr&&pr.w?`<span class="px-pr">${GP.icon("trophy")}${fmtKg(pr.w)} kg</span>`:""}</div></div></div><button class="btn-i px-add${on?" on":""}" onclick="pickAdd(${J})" aria-label="${on?"Added":"Add"} ${esc(e.n)}">${GP.icon(on?"check":"plus")}</button></div>`;}).join("")
+    :`<div class="px-empty">${GP.icon("search")}<b>${q?`No match for "${esc(raw)}"`:"Nothing here yet"}</b><span>${q?"Check the spelling, or add it as your own lift.":"Try another muscle, or clear the gym filter."}</span>${q?`<button class="btn sm" onclick="openCustomCreator(${ghJs(raw)})">${GP.icon("plus")}Create "${esc(raw)}"</button>`:""}</div>`;
   el.scrollTop=st;
   const cnt=$("picker-cnt");if(cnt&&added)cnt.textContent=added.length?`· ${added.length}`:"";
 }
 
 /* ========================= PLATE CALCULATOR (bottom sheet during logging) ========================= */
 function openPlateSheet(ei){
-  const bar=state.data.u.barWeight||20;
-  const calc=(target)=>{
-    let per=(target-bar)/2;if(per<0)per=0;const plates=state.data.plates.slice().sort((a,b)=>b-a);const used=[];
-    plates.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});
-    return used;
-  };
-  const colors={25:"#e8453c",20:"#3c8ce8",15:"#e8c53c",10:"#2ecc71",5:"#f0ead6","2.5":"#9c5ce8","1.25":"#9a8f7a"};
+  const bar=+state.data.u.barWeight||20,plates=(state.data.plates||[]).slice().sort((a,b)=>b-a),step=(plates.length?Math.min(...plates):1.25)*2;
+  const lift=state.session&&ei>=0?state.session.exercises[ei]:null,ws=lift&&(lift.sets||[]).find(s=>s.type!=="W"&&parseFloat(s.w)>0),start=ws?parseFloat(ws.w):0;
+  const calc=target=>{let per=Math.max(0,(target-bar)/2);const used=[];plates.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});return used;};
   // To-scale loaded-barbell graphic: plates mirror both sleeves, height ∝ weight, real plate colours.
-  const barSVG=(used)=>{
-    const H=96,cy=H/2,sleeve=26,W=300,cx=W/2;
-    const ph=p=>26+p*1.55;               // 25kg→64.75, 1.25→27.9
-    const pw=p=>p>=20?12:p>=10?10:p>=5?8:6;
-    let gap=2,xR=cx+sleeve,xL=cx-sleeve,plates="";
-    used.forEach(p=>{
-      const h=ph(p),w=pw(p),col=colors[p]||"#888";
-      plates+=`<rect x="${xR}" y="${cy-h/2}" width="${w}" height="${h}" rx="2.5" fill="${col}" stroke="#05080c" stroke-opacity=".55" stroke-width="1"/>`;
-      plates+=`<rect x="${xL-w}" y="${cy-h/2}" width="${w}" height="${h}" rx="2.5" fill="${col}" stroke="#05080c" stroke-opacity=".55" stroke-width="1"/>`;
-      xR+=w+gap;xL-=w+gap;
-    });
-    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">
+  const barSVG=used=>{
+    const H=96,cy=H/2,sleeve=26,W=300,cx=W/2,ph=p=>26+p*1.55,pw=p=>p>=20?12:p>=10?10:p>=5?8:6;
+    let xR=cx+sleeve,xL=cx-sleeve,pl="";
+    used.forEach(p=>{const h=ph(p),w=pw(p),col=PLATE_COL[p]||"#888";
+      pl+=`<rect x="${xR}" y="${cy-h/2}" width="${w}" height="${h}" rx="2.5" fill="${col}" stroke="#05080c" stroke-opacity=".55" stroke-width="1"/><rect x="${xL-w}" y="${cy-h/2}" width="${w}" height="${h}" rx="2.5" fill="${col}" stroke="#05080c" stroke-opacity=".55" stroke-width="1"/>`;
+      xR+=w+2;xL-=w+2;});
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block" role="img" aria-label="Loaded barbell">
       <defs><linearGradient id="barSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#aeb6c2"/><stop offset=".5" stop-color="#7b828f"/><stop offset="1" stop-color="#4c525c"/></linearGradient></defs>
-      <rect x="20" y="${cy-3}" width="${W-40}" height="6" rx="3" fill="url(#barSteel)"/>
-      <rect x="${cx-sleeve}" y="${cy-7}" width="${sleeve*2}" height="14" rx="3" fill="url(#barSteel)"/>
-      <rect x="${cx-1}" y="${cy-9}" width="2" height="18" fill="#2a2f3a"/>
-      ${plates}</svg>`;
+      <rect x="20" y="${cy-3}" width="${W-40}" height="6" rx="3" fill="url(#barSteel)"/><rect x="${cx-sleeve}" y="${cy-7}" width="${sleeve*2}" height="14" rx="3" fill="url(#barSteel)"/><rect x="${cx-1}" y="${cy-9}" width="2" height="18" fill="#2a2f3a"/>${pl}</svg>`;
   };
-  const render3=(target)=>{
-    const used=calc(target);const leftover=Math.max(0,(target-bar)/2-used.reduce((a,b)=>a+b,0));
-    $("sheet").querySelector("#plate-out").innerHTML=used.length?
-      `<div class="stage" style="border-radius:14px;padding:14px 10px 10px;margin:10px 0">${barSVG(used)}</div>
-       <div class="row wrap" style="justify-content:center;gap:5px;margin:4px 0">${used.map(p=>`<span style="background:${colors[p]||'#888'};color:#000;font-weight:700;font-size:12px;padding:5px 8px;border-radius:5px;box-shadow:0 2px 8px -2px rgba(0,0,0,.6)">${p}</span>`).join("")}</div>
-       <div class="mini center">Per side · bar ${bar}kg · <b class="gold">total ${(bar+used.reduce((a,b)=>a+b,0)*2)}kg</b>${leftover>0?` · <span style="color:#e8a52a">${leftover.toFixed(2)}kg/side short — micro-plates needed</span>`:""}</div>`
-      :`<p class="muted center" style="margin:14px 10px">Just the bar (${bar}kg) — or set a higher target.</p>`;
+  const draw=target=>{
+    const used=calc(target),per=used.reduce((a,b)=>a+b,0),left=Math.max(0,(target-bar)/2-per),out=$("plate-out");if(!out)return;
+    out.innerHTML=`<div class="px-bar s1">${barSVG(used)}</div>`+(used.length
+      ?`<div class="px-plates">${used.map(p=>`<span class="px-plate" style="background:${PLATE_COL[p]||"#888"}">${p}</span>`).join("")}</div><div class="px-sum">Per side <b>${fmtKg(per)} kg</b> · total <b class="c-gold">${fmtKg(bar+per*2)} kg</b>${left>0?` · <span class="c-warn">${left.toFixed(2)} kg per side short, micro-plates needed</span>`:""}</div>`
+      :`<div class="px-sum">${target>0?`Just the bar (${fmtKg(bar)} kg)`:"Enter a target weight, or use the steppers."}</div>`);
   };
-  $("sheet").innerHTML=`<div class="ttl" style="display:flex;align-items:center">${secIcon('plate')}Plate calculator</div>
-    <input id="plate-target" inputmode="decimal" placeholder="Target total weight (kg)" oninput="window._plate(this.value)"/>
-    <div id="plate-out"></div>
-    <button class="btn" style="margin-top:8px" onclick="closeSheet()">Close</button>`;
-  window._plate=(v)=>render3(+v||0);
-  $("sheet").classList.add("on");$("sheetbg").classList.add("on");render3(0);
+  openSheet(`${shHd("Plate calculator",{ic:"dumbbell",sub:`Bar ${fmtKg(bar)} kg · plates per side`})}
+    <div class="gh"><div class="px-st"><button class="btn-i" onclick="_plateStep(-1)" aria-label="${fmtKg(step)} kg less">${gmIc("minus")}</button>
+      <label><input id="plate-target" inputmode="decimal" placeholder="0" value="${start||""}" oninput="_plate(this.value)" aria-label="Target total weight in kilograms"/><span>kg total</span></label>
+      <button class="btn-i" onclick="_plateStep(1)" aria-label="${fmtKg(step)} kg more">${GP.icon("plus")}</button></div>
+      <div id="plate-out"></div></div>`);
+  window._plate=v=>draw(+v||0);
+  window._plateStep=dir=>{const i=$("plate-target");if(!i)return;const nx=Math.max(0,Math.round(((+i.value||0)+dir*step)/step)*step);i.value=nx||"";tickNum(i,dir);try{haptic("tap");}catch(e){}draw(nx);};
+  draw(start);
 }
 
 /* ========================= WORKOUT SUMMARY (4 cards) ========================= */
@@ -10720,18 +10833,15 @@ function openRamp(fei){
   const top=setLoad(ex,wSet.w)||((state.data.prs[e.name]||{}).w)||60;
   const bar=+state.data.u.barWeight||20;
   const steps=[[.4,10],[.55,6],[.7,4],[.85,2]];
-  const rows=steps.map(([p,r])=>{
+  const rows=steps.map(([p,r],i)=>{
     const wt=Math.max(bar,Math.round(top*p/2.5)*2.5);
-    let rem=Math.max(0,(wt-bar)/2),parts=[];
+    let rem=Math.max(0,(wt-bar)/2);const parts=[];
     [25,20,15,10,5,2.5,1.25].forEach(pl=>{while(rem>=pl-0.01){parts.push(pl);rem-=pl;}});
-    return `<div class="row sp" style="padding:8px 2px;border-top:1px solid var(--border)">
-      <b style="font-size:15px">${wt}kg × ${r}</b>
-      <span class="mini" style="color:var(--text2)">${parts.length?parts.join(" + ")+" / side":"bar only"}</span></div>`;
+    return `<div class="px-rr"><span class="n">${i+1}</span><div class="w"><b class="num">${wt}</b><span>kg × ${r}</span></div><div class="sd">${parts.length?parts.map(pl=>`<span class="px-plate sm" style="background:${PLATE_COL[pl]||"#888"}">${pl}</span>`).join(""):`<span class="t-s">bar only</span>`}</div></div>`;
   }).join("");
-  openSheet(`<div class="ttl">🪜 Warm-up ramp — ${esc(e.name)}</div>
-    <div class="mini" style="color:var(--text2);margin-bottom:6px">Built off your ${top}kg working weight (bar ${bar}kg). Fast, light, explosive — save the grind for the money sets.</div>
-    ${rows}
-    <button class="btn" style="margin-top:12px" onclick="closeSheet()">Ready</button>`);
+  openSheet(`${shHd("Warm-up ramp",{ic:"ramp",sub:esc(e.name),act:"done"})}
+    <div class="gh"><div class="px-note s1">${GP.icon("target")}<span>Built off your <b>${fmtKg(top)} kg</b> working weight, bar ${fmtKg(bar)} kg. Plates are per side.</span></div>${rows}
+      <p class="t-xs px-foot">Fast, light, explosive. Save the grind for the working sets.</p></div>`);
 }
 /* ===== ALFRED'S WEEKLY CONTRACT — three concrete goals from your real data, real reward ===== */
 function contractWeekKey(){const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7));return t.toISOString().slice(0,10);}
@@ -11697,7 +11807,7 @@ function gpSec(n){
     el.dataset.ac=hit[2];el.insertAdjacentHTML("afterbegin",`<span class="gp-ic" aria-hidden="true">${GP.icon(hit[1])}</span>`);
   });
 }
-new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);gpSec(n);}))).observe(document.body,{childList:true,subtree:true});
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{hxScan(n);iconize(n);calmGlow(n);gpSec(n);shHead(n);}))).observe(document.body,{childList:true,subtree:true});
 hxScan(document.body);iconize(document.body);calmGlow(document.body);gpSec(document.body);
 document.addEventListener("touchstart",()=>{},{passive:true}); // iOS only applies :active to elements when a touch listener exists
 /* ===== GP:LOGGING (wave 2) — the live workout screen: header strip · focus card · set grid · up next ===== */

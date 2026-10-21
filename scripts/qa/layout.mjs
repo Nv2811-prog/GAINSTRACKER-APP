@@ -53,11 +53,14 @@ const COMMON = [
   ['sheet split exchange', 'openSplitExchange()', SHEET], ['sheet leaderboard', 'openLeaderboard()', SHEET], ['sheet manage allies', 'openJusticeLeague()', SHEET], ['sheet ally', 'openAllySheet(0)', SHEET, 'allies'],
   ['sheet oracle', 'openOracle()', SHEET], ['sheet trophy room', 'openTrophyRoom()', SHEET], ['sheet contracts', 'openContracts()', SHEET], ['sheet simulator', 'openSimulator()', SHEET], ['sheet focus', 'openFocus()', SHEET],
   ['sheet plate calculator', 'openPlateSheet(-1)', SHEET], ['sheet 1RM test day', 'openTestDay()', SHEET],
+  ['sheet add exercise', 'openPicker()', SHEET], ['sheet add exercise, no match', "openPicker();document.getElementById('ex-search').value='zzq';updateExList()", SHEET],
+  ['sheet custom exercise', "openPicker();openCustomCreator('Cable Y Raise')", SHEET], ['sheet picture picker', "openPicPicker('Bench Press (Barbell)','x')", SHEET],
+  ['sheet rank ladder', 'openRankLadder()', OVERLAY],
   ['overlay alfred chat', 'openAlfredChat()', OVERLAY]
 ];
 const LIVE = [
   ['step readiness', '(()=>{const {sp,i}=__qa.nextDay();startWorkout(sp.id,i);})()', 'step'], ['step logging', '__qa.startLogging(2)', 'step'],
-  ['step logging + exercise sheet', '__qa.startLogging(2);openExDetail(state.session.exercises[0].name)', SHEET], ['step logging + plate sheet', '__qa.startLogging(1);openPlateSheet(0)', SHEET],
+  ['step logging + exercise sheet', '__qa.startLogging(2);openExDetail(state.session.exercises[0].name)', SHEET], ['step logging + plate sheet', '__qa.startLogging(1);openPlateSheet(0)', SHEET], ['step logging + warm-up ramp sheet', '__qa.startLogging(1);openRamp(0)', SHEET],
   ['home with a live session', "__qa.startLogging(2);state.minimized=true;state.step=null;go('gotham')", TAB], ['mission with a live session', "__qa.startLogging(2);state.minimized=true;state.step=null;go('mission')", TAB],
   ['step summary', '__qa.startLogging(3);__qa.finish()', 'step']
 ];
