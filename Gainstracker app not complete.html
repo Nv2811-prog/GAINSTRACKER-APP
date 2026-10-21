@@ -606,9 +606,9 @@ button.chip::after,.chip[onclick]::after{content:"";position:absolute;inset:-7px
 .tbtn::after{content:"";position:absolute;inset:-4px}
 .tbtn.tb-alf{background:#0B0F16;box-shadow:0 0 0 1.5px rgba(242,193,78,.75)}
 .tbtn.tb-alf img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 26%;display:block}
-/* tab switch = View Transition: old view fades in 90ms, new one fades up 6px over 200ms; the tab bar stays put */
+/* tab switch = View Transition: the old view fades out in 90ms, the new one rises 8px over 200ms; the hero is its own group (see GP:CHARM, 6) and the tab bar stays put */
 @keyframes vtOut{to{opacity:0}}
-@keyframes vtIn{from{opacity:0;transform:translateY(6px)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(8px)}}
 ::view-transition-old(root){animation:vtOut 90ms linear both}
 ::view-transition-new(root){animation:vtIn 200ms var(--ease-out) both}
 ::view-transition-group(nav){animation-duration:.01s}
@@ -1250,6 +1250,9 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-xh::before{background:linear-gradient(180deg,rgba(19,27,41,.6),rgba(19,27,41,0) 36%),linear-gradient(90deg,#131B29 14%,rgba(19,27,41,.6) 50%,rgba(19,27,41,0) 86%),linear-gradient(0deg,#131B29 0%,rgba(19,27,41,0) 55%),url(assets/art/head-exercise.jpg) right center/cover no-repeat}
 .gm-dos .gm-bh::before{background:linear-gradient(180deg,rgba(23,33,49,.6),rgba(23,33,49,0) 36%),linear-gradient(90deg,#172131 14%,rgba(23,33,49,.6) 50%,rgba(23,33,49,0) 86%),linear-gradient(0deg,#172131 0%,rgba(23,33,49,0) 55%),url(assets/art/head-muscle.jpg) right center/cover no-repeat}
 .p3-xh h2,.p3-xh .sub,.gm-bt,.gm-bh .eyebrow{text-shadow:0 1px 12px rgba(8,12,20,.95)}
+/* 6 · tab switch (View Transition): the hero is its own group, so it cross-fades and morphs between the two tabs inside the same 200ms while the page rises 8px (vtIn) and the tab bar stays put. gpVtTag() names the hero just for the transition. */
+::view-transition-group(root),::view-transition-group(gp-hero){animation-duration:200ms}   /* the whole transition ends with the rise, no 250ms default tail */
+::view-transition-group(gp-hero){animation-timing-function:var(--ease-out);overflow:clip;border-radius:var(--r-l)}
 /* 4 · section headers: one line icon + one area accent. rec = records gold, vol = volume green, rcv = recovery blue, pln = plan amber, n = steel; gpSec() adds the chip by title, nothing is hand-placed */
 .gp-ic{flex:none;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:8px;color:var(--ac,var(--tx2));background:var(--act,rgba(150,178,222,.08));box-shadow:inset 0 0 0 1px var(--acr,var(--hair))}
 .gp-ic .gi{width:14px;height:14px;margin:0;stroke-width:2}
@@ -4250,7 +4253,7 @@ function go(tab,vt){
   const fi=_TAB_ORDER.indexOf(prevTab),ti=_TAB_ORDER.indexOf(tab);
   state._tabDir=(fi>=0&&ti>=0&&fi!==ti)?(ti>fi?"right":"left"):null;
   const swap=q=>{state.tab=tab;state.sumCard=0;try{localStorage.setItem("gt_tab",tab);}catch(e){}state._noEnter=q?1:0;render();state._noEnter=0;window.scrollTo(0,0);};
-  if(vt&&prevTab!==tab&&document.startViewTransition&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)){try{document.startViewTransition(()=>swap(1));return;}catch(e){}}
+  if(vt&&prevTab!==tab&&document.startViewTransition&&!gpReduced()){try{gpVtTag(1);const t=document.startViewTransition(()=>{swap(1);gpVtTag(1);}),untag=()=>gpVtTag(0);t.finished.then(untag,untag);return;}catch(e){}}
   swap(0);}
 
 /* ========================= ROUTER ========================= */
@@ -11199,9 +11202,16 @@ function gpLive(root,first,vk){
 function gpEnter(){
   const app=$("app"),root=app&&app.querySelector(":scope>.gh");if(!root||root.dataset.gp)return;
   root.dataset.gp="1";
+  if(state._noEnter)root.classList.remove("gh-anim");   // a tab switch by View Transition: the transition does the rising, the cards must not stagger on top of it
   const R=state.lastResult,vk=state.step==="summary"&&R?"sum"+(state.sumCard||0)+":"+((R.wk&&R.wk.date)||""):state._vk||"",first=gpFirst(vk);
   gpLive(root,first,vk);
   if(first&&vk.startsWith("tab:"))gpSweep(root);
+}
+/* tab switch: the hero joins the View Transition as its own group, named only for the length of the transition and only while it is on screen (go() calls this) */
+function gpVtTag(on){
+  const h=document.querySelector("#app>.gh .s3");if(!h)return;
+  if(on&&h.getBoundingClientRect().bottom<60)return;   // scrolled away: nothing to morph
+  h.style.viewTransitionName=on?"gp-hero":"";
 }
 /* every section header = one line icon + one area accent, the same everywhere: records gold · volume green · recovery blue · plan amber · the rest steel.
    Matched on the title's own words (first hit wins), so a new section picks its icon up by name. [pattern, GP.icon name, area] */
