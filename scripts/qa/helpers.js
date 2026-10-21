@@ -10,7 +10,7 @@ window.__qa = {
     try { state._cineQ = []; state._cineOn = false; } catch (e) {}
     try { const c = document.getElementById('cine'); if (c) c.classList.remove('on'); } catch (e) {}
     try { document.querySelectorAll('.g9-outro,.outro,#outro').forEach((n) => n.remove()); } catch (e) {}
-    try { const t = document.getElementById('toast'); if (t) t.classList.remove('on'); } catch (e) {}
+    try { const t = document.getElementById('toast'); if (t) { t.classList.remove('on'); t.style.pointerEvents = ''; } } catch (e) {}   // an Undo toast sets pointer-events:auto inline: hiding it must also hand the taps back
   },
   tab(t) { this.clear(); try { closeSheet(); } catch (e) {} state.subpage = null; state.step = state.session && state.step ? state.step : null; go(t); this.clear(); },
   // Index of the next training day on the active split (what "tonight" would be).
