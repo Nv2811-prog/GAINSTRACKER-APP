@@ -2178,6 +2178,24 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .lg2-mi .tx{display:flex;flex-direction:column;min-width:0}.lg2-mi b{font:600 15px/1.25 var(--body);color:var(--tx1)}.lg2-mi i{font:400 12.5px/1.3 var(--body);font-style:normal;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lg2-sec{margin:14px 0 4px;font:600 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
 .lg2-p{margin:6px 0;font:400 14px/1.45 var(--body);color:var(--tx2)}
+/* ===== GP:PRFIN (wave 9) ===== the PR finisher: a new e1RM record plays a Veo takedown clip full-screen (JS: PR FINISHER). Transform / opacity only, nothing infinite. */
+#prfin{position:fixed;inset:0;z-index:100000;background:#000;overflow:hidden;cursor:pointer;touch-action:none;overscroll-behavior:contain;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;opacity:1;transition:opacity .2s ease-out}
+#prfin.pf-hold,#prfin.pf-out{opacity:0}
+#prfin.pf-out{pointer-events:none}
+#prfin .pf-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000}
+#prfin .pf-scrim{position:absolute;left:0;right:0;bottom:0;height:58%;background:linear-gradient(to top,rgba(5,7,12,.94) 0%,rgba(5,7,12,.72) 42%,rgba(5,7,12,0) 100%);opacity:0;transition:opacity .4s ease-out}
+#prfin.pf-on .pf-scrim{opacity:1}
+#prfin .pf-stamp{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 7vh);padding:0 calc(22px + env(safe-area-inset-right,0px)) 0 calc(22px + env(safe-area-inset-left,0px));display:flex;flex-direction:column;align-items:center;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .32s ease-out,transform .32s ease-out}
+#prfin.pf-on .pf-stamp{opacity:1;transform:none}
+#prfin .pf-eye{font:650 12px/1 var(--body);letter-spacing:.3em;text-transform:uppercase;color:var(--gold-ink)}
+#prfin .pf-hair{display:block;width:min(64%,240px);height:1px;margin:12px 0 14px;background:linear-gradient(90deg,transparent,var(--gold) 22%,var(--gold-hi) 50%,var(--gold) 78%,transparent);transform:scaleX(0);transition:transform .5s .12s cubic-bezier(.2,.8,.2,1)}
+#prfin.pf-on .pf-hair{transform:none}
+#prfin .pf-lift{max-width:100%;font:650 17px/1.25 var(--disp);color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+#prfin .pf-num{margin-top:4px;font-family:var(--num);font-size:clamp(78px,25vw,108px);line-height:.88;letter-spacing:.01em;color:var(--tx1);text-shadow:0 3px 22px rgba(0,0,0,.65)}
+#prfin .pf-num small{margin-left:.14em;font-size:.3em;letter-spacing:.06em;color:var(--tx2)}
+#prfin .pf-sub{margin-top:10px;font:600 14px/1.2 var(--body);letter-spacing:.02em;color:var(--tx2)}
+#prfin .pf-sub b{color:var(--gold-ink);font-weight:700}
+/* ===== /GP:PRFIN ===== */
 </style>
 </head>
 <body>
@@ -2950,7 +2968,8 @@ suppStreak:{creatine:0,best:0,last:null}, // creatine daily streak
 raid:null,             // {boss,e,target,mine,ally,allyName,start} co-op raid
 prefs:{weather:true,boot:true,particles:true},
 gymEquipment:{},
-activeGymSplits:{}
+activeGymSplits:{},
+prFin:null             // {i} PR finisher: index of the NEXT clip in the Joker > Bane > Two-Face > Penguin > Scarecrow rotation (optional; absent = 0)
 };}
 let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,restTimer:0,restRunning:false,wtInt:null,restInt:null,showOnboarding:false,obStep:0,obTmp:{},sumCard:0,pickerCb:null,suitView:"front"};
 
@@ -4070,8 +4089,8 @@ function liveCheckPR(ei,si){
   // Tiered PRs: a single set can break several records at once. Track the session's running best
   // for each tier so we only toast genuine new ground, and rank them — e1RM is the crown.
   const lb=state.session.liveBest[exObj.name]=state.session.liveBest[exObj.name]||{orm:0,maxW:0,maxReps:0,maxVol:0};
-  const hits=[];
-  if(e1>cOrm+0.01&&e1>lb.orm+0.01){lb.orm=e1;hits.push({t:"e1rm",val:e1,prev:cOrm});}
+  const hits=[];state._prE1=null;
+  if(e1>cOrm+0.01&&e1>lb.orm+0.01){if(cOrm>0)state._prE1={k:ei+":"+si,name:exObj.name,val:e1,prev:Math.max(cOrm,lb.orm)};/* the PR finisher (prfStart) needs a STANDING record to beat; prev also counts this session's earlier records so the stamp's +delta is vs the last best */lb.orm=e1;hits.push({t:"e1rm",val:e1,prev:cOrm});}
   if(w>cW+0.01&&w>lb.maxW+0.01){lb.maxW=w;hits.push({t:"weight",val:w,prev:cW});}
   if(vol>cVol+0.01&&vol>lb.maxVol+0.01){lb.maxVol=vol;hits.push({t:"vol",val:vol,prev:cVol});}
   if(r>cReps&&r>lb.maxReps&&r<=12){lb.maxReps=r;hits.push({t:"reps",val:r,prev:cReps});} // rep PRs only count inside the 12-rep ceiling — past that, add weight, don't chase reps
@@ -4087,7 +4106,7 @@ function liveCheckPR(ei,si){
     }}catch(e){}
   // Co-op raid: an e1RM crown is a "record landed" — pool it toward the shared boss.
   if(hits.some(h=>h.t==="e1rm")){try{raidNotePR(1);}catch(e){}try{resolveCallouts(exObj.name);}catch(e){}}
-  /* PR during the session = an in-row moment (gold sweep, crown, chime). No full-screen takeover: the big celebration is the finish summary. */
+  /* PR during the session = the in-row moment (gold sweep, crown, chime); an e1RM record over a standing one also plays the PR finisher (lgPrMoment > prfStart). */
   if(hits.length){
     state.session._prCount=state.session._prCount||{};
     state.session._prCount[exObj.name]=(state.session._prCount[exObj.name]||0)+1;
@@ -11809,6 +11828,8 @@ function boot(){
   // cloud sync — go online for live Allies (deferred so it never blocks first paint)
   try{if(state.data.onboardingDone)setTimeout(()=>{try{cloudInit();}catch(e){}},800);}catch(e){}
   setTimeout(()=>{try{phBoot();}catch(e){}},600);   // progress photos: verify the vault, then move any full photo into it (async, idempotent)
+  setTimeout(()=>{try{if(state.data.onboardingDone)(window.requestIdleCallback||setTimeout)(prfWarm);}catch(e){}},3500);   // PR finisher: fetch the next clip while idle
+  window.addEventListener("online",()=>{try{prfWarm();}catch(e){}});
   // offline indicator: reflects real connectivity, reassures data is local
   const offUI=()=>{const p=$("offline-pill");if(p)p.classList.toggle("on",!navigator.onLine);};
   window.addEventListener("online",offUI);window.addEventListener("offline",offUI);offUI();
@@ -11971,7 +11992,91 @@ function lgGhosts(e){
   });
   return out;
 }
-function lgPrMoment(ei,si){state._lgPrFresh=ei+":"+si;try{sfx("pop");}catch(e){}haptic("pr");}
+function lgPrMoment(ei,si){state._lgPrFresh=ei+":"+si;try{sfx("pop");}catch(e){}haptic("pr");prfStart(ei+":"+si);}
+/* ===== PR FINISHER (GP:PRFIN, wave 9) =====
+   A new e1RM record over a standing one plays a Veo takedown clip full-screen (assets/pr/, see the README there). No Done button: a tap anywhere
+   skips, it closes itself at the end. The 2nd+ record of a session starts just before the impact (a ~5 s cut). The villain rotates Joker > Bane >
+   Two-Face > Penguin > Scarecrow, index in data.prFin.i (optional field), so never the same clip twice in a row. The NEXT clip is fetched while
+   the app is idle and held as a Blob: a blob: URL sidesteps iOS Safari's byte-range trouble with service-worker-served video, and the Cache API read
+   in prfGet makes every later boot free. A record that lands before the Blob is ready waits PRF_WAIT_MS, then gets only the in-row crown: never a
+   blank or frozen screen. prefers-reduced-motion shows the poster + stamp instead of the video. Sound: tried unmuted inside the tick's gesture,
+   falls back to muted + the app's own impact sfx. Overlay lives on <body>, outside render(): inputs, rest timer and scroll are never touched. */
+const PRF_CLIPS=[["joker",1.4],["bane",1.3],["two-face",1.3],["penguin",1.3],["scarecrow",1.4]];   // [id, impact seconds] from assets/pr/README.md
+const PRF_WAIT_MS=400,PRF_LEAD_S=.3,PRF_STAMP_S=1,PRF_HOLD_MS=800,PRF_STILL_MS=1200,PRF_GRACE_MS=250,PRF_START_MS=1600,PRF_GUARD_MS=2500;
+const prfBlank=()=>({i:-1,still:false,b:null,p:null});
+let _prf=prfBlank(),_prfOpen=false;   // the clip being held ({i: rotation index, b: Blob, p: its promise}); an overlay is up
+const prfIdx=()=>((state.data.prFin&&state.data.prFin.i)|0)%PRF_CLIPS.length;
+async function prfGet(url,type){
+  let r=null;
+  try{r=await caches.match(url,{ignoreVary:true});}catch(e){}   // the service worker kept it from an earlier boot: no network at all
+  if(!r)r=await fetch(url);                                     // goes through the service worker, which caches it for next time
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  return new Blob([await r.blob()],{type});                     // explicit type: a blob: video needs one whatever the server said
+}
+function prfWarm(){   // fetch the NEXT clip once (idempotent; safe to call any time). Reduced motion needs only the poster.
+  try{
+    const i=prfIdx();if(_prf.i===i)return _prf.p;
+    const still=gpReduced(),id=PRF_CLIPS[i][0],me=_prf={i,still,b:null,p:null};
+    me.p=prfGet(still?`assets/pr/${id}.jpg`:`assets/pr/${id}.mp4`,still?"image/jpeg":"video/mp4").then(b=>{me.b=b;return me;}).catch(()=>{if(_prf===me)_prf=prfBlank();return null;});
+    return me.p;
+  }catch(e){return null;}
+}
+function prfStart(key){   // called inside the ✓ tap by lgPrMoment
+  try{
+    const f=state._prE1;
+    if(!f||f.k!==key||_prfOpen)return;                  // e1RM over a standing record only; one finisher at a time
+    const me=_prf;if(me.i!==prfIdx())return;            // nothing fetched for this turn (offline, not warmed yet): the in-row crown is the whole moment
+    if(me.b){prfShow(me,f);return;}                     // ready: start inside this very tap, so the clip may play with sound
+    if(me.p)Promise.race([me.p,new Promise(r=>setTimeout(r,PRF_WAIT_MS))]).then(r=>{if(r&&!_prfOpen&&state.session&&state.step==="logging")prfShow(r,f);}).catch(()=>{});
+  }catch(e){}
+}
+function prfHtml(f,dt,url,still){
+  return (still?`<img class="pf-bg" alt="" src="${url}">`:`<video class="pf-bg" src="${url}" playsinline webkit-playsinline preload="auto"></video>`)+
+    `<div class="pf-scrim"></div><div class="pf-stamp"><div class="pf-eye">New record</div><i class="pf-hair"></i><div class="pf-lift">${esc(f.name)}</div>`+
+    `<div class="pf-num">${fmtNum(f.val)}<small>kg</small></div><div class="pf-sub">e1RM <b>+${fmtKg(dt)} kg</b></div></div>`;
+}
+function prfShow(me,f){
+  const ses=state.session,id=PRF_CLIPS[me.i][0],at=PRF_CLIPS[me.i][1],short=(ses._finN|0)>0,t0=performance.now();
+  _prfOpen=true;_prf=prfBlank();ses._finN=(ses._finN|0)+1;state.data.prFin={i:(me.i+1)%PRF_CLIPS.length};   // advance now: a skip, an error or a kill never replays this clip next
+  const url=URL.createObjectURL(me.b),d=f.val-f.prev,dt=d>=1?Math.round(d):(Math.round(d*10)/10||.1);
+  const el=document.createElement("div");el.id="prfin";el.dataset.clip=id;if(short)el.dataset.short="1";
+  el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","New record, "+f.name+". Tap to skip.");
+  el.innerHTML=prfHtml(f,dt,url,me.still);
+  const v=el.querySelector("video"),timers=[];let closed=false;
+  const later=(fn,ms)=>{timers.push(setTimeout(fn,ms));};
+  const close=()=>{
+    if(closed)return;closed=true;timers.forEach(clearTimeout);
+    const unseen=el.classList.contains("pf-hold");el.classList.add("pf-out");
+    setTimeout(()=>{
+      if(v){try{v.pause();v.removeAttribute("src");v.load();}catch(e){}}   // let go of the decoder
+      el.remove();URL.revokeObjectURL(url);_prfOpen=false;
+      try{save();prfWarm();}catch(e){}                                        // persist the rotation, then fetch the next clip
+    },unseen?0:230);
+  };
+  el.addEventListener("click",()=>{if(performance.now()-t0>PRF_GRACE_MS)close();});   // tap anywhere skips (click, not touchstart: nothing falls through to the page)
+  document.body.appendChild(el);
+  if(me.still){el.classList.add("pf-on");later(close,PRF_STILL_MS);return;}
+  el.classList.add("pf-hold");                                                       // invisible until the first frame is really playing
+  prfPlay(v,el,at,short?Math.max(0,at-PRF_LEAD_S):0,later,close);
+}
+function prfPlay(v,el,at,from,later,close){
+  if(from)try{v.currentTime=from;}catch(e){}                          // before the metadata loads, this becomes the start position
+  v.addEventListener("ended",()=>{el.classList.add("pf-on");later(close,PRF_HOLD_MS);});   // hold the last frame + stamp a beat, then close itself
+  v.addEventListener("error",close);
+  v.addEventListener("pause",()=>{if(!v.ended)close();});             // iOS pauses it for a call, Siri or leaving the app: close, never a frozen frame
+  v.addEventListener("playing",()=>{
+    el.classList.remove("pf-hold");
+    const left=(v.duration||6)-v.currentTime;
+    later(()=>el.classList.add("pf-on"),Math.max(0,left-PRF_STAMP_S)*1000);                // the stamp lands in the calm final second
+    later(close,left*1000+PRF_HOLD_MS+PRF_GUARD_MS);                                       // guard: `ended` never came
+    if(v.muted)later(()=>{sfx("slam");haptic("hit");},Math.max(0,at-v.currentTime)*1000);   // muted fallback: the app's own impact
+  },{once:true});
+  later(()=>{if(v.paused||v.readyState<3)close();},PRF_START_MS);      // it never got going
+  audioMix();v.muted=false;
+  const go=v.play();
+  if(go&&go.catch)go.catch(()=>{v.muted=true;return v.play();}).catch(close);   // sound was refused: muted autoplay always works
+}
+/* ===== /PR FINISHER ===== */
 function lgUndo(ei,si){const ses=state.session,e=ses.exercises[ei],s=e.sets[si];delete s.t;delete s.rest;delete s.rx;if(ses._prRows&&ses._prRows[ei+":"+si]){delete ses._prRows[ei+":"+si];if(ses.liveBest)delete ses.liveBest[e.name];}}
 function lgRirSet(e,s,v){const rir=state.data.u.metric==="rir";s.rpe=rir?(v>=4?"4+":String(v)):String(v>=4?6:10-v);}
 function lgRir(ei,si,v){try{event.stopPropagation();}catch(_){}const s=state.session.exercises[ei].sets[si];if(rirOfSet(s)===v)s.rpe="";else lgRirSet(null,s,v);haptic("tap");saveSessionSoon();render();}
@@ -12207,6 +12312,7 @@ function playStinger(title,sub,accent){
   }catch(e){}
 }
 function beginPatrol(){state.step='logging';startTimers();try{haptic('done');}catch(e){}
+  try{prfWarm();}catch(e){}   // PR finisher: make sure the next clip is on its way (a no-op when it already is)
   try{cloudPresence(true);}catch(e){}
   // the mission brief is text-only now (Alfred speaks aloud on records + session finish only)
   render();}
