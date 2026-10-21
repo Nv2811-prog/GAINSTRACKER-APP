@@ -149,3 +149,8 @@ Same pipeline as above (`scripts/gen-image.mjs`, gemini-2.5-flash-image, about $
   `sips -s format jpeg -s formatOptions 72`).
 - Tile: draft A (bowl seen edge-on, the food hidden behind the rim), B picked; cropped to a 1000x1000 window at
   (12, 12), resized to 360x360 and exported at quality 72.
+
+### Wired in (wave 8)
+
+`gsHero()` places `suit-hero.jpg` with `gaArt("suit-hero")`; the lighter veil lives in `.ga-suit-hero` (GP:STRENGTH+SUIT) and the scroll parallax and first-view sweep come from GP:CHARM like every other hero.
+`gsDock()` uses `tile-fuel` for the Fuel tile. `suit.jpg` stays only because the Profile Body dock tile crops it.

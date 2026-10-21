@@ -85,7 +85,7 @@ Other shared pieces: `openSheet(html)` / `closeSheet()`, `toast(msg)`, `topBar(l
 
 ## 7 · Art recipe (cinematic Gotham, behind the hero)
 Seven heroes in `assets/art/` (720x480 JPEG, 33-52 KB, ~287 KB total; see `assets/art/README.md`): `logging` (cave gym), `rest` (blue-hour skyline),
-`finish` (gold signal beam), `profile` (armoured cowl, crimson kicker), `mission` (war room), `suit` (carbon plates, the quietest), `allies` (two caped figures), plus the `tile-*.jpg`
+`finish` (gold signal beam), `profile` (armoured cowl, crimson kicker), `mission` (war room), `suit-hero` (a bat-suit in a glass vault under one gold shaft; low-key, so it gets a lighter left veil than the standard recipe, see `.ga-suit-hero` in GP:STRENGTH+SUIT; the old `suit.jpg` carbon band now only crops into the Profile Body tile), `allies` (two caped figures), plus the `tile-*.jpg`
 dock stills (one per feature tile, small crops; a tile without its own still reuses another with `pos:` to crop it differently).
 - Subject lives in the right ~40% of the frame; the left ~60% is dark so text sits on it.
 - Placed by `gaArt(n,c)` as `.ga` (absolute, `z-index:-2`, `pointer-events:none`) -> `<img>` with `object-position:right center`, opacity via `--o`, and a **left + bottom gradient mask** — never raw. A missing file drops its own layer (`onerror` removes the node).
@@ -211,6 +211,7 @@ Checked per screen by `node scripts/qa/perf.mjs [--throttle 4]` (4x CPU throttle
 | `GP:CHARM (wave 6)` ... `/GP:CHARM` | scroll-driven hero art, `.gp-sw` sweep, `.gp-first` draw-ins, section header icons (`.gp-ic`, `data-ac`), tab-switch morph |
 | `GP:WEEKLY+BODY (wave 7)` ... `/GP:WEEKLY+BODY` | `.wk-*` one-tap adjust buttons and `.bd-*` the Profile Body section |
 | `GP:PHOTOS (wave 7)` ... `/GP:PHOTOS` | `.pc-*` Suit photo card, single-photo sheet, Compare |
+| `GP:STRENGTH+SUIT (wave 8)` ... `/GP:STRENGTH+SUIT` | `.ga-suit-hero` (the Suit hero still + veil), the Strength rows' via line (`.p3-sv`, `.p3-go`) and the variations sheet (`.sv-*`) |
 The JS has matching banners (`/* ===== ... (GP:TABS, wave 5) ===== */`, `GP:CHARM`, `FEATURE DOCK (GP:DOCKS)`, `ONE-TAP WEEKLY ADJUST`, `BODY (Profile, wave 7)`, `PROGRESS PHOTOS (GP:PHOTOS)`). Scoped primitives live under `.gh` (+ `.gm` / `.p3-pf` / `.al-pg` ...) so a tab can restyle without leaking. Do not add a new wave-layer that overrides an old rule: edit the rule in place and delete what it replaced.
 
 ## 17 · Mobile rules (iPhone Safari PWA first)
@@ -224,3 +225,15 @@ The JS has matching banners (`/* ===== ... (GP:TABS, wave 5) ===== */`, `GP:CHAR
 - No overlay haptic hosts beyond `#nav button` and `.sdone`. No more than one infinite animation or three backdrop-filters per screen.
 - No second copy of something that already has a home (§10); no icon-only control without an `aria-label`; no glyph-only button.
 - Never edit `index.html` (generated deploy copy) and never break or erase `localStorage` data.
+
+## 19 · Strongest variation (GP:STRENGTH+SUIT, wave 8)
+Strength standards read movement PATTERNS, not single exercises. `liftEstimate(lift)` (now, from the PR records of the active gym) and `liftEstimateAt(lift, t, svRows(lift))` (history) are the ONLY readers of "how strong is your squat / bench / deadlift / press / row":
+both rank every logged variation through `svRank` and return the strongest barbell equivalent. The Strength card, the Big-3 total (`p3BigThree`), the Body trend (`bdRel`, whose last point is the same sum), the Standards dock tile, the ally
+optimality score (`myPatrolCard`) and the bodyweight badges (`achStats().bwRatio`) all call it. Before adding another strength ratio anywhere, call it too (§1: one number, one source).
+- **The `SV` table** (one entry per lift): `yes` = names in the pattern, `no` = dumbbell / cable / kettlebell / band / single-leg / unilateral / accessory lifts, which never count (their load is not comparable to a barbell), and ordered rows `[test, factor, label]`, first match wins.
+  The comment above the table documents every factor and why. Factor = barbell-equivalent / logged e1RM.
+- **Conservative by construction:** a conversion may understate a lift, never flatter it, and a converted lift (factor != 1) is capped at the Elite tier x bodyweight (shown as "capped at Elite"); a real barbell lift is never capped.
+  Leg press x0.50 (45°, horizontal, plate-loaded, lying squat machine), hack / V-squat / belt squat x0.85, pendulum x0.75, Smith x0.90, front squat x1.15; machine presses and rows x0.85, incline x1.12, floor press x0.95;
+  RDL / stiff-leg x1.10, rack pull x0.80, trap bar x0.95, hip-hinge machines x0.85; push press x0.80.
+- **UI:** a Strength row is a `role=button` that says `est. · via <exercise> · <raw> kg × <factor>` and opens `openStrengthLift(lift)` (strongest first, then the rest with their conversion). That sheet is the only place the table is visible.
+  `node scripts/qa/strength.mjs` covers the ranking, the exclusions, the cap, one-number-everywhere and the sheet.
