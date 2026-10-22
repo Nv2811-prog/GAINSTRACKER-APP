@@ -9599,7 +9599,7 @@ function _alfScroll(top){
 }
 function _alfSub(){
   const s=$("ac-sub");if(!s)return;const k=!!geminiKey();
-  s.innerHTML=_alfListening?"Listening…":`<i class="ac-dot${k?" on":""}"></i>${k?"Training coach":"Offline mode · app help"}`;
+  s.innerHTML=_alfListening?"Listening…":`<i class="ac-dot${k?" on":""}"></i>${k?"Training coach":"No key · answers from your logs"}`;
 }
 function _alfMicUi(){const b=$("ac-mic");if(b)b.classList.toggle("rec",_alfListening);_alfSub();}
 /* tiny markdown: **bold**, "- " bullets and "1." steps */
@@ -9630,7 +9630,7 @@ function _alfEmpty(){
   const {tr,ap}=alfSuggest();
   const grp=(t,a)=>`<div class="ac-gl">${t}</div><div class="ac-chips">${a.map(q=>_alfChip(q)).join("")}</div>`;
   const hr=new Date().getHours(),hi=hr<5?"Burning the midnight oil":hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
-  return `<div class="ac-empty"><img class="ac-big" src="assets/alfred.png" alt=""/><div class="ac-et">${hi}.</div><div class="ac-es">Ask me about your training, your numbers, or how the app works.</div>${grp("Training",tr)}${grp("The app",ap)}${geminiKey()?"":`<div class="ac-note">Live training answers need a free Gemini key. <button class="ac-link" onclick="_alfOpen('settings')">Open Settings</button> Until then I can still explain the app.</div>`}</div>`;
+  return `<div class="ac-empty"><img class="ac-big" src="assets/alfred.png" alt=""/><div class="ac-et">${hi}.</div><div class="ac-es">Ask me about your training, your numbers, or how the app works.</div>${grp("Training",tr)}${grp("The app",ap)}${geminiKey()?"":`<div class="ac-note">Without a free Gemini key I answer from your logs and explain the app. <button class="ac-link" onclick="_alfOpen('settings')">Open Settings</button> for open-ended coaching.</div>`}</div>`;
 }
 function _alfActLabel(a){
   const g=a.args||[],cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
@@ -9741,10 +9741,12 @@ async function _alfSend(q,pic,viaMic){
   if(r.run)setTimeout(()=>{try{closeAlfredChat();r.run();}catch(e){}},450);
   else if(r.auto&&r.actions&&r.actions.length)setTimeout(()=>{try{_alfExecAction(r.actions[0].type,r.actions[0].args);}catch(e){}},600);
 }
+const _alfAsk=(q,pic)=>pic||ALF_HOW.test(q)?null:alfIntel(q);   // what is being asked, worked out from his logs (null for a photo or a how-to)
 async function _alfReply(q,pic){
   const loc=_alfLocal(q,pic);if(loc)return loc;
-  if(!geminiKey())return _alfOffline(q);
-  const raw=await geminiConvCall(_alfContents(q,pic,""),alfredContext(true));
+  const it=_alfAsk(q,pic);
+  if(!geminiKey())return _alfOffline(q,it);
+  const raw=await geminiConvCall(_alfContents(q,pic,it&&!it.ask?it.hint:""),alfredContext(true));
   state.data.u.aiUses=(state.data.u.aiUses||0)+1;try{checkAchievements();}catch(e){}
   return _alfParseReply(raw);
 }
@@ -9768,12 +9770,14 @@ function _alfParseReply(raw){
 }
 function _alfFail(e,q){
   const m=String((e&&e.message)||"");
-  if(/limit/i.test(m))return {text:"I've hit the free-tier limit for the minute, sir. Give me about a minute and ask again.",loc:true};
   if(/valid|rejected/i.test(m))return {text:"That Gemini key isn't being accepted. Check it under Settings → Gemini API key and I'll be back in business.",actions:[{type:"OPEN",args:["settings"]}],loc:true};
-  return _alfOffline(q);
+  return _alfOffline(q,_alfAsk(q),/limit/i.test(m)?"limit":/credits/i.test(m)?"credits":"");
 }
-/* No key / offline: app questions come from the best-matching guide section; training questions get a friendly note */
+/* ===== NO KEY / NO CONNECTION (GP:ALFRED2, wave 10) =====
+   A how-to or "what does X mean" question gets the 1-2 best guide clauses. Anything about his own numbers goes to the LOCAL ANALYSIS ENGINE
+   (alfIntel, below). What neither recognises is said honestly: never a guess, never a pasted manual page. */
 const ALF_STOP=new Set("the and for you your are can how what why when where does did not with from that this have has about mean means work works tell give show please explain which would should could into onto than then them they there their some any all out off over just like".split(" "));
+const ALF_HOW=/\b(mean|means|meaning|works?|calculated|explain|walk me through|how (do|can|to|would) (i|you|we)|where (do|can|is|are)|what (is|are|does) (the|a|an))\b/i;
 let _alfSecs=null;
 function _alfSections(){
   return _alfSecs||(_alfSecs=ALFRED_APP_GUIDE.split(/^## /m).map(s=>s.trim()).filter(Boolean).map(s=>{
@@ -9781,29 +9785,166 @@ function _alfSections(){
     return {title,t:title.toLowerCase(),b:s.toLowerCase(),body:(n<0?"":s.slice(n+1)).trim()};
   }));
 }
+const _alfWords=q=>(String(q).toLowerCase().match(/[a-z0-9]+/g)||[]).filter(x=>x.length>2&&!ALF_STOP.has(x)).map(x=>x.length>=6?x.slice(0,-2):x);
 function _alfGuide(q){
-  const w=(String(q).toLowerCase().match(/[a-z0-9]+/g)||[]).filter(x=>x.length>2&&!ALF_STOP.has(x)).map(x=>x.length>=6?x.slice(0,-2):x);
+  const w=_alfWords(q);
   if(!w.length)return null;
   let best=null;
   _alfSections().forEach(s=>{let sc=0,ti=0;w.forEach(x=>{if(s.t.includes(x)){sc+=2;ti++;}sc+=Math.min(3,s.b.split(x).length-1);});if(!best||sc>best.sc)best={s,sc,ti};});
   return best&&best.sc>=4?best:null;
 }
-function _alfOffline(q){
-  const g=_alfGuide(q);
-  if(g){const lab=g.s.title.replace(/[:(].*$/,"").trim().toLowerCase();return {text:"Straight from the manual — **"+lab.charAt(0).toUpperCase()+lab.slice(1)+"**\n"+g.s.body,loc:true};}
-  if(geminiKey())return {text:"I can't reach my sources just now, so I can't think that one through properly. Ask me again once you're back online — I can still explain how the app works in the meantime.",loc:true};
-  return {text:"That one needs my live line, sir, and there's no Gemini key on this device yet. Add the free key under Settings → Gemini API key and I can talk training properly. Until then I'm still good for questions about how the app works.",actions:[{type:"OPEN",args:["settings"]}],loc:true};
+function _alfShort(g,q){   // the 1-2 clauses of the section that fit the question best, trimmed around the matching words (never the whole page); null = none really does
+  const w=_alfWords(q),cl=g.s.body.replace(/\s+/g," ").split(/[.;]\s+/).map(x=>x.trim()).filter(Boolean);
+  const need=Math.min(2,w.length),sc=cl.map((t,i)=>({t,i,n:w.filter(x=>t.toLowerCase().includes(x)).length})).filter(x=>x.n>=need);
+  if(!sc.length)return null;
+  let t=sc.sort((a,b)=>b.n-a.n||a.i-b.i).slice(0,2).sort((a,b)=>a.i-b.i).map(x=>x.t).join(". ");
+  if(t.length>300){
+    const lo=t.toLowerCase(),at=w.map(x=>lo.indexOf(x)).filter(x=>x>=0).sort((a,b)=>a-b)[0]||0,s0=at>90?t.indexOf(" ",at-90)+1:0;
+    t=(s0?"…":"")+t.slice(s0,s0+300).replace(/\s+\S*$/,"")+"…";
+  }
+  return t.replace(/[.…]*$/,m=>m.includes("…")?"…":".");
+}
+const _alfTitle=g=>{const l=g.s.title.replace(/[:(].*$/,"").trim().toLowerCase();return l.charAt(0).toUpperCase()+l.slice(1);};
+const ALF_FALLBACK_CHIPS=["Am I ready to train?","What should I hit tonight?","Any records this week?"];
+const ALF_WHY={limit:"I've hit the free-tier limit for the minute. Give me about a minute and ask again, or try:",credits:"Your Gemini credits are used up, so I can't think that one through. Top the key up at aistudio.google.com. Meanwhile, try:"};
+function _alfOffline(q,it,why){   // it = alfIntel(q) or null; why = what stopped the AI ("limit" | "credits" | "" = no connection)
+  const g=_alfGuide(q),gs=g&&g.ti?_alfShort(g,q):null,key=!!geminiKey();   // a guide answer needs the section's title AND one clause to share the question's words
+  if(gs&&ALF_HOW.test(q))return {text:"**"+_alfTitle(g)+"** — "+gs,loc:true};
+  if(it)return {text:it.text,loc:true};
+  if(/^(thanks|thank you|cheers|ok|okay|cool|nice|great|got it)\b/i.test(q))return {text:"Anytime.",loc:true};
+  if(gs)return {text:"**"+_alfTitle(g)+"** — "+gs,loc:true};
+  return key
+    ?{text:ALF_WHY[why]||"I can't reach my AI line right now, and I won't guess at that one. Ask again once you're back online, or try:",follow:ALF_FALLBACK_CHIPS,loc:true}
+    :{text:"That one needs my AI line, and this device has no Gemini key. Add the free key in Settings and I'll think it through. Meanwhile, try:",follow:ALF_FALLBACK_CHIPS,actions:[{type:"OPEN",args:["settings"]}],loc:true};
+}
+
+/* ===== LOCAL ANALYSIS ENGINE (GP:ALFRED2, wave 10) =====
+   alfIntel(q) works out WHAT was asked (readiness, tonight, a muscle's recovery or sets, a lift's last / best / next, stalled lifts, this
+   week's records and sessions) and answers it in 1-2 sentences from his own logs: {id,text,hint} (id "ask" = one clarifying question).
+   Pure reads, nothing is ever written. No key: text is the answer. With a key: it rides along as the PRE-COMPUTED line so the model builds on
+   exact numbers. Nothing recognised = null, and the caller says so instead of guessing. */
+const ALF_MUSC=[["chest",/\b(chest|pecs?|pectorals?)\b/],["back",/\b(back|lats?|latissimus)\b/],["shoulders",/\b(shoulders?|delts?|deltoids?)\b/],["biceps",/\bbiceps?\b/],["triceps",/\btriceps?\b/],["forearms",/\bforearms?\b/],["quads",/\b(quads?|quadriceps|thighs?)\b/],["hamstrings",/\b(hamstrings?|hams)\b/],["glutes",/\b(glutes?|butt)\b/],["calves",/\b(calf|calves)\b/],["abs",/\b(abs|core|abdominals?)\b/],["traps",/\b(traps?|trapezius)\b/]];
+const ALF_MUSWORDS=new Set(["chest","back","shoulder","bicep","tricep","forearm","quad","hamstring","glute","calve","calf","abs","core","trap","pec","lat","delt"]);
+const _alfStem=w=>w.length>3?w.replace(/s$/,""):w;
+const _alfSet=b=>(+b.w?fmtKg(+b.w)+" kg × ":"")+b.r+(+b.w?"":" reps");
+const _alfAgo=n=>n<=0?"today":n===1?"yesterday":n+" days ago";
+function _alfLift(s){   // a lift he has actually logged, matched on the lift's own words: {name} | {ask:[tied names]} | null
+  const qw=new Set((s.match(/[a-z0-9]+/g)||[]).map(_alfStem)),c=[];
+  loggedExerciseNames().forEach(n=>{
+    const nw=[...new Set((n.toLowerCase().match(/[a-z0-9]+/g)||[]).filter(w=>w.length>2&&!ALF_STOP.has(w)).map(_alfStem))],hit=nw.filter(w=>qw.has(w));
+    if(!hit.length||(hit.length===1&&ALF_MUSWORDS.has(hit[0])))return;   // "chest" alone means the muscle, not "Chest Press"
+    c.push({n,sc:hit.length+(hit.length===nw.length?.5:0)});
+  });
+  if(!c.length)return null;
+  const top=Math.max(...c.map(x=>x.sc)),t=c.filter(x=>x.sc>top-1e-9);
+  return t.length>1?{ask:t.map(x=>x.n)}:{name:t[0].n};
+}
+function _alfLiftAns(n,kind){
+  const it=liftIntel(n);if(!it||!it.last)return `No logged sets for ${n} yet.`;
+  const b=it.last.bset,p=state.data.prs[n],last=(b?_alfSet(b)+" ":"")+`(${_alfAgo(it.daysAgo)})`,t=it.tgt,next=t?`${t.w?fmtKg(t.w)+" kg":"bodyweight"} × ${t.r}${t.type==="rep"?"+":""} (${t.reason})`:"";
+  const best=p&&p.orm>0?`${Math.round(p.orm)} kg e1RM (${_alfSet(p)})`:`${Math.round(it.bestE)} kg e1RM`;
+  if(kind==="stall")return it.stalled?`${n} is stalled: its best (${Math.round(it.bestE)} kg e1RM) has not been beaten in ${it.sinceImprove} sessions. ${stallFix(n)[1]}`
+    :`${n} is not stalled: ${it.trend==="up"?"up "+Math.abs(it.pct)+"%":it.trend==="down"?"down "+Math.abs(it.pct)+"%":"flat"} over its last sessions, best ${best}.`;
+  if(kind==="best")return `${n}: best ${best}.`;
+  if(kind==="last")return `${n}: last ${last}.`;
+  if(kind==="next")return next?`Next on ${n}: ${next}. Last time ${last}.`:`${n}: last ${last}, no target yet.`;
+  return `${n}: last ${last}, best ${best}.`+(next?` Next: ${next}.`:"");
+}
+function _alfRecAns(ms,verdict){   // recovery of the named muscles; with a verdict when he asks whether to train one
+  const d=state.data;
+  if(ms.length>1){
+    const no=ms.filter(m=>getRecovery(m)<50),mid=ms.filter(m=>getRecovery(m)>=50&&getRecovery(m)<80),nm=a=>a.map(m=>MNAME[m].toLowerCase()).join(", ");
+    return ms.map(m=>`${MNAME[m]} ${getRecovery(m)}%`).join(", ")+" recovered."+(verdict?(no.length?` Not yet: ${nm(no)}.`:mid.length?` Still recovering: ${nm(mid)}.`:" All good to train."):"");
+  }
+  const m=ms[0],r=getRecovery(m);
+  return `${MNAME[m]} is ${_alfRecBit(m)}.`+(verdict?(r>=80?" Good to train.":r>=50?" Still recovering, so wait if you can.":" Not yet: give it the time."):"");
+}
+function _alfRecBit(m){const h=muscleFatigue(m).hrs;return (state.data.muscleVol[m]||0)>0?`${getRecovery(m)}% recovered, ${h>0?"about "+h+" h from fully ready":"ready now"}`:"untrained so far, so fully fresh";}
+function _alfRecAll(){
+  const tr=M12.filter(m=>(state.data.muscleVol[m]||0)>0);
+  if(!tr.length)return "Nothing logged yet, so there is nothing to recover from.";
+  const low=tr.map(m=>({m,r:getRecovery(m),h:muscleFatigue(m).hrs})).filter(x=>x.r<80).sort((a,b)=>a.r-b.r);
+  return low.length?"Least recovered: "+low.slice(0,3).map(x=>`${MNAME[x.m]} ${x.r}% (about ${x.h} h)`).join(", ")+". Everything else is 80%+.":"Every muscle you have trained is 80%+ recovered, so anything is fair game.";
+}
+function _alfSetsBit(m){
+  const ws=weeklySets(m),z=zoneOf(m,ws),v=z.key==="low"?`${z.mev-ws} short of MEV, not enough to grow yet`:z.key==="grow"?"in the growth zone":z.key==="high"?"high but still recoverable":"over MRV, ease off";
+  return `${ws} hard sets this week, ${v} (MEV ${z.mev} · MAV ${z.mav} · MRV ${z.mrv})`;
+}
+const _alfSetsAns=ms=>ms.map(m=>`${MNAME[m]}: ${_alfSetsBit(m)}.`).join(" ");
+function _alfBehind(){   // muscles under MEV, furthest behind first
+  const low=M12.map(m=>({m,ws:weeklySets(m),mev:VL[m].mev})).filter(x=>x.ws<x.mev).sort((a,b)=>(b.mev-b.ws)-(a.mev-a.ws));
+  const hi=M12.filter(m=>weeklySets(m)>effectiveMRV(m));
+  return (low.length?"Furthest behind MEV: "+low.slice(0,4).map(x=>`${MNAME[x.m]} ${x.ws}/${x.mev}`).join(", ")+".":"Every muscle is at or above its MEV this week.")+(hi.length?" Over MRV: "+hi.map(m=>MNAME[m]).join(", ")+".":"");
+}
+function _alfReady(){
+  const p=patrolReadiness();
+  if(p.score==null)return "Log a session first: readiness needs your training history to read.";
+  return `Readiness ${p.score} (${p.label}): ${p.scope==="tonight"?"tonight's muscles are":"your three most fatigued muscles are"} ${p.rec}% recovered${p.sleepKnown?`, sleep ${p.sleep}%`:""}. ${p.line}`;
+}
+function _alfTonight(){
+  const cp=currentPlanDay();if(!cp||!cp.day)return null;
+  const {sp,i,day}=cp;
+  if(isRest(day)){const nx=sp.days.slice(i+1).concat(sp.days.slice(0,i)).find(x=>!isRest(x));return `Tonight is a rest day (${day.name}) in ${sp.name}.`+(nx?` Next training day: ${nx.name}.`:"");}
+  const pm=dayMuscles(day).prim,all=Object.keys(pm),ms=all.slice().sort((a,b)=>pm[b]-pm[a]).slice(0,3);
+  if(!all.length)return `Tonight: ${day.name}, ${(day.exercises||[]).length} lifts.`;
+  const rec=Math.round(all.reduce((a,m)=>a+getRecovery(m),0)/all.length),lo=all.slice().sort((a,b)=>getRecovery(a)-getRecovery(b))[0];
+  return `Tonight: ${day.name}, hitting ${ms.map(m=>MNAME[m].toLowerCase()).join(", ")}${all.length>3?" and more":""}. Those muscles are ${rec}% recovered`+(getRecovery(lo)<60?`, ${MNAME[lo].toLowerCase()} lowest at ${getRecovery(lo)}%`:"")+".";
+}
+function _alfStalledAns(scope){   // scope = an optional list of lift names to look within
+  const L=stalledLifts().filter(x=>!scope||scope.includes(x.n));
+  if(!L.length)return scope?"None of those is stalled: every one you trained in the last 3 weeks is still moving.":"Nothing is stalled right now: every lift you trained in the last 3 weeks is still moving.";
+  return "Stalled: "+L.slice(0,3).map(s=>`${s.n} (best ${Math.round(s.best)} kg e1RM, flat ${s.sessions} sessions)`).join(", ")+`. For ${L[0].n}: ${stallFix(L[0].n)[1]}`;
+}
+function _alfWeekPRs(){
+  const t0=weekStartK(0),ws=(state.data.workouts||[]).filter(w=>new Date(w.date).getTime()>=t0),nm=[];
+  ws.forEach(w=>(w.prs||[]).forEach(n=>{if(!nm.includes(n))nm.push(n);}));
+  return nm.length?`${nm.length} record${nm.length>1?"s":""} this week: ${nm.slice(0,5).join(", ")}${nm.length>5?" and "+(nm.length-5)+" more":""}.`:`No new records this week yet (${ws.length} session${ws.length===1?"":"s"} logged).`;
+}
+function _alfWeekAns(s){
+  const u=state.data.u,c=weekCount(),g=u.weeklyGoal||4,st=u.streakDays||0;
+  return `${c} of ${g} sessions this week${c>=g?", goal met":`, ${g-c} to go`}.`+(/streak/.test(s)?` Streak: ${st} day${st===1?"":"s"}.`:"");
+}
+function _alfMisc(s){   // standing, bodyweight, fuel targets
+  const u=state.data.u,has=re=>re.test(s);
+  if(has(/\b(how strong|standing|percentile|stack up)\b/)){const c=myPatrolCard();return c.opt?`Across your big lifts you are in roughly the top ${Math.max(1,100-c.opt)}% of trained lifters (strength level ${c.sl}).`:"Log your big lifts and I can place you against other lifters.";}
+  if(has(/\b(body ?weight|how much do i weigh|my weight|weigh in)\b/))return u.bodyweight?`Bodyweight on record: ${u.bodyweight} kg.`:"No bodyweight logged yet: add it under Profile, Body.";
+  if(has(/\b(calories|kcal|macros?|protein|how much (should i )?eat)\b/)){const n=u.nutrition;return n&&n.cals?`Daily target: ${fmtNum(n.cals)} kcal · ${n.protein} g protein · ${n.carbs} g carbs · ${n.fat} g fat.`:"No fuel protocol set yet: open Fuel and I'll work out your targets.";}
+  return null;
+}
+function alfIntel(q){
+  const s=" "+String(q||"").toLowerCase().replace(/[^a-z0-9?' ]+/g," ").replace(/\s+/g," ").trim()+" ",has=re=>re.test(s);
+  const out=(id,text)=>text?{id,text,hint:text.replace(/\*\*/g,"")}:null;
+  const ms=ALF_MUSC.filter(x=>x[1].test(s)).map(x=>x[0]).concat(has(/\blegs?\b/)?["quads","hamstrings","glutes","calves"]:[],has(/\barms?\b/)?["biceps","triceps","forearms"]:[]).filter((m,i,a)=>a.indexOf(m)===i&&(m!=="back"||!has(/\b(i'?m|im|we'?re|go|come|get|got|be|bring|take|put|step|fall|bounce|right|are)\s+back\b|\bback\s+(to|off|up|down|in|out|on|then|later|soon|again|here)\b/)));
+  const L=_alfLift(s),short=s.trim().split(" ").length<=4;
+  const liftQ=has(/\b(last|previous|latest|next|target|beat|increase|overload|progress\w*|go up|add weight|how much|what weight|which weight|pr|prs|record|best|max|1rm|e1rm|heaviest|trend\w*|doing|going)\b/)||has(/\bshould i (lift|use|do|go|put|add|try|take)\b/);
+  if(has(/\b(stall\w*|plateau\w*|stuck|stagnat\w*|no progress|not (progress\w*|improv\w*|moving|going up))\b/))
+    return L&&L.name?out("lift",_alfLiftAns(L.name,"stall")):out("stall",_alfStalledAns(L&&L.ask));
+  if(L&&L.name&&(liftQ||short))return out("lift",_alfLiftAns(L.name,has(/\b(pr|prs|record|best|max|1rm|e1rm|heaviest)\b/)?"best":has(/\b(next|target|beat|increase|overload|go up|add weight|how much|what weight|which weight|should i)\b/)?"next":has(/\b(last|previous|latest)\b/)?"last":"status"));
+  if(L&&L.ask&&liftQ)return {id:"ask",ask:true,text:`Which one: ${L.ask.slice(0,3).join(", ")}?`};
+  if(has(/\b(prs?|records?|pbs?|personal bests?)\b/)&&has(/\b(this week|today|lately|recent\w*|new|any|so far|did i|have i)\b/))return out("prs",_alfWeekPRs());
+  const recQ=has(/\b(recover\w*|sore\w*|fresh|fatigue\w*|rested|tired|wrecked|ready)\b/),setsQ=has(/\b(sets?|volume|mev|mav|mrv|landmarks?|enough|too (much|little|few|many)|how (much|many)|under ?train\w*|over ?train\w*|hit|hitting|working)\b/);
+  if(ms.length){
+    if(has(/\b(train|workout|exercises?|routine)\b/)&&!has(/\b(should|can) i\b/))return null;   // "what should I train for biceps" is the coach's call
+    if(recQ||has(/\b(should|can) i\b/))return out("rec",_alfRecAns(ms,has(/\b(should|can|ready|good to|ok|okay|safe)\b/)));
+    if(setsQ)return out("sets",_alfSetsAns(ms));
+    if(short||has(/\b(how'?s|how is|how are|status|doing|looking|look)\b/))return out("muscle",ms.length>1?_alfSetsAns(ms):`${MNAME[ms[0]]}: ${_alfRecBit(ms[0])}; ${_alfSetsBit(ms[0])}.`);
+    return null;
+  }
+  if(has(/\b(readiness|am i ready|ready (to|for)|primed|should i (train|lift|work ?out|go|rest|skip)|can i (train|lift|work ?out)|good to (train|go|lift)|train (today|tonight)|day off|skip (the gym|training|today)|rest today|need (a )?rest)\b/))return out("ready",_alfReady());
+  if(has(/\btonight\b|\bwhat (should|do|shall|to|am|are) (i|we)? ?(train|do|hit|lift|work ?out)\b|\bwhat('s| is) (on|next|the plan|up next)\b|\b(today'?s|next) (workout|session|plan|day)\b|\bwhat to train\b|\bwhat (muscles?|body ?parts?) (should|do|shall|to) (i|we)\b/))return out("tonight",_alfTonight());
+  if(has(/\b(streak|how many (sessions|workouts|times)|(sessions?|workouts?) (this|so far)|(trained|train|worked out) (so far )?this week|weekly goal|on track)\b/))return out("week",_alfWeekAns(s));
+  const misc=_alfMisc(s);if(misc)return out("misc",misc);
+  if(recQ)return out("rec",_alfRecAll());
+  if(has(/\b(weak\w*|lagging|behind|neglect\w*|priorit\w*|lacking|below mev|under mev|furthest|mev|sets?|volume|mav|mrv|landmarks?|under ?train\w*|over ?train\w*)\b/))return out("behind",_alfBehind());
+  return null;
 }
 /* Typed commands the old console understood (open…, start…, add … to …, set weekly goal…) — local, instant, edits confirm first.
-   With a key, only short imperative messages are tried; offline, short questions without numbers are too. */
+   Only short imperatives come here; every QUESTION goes to the engine above (no key) or to Alfred (key). */
 function _alfLocal(q,pic){
   if(pic)return null;
   const words=q.split(/\s+/).length;
-  const cmd=words<=9&&!/\?\s*$/.test(q)&&/^(open|show|go to|goto|take me|launch|view|pull up|jump to|bring up|navigate|start|begin|fire up|add|remove|delete|set|switch to|activate|use|change to|copy|move)\b/i.test(q);
-  if(!cmd){
-    if(geminiKey()||/\d/.test(q)||words>7||/^(why|how come)\b/i.test(q))return null;
-    if(/\b(what does|what is|what's|what are|how does|how do i|how do you|how can i|where do i|where is|explain)\b/i.test(q)){const g=_alfGuide(q);if(g&&g.ti)return null;}
-  }
+  if(!(words<=9&&!/\?\s*$/.test(q)&&/^(open|show|go to|goto|take me|launch|view|pull up|jump to|bring up|navigate|start|begin|fire up|add|remove|delete|set|switch to|activate|use|change to|copy|move)\b/i.test(q)))return null;
+  if(/^(show|view|pull up|bring up)\b/i.test(q)&&alfIntel(q))return null;   // "show my chest sets" is a question, not navigation
   state._alfredPending=null;
   let r;try{r=alfredAsk(q);}catch(e){return null;}
   if(!r||r.__fallback)return null;
@@ -10103,57 +10244,8 @@ function alfredAsk(q){
     if(sp){if(d.activeSplitId===sp.id)return `<b>${esc(sp.name)}</b> is already your active split, sir.`;
       d.activeSplitId=sp.id;save();return `Active split is now <b>${esc(sp.name)}</b>, Master.`;}
     if((d.splits||[]).length)return `No split called "${esc(m[1])}", sir. You have: ${(d.splits||[]).map(x=>esc(x.name)).join(", ")}.`;}
-  // READ: recovery / readiness
-  if(/recover|recovered|fresh|am i ready|fatigue|how (?:fresh|recovered)/.test(s)){
-    const trained=M12.filter(x=>(d.muscleVol[x]||0)>0);
-    if(!trained.length)return "Nothing logged yet, sir — train something and I'll track recovery.";
-    const fresh=trained.filter(x=>getRecovery(x)>=80).map(x=>MNAME[x]);
-    const fried=trained.filter(x=>getRecovery(x)<50).map(x=>MNAME[x]);
-    return `Recovered & ready: <b>${fresh.length?fresh.join(", "):"—"}</b>. Still fatigued: <b>${fried.length?fried.join(", "):"none"}</b>, Master.`;}
-  // READ: streak
-  if(/streak|consecutive|chain/.test(s))return `Current streak: <b>${d.u.streakDays||0} day${(d.u.streakDays||0)===1?"":"s"}</b>, sir. Don't break the chain.`;
-  // READ: sessions this week  (must precede the broad train/today read)
-  if(/this week|how many.*sessions?|sessions? (?:this|so far)|trained this week/.test(s)){
-    const c=weekCount(),g=d.u.weeklyGoal||4;
-    return `<b>${c}</b> session${c===1?"":"s"} this week against a goal of <b>${g}</b>, Master.${c>=g?" Target met — excellent.":" "+(g-c)+" to go."}`;}
-  // READ: bodyweight
-  if(/body\s?weight|how much do i weigh|my weight|weigh/.test(s)){const bw=bodyW();return bw?`You're <b>${bw}kg</b> on record, sir.`:"No bodyweight logged yet, Master — log it under Profile, Body.";}
-  // READ: calories / macros
-  if(/calorie|macro|protein|kcal|how much.*eat/.test(s)){const n=d.u.nutrition;if(!n||!n.cals)return "No fuel protocol set yet, sir — say <b>open fuel</b> and I'll calculate your targets.";
-    return `Daily targets, Master: <b>${fmtNum(n.cals)} kcal</b> · ${n.protein}g protein · ${n.carbs}g carbs · ${n.fat}g fat.`;}
-  // READ: weakest
-  if(/weak/.test(s)){const tr=M12.filter(x=>(d.muscleVol[x]||0)>0);if(!tr.length)return "No data yet, sir — train something first.";
-    const wk=tr.map(x=>({x,l:muscleLevel(x),sets:weeklySets(x)})).sort((a,b)=>a.l-b.l)[0];
-    return `Your weakest link is <b>${MNAME[wk.x]}</b> — level ${wk.l}, ${wk.sets} hard sets this week. Give it priority, Master.`;}
-  // READ: stalled
-  if(/stall|plateau|stuck/.test(s)){const out=[];loggedExerciseNamesByRecency().forEach(n=>{const it=liftIntel(n);if(it&&it.stalled)out.push(n);});
-    return out.length?`Stalled, sir: <b>${out.slice(0,5).map(esc).join(", ")}</b>. Change the angle, grip or rep range.`:"Nothing's stalled right now, Master. Keep the pressure on.";}
-  // READ: how strong / standing
-  if(/how strong|standing|percentile|how good|world/.test(s)){const c=myPatrolCard();if(!c.opt)return "Log your big lifts and I'll place you against the world, sir.";return `Across your big lifts you're in roughly the <b>top ${Math.max(1,100-c.opt)}%</b> of trained lifters, Master. Strength level ${c.sl}.`;}
-  // READ: what to train today
-  if(/train|today|what should|workout|session/.test(s)){const tr=M12.filter(x=>(d.muscleVol[x]||0)>0);
-    const prime=tr.filter(x=>getRecovery(x)>=70&&weeklySets(x)<VL[x].mav).sort((a,b)=>getRecovery(b)-getRecovery(a)).slice(0,3);
-    if(prime.length)return `Tonight, Master: <b>${prime.map(x=>MNAME[x]).join(", ")}</b> — recovered and below your weekly MAV. Productive volume waiting.`;
-    return "Everything you've trained is still recovering, sir. Hit an untrained group or take the rest.";}
-  // READ: PR for X
-  m=s.match(/(?:pr|record|best|1rm|max)\s+(?:for\s+)?(.+)$/)||s.match(/(.+?)\s+(?:pr|record|max|1rm)$/);
-  if(m){const exName=_alfredFindEx(m[1]);if(!exName)return "Can't find that lift, sir.";const p=d.prs[exName];
-    const cur=prCurrentProfile(exName),vault=(d.prVault&&d.prVault[exName])||{};
-    const others=Object.keys(vault).filter(k=>vault[k]&&vault[k].orm>0).map(k=>`${esc(k)} ${Math.round(vault[k].orm)}kg`);
-    const tag=cur!=="Standard"?` <span class="mini">[${esc(cur)} profile]</span>`:"";
-    if(!p||!p.orm)return `No record logged for <b>${esc(exName)}</b>${cur!=="Standard"?` on the <b>${esc(cur)}</b> profile`:""} yet, Master.${others.length?` Other profiles: ${others.join(", ")}.`:""}`;
-    return `<b>${esc(exName)}</b>${tag} — best e1RM <b class="gold">${Math.round(p.orm)}kg</b>${p.maxW?`, top weight ${Math.round(p.maxW)}kg`:""}.${others.length?` Other profiles: ${others.join(", ")}.`:""} Go and beat it, sir.`;}
-  // READ: last time X
-  m=s.match(/^(?:last|previous)\s+(?:time\s+)?(.+)$/);
-  if(m){const exName=_alfredFindEx(m[1]);if(!exName)return "Can't find that lift, sir.";const it=liftIntel(exName);
-    if(!it||!it.last||!it.last.bset)return `No logged sets for <b>${esc(exName)}</b> yet, Master.`;
-    const b=it.last.bset;return `Last <b>${esc(exName)}</b> (${it.daysAgo<=0?"today":it.daysAgo+"d ago"}): top set <b>${b.w}kg × ${b.r}</b>.${it.tgt?" Next: "+esc(it.tgt.txt):""}`;}
-  // READ: volume for muscle
-  m=s.match(/(?:volume|sets)\s+(?:for\s+)?(.+)$/)||s.match(/(.+?)\s+(?:volume|sets)$/);
-  if(m){const mq=m[1].toLowerCase();const mm=M12.find(x=>MNAME[x].toLowerCase().includes(mq)||x.includes(mq));
-    if(!mm)return "Which muscle, sir? Name one of the twelve.";const ws=weeklySets(mm),vl=VL[mm],eMrv=effectiveMRV(mm);
-    return `<b>${MNAME[mm]}</b>: ${ws} hard sets a week (MEV ${vl.mev} · MAV ${vl.mav} · MRV ${eMrv}). Zone: <b>${zoneOf(mm,ws).label}</b>, Master.`;}
-  return {__fallback:true,text:`I can answer or act, Master. Try: <b>what should I train</b>, <b>weakest muscle</b>, <b>how strong am I</b>, <b>PR for bench</b>, <b>volume for chest</b>, <b>am I recovered</b> — or commands like <b>open leaderboard</b>, <b>start push day</b>, <b>add face pull to push</b>, <b>set weekly goal to 5</b>.`};
+  // Questions about his own numbers (recovery, sets, lifts, records, readiness, tonight) live in alfIntel; anything unrecognised falls through to Alfred.
+  return {__fallback:true};
 }
 function caveStat(v,l){return `<div style="flex:1;min-width:64px;text-align:center;border:1px solid var(--border2);border-radius:11px;padding:8px 4px;background:var(--bg2)"><div style="font-family:var(--num);font-weight:400;font-size:22px;color:var(--gold2);line-height:1.05">${v}</div><div class="mini" style="font-size:9px;letter-spacing:.1em;text-transform:uppercase">${l}</div></div>`;}
 /* ===== Fuel Protocol — Alfred's nutrition calculator (Mifflin-St Jeor → goal-matched macros) ===== */
