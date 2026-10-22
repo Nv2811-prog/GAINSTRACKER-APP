@@ -77,6 +77,8 @@ const CASES = [
   ['Am I hitting my protein?', /(Daily target:|No fuel protocol set)/, 'misc'],
   ['Should I train or rest tonight?', /^Readiness \d+/, 'ready'],
   // not random: a question the logs cannot answer is said so, never answered with the nearest template
+  ['What should I eat tonight?', /(needs my AI line|can't reach my AI line)/, null],
+  ['Should I go heavier today?', /(needs my AI line|can't reach my AI line)/, null],
   ['How many reps should I do?', /(needs my AI line|can't reach my AI line)/, null],
   ['What muscles does leg press work?', /(needs my AI line|can't reach my AI line)/, null],
   ["What's the capital of France?", /(needs my AI line|can't reach my AI line)/, null],
@@ -158,6 +160,9 @@ async function typedRun(P, label) {
   await ask(P, "What's the capital of France?");
   r = await last();
   check('B: an unrecognised question still goes to the model, unmodified', turn(r) === "What's the capital of France?", turn(r));
+  await ask(P, 'What should I eat tonight?');
+  r = await last();
+  check('B: a food question is not answered with a training template', turn(r) === 'What should I eat tonight?', turn(r));
   await ask(P, 'Is my chest recovered?');
   r = await last();
   check('B: recovery question carries its number', /PRE-COMPUTED[^\]]*Chest is \d+% recovered/.test(turn(r)), turn(r).slice(0, 240));

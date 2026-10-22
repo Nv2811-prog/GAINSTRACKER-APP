@@ -9930,9 +9930,9 @@ function alfIntel(q){
     if(short||has(/\b(how'?s|how is|how are|status|doing|looking|look)\b/))return out("muscle",ms.length>1?_alfSetsAns(ms):`${MNAME[ms[0]]}: ${_alfRecBit(ms[0])}; ${_alfSetsBit(ms[0])}.`);
     return null;
   }
-  if(has(/\b(readiness|am i ready|ready (to|for)|primed|should i (train|lift|work ?out|go|rest|skip)|can i (train|lift|work ?out)|good to (train|go|lift)|train (today|tonight)|day off|skip (the gym|training|today)|rest today|need (a )?rest)\b/))return out("ready",_alfReady());
-  if(has(/\btonight\b|\bwhat (should|do|shall|to|am|are) (i|we)? ?(train|do|hit|lift|work ?out)\b|\bwhat('s| is) (on|next|the plan|up next)\b|\b(today'?s|next) (workout|session|plan|day)\b|\bwhat to train\b|\bwhat (muscles?|body ?parts?) (should|do|shall|to) (i|we)\b/))return out("tonight",_alfTonight());
-  if(has(/\b(streak|how many (sessions|workouts|times)|(sessions?|workouts?) (this|so far)|(trained|train|worked out) (so far )?this week|weekly goal|on track)\b/))return out("week",_alfWeekAns(s));
+  if(has(/\b(readiness|am i ready|ready (to|for)|primed|should i (train|lift|work ?out|rest|skip|go (to|in|train|lift|today|tonight)|hit the gym)|can i (train|lift|work ?out)|good to (train|go|lift)|train (today|tonight)|day off|skip (the gym|training|today)|rest today|need (a )?rest)\b/))return out("ready",_alfReady());
+  if(has(/\bwhat (should|do|shall|to|am|are) (i|we)? ?(train|hit|lift|work ?out)\b|\bwhat (should|do|shall|to|am|are) (i|we)? ?do (tonight|today)\b|\bwhat('s| is) (on|up|planned)( for)? (tonight|today)\b|\bwhat('s| is) (next|the plan)\b|\b(today'?s|tonight'?s|next) (workout|session|plan|day|training)\b|\bwhat to train\b|\bwhat (muscles?|body ?parts?) (should|do|shall|to) (i|we)\b|\b(train|training|workout|lift|hit)\b.*\btonight\b|\btonight\b.*\b(train|training|workout|session|lift|hit)\b/))return out("tonight",_alfTonight());
+  if(has(/\b(streak|how many (sessions|workouts|times)|(sessions?|workouts?) (this|so far)|(trained|train|worked out) (so far )?this week|weekly goal)\b/))return out("week",_alfWeekAns(s));
   const misc=_alfMisc(s);if(misc)return out("misc",misc);
   if(recQ)return out("rec",_alfRecAll());
   if(has(/\b(weak\w*|lagging|behind|neglect\w*|priorit\w*|lacking|below mev|under mev|furthest|mev|sets?|volume|mav|mrv|landmarks?|under ?train\w*|over ?train\w*)\b/))return out("behind",_alfBehind());
