@@ -9286,7 +9286,7 @@ function exportICS(){
   const fmt=d=>d.getUTCFullYear()+z(d.getUTCMonth()+1)+z(d.getUTCDate())+"T"+z(d.getUTCHours())+z(d.getUTCMinutes())+z(d.getUTCSeconds())+"Z";
   let ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//GainsTracker//Gotham//EN\r\nCALSCALE:GREGORIAN\r\n";
   ws.forEach(w=>{const s=new Date(w.date);const e=new Date(s.getTime()+((w.duration||3600)*1000));
-    ics+=`BEGIN:VEVENT\r\nUID:${w.id||("w"+s.getTime())}@gainstracker\r\nDTSTAMP:${fmt(s)}\r\nDTSTART:${fmt(s)}\r\nDTEND:${fmt(e)}\r\nSUMMARY:🦇 ${(w.name||"Training").replace(/[\r\n,;]/g," ")} — ${fmtNum(w.totalVol)}kg\r\nDESCRIPTION:${(w.exercises||[]).map(x=>x.name).join(", ").replace(/[\r\n,;]/g," ")}\r\nEND:VEVENT\r\n`;});
+    ics+=`BEGIN:VEVENT\r\nUID:${w.id||("w"+s.getTime())}@gainstracker\r\nDTSTAMP:${fmt(s)}\r\nDTSTART:${fmt(s)}\r\nDTEND:${fmt(e)}\r\nSUMMARY:🦇 ${(w.name||"Training").replace(/[\r\n,;]/g," ")} — ${w.quick?"marked done":fmtNum(w.totalVol)+"kg"}\r\nDESCRIPTION:${(w.exercises||[]).map(x=>x.name).join(", ").replace(/[\r\n,;]/g," ")}\r\nEND:VEVENT\r\n`;});
   ics+="END:VCALENDAR";
   try{
     const blob=new Blob([ics],{type:"text/calendar"});const url=URL.createObjectURL(blob);
@@ -9578,7 +9578,7 @@ function alfredContext(chat){
     sessionStr=`\n🔴 ACTIVE WORKOUT (${elapsed}min in): ${ses.split} — ${ses.day}\n  ${exLines||'no exercises logged yet'}`;
   }
   // Last workout
-  const lastW=(d.workouts||[])[0];const lastStr=lastW?`\nLAST SESSION: ${new Date(lastW.date).toLocaleDateString()} — ${lastW.name}, ${Math.round(lastW.totalVol||0)}kg total`:'';
+  const lastW=(d.workouts||[])[0];const lastStr=lastW?`\nLAST SESSION: ${new Date(lastW.date).toLocaleDateString()} — ${lastW.name}, ${lastW.quick?"marked done from the plan, not logged (no weights or tonnage)":Math.round(lastW.totalVol||0)+"kg total"}`:'';
   // Injuries
   const inj=Object.keys(d.injuries||{}).map(m=>MNAME[m]||m).join(', ');
   // Physique
@@ -9929,7 +9929,7 @@ const ALF_WHY={limit:"I've hit the free-tier limit for the minute. Give me about
 function _alfOffline(q,it,why){   // it = alfIntel(q) or null; why = what stopped the AI ("limit" | "credits" | "" = no connection)
   const g=_alfGuide(q),gs=g&&g.ti?_alfShort(g,q):null,key=!!geminiKey();   // a guide answer needs the section's title AND one clause to share the question's words
   if(gs&&ALF_HOW.test(q))return {text:"**"+_alfTitle(g)+"** — "+gs,loc:true};
-  if(it)return {text:it.text,loc:true};
+  if(it)return {text:it.text,loc:true,follow:it.follow};
   if(/^(thanks|thank you|cheers|ok|okay|cool|nice|great|got it)\b/i.test(q))return {text:"Anytime.",loc:true};
   if(gs)return {text:"**"+_alfTitle(g)+"** — "+gs,loc:true};
   return key
@@ -10038,8 +10038,9 @@ function alfIntel(q){
   const liftQ=has(/\b(last|previous|latest|next|target|beat|increase|overload|progress\w*|go up|add weight|how much|what weight|which weight|pr|prs|record|best|max|1rm|e1rm|heaviest|trend\w*|doing|going)\b/)||has(/\bshould i (lift|use|do|go|put|add|try|take)\b/);
   if(has(/\b(stall\w*|plateau\w*|stuck|stagnat\w*|no progress|not (progress\w*|improv\w*|moving|going up))\b/))
     return L&&L.name?out("lift",_alfLiftAns(L.name,"stall")):out("stall",_alfStalledAns(L&&L.ask));
-  if(L&&L.name&&(liftQ||short))return out("lift",_alfLiftAns(L.name,has(/\b(pr|prs|record|best|max|1rm|e1rm|heaviest)\b/)?"best":has(/\b(next|target|beat|increase|overload|go up|add weight|how much|what weight|which weight|should i)\b/)?"next":has(/\b(last|previous|latest)\b/)?"last":"status"));
-  if(L&&L.ask&&liftQ)return {id:"ask",ask:true,text:`Which one: ${L.ask.slice(0,3).join(", ")}?`};
+  const kind=has(/\b(pr|prs|record|best|max|1rm|e1rm|heaviest)\b/)?"best":has(/\b(next|target|beat|increase|overload|go up|add weight|how much|what weight|which weight|should i)\b/)?"next":has(/\b(last|previous|latest)\b/)?"last":"status";
+  if(L&&L.name&&(liftQ||short))return out("lift",_alfLiftAns(L.name,kind));
+  if(L&&L.ask&&liftQ)return {id:"ask",ask:true,text:`Which one: ${L.ask.slice(0,3).join(", ")}?`,follow:L.ask.slice(0,3).map(n=>({best:"Best on ",last:"Last time on "}[kind]||"Next weight on ")+n)};
   if(has(/\b(prs?|records?|pbs?|personal bests?)\b/)&&has(/\b(this week|today|lately|recent\w*|new|any|so far|did i|have i)\b/))return out("prs",_alfWeekPRs());
   const recQ=has(/\b(recover\w*|sore\w*|fresh|fatigue\w*|rested|tired|wrecked|ready)\b/),setsQ=has(/\b(sets?|volume|mev|mav|mrv|landmarks?|enough|too (much|little|few|many)|how (much|many)|under ?train\w*|over ?train\w*|hit|hitting|working)\b/);
   if(ms.length){
@@ -10049,9 +10050,9 @@ function alfIntel(q){
     if(short||has(/\b(how'?s|how is|how are|status|doing|looking|look)\b/))return out("muscle",ms.length>1?_alfSetsAns(ms):`${MNAME[ms[0]]}: ${_alfRecBit(ms[0])}; ${_alfSetsBit(ms[0])}.`);
     return null;
   }
-  if(has(/\b(readiness|am i ready|ready (to|for)|primed|should i (train|lift|work ?out|go|rest|skip)|can i (train|lift|work ?out)|good to (train|go|lift)|train (today|tonight)|day off|skip (the gym|training|today)|rest today|need (a )?rest)\b/))return out("ready",_alfReady());
-  if(has(/\btonight\b|\bwhat (should|do|shall|to|am|are) (i|we)? ?(train|do|hit|lift|work ?out)\b|\bwhat('s| is) (on|next|the plan|up next)\b|\b(today'?s|next) (workout|session|plan|day)\b|\bwhat to train\b|\bwhat (muscles?|body ?parts?) (should|do|shall|to) (i|we)\b/))return out("tonight",_alfTonight());
-  if(has(/\b(streak|how many (sessions|workouts|times)|(sessions?|workouts?) (this|so far)|(trained|train|worked out) (so far )?this week|weekly goal|on track)\b/))return out("week",_alfWeekAns(s));
+  if(has(/\b(readiness|am i ready|ready (to|for)|primed|should i (train|lift|work ?out|rest|skip|go (to|in|train|lift|today|tonight)|hit the gym)|can i (train|lift|work ?out)|good to (train|go|lift)|train (today|tonight)|day off|skip (the gym|training|today)|rest today|need (a )?rest)\b/))return out("ready",_alfReady());
+  if(has(/\bwhat (should|do|shall|to|am|are) (i|we)? ?(train|hit|lift|work ?out)\b|\bwhat (should|do|shall|to|am|are) (i|we)? ?do (tonight|today)\b|\bwhat('s| is) (on|up|planned)( for)? (tonight|today)\b|\bwhat('s| is) (next|the plan)\b|\b(today'?s|tonight'?s|next) (workout|session|plan|day|training)\b|\bwhat to train\b|\bwhat (muscles?|body ?parts?) (should|do|shall|to) (i|we)\b|\b(train|training|workout|lift|hit)\b.*\btonight\b|\btonight\b.*\b(train|training|workout|session|lift|hit)\b/))return out("tonight",_alfTonight());
+  if(has(/\b(streak|how many (sessions|workouts|times)|(sessions?|workouts?) (this|so far)|(trained|train|worked out) (so far )?this week|weekly goal)\b/))return out("week",_alfWeekAns(s));
   const misc=_alfMisc(s);if(misc)return out("misc",misc);
   if(recQ)return out("rec",_alfRecAll());
   if(has(/\b(weak\w*|lagging|behind|neglect\w*|priorit\w*|lacking|below mev|under mev|furthest|mev|sets?|volume|mav|mrv|landmarks?|under ?train\w*|over ?train\w*)\b/))return out("behind",_alfBehind());
