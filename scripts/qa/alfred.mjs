@@ -77,6 +77,8 @@ const CASES = [
   ['Am I hitting my protein?', /(Daily target:|No fuel protocol set)/, 'misc'],
   ['Should I train or rest tonight?', /^Readiness \d+/, 'ready'],
   // not random: a question the logs cannot answer is said so, never answered with the nearest template
+  ['What should I eat tonight?', /(needs my AI line|can't reach my AI line)/, null],
+  ['Should I go heavier today?', /(needs my AI line|can't reach my AI line)/, null],
   ['How many reps should I do?', /(needs my AI line|can't reach my AI line)/, null],
   ['What muscles does leg press work?', /(needs my AI line|can't reach my AI line)/, null],
   ["What's the capital of France?", /(needs my AI line|can't reach my AI line)/, null],
@@ -114,6 +116,10 @@ async function typedRun(P, label) {
   check('A: honest fallback offers tappable examples (and Settings)', fb.chips.length === 3 && fb.chips.every((c) => c.length < 40), fb.chips);
   const chipAns = await P.evaluate(async () => { document.querySelector('#ac-log .ac-fu .ac-chip').click(); await new Promise((r) => setTimeout(r, 200)); const rows = [...document.querySelectorAll('#ac-log .ac-row.a .ac-b')]; return rows[rows.length - 1].innerText; });
   check('A: tapping an example chip is answered from the logs', /Readiness \d+/.test(chipAns), chipAns.slice(0, 120));
+  const cl = await ask(P, 'chest press next weight');
+  check('A: the clarifying question offers each candidate as a tap', cl.chips.length === 2 && cl.chips.every((c) => /^Next weight on .*Chest Press$/.test(c)), cl.chips);
+  const clAns = await P.evaluate(async () => { document.querySelector('#ac-log .ac-fu .ac-chip').click(); await new Promise((r) => setTimeout(r, 200)); const rows = [...document.querySelectorAll('#ac-log .ac-row.a .ac-b')]; return rows[rows.length - 1].innerText; });
+  check('A: tapping a candidate answers that lift', /^Next on (Plate-Loaded|Incline Machine) Chest Press: /.test(clAns), clAns.slice(0, 120));
   await ask(P, 'Is my chest recovered?'); await shot('answer-recovery');
   await ask(P, 'What weight next on machine shoulder press?'); await shot('answer-lift');
   await ask(P, 'chest press next weight'); await shot('answer-clarify');
@@ -158,6 +164,9 @@ async function typedRun(P, label) {
   await ask(P, "What's the capital of France?");
   r = await last();
   check('B: an unrecognised question still goes to the model, unmodified', turn(r) === "What's the capital of France?", turn(r));
+  await ask(P, 'What should I eat tonight?');
+  r = await last();
+  check('B: a food question is not answered with a training template', turn(r) === 'What should I eat tonight?', turn(r));
   await ask(P, 'Is my chest recovered?');
   r = await last();
   check('B: recovery question carries its number', /PRE-COMPUTED[^\]]*Chest is \d+% recovered/.test(turn(r)), turn(r).slice(0, 240));
