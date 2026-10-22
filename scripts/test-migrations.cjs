@@ -69,7 +69,7 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
 {const {ctx,store}=sandbox(RAW,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts);ctx.runMigrations();
  const d=ctx.state.data,cyc=d.splits.filter(s=>s.id==='cycle8');
  ok(cyc.length===1,'8-day cycle present exactly once');
- ok(d.activeSplitId==='cycle8'&&d.activeGymSplits['Fitness X']==='cycle8','8-day cycle is the active plan');
+ ok(d.activeSplitId==='cycle8v2'&&d.activeGymSplits['Fitness X']==='cycle8v2'&&d.splits.some(s=>s.id==='cycle8'),'v1 installs the 8-day cycle, v3 then makes its v2 the active plan (old one kept)');
  const days=cyc[0].days;ok(days.length===8&&days.filter(x=>x.rest).length===3,'8 days: 5 sessions + 3 rest');
  const sum=i=>Object.values(days[i].plan).reduce((a,v)=>a+v.s,0);
  ok([sum(0),sum(3),sum(6),sum(1),sum(4)].join()==='18,19,18,16,16','set totals match the plan (A18 B19 C18 / A16 B16)');
@@ -84,8 +84,8 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
 {const imp=JSON.parse(RAW);const {ctx:c0}=sandbox(RAW,{real:true});
  const plain=vm.runInContext('cycle8Split()',c0);plain.id='s123';plain.days.forEach(x=>delete x.plan);imp.splits.push(plain);
  const {ctx}=sandbox(JSON.stringify(imp),{real:true});ctx.load();ctx.runMigrations();const d=ctx.state.data;
- ok(d.splits.filter(s=>/8-Day Cycle/.test(s.name)).length===1,'imported-by-code copy reused, no duplicate');
- ok(d.activeSplitId==='s123'&&d.splits.find(s=>s.id==='s123').days[0].plan['Plate-Loaded Chest Press'].s===2,'imported copy activated and given its set targets');}
+ ok(d.splits.filter(s=>/^8-Day Cycle · /.test(s.name)).length===1,'imported-by-code copy reused, no duplicate');
+ ok(d.splits.find(s=>s.id==='s123').days[0].plan['Plate-Loaded Chest Press'].s===2&&d.activeSplitId==='cycle8v2','imported copy given its set targets (v3 then activates the v2 cycle)');}
 
 // ===== The real v2 migration: plan reps "5–8" → "5–10" (exact matches only; history untouched) =====
 {const {ctx:c0}=sandbox(RAW,{real:true});
@@ -102,7 +102,7 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
  ok(expected>=10&&rs(cyc).every(r=>r!=='5–10'),'fixture is a faithful pre-v2 plan ('+expected+' lifts at "5–8", none at "5–10")');
  const {ctx,store}=sandbox(RAW1,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts);ctx.runMigrations();
  const d=ctx.state.data,c2=d.splits.find(s=>s.id==='cycle8'),i2=d.splits.find(s=>s.id==='s123'),m2=d.splits.find(s=>s.id==='mine2');
- ok(d.dataVersion===2,'dataVersion bumped 1 → 2');
+ ok(d.dataVersion===3,'dataVersion bumped 1 → 3 (v2 + v3)');
  ok(rs(c2).every(r=>r!=='5–8')&&rs(c2).filter(r=>r==='5–10').length===expected,'every exact "5–8" in the 8-day cycle is now "5–10"');
  ok(c2.days[0].plan['Cable Lateral Raise'].r==='8–12'&&c2.days[0].plan['Lat Pulldown (Wide Grip)'].r==='5-8','custom ranges (8–12, 5-8) untouched');
  ok(rs(c2).filter(r=>r==='6–10').length===rs(cyc).filter(r=>r==='6–10').length,'existing 6–10 targets untouched');
@@ -114,7 +114,34 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
  const after=JSON.stringify(d.splits);d.dataVersion=1;ctx.runMigrations();ok(JSON.stringify(ctx.state.data.splits)===after,'idempotent: forced re-run changes nothing');
  // brand-new install path: v1 installs the (already 5–10) plan, v2 is a no-op
  const {ctx:cf}=sandbox(RAW,{real:true});cf.load();cf.runMigrations();const f=cf.state.data;
- ok(f.dataVersion===2&&new Set(rs(f.splits.find(s=>s.id==='cycle8'))).size===2&&rs(f.splits.find(s=>s.id==='cycle8')).every(r=>r==='5–10'||r==='6–10'),'fresh v0 → v2: plan only holds 5–10 / 6–10');}
+ ok(f.dataVersion===3&&new Set(rs(f.splits.find(s=>s.id==='cycle8'))).size===2&&rs(f.splits.find(s=>s.id==='cycle8')).every(r=>r==='5–10'||r==='6–10'),'fresh v0 → v2: plan only holds 5–10 / 6–10');}
+
+// ===== The real v3 migration: 8-day cycle v2 (identical upper days) added + activated; old split untouched =====
+{const {ctx:c0}=sandbox(RAW,{real:true});
+ const v2=JSON.parse(RAW);v2.dataVersion=2;const cyc=vm.runInContext('cycle8Split()',c0);
+ v2.splits=v2.splits.concat([cyc]);v2.activeSplitId='cycle8';v2._nextDay=6;
+ const RAW2=JSON.stringify(v2),cycBefore=JSON.stringify(cyc);
+ const {ctx,store}=sandbox(RAW2,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts);ctx.runMigrations();
+ const d=ctx.state.data,n2=d.splits.find(s=>s.id==='cycle8v2');
+ ok(d.dataVersion===3&&!!n2,'v3 adds the 8-day cycle v2');
+ ok(d.activeSplitId==='cycle8v2'&&d._nextDay===6,'v2 cycle is active and the cycle position is kept');
+ ok(JSON.stringify(d.splits.find(s=>s.id==='cycle8'))===cycBefore,'the old 8-day split is untouched (one tap to switch back)');
+ const ups=[0,3,6].map(i=>n2.days[i]);
+ ok(ups.every(x=>x.exercises.slice(0,12).join('|')===ups[0].exercises.slice(0,12).join('|')),'all three upper days share one exercise list in one order');
+ ok(!JSON.stringify(n2).includes('Pec Deck Fly')&&ups.every(x=>x.plan['High-to-Low Cable Row']&&x.plan['Machine Shoulder Press']&&x.plan['Reverse-Grip Cable Curl']&&x.plan['Incline Machine Chest Press'].s===2),'high-to-low row, shoulder press and reverse curls every upper day; incline always 2; no pec deck fly');
+ ok(!ups[0].plan['Reverse Pec Deck']&&ups[1].exercises.at(-1)==='Reverse Pec Deck'&&ups[2].exercises.at(-1)==='Reverse Pec Deck','reverse pec deck is the last lift on B and C only');
+ const lows=[1,4].map(i=>n2.days[i]);
+ ok(lows[0].exercises.join('|')===lows[1].exercises.join('|')&&lows[0].plan['Hip Hinge (Erectors)'].s===1&&lows[1].plan['Hip Hinge (Erectors)'].s===2,'both lower days share one exercise list in one order; only set counts differ');
+ const work=x=>Object.entries(x.plan).filter(([n])=>n!=='Cable Rope Crunch').reduce((a,[,p])=>a+p.s,0);
+ ok(ups.concat(lows).every(x=>work(x)<=20),'every training day is at most 20 working sets (abs not counted)');
+ ok(JSON.stringify(d.workouts)===wBefore,'workouts byte-identical after v3');
+ ok(store.get('gt_data_backup')===RAW2,'backup taken before v3');
+ const after=JSON.stringify(d.splits);d.dataVersion=2;ctx.runMigrations();
+ ok(JSON.stringify(ctx.state.data.splits)===after&&ctx.state.data.splits.filter(s=>s.id==='cycle8v2').length===1&&ctx.state.data._nextDay===6,'idempotent: re-run adds nothing and keeps the position');
+ // someone using their OWN split: v3 adds the new plan but does not switch them
+ const own=JSON.parse(RAW);own.dataVersion=2;own.splits=own.splits.concat([cyc]);own.activeSplitId='mine';
+ const {ctx:co}=sandbox(JSON.stringify(own),{real:true});co.load();co.runMigrations();
+ ok(co.state.data.activeSplitId==='mine'&&co.state.data.splits.some(s=>s.id==='cycle8v2'),'a different active split is never switched');}
 
 // ===== seedSets honours the plan's set count =====
 {const fn=js.slice(js.indexOf('function seedSets('),js.indexOf('function setReadiness('));

@@ -1248,6 +1248,41 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-cd.on.qk.today{box-shadow:inset 0 0 0 1.5px var(--gold)}
 .p3-cl .sw.qk{background:none;box-shadow:none;outline:1.5px dashed rgba(242,193,78,.75);outline-offset:-2px}
 /* ===== /GP:QUICKLOG ===== */
+/* ===== GP:FOCUS (2026-10-22) ===== */
+/* Training focus sheet: a 3-column muscle picker (gold ring + gold rank coin = chosen), sets per week before → after on the shared landmark bar, each day's new opening lifts, one gold Apply. Colours keep their one meaning (gold = the choice and the action, green = more sets, muted = fewer). */
+.fc .fc-note{margin:0 2px 14px;font-size:13px;line-height:18px;color:var(--tx2)}
+.fc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fc-m{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;min-width:0;min-height:60px;padding:10px 30px 10px 12px;border:0;border-radius:var(--r-m);background:linear-gradient(180deg,#18212F,#121925);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);text-align:left;font:600 14px/1.1 var(--body);cursor:pointer;transition:transform .12s var(--ease-out),box-shadow .2s,background .2s}
+.fc-m:active{transform:scale(.96)}
+.fc-m span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fc-m i{font-style:normal;font-weight:500;font-size:11.5px;color:var(--tx3)}
+.fc-m.on{background:linear-gradient(180deg,rgba(242,193,78,.16),rgba(242,193,78,.04));box-shadow:inset 0 0 0 1.5px var(--gold),0 10px 22px -16px rgba(242,193,78,.7),var(--hl)}
+.fc-m.on i{color:var(--gold-ink)}
+.fc-m b{position:absolute;top:8px;right:8px;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--on-gold);font-size:15px;line-height:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.5);animation:fcPop .22s var(--ease-out)}
+@keyframes fcPop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.fc .fc-sec{display:block;margin:18px 2px 8px}
+.fc .fc-list{padding:4px 12px}
+.fc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--hair)}
+.fc-row:first-child,.fc-day:first-child{border-top:0}
+.fc-rk{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:15px;line-height:1}
+b.fc-rk{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0 1px rgba(242,193,78,.4)}
+.fc-rm{flex:1;min-width:0}
+.fc-rt{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px;font:600 14px/1.2 var(--body)}
+.fc-rv{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-weight:500;color:var(--tx3)}
+.fc-rv i{font-style:normal;font-size:17px}
+.fc-rv b{font-size:19px;color:var(--tx1)}
+.fc-rv .gi{width:12px;height:12px;opacity:.6}
+.fc-d{margin-left:4px;padding:2px 6px;border-radius:6px;font:700 11px/1.2 var(--body);background:var(--g3);color:var(--tx3)}
+.fc-d.up{background:var(--tint-ok);color:var(--ok)}
+.fc-day{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid var(--hair)}
+.fc-dn{flex:none;width:26px;padding-top:1px;font-size:16px;color:var(--gold-ink)}
+.fc-dm{flex:1;min-width:0}
+.fc-dt{display:flex;justify-content:space-between;gap:8px;font:600 14px/1.25 var(--body)}
+.fc-dt span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fc-dt i{flex:none;font-style:normal;font-weight:500;font-size:12.5px;color:var(--tx3)}
+.fc-do{margin-top:3px;font-size:12.5px;line-height:17px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fc .fc-go{width:100%;margin:18px 0 6px}
+/* ===== /GP:FOCUS ===== */
 /* ===== GP:WEEKLY+BODY (wave 7) ===== */
 /* Two things, one block: the Sunday review's one-tap adjust buttons (.wk-*) and the Profile Body section (.bd-*). Built on the Home primitives; colours keep their one meaning (amber = under target, red = over limit, green = done, gold = the action word). Sits before GP:HOME in the source, so rules that must beat a later wave-5 rule carry an extra class. */
 /* 1 · one-tap weekly adjust: a button = tinted icon chip + what changes + where, "Apply" in gold; the result row turns green with a check */
@@ -3074,6 +3109,34 @@ function cycle8Split(){
     ?{name,exercises:lifts.map(l=>l[0]),plan:Object.fromEntries(lifts.map(([n,sets,reps,opt])=>[n,opt?{s:sets,r:reps,opt:1}:{s:sets,r:reps}]))}
     :{name,rest:true,exercises:[]})};
 }
+/* 8-day cycle v2 (user decision 2026-10-22, after the research): the three upper days share ONE exercise list in ONE
+   order (same order = same fatigue state = clean progress tracking; order changes strength, not growth — Nunes 2021),
+   and differ only in small set counts so every muscle's WEEKLY volume lands in its zone (Grgic 2017: how volume is
+   spread across the week doesn't change growth when the weekly total matches). Weekly sets (x7/8): chest 10.5,
+   back 16.6, shoulders 17.9 (MAV–MRV), triceps 14.0, biceps 12.7, abs 6.1. Reverse Pec Deck = last lift on B and C.
+   The two lower days follow the same rule: one list, one order, only Hip Hinge / Hip Adduction swap 1 ↔ 2 sets
+   (quads 9.6, hamstrings 6.6, glutes 4.4). Every day stays at or under 20 working sets with abs not counted. */
+const CYCLE8V2_UPPER=(tb,htl,sp,ext,pre,rpd)=>[["Plate-Loaded Chest Press",2,"5–10"],["Lat Pulldown (Wide Grip)",2,"5–10"],["Incline Machine Chest Press",2,"5–10"],
+  ["Chest-Supported T-Bar Row",tb,"5–10"],["High-to-Low Cable Row",htl,"5–10"],["Machine Shoulder Press",sp,"5–10"],["Cable Lateral Raise",1,"6–10"],
+  ["Cable Cross-Body Extension",ext,"6–10"],["V-Bar Triceps Pushdown",1,"6–10"],["Machine Preacher Curl",pre,"6–10"],["Reverse-Grip Cable Curl",1,"6–10"],
+  ["Cable Rope Crunch",1,"6–10"]].concat(rpd?[["Reverse Pec Deck",rpd,"6–10"]]:[]);
+const CYCLE8V2_LOWER=(hinge,add)=>[["Leg Extension",2,"6–10"],["Machine Seated Leg Curl",2,"6–10"],["Leg Press (45°)",2,"5–10"],["Hip Hinge (Erectors)",hinge,"6–10"],
+  ["Hip Adduction Machine",add,"6–10"],["Standing Calf Raise",2,"6–10"],["Cable Rope Crunch",2,"6–10"],["Wrist Curl",2,"6–10"],["Reverse Wrist Curl",2,"6–10"]];
+const CYCLE8V2={id:"cycle8v2",name:"8-Day Cycle v2 · Upper / Lower",days:[
+  ["Upper A · Wingspan",CYCLE8V2_UPPER(2,1,1,2,2,0)],
+  ["Lower A · Foundation",CYCLE8V2_LOWER(1,2)],
+  ["Rest & Recover"],
+  ["Upper B · Shoulder Armor",CYCLE8V2_UPPER(1,2,1,1,1,1)],
+  ["Lower B · Backbone",CYCLE8V2_LOWER(2,1)],
+  ["Rest & Recover"],
+  ["Upper C · Chest Plate",CYCLE8V2_UPPER(2,1,2,2,1,1)],
+  ["Rest & Recover"]
+]};
+function cycle8v2Split(){
+  return {id:CYCLE8V2.id,name:CYCLE8V2.name,days:CYCLE8V2.days.map(([name,lifts])=>lifts
+    ?{name,exercises:lifts.map(l=>l[0]),plan:Object.fromEntries(lifts.map(([n,sets,reps])=>[n,{s:sets,r:reps}]))}
+    :{name,rest:true,exercises:[]})};
+}
 const MIGRATIONS=[
   // v1 — installs the 8-day cycle and makes it the active plan. Idempotent: if it's already there
   // (by id, or by name from an imported code) nothing is added — that copy just gets any missing
@@ -3101,6 +3164,19 @@ const MIGRATIONS=[
     const fix=pl=>pl&&pl.r==="5–8"?Object.assign({},pl,{r:"5–10"}):pl;
     return Object.assign({},d,{splits:(d.splits||[]).map(sp=>!isCycle(sp)?sp:Object.assign({},sp,{days:(sp.days||[]).map(day=>
       !day.plan?day:Object.assign({},day,{plan:Object.fromEntries(Object.entries(day.plan).map(([n,pl])=>[n,fix(pl)]))}))}))});
+  }},
+  // v3 — the 8-day cycle v2 (identical upper days, user decision 2026-10-22) is ADDED as its own split and made active when
+  // the 8-day cycle was the active plan. The old split stays untouched (one tap to switch back), the cycle position is kept
+  // (same 8-day layout), history is never touched. Idempotent: an existing cycle8v2 is never added twice or reset.
+  {v:3,name:"8-day cycle v2 (identical upper days)",run:d=>{
+    const lc=x=>String(x||"").toLowerCase().trim(),fresh=cycle8v2Split(),splits=d.splits||[];
+    const isCycle=sp=>sp&&(sp.id===CYCLE8.id||lc(sp.name)===lc(CYCLE8.name));
+    const active=splits.find(sp=>sp.id===d.activeSplitId),has=splits.some(sp=>sp.id===fresh.id);
+    const take=!active||isCycle(active)||active.id===fresh.id,gym=d.u&&d.u.activeGym;
+    const out=Object.assign({},d,{splits:has?splits:splits.concat([fresh])});
+    if(take)Object.assign(out,{activeSplitId:fresh.id,_nextDay:d._nextDay||0,
+      activeGymSplits:Object.assign({},d.activeGymSplits||{},gym?{[gym]:fresh.id}:{})});
+    return out;
   }}
 ];
 function migrateData(data){
@@ -4386,7 +4462,8 @@ function qlSheet(fresh){
   const short=n=>String(n||"").split(" · ")[0],ids=sp.days.map((_,i)=>i).filter(i=>qlDay(sp.id,i));
   const lbl=i=>{const s=short(sp.days[i].name);return ids.filter(j=>short(sp.days[j].name)===s).length>1?sp.days[i].name:s;};
   const chip=(on,fn,txt)=>`<button type="button" class="chip${on?" on":""}" aria-pressed="${on}" onclick="${fn}">${txt}</button>`;
-  const dup=(d.workouts||[]).some(w=>w.splitId===sp.id&&w.dayIdx===st.di&&ghSameDay(w.date,when)),need=st.when==="date"&&!st.date;
+  const lc=x=>String(x||"").toLowerCase().trim(),same=w=>w.splitId===sp.id?w.dayIdx===st.di:lc(w.name)===lc(day.name);   // another split's session counts by day name (a new version of a plan keeps its day names), like computeNextDay
+  const dup=(d.workouts||[]).some(w=>same(w)&&ghSameDay(w.date,when)),need=st.when==="date"&&!st.date;
   const mus=Object.keys(plan).filter(m=>MNAME[m]&&plan[m]>0).sort((a,b)=>plan[b]-plan[a]).slice(0,6).map(m=>`<span class="gm-chip on">${MNAME[m]}<i>${p3Half(plan[m])}</i></span>`).join("");
   const html=`<div class="gh ql">${shHd("Mark as done",{ic:"check",sub:esc(sp.name)+" · day "+(st.di+1)})}
     <div class="eyebrow ql-sec">Which day</div>
@@ -7455,7 +7532,9 @@ function gdJump(sel){   // smooth-scroll to a section of the current tab and rin
 function gmDock(cur){
   const d=state.data,n=(d.splits||[]).length;let stalled=0;try{stalled=stalledLifts().length;}catch(e){}
   const lifts=cur?cur.sp.days.reduce((a,x)=>a+(x.exercises||[]).length,0):0;
+  const fr=cur?fcRanks(cur.sp):[];
   const own=cur?[{art:"tile-plan-edit",ic:"sliders",t:"Edit plan",s:`${cur.sp.days.length} days · ${lifts} lifts`,fn:"openSplitSheet()"},
+    {art:"tile-generator",ic:"target",t:"Focus",s:fr.length?fr.slice(0,2).map(ghName).join(" · ")+(fr.length>2?" +"+(fr.length-2):""):"Rank your top 5",fn:"openFocusPlan()"},
     {art:"tile-split-new",ic:"plus",t:"New split",s:n===1?"1 split":n+" splits",fn:"gdNewSplit()"}]:[];
   return gdDock("Mission tools",own.concat([
     {art:"tile-split-import",ic:"down",t:"Import split",s:d.splitImportAt?"Imported "+ghAgo(d.splitImportAt):"Share or paste",fn:"openSplitExchange()"},
@@ -7465,6 +7544,113 @@ function gdNewSplit(){   // New split tile: add the split, open the plan editor 
   newSplit();openSplitSheet();haptic("done");
   const cards=$("sheet").querySelectorAll(".gm-sp"),last=cards[cards.length-1];
   if(last)last.scrollIntoView({block:"start"});
+}
+
+/* ===== TRAINING FOCUS (GP:FOCUS, 2026-10-22) =====
+   Rank up to 5 muscles; every training day of the active split is rebuilt from the plan as written (focus.base), so re-ranking never compounds:
+   1 · Order — on a muscle's home days (at least half of its biggest day's direct sets) its lifts move to the front, in rank order. What is trained first
+       gains the most strength while growth does not depend on order (Nunes 2021), so every other lift keeps its written order behind them.
+   2 · Volume — rank 1 is filled first, then rank 2 …: one set at a time, round-robin over the muscle's home days, toward a target inside its MAV–MRV band
+       (FOCUS_PUSH: rank 1 highest). Each added set is paid by one set from a non-focus lift on the same day while that lift's muscles stay at or above MEV
+       (muscles furthest over MAV give first), so sessions keep their length; a day only grows when nothing can give. Limits: FOCUS_DAY_CAP working sets a day
+       (abs not counted), FOCUS_SESSION_CAP fractional sets per muscle per session (the per-session plateau, Pelland 2024), FOCUS_LIFT_MAX sets a lift, never over MRV.
+   Stored on the split as focus={ranks,base,sig}: sig hashes the days the focus wrote, so a plan edited afterwards no longer matches and becomes the new base.
+   Clear restores base. Rest days, rep targets and logged workouts are never touched. */
+const FOCUS_MAX=5,FOCUS_DAY_CAP=20,FOCUS_SESSION_CAP=11,FOCUS_LIFT_MAX=4,FOCUS_LIFT_MIN=1,FOCUS_GUARD=400,FOCUS_PUSH=[.75,.5,.25,0,0];
+const FOCUS_PICK=["chest","back","shoulders","biceps","triceps","quads","hamstrings","glutes","calves"];
+const FC_EPS=1e-9;
+const fcSig=days=>{const s=JSON.stringify(days);let h=5381;for(let i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return h.toString(36);};
+const fcIsAbs=ex=>(ex.p||[]).length>0&&(ex.p||[]).every(m=>m==="abs");
+const fcLive=sp=>!!(sp&&sp.focus&&sp.focus.base&&sp.focus.sig===fcSig(sp.days));
+const fcBase=sp=>fcLive(sp)?sp.focus.base:sp.days;
+const fcRanks=sp=>fcLive(sp)?sp.focus.ranks.slice():[];
+function fcModel(days){   // working copy: per training day its lifts with sets, muscles and written position (null for rest days)
+  return days.map(d=>isRest(d)?null:(d.exercises||[]).map((n,j)=>{const pl=d.plan&&d.plan[n];return {n,j,s:ghSetsOf(d,n),ex:exFor(n),opt:!!(pl&&pl.opt)};}));
+}
+function fcCredit(v,l,x){(l.ex.p||[]).forEach(m=>{v[m]=(v[m]||0)+x;});(l.ex.s||[]).forEach(m=>{v[m]=(v[m]||0)+x*.5;});}   // same credit rule as ghPlanSets (secondary = half)
+function fcWeek(model,k){const v={};model.forEach(day=>day&&day.forEach(l=>fcCredit(v,l,l.s*k)));return v;}
+const fcDirect=(day,m)=>day.reduce((a,l)=>a+((l.ex.p||[]).includes(m)?l.s:0),0);
+const fcSession=(day,m)=>day.reduce((a,l)=>a+((l.ex.p||[]).includes(m)?l.s:(l.ex.s||[]).includes(m)?l.s*.5:0),0);
+const fcWork=day=>day.reduce((a,l)=>a+(fcIsAbs(l.ex)?0:l.s),0);
+function fcHome(model,m){
+  const per=model.map(d=>d?fcDirect(d,m):0),top=Math.max(0,...per);
+  return top?per.map((x,i)=>x>0&&x>=top/2?i:-1).filter(i=>i>=0):[];
+}
+function fcBuild(days,ranks){   // {days,before,after}: new day objects, never in place
+  const k=7/(days.length||7),model=fcModel(days),before=fcWeek(model,k),v=Object.assign({},before),L=m=>zoneOf(m,0),home={},added={};
+  ranks.forEach(m=>{home[m]=fcHome(model,m);added[m]={};});
+  const tgt=Object.fromEntries(ranks.map((m,r)=>{const z=VL[m]||L(m);return [m,Math.max(before[m]||0,z.mav+(z.mrv-z.mav)*FOCUS_PUSH[r])];}));   // targets from the plain landmarks; the personal MRV (effectiveMRV) is only the ceiling
+  const fits=l=>(l.ex.p||[]).every(m=>(v[m]||0)+k<=L(m).mrv+FC_EPS)&&(l.ex.s||[]).every(m=>(v[m]||0)+k*.5<=L(m).mrv+FC_EPS);
+  const donor=day=>day.filter(l=>!l.opt&&l.s>FOCUS_LIFT_MIN&&!fcIsAbs(l.ex)&&(l.ex.p||[]).length&&!(l.ex.p||[]).some(m=>ranks.includes(m))
+      &&(l.ex.p||[]).every(m=>(v[m]||0)-k>=L(m).mev-FC_EPS))
+    .map(l=>({l,sec:(l.ex.s||[]).some(m=>ranks.includes(m))?1:0,mar:Math.min(...l.ex.p.map(m=>(v[m]||0)-L(m).mav))}))
+    .sort((a,b)=>a.sec-b.sec||b.mar-a.mar||b.l.s-a.l.s||b.l.j-a.l.j)[0]||null;
+  const step=m=>{
+    if((v[m]||0)>=tgt[m]-FC_EPS)return false;
+    const c=[];
+    home[m].forEach(i=>{const day=model[i],room=fcWork(day)<FOCUS_DAY_CAP,d=donor(day);
+      if(!d&&!room||fcSession(day,m)+1>FOCUS_SESSION_CAP)return;
+      day.forEach(l=>{if(!l.opt&&(l.ex.p||[]).includes(m)&&l.s<FOCUS_LIFT_MAX&&fits(l))c.push({i,l,d,add:added[m][i]||0});});});
+    const pick=c.sort((a,b)=>a.add-b.add||(a.d?0:1)-(b.d?0:1)||a.l.s-b.l.s||a.l.j-b.l.j)[0];
+    if(!pick)return false;
+    pick.l.s++;fcCredit(v,pick.l,k);added[m][pick.i]=(added[m][pick.i]||0)+1;
+    if(pick.d){pick.d.l.s--;fcCredit(v,pick.d.l,-k);}
+    return true;
+  };
+  ranks.forEach(m=>{let n=0;while(n++<FOCUS_GUARD&&step(m));});
+  const rk=(l,i)=>(l.ex.p||[]).reduce((r,m)=>{const x=ranks.indexOf(m);return x>=0&&x<r&&home[m].includes(i)?x:r;},ranks.length);
+  const out=days.map((d,i)=>{const day=model[i];if(!day)return d;
+    const ord=day.map((l,pos)=>({l,pos,r:rk(l,i)})).sort((a,b)=>a.r-b.r||a.pos-b.pos).map(x=>x.l.n),plan=Object.assign({},d.plan||{});
+    day.forEach(l=>{if(l.s!==ghSetsOf(d,l.n)||plan[l.n])plan[l.n]=Object.assign({r:GM_REPS},plan[l.n],{s:l.s});});
+    return Object.assign({},d,{exercises:ord},Object.keys(plan).length?{plan}:{});
+  });
+  return {days:out,before,after:v};
+}
+/* the sheet: pick in order (tap again to remove), the weekly before → after per muscle, each day's new opening lifts, one gold Apply */
+const fcCur=()=>{const c=currentPlanDay();return c?c.sp:null;};
+function openFocusPlan(){const sp=fcCur();if(!sp)return;state._fcDraft=fcRanks(sp);haptic("tap");openSheet(fcSheet());state._sheetKind="focus";}
+function fcRefresh(){const sh=$("sheet");if(state._sheetKind!=="focus"||!sh||!sh.classList.contains("on"))return;const sc=sh.scrollTop;sh.innerHTML=fcSheet();sh.scrollTop=sc;}
+function fcTap(m){
+  const d=state._fcDraft||[];
+  if(!d.includes(m)&&d.length>=FOCUS_MAX){toast("Five is the most. Tap one to remove it.");return;}
+  state._fcDraft=d.includes(m)?d.filter(x=>x!==m):d.concat([m]);haptic("tap");fcRefresh();
+}
+function fcApply(clear){
+  const sp=fcCur();if(!sp)return;
+  const ranks=clear?[]:(state._fcDraft||[]).slice(),base=wkClone(fcBase(sp)),{focus:_f,...plain}=sp;
+  const next=ranks.length?(r=>Object.assign({},sp,{days:r.days,focus:{ranks,base,sig:fcSig(r.days)}}))(fcBuild(base,ranks)):Object.assign({},plain,{days:base});
+  state.data.splits=(state.data.splits||[]).map(s=>s.id===sp.id?next:s);
+  haptic("done");closeSheet();splitsChanged();
+  toastUndo(ranks.length?"Focus · "+ranks.map(ghName).join(" › "):"Focus cleared · plan as written",()=>{
+    state.data.splits=(state.data.splits||[]).map(s=>s.id===sp.id?sp:s);splitsChanged();toast("Plan restored");},"Undo");
+}
+const fcNum=x=>(Math.round(x*10)/10).toFixed(1).replace(/\.0$/,"");
+function fcRows(res,draft){   // muscles that move by at least half a set a week: focus first in rank order, then the biggest change
+  return M12.map(m=>({m,a:res.before[m]||0,b:res.after[m]||0,r:draft.indexOf(m)})).filter(x=>x.r>=0||Math.abs(x.b-x.a)>=.4)
+    .sort((x,y)=>(x.r<0)-(y.r<0)||(x.r>=0?x.r-y.r:Math.abs(y.b-y.a)-Math.abs(x.b-x.a)));
+}
+function fcRow(x){
+  const z=zoneOf(x.m,0),L={mev:z.mev,mav:z.mav,mrv:z.mrv},dl=x.b-x.a,up=dl>=.05,bar=up?GP.landmark(+fcNum(x.a),L,+fcNum(dl)):GP.landmark(+fcNum(x.b),L);
+  const tag=Math.abs(dl)<.05?`<span class="fc-d">same</span>`:`<span class="fc-d ${up?"up":"dn"}">${up?"+":"−"}${fcNum(Math.abs(dl))}</span>`;
+  return `<div class="fc-row">${x.r>=0?`<b class="fc-rk num">${x.r+1}</b>`:`<span class="fc-rk"></span>`}<div class="fc-rm"><div class="fc-rt"><span>${MNAME[x.m]}</span><span class="fc-rv"><i class="num">${fcNum(x.a)}</i>${GP.icon("chevR")}<b class="num">${fcNum(x.b)}</b>${tag}</span></div>${bar}</div></div>`;
+}
+function fcSheet(){
+  const sp=fcCur();if(!sp)return `<div class="gh fc">${shHd("Training focus",{ic:"target"})}</div>`;
+  const draft=state._fcDraft||[],live=fcRanks(sp),base=fcBase(sp),k=7/(base.length||7),now0=fcWeek(fcModel(base),k);
+  const res=draft.length?fcBuild(base,draft):{days:base,before:now0,after:now0},same=draft.join()===live.join();
+  const grid=FOCUS_PICK.map(m=>{const r=draft.indexOf(m);
+    return `<button type="button" class="fc-m${r>=0?" on":""}" aria-pressed="${r>=0}" onclick="fcTap('${m}')" aria-label="${MNAME[m]}${r>=0?", focus "+(r+1):""}. ${fcNum(now0[m]||0)} sets a week as written.">${r>=0?`<b class="num">${r+1}</b>`:""}<span>${ghName(m)}</span><i>${fcNum(now0[m]||0)} / wk</i></button>`;}).join("");
+  const rows=draft.length?fcRows(res,draft):[];
+  const days=res.days.map((d,i)=>{if(isRest(d))return "";const md=fcModel([d])[0],st=fcWork(md),ab=md.reduce((a,l)=>a+l.s,0)-st;   // the cap counts working sets without abs; the abs are shown beside so the total matches the day row
+    return `<div class="fc-day"><span class="fc-dn num">D${i+1}</span><div class="fc-dm"><div class="fc-dt"><span>${esc(d.name)}</span><i>${st} sets${ab?" + "+ab+" abs":""}</i></div><div class="fc-do">${(d.exercises||[]).slice(0,3).map(esc).join(" › ")}${(d.exercises||[]).length>3?" …":""}</div></div></div>`;}).join("");
+  const go=same?(live.length?`<button class="btn fc-go" onclick="fcApply(true)">${GP.icon("x")}Clear focus</button>`:""):
+    `<button class="btn gold fc-go" onclick="fcApply(false)">${GP.icon("target")}${draft.length?"Apply focus":"Back to the plan as written"}</button>`;
+  return `<div class="gh fc">${shHd("Training focus",{ic:"target",sub:esc(sp.name)})}
+    <p class="fc-note">Tap muscles in order of priority, up to five. Their lifts go first and sets move to them from the rest, so sessions keep their length. Max ${FOCUS_DAY_CAP} sets a day, abs not counted.</p>
+    <div class="fc-grid" role="group" aria-label="Focus muscles">${grid}</div>
+    ${rows.length?`<div class="eyebrow fc-sec">Sets per week</div><section class="s1 fc-list">${rows.map(fcRow).join("")}</section>`:""}
+    <div class="eyebrow fc-sec">${draft.length?"New day openers":"Day openers"}</div><section class="s1 fc-list">${days}</section>
+    ${go}</div>`;
 }
 
 /* ---- volume forecast: planned working sets per muscle per week, running through the cycle. Same credit rule + per-week normalising as Home's tonight forecast (ghPlanSets, perWeek). ---- */
