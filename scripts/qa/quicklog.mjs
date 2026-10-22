@@ -127,6 +127,14 @@ try {
   await page('07-day-detail');
   const hist = await ev(() => { closeSheet(); const w = state.data.workouts[0]; return { n: loggedExerciseNames().length, ex: exerciseRows(w.exercises[0].name).every((r) => r.date !== w.date), last: (lastSetFor(w.exercises[0].name) || []).every((s) => !s.est) }; });
   ok('lift history: the marked day never shows up as a performance row or as last time', hist.ex && hist.last, hist);
+  const oth = await ev(() => {   // the two outbound readers that print a session's tonnage: the calendar export and Alfred's context
+    const B = window.Blob, C = HTMLAnchorElement.prototype.click; let ics = '';
+    window.Blob = function (p, o) { ics = p.join(''); return new B(p, o); }; HTMLAnchorElement.prototype.click = function () {};
+    try { exportICS(); } finally { window.Blob = B; HTMLAnchorElement.prototype.click = C; }
+    const q = state.data.workouts[0], block = ics.split('BEGIN:VEVENT').find((s) => s.includes('UID:' + q.id)) || '';
+    return { alfred: (alfredContext(false).match(/LAST SESSION:[^\n]*/) || [''])[0], summary: (block.match(/SUMMARY:[^\r\n]*/) || [''])[0] };
+  });
+  ok('other readers: Alfred\'s context and the calendar export say "marked done", never a 0 kg session', /marked done/.test(oth.alfred) && !/0kg total/.test(oth.alfred) && /marked done/.test(oth.summary) && !/ 0kg/.test(oth.summary), oth);
   await reset();
 
   /* ---------- 5 · an OLDER day from Mission (Preview > Mark as done > Other date) ---------- */

@@ -9286,7 +9286,7 @@ function exportICS(){
   const fmt=d=>d.getUTCFullYear()+z(d.getUTCMonth()+1)+z(d.getUTCDate())+"T"+z(d.getUTCHours())+z(d.getUTCMinutes())+z(d.getUTCSeconds())+"Z";
   let ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//GainsTracker//Gotham//EN\r\nCALSCALE:GREGORIAN\r\n";
   ws.forEach(w=>{const s=new Date(w.date);const e=new Date(s.getTime()+((w.duration||3600)*1000));
-    ics+=`BEGIN:VEVENT\r\nUID:${w.id||("w"+s.getTime())}@gainstracker\r\nDTSTAMP:${fmt(s)}\r\nDTSTART:${fmt(s)}\r\nDTEND:${fmt(e)}\r\nSUMMARY:🦇 ${(w.name||"Training").replace(/[\r\n,;]/g," ")} — ${fmtNum(w.totalVol)}kg\r\nDESCRIPTION:${(w.exercises||[]).map(x=>x.name).join(", ").replace(/[\r\n,;]/g," ")}\r\nEND:VEVENT\r\n`;});
+    ics+=`BEGIN:VEVENT\r\nUID:${w.id||("w"+s.getTime())}@gainstracker\r\nDTSTAMP:${fmt(s)}\r\nDTSTART:${fmt(s)}\r\nDTEND:${fmt(e)}\r\nSUMMARY:🦇 ${(w.name||"Training").replace(/[\r\n,;]/g," ")} — ${w.quick?"marked done":fmtNum(w.totalVol)+"kg"}\r\nDESCRIPTION:${(w.exercises||[]).map(x=>x.name).join(", ").replace(/[\r\n,;]/g," ")}\r\nEND:VEVENT\r\n`;});
   ics+="END:VCALENDAR";
   try{
     const blob=new Blob([ics],{type:"text/calendar"});const url=URL.createObjectURL(blob);
@@ -9573,7 +9573,7 @@ function alfredContext(chat){
     sessionStr=`\n🔴 ACTIVE WORKOUT (${elapsed}min in): ${ses.split} — ${ses.day}\n  ${exLines||'no exercises logged yet'}`;
   }
   // Last workout
-  const lastW=(d.workouts||[])[0];const lastStr=lastW?`\nLAST SESSION: ${new Date(lastW.date).toLocaleDateString()} — ${lastW.name}, ${Math.round(lastW.totalVol||0)}kg total`:'';
+  const lastW=(d.workouts||[])[0];const lastStr=lastW?`\nLAST SESSION: ${new Date(lastW.date).toLocaleDateString()} — ${lastW.name}, ${lastW.quick?"marked done from the plan, not logged (no weights or tonnage)":Math.round(lastW.totalVol||0)+"kg total"}`:'';
   // Injuries
   const inj=Object.keys(d.injuries||{}).map(m=>MNAME[m]||m).join(', ');
   // Physique
