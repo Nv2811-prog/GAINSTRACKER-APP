@@ -116,6 +116,10 @@ async function typedRun(P, label) {
   check('A: honest fallback offers tappable examples (and Settings)', fb.chips.length === 3 && fb.chips.every((c) => c.length < 40), fb.chips);
   const chipAns = await P.evaluate(async () => { document.querySelector('#ac-log .ac-fu .ac-chip').click(); await new Promise((r) => setTimeout(r, 200)); const rows = [...document.querySelectorAll('#ac-log .ac-row.a .ac-b')]; return rows[rows.length - 1].innerText; });
   check('A: tapping an example chip is answered from the logs', /Readiness \d+/.test(chipAns), chipAns.slice(0, 120));
+  const cl = await ask(P, 'chest press next weight');
+  check('A: the clarifying question offers each candidate as a tap', cl.chips.length === 2 && cl.chips.every((c) => /^Next weight on .*Chest Press$/.test(c)), cl.chips);
+  const clAns = await P.evaluate(async () => { document.querySelector('#ac-log .ac-fu .ac-chip').click(); await new Promise((r) => setTimeout(r, 200)); const rows = [...document.querySelectorAll('#ac-log .ac-row.a .ac-b')]; return rows[rows.length - 1].innerText; });
+  check('A: tapping a candidate answers that lift', /^Next on (Plate-Loaded|Incline Machine) Chest Press: /.test(clAns), clAns.slice(0, 120));
   await ask(P, 'Is my chest recovered?'); await shot('answer-recovery');
   await ask(P, 'What weight next on machine shoulder press?'); await shot('answer-lift');
   await ask(P, 'chest press next weight'); await shot('answer-clarify');
