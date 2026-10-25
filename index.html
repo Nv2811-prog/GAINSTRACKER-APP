@@ -18,7 +18,7 @@
 :root{
 color-scheme:dark;
 /* GOTHAM PRO tokens (wave 1). Elevation by luminance; gold = action / selection / record; one meaning per status colour. */
---g0:#05070C;--g1:#0C121C;--g2:#111925;--g3:#182234;--g4:#202C40;
+--g0:#030407;--g1:#080C13;--g2:#0C121B;--g3:#131B28;--g4:#1A2334;   /* GP:DARK 2026-10-25: one step deeper and colder */
 --hair:rgba(150,178,222,.10);--hair2:rgba(150,178,222,.18);--hl:inset 0 1px 0 rgba(255,255,255,.05);
 --sh1:0 1px 2px rgba(0,0,0,.55);--sh2:0 16px 36px -16px rgba(0,0,0,.85);
 --gold-hi:#FFDD8A;--gold-lo:#D9A033;--gold-ink:#F5CD72;--on-gold:#1A1305;
@@ -29,7 +29,7 @@ color-scheme:dark;
 --r-s:10px;--r-m:16px;--r-l:22px;
 --spring:linear(0,.38 9%,.88 20%,1.06 30%,1.03 40%,.995 55%,1);--d-in:90ms;--d-out:280ms;
 /* legacy names remapped onto the Gotham Pro palette, so every existing rule and inline style inherits it */
---bg:#05070C;--bg2:#0C121C;--bg3:#111925;--bg4:#202C40;
+--bg:#030407;--bg2:#080C13;--bg3:#0C121B;--bg4:#1A2334;
 --gold:#F2C14E;--gold2:#F5CD72;--gold3:#FFDD8A;--gold-dim:#B8892E;--gold-bg:#17130A;
 --red:#FF5A4E;--green:#34D27F;--yellow:#FFB224;--orange:#FFB224;--blue:#5BB4FF;--purple:#A88BFA;--steel:#7F9CC8;
 --text:#F3F0E8;--text2:#A8B3C6;--text3:#8C97AC;
@@ -502,8 +502,8 @@ input:focus,select:focus,textarea:focus{border-color:rgba(255,208,72,.65);box-sh
 .ex-act-r{position:absolute;right:0;top:0;bottom:0;width:72px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;background:linear-gradient(270deg,rgba(232,69,60,.35),rgba(232,69,60,.12));color:#f87171;font-family:var(--disp);font-weight:650;font-size:10px;letter-spacing:.07em;text-transform:uppercase;z-index:1;pointer-events:none;border-radius:0 14px 14px 0}
 .ex-act-r span{font-size:18px}
 /* canvas: one calm gold haze + a cool hint; the neon multi-glow and the blue grid are gone */
-body{background:radial-gradient(110% 55% at 50% -12%,rgba(242,193,78,.07),transparent 58%) no-repeat,radial-gradient(80% 40% at 100% 2%,rgba(91,180,255,.045),transparent 60%) no-repeat,var(--g0);background-attachment:scroll;letter-spacing:-.005em}
-body::before{content:none}
+body{background:radial-gradient(120% 55% at 50% -16%,rgba(150,172,210,.075),transparent 60%) no-repeat,radial-gradient(90% 45% at 50% 112%,rgba(0,0,0,.7),transparent 70%) no-repeat,var(--g0);background-attachment:scroll;letter-spacing:-.005em}   /* GP:DARK: cold moonlight, a darker floor */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.045;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}   /* film grain, static */
 /* type: SF Pro for every word; Bebas (--num) only for big numerals */
 h1{font-size:28px!important;letter-spacing:-.02em!important;line-height:1.12!important;text-shadow:none!important}
 h2{letter-spacing:-.015em}
@@ -1289,6 +1289,28 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-suit .ana-lg{margin:8px 14px 0;padding:10px 0 14px;border-top:1px solid var(--hair)}
 @media (prefers-reduced-motion:reduce){.p3-fin .ana-g{animation:none}}
 /* ===== /GP:ANATOMY ===== */
+/* ===== GP:DARK (2026-10-25) ===== */
+/* The darker Gotham: the palette, body, cards and art grade are edited in place (tokens, body, .gh .s2/.s3, .ga, .gh-bg). This block holds the new pieces:
+   the dark line (.dk: italic SF, a thin gold rule, the credit in small caps) and the rebuilt briefing before the first set (.pi). */
+.dk{margin:14px 0 2px;padding:2px 0 2px 13px;border-left:2px solid rgba(242,193,78,.5)}
+.dk blockquote{margin:0;font:italic 500 16px/1.42 var(--body);letter-spacing:-.005em;color:var(--tx1);text-wrap:pretty}
+.dk figcaption{margin-top:7px;font:600 10.5px/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--tx3)}
+.p3-fin .dk.fin{max-width:300px;margin:12px auto 0;padding:0;border:0;text-align:center}
+.p3-fin .dk.fin blockquote{font-size:15px;color:var(--tx2)}
+.p3-fin .dk.fin figcaption{margin-top:5px}
+.dk.sum{margin:16px 2px 4px}
+.pi{padding-bottom:20px}
+.pi .pi-hero{padding-bottom:16px}
+.pi .gh-top .pi-sp{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pi .pi-t{margin:10px 0 6px;font:700 30px/1.08 var(--body);letter-spacing:-.03em;color:var(--tx1);text-wrap:balance}
+.pi .pi-dk{max-width:30em}
+.pi .pi-fig{max-width:400px;margin:4px auto 0}
+.pi .pi-fig svg{width:100%;height:auto}
+.pi .pi-chips{justify-content:center;margin:8px 14px 14px}
+.pi .pi-gp{white-space:normal;line-height:1.4;color:var(--tx2)}
+.pi .pi-gp b{color:var(--tx1)}
+.pi-cta{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:10px;margin:16px 0 0}
+/* ===== /GP:DARK ===== */
 /* ===== GP:FOCUS (2026-10-22) ===== */
 /* Training focus sheet: a 3-column muscle picker (gold ring + gold rank coin = chosen), sets per week before → after on the shared landmark bar, each day's new opening lifts, one gold Apply. Colours keep their one meaning (gold = the choice and the action, green = more sets, muted = fewer). */
 .fc .fc-note{margin:0 2px 14px;font-size:13px;line-height:18px;color:var(--tx2)}
@@ -1401,17 +1423,17 @@ b.fc-rk{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0
 
 /* surfaces: S1 row/tile, S2 card, S3 hero (one per screen) */
 .gh .s1{background:var(--g1);border-radius:var(--r-m);box-shadow:var(--hl)}
-.gh .s2{background:linear-gradient(180deg,#131B29 0%,#0F1621 100%);border:1px solid var(--hair);border-radius:var(--r-l);box-shadow:var(--hl),var(--sh2)}
-.gh .s3{position:relative;isolation:isolate;overflow:hidden;border-radius:var(--r-l);background:radial-gradient(120% 85% at 100% 0%,rgba(242,193,78,.17),transparent 56%),radial-gradient(90% 70% at 0% 100%,rgba(91,180,255,.07),transparent 60%),linear-gradient(180deg,#1B2638 0%,#111927 100%);border:1px solid rgba(242,193,78,.22);box-shadow:inset 0 1px 0 rgba(255,226,150,.16),0 26px 50px -22px rgba(0,0,0,.95)}
-.gh .s3::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,221,138,.9) 28%,rgba(255,221,138,.9) 72%,transparent)}
+.gh .s2{background:linear-gradient(180deg,#0F1622 0%,#0A0F18 100%);border:1px solid var(--hair);border-radius:var(--r-l);box-shadow:var(--hl),var(--sh2)}
+.gh .s3{position:relative;isolation:isolate;overflow:hidden;border-radius:var(--r-l);background:radial-gradient(120% 85% at 100% 0%,rgba(242,193,78,.10),transparent 56%),radial-gradient(90% 70% at 0% 100%,rgba(91,180,255,.04),transparent 60%),linear-gradient(180deg,#121A27 0%,#0A0F18 100%);border:1px solid rgba(242,193,78,.17);box-shadow:inset 0 1px 0 rgba(255,226,150,.16),0 26px 50px -22px rgba(0,0,0,.95)}
+.gh .s3::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,221,138,.6) 28%,rgba(255,221,138,.6) 72%,transparent)}
 .gh .s3::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.35;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
 .gh .s3.is-live{box-shadow:inset 0 1px 0 rgba(255,226,150,.16),0 0 0 1.5px var(--gold),0 26px 50px -22px rgba(0,0,0,.95)}
 
 /* TONIGHT hero */
 .gh-hero{padding:12px 16px 10px}
 .gh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-.gh-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(242,193,78,.12) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
-.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.9;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:saturate(.9) contrast(1.08)}
+.gh-bg::after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cpath d='M58 27l-4.9 19' stroke='rgba(214,226,255,0.055)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M66 10l-4.3 17' stroke='rgba(214,226,255,0.052)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M75 43l-4.5 17' stroke='rgba(214,226,255,0.054)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M171 114l-4.6 18' stroke='rgba(214,226,255,0.054)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M9 40l-4.5 17' stroke='rgba(214,226,255,0.060)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M26 21l-3.5 14' stroke='rgba(214,226,255,0.110)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M19 103l-3.1 12' stroke='rgba(214,226,255,0.057)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M102 111l-4.3 16' stroke='rgba(214,226,255,0.089)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M84 166l-3.8 14' stroke='rgba(214,226,255,0.068)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M126 44l-4.6 18' stroke='rgba(214,226,255,0.089)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M131 52l-6.2 24' stroke='rgba(214,226,255,0.058)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M30 62l-6.0 23' stroke='rgba(214,226,255,0.081)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M138 103l-5.8 22' stroke='rgba(214,226,255,0.073)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M107 104l-4.1 16' stroke='rgba(214,226,255,0.112)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M85 120l-2.6 10' stroke='rgba(214,226,255,0.102)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M51 69l-4.9 19' stroke='rgba(214,226,255,0.051)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M64 110l-4.3 16' stroke='rgba(214,226,255,0.066)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M23 45l-3.9 15' stroke='rgba(214,226,255,0.114)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M30 72l-3.4 13' stroke='rgba(214,226,255,0.060)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M156 50l-4.0 15' stroke='rgba(214,226,255,0.076)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M172 27l-3.0 12' stroke='rgba(214,226,255,0.067)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M2 150l-3.1 12' stroke='rgba(214,226,255,0.071)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M75 66l-4.5 17' stroke='rgba(214,226,255,0.121)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M82 157l-6.1 23' stroke='rgba(214,226,255,0.100)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M72 71l-4.2 16' stroke='rgba(214,226,255,0.079)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M12 38l-3.0 11' stroke='rgba(214,226,255,0.075)' stroke-width='0.6' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/180px 180px,linear-gradient(115deg,transparent 40%,rgba(242,193,78,.08) 74%,transparent 94%),linear-gradient(180deg,rgba(4,5,8,.1),rgba(4,5,8,.66) 56%,#07090d),linear-gradient(90deg,rgba(7,9,13,.95),rgba(7,9,13,.42) 48%,rgba(7,9,13,.7))}
+.gh-art{position:absolute;right:-8px;top:-8px;width:64%;height:88%;object-fit:cover;object-position:50% 14%;opacity:.86;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36%);mask-image:linear-gradient(90deg,transparent,#000 36%);filter:brightness(.8) saturate(.7) contrast(1.14)}
 .s3.is-live .gh-art{opacity:.5}   /* live hero: dimmed; the pulsing live dot is the one time-based motion */
 .gh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:20px}
 .gh-live{display:inline-flex;align-items:center;gap:7px;color:var(--gold-ink)}
@@ -1576,8 +1598,8 @@ b.fc-rk{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0
 /* Cinematic Gotham stills behind the heroes (assets/art/*.jpg, 720x480, subject in the right ~40%). One per screen, static, always veiled so text stays crisp.
    gaArt() drops a .ga layer into the S3 at z-index:-2 (under the grain): the still feathers in from the left, a card-coloured veil closes the bottom. The workout bar and the finish moment use the same stills. */
 .ga{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-.ga img{position:absolute;inset:0;width:100%;max-width:none;height:100%;display:block;object-fit:cover;object-position:right center;opacity:var(--o,.8);-webkit-mask-image:linear-gradient(90deg,transparent 4%,#000 56%);mask-image:linear-gradient(90deg,transparent 4%,#000 56%)}
-.ga::after{content:"";position:absolute;inset:0;background:var(--v,linear-gradient(transparent,transparent)),linear-gradient(0deg,#111927 0%,rgba(17,25,39,.6) 28%,rgba(17,25,39,0) 62%),linear-gradient(90deg,rgba(17,25,39,.55),rgba(17,25,39,0) 72%)}
+.ga img{position:absolute;inset:0;width:100%;max-width:none;height:100%;display:block;object-fit:cover;object-position:right center;opacity:var(--o,.8);filter:brightness(.78) saturate(.72) contrast(1.1);-webkit-mask-image:linear-gradient(90deg,transparent 4%,#000 56%);mask-image:linear-gradient(90deg,transparent 4%,#000 56%)}
+.ga::after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cpath d='M58 27l-4.9 19' stroke='rgba(214,226,255,0.055)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M66 10l-4.3 17' stroke='rgba(214,226,255,0.052)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M75 43l-4.5 17' stroke='rgba(214,226,255,0.054)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M171 114l-4.6 18' stroke='rgba(214,226,255,0.054)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M9 40l-4.5 17' stroke='rgba(214,226,255,0.060)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M26 21l-3.5 14' stroke='rgba(214,226,255,0.110)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M19 103l-3.1 12' stroke='rgba(214,226,255,0.057)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M102 111l-4.3 16' stroke='rgba(214,226,255,0.089)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M84 166l-3.8 14' stroke='rgba(214,226,255,0.068)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M126 44l-4.6 18' stroke='rgba(214,226,255,0.089)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M131 52l-6.2 24' stroke='rgba(214,226,255,0.058)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M30 62l-6.0 23' stroke='rgba(214,226,255,0.081)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M138 103l-5.8 22' stroke='rgba(214,226,255,0.073)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M107 104l-4.1 16' stroke='rgba(214,226,255,0.112)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M85 120l-2.6 10' stroke='rgba(214,226,255,0.102)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M51 69l-4.9 19' stroke='rgba(214,226,255,0.051)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M64 110l-4.3 16' stroke='rgba(214,226,255,0.066)' stroke-width='0.8' stroke-linecap='round'/%3E%3Cpath d='M23 45l-3.9 15' stroke='rgba(214,226,255,0.114)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M30 72l-3.4 13' stroke='rgba(214,226,255,0.060)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M156 50l-4.0 15' stroke='rgba(214,226,255,0.076)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M172 27l-3.0 12' stroke='rgba(214,226,255,0.067)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M2 150l-3.1 12' stroke='rgba(214,226,255,0.071)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M75 66l-4.5 17' stroke='rgba(214,226,255,0.121)' stroke-width='0.6' stroke-linecap='round'/%3E%3Cpath d='M82 157l-6.1 23' stroke='rgba(214,226,255,0.100)' stroke-width='1' stroke-linecap='round'/%3E%3Cpath d='M72 71l-4.2 16' stroke='rgba(214,226,255,0.079)' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M12 38l-3.0 11' stroke='rgba(214,226,255,0.075)' stroke-width='0.6' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/180px 180px,var(--v,linear-gradient(transparent,transparent)),linear-gradient(0deg,#0A0F18 0%,rgba(10,15,24,.62) 28%,rgba(10,15,24,0) 62%),linear-gradient(90deg,rgba(10,15,24,.6),rgba(10,15,24,0) 72%),linear-gradient(rgba(4,8,16,.22),rgba(4,8,16,.22))}   /* GP:DARK: static rain + a cold grade */
 .ga-rest img{width:calc(100% + 60px);object-position:right 38%}   /* skyline pushed past the right edge so the moon clears the Next row */
 .ga-mission{--o:.66;--v:linear-gradient(180deg,rgba(17,25,39,.62),rgba(17,25,39,0) 34%)}   /* top veil keeps "Day 7 of 8" crisp */
 .ga-mission.dim{--o:.4}   /* the no-plan hero runs a paragraph across the full width */
@@ -4986,7 +5008,7 @@ function checkWeightAnomaly(ei,si){
   const w=parseFloat(s.w);if(!w||w<=0)return;
   ses._anomalyAsked=ses._anomalyAsked||{};if(ses._anomalyAsked[e.name])return; // once per exercise per session
   const ex=exFor(e.name);
-  const lb=lastBestSet(e.name);if(!lb||!lb.w)return;
+  const lb=lastBestSet(e.name);if(!lb||!lb.w||lb.otherGym)return;   // another gym's numbers are no baseline for this gym's machine
   const cut=exResetAt(e.name);
   if(cut&&lb.date&&new Date(lb.date).getTime()<new Date(cut).getTime())return; // archived — no fair baseline to compare against yet
   const lw=setLoad(ex,lb.w),cw=setLoad(ex,w);
@@ -5711,7 +5733,7 @@ function playOutro(R){
   const cell=(n,dec,u,gold)=>`<div><b class="num${gold?" g":""}" data-to="${n}" data-dec="${dec}">0</b><span>${u}</span></div>`;
   const el=document.createElement("div");el.id="p3fin";el.className="p3-fin";el.setAttribute("role","status");
   el.innerHTML=`${gaArt("finish","fin")}<div class="c"><div class="eb">${GP.icon("bat")}<span>Session complete</span></div><div class="ttl">${esc(R.wk.name)}</div>
-    <div class="p3-fsuit">${anaFinishFig(R.wk)}</div>${anaLegend()}
+    ${darkHtml(darkFinish(R),"fin")}<div class="p3-fsuit">${anaFinishFig(R.wk)}</div>${anaLegend()}
     <div class="n">${cell(p3Min(R.dur),0,"min")}${cell(p3Working(R.wk),0,"sets")}${cell(v.n,v.dec,v.u==="t"?"tonnes":"kg")}${cell(prs.length,0,prs.length===1?"PR":"PRs",prs.length>0)}</div>
     ${prs.length?`<div class="pr">${prs.slice(0,3).map((p,i)=>`<div style="--i:${i}">${GP.icon("trophy")}<span>${esc(p.name)}</span><b>${Math.round(p.orm)} kg</b></div>`).join("")}${prs.length>3?`<div class="mo" style="--i:3">+${prs.length-3} more</div>`:""}</div>`:""}</div>`;
   document.body.appendChild(el);
@@ -5735,6 +5757,7 @@ function p3SumSession(R){
     ${lgRestSummary(wk)}
   </section>
   ${prs.length?`<section class="s2 gh-list gh-c" style="--i:2"><div class="gh-lh"><h3>New records <span class="tag ok">${prs.length}</span></h3><span class="t-xs">best e1RM</span></div>${prRows}</section>`:""}
+  ${darkHtml(darkFinish(R),"sum gh-c")}
   <div class="p3-line gh-c" style="--i:3">${GP.icon("flame")}<span>${ws>0?ws+"-week streak · ":""}${esc(rankFor(sl).name)} · Lv ${sl}</span></div>`;
 }
 /* ===== slide 2 = muscles (sets tonight vs the weekly landmarks) + lift by lift ===== */
@@ -5936,6 +5959,53 @@ function suitProps(){
 function rcHex(r){return r>=80?"#2ECC71":r>=50?"#E8C53C":"#E8453C";}
 function suitColor(m){if(!(state.data.muscleVol[m]||0))return null;return rcHex(getRecovery(m));}
 const SUIT_DEFS="";   // the old Batsuit's per-figure shading; the anatomy keeps its gradients and glow once in the sprite (anaSprite)
+/* ===== THE DARK SIDE (GP:DARK, 2026-10-25) =====
+   One line when a workout starts (the briefing) and one when it ends (the finish moment and the summary), in the voice of the Nolan films, Mask of the
+   Phantasm, the animated series and the comics: a few short real lines, credited, and original lines in the same voice (no credit). Picked by the
+   moment (back after days away, a tired check-in, a late night, a record, a session you started tired), deterministic per session so it never flickers
+   on a re-render, and never one of the last 8 shown. Nothing pops up: it lives in screens that already exist. */
+const DARK_LINES={
+  start:[{id:"s1",t:"Gotham doesn't take nights off. Neither does the work."},{id:"s2",t:"Nobody is coming to lift it for you."},
+    {id:"s3",t:"The cowl doesn't get lighter. You get stronger."},{id:"s4",t:"No one will see this work. That's the point."},
+    {id:"s5",t:"She said the day would come when Gotham no longer needs Batman. It never comes. Neither does the day you stop needing this."},
+    {id:"s6",t:"I am vengeance. I am the night.",by:"Batman · The Animated Series"},{id:"s7",t:"I shall become a bat.",by:"Bruce Wayne · Year One"},
+    {id:"s8",t:"Fear is a tool.",by:"Batman · The Batman"},{id:"s9",t:"I didn't count on being happy.",by:"Bruce Wayne · Mask of the Phantasm"},
+    {id:"s10",t:"Quiet room. Heavy iron. Begin."}],
+  tired:[{id:"t1",t:"Know your limits, Master Wayne.",by:"Alfred · The Dark Knight"},{id:"t2",t:"Tired is a report, sir, not a verdict. We go anyway, and we go smart."},
+    {id:"t3",t:"I'm tired too, Master Wayne. The city isn't."}],
+  back:[{id:"b1",t:"Why do we fall? So we can learn to pick ourselves up.",by:"Thomas Wayne · Batman Begins"},
+    {id:"b2",t:"Days in the dark. The bar still remembers you. Make it remember more."},{id:"b3",t:"Rise.",by:"The Dark Knight Rises"}],
+  late:[{id:"l1",t:"The city is asleep. You are not."}],
+  finish:[{id:"f1",t:"It's not who I am underneath, but what I do that defines me.",by:"Batman · Batman Begins"},{id:"f2",t:"The city sleeps. You didn't."},
+    {id:"f3",t:"Work done in the dark still counts."},{id:"f4",t:"Gotham will never thank you. Train anyway."},
+    {id:"f5",t:"A silent guardian. A watchful protector.",by:"Gordon · The Dark Knight"},{id:"f6",t:"Another night in the cave. The suit fits a little better."}],
+  pr:[{id:"p1",t:"The world only makes sense if you force it to.",by:"Batman · The Dark Knight Returns"},{id:"p2",t:"Pain fades. The record stays."}],
+  hard:[{id:"h1",t:"Endure, Master Wayne. Take it.",by:"Alfred · The Dark Knight"},{id:"h2",t:"You came in tired and you finished anyway. That is the whole job."}],
+  dawn:[{id:"d1",t:"The night is darkest just before the dawn.",by:"Harvey Dent · The Dark Knight"}]
+};
+function darkPick(pool,seed){   // the same line for the same seed, skipping the 8 shown most recently
+  const seen=state.data.darkSeen||[],fresh=pool.filter(x=>!seen.includes(x.id)),list=fresh.length?fresh:pool;
+  let h=0;String(seed).split("").forEach(c=>{h=(h*31+c.charCodeAt(0))>>>0;});
+  const pick=list[h%list.length];
+  state.data.darkSeen=[pick.id].concat(seen.filter(i=>i!==pick.id)).slice(0,8);
+  return pick;
+}
+const darkLate=()=>{const h=new Date(now()).getHours();return h>=21||h<5;};
+function darkStart(ses){   // once per session, kept on it
+  if(!ses)return null;if(ses.dark)return ses.dark;
+  const last=(state.data.workouts||[]).reduce((t,w)=>Math.max(t,(w&&new Date(w.date).getTime())||0),0),away=last?(now()-last)/864e5:0;
+  const pool=away>=4?DARK_LINES.back:ses.readiness==="tired"?DARK_LINES.tired:darkLate()?DARK_LINES.late.concat(DARK_LINES.start):DARK_LINES.start;
+  ses.dark=darkPick(pool,ses.startedAt||now());save();try{saveSession();}catch(e){}
+  return ses.dark;
+}
+function darkFinish(R){   // once per finished session, kept on the result (the finish moment and the summary show the same line)
+  if(!R)return null;if(R.dark)return R.dark;
+  const pool=(R.prsThis||[]).length?DARK_LINES.pr:R.wk&&R.wk.readiness==="tired"?DARK_LINES.hard:darkLate()?DARK_LINES.dawn.concat(DARK_LINES.finish):DARK_LINES.finish;
+  R.dark=darkPick(pool,(R.wk&&R.wk.id)||now());save();
+  return R.dark;
+}
+const darkHtml=(l,cls)=>l?`<figure class="dk${cls?" "+cls:""}"><blockquote>${esc(l.t)}</blockquote>${l.by?`<figcaption>${esc(l.by)}</figcaption>`:""}</figure>`:"";
+
 /* ===== ANATOMY (GP:ANATOMY, 2026-10-25): the detailed body behind every figure =====
    Suit hero, finish moment, summary, day previews, exercise pictures, heat maps, the patrol intro: front 69 / back 54 pieces with the heads and segments
    (upper / lower abs + obliques; rectus femoris / vastus lateralis / medialis + adductors; lats / teres / mid back / erectors; biceps femoris /
@@ -9703,7 +9773,7 @@ Five tabs along the bottom; Search (the magnifier), Settings (the sliders) and m
 A dock is one sideways-scrolling row of tiles under a tab's hero, each with a picture, a label and a live line of status, so nothing needs searching for. MISSION: Edit plan (the plan editor), New split, Import split (paste or share a Split Card) and Lab (stimulus-to-fatigue ratings, balance, the plateau breaker and the tools: Forge, Plate calculator, 1RM test day, Oracle, Strength simulator, Contracts, Bat-Focus). SUIT: Infirmary (sleep, soreness, workload, injuries), Fuel (calories, macros, food log, hydration), Time-lapse (replay your muscle heat week by week, plus the coverage radar) and Photos (Before & after when you have two or more, otherwise add your first). PROFILE: History (the calendar), Records, Standards (lifts against bodyweight), Body (weigh-in and trend), Badges (the trophy room) and Backup (Data control). ALLIES: Add ally, Chat, Duel, Raid, Leaderboard and Manage (your offline snapshot code, and removing allies). A tile for a section on the same page scrolls to it; the others open a sheet or a page.
 
 ## A SESSION FROM START TO FINISH
-Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
+Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). Then a short briefing (tonight's day, one line from the dark side, the muscles on the anatomy and my targets; Begin or Cancel) leads to the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. Finishing shows the suit for a moment: the muscles you trained in gold, the rest in their recovery colour (green ready, amber recovering, red fatigued), with a closing line. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (the recovery map, weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
 
 ## LOGGING SETS: THE FOCUS CARD, RIR TILES AND SET TYPES
 The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan, the Target, Last time and e1RM boxes, then one row per set with the set badge (tap to cycle the set type), kilos, reps and the tick. Empty kilos and reps show the target as ghost values (last time +1 rep, or more weight once you hit 10), and one tap on the tick logs them as they are. Under every working set a small "last 90 × 7" line shows exactly what you lifted on that set in your newest session of the lift, from any day or split, at this gym; only when this gym has none does it use another gym's (marked "other gym"). RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
@@ -10796,8 +10866,8 @@ const _ALFRED_WEAK=["Did you mean that as a warm-up, sir? You have a great deal 
 // This is the line Alfred reaches for when you drop down from a high weight. Genuinely irritated.
 const _ALFRED_REGRESS=["You've gone BACKWARDS, sir. You lifted heavier than this not long ago — what happened?","I have it in the records, Master: you moved more than this recently. Explain yourself, then add weight.","Down from where you were, sir. That is not a plateau — that is retreat. I won't pretend otherwise.","You handled more than this a few sessions ago, Master. Going backwards is the one thing I will not abide.","Lighter than your recent best, sir. We do not regress in this cave. Load the bar to where it belongs.","I refuse to applaud a backward step, Master. You've lifted heavier — go and lift it again.","That number was higher last time, sir. Don't insult the work you already put in by sliding back now.","Backwards, Master. You spent weeks earning that weight — pick it back up, don't surrender it.","You've slipped, sir, and we both know it. Recover properly, eat, and reclaim what was yours.","This is beneath your recent self, Master. The man from two weeks ago is ashamed. Add load.","No, sir. You were stronger than this days ago. I will not log a retreat as if it were progress.","Going down from a high weight, Master? That is how strength quietly dies. Stop it now — heavier."];
 const _ALFRED_VERDICT_WEAK=["A light evening's work, sir. Gotham expects more.","Below your standard, Master. The iron noticed, and so did I.","You went through the motions tonight, sir. Tomorrow, we mean it.","Honest assessment: that was maintenance, not progress.","Half-effort, sir. The villains are training harder than that.","You showed up, Master. You did not show out. There is a difference.","That was a rehearsal, sir — not the performance. I expect the real thing next.","The Rogues slept easy tonight, Master. Let us change that.","Bluntly, sir: that was a wasted evening. Add load next session or don't bother changing into your kit.","I'll not flatter you, Master — that was lazy. Beat last week's numbers or we are going backwards.","Disappointing, sir. You have more in you and we both know it. No excuses next time.","That was beneath you, Master. Train like the man you're trying to become, not the one you are."];
-const _ALFRED_VERDICT_OK=["Solid, disciplined work, sir. The standard holds.","A respectable session, Master. Consistency is the weapon.","Good, controlled volume tonight. Recover and repeat.","Clean and deliberate, sir. Exactly as it should be.","No fireworks, sir — but the brick was laid. Walls are built this way.","Dependable work, Master. The kind that quietly wins wars."];
-const _ALFRED_VERDICT_STRONG=["Ferocious work tonight, sir. Master Bruce would be proud.","That was war on the iron, Master. Outstanding.","You left nothing in the tank, sir. Precisely the standard.","A statement session, Master. The Rogues should be worried.","Magnificent, sir. Gotham is safer for what you did tonight.","You went to a dark place and came back stronger, Master. That is the work.","I have rarely seen you this dangerous, sir. Keep it.","That, Master, was the weapon being forged. Spectacular.","I am proud of you tonight, sir — and I do not hand that out. You earned every word of it.","THAT is the standard. Remember exactly how that felt, Master, because that is who you are now.","Extraordinary session, sir. If the Rogues could see this, they'd surrender. Truly elite work.","You didn't train tonight, Master — you declared war, and you won. Outstanding from the first set to the last."];
+const _ALFRED_VERDICT_OK=["Solid, disciplined work, sir. The standard holds.","The city will never know what tonight cost you, sir. That is rather the point.","Another night nobody saw, Master. Those are the ones that count.","A respectable session, Master. Consistency is the weapon.","Good, controlled volume tonight. Recover and repeat.","Clean and deliberate, sir. Exactly as it should be.","No fireworks, sir — but the brick was laid. Walls are built this way.","Dependable work, Master. The kind that quietly wins wars."];
+const _ALFRED_VERDICT_STRONG=["Ferocious work tonight, sir. Master Bruce would be proud.","Endure, Master Wayne. You did more than endure tonight.","Gotham doesn't deserve that kind of work, sir. Do it again anyway.","That was war on the iron, Master. Outstanding.","You left nothing in the tank, sir. Precisely the standard.","A statement session, Master. The Rogues should be worried.","Magnificent, sir. Gotham is safer for what you did tonight.","You went to a dark place and came back stronger, Master. That is the work.","I have rarely seen you this dangerous, sir. Keep it.","That, Master, was the weapon being forged. Spectacular.","I am proud of you tonight, sir — and I do not hand that out. You earned every word of it.","THAT is the standard. Remember exactly how that felt, Master, because that is who you are now.","Extraordinary session, sir. If the Rogues could see this, they'd surrender. Truly elite work.","You didn't train tonight, Master — you declared war, and you won. Outstanding from the first set to the last."];
 let _lastLineIdx={};
 function _pickLine(arr,key){
   if(arr.length<2)return arr[0];
@@ -12849,50 +12919,22 @@ function suitFigureFB(colFn){
 /* ===== Wave 9 v2: Dramatic patrol intro + proper logging redesign ===== */
 
 /* Patrol intro: vehicle strip + large front+back anatomy figure with session muscles red. */
-function renderPatrolIntro(){
-  const ses=state.session;
-  const muscles=[];const seen=new Set();
-  (ses.exercises||[]).forEach(e=>{
-    const ex=exFor(e.name);
-    (ex.p||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);muscles.push(m);}});
-    (ex.s||[]).forEach(m=>{if(!seen.has(m)){seen.add(m);muscles.push(m);}});
-  });
-  const pCols={chest:'#FF3622',back:'#3C96FF',shoulders:'#9840F8',biceps:'#22E87A',triceps:'#FF8C22',quads:'#FFD200',hamstrings:'#FF5922',glutes:'#A040F8',calves:'#22E87A',abs:'#3C96FF',traps:'#FFD200',forearms:'#FF8C22'};
-  const musTags=muscles.slice(0,8).map(m=>{const col=pCols[m]||'var(--gold2)';return `<span class="patrol2-mtag" style="color:${col};border-color:${col}44;background:${col}0e">${MNAME[m]||m}</span>`;}).join('');
-  const exCount=(ses.exercises||[]).length;
-  const gp=tonightGamePlan();
-  const gpCards=gp&&gp.length?gp.map(t=>`<div class="patrol2-tcard">🎯 ${t}</div>`).join(''):'';
-  const dayWords=ses.day.trim().split(/\s+/);
-  const dayHtml=dayWords.length>1?dayWords.slice(0,-1).join(' ')+' <span>'+esc(dayWords[dayWords.length-1])+'</span>':`<span>${esc(ses.day)}</span>`;
-  // Top vehicle
-  let topV={e:'🏎️',n:'Batmobile'};
-  try{const gs=gothamStats();const own=GARAGE.filter(v=>v.req(gs));if(own.length)topV=own[own.length-1];}catch(_){}
-  // Batman figure: all session muscles in red, secondary amber, rest near-invisible
-  let figHtml='';
-  if(muscles.length){
-    const hi=new Set(muscles.map(MM_NORM));
-    const col=m=>hi.has(m)?{fill:'#E8453C',op:'.95'}:{fill:'#E8C56A',op:'.06'};
-    figHtml=`<div class="pbat-fig-outer">
-      <div class="pbat-fig-lbl">TARGET SYSTEMS ONLINE</div>
-      <div class="pbat-fig">${suitFigureFB(col)}</div>
-      <div class="patrol2-muscles" style="margin-top:10px">${musTags}</div>
-    </div>`;
-  }
-  $('app').innerHTML=`<div class="patrol2-wrap">
-    <div class="patrol2-grid"></div>
-    <div class="patrol2-glow"></div>
-    <div class="patrol2-body">
-      <div class="patrol2-eye">GOTHAM IRON PROTOCOL · MISSION BRIEFING</div>
-      <div class="pveh-bar"><span class="pveh-e" style="display:flex;align-items:center">${vehImg(topV.n,52)||topV.e}</span><span class="pveh-nm">${esc(topV.n)}</span></div>
-      <div class="patrol2-day">${dayHtml}</div>
-      <div class="patrol2-split">${esc(ses.split)}</div>
-      <div class="patrol2-rule"></div>
-      ${figHtml}
-      ${gpCards?`<div class="patrol2-targets">${gpCards}</div>`:''}
-      <button class="patrol2-deploy" onclick="beginPatrol()">DEPLOY TO FIELD</button>
-      <button class="btn ghost" style="margin-top:11px;color:var(--text3);max-width:380px;width:100%;animation:pfade .65s .4s ease both" onclick="endSession()">ABORT MISSION</button>
-    </div>
-  </div>`;
+function renderPatrolIntro(){   // the briefing before the first set (GP:DARK): tonight's day + one line from the dark side, the targets on the anatomy, Alfred's targets, Begin
+  const ses=state.session,prim=new Set(),sec=new Set();
+  (ses.exercises||[]).forEach(e=>{const ex=exFor(e.name);(ex.p||[]).forEach(m=>prim.add(MM_NORM(m)));});
+  (ses.exercises||[]).forEach(e=>{(exFor(e.name).s||[]).forEach(m=>{if(!prim.has(MM_NORM(m)))sec.add(MM_NORM(m));});});
+  const n=(ses.exercises||[]).length,sets=(ses.exercises||[]).reduce((a,e)=>a+(e.sets||[]).filter(x=>x.type!=="W").length,0),gp=tonightGamePlan()||[];
+  const fig=prim.size?`<section class="s2 pi-tg gh-c" style="--i:1"><div class="gh-lh"><h3>Muscles</h3><span class="t-xs">red primary · gold assist</span></div>
+      <div class="pi-fig">${suitFigureFB(m=>prim.has(m)?{fill:"#E8453C",op:".95"}:sec.has(m)?{fill:"#E8C56A",op:".45"}:null)}</div>
+      <div class="gm-chips pi-chips">${[...prim].map(m=>`<span class="gm-chip on">${ghName(m)}</span>`).join("")}</div></section>`:"";
+  $("app").innerHTML=`<div class="gh pi">
+    <section class="s3 gh-hero pi-hero gh-c" style="--i:0">${gaArt("logging")}<div class="gh-top"><span class="eyebrow gh-live">Tonight</span><span class="t-xs pi-sp">${esc(ses.split||"")}</span></div>
+      <h1 class="pi-t">${esc(ses.day||"Workout")}</h1>
+      <div class="gh-meta"><span><b>${n}</b> lifts</span><span><b>${sets}</b> sets</span></div>
+      ${darkHtml(darkStart(ses),"pi-dk")}</section>
+    ${fig}
+    ${gp.length?`<section class="s2 gh-list gh-c" style="--i:2"><div class="gh-lh"><h3>Alfred's targets</h3></div>${gp.map(t=>`<div class="gh-row"><span class="lead">${GP.icon("target")}</span><div class="main"><div class="gh-t2 pi-gp">${t}</div></div></div>`).join("")}</section>`:""}
+    <div class="pi-cta gh-c" style="--i:3"><button class="btn btn-1" onclick="beginPatrol()">${GP.icon("play")}Begin</button><button class="btn" onclick="endSession()">Cancel</button></div></div>`;
 }
 
 
