@@ -1274,7 +1274,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .ana-sil{fill:#0D1118;stroke:rgba(205,220,255,.1);stroke-width:4}
 .ana-base{fill:url(#ana-mus);stroke:#06080D;stroke-width:3.4;stroke-linejoin:round}
 .ana-light{fill:url(#ana-light)}
-.ana.tap use[onclick]{cursor:pointer}
+.ana-tap use[data-m]{cursor:pointer}
+.gm-fig2{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .ana-lg{display:flex;flex-wrap:wrap;justify-content:center;gap:7px 14px;margin-top:10px;font:600 12px/1 var(--body);color:var(--tx2)}
 .ana-lg span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .ana-lg i{width:9px;height:9px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
@@ -6055,12 +6056,20 @@ function anaBody(v,cx,P){
     if(fc){const o=fc(m,p[1]);if(!o||!(+o.op>.1))return "";c={fill:o.fill,op:+o.op,glow:o.glow!=null?o.glow:!!(state._figGlow&&+o.op>=.4),stroke:o.stroke,gold:o.gold};}
     else if(today[m])c=anaGold(today[m]);
     else{const col=anaRecCol(m);c=col?{fill:col,op:.82}:{fill:"#E8C56A",op:.08};}
-    const cls=c.gold?' class="ana-g"':"",tap=fc?"":` onclick="muscleDrill('${m}')"`;
+    const cls=c.gold?' class="ana-g"':"",tap=fc?"":` data-m="${m}"`;   // the hero's taps are read by anaTap on its HTML container
     return `<use href="#ana-${v}-${i}"${cls} fill="${c.fill}" fill-opacity="${c.op}"${c.stroke?` stroke="${c.stroke}" stroke-width="3"`:""}${c.glow?' filter="url(#ana-glow)"':""}${tap}/>`
       +(c.op>=.6?`<use href="#ana-${v}-${i}"${cls} fill="url(#ana-shine)" pointer-events="none"/>`:"");
   }).join("");
   const tx=cx-ANA_MID[v]*sx,ty=ANA_Y-ANA_TOP*k;
-  return `<g class="ana${fc?"":" tap"}" transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${sx.toFixed(4)} ${k})"><use href="#ana-${v}-o" class="ana-sil"/><use href="#ana-${v}-all" class="ana-base"/>${lit}<use href="#ana-${v}-o" class="ana-light" pointer-events="none"/></g>`;
+  return `<g class="ana${fc?"":" ana-tap"}" transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${sx.toFixed(4)} ${k})"><use href="#ana-${v}-o" class="ana-sil"/><use href="#ana-${v}-all" class="ana-base"/>${lit}<use href="#ana-${v}-o" class="ana-light" pointer-events="none"/></g>`;
+}
+/* The Suit hero's muscle taps: ONE handler on the figure's HTML container. iOS only synthesises clicks reliably for real elements (not for <use>
+   instances), and the global .tap press effect (scale on :active) must never touch the SVG group: a CSS transform replaces its transform attribute,
+   so the whole body jumped to raw coordinates under the finger ("it just zooms") and the tap landed elsewhere. */
+function anaTap(e){
+  let u=e&&e.target&&e.target.closest?e.target.closest("[data-m]"):null;
+  if(!u&&e&&e.clientX!=null){const el=document.elementFromPoint(e.clientX,e.clientY);u=el&&el.closest?el.closest("[data-m]"):null;}
+  const m=u&&u.getAttribute("data-m");if(m){try{haptic("tap");}catch(x){}muscleDrill(m);}
 }
 function _frontBody(cx,P){return anaBody("f",cx,P);}
 function _backBody(cx,P){return anaBody("b",cx,P);}
@@ -6215,7 +6224,7 @@ function gsHero(){
   const dot=(c,t,k)=>`<span><i style="background:${c}"></i>${t} <b>${k}</b></span>`;
   const status=!rows.length&&!nt?"Log a session and the figure lights up.":low.length?`<span class="c-warn">${low.join(", ")} below ${GS_MID}%</span>`:rows.every(x=>x.r>=GS_FRESH)?`<span class="c-ok">All trained muscles above ${GS_FRESH}%</span>`:"Tap a muscle for its dossier";
   return `<section class="s3 gm-suit gh-c" style="--i:0">${gaArt("suit-hero")}<div class="gh-top"><span class="eyebrow gh-live">Recovery</span></div><div class="gm-st">${status}</div>
-    <div class="gm-fig2">${buildSuit()}</div>
+    <div class="gm-fig2" onclick="anaTap(event)" role="group" aria-label="Recovery map: tap a muscle for its dossier">${buildSuit()}</div>
     <div class="gm-leg">${nt?dot(ANA_GOLD_BG,"Today",nt):""}${dot("#2ECC71","Fresh",n(GS_FRESH,101))}${dot(ANA_AMBER,"50–79%",n(GS_MID,GS_FRESH))}${dot("#E8453C","Fatigued",n(0,GS_MID))}${rows.length+Object.keys(today).length<12?dot("rgba(232,197,106,.35)","Untrained",12-rows.length-Object.keys(today).length):""}</div></section>`;
 }
 /* Suit dock: Infirmary, Fuel and Time-lapse open their own page/sheet; Photos opens Compare (2+ photos) or scrolls to the card at the bottom. Fuel lives here: nutrition is body state, next to sleep and recovery. */

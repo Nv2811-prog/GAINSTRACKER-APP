@@ -8,6 +8,7 @@ const ctx = await launch({ file: A.file || DEFAULT_FILE, fixture: fileURLToPath(
 const P = ctx.page; const checks = [];
 const ok = (name, pass, info) => checks.push({ name, pass: !!pass, ...(pass ? {} : { info }) });
 const ev = (f, ...a) => P.evaluate(f, ...a);
+const MN = { back: 'Back', quads: 'Quads', chest: 'Chest' };
 try {
   await open(ctx, { settle: 1400 });
   const data = await ev(() => {
@@ -42,9 +43,17 @@ try {
   const hero = await ev(() => { const f = document.querySelector('.gm-fig2'); const leg = document.querySelector('.gm-leg').textContent.replace(/\s+/g, ' '); const gold = f.querySelectorAll('use.ana-g[filter]').length, soft = [...f.querySelectorAll('use.ana-g')].filter((u) => u.getAttribute('fill-opacity') === '0.6').length; const uses = f.querySelectorAll('use').length; return { gold, soft, leg, uses, amber: !!f.querySelector('use[fill="#FF9F1C"]') || true }; });
   ok('Suit hero: today\'s primary muscle (chest) is glowing gold, its secondaries softer gold, the legend counts "Today"', hero.gold >= 2 && hero.soft >= 2 && /Today 1/.test(hero.leg), hero);
   ok('Suit hero stays light (under 320 <use> elements for front + back)', hero.uses < 320, hero.uses);
-  const tap = await ev(() => { const u = document.querySelector('.gm-fig2 use[onclick*="muscleDrill"]'); if (!u) return null; u.dispatchEvent(new MouseEvent('click', { bubbles: true })); return { kind: !!document.querySelector('#sheet.on'), title: (document.querySelector('#sheet h1, #sheet h2, #sheet .sh-hd h2') || {}).textContent }; });
-  ok('tapping a muscle on the Suit hero opens its dossier', tap && tap.kind, tap);
-  await ev(() => { try { closeSheet(); } catch (e) {} });
+  // a REAL touch tap on a muscle piece (iOS-like hit test through the container), never through the global .tap press effect
+  const noPress = await ev(() => !document.querySelector('.gm-fig2 .tap, .gm-fig2 g.tap') && !!document.querySelector('.gm-fig2 .ana-tap'));
+  ok('the figure group never carries the .tap press class (a CSS transform would replace its transform attribute: the "zoom")', noPress, null);
+  for (const m of ['back', 'quads', 'chest']) {
+    const pt = await ev((m) => { const us = [...document.querySelectorAll('.gm-fig2 use[data-m="' + m + '"]')].map((u) => u.getBoundingClientRect()).filter((r) => r.width > 6 && r.height > 6).sort((a, b) => b.width * b.height - a.width * a.height); const r = us[0]; if (!r) return null; window.scrollTo(0, 0); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, m);
+    if (!pt) { ok('touch tap on ' + m, false, 'no piece'); continue; }
+    await P.touchscreen.tap(pt.x, pt.y); await sleep(500);
+    const t = await ev(() => ({ open: !!document.querySelector('#sheet.on'), txt: (document.querySelector('#sheet') || {}).textContent || '' }));
+    ok('a real touch tap on ' + m + ' opens that muscle\'s dossier', t.open && new RegExp(MN[m], 'i').test(t.txt.slice(0, 200)), { m, open: t.open, head: t.txt.slice(0, 80) });
+    await ev(() => { try { closeSheet(); } catch (e) {} __qa.tab('suit'); }); await sleep(300);
+  }
 
   /* ---------- finish: the suit comes up with this session's muscles in gold ---------- */
   const fin = await ev(() => { __qa.startLogging(4); __qa.finish(); const f = document.getElementById('p3fin'); return f ? { fig: !!f.querySelector('.p3-fsuit svg'), gold: f.querySelectorAll('.ana-g').length, legend: !!f.querySelector('.ana-lg'), recovery: f.querySelectorAll('.p3-fsuit use[onclick]').length } : null; });
