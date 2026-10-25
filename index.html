@@ -3319,7 +3319,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const now=()=>Date.now();
 const fmtTime=s=>{s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return (m<10?"0":"")+m+":"+((s%60)<10?"0":"")+(s%60);};
 const fmtNum=n=>Math.round(n).toLocaleString("en-US");
-const fmtKg=n=>String(Math.round((+n||0)*10)/10);   // suggestion weights keep one decimal: 72.5, not 73
+const fmtKg=n=>String(Math.round(kgNum(n)*10)/10);   // suggestion weights keep one decimal: 72.5, not 73
 const hoursSince=t=>t?(now()-new Date(t).getTime())/3600000:99999;
 const daysSince=t=>hoursSince(t)/24;
 // Toasts queue and play ONE AT A TIME so a burst (coach line + PR + tip) can all be read,
@@ -3778,7 +3778,10 @@ function exFor(name){const k=(name||"").toLowerCase();const hit=EXBYNAME[k]||(EX
 /* ========================= VOLUME / E1RM / SETS ========================= */
 function bodyW(){return state.data.u.bodyweight||75;}
 // effective load for a set on a given exercise (bodyweight fix)
-function setLoad(ex,w){return ex&&ex.bw?(bodyW()+(+w||0)):(+w||0);}
+// A weight as typed may use a decimal COMMA: iOS's decimal keypad on a Danish (or any comma-locale) phone types "82,5", and "+"82,5"" is NaN, so a
+// half-kilo set used to count as 0 kg (no volume, no record, "last 0 × 8"). Every reader of a weight goes through kgNum; history stays exactly as typed.
+function kgNum(v){const n=typeof v==="number"?v:parseFloat(String(v==null?"":v).replace(",","."));return isFinite(n)?n:0;}
+function setLoad(ex,w){return ex&&ex.bw?(bodyW()+kgNum(w)):kgNum(w);}
 // Count working sets, with unilateral (Left/Right) sets worth 0.5 each so a "2 sets per arm"
 // session reads as 2 sets, not 4 — keeps volume warnings honest for single-arm work.
 // live=true also counts sets that have reps entered but aren't ticked done yet (in-session nudges).
@@ -4270,9 +4273,9 @@ function setSessionGym(gym){if(state.session)state.session.gym=gym;switchGym(gym
 function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Different machines mean different PRs. Name the gym:",ok:"Add"}).then(n=>{n=(n||"").trim();if(!n)return;switchGym(n);if(state.session)state.session.gym=n;if(fromSettings)openSettings();else render();});}
 
 /* ========================= LOGGING INTERACTIONS ========================= */
-function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=v;saveSessionSoon();} // no render (Rule 1 spirit); debounced backup
+function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=f==="w"&&typeof v==="string"?v.replace(",","."):v;saveSessionSoon();}   // a typed comma decimal is stored with a dot (kgNum still reads old commas) // no render (Rule 1 spirit); debounced backup
 function setSessionNotes(v){if(state.session)state.session.notes=v;} // no render — keep textarea focus
-function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){state.session._tick=ei+":"+si;haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")prfSay(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(parseFloat(s.w)>0?fmtNum(parseFloat(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();state.session._tick=null;saveSession();}
+function toggleDone(ei,si){const s=state.session.exercises[ei].sets[si];if(!s.done&&!fillEmptySet(state.session.exercises[ei],s)){haptic("warn");toast("Enter weight and reps first");return;}s.done=!s.done;state.session._focusEi=ei;/* stay on THIS lift — never snap back to an earlier open one */if(s.done){state.session._tick=ei+":"+si;haptic("done");sfx("thud");if((s.type==="NRM"||s.type==="F"||s.type==="D")&&!s.rpe&&state.data.u.metric==="rpe")s.rpe="";lgNoteDone(ei,si);const ev=liveCheckPR(ei,si);lgRest(ei,si);if(ev==="pr")lgPrMoment(ei,si);if(s.type!=="W"){const line=alfredCoachLine(ei,si,ev);state.session._coach=line;if(ev==="pr")prfSay(line);else toast("🎩 "+line);}try{const exx=state.session.exercises[ei];if(s.type!=="W"&&!exx._cleared&&exProgress(exx).allDone){exx._cleared=true;state.session._lastCleared=ei;try{const N=state.session.exercises;for(let k=1;k<=N.length;k++){const j=(ei+k)%N.length;if(!N[j]._skip&&!exProgress(N[j]).allDone){state.session._focusEi=j;break;}}}catch(_){}haptic("tap");toast("✓ "+exx.name+" cleared");}}catch(e){}try{const T=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W").length),0),D=state.session.exercises.reduce((a,x2)=>a+(x2._skip?0:x2.sets.filter(x=>x.type!=="W"&&x.done).length),0);if(T>0&&D>=T&&!state.session._foeKO){state.session._foeKO=true;setTimeout(()=>{try{toast("All sets logged · finish when you are ready");}catch(_){}},1300);}}catch(e){}try{const exN=state.session.exercises[ei];cloudPresencePulse(exN.name,(kgNum(s.w)>0?fmtNum(kgNum(s.w))+"kg × ":"")+(s.r||"?"));}catch(e){}try{checkWeightAnomaly(ei,si);}catch(e){}try{const ns=(state.session.exercises||[]).reduce((a,ex2)=>a+ex2.sets.filter(x=>x.done&&x.type!=="W").length,0);if(ns>0&&ns%6===0)alfredPingAI("mid-workout: "+ns+" working sets into "+(state.session.day||"a session")+", currently on "+state.session.exercises[ei].name+". One sharp tactical or motivational remark.");}catch(e){}}else{try{state.session.exercises[ei]._cleared=false;}catch(e){}lgUndo(ei,si);}render();state.session._tick=null;saveSession();}
 // Real-time PR check: the moment a working set is completed and beats your record, it is flagged in its row.
 function liveCheckPR(ei,si){
   const exObj=state.session.exercises[ei];const s=exObj.sets[si];
@@ -5006,7 +5009,7 @@ function suggestionFor(name){
 function checkWeightAnomaly(ei,si){
   const ses=state.session;const e=ses.exercises[ei];const s=e&&e.sets[si];
   if(!s||!s.done||s.type==="W")return;
-  const w=parseFloat(s.w);if(!w||w<=0)return;
+  const w=kgNum(s.w);if(!w||w<=0)return;
   ses._anomalyAsked=ses._anomalyAsked||{};if(ses._anomalyAsked[e.name])return; // once per exercise per session
   const ex=exFor(e.name);
   const lb=lastBestSet(e.name);if(!lb||!lb.w||lb.otherGym)return;   // another gym's numbers are no baseline for this gym's machine
@@ -5039,7 +5042,7 @@ function answerWeightCheck(name,answer){
 function lastBestSet(name,opt){   // the best WORKING set (by e1RM) of the newest outing: what the Target and the progression rule read
   const o=lastOuting(name,opt);if(!o)return null;const ex=exFor(name);let best=null,bv=-1;
   o.sets.forEach(s=>{if(s.type==="W"||s.est)return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
-  return best?{w:+best.w||0,r:+best.r||0,date:o.date,e1:bv,otherGym:o.otherGym}:null;
+  return best?{w:kgNum(best.w)||0,r:+best.r||0,date:o.date,e1:bv,otherGym:o.otherGym}:null;
 }
 /* ===== ONE PROGRESSION RULE (user decision 2026-10-19) — every suggestion path reads progressionFor/progressionFrom =====
    Plan ranges are 5–10. A WORKING set (warm-ups never count) that reaches the top of the range (10+) earns more weight
@@ -5057,7 +5060,7 @@ const repTop=name=>Math.max(REP_TOP,(planReps(name)||[0,0])[1]);
 function progressionFrom(name,lb){   // lb = {w,r} = the best WORKING set of the last outing
   const ex=exFor(name);
   if(!lb||!lb.r||(!lb.w&&!ex.bw))return null;
-  const w=+lb.w||0,r=+lb.r,top=repTop(name),pr=planReps(name),restart=Math.max(REP_RESTART,pr?pr[0]:0);
+  const w=kgNum(lb.w)||0,r=+lb.r,top=repTop(name),pr=planReps(name),restart=Math.max(REP_RESTART,pr?pr[0]:0);
   if(r<top)return {w,r:r+1,add:false,top,reason:`${r} reps is under ${top} — same load, +1 rep`,
     text:ex.bw?`last ${r} reps${w?" +"+fmtKg(w)+"kg":""} → chase <b>${r+1}+ reps</b>`:`<b>${fmtKg(w)}kg × ${r+1}+</b> — ${r+1>=top?`hit ${top} and we add weight`:`build reps to ${top}, then we add weight`}`};
   if(ex.bw&&!w)return {w:0,r:r+1,add:false,top,reason:`${r} clean reps — add a vest/belt or keep climbing`,text:`${r} clean reps → <b>add a vest/belt</b> or keep climbing`};
@@ -5101,7 +5104,7 @@ function warmupSuggest(ei){
   const fresh=prim.filter(m=>!warmed.has(m));
   if(!fresh.length)return null;                           // muscle already warm this session
   // working weight: first real set entered, else last best
-  let W=0;for(const s of e.sets){if(s.type!=="W"&&+s.w>0){W=+s.w;break;}}
+  let W=0;for(const s of e.sets){if(s.type!=="W"&&kgNum(s.w)>0){W=kgNum(s.w);break;}}
   if(!W)W=suggestionFor(e.name)||0;
   if(!W)return null;                                      // nothing to base it on yet
   const round=x=>Math.max(0,Math.round(x/2.5)*2.5);
@@ -5213,7 +5216,7 @@ function startTestDay(name){
    working weight. Tagged D/RP/M so volume + fatigue maths treat them honestly. */
 function protocolBase(ei){
   const e=state.session.exercises[ei];
-  for(const s of e.sets){if(s.type!=="W"&&+s.w>0)return +s.w;}
+  for(const s of e.sets){if(s.type!=="W"&&kgNum(s.w)>0)return kgNum(s.w);}
   return suggestionFor(e.name)||0;
 }
 function openProtocolSheet(ei){
@@ -5658,7 +5661,7 @@ function updateExList(){
 /* ========================= PLATE CALCULATOR (bottom sheet during logging) ========================= */
 function openPlateSheet(ei){
   const bar=+state.data.u.barWeight||20,plates=(state.data.plates||[]).slice().sort((a,b)=>b-a),step=(plates.length?Math.min(...plates):1.25)*2;
-  const lift=state.session&&ei>=0?state.session.exercises[ei]:null,ws=lift&&(lift.sets||[]).find(s=>s.type!=="W"&&parseFloat(s.w)>0),start=ws?parseFloat(ws.w):0;
+  const lift=state.session&&ei>=0?state.session.exercises[ei]:null,ws=lift&&(lift.sets||[]).find(s=>s.type!=="W"&&kgNum(s.w)>0),start=ws?kgNum(ws.w):0;
   const calc=target=>{let per=Math.max(0,(target-bar)/2);const used=[];plates.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});return used;};
   // To-scale loaded-barbell graphic: plates mirror both sleeves, height ∝ weight, real plate colours.
   const barSVG=used=>{
@@ -5683,7 +5686,7 @@ function openPlateSheet(ei){
       <button class="btn-i" onclick="_plateStep(1)" aria-label="${fmtKg(step)} kg more">${GP.icon("plus")}</button></div>
       <div id="plate-out"></div></div>`);
   window._plate=v=>draw(+v||0);
-  window._plateStep=dir=>{const i=$("plate-target");if(!i)return;const nx=Math.max(0,Math.round(((+i.value||0)+dir*step)/step)*step);i.value=nx||"";tickNum(i,dir);try{haptic("tap");}catch(e){}draw(nx);};
+  window._plateStep=dir=>{const i=$("plate-target");if(!i)return;const nx=Math.max(0,Math.round((kgNum(i.value)+dir*step)/step)*step);i.value=nx||"";tickNum(i,dir);try{haptic("tap");}catch(e){}draw(nx);};
   draw(start);
 }
 
@@ -5768,7 +5771,7 @@ function p3SumMuscles(R){
       tag=zn==="bad"?`<span class="tag bad">over MRV</span>`:zn==="warn"?`<span class="tag warn">under MEV</span>`:"";
     return `<div class="p3-mrow"><div class="p3-mh"><b>${MNAME[m]}</b>${tag}<span class="tn">+${p3Half(ton[m])} tonight</span><span class="num">${s}</span></div>${GP.landmark(s,L)}</div>`;}).join("");
   const lifts=(wk.exercises||[]).map(e=>{const ex=exFor(e.name);let bo=0,tw=0,tr=0,n=0;
-    (e.sets||[]).forEach(s=>{if(s.type==="W")return;n++;const o=setE1RM(ex,s);if(o>bo){bo=o;tw=+s.w||0;tr=+s.r||0;}});
+    (e.sets||[]).forEach(s=>{if(s.type==="W")return;n++;const o=setE1RM(ex,s);if(o>bo){bo=o;tw=kgNum(s.w)||0;tr=+s.r||0;}});
     const pv=prevExercise(e.name,wk),d=pv&&pv.e1>0&&bo>0?bo-pv.e1:null;
     const dl=d==null?`<span class="tag">New</span>`:d>.5?`<span class="p3-d">+${Math.round(d)} kg</span>`:d<-.5?`<span class="p3-d dn">${Math.round(d)} kg</span>`:`<span class="p3-d eq">=</span>`;
     return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(e.name)})"><span class="lead">${GP.icon("dumbbell")}</span><div class="main"><div class="gh-t1">${esc(e.name)}</div><div class="gh-t2">${ex.bw?"+":""}${fmtKg(tw)} kg × ${tr} · ${n} set${n===1?"":"s"}</div></div><span class="trail">${dl}${GP.icon("chevR")}</span></div>`;}).join("");
@@ -6218,7 +6221,7 @@ function symmetryCard(){
 const GS_FRESH=80,GS_MID=50;   // recovery bands, identical to the figure's colours: fresh >= 80, 50-79, fatigued < 50
 const GS_BAND={"NO EFFORT DATA":["No data",""],REDLINING:["Near failure","warn"],"THE KILL ZONE":["On target","ok"],EFFECTIVE:["Effective","ok"],SANDBAGGING:["Too easy","warn"]};
 function gsHero(){
-  const today=anaToday(),nt=Object.keys(today).filter(m=>today[m]>=1).length;
+  const today=anaToday(),nt=Object.keys(today).length;   // every muscle shown in gold (primary or assist) counts as Today, so the legend adds up to 12
   const rows=M12.filter(m=>(state.data.muscleVol[m]||0)>0&&!today[m]).map(m=>({m,r:getRecovery(m)}));
   const n=(a,b)=>rows.filter(x=>x.r>=a&&x.r<b).length,low=rows.filter(x=>x.r<GS_MID).map(x=>ghName(x.m));
   const dot=(c,t,k)=>`<span><i style="background:${c}"></i>${t} <b>${k}</b></span>`;
@@ -6820,7 +6823,7 @@ function renderArchive(){
 function openMeasure(){
   const me=state.data.u.measurements;
   openSheet(`<div class="ttl">Body measurements (cm)</div>
-    ${[["chest","Chest"],["waist","Waist"],["leftArm","Left arm"],["rightArm","Right arm"],["leftThigh","Left thigh"],["rightThigh","Right thigh"]].map(([k,l])=>`<label class="mini">${l}</label><input inputmode="decimal" value="${me[k]||""}" oninput="state.data.u.measurements['${k}']=parseFloat(this.value)||null" style="margin-bottom:8px"/>`).join("")}
+    ${[["chest","Chest"],["waist","Waist"],["leftArm","Left arm"],["rightArm","Right arm"],["leftThigh","Left thigh"],["rightThigh","Right thigh"]].map(([k,l])=>`<label class="mini">${l}</label><input inputmode="decimal" value="${me[k]||""}" oninput="state.data.u.measurements['${k}']=kgNum(this.value)||null" style="margin-bottom:8px"/>`).join("")}
     <button class="btn gold" onclick="state.data.u.measurements.history.unshift({date:new Date().toISOString(),...state.data.u.measurements});save();checkAchievements();closeSheet();render();toast('Measurements saved.')">Save</button>`);
 }
 
@@ -6952,7 +6955,7 @@ function forgeFrame(){
 }
 function drawForge(){const o=$("fg-out");if(o)o.innerHTML=forgeOut();}
 function forgeOut(){
-  const w=+state._forgeW||0,r=+state._forgeR||0,bar=+state.data.u.barWeight||20,orm=(w&&r)?epley(w,r):0;
+  const w=kgNum(state._forgeW),r=+state._forgeR||0,bar=+state.data.u.barWeight||20,orm=(w&&r)?epley(w,r):0;
   if(!w)return `<div class="px-empty">${GP.icon("wrench")}<b>Forge your numbers</b><span>Enter the weight and reps of a real set.</span></div>`;
   const chips=used=>used.map(p=>`<span class="px-plate sm" style="background:${PLATE_COL[p]||"#888"}">${p}</span>`).join("");
   const label=(t,s)=>`<div class="cx-l cx-l2">${t} <span>${s}</span></div>`;
@@ -8208,7 +8211,7 @@ function myPatrolCard(){
   }catch(e){}
   // Recent patrols — the async "see each other's past workouts": last 5 sessions, compact for sharing.
   const recent=(d.workouts||[]).filter(w=>!w.quick).slice(0,5).map(w=>{
-    let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{if(s.est)return;const o=epley(+s.w||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
+    let top="";try{let bo=0;(w.exercises||[]).forEach(ex=>{(ex.sets||[]).forEach(s=>{if(s.est)return;const o=epley(kgNum(s.w)||0,+s.r||0);if(o>bo){bo=o;top=(ex.name||"").replace(/^(Barbell|Dumbbell|Cable|Machine|Lever|Smith) /,"");}});});}catch(e){}
     return {n:(w.name||"Session").slice(0,16),v:Math.round(w.totalVol||0),t:(w.date||"").slice(0,10),top:top.slice(0,18)};
   });
   const prTot=(d.workouts||[]).reduce((n,w)=>n+((w.prs||[]).length),0); // cumulative PR events ever — lets Fight Night score progress, not tonnage
@@ -9856,7 +9859,7 @@ function alfredContext(chat){
   let sessionStr='';
   if(state.session&&state.step==='logging'){
     const ses=state.session;const elapsed=Math.floor((Date.now()-ses.startedAt)/60000);
-    const exLines=ses.exercises.map(e=>{const done=e.sets.filter(s=>s.done&&s.type!=='W');const all=e.sets.filter(s=>s.type!=='W');const best=done.length?done.reduce((a,s)=>((+s.w||0)*(1+(+s.r||0)/30))>(+a.w||0)*(1+(+a.r||0)/30)?s:a,done[0]):null;return `${e.name}: ${done.length}/${all.length} sets${best?' (best so far: '+best.w+'kg×'+best.r+')':''}`;}).join(', ');
+    const exLines=ses.exercises.map(e=>{const done=e.sets.filter(s=>s.done&&s.type!=='W');const all=e.sets.filter(s=>s.type!=='W');const best=done.length?done.reduce((a,s)=>((kgNum(s.w)||0)*(1+(+s.r||0)/30))>(kgNum(a.w)||0)*(1+(+a.r||0)/30)?s:a,done[0]):null;return `${e.name}: ${done.length}/${all.length} sets${best?' (best so far: '+fmtKg(best.w)+'kg×'+best.r+')':''}`;}).join(', ');
     sessionStr=`\n🔴 ACTIVE WORKOUT (${elapsed}min in): ${ses.split} — ${ses.day}\n  ${exLines||'no exercises logged yet'}`;
   }
   // Last workout
@@ -10227,7 +10230,7 @@ function _alfOffline(q,it,why){   // it = alfIntel(q) or null; why = what stoppe
 const ALF_MUSC=[["chest",/\b(chest|pecs?|pectorals?)\b/],["back",/\b(back|lats?|latissimus)\b/],["shoulders",/\b(shoulders?|delts?|deltoids?)\b/],["biceps",/\bbiceps?\b/],["triceps",/\btriceps?\b/],["forearms",/\bforearms?\b/],["quads",/\b(quads?|quadriceps|thighs?)\b/],["hamstrings",/\b(hamstrings?|hams)\b/],["glutes",/\b(glutes?|butt)\b/],["calves",/\b(calf|calves)\b/],["abs",/\b(abs|core|abdominals?)\b/],["traps",/\b(traps?|trapezius)\b/]];
 const ALF_MUSWORDS=new Set(["chest","back","shoulder","bicep","tricep","forearm","quad","hamstring","glute","calve","calf","abs","core","trap","pec","lat","delt"]);
 const _alfStem=w=>w.length>3?w.replace(/s$/,""):w;
-const _alfSet=b=>(+b.w?fmtKg(+b.w)+" kg × ":"")+b.r+(+b.w?"":" reps");
+const _alfSet=b=>(kgNum(b.w)?fmtKg(kgNum(b.w))+" kg × ":"")+b.r+(kgNum(b.w)?"":" reps");
 const _alfAgo=n=>n<=0?"today":n===1?"yesterday":n+" days ago";
 function _alfLift(s){   // a lift he has actually logged, matched on the lift's own words: {name} | {ask:[tied names]} | null
   const qw=new Set((s.match(/[a-z0-9]+/g)||[]).map(_alfStem)),c=[];
@@ -11470,7 +11473,7 @@ function warmRound(eq,w){   // {w, plates|null}: rounded down to what this equip
   return {w:Math.max(st,Math.floor(w/st+1e-9)*st),plates:null};
 }
 function warmRamp(name,topW,topR,n,eqOver){   // [{w,r,plates}] lightest first
-  const ex=exFor(name),eq=(eqOver||ex.eq||"").toLowerCase(),W=+topW||0,R=+topR||0,k=clamp(Math.round(+n||1),1,WARM_MAX);
+  const ex=exFor(name),eq=(eqOver||ex.eq||"").toLowerCase(),W=kgNum(topW),R=+topR||0,k=clamp(Math.round(+n||1),1,WARM_MAX);
   if((!eqOver&&ex.bw)||eq==="bodyweight"||!(W>0))return [];
   const base=WARM_PCT[k],shift=R&&R<=5?.04:R>=10?-.05:0,f=k>1?(base[k-1]+shift)/base[k-1]:1;
   const reps=WARM_REPS[k].map(r=>R>=10?Math.max(1,Math.min(r,Math.round(R/2))):r);
@@ -11490,7 +11493,7 @@ function rampRows(list,W,R,ex){   // the ramp + the top set it leads to
 }
 function rampTop(e,ei){   // the top set to build on: the first typed working set, else its target ghost, else the newest best set; reps fall back to the plan
   const gs=lgGhosts(e);let w=0,r=0;
-  (e.sets||[]).some((s,i)=>{if(s.type==="W")return false;w=+s.w||+(gs[i]&&gs[i].w)||0;r=+s.r||+(gs[i]&&gs[i].r)||0;return true;});
+  (e.sets||[]).some((s,i)=>{if(s.type==="W")return false;w=kgNum(s.w)||+(gs[i]&&gs[i].w)||0;r=+s.r||+(gs[i]&&gs[i].r)||0;return true;});
   const lb=lastBestSet(e.name);if(!w&&lb){w=lb.w;r=r||lb.r;}
   if(!r){const pr=planReps(e.name);r=pr?pr[0]:8;}
   return {w:w?String(w):"",r:String(r)};
@@ -11514,9 +11517,9 @@ function rampBody(){
   const ex=exFor(e.name),list=warmRamp(e.name,st.w,st.r,st.n),n=list.length;
   const chips=`<div class="rp-n" role="group" aria-label="Number of warm-up sets">${[1,2,3,4,5].map(i=>`<button type="button" class="chip${i===st.n?" on":""}" aria-pressed="${i===st.n}" onclick="rampN(${i})">${i}</button>`).join("")}</div>`;
   if(ex.bw||(ex.eq||"")==="bodyweight")return chips+`<div class="px-empty">${GP.icon("ramp")}<b>No load to ramp</b><span>A bodyweight lift warms up with a few easy reps.</span></div>`;
-  if(!(+st.w>0))return chips+`<div class="px-empty">${GP.icon("ramp")}<b>Enter your top set</b><span>The weight and reps you plan for your heaviest set.</span></div>`;
+  if(!(kgNum(st.w)>0))return chips+`<div class="px-empty">${GP.icon("ramp")}<b>Enter your top set</b><span>The weight and reps you plan for your heaviest set.</span></div>`;
   const merged=n<st.n?`<p class="t-xs rp-note">${st.n} steps merge into ${n} at this weight, the jumps would be too small to load.</p>`:"";
-  return chips+rampRows(list,+st.w,+st.r,ex)+merged
+  return chips+rampRows(list,kgNum(st.w),+st.r,ex)+merged
     +(n?`<button class="btn gold rp-go" onclick="rampAdd()">${GP.icon("plus")}Add ${n} warm-up set${n===1?"":"s"}</button>`:"")
     +`<p class="t-xs px-foot">Fast and light, about a minute of rest between, then straight into the top set.</p>`;
 }
@@ -11782,7 +11785,7 @@ function ghRecentPRs(max){
       let best=null,bv=0;(e.sets||[]).forEach(s=>{if(!s.done||s.type==="W")return;const v=setE1RM(ex,s);if(v>bv){bv=v;best=s;}});
       if(!best)continue;
       const rows=exerciseRows(name),i=rows.findIndex(r=>r.date===w.date),prev=i>0?Math.max(...rows.slice(0,i).map(r=>r.e1rm)):0;
-      out.push({name,w:+best.w||0,r:+best.r||0,e1:bv,d:prev?Math.round((bv-prev)*10)/10:0,spark:i>=0?rows.slice(Math.max(0,i-7),i+1).map(r=>r.e1rm):[],ago:ghAgo(w.date)});
+      out.push({name,w:kgNum(best.w)||0,r:+best.r||0,e1:bv,d:prev?Math.round((bv-prev)*10)/10:0,spark:i>=0?rows.slice(Math.max(0,i-7),i+1).map(r=>r.e1rm):[],ago:ghAgo(w.date)});
     }
   }
   return out;
@@ -12524,7 +12527,7 @@ const lgWeekly=m=>Math.round(weeklySets(m)+perWeek(lgSessionSets(m)));
 function lgDayInfo(ses){const sp=(state.data.splits||[]).find(s=>s.id===ses.srcSplit);return sp&&ses.srcDay!=null?`Day ${ses.srcDay+1} of ${sp.days.length}`:"Free session";}
 /* "vs last": tonnage of the sets done so far vs the same set of the same lift last outing. Only done sets are compared, so an unfinished night is never punished. */
 function lgVsLast(ses){let now=0,was=0,n=0;(ses.exercises||[]).forEach(e=>{if(e._skip)return;const ex=exFor(e.name),L=lgLast(e.name);if(!L)return;let k=0;(e.sets||[]).forEach(s=>{if(s.type==="W")return;const lw=L.sets[k++];if(!s.done||!lw)return;now+=setVolume(ex,s);was+=setVolume(ex,Object.assign({},lw,{done:true}));n++;});});return n&&was>0?Math.round((now/was-1)*100):null;}
-function lgDelta(s){const pw=+s.prevW,pr=+s.prevR;if(!(pr>0)||isNaN(pw))return null;const w=+s.w||0,r=+s.r||0;
+function lgDelta(s){const pw=lgHas(s.prevW)?kgNum(s.prevW):NaN,pr=+s.prevR;if(!(pr>0)||isNaN(pw))return null;const w=kgNum(s.w)||0,r=+s.r||0;
   if(w>pw)return{t:"+"+fmtKg(w-pw)+" kg",c:"up",k:"w"};if(w<pw)return{t:"−"+fmtKg(pw-w)+" kg",c:"dn",k:"w"};
   if(r>pr)return{t:"+"+(r-pr)+(r-pr===1?" rep":" reps"),c:"up",k:"r"};if(r<pr)return{t:"−"+(pr-r)+(r+1===pr?" rep":" reps"),c:"dn",k:"r"};return{t:"=",c:"eq",k:"r"};}
 /* Ghost numbers for every set of a lift: what ✓ commits when the row is untouched. Warm-ups carry their own numbers.
@@ -12534,7 +12537,7 @@ function lgGhosts(e){
   (e.sets||[]).forEach(s=>{
     if(s.type==="W"){out.push(null);return;}
     let fresh=false;
-    if(last&&last.done&&tg&&rirOfSet(last)===0&&(+last.r||0)<=tg.r-2){const lw=+last.w||0;fresh=true;adj=(ex.bw||lw<30)?{dr:-1,why:`RIR 0 at ${last.r} of ${tg.r} reps`}:{w:Math.round((lw-2.5)*2)/2,why:`RIR 0 at ${last.r} of ${tg.r} reps`};}
+    if(last&&last.done&&tg&&rirOfSet(last)===0&&(+last.r||0)<=tg.r-2){const lw=kgNum(last.w)||0;fresh=true;adj=(ex.bw||lw<30)?{dr:-1,why:`RIR 0 at ${last.r} of ${tg.r} reps`}:{w:Math.round((lw-2.5)*2)/2,why:`RIR 0 at ${last.r} of ${tg.r} reps`};}
     let g=null;
     if((s.type||"NRM")!=="NRM"&&lgHas(s.prevW)&&lgHas(s.prevR))g={w:String(s.prevW),r:String(s.prevR)};
     else if(tg)g={w:tg.w?fmtKg(tg.w):(ex.bw?"0":""),r:String(tg.r)};
@@ -12685,8 +12688,8 @@ function lgBar(ses,fei){
 function lgDoneRow(e,ei){
   const ex=exFor(e.name),sets=(e.sets||[]).filter(s=>s.type!=="W"&&s.done),lb=lastBestSet(e.name);let top=null;
   sets.forEach(s=>{if(!top||setE1RM(ex,s)>setE1RM(ex,top))top=s;});
-  let d="";if(lb&&top){const tw=+top.w||0,tr=+top.r||0;d=tw>lb.w?`+${fmtKg(tw-lb.w)} kg`:tr>lb.r?`+${tr-lb.r} rep${tr-lb.r>1?"s":""}`:(tw===lb.w&&tr===lb.r)?"=":"";}
-  const hit=sets.some(s=>(+s.r||0)>=repTop(e.name)),inc=ex.bw?2.5:((top&&+top.w>=60)?5:2.5);
+  let d="";if(lb&&top){const tw=kgNum(top.w)||0,tr=+top.r||0;d=tw>lb.w?`+${fmtKg(tw-lb.w)} kg`:tr>lb.r?`+${tr-lb.r} rep${tr-lb.r>1?"s":""}`:(tw===lb.w&&tr===lb.r)?"=":"";}
+  const hit=sets.some(s=>(+s.r||0)>=repTop(e.name)),inc=ex.bw?2.5:((top&&kgNum(top.w)>=60)?5:2.5);
   let dsx="";if(state.session._lastCleared===ei){const li=e.sets.map((s,i)=>s.type!=="W"&&s.done?i:-1).filter(i=>i>=0).pop();if(li!=null&&rirOfSet(e.sets[li])==null)dsx=`<div class="lg2-dsx"><span class="lbl">Last set RIR</span><div class="rir">${[0,1,2,3,4].map(v=>`<button data-hx onclick="lgRir(${ei},${li},${v})">${v===4?"4+":v}</button>`).join("")}</div></div>`;}
   return `<div class="lg2-done tap" onclick="focusEx(${ei})"><span class="lead">${GP.icon("check")}</span>
     <div class="mn"><div class="nm">${esc(e.name)}</div><div class="sub">${sets.map(s=>`${lgNum(s.w,ex)} × ${esc(s.r)}`).join(" · ")}${d?` · <b>${d}</b>`:""}</div></div>
@@ -12752,14 +12755,14 @@ function lgRest(ei,si){const e=state.session.exercises[ei],s=e.sets[si];restStar
 function lgRestSummary(wk){
   let n=0,sum=0,rx=0,sh=0,lost=0;
   (wk.exercises||[]).forEach(e=>{let prev=null;(e.sets||[]).forEach(s=>{if(s.type==="W")return;
-    if(s.rest>0&&s.rest<=900&&s.rx){n++;sum+=s.rest;rx+=s.rx;if(s.rest<s.rx*.8){sh++;if(prev&&(+s.r||0)<(+prev.r||0)&&(+s.w||0)>=(+prev.w||0))lost++;}}
+    if(s.rest>0&&s.rest<=900&&s.rx){n++;sum+=s.rest;rx+=s.rx;if(s.rest<s.rx*.8){sh++;if(prev&&(+s.r||0)<(+prev.r||0)&&(kgNum(s.w)||0)>=(kgNum(prev.w)||0))lost++;}}
     prev=s;});});
   if(n<2)return"";
   return `<div class="lg2-sumrest">${GP.icon("timer")}<span>Rest: <b>avg ${lgM(sum/n)}</b> vs ${lgM(rx/n)} prescribed${sh?` · ${sh} set${sh>1?"s":""} after short rest${lost?`, <b>${lost} lost reps</b>`:", no reps lost"}`:" · right on target"}</span></div>`;
 }
 function lgFocus(ses,fei){
   const e=ses.exercises[fei],ex=exFor(e.name),m=lgMuscle(e),eq=(ex.eq||"").toLowerCase(),isBar=["barbell","smith","ez bar","trap bar"].includes(eq);
-  const wu=warmupSuggest(fei),wk=(e.sets.filter(s=>s.type!=="W"&&parseFloat(s.w)>0).map(s=>parseFloat(s.w)))[0]||0,pl=isBar&&wk?lgPlates(wk):"";
+  const wu=warmupSuggest(fei),wk=(e.sets.filter(s=>s.type!=="W"&&kgNum(s.w)>0).map(s=>kgNum(s.w)))[0]||0,pl=isBar&&wk?lgPlates(wk):"";
   return `<section class="lg2-hero" id="lgfocus">
     <div class="lg2-xh"><div class="exwrap lg2-thumb" id="lgfig" onclick="lgDetail(${fei})" role="button" aria-label="Exercise details"><div class="figlayer">${figLayerHtml(ex)}</div></div>
       <div class="mn"><div class="eyr"><div class="eb">${fei+1} of ${ses.exercises.length} · Plan ${esc(lgPlan(e))}</div><button class="lg2-ibtn sm" data-hx onclick="lgExMenu(${fei})" aria-label="Exercise options">${GP.icon("more")}</button></div><h2>${esc(e.name)}</h2></div></div>
