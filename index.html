@@ -1248,6 +1248,15 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-cd.on.qk.today{box-shadow:inset 0 0 0 1.5px var(--gold)}
 .p3-cl .sw.qk{background:none;box-shadow:none;outline:1.5px dashed rgba(242,193,78,.75);outline-offset:-2px}
 /* ===== /GP:QUICKLOG ===== */
+/* ===== GP:HISTORY (2026-10-25) ===== */
+/* The per-set "last" line under each working set of the focus card: what was lifted on that set in the newest session of the lift (tx3 label, Bebas numerals),
+   with an amber "other gym" chip when this gym has no history of the lift. Aligned under the kg / reps boxes (row padding 6 + set column 38 + gap 8). */
+.lg2-last{display:flex;align-items:baseline;gap:5px;margin:3px 0 5px;padding-left:52px;font:500 11.5px/16px var(--body);color:var(--tx3)}
+.lg2-last b{font-family:var(--num);font-weight:400;font-size:15px;line-height:16px;letter-spacing:.02em;color:var(--tx2)}
+.lg2-last i{font-style:normal}
+.lg2-last .og{align-self:center;margin-left:4px;padding:0 6px;border-radius:5px;background:var(--tint-warn);color:var(--warn);font:600 10.5px/16px var(--body)}
+.lg2-last.dn{opacity:.55}
+/* ===== /GP:HISTORY ===== */
 /* ===== GP:FOCUS (2026-10-22) ===== */
 /* Training focus sheet: a 3-column muscle picker (gold ring + gold rank coin = chosen), sets per week before → after on the shared landmark bar, each day's new opening lifts, one gold Apply. Colours keep their one meaning (gold = the choice and the action, green = more sets, muted = fewer). */
 .fc .fc-note{margin:0 2px 14px;font-size:13px;line-height:18px;color:var(--tx2)}
@@ -3036,7 +3045,8 @@ let state={data:blankData(),tab:"gotham",step:null,session:null,workoutTimer:0,r
    persistent red bar stays up (never silently lose a session); the next successful save clears it. In-memory data is never touched. */
 const SAVE_FAIL_MSG="Storage full — recent changes are NOT saved. Settings → Data control → back up, then delete old progress photos.";
 function saveFailBanner(on){const b=$("savefail");if(!on){if(b)b.remove();return;}if(b||!document.body)return;const d=document.createElement("div");d.id="savefail";d.setAttribute("role","alert");d.textContent=SAVE_FAIL_MSG;document.body.appendChild(d);}
-function save(){let ok=true;try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){ok=false;}
+let _histVer=0;   // bumped on every save so lastOuting's index sees edits to old sessions
+function save(){_histVer++;let ok=true;try{localStorage.setItem("gt_data",JSON.stringify(state.data));}catch(e){ok=false;}
   try{if(ok===!!state._saveFail||(!ok&&!document.getElementById("savefail"))){state._saveFail=!ok;saveFailBanner(!ok);}}catch(e){}
   try{if(typeof cloud!=="undefined"&&cloud.ready)cloudPublish(false);}catch(e){}
   return ok;}
@@ -3177,6 +3187,13 @@ const MIGRATIONS=[
     if(take)Object.assign(out,{activeSplitId:fresh.id,_nextDay:d._nextDay||0,
       activeGymSplits:Object.assign({},d.activeGymSplits||{},gym?{[gym]:fresh.id}:{})});
     return out;
+  }},
+  // v4 (2026-10-25) — the v2 cycle remembers the plan versions it replaced (sp.from = the old 8-day cycle and its imported copies), so tonight's day
+  // keeps following sessions logged under them (computeNextDay matches those by day name). Adds one field to that split; nothing else changes.
+  {v:4,name:"cycle8v2 lineage",run:d=>{
+    const lc=x=>String(x||"").toLowerCase().trim(),splits=d.splits||[];
+    const old=splits.filter(sp=>sp&&sp.id!==CYCLE8V2.id&&(sp.id===CYCLE8.id||lc(sp.name)===lc(CYCLE8.name))).map(sp=>sp.id);
+    return Object.assign({},d,{splits:splits.map(sp=>sp&&sp.id===CYCLE8V2.id?Object.assign({},sp,{from:[...new Set((sp.from||[]).concat(old))]}):sp)});
   }}
 ];
 function migrateData(data){
@@ -3745,16 +3762,46 @@ function unarchiveExercise(name){
   const key=(name||"").toLowerCase().trim();if(!key||!state.data.exReset)return;
   delete state.data.exReset[key];save();
 }
-function lastSetFor(name){
-  const key=(name||"").toLowerCase().trim();
-  const cut=exResetAt(name);
-  const ws=gymWs();
-  for(let i=0;i<ws.length;i++){
-    if(cut&&new Date(ws[i].date).getTime()<new Date(cut).getTime())break; // newest-first — once we hit the cutoff, everything after is pre-reset too
-    const e=(ws[i].exercises||[]).find(x=>(x.name||"").toLowerCase().trim()===key);
-    if(e&&e.sets&&e.sets.length&&!e.sets.some(s=>s.est))return e.sets;   // a marked-done session (est sets) is never "last time"
+/* ===== LAST OUTING (2026-10-25): the ONE answer to "what did I lift last time?" =====
+   Every reader goes through lastOuting(name): the focus card's Last time and Target, the per-set "last" lines, Up next, Later, the done row, swaps,
+   fill-from-last, plan set counts, the summary's vs-last and Alfred, so no two screens can disagree.
+   · the newest session of the lift BY DATE (the array is newest-first, but imports and back-dated "Mark as done" entries can break that order);
+   · at the gym you're in; only when this gym has none, the newest from any gym, flagged otherGym (machines differ; records stay per gym);
+   · the same lift name, case- and space-insensitive, never through EX_ALIAS: an alias shares a library entry, not the weights
+     (High-to-Low Cable Row is not a Seated Cable Row); only after the lift's reset point (exReset);
+   · an outing needs a real working set; "Mark as done" sessions (est sets) never count. opt.before = a workout: only outings older than it. */
+const exKey=n=>String(n||"").toLowerCase().replace(/\s+/g," ").trim();
+let _loIx=null;
+function loIndex(){   // lift key -> [{t,w,e}] newest first; rebuilt when the history changes (save() bumps _histVer)
+  const ws=state.data.workouts||[],sig=ws.length+"|"+(ws[0]&&ws[0].id)+"|"+(ws[ws.length-1]&&ws[ws.length-1].id)+"|"+_histVer;
+  if(_loIx&&_loIx.sig===sig&&_loIx.ws===ws)return _loIx.map;
+  const map=new Map();
+  ws.forEach(w=>{const t=w?new Date(w.date).getTime():NaN;if(!(t>0))return;
+    (w.exercises||[]).forEach(e=>{if(!e||!e.sets||!e.sets.length)return;const k=exKey(e.name);if(!map.has(k))map.set(k,[]);map.get(k).push({t,w,e});});});
+  map.forEach(l=>l.sort((a,b)=>b.t-a.t));
+  _loIx={sig,ws,map};return map;
+}
+function lastOuting(name,opt){
+  const list=loIndex().get(exKey(name));if(!list)return null;
+  const cut=exResetAt(name),c=cut?new Date(cut).getTime():0,b=opt&&opt.before,bt=b?new Date(b.date).getTime():Infinity;
+  const u=state.data.u,home=(u.gyms||[])[0]||"",gym=u.activeGym||home;let any=null;
+  for(const x of list){
+    if(x.t<c)break;   // newest first: everything after this is from before the reset
+    if(b&&(x.w===b||(b.id&&x.w.id===b.id)||x.t>bt))continue;
+    if(x.e.sets.some(s=>s&&s.est)||!x.e.sets.some(s=>s&&s.type!=="W"&&+s.r>0))continue;
+    const g=x.w.gym||home,o={sets:x.e.sets,date:x.w.date,gym:g,otherGym:g!==gym,w:x.w};
+    if(!o.otherGym)return o;
+    if(!any)any=o;
   }
-  return null;
+  return any;
+}
+function lastSetFor(name){const o=lastOuting(name);return o?o.sets:null;}
+// prevW / prevR / prevType on each set from the newest outing: working set i <- its working set i (extra sets <- its last working set),
+// warm-up j <- its warm-up j. clear: sets with no match lose stale numbers (a swapped lift must not show the old lift's weights).
+function withPrev(name,sets,clear){
+  const L=lastSetFor(name)||[],work=L.filter(s=>s.type!=="W"),warm=L.filter(s=>s.type==="W");let wi=0,mi=0;
+  return sets.map(s=>{const src=s.type==="W"?warm[mi++]:(work[wi++]||work[work.length-1]);
+    return src?Object.assign({},s,{prevW:src.w,prevR:src.r,prevType:src.type||"NRM"}):clear?Object.assign({},s,{prevW:null,prevR:null,prevType:null}):s;});
 }
 
 /* ========================= SCIENCE-BASED FATIGUE / RECOVERY MODEL =========================
@@ -4148,15 +4195,11 @@ function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();
 // planned = the split day's target for this lift ({s:sets, r:"5–10"}). With a plan, seed exactly that
 // many working sets (last session's numbers shown per set where they exist) instead of copying last
 // session's set count — otherwise every session starts with the old plan's sets to delete by hand.
-function seedSets(name,planned){
-  const last=lastSetFor(name);
-  const n=planned&&+planned.s>0?Math.round(+planned.s):0;
-  if(n){
-    const work=(last||[]).filter(s=>s.type!=="W");
-    return Array.from({length:n},(_,i)=>{const s=work[i];return s?{w:"",r:"",type:s.type||"NRM",done:false,rpe:"",prevW:s.w,prevR:s.r,prevType:s.type||"NRM"}:{w:"",r:"",type:"NRM",done:false,rpe:""};});
-  }
-  if(last&&last.length)return last.map(s=>({w:"",r:"",type:s.type||"NRM",done:false,rpe:"",prevW:s.w,prevR:s.r,prevType:s.type||"NRM"}));
-  return [0,1,2].map(()=>({w:"",r:"",type:"NRM",done:false,rpe:""}));
+function seedSets(name,planned){   // plan count when the day has one, else last time's sets; every set carries last time's numbers for its row (withPrev)
+  const last=lastSetFor(name),n=planned&&+planned.s>0?Math.round(+planned.s):0,work=(last||[]).filter(s=>s.type!=="W");
+  const blank=ty=>({w:"",r:"",type:ty||"NRM",done:false,rpe:""});
+  const sets=n?Array.from({length:n},(_,i)=>blank(work[i]&&work[i].type)):last&&last.length?last.map(s=>blank(s.type)):[0,1,2].map(()=>blank());
+  return withPrev(name,sets);
 }
 function setReadiness(r){state.session.readiness=r;state.step="patrol-intro";render();saveSession();}
 /* Per-gym records: switching the active gym re-points d.prs to that gym's record book, so every PR
@@ -4223,7 +4266,7 @@ const PR_TIER={
   vol   :{rank:2,badge:"📊",kick:"NEW SET VOLUME PR",unit:"kg in one set",accent:"#5ec8c0",fmt:v=>Math.round(v)+"kg"},
   reps  :{rank:1,badge:"🔁",kick:"NEW REP RECORD",unit:"reps · most ever",accent:"#8fa9e8",fmt:v=>v+" reps"}
 };
-function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets.push({w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""});render();saveSession();}
+function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets=withPrev(ex.name,ex.sets.concat([{w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""}]));render();saveSession();}
 function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();saveSession();}
 function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;render();}
 function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
@@ -4370,8 +4413,7 @@ function finishWorkout(){
   }catch(e){}
   checkAchievements();
   checkUnlocks();
-  // advance the case-file rotation when the session came from a planned split (not a free session)
-  if(ses.split&&ses.split!=="Free Session")advanceDay();
+  // tonight's next day is derived from this workout's splitId + dayIdx (computeNextDay): nothing to advance here
   save();
   // store result for the summary
   try{const sk=(ses.exercises||[]).filter(e=>e._skip);if(sk.length){const line="Skipped: "+sk.map(e=>e.name+" ("+String(e._skip).replace(/^\p{Extended_Pictographic}️?\s*/u,"")+")").join(", ");wk.notes=(wk.notes?wk.notes+"\n":"")+line;}}catch(e){}
@@ -4438,11 +4480,10 @@ function qlCommit(){
   Object.keys(sessVol).forEach(m=>{d.muscleVol[m]=(d.muscleVol[m]||0)+sessVol[m];const seen=d.muscleLastTrained[m];
     if((musclesHit[m]>=1||sessVol[m]>500)&&(!seen||new Date(seen).getTime()<=tm)){d.muscleLastTrained[m]=t;d.muscleLastVol[m]=sessVol[m];d.muscleLastFails[m]=0;}});
   const u=d.u;u.totalWorkouts++;
-  if(at===0){   // the newest session: streak, last-trained date and the stored cycle pointer follow it
+  if(at===0){   // the newest session: streak and last-trained date follow it (the cycle reads the workout itself)
     if(u.lastTrainedDate){if(new Date(u.lastTrainedDate).toDateString()!==when.toDateString())u.streakDays=Math.round((tm-new Date(u.lastTrainedDate).getTime())/864e5)<=1?u.streakDays+1:1;}
     else u.streakDays=1;
     u.lastTrainedDate=t;
-    if(sp.id===d.activeSplitId)d._nextDay=(st.di+1)%sp.days.length;
   }
   save();
   const df=qlDiff(d,pre);
@@ -4940,16 +4981,10 @@ function answerWeightCheck(name,answer){
   (state.data.exNotes[name]=state.data.exNotes[name]||[]).unshift({date:new Date().toISOString(),note:answer});
   save();haptic("tap");closeSheet();toast("Noted, sir.");
 }
-function lastBestSet(name){
-  const ws=gymWs();const ex=exFor(name);const cut=exResetAt(name);
-  for(const w of ws){
-    if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())break; // newest-first — archived, stop here
-    const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;
-    let best=null,bv=-1;
-    (e.sets||[]).forEach(s=>{if(s.type==="W"||s.est)return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
-    if(best)return {w:+best.w||0,r:+best.r||0,date:w.date,e1:bv};
-  }
-  return null;
+function lastBestSet(name,opt){   // the best WORKING set (by e1RM) of the newest outing: what the Target and the progression rule read
+  const o=lastOuting(name,opt);if(!o)return null;const ex=exFor(name);let best=null,bv=-1;
+  o.sets.forEach(s=>{if(s.type==="W"||s.est)return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
+  return best?{w:+best.w||0,r:+best.r||0,date:o.date,e1:bv,otherGym:o.otherGym}:null;
 }
 /* ===== ONE PROGRESSION RULE (user decision 2026-10-19) — every suggestion path reads progressionFor/progressionFrom =====
    Plan ranges are 5–10. A WORKING set (warm-ups never count) that reaches the top of the range (10+) earns more weight
@@ -5059,8 +5094,7 @@ function drawSwapList(){
 }
 function swapExercise(ei,name){
   const e=state.session.exercises[ei];if(!e)return;e.name=name;
-  const lb=lastBestSet(name);
-  (e.sets||[]).forEach(s=>{s.prevW=lb?lb.w:null;s.prevR=lb?lb.r:null;s.prevType=lb?"NRM":null;});
+  e.sets=withPrev(name,e.sets||[],true);   // the new lift's own last numbers per set; none = no stale ones from the old lift
   haptic("done");closeSheet();toast("Swapped to "+name);saveSession();syncSessionToSplit();render();
 }
 /* Antagonist / forearm pairing — the only superset-style tool, kept purposeful:
@@ -5427,7 +5461,7 @@ function p3Applied(nm){   // which stall-breaker options are active (last 4 week
 }
 function p3Stall(nm,k){
   const o=p3StallOpts(nm).find(x=>x.k===k);if(!o||o.off)return;
-  const L=cycleLen(),nd=(state.data._nextDay||0)%L,slots=p3Slots(nm).sort((a,b)=>((a.di-nd+L)%L)-((b.di-nd+L)%L));
+  const L=cycleLen(),nd=(c=>c?c.i:0)(currentPlanDay()),slots=p3Slots(nm).sort((a,b)=>((a.di-nd+L)%L)-((b.di-nd+L)%L));
   const snap=slots.map(s=>({day:s.day,ex:s.day.exercises.slice(),pl:s.day.plan?JSON.parse(JSON.stringify(s.day.plan)):null}));
   const stamp={k,date:new Date(now()).toISOString()},n0=(lastSetFor(nm)||[]).filter(s=>s.type!=="W").length||3,cur=day=>Object.assign({s:n0,r:"6-10"},day.plan&&day.plan[nm]);
   if(k==="rep")slots.forEach(s=>{s.day.plan=s.day.plan||{};s.day.plan[nm]=Object.assign(cur(s.day),{r:o.rng,stall:stamp});});
@@ -5607,13 +5641,14 @@ function openPlateSheet(ei){
 
 /* ========================= WORKOUT SUMMARY (4 cards) ========================= */
 // Previous time this exact lift was logged (skips the just-finished session at workouts[0]).
-function prevExercise(name){
-  const ws=state.data.workouts||[];
-  for(let i=1;i<ws.length;i++){const e=(ws[i].exercises||[]).find(x=>x.name===name);if(!e)continue;const ex=exFor(name);let bo=0,bw=0,br=0;(e.sets||[]).forEach(s=>{if(s.type==="W"||s.est)return;const o=setE1RM(ex,s);if(o>bo){bo=o;bw=setLoad(ex,s.w);br=+s.r||0;}});if(bo>0)return {e1:bo,w:bw,r:br,date:ws[i].date};}
-  return null;
+function prevExercise(name,wk){   // the summary's "vs last": the best working set of the outing before this session (lastOuting rules)
+  const cur=wk||(state.lastResult&&state.lastResult.wk)||null,o=lastOuting(name,cur?{before:cur}:null);if(!o)return null;
+  const ex=exFor(name);let bo=0,bw=0,br=0;
+  o.sets.forEach(s=>{if(s.type==="W"||s.est)return;const v=setE1RM(ex,s);if(v>bo){bo=v;bw=setLoad(ex,s.w);br=+s.r||0;}});
+  return bo>0?{e1:bo,w:bw,r:br,date:o.date}:null;
 }
 // Previous workout sharing this session's name (e.g. last "Chest Day") for total-volume comparison.
-function prevSameDay(wk){const ws=gymWs();for(const w of ws){if(w!==wk&&w.id!==wk.id&&w.name===wk.name&&w.totalVol)return w;}return null;}
+function prevSameDay(wk){const t=new Date(wk.date).getTime();let best=null,bt=-Infinity;gymWs().forEach(w=>{if(w===wk||w.id===wk.id||w.name!==wk.name||!w.totalVol)return;const x=new Date(w.date).getTime();if(x<t&&x>bt){bt=x;best=w;}});return best;}   // newest earlier session of the same day, by date
 function saveSessionNote(v){if(state.lastResult){state.lastResult.wk.notes=v;save();}}
 function setSessionFeel(v){if(!state.lastResult)return;const wk=state.lastResult.wk;wk.feel=(wk.feel===v?"":v);save();haptic("tap");document.querySelectorAll(".feelchip").forEach(c=>c.classList.toggle("on",c.getAttribute("data-feel")===wk.feel));}
 /* ========================= FINISH MOMENT + SUMMARY (GP:PROFILE+FINISH, wave 3) =========================
@@ -5684,7 +5719,7 @@ function p3SumMuscles(R){
     return `<div class="p3-mrow"><div class="p3-mh"><b>${MNAME[m]}</b>${tag}<span class="tn">+${p3Half(ton[m])} tonight</span><span class="num">${s}</span></div>${GP.landmark(s,L)}</div>`;}).join("");
   const lifts=(wk.exercises||[]).map(e=>{const ex=exFor(e.name);let bo=0,tw=0,tr=0,n=0;
     (e.sets||[]).forEach(s=>{if(s.type==="W")return;n++;const o=setE1RM(ex,s);if(o>bo){bo=o;tw=+s.w||0;tr=+s.r||0;}});
-    const pv=prevExercise(e.name),d=pv&&pv.e1>0&&bo>0?bo-pv.e1:null;
+    const pv=prevExercise(e.name,wk),d=pv&&pv.e1>0&&bo>0?bo-pv.e1:null;
     const dl=d==null?`<span class="tag">New</span>`:d>.5?`<span class="p3-d">+${Math.round(d)} kg</span>`:d<-.5?`<span class="p3-d dn">${Math.round(d)} kg</span>`:`<span class="p3-d eq">=</span>`;
     return `<div class="gh-row" data-hx onclick="openExDetail(${ghJs(e.name)})"><span class="lead">${GP.icon("dumbbell")}</span><div class="main"><div class="gh-t1">${esc(e.name)}</div><div class="gh-t2">${ex.bw?"+":""}${fmtKg(tw)} kg × ${tr} · ${n} set${n===1?"":"s"}</div></div><span class="trail">${dl}${GP.icon("chevR")}</span></div>`;}).join("");
   return `${p3SumHead(R,"Muscles & lifts")}
@@ -8392,7 +8427,7 @@ function openRaid(){
     <button class="btn ghost sm" style="margin-top:12px;color:var(--text3)" onclick="endRaid()">Abandon raid</button>
     <button class="btn ghost" style="margin-top:6px" onclick="closeSheet()">Close</button>`);
 }
-function setActiveSplit(id){const d=state.data;d.activeSplitId=id;d._nextDay=0;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;splitsChanged();}
+function setActiveSplit(id){const d=state.data;d.activeSplitId=id;d.activeGymSplits=d.activeGymSplits||{};if(d.u.activeGym)d.activeGymSplits[d.u.activeGym]=id;splitsChanged();}
 function open1RM(){openSheet(`<div class="ttl">1RM calculator (Epley)</div>
   <label class="mini">Weight (kg)</label><input id="o-w" inputmode="decimal" oninput="calc1rm()" style="margin-bottom:8px"/>
   <label class="mini">Reps</label><input id="o-r" inputmode="numeric" oninput="calc1rm()" style="margin-bottom:8px"/>
@@ -8729,46 +8764,54 @@ function toggleRestDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s)
   if(!day.rest){day.rest=true;day._rn=day.name;day.name="Rest & Recover";}
   else{day.rest=false;day.name=day._rn||"Training day";delete day._rn;}
   splitsChanged();}
-function delDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s||s.days.length<=1)return;s.days.splice(i,1);if((state.data._nextDay||0)>=s.days.length)state.data._nextDay=0;splitsChanged();}
-function advanceDay(){const sp=state.data.splits.find(s=>s.id===state.data.activeSplitId)||state.data.splits[0];if(sp&&sp.days.length)state.data._nextDay=((state.data._nextDay||0)+1)%sp.days.length;}
-// Tonight's day follows your SPLIT PROGRESSION (self-healing from real history), never the calendar
-// weekday: it's the day right after the most recent split-day you actually completed — Upper→Lower→Rest→…
-// Falls back to the stored pointer for rest days / no history.
+function delDay(id,i){const s=state.data.splits.find(x=>x.id===id);if(!s||s.days.length<=1)return;s.days.splice(i,1);splitsChanged();}
+// Tonight's day follows your SPLIT PROGRESSION, derived from history every time (rewritten 2026-10-25: the old stored pointer drifted:
+// it stepped +1 on every finished session of ANY split or day, reset to 0 on a split switch, and took over after any logged rest day,
+// which is how "the next training day or two after, it had switched what I did" happened).
+//   1 · the newest session of THIS split decides, by date (not array order): its own sessions (splitId + day; a quick "Mark as done" counts),
+//       plus, by day name, history from the plan versions it replaced (sp.from) and old sessions with no or a deleted split id.
+//       Another split's sessions and Free sessions never move it.
+//   2 · the rest days right after that day pass by themselves, one per calendar day gone by, or at once when you log them (Log rest day);
+//       a training day is never skipped, however long the gap.
+//   3 · a split with no history starts at its first day.
+const CYC_DAY_MS=864e5,lcName=x=>String(x||"").toLowerCase().trim();
+function calDaysBetween(a,b){const A=new Date(a),B=new Date(b);A.setHours(0,0,0,0);B.setHours(0,0,0,0);return Math.round((B-A)/CYC_DAY_MS);}   // whole calendar days, DST-safe
+function lastSplitDay(sp){   // {idx,t}: the newest trained day of this split, or null
+  const len=sp.days.length,byName={},kin=new Set([sp.id].concat(sp.from||[])),known=new Set((state.data.splits||[]).map(x=>x&&x.id));
+  sp.days.forEach((dy,i)=>{const k=lcName(dy&&dy.name);if(k&&byName[k]==null)byName[k]=i;});
+  let best=null;
+  (state.data.workouts||[]).forEach(w=>{
+    const t=w?new Date(w.date).getTime():NaN;if(!(t>0)||(best&&t<=best.t))return;
+    const nm=byName[lcName(w.name)];let i=null;
+    if(w.splitId===sp.id&&w.dayIdx!=null&&w.dayIdx>=0&&w.dayIdx<len)i=nm==null||lcName(sp.days[w.dayIdx].name)===lcName(w.name)?w.dayIdx:nm;   // a renamed day is found by index, a moved one by name
+    else if(!w.splitId||kin.has(w.splitId)||!known.has(w.splitId))i=nm!=null?nm:null;
+    if(i!=null)best={idx:i,t};
+  });
+  return best;
+}
 function computeNextDay(sp){
   if(!sp||!sp.days||!sp.days.length)return 0;
-  const len=sp.days.length;
-  const idxByName={};
-  sp.days.forEach((dy,i)=>{const k=((dy&&dy.name)||"").toLowerCase().trim();if(k&&idxByName[k]==null)idxByName[k]=i;});
-  let lastWoTime=-1,lastWoIdx=null;
-  for(const w of (state.data.workouts||[])){            // newest-first (unshift order)
-    // Stable identity first: a session tagged with THIS split's id + day index is unambiguous,
-    // even if the day's since been renamed. Only fall back to name-matching for older history
-    // logged before this field existed — that fallback is what let a rename (or a Free Session
-    // breaking the streak) skip straight past a real recent session to an older name-match,
-    // making "last time you did this day" show weeks-old data the day after you actually trained.
-    if(w&&w.splitId===sp.id&&w.dayIdx!=null&&w.dayIdx<len){lastWoTime=new Date(w.date).getTime();lastWoIdx=w.dayIdx;break;}
-    const k=((w&&w.name)||"").toLowerCase().trim();
-    if(idxByName[k]!=null){lastWoTime=new Date(w.date).getTime();lastWoIdx=idxByName[k];break;}
-  }
-  const rest=state.data.restLog||[];
-  const lastRestTime=rest.length?new Date(rest[0]).getTime():-1;
-  if(lastWoIdx==null&&lastRestTime<0)return (state.data._nextDay||0)%len;   // brand new — start at the pointer
-  if(lastRestTime>lastWoTime)return (state.data._nextDay||0)%len;           // last thing was a rest → pointer already moved past it
-  return (lastWoIdx+1)%len;                                                 // the day after the last split-day you trained
+  const len=sp.days.length,last=lastSplitDay(sp);if(!last)return 0;
+  let k=0;while(k<len-1&&isRest(sp.days[(last.idx+1+k)%len]))k++;   // rest days straight after the last trained day
+  const gone=Math.max(0,calDaysBetween(last.t,now())-1);             // calendar days fully gone by since that day
+  const logged=new Set((state.data.restLog||[]).filter(r=>new Date(r).getTime()>last.t).map(r=>new Date(r).toDateString())).size;   // rest days logged since
+  return (last.idx+1+Math.min(k,Math.max(gone,logged)))%len;
 }
-function restLoggedToday(){return (state.data.restLog||[]).some(r=>new Date(r).toDateString()===new Date().toDateString());}
-function logRestDay(){   // guarded: only on tonight's rest day, once per calendar day; the toast carries Undo
+const trainedToday=()=>(state.data.workouts||[]).some(w=>w&&new Date(w.date).toDateString()===new Date(now()).toDateString());
+function restLoggedToday(){return (state.data.restLog||[]).some(r=>new Date(r).toDateString()===new Date(now()).toDateString());}
+function logRestDay(){   // guarded: only on tonight's rest day, once per calendar day, never on a day you trained; the logged rest day is used up at once
   const cur=currentPlanDay();
   if(!cur||!isRest(cur.day)){toast("Tonight is a training day");return;}
   if(restLoggedToday()){toast("Rest day already logged");return;}
-  state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date().toISOString());advanceDay();save();
+  if(trainedToday()){toast("You trained today. Rest starts tomorrow.");return;}
+  state.data.restLog=(state.data.restLog||[]);state.data.restLog.unshift(new Date(now()).toISOString());save();
   try{checkStreakMilestone();}catch(e){}
   render();toastUndo("Rest day logged",undoRestDay);
 }
-function undoRestDay(){   // reverses today's log: drops the entry and steps the day pointer back
-  const d=state.data,r=d.restLog||[],sp=(d.splits||[]).find(s=>s.id===d.activeSplitId)||(d.splits||[])[0];
-  if(!r.length||!restLoggedToday()||!sp||!sp.days.length)return;
-  r.shift();const n=sp.days.length;d._nextDay=((d._nextDay||0)-1+n)%n;save();render();toast("Rest day undone");
+function undoRestDay(){   // reverses today's log
+  const r=state.data.restLog||[];
+  if(!r.length||!restLoggedToday())return;
+  r.shift();save();render();toast("Rest day undone");
 }
 
 // ---- strength standards (bodyweight-relative, evidence-based multipliers) ----
@@ -9689,7 +9732,7 @@ A dock is one sideways-scrolling row of tiles under a tab's hero, each with a pi
 Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). After a short patrol intro you reach the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
 
 ## LOGGING SETS: THE FOCUS CARD, RIR TILES AND SET TYPES
-The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan, the Target, Last time and e1RM boxes, then one row per set with the set badge (tap to cycle the set type), kilos, reps and the tick. Empty kilos and reps show last time's numbers as ghost values, and one tap on the tick logs them as they are. RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
+The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan, the Target, Last time and e1RM boxes, then one row per set with the set badge (tap to cycle the set type), kilos, reps and the tick. Empty kilos and reps show the target as ghost values (last time +1 rep, or more weight once you hit 10), and one tap on the tick logs them as they are. Under every working set a small "last 90 × 7" line shows exactly what you lifted on that set in your newest session of the lift, from any day or split, at this gym; only when this gym has none does it use another gym's (marked "other gym"). RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
 
 ## PLAN TARGETS AND THE PROGRESSION RULE (WHEN TO ADD WEIGHT)
 A plan day shows each lift's target as sets × rep range, e.g. "PLAN 2 × 5–10" on the focus card (some are optional tonight). Plan ranges are 5–10 reps and ONE progression rule runs everywhere — the focus card's Target box, the exercise detail, the finish summary's Targets and my comments after a set. Only a WORKING set counts: warm-up sets never do. If your best working set reached the top of the range (10 or more reps), add weight (2.5 kg, or 5 kg from 60 kg up) and restart at about 6 reps. At 5–9 reps keep the same load and add one rep. A custom plan with a higher top (say 12–15) moves the add-weight point up with it. Suggested weights show one decimal where needed (72.5 kg, not 73). The Target box shows the next target, for example 67.5 × 10 with "hit 10 → +5 kg" under it.
@@ -9722,7 +9765,7 @@ Suit → Progress photos (or the Photos tile): Add photo, then tap a photo to vi
 The Garage is a fleet that unlocks with real milestones (sessions, streak, lifetime volume, records, strength level). Seasonal events are short training challenges inside fixed date windows (for example the Long Halloween, 24–31 October): a progress row appears on Gotham while one runs, and clearing it pays XP once.
 
 ## THE 8-DAY CYCLE AND LOGGING A REST DAY
-The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did, not the calendar: tonight is the day after the last plan day you completed. Logging a rest day (Log rest day on Gotham, which then reads "Rest day logged" with an Undo) moves it on; a Free Session doesn't. Miss a day and the cycle waits for you.
+The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did: tonight is the day after the last plan day you completed. The rest days after it pass by themselves, one per calendar day; a training day is never skipped, so miss three days and the next workout is still the next training day. Log rest day on Gotham marks it done at once (it counts for your streak and calendar; Undo in the toast). Train anyway on a rest day starts the next plan day. A Free Session or a session from another split never moves the cycle.
 
 ## TOOLS DURING A SESSION: SKIP, REORDER, SWAP, WARM-UP RAMP, PLATE MATHS
 The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (save seat, pin, pad), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. When a lift trains a muscle that is still cold, the menu suggests a warm-up ramp built from your working weight (about 40/60/80% on the first lift of the night, two lighter steps later) and lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
@@ -11568,12 +11611,14 @@ function ghHeroRest(cur,vol){
   const n=cur.sp.days.length,logged=ghRestLoggedToday();
   let ni=-1;for(let j=1;j<n;j++){const k=(cur.i+j)%n;if(!isRest(cur.sp.days[k])){ni=k;break;}}
   const nd=ni>=0?cur.sp.days[ni]:null,low=vol.filter(t=>t.trained).sort((a,b)=>a.rec-b.rec).slice(0,4);
+  const go=`<button class="btn" onclick="${nd?`startWorkout('${cur.sp.id}',${ni})`:"freeWorkout()"}" aria-label="${nd?"Train "+esc(nd.name)+" now":"Train anyway"}">Train anyway</button>`;   // the next plan day, so the cycle moves on with it (a Free session would not)
   return `<section class="s3 gh-hero is-rest gh-c" style="--i:0">${gaArt("rest")}<div class="gh-top"><span class="eyebrow gh-live">Tonight · Rest</span>${ghRail(cur)}</div>
     <h2 class="num gh-title">Rest day</h2>
     <div class="gh-meta">${nd?`<button class="gh-next" data-hx onclick="openDayBriefing('${cur.sp.id}',${ni})">Next: <b>${esc(nd.name)}</b>${GP.icon("chevR")}</button>`:"<span>Recovery is part of the plan</span>"}</div>
     ${ghBand(low,"Recovery outlook: the muscles furthest from ready")}
     <div class="gh-cta">${logged?`<button class="btn gh-done" disabled>${GP.icon("check")}Rest day logged</button><button class="btn" onclick="undoRestDay()">Undo</button>`
-      :`<button class="btn btn-1" onclick="logRestDay()">Log rest day</button><button class="btn" onclick="freeWorkout()">Train anyway</button>`}</div>
+      :trainedToday()?`<button class="btn gh-done" disabled>${GP.icon("check")}Trained today</button>${go}`
+      :`<button class="btn btn-1" onclick="logRestDay()">Log rest day</button>${go}`}</div>
     ${ghCoach(vol,null,true)}</section>`;
 }
 function ghHeroFree(vol){
@@ -12360,7 +12405,7 @@ function lgRx(name){if(LG_ISO.test(name))return LG_RX.iso;return["quads","hamstr
 function lgCap(e){const m=lgMuscle(e);return !!m&&getRecovery(m)<60;}
 function lgPlan(e){const n=(e.sets||[]).filter(s=>s.type!=="W").length;return e.plan?`${+e.plan.s||n} × ${e.plan.r||""}${e.plan.opt?" · optional":""}`:`${n} set${n===1?"":"s"}`;}
 /* last outing of a lift on this gym (working sets, newest first, respects the archive cut) */
-function lgLast(name){const cut=exResetAt(name);for(const w of gymWs()){if(cut&&new Date(w.date).getTime()<new Date(cut).getTime())break;const e=(w.exercises||[]).find(x=>x.name===name);if(!e)continue;const sets=(e.sets||[]).filter(s=>s.type!=="W"&&+s.r>0&&!s.est);if(sets.length)return{date:w.date,sets};}return null;}
+function lgLast(name){const o=lastOuting(name);if(!o)return null;const sets=o.sets.filter(s=>s.type!=="W"&&+s.r>0&&!s.est);return sets.length?{date:o.date,sets,otherGym:o.otherGym}:null;}
 function lgSessionSets(m){let c=0;(state.session.exercises||[]).forEach(e=>{if(e._skip)return;const ex=exFor(e.name),n=(e.sets||[]).filter(s=>s.type!=="W"&&s.done).length;if((ex.p||[]).map(MM_NORM).includes(m))c+=n;else if((ex.s||[]).map(MM_NORM).includes(m))c+=n*.5;});return c;}
 const lgWeekly=m=>Math.round(weeklySets(m)+perWeek(lgSessionSets(m)));
 function lgDayInfo(ses){const sp=(state.data.splits||[]).find(s=>s.id===ses.srcSplit);return sp&&ses.srcDay!=null?`Day ${ses.srcDay+1} of ${sp.days.length}`:"Free session";}
@@ -12547,7 +12592,7 @@ function lgTiles(e,ex,m){
   if(p){const inc=p.inc||(ex.bw?2.5:(p.w>=60?5:2.5));tv=`<b class="num">${lgNum(p.w,ex)}<i>×</i>${p.r}</b>`;ts=p.add?`+${fmtKg(inc)} kg earned · reset to ${p.r}`:`hit ${p.top} → +${fmtKg(inc)} kg`;}
   let lv='<b class="num">—</b>',ls="no history yet";
   if(lb){let bi=0,bv=-1;L.sets.forEach((s,i)=>{const v=setE1RM(ex,s);if(v>=bv){bv=v;bi=i;}});const others=L.sets.filter((s,i)=>i!==bi).map(s=>s.r).slice(0,2),rir=rirOfSet(L.sets[bi]);
-    lv=`<b class="num">${lgNum(lb.w,ex)}<i>×</i>${lb.r}</b>`;ls=(others.length?"then ×"+others.join(", "):Math.round(daysSince(L.date))+"d ago")+(rir!=null?" · RIR "+rir:"");}
+    lv=`<b class="num">${lgNum(lb.w,ex)}<i>×</i>${lb.r}</b>`;ls=lb.otherGym?"other gym · "+Math.round(daysSince(L.date))+"d ago":(others.length?"then ×"+others.join(", "):Math.round(daysSince(L.date))+"d ago")+(rir!=null?" · RIR "+rir:"");}
   let cur=0;(e.sets||[]).forEach(s=>{if(s.type!=="W"&&s.done&&setLogged(e.name,s))cur=Math.max(cur,setE1RM(ex,s));});
   const best=pr&&pr.orm||0,val=cur||(lb?lb.e1:0),isPR=cur>0&&best>0&&cur>best+.01;
   const es=isPR?`PR +${Math.round(cur-best)}`:best?`best ${Math.round(best)}`:"no record yet";
@@ -12558,7 +12603,7 @@ function lgTiles(e,ex,m){
 }
 function lgPlates(kg){const bar=state.data.u.barWeight||20,pl=((state.data.plates&&state.data.plates.length)?state.data.plates.slice():[25,20,15,10,5,2.5,1.25]).sort((a,b)=>b-a);let per=(kg-bar)/2;if(per<=0)return"";const used=[];pl.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});return used.length?used.join(" + "):"";}
 function lgRows(e,ei,ex){
-  const ses=state.session,gs=lgGhosts(e),act=e.sets.findIndex(s=>!s.done);let lastDone=-1;e.sets.forEach((s,i)=>{if(s.done&&s.type!=="W")lastDone=i;});
+  const ses=state.session,gs=lgGhosts(e),act=e.sets.findIndex(s=>!s.done),og=!!(lastOuting(e.name)||{}).otherGym;let lastDone=-1;e.sets.forEach((s,i)=>{if(s.done&&s.type!=="W")lastDone=i;});
   let h="",wn=0;
   e.sets.forEach((s,si)=>{
     const isW=s.type==="W";if(!isW)wn++;
@@ -12571,6 +12616,7 @@ function lgRows(e,ei,ex){
       <div class="lg2-cell"><input data-fid="${ei}-${si}-w" inputmode="decimal" value="${esc(lgHas(s.w)?s.w:"")}" placeholder="${esc(g?g.w:"")}" oninput="setField(${ei},${si},'w',this.value)" aria-label="Set ${wn} kilograms"/>${dchip("w")}</div>
       <div class="lg2-cell"><input data-fid="${ei}-${si}-r" inputmode="numeric" value="${esc(lgHas(s.r)?s.r:"")}" placeholder="${esc(g?g.r:(e.plan&&e.plan.r)||"")}" oninput="setField(${ei},${si},'r',this.value)" aria-label="Set ${wn} reps"/>${dchip("r")}</div>
       <div class="sdone lg2-ck${s.done?" on":""}" role="button" aria-label="Log set ${wn}" onclick="toggleDone(${ei},${si})">${GP.icon("check")}</div></div>`;
+    if(!isW&&(lgHas(s.prevW)||lgHas(s.prevR)))h+=`<div class="lg2-last${s.done?" dn":""}"><span>last</span><b>${esc(lgHas(s.prevW)?lgNum(s.prevW,ex):"–")}</b><i>×</i><b>${esc(lgHas(s.prevR)?String(s.prevR):"–")}</b>${og?'<span class="og">other gym</span>':""}</div>`;
     if(g&&g.why&&!s.done)h+=`<div class="lg2-why">${GP.icon("alert")}<span>${esc(g.why)}</span></div>`;
     if(s.done&&!isW&&(si===lastDone||ses._rirOpen===ei+":"+si)){
       const cur=rirOfSet(s);

@@ -102,7 +102,7 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
  ok(expected>=10&&rs(cyc).every(r=>r!=='5–10'),'fixture is a faithful pre-v2 plan ('+expected+' lifts at "5–8", none at "5–10")');
  const {ctx,store}=sandbox(RAW1,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts);ctx.runMigrations();
  const d=ctx.state.data,c2=d.splits.find(s=>s.id==='cycle8'),i2=d.splits.find(s=>s.id==='s123'),m2=d.splits.find(s=>s.id==='mine2');
- ok(d.dataVersion===3,'dataVersion bumped 1 → 3 (v2 + v3)');
+ ok(d.dataVersion===4,'dataVersion bumped 1 → 4 (v2 + v3 + v4)');
  ok(rs(c2).every(r=>r!=='5–8')&&rs(c2).filter(r=>r==='5–10').length===expected,'every exact "5–8" in the 8-day cycle is now "5–10"');
  ok(c2.days[0].plan['Cable Lateral Raise'].r==='8–12'&&c2.days[0].plan['Lat Pulldown (Wide Grip)'].r==='5-8','custom ranges (8–12, 5-8) untouched');
  ok(rs(c2).filter(r=>r==='6–10').length===rs(cyc).filter(r=>r==='6–10').length,'existing 6–10 targets untouched');
@@ -114,7 +114,7 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
  const after=JSON.stringify(d.splits);d.dataVersion=1;ctx.runMigrations();ok(JSON.stringify(ctx.state.data.splits)===after,'idempotent: forced re-run changes nothing');
  // brand-new install path: v1 installs the (already 5–10) plan, v2 is a no-op
  const {ctx:cf}=sandbox(RAW,{real:true});cf.load();cf.runMigrations();const f=cf.state.data;
- ok(f.dataVersion===3&&new Set(rs(f.splits.find(s=>s.id==='cycle8'))).size===2&&rs(f.splits.find(s=>s.id==='cycle8')).every(r=>r==='5–10'||r==='6–10'),'fresh v0 → v2: plan only holds 5–10 / 6–10');}
+ ok(f.dataVersion===4&&new Set(rs(f.splits.find(s=>s.id==='cycle8'))).size===2&&rs(f.splits.find(s=>s.id==='cycle8')).every(r=>r==='5–10'||r==='6–10'),'fresh v0 → v2: plan only holds 5–10 / 6–10');}
 
 // ===== The real v3 migration: 8-day cycle v2 (identical upper days) added + activated; old split untouched =====
 {const {ctx:c0}=sandbox(RAW,{real:true});
@@ -123,7 +123,8 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
  const RAW2=JSON.stringify(v2),cycBefore=JSON.stringify(cyc);
  const {ctx,store}=sandbox(RAW2,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts);ctx.runMigrations();
  const d=ctx.state.data,n2=d.splits.find(s=>s.id==='cycle8v2');
- ok(d.dataVersion===3&&!!n2,'v3 adds the 8-day cycle v2');
+ ok(d.dataVersion===4&&!!n2,'v3 adds the 8-day cycle v2');
+ ok(JSON.stringify(n2.from)==='["cycle8"]','v4: the v2 cycle remembers the old cycle as its lineage');
  ok(d.activeSplitId==='cycle8v2'&&d._nextDay===6,'v2 cycle is active and the cycle position is kept');
  ok(JSON.stringify(d.splits.find(s=>s.id==='cycle8'))===cycBefore,'the old 8-day split is untouched (one tap to switch back)');
  const ups=[0,3,6].map(i=>n2.days[i]);
@@ -143,9 +144,26 @@ const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
  const {ctx:co}=sandbox(JSON.stringify(own),{real:true});co.load();co.runMigrations();
  ok(co.state.data.activeSplitId==='mine'&&co.state.data.splits.some(s=>s.id==='cycle8v2'),'a different active split is never switched');}
 
-// ===== seedSets honours the plan's set count =====
-{const fn=js.slice(js.indexOf('function seedSets('),js.indexOf('function setReadiness('));
+// ===== The real v4 migration: lineage on the v2 cycle only (old cycle + imported copies by name), nothing else touched =====
+{const {ctx:c0}=sandbox(RAW,{real:true});
+ const v3=JSON.parse(RAW);v3.dataVersion=3;const cyc=vm.runInContext('cycle8Split()',c0),imp=vm.runInContext('cycle8Split()',c0),v2c=vm.runInContext('cycle8v2Split()',c0);
+ imp.id='s123';v3.splits=v3.splits.concat([cyc,imp,v2c]);v3.activeSplitId='cycle8v2';
+ const RAW3=JSON.stringify(v3);
+ const {ctx,store}=sandbox(RAW3,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts),others=JSON.stringify(ctx.state.data.splits.filter(s=>s.id!=='cycle8v2'));ctx.runMigrations();
+ const d=ctx.state.data,n2=d.splits.find(s=>s.id==='cycle8v2');
+ ok(d.dataVersion===4&&JSON.stringify(n2.from)==='["cycle8","s123"]','v4: lineage = the old cycle and its imported copy');
+ ok(JSON.stringify(d.splits.filter(s=>s.id!=='cycle8v2'))===others&&JSON.stringify(Object.assign({},n2,{from:undefined}))===JSON.stringify(Object.assign({},v2c,{from:undefined})),'v4 touches nothing but that one field');
+ ok(JSON.stringify(d.workouts)===wBefore&&store.get('gt_data_backup')===RAW3,'v4: workouts byte-identical, backup taken');
+ const after=JSON.stringify(d.splits);d.dataVersion=3;ctx.runMigrations();
+ ok(JSON.stringify(ctx.state.data.splits)===after,'v4 idempotent');}
+
+// ===== seedSets honours the plan's set count, and every set carries its row's last numbers =====
+{const fn=js.slice(js.indexOf('function withPrev('),js.indexOf('/* ========================= SCIENCE-BASED FATIGUE'))+js.slice(js.indexOf('function seedSets('),js.indexOf('function setReadiness('));
  const c={};vm.createContext(c);vm.runInContext('function lastSetFor(){return [{w:20,r:10,type:"W"},{w:80,r:7,type:"NRM"},{w:80,r:6,type:"NRM"},{w:75,r:8,type:"NRM"}];}\n'+fn,c);
+ const five=vm.runInContext('seedSets("x",{s:5,r:"5–10"})',c);
+ ok(five.length===5&&five[2].prevW===75&&five[3].prevW===75&&five[4].prevR===8&&five.every(s=>s.type==="NRM"&&s.w===""),'plan 5 sets after a 3-set session → the extra sets show the last working set (never blank)');
+ const sw=vm.runInContext('withPrev("x",[{type:"NRM",prevW:999,prevR:1},{type:"W",prevW:999}],true)',c);
+ ok(sw[0].prevW===80&&sw[1].prevW===20,'withPrev re-stamps working and warm-up sets from the newest outing');
  const two=vm.runInContext('seedSets("x",{s:2,r:"5–8"})',c);
  ok(two.length===2&&two[0].prevW===80&&two[1].prevR===6,'plan 2 sets → exactly 2 sets, last session\'s working numbers shown');
  ok(vm.runInContext('seedSets("x").length',c)===4,'no plan → old behaviour (copies last session)');}
