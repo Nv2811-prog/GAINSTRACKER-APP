@@ -1257,6 +1257,16 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .lg2-last .og{align-self:center;margin-left:4px;padding:0 6px;border-radius:5px;background:var(--tint-warn);color:var(--warn);font:600 10.5px/16px var(--body)}
 .lg2-last.dn{opacity:.55}
 /* ===== /GP:HISTORY ===== */
+/* ===== GP:RAMP (2026-10-25) ===== */
+/* The warm-up ramp sheet (and the Forge's ramp): the top set in the Forge's two fields, five count chips (gold = chosen), the ramp rows ending in the top set, one gold Add. */
+.rp .rp-sec{display:block;margin:4px 2px 8px}
+.rp .rp-sec+.fg-in{margin-bottom:16px}
+.rp-n{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 12px}
+.rp-n .chip{justify-content:center;width:100%;min-height:42px;padding:0;font:600 17px/1 var(--num);letter-spacing:.02em}
+.rp .rp-note{margin:-2px 2px 10px;color:var(--tx3)}
+.rp .rp-go{width:100%;margin:6px 0 4px}
+.px-rr.fg-work .n .gi{width:15px;height:15px;color:var(--gold-ink)}
+/* ===== /GP:RAMP ===== */
 /* ===== GP:FOCUS (2026-10-22) ===== */
 /* Training focus sheet: a 3-column muscle picker (gold ring + gold rank coin = chosen), sets per week before → after on the shared landmark bar, each day's new opening lifts, one gold Apply. Colours keep their one meaning (gold = the choice and the action, green = more sets, muted = fewer). */
 .fc .fc-note{margin:0 2px 14px;font-size:13px;line-height:18px;color:var(--tx2)}
@@ -5055,13 +5065,6 @@ function warmupSuggest(ei){
   const sets=scheme.map(([p,r])=>({w:round(W*p),r}));
   return {muscles:fresh.map(m=>MNAME[m]).join(", "),sets};
 }
-function addWarmups(ei){
-  const w=warmupSuggest(ei);if(!w)return;
-  const e=state.session.exercises[ei];
-  const warm=w.sets.map(s=>({w:s.w,r:s.r,type:"W",done:false,rpe:""}));
-  e.sets=warm.concat(e.sets);
-  render();
-}
 function dismissWarm(ei){
   const ses=state.session;ses.warmDismiss=ses.warmDismiss||{};
   ses.warmDismiss[ses.exercises[ei].name]=true;render();
@@ -6902,10 +6905,8 @@ function forgeOut(){
   const chips=used=>used.map(p=>`<span class="px-plate sm" style="background:${PLATE_COL[p]||"#888"}">${p}</span>`).join("");
   const label=(t,s)=>`<div class="cx-l cx-l2">${t} <span>${s}</span></div>`;
   const hero=orm?`<section class="s2 fg-hero"><div><div class="eyebrow">Estimated 1RM</div><div class="t-xs">${fmtKg(w)} kg × ${r} · Epley formula</div></div><div class="fg-big"><b class="num">${Math.round(orm)}</b><span>kg</span></div></section>`:"";
-  const steps=[{p:.4,r:8},{p:.6,r:5},{p:.75,r:3},{p:.9,r:1}];   // warm-up toward the entered weight, treated as the working weight
-  const warm=w>bar?label("Warm-up ramp",`toward ${fmtKg(w)} kg`)+steps.map((s,i)=>{const ld=forgeLoadable(w*s.p);
-    return `<div class="px-rr"><span class="n">${i+1}</span><div class="w"><b class="num">${Math.round(ld.w)}</b><span>kg × ${s.r}</span></div><div class="sd">${ld.used.length?chips(ld.used):`<span class="t-s">bar only</span>`}</div></div>`;}).join("")
-    +`<div class="px-rr fg-work"><span class="n">W</span><div class="w"><b class="num">${fmtKg(w)}</b><span>kg × ${r||"?"}</span></div><div class="sd"><span class="t-s">working</span></div></div>`:"";
+  const fn=state._forgeN||3,ramp=w>bar?warmRamp("",w,r,fn,"barbell"):[];   // the logging card's engine, on a barbell, toward the entered set
+  const warm=w>bar?label("Warm-up ramp",`toward ${fmtKg(w)} kg`)+`<div class="rp-n" role="group" aria-label="Number of warm-up sets">${[1,2,3,4,5].map(i=>`<button type="button" class="chip${i===fn?" on":""}" aria-pressed="${i===fn}" onclick="state._forgeN=${i};drawForge()">${i}</button>`).join("")}</div>`+rampRows(ramp,w,r):"";
   const j=w>=bar?nextPlateJump(w):null;   // the smallest loadable progressions above the entered weight
   const jump=j?label("Next plate jump",`one ${j.small} kg plate per side`)+j.rungs.map((rg,i)=>`<div class="px-rr"><span class="n">${i+1}</span><div class="w"><b class="num">${rg.w}</b><span>kg</span></div><div class="sd"><span class="t-s">+${fmtKg(j.step*(i+1))} kg</span></div></div>`).join("")
     +`<p class="t-xs px-foot">Add load only once you own the top of your rep range with clean form.</p>`:"";
@@ -9768,7 +9769,7 @@ The Garage is a fleet that unlocks with real milestones (sessions, streak, lifet
 The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did: tonight is the day after the last plan day you completed. The rest days after it pass by themselves, one per calendar day; a training day is never skipped, so miss three days and the next workout is still the next training day. Log rest day on Gotham marks it done at once (it counts for your streak and calendar; Undo in the toast). Train anyway on a rest day starts the next plan day. A Free Session or a session from another split never moves the cycle.
 
 ## TOOLS DURING A SESSION: SKIP, REORDER, SWAP, WARM-UP RAMP, PLATE MATHS
-The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (save seat, pin, pad), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. When a lift trains a muscle that is still cold, the menu suggests a warm-up ramp built from your working weight (about 40/60/80% on the first lift of the night, two lighter steps later) and lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
+The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (save seat, pin, pad), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. Warm-up ramp opens a sheet: type your top set (kilos × reps, prefilled from the first set), pick 1 to 5 warm-up sets and it lists each warm-up weight × reps, rounded to what you can load (plates per side on a barbell); Add puts them on the lift as warm-up sets. Your choice of how many is remembered per lift, and the Forge in the Lab uses the same ramp. When a lift trains a muscle that is still cold, the button shows a dot and the menu lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
 
 ## DATA CONTROL: ARCHIVING OLD MACHINE WEIGHTS, BACKUP, RESTORE AND CSV EXPORT
 Settings → Data control (also Profile → the Backup tile). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now (progress photos go into the file at full size), Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first; photos included).
@@ -11402,23 +11403,83 @@ function sendGauntlet(i,liftN,tw){
   state.data.gauntlets.push({ally:((state.data.allies||[])[i]||{}).n,ex:liftN,targetW:tw,date:new Date().toISOString()});
   save();closeSheet();toast("🧤 Gauntlet thrown. No backing out now.");
 }
-/* ===== WARM-UP RAMP — tap a working weight, get the exact ramp with plates per side ===== */
+/* ===== WARM-UP RAMP (GP:RAMP, 2026-10-25): enter the top set, pick 1–5 warm-up sets, get the weights =====
+   ONE engine (warmRamp) behind the logging card's sheet (Warm-up ramp under the sets and in the ⋯ menu) and the Forge.
+   Why these numbers: warm-ups rehearse the groove and prime the nervous system at rising load without costing the top set anything, so the load
+   climbs toward the top while the reps fall, always far from failure. A heavy top set (5 reps or fewer) ends its ramp ~4% closer to the top weight,
+   a light one (10+ reps) ~5% lower with shorter sets. Weights round DOWN to what you can load: bar + plate pairs for barbells (forgeLoadable, the
+   bar from Settings), 2.5 kg steps for machines and cables, 2 / 2.5 kg dumbbells. Equal weights merge, nothing reaches the top set, a barbell never
+   goes under the empty bar, bodyweight lifts get none. The chosen count is remembered per lift (d.warmPrefs), it is not a setting. */
+const WARM_MAX=5,WARM_PCT={1:[.6],2:[.5,.75],3:[.45,.65,.85],4:[.4,.55,.7,.85],5:[.3,.45,.6,.75,.87]},WARM_REPS={1:[5],2:[8,3],3:[8,5,2],4:[8,5,3,1],5:[10,8,5,3,1]};
+const WARM_BAR=["barbell","smith","ez bar","trap bar"];
+function warmRound(eq,w){   // {w, plates|null}: rounded down to what this equipment can load
+  if(WARM_BAR.includes(eq)){const l=forgeLoadable(w);return {w:l.w,plates:l.used};}
+  const st=eq==="dumbbell"?(w<=20?2:2.5):(eq==="band"||eq==="other")?1:2.5;
+  return {w:Math.max(st,Math.floor(w/st+1e-9)*st),plates:null};
+}
+function warmRamp(name,topW,topR,n,eqOver){   // [{w,r,plates}] lightest first
+  const ex=exFor(name),eq=(eqOver||ex.eq||"").toLowerCase(),W=+topW||0,R=+topR||0,k=clamp(Math.round(+n||1),1,WARM_MAX);
+  if((!eqOver&&ex.bw)||eq==="bodyweight"||!(W>0))return [];
+  const base=WARM_PCT[k],shift=R&&R<=5?.04:R>=10?-.05:0,f=k>1?(base[k-1]+shift)/base[k-1]:1;
+  const reps=WARM_REPS[k].map(r=>R>=10?Math.max(1,Math.min(r,Math.round(R/2))):r);
+  const bar=WARM_BAR.includes(eq)?(+state.data.u.barWeight||20):0,out=[];
+  base.forEach((p,i)=>{
+    let x=warmRound(eq,W*p*f);if(bar&&x.w<bar)x={w:bar,plates:[]};
+    if(x.w>=W)return;
+    const last=out[out.length-1];if(last&&x.w<=last.w){last.r=Math.min(last.r,reps[i]);return;}   // a step that rounds onto the previous one merges into it
+    out.push({w:x.w,r:reps[i],plates:x.plates});
+  });
+  return out;
+}
+const rampPlates=pl=>pl==null?"":pl.length?pl.map(p=>`<span class="px-plate sm" style="background:${PLATE_COL[p]||"#888"}">${p}</span>`).join(""):`<span class="t-s">bar only</span>`;
+function rampRows(list,W,R,ex){   // the ramp + the top set it leads to
+  return list.map((x,i)=>`<div class="px-rr"><span class="n">${i+1}</span><div class="w"><b class="num">${fmtKg(x.w)}</b><span>kg × ${x.r}</span></div><div class="sd">${rampPlates(x.plates)}</div></div>`).join("")
+    +`<div class="px-rr fg-work"><span class="n">${GP.icon("target")}</span><div class="w"><b class="num">${fmtKg(W)}</b><span>kg × ${R||"?"}</span></div><div class="sd"><span class="t-s">top set</span></div></div>`;
+}
+function rampTop(e,ei){   // the top set to build on: the first typed working set, else its target ghost, else the newest best set; reps fall back to the plan
+  const gs=lgGhosts(e);let w=0,r=0;
+  (e.sets||[]).some((s,i)=>{if(s.type==="W")return false;w=+s.w||+(gs[i]&&gs[i].w)||0;r=+s.r||+(gs[i]&&gs[i].r)||0;return true;});
+  const lb=lastBestSet(e.name);if(!w&&lb){w=lb.w;r=r||lb.r;}
+  if(!r){const pr=planReps(e.name);r=pr?pr[0]:8;}
+  return {w:w?String(w):"",r:String(r)};
+}
 function openRamp(fei){
-  const e=state.session&&state.session.exercises[fei];if(!e)return;
-  const ex=exFor(e.name);
-  const wSet=(e.sets||[]).find(s=>!s.done&&s.type!=="W")||e.sets[e.sets.length-1]||{};
-  const top=setLoad(ex,wSet.w)||((state.data.prs[e.name]||{}).w)||60;
-  const bar=+state.data.u.barWeight||20;
-  const steps=[[.4,10],[.55,6],[.7,4],[.85,2]];
-  const rows=steps.map(([p,r],i)=>{
-    const wt=Math.max(bar,Math.round(top*p/2.5)*2.5);
-    let rem=Math.max(0,(wt-bar)/2);const parts=[];
-    [25,20,15,10,5,2.5,1.25].forEach(pl=>{while(rem>=pl-0.01){parts.push(pl);rem-=pl;}});
-    return `<div class="px-rr"><span class="n">${i+1}</span><div class="w"><b class="num">${wt}</b><span>kg × ${r}</span></div><div class="sd">${parts.length?parts.map(pl=>`<span class="px-plate sm" style="background:${PLATE_COL[pl]||"#888"}">${pl}</span>`).join(""):`<span class="t-s">bar only</span>`}</div></div>`;
-  }).join("");
-  openSheet(`${shHd("Warm-up ramp",{ic:"ramp",sub:esc(e.name),act:"done"})}
-    <div class="gh"><div class="px-note s1">${GP.icon("target")}<span>Built off your <b>${fmtKg(top)} kg</b> working weight, bar ${fmtKg(bar)} kg. Plates are per side.</span></div>${rows}
-      <p class="t-xs px-foot">Fast, light, explosive. Save the grind for the working sets.</p></div>`);
+  const ses=state.session,e=ses&&ses.exercises[fei];if(!e)return;
+  const t=rampTop(e,fei),pref=(state.data.warmPrefs||{})[exKey(e.name)],first=ses.exercises.findIndex(x=>!x._skip)===fei;
+  state._rp={fei,w:t.w,r:t.r,n:pref||(first?3:2)};
+  openSheet(rampFrame());state._sheetKind="ramp";
+}
+function rampFrame(){   // drawn once; typing only redraws the list, so the fields keep focus (the Forge pattern)
+  const st=state._rp,e=st&&state.session&&state.session.exercises[st.fei];if(!e)return shHd("Warm-up ramp",{ic:"ramp"});
+  return `${shHd("Warm-up ramp",{ic:"ramp",sub:esc(e.name)})}
+    <div class="gh rp"><div class="eyebrow rp-sec">Top set</div>
+      <div class="fg-in"><label><span>Weight</span><input inputmode="decimal" value="${esc(st.w)}" oninput="rampSet('w',this.value)" placeholder="100" aria-label="Top set kilograms"/><i>kg</i></label>
+        <label><span>Reps</span><input inputmode="numeric" value="${esc(st.r)}" oninput="rampSet('r',this.value)" placeholder="8" aria-label="Top set reps"/><i>reps</i></label></div>
+      <div class="eyebrow rp-sec">Warm-up sets</div><div id="rp-body">${rampBody()}</div></div>`;
+}
+function rampBody(){
+  const st=state._rp,e=st&&state.session&&state.session.exercises[st.fei];if(!e)return "";
+  const ex=exFor(e.name),list=warmRamp(e.name,st.w,st.r,st.n),n=list.length;
+  const chips=`<div class="rp-n" role="group" aria-label="Number of warm-up sets">${[1,2,3,4,5].map(i=>`<button type="button" class="chip${i===st.n?" on":""}" aria-pressed="${i===st.n}" onclick="rampN(${i})">${i}</button>`).join("")}</div>`;
+  if(ex.bw||(ex.eq||"")==="bodyweight")return chips+`<div class="px-empty">${GP.icon("ramp")}<b>No load to ramp</b><span>A bodyweight lift warms up with a few easy reps.</span></div>`;
+  if(!(+st.w>0))return chips+`<div class="px-empty">${GP.icon("ramp")}<b>Enter your top set</b><span>The weight and reps you plan for your heaviest set.</span></div>`;
+  const merged=n<st.n?`<p class="t-xs rp-note">${st.n} steps merge into ${n} at this weight, the jumps would be too small to load.</p>`:"";
+  return chips+rampRows(list,+st.w,+st.r,ex)+merged
+    +(n?`<button class="btn gold rp-go" onclick="rampAdd()">${GP.icon("plus")}Add ${n} warm-up set${n===1?"":"s"}</button>`:"")
+    +`<p class="t-xs px-foot">Fast and light, about a minute of rest between, then straight into the top set.</p>`;
+}
+function rampSet(k,v){if(!state._rp)return;state._rp[k]=v;const b=$("rp-body");if(b)b.innerHTML=rampBody();}
+function rampN(n){
+  const st=state._rp,e=st&&state.session&&state.session.exercises[st.fei];if(!e)return;
+  st.n=n;state.data.warmPrefs=Object.assign({},state.data.warmPrefs,{[exKey(e.name)]:n});save();haptic("tap");
+  const b=$("rp-body");if(b)b.innerHTML=rampBody();
+}
+function rampAdd(){   // the new warm-ups replace this lift's un-done warm-ups; logged ones stay
+  const st=state._rp,e=st&&state.session&&state.session.exercises[st.fei];if(!e)return;
+  const list=warmRamp(e.name,st.w,st.r,st.n);if(!list.length)return;
+  const fresh=withPrev(e.name,list.map(x=>({w:String(x.w),r:String(x.r),type:"W",done:false,rpe:""})));
+  e.sets=(e.sets||[]).filter(x=>x.type==="W"&&x.done).concat(fresh,(e.sets||[]).filter(x=>x.type!=="W"));
+  closeSheet();haptic("done");render();saveSession();toast(`${list.length} warm-up set${list.length===1?"":"s"} added · ${esc(e.name)}`);
 }
 /* ===== ALFRED'S WEEKLY CONTRACT — three concrete goals from your real data, real reward ===== */
 function contractWeekKey(){const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7));return t.toISOString().slice(0,10);}
@@ -12884,8 +12945,8 @@ function confirmFinish(){
     <button class="btn gold" onclick="closeSheet();finishWorkout()">🏁 FINISH — LEAVE ${open} BEHIND</button>
     <button class="btn ghost" style="margin-top:8px" onclick="closeSheet()">← Back to the iron</button>`);
 }
-// One-tap warm-up: inject calculated ramp sets straight into the table; falls back to the ramp sheet when already warm.
-function quickRamp(fei){const wu=warmupSuggest(fei);if(wu){addWarmups(fei);try{haptic("done");}catch(e){}}else openRamp(fei);}
+// Warm-up ramp button (under the sets and in the ⋯ menu): the sheet, where you set the top set and how many warm-ups; the dot = a cold muscle (warmupSuggest).
+function quickRamp(fei){openRamp(fei);}
 </script>
 </body>
 </html>

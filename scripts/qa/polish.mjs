@@ -100,7 +100,7 @@ try {
   await P.focus('#sheet .fg-in label:nth-child(2) input'); await P.keyboard.type('5', { delay: 30 }); await sleep(200);
   const fg2 = await ev(() => ({ big: (document.querySelector('#fg-out .fg-big .num') || {}).textContent, ramp: document.querySelectorAll('#fg-out .px-rr').length, pct: document.querySelectorAll('#fg-out .fg-row').length, head: !!document.querySelector('#sheet .sh-hd .sh-ic'), bottom: document.getElementById('sheet').lastElementChild.className }));
   check('Forge: typing keeps focus in the field', fg1.id === 'Weight in kilograms' && fg1.v === '100', JSON.stringify(fg1));
-  check('Forge: 100 x 5 gives 117 kg, ramp and plate-jump rows, nine percentages', fg2.big === '117' && fg2.ramp === 9 && fg2.pct === 9 && fg2.head, JSON.stringify(fg2));
+  check('Forge: 100 x 5 gives 117 kg, ramp (3 warm-ups + top set, the shared warmRamp engine) and plate-jump rows, nine percentages', fg2.big === '117' && fg2.ramp === 8 && fg2.pct === 9 && fg2.head, JSON.stringify(fg2));
   await reset();
 
   // ---- emoji in sheet chips become line icons ----
