@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 // WAVE 8 pass/fail (GP:POLISH): real touch taps through the surfaces that were brought up to the Gotham Pro standard and the four micro-moments.
-//   readiness check-in (one tap starts) · add-exercise picker (search, empty state offers "Create <name>") · custom exercise creator (footer tells what is missing, draft survives the picture picker)
+//   readiness check-in (one tap starts) · add-exercise picker (search, empty state offers "Create <name>") · custom exercise creator (footer tells what is missing, draft survives the picture picker; muscle parts, see customex.mjs)
 //   swap sheet (same picker row, search, swap) · skip sheet (line-icon reasons, plain-text reason, the session summary still reads old emoji-prefixed ones) · emoji in sheet chips become line icons
 //   micro-moments: set tick draws its check + one gold edge pulse (<= 400 ms, never replays on a later render, silent under reduced motion) · crown on a record from the last 24 h ·
 //   Mission cycle ring · stepper number tick (plate calculator)
@@ -83,14 +83,14 @@ try {
   check('picker: an unknown name offers Create', await ev(() => /Create "zzq"/.test((document.querySelector('#ex-list .px-empty .btn') || {}).textContent || '')));
   await tap('#ex-list .px-empty .btn'); await sleep(450);
   const cx = await ev(() => ({ name: (document.getElementById('cx-name') || {}).value, hint: (document.getElementById('cx-hint') || {}).textContent, ready: document.getElementById('cx-foot').classList.contains('ready') }));
-  check('creator: name prefilled, footer says a primary muscle is missing', cx.name === 'Zzq' && /primary muscle/.test(cx.hint) && !cx.ready, JSON.stringify(cx));
-  await tap('.cx-chips .chip'); await sleep(350);
-  check('creator: the footer is ready once a primary muscle is picked', await ev(() => document.getElementById('cx-foot').classList.contains('ready')));
+  check('creator: name prefilled, footer says a main muscle part is missing', cx.name === 'Zzq' && /main mover/.test(cx.hint) && !cx.ready, JSON.stringify(cx));
+  await tap('.cx-pc'); await sleep(350);
+  check('creator: the footer is ready once a muscle part is marked main', await ev(() => document.getElementById('cx-foot').classList.contains('ready')));
   await tap('.cx-pic .btn'); await sleep(450);
   check('creator: the picture picker opens on the shared header', await ev(() => /Choose a picture/.test((document.querySelector('#sheet .sh-hd h2') || {}).textContent || '')));
   await tap('#sheet .sh-hd .btn-i'); await sleep(450);
-  const cx2 = await ev(() => ({ name: (document.getElementById('cx-name') || {}).value, chip: !!document.querySelector('.cx-chips .chip.on') }));
-  check('creator: the draft (name, muscle) survives the picture picker', cx2.name === 'Zzq' && cx2.chip, JSON.stringify(cx2));
+  const cx2 = await ev(() => ({ name: (document.getElementById('cx-name') || {}).value, chip: !!document.querySelector('.cx-pc.on') }));
+  check('creator: the draft (name, muscle part) survives the picture picker', cx2.name === 'Zzq' && cx2.chip, JSON.stringify(cx2));
   await reset();
 
   // ---- Forge: the fields keep focus while typing, the results redraw in place ----

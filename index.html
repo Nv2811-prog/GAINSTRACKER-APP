@@ -839,7 +839,7 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .px-empty b{font:650 16px/1.3 var(--body);color:var(--tx1)}
 .px-empty span{max-width:30ch;font:500 13px/1.4 var(--body);color:var(--tx2)}
 .px-empty .btn{margin-top:8px}
-/* custom exercise creator: three grouped cards, an optional fold, one sticky Save */
+/* custom exercise creator + editor: brand / name / picture, equipment, the muscle parts (main / assist + an info card per part), an optional fold, one sticky Save */
 .cx-f{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 .cx-s{min-width:0;padding:14px 14px 16px}
 .cx-l{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px;font:650 11px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx2)}
@@ -870,6 +870,33 @@ h1[style*="--gold2"]{color:var(--tx1)!important;text-shadow:none!important}
 .cx-opt textarea{width:100%;border-radius:var(--r-m)}
 .cx-foot{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom));z-index:3;display:grid;gap:8px;margin:2px -16px calc(-18px - env(safe-area-inset-bottom));padding:18px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(15,22,33,0),#0F1621 16px)}
 .cx-foot .t-xs{text-align:center}
+.cx-brin{width:100%;height:44px;margin-top:8px;border-radius:var(--r-m);font-size:16px}
+.cx-full{margin-top:6px;color:var(--tx3)}
+.cx-fixed{display:grid;gap:3px;padding:10px 12px;border-radius:var(--r-m);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair)}
+.cx-fixed b{font:650 16px/1.25 var(--body);color:var(--tx1)}
+.cx-fixed span{font:500 12px/1.35 var(--body);color:var(--tx3)}
+.cx-mg{padding:12px 0 10px;border-top:1px solid var(--hair)}
+.cx-mg:first-of-type{padding-top:2px;border-top:0}
+.cx-mh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.cx-mh b{font:650 14px/1.2 var(--body);color:var(--tx1)}
+.cx-mh span{font:650 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+.cx-parts{display:flex;flex-wrap:wrap;gap:8px 10px}
+.cx-pt{display:inline-flex;align-items:center;gap:2px;max-width:100%}
+.cx-pc i{margin-left:2px;padding:3px 5px;border-radius:6px;background:rgba(242,193,78,.16);font:700 10px/1 var(--body);font-style:normal;letter-spacing:.06em;text-transform:uppercase}
+.cx-pc.as{background:transparent;box-shadow:inset 0 0 0 1px rgba(242,193,78,.42);color:var(--tx1)}
+.cx-pc.as i{background:rgba(150,178,222,.12);color:var(--tx2)}
+.cx-pi{position:relative;flex:none;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:none;color:var(--tx3)}
+.cx-pi::after{content:"";position:absolute;inset:-6px}
+.cx-pi .gi{width:18px;height:18px}
+.cx-pi.on{color:var(--gold)}
+.cx-ic{margin-top:10px;padding:12px;border-radius:var(--r-m);background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair)}
+.cx-ich{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-bottom:8px}
+.cx-ich b{font:650 14px/1.2 var(--body);color:var(--tx1)}
+.cx-ich i{font:500 12px/1.2 var(--body);font-style:normal;color:var(--tx3)}
+.cx-ich .tag{margin-left:auto}
+.cx-ic p{margin:0;font:500 13px/1.45 var(--body);color:var(--tx2)}
+.cx-ic p+p{margin-top:8px}
+.cx-ic p b{display:block;margin-bottom:2px;font:650 10px/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3)}
 .cx-foot:not(.ready) .btn-1{opacity:.55}
 /* plate calculator + warm-up ramp */
 .px-st{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
@@ -2970,6 +2997,43 @@ const SUBBIAS={
   abs:{up:["low","Crunch-type work — abs mostly contract as one sheet, limited regional bias."],lo:["mid","Mild bias from reverse crunches / leg raises, but overlap with the upper abs is high."],obl:["high","Yes, separate — rotation, anti-rotation and side bends."]},
   traps:{up:["high","Shrugs — separate from mid/lower traps."],mid:["mid","Rows & scapular retraction."],lo:["high","Y-raises / lower-trap work — usually the weak link holding posture back."]}
 };
+// What each part does and how to bias it: the info button on every part in the exercise editor. [what it does, how to hit it]
+const PART_INFO={
+  chest:{up:["Runs from the collarbone. Lifts the arm forward and up.","Incline press or fly at about 30-45 degrees, low-to-high cable fly. Steeper than that and the front delt takes over."],
+    mid:["The big middle of the chest. Brings the arm across the body.","Flat press, machine chest press, pec deck: hands in line with mid-chest."],
+    lo:["The lower fibres. Pull the arm down and across, from high to low.","Dips, decline press, high-to-low cable fly."]},
+  back:{ulat:["The upper, outer lat that gives width. Pulls the arm down from out to the side.","Wide grip, elbows out: wide pulldown, wide pull-up. Drive the elbows down in an arc."],
+    llat:["The lower lat down toward the hip. Pulls the elbow down and back to the hip.","Close or neutral grip, elbows tucked: close-grip pulldown, one-arm cable pulldown, straight-arm pulldown, pullover, rows that drive the elbow to the hip."],
+    mid:["Rhomboids and mid traps between the shoulder blades. Squeeze the blades together: back thickness.","Rows with the elbows 45-90 degrees out and a squeeze at the end: chest-supported row, T-bar, wide-handle cable row."],
+    ere:["The columns along the spine. Hold the back straight under load and extend it.","Hinges (deadlift, Romanian deadlift, good morning) and back extensions."]},
+  shoulders:{front:["Lifts the arm forward.","Every press already works it hard. Front raises only if it lags."],
+    side:["Lifts the arm out to the side: this is what makes shoulders wide.","Lateral raises (cable or dumbbell), lead with the elbow; upright row to chest height."],
+    rear:["Pulls the arm back and out.","Reverse pec deck, face pulls, rows with the elbows high and wide."]},
+  biceps:{long:["The outer head (the peak). It crosses the shoulder, so it stretches with the arm behind the body.","Arm behind the body: incline dumbbell curl, behind-the-body cable curl; a narrower grip."],
+    short:["The inner head (thickness). Works most with the arm in front of the body.","Arm in front: preacher, spider and concentration curls; a wider grip."],
+    brach:["Under the biceps. Bends the elbow whatever the grip and pushes the biceps up and out.","Neutral or overhand grip: hammer curl, reverse curl."]},
+  triceps:{long:["The biggest head and the only one that crosses the shoulder: it works hardest when the elbow moves up and overhead, because there it is stretched.","Elbow moving, arm overhead: overhead cable or dumbbell extension, skull crusher lowered behind the head, cable pullover."],
+    lat:["The outer horseshoe. Does the most work with the elbow kept still at your side.","Elbow still, pinned to the side: rope or bar pushdown, close-grip press, dips."],
+    med:["Under the other two. Works in every extension, especially the lockout.","Grows with all triceps work; reverse-grip pushdowns bias it a little."]},
+  forearms:{flex:["Inner forearm. Curls the wrist and holds the grip.","Wrist curls, heavy holds, farmer carries."],
+    ext:["Outer forearm. Lifts the back of the hand.","Reverse wrist curls and reverse curls."],
+    brad:["Top of the forearm by the elbow. Bends the elbow with a neutral or overhand grip.","Hammer curls and reverse curls."]},
+  quads:{rec:["The front-middle quad. It crosses the hip as well as the knee, so it is short and weaker in a deep squat.","Leg extension (lean back), sissy squat."],
+    vas:["The outer sweep and the teardrop above the knee. Straighten the knee.","Squat, hack squat, leg press: deep knee bend."],
+    add:["Inner thigh. Pulls the leg in and drives you out of the bottom of a squat.","Adductor machine, wide-stance squat and leg press."]},
+  hamstrings:{hip:["The hamstrings working at the hip: extend the hip from a hinge.","Romanian or stiff-leg deadlift, good morning: hinge with soft knees and feel the stretch."],
+    knee:["The hamstrings working at the knee: bend the knee.","Seated leg curl (more stretch) and lying leg curl."]},
+  glutes:{max:["The main glute. Extends the hip: standing up out of a squat or hinge.","Hip thrust, deep squat, leg press with high feet, hinges."],
+    med:["Upper and side glute. Lifts the leg out to the side and keeps the hip level.","Hip abduction machine (lean forward), cable abduction, single-leg work."]},
+  calves:{gas:["The visible two-headed calf. It crosses the knee, so it works best with a straight leg.","Standing or leg-press calf raise, knees straight, full stretch at the bottom."],
+    sol:["Under the gastrocnemius. Does most of the work when the knee is bent.","Seated calf raise."]},
+  abs:{up:["Upper six-pack. Curls the ribs down toward the hips.","Crunches and cable crunches: round the spine."],
+    lo:["Lower six-pack. Curls the hips up toward the ribs.","Reverse crunch, hanging knee or leg raise: curl the pelvis up, do not just swing the legs."],
+    obl:["The sides. Twist and bend the trunk and stop it twisting.","Cable woodchop, Pallof press, side bend, landmine rotation."]},
+  traps:{up:["Neck to shoulder. Lifts the shoulder blades: the shrug.","Shrugs (barbell, dumbbell, machine) and heavy carries."],
+    mid:["Across the upper back. Squeezes the shoulder blades together.","Wide-grip rows with a squeeze, face pulls."],
+    lo:["Runs down to the middle of the spine. Pulls the blades down and helps the arm go overhead.","Prone or cable Y-raises, scapular pull-downs."]}
+};
 function subName(m,id){const r=(SUBG[m]||[]).find(x=>x[0]===id);return r?r[1]:id;}
 // which sub-regions of muscle m does this exercise hit? (inferred from movement name)
 function exSub(ex,m){
@@ -3773,7 +3837,33 @@ function askAlfredAbout(topic){
 function indexEx(){EXBYNAME={};EXDB.forEach(e=>{if(!EXBYNAME[e.n.toLowerCase()])EXBYNAME[e.n.toLowerCase()]=e;});}
 // User-created exercises live in state.data.customEx (array). Merge them into the active EXDB.
 function customExList(){const ce=state&&state.data&&state.data.customEx;if(Array.isArray(ce))return ce;if(ce&&typeof ce==="object")return Object.values(ce);return [];}
-function mergeCustomEx(){const have=new Set(EXDB.map(e=>e.id));customExList().forEach(e=>{if(e&&e.id&&!have.has(e.id)){EXDB.push(e);have.add(e.id);}});indexEx();}
+// The user's edits to built-in lifts live in state.data.exEdits ({id: {eq, p, s, sub, subA, br, bw}}): applied over the core list on every rebuild,
+// validated field by field (an unknown muscle or part is dropped, never thrown). The name is never edited, so history, records and splits stay linked.
+function exEditsOf(){const x=state&&state.data&&state.data.exEdits;return x&&typeof x==="object"&&!Array.isArray(x)?x:{};}
+function exSubClean(x){if(!x||typeof x!=="object")return null;const r={};Object.keys(x).forEach(m=>{if(!SUBG[m]||!Array.isArray(x[m]))return;const ids=x[m].filter(id=>SUBG[m].some(z=>z[0]===id));if(ids.length)r[m]=ids;});return r;}
+function applyExEdit(e,ed){
+  if(!ed||typeof ed!=="object")return e;
+  const o={...e,_edited:1},okM=a=>Array.isArray(a)?a.filter(m=>M12.includes(m)):null,p=okM(ed.p),s=okM(ed.s);
+  if(typeof ed.eq==="string"&&ed.eq)o.eq=ed.eq;
+  if(p&&p.length){o.p=p;o.s=(s||[]).filter(m=>!p.includes(m));}
+  const sub=exSubClean(ed.sub),subA=exSubClean(ed.subA);
+  if(sub&&Object.keys(sub).length){o.sub=sub;delete o.tgt;}   // your parts replace the curated target line (exTarget then reads the parts)
+  if(subA&&Object.keys(subA).length)o.subA=subA;else delete o.subA;
+  if(typeof ed.br==="string"){if(ed.br.trim()){o.br=ed.br.trim();o.brUser=1;}else delete o.br;}
+  if(ed.bw===0)delete o.bw;else if(ed.bw===1)o.bw=1;
+  return o;
+}
+function rebuildExDB(){
+  const ed=exEditsOf();
+  EXDB=CORE_EX.map(e=>ed[e.id]?applyExEdit(e,ed[e.id]):e);
+  const have=new Set(EXDB.map(e=>e.id));
+  customExList().forEach(e=>{if(e&&e.id&&e.n&&!have.has(e.id)){EXDB.push(e);have.add(e.id);}});
+  indexEx();
+  if(FBPAIRS.length)resolveImages();
+}
+function mergeCustomEx(){rebuildExDB();}
+// an assist part counts half (a primary muscle can be main on one part and assist on another)
+const exPartW=(ex,m,id)=>(((ex&&ex.subA)||{})[m]||[]).includes(id)?0.5:1;
 /* free-exercise-db (public-domain, The Unlicense) supplies real exercise photos.
    We use ONLY the curated CORE_EX list as the library — no more 1,400-exercise dump
    (that was the source of kettlebell spam, 20 duplicate variants, lever/machine dupes,
@@ -3809,7 +3899,7 @@ function resolveImages(){
 }
 function buildPairs(arr){FBPAIRS=arr.map(p=>({i:p[1],t:exToks(p[0])}));FB_DF={};FBPAIRS.forEach(p=>{new Set(p.t).forEach(t=>FB_DF[t]=(FB_DF[t]||0)+1);});}
 function loadExDB(){
-  EXDB=CORE_EX.slice(); mergeCustomEx();
+  rebuildExDB();
   try{const c=localStorage.getItem("gt_fbpairs");if(c){buildPairs(JSON.parse(c)||[]);resolveImages();}}catch(e){}
   fetch("https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json")
    .then(r=>r.ok?r.json():null).then(raw=>{
@@ -4093,7 +4183,7 @@ function subSetCounts(m){
     (w.exercises||[]).forEach(e=>{const ex=exFor(e.name);
       const working=countSets(e.sets,false); if(!working)return;
       let w8=0; if(ex.p&&ex.p.includes(m))w8=working; else if(ex.s&&ex.s.includes(m))w8=working*0.5; else return;
-      exSub(ex,m).forEach(id=>{if(id in c)c[id]+=w8;});
+      exSub(ex,m).forEach(id=>{if(id in c)c[id]+=w8*exPartW(ex,m,id);});
     });
   });
   Object.keys(c).forEach(k=>c[k]=Math.round(perWeek(c[k])*10)/10); return c;
@@ -4119,7 +4209,7 @@ function coverageTips(m){
 }
 // suggest library exercises that train a given sub-region (for the coverage coach)
 function suggestForSub(m,id,n){
-  return CORE_EX.filter(ex=>ex.p&&ex.p.includes(m)&&exSub(ex,m).includes(id)).slice(0,n||3).map(e=>e.n);
+  return EXDB.filter(ex=>ex.p&&ex.p.includes(m)&&exSub(ex,m).includes(id)).slice(0,n||3).map(e=>e.n);
 }
 
 
@@ -4789,6 +4879,7 @@ function discardSession(){appConfirm({title:"Discard session",body:"End this ses
 const GP=(()=>{
   const P={
     search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+    info:'<circle cx="12" cy="12" r="8.6"/><path d="M12 11.2v5.3M12 7.7v.1"/>',pencil:'<path d="M4.8 19.2l.9-3.9L15.6 5.4a1.8 1.8 0 0 1 2.5 0l.5.5a1.8 1.8 0 0 1 0 2.5l-9.9 9.9zM13.9 7.1l3 3"/>',
     calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="3.2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
     play:'<path d="M8 5.6v12.8a.8.8 0 0 0 1.2.7l10.3-6.4a.8.8 0 0 0 0-1.4L9.2 4.9A.8.8 0 0 0 8 5.6z" fill="currentColor" stroke="none"/>',
     chevR:'<path d="M9.5 6l6 6-6 6"/>',chevD:'<path d="M6 9.5l6 6 6-6"/>',
@@ -5522,7 +5613,7 @@ function addExNote(name){const el=$("exnote-in");if(!el)return;const v=(el.value
 /* ===== My Gym — equipment profile so suggestions match what's actually in front of you ===== */
 const GYM_EQUIP=[["barbell","Barbells"],["dumbbell","Dumbbells"],["machine","Machines"],["cable","Cables"],["smith","Smith machine"],["ez bar","EZ bar"],["trap bar","Trap bar"],["bodyweight","Bodyweight / bars"],["band","Bands"],["kettlebell","Kettlebells"],["other","Other"]];
 const gymBrands=()=>(((state.data.gymEquipment||{})[activeGymName()]||{}).brands)||[];
-function exBrandShown(e,q){return !e.br||gymBrands().includes(e.br)||(!!q&&e.n.toLowerCase().includes(q));}   // another gym's brand machine stays out unless searched by name
+function exBrandShown(e,q){return !e.br||e.custom||e.brUser||gymBrands().includes(e.br)||(!!q&&e.n.toLowerCase().includes(q));}   // a brand you typed yourself never hides a lift   // another gym's brand machine stays out unless searched by name
 const exBrandRank=e=>e.br&&gymBrands().includes(e.br)?0:1;
 function gymAllows(eq){const g=(state.data.gymEquipment||{})[state.data.u.activeGym||""];if(!g||!g.equip||!Object.keys(g.equip).length)return true;return g.equip[eq]!==false;}
 function openGym(gymName){
@@ -5651,7 +5742,7 @@ function p3XdHtml(name){
   const pg=progressionFor(nm),target=pg?`<section class="s1 p3-tg2"><div><span class="eyebrow">Next target</span><div class="v">${(pg.w||!ex.bw)?`<b class="num">${fmtKg(pg.w)}</b><i>kg × ${pg.r}${pg.add?"":"+"}</i>`:`<b class="num">BW</b><i>× ${pg.r}+</i>`}</div></div><div class="why">${pg.add?`<span class="tag ok">+${fmtKg(pg.inc)} kg</span>`:`<span class="tag">+1 rep</span>`}<span>${esc(pg.reason)}</span></div></section>`:"";
   const cues=!rows.length&&(ex.c||[]).length?`<section class="s2 p3-card"><div class="p3-ch2"><h3>Form cues</h3></div>${ex.c.slice(0,4).map(c=>`<div class="p3-cue">${GP.icon("chevR")}<span>${esc(c)}</span></div>`).join("")}</section>`:"";
   const nn=((state.data.exNotes||{})[nm]||[]).length;
-  const tools=`<section class="s2 gh-list">${p3Row("note","Cues & notes",nn?nn+" note"+(nn===1?"":"s"):"Form cues and your own notes","showCues("+J+")")}${p3Row("image","Choose picture","Match the demo to your machine","openPicPicker("+J+",'exdet-fig')")}${rows.length?p3Row("lock","Archive history","New equipment? Start fresh. Nothing is deleted.","confirmArchiveExercise("+J+")"):""}</section>`;
+  const tools=`<section class="s2 gh-list">${p3Row("pencil","Edit exercise",(ex.br?esc(ex.br)+" · ":"")+"Brand, equipment, muscle parts","openExEditor("+J+",'detail')")}${p3Row("note","Cues & notes",nn?nn+" note"+(nn===1?"":"s"):"Form cues and your own notes","showCues("+J+")")}${p3Row("image","Choose picture","Match the demo to your machine","openPicPicker("+J+",'exdet-fig')")}${rows.length?p3Row("lock","Archive history","New equipment? Start fresh. Nothing is deleted.","confirmArchiveExercise("+J+")"):""}</section>`;
   const acts=`<div class="p3-acts">${back?`<button class="btn" data-hx onclick="exDetClose()">Back to editor</button>`:`<button class="btn btn-1" data-hx onclick="pickAdd(${J});exDetClose()">${GP.icon("plus")} Add to session</button>`}</div>`;
   return `<div class="gh p3-xd">${head}${nums}${trend}${target}${intel&&intel.stalled?p3StallHtml(nm,intel):""}${p3RepBook(nm)}${hist}${cues}${tools}${acts}</div>`;
 }
@@ -5665,76 +5756,148 @@ function weeklyLoadS(weekIdx,k){   // like weeklyLoad, but a rated session count
   return perWeek((state.data.workouts||[]).filter(w=>{const t=new Date(w.date).getTime();return t>=s&&t<e;}).reduce((a,w)=>a+(+w.rpe>0&&w.duration>0?w.rpe*p3Min(w.duration):(w.totalVol||0)*(k||1)),0));
 }
 
-/* ===== CUSTOM EXERCISE CREATOR ===== */
+/* ===== CUSTOM EXERCISE CREATOR + EDITOR =====
+   One sheet makes a new lift (brand, name, picture, equipment, the muscle PARTS it trains, bodyweight, cues) or edits any existing one
+   (brand, equipment, parts, bodyweight). An existing lift keeps its name, so its history, records, last weights and split days stay linked.
+   Parts are SUBG's sub-regions: tap a part once = main mover, twice = assist, a third time = off. The muscles follow (a main part makes the
+   muscle primary, only assist parts make it secondary) and an assist part on a primary muscle counts half (exPartW). Every part has an info
+   button: what it does and how to hit it (PART_INFO) with how separately trainable it is (SUBBIAS). */
+const cxBrandList=()=>{const b=new Set(GYM_BRANDS);Object.values(state.data.gymEquipment||{}).forEach(g=>((g&&g.brands)||[]).forEach(x=>b.add(x)));customExList().forEach(e=>{if(e&&e.br)b.add(e.br);});Object.values(exEditsOf()).forEach(e=>{if(e&&typeof e.br==="string"&&e.br.trim())b.add(e.br.trim());});return [...b].filter(Boolean).sort((x,y)=>x.localeCompare(y));};
+function cxPartsOf(ex){   // an exercise's parts as {muscle: {part: "main" | "assist"}}
+  const out={},put=(m,role)=>{(exSub(ex,m)||[]).forEach(id=>{(out[m]=out[m]||{})[id]=role==="assist"||exPartW(ex,m,id)<1?"assist":"main";});};
+  (ex.p||[]).forEach(m=>put(m,"main"));(ex.s||[]).forEach(m=>{if(!(ex.p||[]).includes(m))put(m,"assist");});
+  return out;
+}
+function cxMuscles(parts){   // parts -> the library fields: p, s, sub (every chosen part), subA (assist parts on a primary muscle)
+  const p=[],s=[],sub={},subA={};
+  M12.forEach(m=>{const pm=(parts||{})[m]||{},ids=(SUBG[m]||[]).map(x=>x[0]).filter(id=>pm[id]==="main"||pm[id]==="assist");if(!ids.length)return;
+    const main=ids.filter(id=>pm[id]==="main"),as=ids.filter(id=>pm[id]==="assist");
+    (main.length?p:s).push(m);sub[m]=ids;if(main.length&&as.length)subA[m]=as;});
+  return {p,s,sub,subA};
+}
+const cxFullName=d=>{const nm=(d.n||"").trim(),br=(d.br||"").trim();return br&&nm&&!nm.toLowerCase().startsWith(br.toLowerCase()+" ")?br+" "+nm:nm;};
 function openCustomCreator(prefill){
   state.cxReturnMulti=state.pickerMulti||null;   // remember multi-add context to restore after saving
-  state.cxDraft={n:String(prefill||"").trim().replace(/\b[a-z]/g,c=>c.toUpperCase()).slice(0,60),eq:"dumbbell",p:[],s:[],bw:0,c:[],note:"",picId:undefined};
+  state.cxDraft={mode:"new",n:String(prefill||"").trim().replace(/\b[a-z]/g,c=>c.toUpperCase()).slice(0,60),br:"",brOther:false,eq:"dumbbell",parts:{},bw:0,c:[],note:"",info:null,picId:undefined};
+  state.pickerOpen=false;
+  renderCustomCreator();
+}
+function openExEditor(name,from){   // edit an existing lift; from = "detail" (back to its page) or "session" (back to the workout)
+  const ex=exFor(name);if(!ex||!ex.id){toast("This lift is not in the library yet. Create it as a custom exercise.");return;}
+  state.cxReturnMulti=null;
+  state.cxDraft={mode:"edit",id:ex.id,n:ex.n,custom:!!ex.custom,edited:!!ex._edited,from:from||null,br:ex.br||"",brOther:false,eq:ex.eq||"other",parts:cxPartsOf(ex),bw:ex.bw?1:0,info:null};
   state.pickerOpen=false;
   renderCustomCreator();
 }
 function cxSyncInputs(){
-  const n=$("cx-name");if(n)state.cxDraft.n=n.value;
-  const c=$("cx-cues");if(c)state.cxDraft.c=c.value.split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,4);
-  const note=$("cx-note");if(note)state.cxDraft.note=note.value;
+  const d=state.cxDraft;if(!d)return;
+  const n=$("cx-name");if(n)d.n=n.value;
+  const b=$("cx-br");if(b)d.br=b.value.replace(/\s+/g," ").replace(/^ /,"").slice(0,30);
+  const c=$("cx-cues");if(c)d.c=c.value.split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,4);
+  const note=$("cx-note");if(note)d.note=note.value;
 }
 function cxChoosePic(){
-  cxSyncInputs();const name=(state.cxDraft.n||"").trim();
+  cxSyncInputs();const d=state.cxDraft,name=d.mode==="edit"?d.n:cxFullName(d);
   if(!name){toast("Name it first. The picture is filed under the name.");return;}
   openPicPicker(name,"cx-pic");
   state._picPickBack=()=>renderCustomCreator();
 }
-function cxToggleMuscle(which,m){
-  cxSyncInputs();const d=state.cxDraft;const other=which==="p"?"s":"p";
-  const arr=d[which],oa=d[other];const i=arr.indexOf(m);
-  if(i>=0)arr.splice(i,1); else {arr.push(m);const j=oa.indexOf(m);if(j>=0)oa.splice(j,1);}
+function cxPart(m,id){   // off -> main -> assist -> off
+  cxSyncInputs();const d=state.cxDraft,cur=((d.parts||{})[m]||{})[id],next=cur==="main"?"assist":cur==="assist"?null:"main";
+  const {[id]:_,...rest}=(d.parts[m]||{}),pm=next?{...rest,[id]:next}:rest;
+  const {[m]:__,...others}=d.parts;d.parts=Object.keys(pm).length?{...others,[m]:pm}:others;
   renderCustomCreator();
+}
+function cxInfo(m,id){cxSyncInputs();const k=m+"."+id;state.cxDraft.info=state.cxDraft.info===k?null:k;renderCustomCreator();}
+function cxSetBrand(b){
+  cxSyncInputs();const d=state.cxDraft;
+  if(b==="__other"){d.brOther=true;d.br="";}else{d.brOther=false;d.br=b;}
+  renderCustomCreator();if(b==="__other"){const i=$("cx-br");if(i)i.focus();}
 }
 function cxSetEq(eq){cxSyncInputs();state.cxDraft.eq=eq;renderCustomCreator();}
 function cxToggleBw(){cxSyncInputs();state.cxDraft.bw=state.cxDraft.bw?0:1;renderCustomCreator();}
+const CX_TRAIN={high:["ok","Trains on its own"],mid:["","Can be biased"],low:["","Grows with the muscle"]};
+function cxPartsHtml(d){
+  return M12.map(m=>{
+    const rows=SUBG[m]||[],pm=d.parts[m]||{},roles=Object.values(pm),main=roles.includes("main");
+    const chips=rows.map(([id,label])=>{const r=pm[id]||"",k=m+"."+id;
+      return `<span class="cx-pt"><button class="chip cx-pc${r?" on":""}${r==="assist"?" as":""}" onclick="haptic('tap');cxPart('${m}','${id}')" aria-pressed="${!!r}" aria-label="${esc(label)}: ${r==="main"?"main mover":r==="assist"?"assist":"off"}">${esc(label)}${r?`<i>${r==="main"?"Main":"Assist"}</i>`:""}</button><button class="cx-pi${d.info===k?" on":""}" onclick="cxInfo('${m}','${id}')" aria-label="What does the ${esc(label)} do?" aria-expanded="${d.info===k}">${GP.icon("info")}</button></span>`;}).join("");
+    const k=d.info&&d.info.split(".")[0]===m?d.info.split(".")[1]:null,row=k?rows.find(x=>x[0]===k):null;
+    let card="";
+    if(row){const inf=(PART_INFO[m]||{})[k]||[],tb=((SUBBIAS[m]||{})[k]||[])[0],t=CX_TRAIN[tb];
+      card=`<div class="cx-ic"><div class="cx-ich"><b>${esc(row[1])}</b><i>${esc(row[2])}</i>${t?`<span class="tag${t[0]?" "+t[0]:""}">${t[1]}</span>`:""}</div>${inf[0]?`<p><b>What it does</b>${esc(inf[0])}</p>`:""}${inf[1]?`<p><b>How to hit it</b>${esc(inf[1])}</p>`:""}</div>`;}
+    return `<div class="cx-mg${roles.length?" has":""}"><div class="cx-mh"><b>${MNAME[m]}</b>${roles.length?`<span>${main?"Main":"Assist"}</span>`:""}</div><div class="cx-parts">${chips}</div>${card}</div>`;
+  }).join("");
+}
 function renderCustomCreator(){
-  const d=state.cxDraft,previewName=(d.n||"").trim(),sc=$("sheet").scrollTop;
-  const chip=(m,on,which)=>`<button class="chip${on?" on":""}" onclick="cxToggleMuscle('${which}','${m}')" aria-pressed="${on}">${MNAME[m]}</button>`;
-  const opt=!!(d.optOpen||(d.c||[]).length||d.note);
-  $("sheet").innerHTML=`${shHd("Custom exercise",{ic:"wrench",sub:"Added to your library",back:"closeCustomCreator()",backLabel:"Back to exercise list",act:"none"})}
+  const d=state.cxDraft,edit=d.mode==="edit",full=edit?d.n:cxFullName(d),sc=$("sheet").scrollTop,brOn=b=>!d.brOther&&(d.br||"")===b;
+  const brands=cxBrandList();if(d.br&&!d.brOther&&!brands.includes(d.br))brands.push(d.br);
+  const brandRow=`<div class="cx-l">Brand <span>optional</span></div><div class="cx-chips">${[["","None"],...brands.map(b=>[b,b])].map(([v,t])=>`<button class="chip${brOn(v)?" on":""}" onclick="cxSetBrand(${esc(JSON.stringify(v))})" aria-pressed="${brOn(v)}">${esc(t)}</button>`).join("")}<button class="chip${d.brOther?" on":""}" onclick="cxSetBrand('__other')" aria-pressed="${!!d.brOther}">Other</button></div>${d.brOther?`<input id="cx-br" class="cx-brin" placeholder="Brand, e.g. Gym80" autocomplete="off" maxlength="30" value="${esc(d.br||"")}" oninput="cxLive()" aria-label="Brand name"/>`:""}`;
+  const nameRow=edit?`<div class="cx-l cx-l2">Exercise</div><div class="cx-fixed"><b>${esc(exBrandTitle({br:d.br},full))}</b><span>The name stays, so its history, records and last weights stay with it.</span></div>`
+    :`<label class="cx-l cx-l2" for="cx-name">Exercise name</label><input id="cx-name" class="cx-name" placeholder="e.g. Chest Press" autocomplete="off" maxlength="60" value="${esc(d.n||"")}" oninput="cxLive()"/><div class="t-xs cx-full" id="cx-full"></div>`;
+  $("sheet").innerHTML=`${shHd(edit?"Edit exercise":"Custom exercise",{ic:edit?"pencil":"wrench",sub:edit?exBrandTitle({br:d.br},full):"Added to your library",back:"closeCustomCreator()",backLabel:edit?"Back":"Back to exercise list",act:"none"})}
     <div class="gh cx-f">
-      <section class="s2 cx-s"><label class="cx-l" for="cx-name">Name</label>
-        <input id="cx-name" class="cx-name" placeholder="e.g. Cable Y-Raise" autocomplete="off" maxlength="60" value="${esc(d.n||"")}" oninput="cxLive()"/>
-        <div class="cx-pic"><span class="exwrap sm" id="cx-pic">${figureSVG(previewName?exFor(previewName):{p:d.p,s:d.s})}</span><div class="cx-pm"><b>Picture</b><span>Match the demo to your machine</span><button class="btn sm" onclick="cxChoosePic()">${GP.icon("image")}Choose picture</button></div></div></section>
+      <section class="s2 cx-s">${brandRow}${nameRow}
+        <div class="cx-pic"><span class="exwrap sm" id="cx-pic">${figureSVG({...(full&&exFor(full).id?exFor(full):{}),...cxMuscles(d.parts)})}</span><div class="cx-pm"><b>Picture</b><span>Match the demo to your machine</span><button class="btn sm" onclick="cxChoosePic()">${GP.icon("image")}Choose picture</button></div></div></section>
       <section class="s2 cx-s"><div class="cx-l">Equipment</div><div class="scroll-x">${GYM_EQUIP.map(g=>`<button class="chip${d.eq===g[0]?" on":""}" onclick="cxSetEq('${g[0]}')" aria-pressed="${d.eq===g[0]}">${g[1]}</button>`).join("")}</div></section>
-      <section class="s2 cx-s"><div class="cx-l">Primary muscles <span>what it mainly hits</span></div><div class="cx-chips">${M12.map(m=>chip(m,d.p.includes(m),"p")).join("")}</div>
-        <div class="cx-l cx-l2">Secondary muscles <span>optional assist</span></div><div class="cx-chips">${M12.map(m=>chip(m,d.s.includes(m),"s")).join("")}</div>
+      <section class="s2 cx-s"><div class="cx-l">Muscle parts <span>tap once = main, twice = assist</span></div>${cxPartsHtml(d)}
         <button class="cx-bw${d.bw?" on":""}" onclick="cxToggleBw()" aria-pressed="${!!d.bw}"><span class="lead">${GP.icon("profile")}</span><span class="cx-bwt"><b>Bodyweight movement</b><i>Load counts bodyweight plus added weight</i></span><span class="cx-chk" aria-hidden="true">${d.bw?GP.icon("check"):""}</span></button></section>
-      <details class="s2 cx-s cx-opt"${opt?" open":""} ontoggle="if(state.cxDraft)state.cxDraft.optOpen=this.open"><summary>Cues and notes<span>optional</span>${GP.icon("chevD")}</summary>
+      ${edit?"":`<details class="s2 cx-s cx-opt"${(d.optOpen||(d.c||[]).length||d.note)?" open":""} ontoggle="if(state.cxDraft)state.cxDraft.optOpen=this.open"><summary>Cues and notes<span>optional</span>${GP.icon("chevD")}</summary>
         <label class="cx-l" for="cx-cues">Form cues <span>one per line</span></label><textarea id="cx-cues" rows="3" placeholder="Squeeze at the top&#10;Control the negative" oninput="cxSyncInputs()">${esc((d.c||[]).join("\n"))}</textarea>
-        <label class="cx-l" for="cx-note">Your notes <span>private</span></label><textarea id="cx-note" rows="2" placeholder="e.g. Seat on 4, wide grip feels best" oninput="cxSyncInputs()">${esc(d.note||"")}</textarea></details>
-      <div class="cx-foot${cxReady(d)?" ready":""}" id="cx-foot"><div class="t-xs" id="cx-hint"></div><button class="btn btn-1" onclick="saveCustomEx()">${GP.icon("check")}Save exercise</button></div>
+        <label class="cx-l" for="cx-note">Your notes <span>private</span></label><textarea id="cx-note" rows="2" placeholder="e.g. Seat on 4, wide grip feels best" oninput="cxSyncInputs()">${esc(d.note||"")}</textarea></details>`}
+      <div class="cx-foot" id="cx-foot"><div class="t-xs" id="cx-hint"></div><button class="btn btn-1" onclick="saveCustomEx()">${GP.icon("check")}${edit?"Save changes":"Save exercise"}</button>${edit&&d.edited&&!d.custom?`<button class="btn btn-3" onclick="cxResetEx()">Back to the original</button>`:""}</div>
     </div>`;
   $("sheet").classList.add("on");$("sheetbg").classList.add("on");$("sheet").scrollTop=sc;
-  if(previewName)_figApply(previewName,"cx-pic");
+  if(full)_figApply(full,"cx-pic");
   cxLive();
 }
-const cxReady=d=>!!(d.n||"").trim()&&d.p.length>0;
-function cxLive(){   // keeps the footer honest while typing: what is still missing before Save works
-  cxSyncInputs();const f=$("cx-foot");if(!f)return;const d=state.cxDraft,ok=cxReady(d),h=$("cx-hint");
-  f.classList.toggle("ready",ok);if(h)h.textContent=ok?"Saved to your library and the picker.":!(d.n||"").trim()?"Name it to continue.":"Pick at least one primary muscle.";
+const cxReady=d=>(d.mode==="edit"||!!(d.n||"").trim())&&cxMuscles(d.parts).p.length>0;
+function cxLive(){   // keeps the footer honest while typing: what is still missing before Save works, and the name it will be saved under
+  cxSyncInputs();const f=$("cx-foot");if(!f)return;const d=state.cxDraft,ok=cxReady(d),h=$("cx-hint"),fn=$("cx-full");
+  f.classList.toggle("ready",ok);
+  if(fn)fn.textContent=d.br&&(d.n||"").trim()?"Saved as “"+cxFullName(d)+"”":"";
+  if(h)h.textContent=ok?(d.mode==="edit"?"Your history and records stay with it.":"Saved to your library and the picker."):d.mode!=="edit"&&!(d.n||"").trim()?"Name it to continue.":"Mark at least one part as the main mover.";
 }
-function closeCustomCreator(){const m=state.cxReturnMulti;state.cxReturnMulti=null;openPicker(m);}
+function cxBack(d){   // where the sheet returns after Save / Back
+  if(d&&d.mode==="edit"){if(d.from==="detail")openExDetail(d.n);else closeSheet();return;}
+  const m=state.cxReturnMulti;state.cxReturnMulti=null;openPicker(m);
+}
+function closeCustomCreator(){const d=state.cxDraft;state.cxDraft=null;cxBack(d);}
 function saveCustomEx(){
-  cxSyncInputs();const d=state.cxDraft;
-  const name=(d.n||"").trim();
-  if(!name){toast&&toast("Give it a name first");return;}
-  if(!d.p.length){toast&&toast("Pick at least one primary muscle");return;}
-  if(EXBYNAME[name.toLowerCase()]){toast&&toast("That name already exists");return;}
-  const ex={n:name,id:"cx"+Date.now().toString(36),eq:d.eq||"other",p:d.p.slice(),s:d.s.slice(),c:(d.c||[]).slice(),custom:1};
+  cxSyncInputs();const d=state.cxDraft;if(!d)return;
+  const mus=cxMuscles(d.parts),br=(d.br||"").trim();
+  if(d.mode!=="edit"&&!(d.n||"").trim()){toast("Give it a name first");return;}
+  if(!mus.p.length){toast("Mark at least one part as the main mover");return;}
+  if(d.mode==="edit"){cxSaveEdit(d,mus,br);return;}
+  const name=cxFullName(d);
+  if(EXBYNAME[name.toLowerCase()]){toast("That name already exists");return;}
+  const ex={n:name,id:"cx"+Date.now().toString(36),eq:d.eq||"other",p:mus.p,s:mus.s,sub:mus.sub,c:(d.c||[]).slice(),custom:1};
+  if(Object.keys(mus.subA).length)ex.subA=mus.subA;
+  if(br)ex.br=br;
   if(d.bw)ex.bw=1;
-  if(!Array.isArray(state.data.customEx))state.data.customEx=[];
-  state.data.customEx.push(ex);
+  state.data.customEx=[...customExList(),ex];
   const note=(d.note||"").trim();
   if(note){state.data.exNotes=state.data.exNotes||{};(state.data.exNotes[name]=state.data.exNotes[name]||[]).unshift({date:new Date().toISOString(),note});}
   mergeCustomEx();save();
-  toast&&toast("“"+name+"” added to your library");
-  const m=state.cxReturnMulti;state.cxReturnMulti=null;state.cxDraft=null;
-  openPicker(m);
+  toast("“"+name+"” added to your library");
+  state.cxDraft=null;cxBack(d);
+}
+function cxSaveEdit(d,mus,br){   // a custom lift is rewritten in place; a built-in one gets an edit record over the original (Undo either way)
+  const prev={c:state.data.customEx,e:state.data.exEdits},fields={eq:d.eq||"other",p:mus.p,s:mus.s,sub:mus.sub};
+  if(d.custom){
+    state.data.customEx=customExList().map(e=>{if(!e||e.id!==d.id)return e;const {subA:_a,br:_b,bw:_w,...base}=e;
+      return {...base,...fields,...(Object.keys(mus.subA).length?{subA:mus.subA}:{}),...(br?{br}:{}),...(d.bw?{bw:1}:{})};});
+  }else state.data.exEdits={...exEditsOf(),[d.id]:{...fields,...(Object.keys(mus.subA).length?{subA:mus.subA}:{}),br,bw:d.bw?1:0}};
+  rebuildExDB();save();render();
+  state.cxDraft=null;cxBack(d);
+  toastUndo("Saved: "+exBrandTitle({br},d.n),()=>{state.data.customEx=prev.c;if(prev.e===undefined)delete state.data.exEdits;else state.data.exEdits=prev.e;rebuildExDB();save();render();});
+}
+function cxResetEx(){   // a built-in lift: drop the user's edit record (Undo brings it back)
+  const d=state.cxDraft;if(!d||d.custom)return;
+  const prev=state.data.exEdits,{[d.id]:_,...rest}=exEditsOf();state.data.exEdits=rest;
+  rebuildExDB();save();render();
+  state.cxDraft=null;cxBack(d);
+  toastUndo("Back to the original",()=>{state.data.exEdits=prev;rebuildExDB();save();render();});
 }
 // exercises already in the split-day being edited (multi-add highlight)
 function pickerAddedList(){if(!state.pickerMulti)return null;const s=state.data.splits.find(x=>x.id===state.pickerMulti.id);return (s&&s.days[state.pickerMulti.i])?s.days[state.pickerMulti.i].exercises:[];}
@@ -9933,7 +10096,8 @@ The ⋯ Exercise options button on the focus card opens: Exercise details (muscl
 Settings → Data control (also Profile → the Backup tile). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now (progress photos go into the file at full size), Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first; photos included).
 
 ## PICTURES AND CUSTOM EXERCISES
-In an exercise's detail, Choose picture browses the demo library (filter with your own words) or picks the plain anatomy figure. For a missing lift, use the dashed custom-exercise button in the exercise picker: name, equipment, muscles, bodyweight or not, cues, picture.
+In an exercise's detail, Choose picture browses the demo library (filter with your own words) or picks the plain anatomy figure. For a missing lift, use the dashed Create custom lift button in the exercise picker: brand (your gyms' brands, None, or Other to type one), exercise name (saved as brand + name), picture, equipment, the muscle parts it trains, bodyweight or not, cues. Muscle parts: every muscle is split into its parts (e.g. Back: Upper lats, Lower lats, Mid-back, Spinal erectors; Chest: Upper pec, Mid pec, Lower pec; Triceps: Long head, Lateral head, Medial head); tap a part once for Main, twice for Assist, a third time to clear it (an Assist part counts half). The info button next to each part explains what it does and how to hit it (wide grip = upper lats, close grip = lower lats; triceps long head = the elbow moving overhead, lateral head = the elbow kept still at your side).
+To change any lift, built-in or your own: its detail page → Edit exercise, or the ⋯ menu in a workout → Edit exercise. You can change the brand, equipment, muscle parts and bodyweight; the name stays, so its history, records and last weights stay linked. Save shows Undo; an edited built-in lift has Back to the original.
 
 ## ALLIES AND FRIEND CODES
 ALLIES → Add ally opens a two-step sheet: 1 · Send them your code (it starts with GTUID:, with a Copy button) and 2 · Paste theirs (Paste & add, or paste it in the box and tap Add); their card then updates live. Tap an ally for their top lifts and split, Head to head, a Gauntlet (challenge their numbers) or Send a signal (nudge them to train). Chat, Duel, Raid and Leaderboard have their own tiles; Manage holds your offline snapshot code (for allies who are not live) and Remove.
@@ -12915,7 +13079,7 @@ function lgExMenu(ei){
   const q=esc(JSON.stringify(e.name)),ms=machineSetting(e.name);
   const it=(ic,t,fn,sub)=>`<button class="lg2-mi" onclick="closeSheet();${fn}"><span class="ic">${GP.icon(ic)}</span><span class="tx"><b>${t}</b>${sub?`<i>${sub}</i>`:""}</span></button>`;
   openSheet(`<div class="ttl">${esc(e.name)}</div><div class="lg2-menu">
-    ${it("book","Exercise details",`lgDetail(${ei})`,"Muscles, cues, history")}${it("image","Choose picture",`lgPic(${ei})`)}
+    ${it("book","Exercise details",`lgDetail(${ei})`,"Muscles, cues, history")}${it("pencil","Edit exercise",`openExEditor(${q},'session')`,"Brand, equipment, muscle parts")}${it("image","Choose picture",`lgPic(${ei})`)}
     ${it("ramp","Warm-up ramp",`quickRamp(${ei})`,wu?"Suggested: "+esc(wu.muscles)+" still cold":"")}${wu?it("skip","Skip warm-up suggestion",`dismissWarm(${ei})`):""}
     ${it("down","Fill from last time",`fillLast(${ei})`)}${it("swap","Swap exercise",`openSwap(${ei})`,"Same primary muscle")}${it("link","Pair as superset",`openPair(${ei})`)}${it("bolt","Intensity technique",`openProtocolSheet(${ei})`)}
     ${isBar?it("dumbbell","Plate maths",`openPlateSheet(${ei})`):""}${mach?it("wrench","Machine setup",`openSetup(${ei})`,ms?esc(ms):"Seat, pads, handles"):""}

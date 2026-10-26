@@ -54,7 +54,8 @@ const COMMON = [
   ['sheet oracle', 'openOracle()', SHEET], ['sheet trophy room', 'openTrophyRoom()', SHEET], ['sheet contracts', 'openContracts()', SHEET], ['sheet simulator', 'openSimulator()', SHEET], ['sheet focus', 'openFocus()', SHEET],
   ['sheet plate calculator', 'openPlateSheet(-1)', SHEET], ['sheet 1RM test day', 'openTestDay()', SHEET],
   ['sheet add exercise', 'openPicker()', SHEET], ['sheet add exercise, no match', "openPicker();document.getElementById('ex-search').value='zzq';updateExList()", SHEET],
-  ['sheet custom exercise', "openPicker();openCustomCreator('Cable Y Raise')", SHEET], ['sheet picture picker', "openPicPicker('Bench Press (Barbell)','x')", SHEET],
+  ['sheet custom exercise', "openPicker();openCustomCreator('Cable Y Raise')", SHEET], ['sheet edit exercise', "openExEditor('Lat Pulldown (Wide Grip)')", SHEET],
+  ['sheet edit exercise + part info', "openExEditor('Lat Pulldown (Wide Grip)');cxInfo('triceps','long')", SHEET], ['sheet picture picker', "openPicPicker('Bench Press (Barbell)','x')", SHEET],
   ['sheet rank ladder', 'openRankLadder()', OVERLAY],
   ['overlay alfred chat', 'openAlfredChat()', OVERLAY]
 ];
