@@ -64,8 +64,9 @@ const addPlan=`MIGRATIONS.push({v:1,name:'test plan',run:d=>{const has=(d.splits
 
 
 // ===== The real v1 migration: 8-day cycle on OLD data (templates edited, exercises deleted) =====
-const coreTxt=js.slice(js.indexOf('const CORE_EX = ')+16,js.indexOf('const M12='));
-const CORE=new Set(eval(coreTxt.trim().replace(/;\s*$/,'')).map(e=>e.n));
+// the library as the app builds it: the core list, then the brand machines pushed into it (2026-10-26), so the slice runs with its own declaration
+const coreTxt=js.slice(js.indexOf('const CORE_EX = '),js.indexOf('const M12='));
+const CORE=new Set(new Function(coreTxt+'\nreturn CORE_EX;')().map(e=>e.n));
 {const {ctx,store}=sandbox(RAW,{real:true});ctx.load();const wBefore=JSON.stringify(ctx.state.data.workouts);ctx.runMigrations();
  const d=ctx.state.data,cyc=d.splits.filter(s=>s.id==='cycle8');
  ok(cyc.length===1,'8-day cycle present exactly once');

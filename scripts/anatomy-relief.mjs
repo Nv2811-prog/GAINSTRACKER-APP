@@ -1,7 +1,9 @@
 // Relief "clay sculpt" renderer (dev tool, 2026-10-26; regenerates assets/anatomy/shade-*.png — then convert to grey+alpha PNG): our own anatomy paths -> height map (rounded muscle domes on a rounded body) -> per-pixel lighting -> grey PNG.
 import fs from 'node:fs';
-import puppeteer from '/Users/nickivendelbo/Desktop/Gainstracker batman/scripts/qa/node_modules/puppeteer-core/lib/esm/puppeteer/puppeteer-core.js';
-const anaTxt = fs.readFileSync('../anat/out/ana-data.js', 'utf8'), ana = JSON.parse(anaTxt.slice(anaTxt.indexOf('{'), anaTxt.lastIndexOf('}') + 1));
+import puppeteer from './qa/node_modules/puppeteer-core/lib/esm/puppeteer/puppeteer-core.js';
+// the anatomy data is read straight from the app (one line: const ANA={...};)
+const app = fs.readFileSync(new URL('../Gainstracker app not complete.html', import.meta.url), 'utf8'), m0 = app.indexOf('const ANA={'), m1 = app.indexOf('};', m0);
+const ana = JSON.parse(app.slice(m0 + 10, m1 + 1));
 const view = process.argv[2] || 'f', out = process.argv[3] || 'relief-' + view + '.png', S = +(process.argv[4] || 1);
 const b = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true, args: ['--disable-gpu'] });
 const p = await b.newPage();

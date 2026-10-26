@@ -15,8 +15,11 @@ const ev = (f, ...a) => P.evaluate(f, ...a);
 const shot = (n) => P.screenshot({ path: path.join(out, `flow-${n}-${tag}.png`) });
 const tapAt = async (sel, i = 0) => {
   await P.waitForSelector(sel, { timeout: 6000 }).catch(() => {});
-  const pt = await ev((s, i) => { const e = document.querySelectorAll(s)[i]; if (!e) return null; e.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel, i);
-  if (!pt) return false;
+  const found = await ev((s, i) => { const e = document.querySelectorAll(s)[i]; if (!e) return false; e.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' }); return true; }, sel, i);
+  if (!found) return false;
+  // a finger lands on a still page: wait until the app's own smooth scroll (after a tick) has stopped, or the haptic switch's scroll guard rightly reads the tap as a scroll
+  await P.waitForFunction(() => { const y = window.scrollY, w = window.__qaY; window.__qaY = y; return w === y; }, { polling: 120, timeout: 3000 }).catch(() => {});
+  const pt = await ev((s, i) => { const r = document.querySelectorAll(s)[i].getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel, i);
   await sleep(90); await P.touchscreen.tap(pt.x, pt.y); await sleep(400); return true;
 };
 const sets = () => ev(() => state.session.exercises.map((e) => e.sets.map((s) => ({ d: !!s.done, w: s.w, r: s.r }))));
