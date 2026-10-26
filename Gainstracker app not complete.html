@@ -1328,6 +1328,27 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .gy .gy-add{width:100%;margin-top:4px}
 .gy .gy-n{margin:12px 2px 2px;color:var(--tx3)}
 /* ===== /GP:GYMS ===== */
+/* ===== GP:SETUP (2026-10-26) ===== */
+/* The focus card's setup strip (a machine's saved seat / pads / handles at this gym, one tap to edit), the brand line above a machine's name,
+   and the setup sheet (one stepper row per field, more fields one tap away, a note, one gold Save). */
+.lg2-setup{display:flex;align-items:center;gap:9px;width:100%;min-height:42px;margin:10px 0 2px;padding:8px 12px;border:0;border-radius:12px;background:var(--g1);box-shadow:inset 0 0 0 1px var(--hair2),var(--hl);color:var(--tx1);text-align:left;font:inherit;cursor:pointer}
+.lg2-setup>.gi:first-child{flex:none;width:16px;height:16px;color:var(--gold-ink)}
+.lg2-setup .k{flex:none;font:650 10.5px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--tx3)}
+.lg2-setup .v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 14px/1.2 var(--body)}
+.lg2-setup.empty .v{font-weight:500;color:var(--tx3)}
+.lg2-setup>.gi:last-child{flex:none;width:14px;height:14px;color:var(--tx3)}
+.lg2-xh .lg2-br{margin:4px 0 -2px;font:650 10.5px/1.2 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink)}
+.su .su-list{padding:2px 14px}
+.su-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:56px;border-top:1px solid var(--hair)}
+.su-row:first-child{border-top:0}
+.su-l{font:600 15px/1.2 var(--body);color:var(--tx1)}
+.su-st{display:flex;align-items:center;gap:8px}
+.su-st input{width:64px;height:42px;border:0;border-radius:10px;background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2);color:var(--tx1);text-align:center;font:400 24px/1 var(--num);letter-spacing:.02em}
+.su .su-sec{display:block;margin:16px 2px 8px}
+.su-more{display:flex;flex-wrap:wrap;gap:8px}
+.su-note{display:block;width:100%;height:44px;padding:0 12px;border:0;border-radius:var(--r-s);background:var(--g3);box-shadow:inset 0 0 0 1px var(--hair2);color:var(--tx1);font:500 16px var(--body)}
+.su .su-go{width:100%;margin:16px 0 4px}
+/* ===== /GP:SETUP ===== */
 /* ===== GP:FOCUS (2026-10-22) ===== */
 /* Training focus sheet: a 3-column muscle picker (gold ring + gold rank coin = chosen), sets per week before → after on the shared landmark bar, each day's new opening lifts, one gold Apply. Colours keep their one meaning (gold = the choice and the action, green = more sets, muted = fewer). */
 .fc .fc-note{margin:0 2px 14px;font-size:13px;line-height:18px;color:var(--tx2)}
@@ -5350,8 +5371,50 @@ function stretchRedundancyNotes(){
 /* "Fill last" — copy last session's weight×reps into tonight's sets so you only nudge what changes. */
 function fillLast(ei){const ses=state.session;if(!ses)return;const e=ses.exercises[ei];if(!e)return;let n=0,kept=0;(e.sets||[]).forEach(s=>{if(s.type==="W")return;if(s.done){kept++;return;}/* never overwrite a logged set */if(s.prevW!=null&&s.prevW!==""){s.w=s.prevW;n++;}if(s.prevR!=null&&s.prevR!=="")s.r=s.prevR;});if(typeof saveSession==="function")saveSession();try{haptic("tap");}catch(_){}render();toast(n?`Filled ${n} set${n===1?"":"s"} from last time — now beat it.`:kept?"Sets you already logged stay untouched.":"No previous numbers for this lift yet.");}
 /* Per-gym machine settings — remember seat height / pin / pad for this machine AT THIS GYM. */
-function machineSetting(name){const d=state.data;return ((d.machineSettings||{})[d.u.activeGym]||{})[name]||"";}
-function setMachineSetting(name){const d=state.data;appPrompt({title:"Machine setup · "+(d.u.activeGym||"gym"),body:"Save your settings for this machine (seat height, pin, pad position…). Stored per gym.",ok:"Save",value:machineSetting(name)}).then(v=>{if(v===null)return;d.machineSettings=d.machineSettings||{};d.machineSettings[d.u.activeGym]=d.machineSettings[d.u.activeGym]||{};v=(v||"").trim();if(v)d.machineSettings[d.u.activeGym][name]=v;else delete d.machineSettings[d.u.activeGym][name];save();render();});}
+/* ===== MACHINE SETUP (2026-10-26): seat, pads, handles … per machine, per gym, on the focus card =====
+   d.machineSettings[gym][lift] = {seat:"4", thigh:"2", …, note:""}; an older free-text value is read as the note. The fields a sheet starts with
+   follow the movement (a pulldown asks for seat + thigh pad, a leg extension for back + shin pad); any other field is one tap away. */
+const SETUP_FIELDS=[["seat","Seat"],["back","Back pad"],["chest","Chest pad"],["thigh","Thigh pad"],["shin","Shin pad"],["foot","Foot plate"],["handles","Handles"],["range","Range"],["pin","Start"]];
+const SETUP_DEF={bench:["seat","back"],incline:["seat","back"],fly:["seat","handles"],pullover:["seat","back"],ohp:["seat","back"],lateral:["seat"],rearfly:["seat","handles"],
+  curl:["seat"],pushdown:["handles"],ohext:["seat"],dip:["seat"],kickback:["seat"],row:["seat","chest"],pulldown:["seat","thigh"],deadlift:["foot"],squat:["back","foot"],
+  lunge:["foot"],legpress:["back","foot"],legext:["back","shin"],legcurl:["back","shin"],calf:["back"],crunch:["seat"],hipthrust:["back"],abduction:["seat","range"],shrug:["handles"],twist:["seat"]};
+const setupEq=ex=>["machine","cable","smith","lever","plate-loaded"].includes(((ex&&ex.eq)||"").toLowerCase());
+function setupGet(name){const v=((state.data.machineSettings||{})[activeGymName()]||{})[name];return !v?{}:typeof v==="string"?{note:v}:Object.assign({},v);}
+const setupText=o=>SETUP_FIELDS.filter(([k])=>o[k]!=null&&String(o[k]).trim()!=="").map(([k,l])=>l+" "+o[k]).concat(o.note?[o.note]:[]).join(" · ");
+function machineSetting(name){return setupText(setupGet(name));}
+function setMachineSetting(name){const ses=state.session,ei=ses?ses.exercises.findIndex(x=>x.name===name):-1;openSetup(ei,name);}
+function openSetup(ei,nm){
+  const name=nm||(state.session&&state.session.exercises[ei]||{}).name;if(!name)return;
+  const ex=exFor(name),o=setupGet(name),keys=SETUP_FIELDS.map(f=>f[0]).filter(k=>o[k]!=null&&String(o[k]).trim()!=="");
+  if(!keys.length)(SETUP_DEF[movePattern(ex)]||["seat"]).forEach(k=>keys.push(k));
+  state._setup={name,keys,vals:o};openSheet(setupSheet());state._sheetKind="setup";
+}
+function setupSheet(){
+  const st=state._setup;if(!st)return "";
+  const lab=k=>(SETUP_FIELDS.find(f=>f[0]===k)||[k,k])[1],js=k=>`'${k}'`;
+  const rows=st.keys.map(k=>`<div class="su-row"><span class="su-l">${lab(k)}</span><div class="su-st"><button class="btn-i" onclick="setupStep(${js(k)},-1)" aria-label="${lab(k)} down">${gmIc("minus")}</button>
+    <input id="su-${k}" inputmode="decimal" value="${esc(st.vals[k]==null?"":String(st.vals[k]))}" oninput="setupSet(${js(k)},this.value)" placeholder="–" aria-label="${lab(k)}"/>
+    <button class="btn-i" onclick="setupStep(${js(k)},1)" aria-label="${lab(k)} up">${GP.icon("plus")}</button></div></div>`).join("");
+  const more=SETUP_FIELDS.filter(([k])=>!st.keys.includes(k)).map(([k,l])=>`<button class="chip" onclick="setupAdd(${js(k)})">${GP.icon("plus")}${l}</button>`).join("");
+  return `<div class="gh su">${shHd("Machine setup",{ic:"wrench",sub:esc(st.name)+" · "+esc(activeGymName())})}
+    <section class="s1 su-list">${rows}</section>
+    ${more?`<div class="eyebrow su-sec">Add</div><div class="su-more">${more}</div>`:""}
+    <div class="eyebrow su-sec">Note</div><input class="su-note" value="${esc(st.vals.note||"")}" oninput="setupSet('note',this.value)" placeholder="e.g. handles on the 2nd hole, pin at 7" aria-label="Setup note"/>
+    <button class="btn gold su-go" onclick="setupSave()">${GP.icon("check")}Save setup</button></div>`;
+}
+function setupRedraw(){const sh=$("sheet");if(state._sheetKind!=="setup"||!sh)return;const sc=sh.scrollTop;sh.innerHTML=setupSheet();sh.scrollTop=sc;}
+function setupSet(k,v){if(state._setup)state._setup.vals=Object.assign({},state._setup.vals,{[k]:v});}
+function setupStep(k,d){   // numbers step by 1 (a first tap starts at 1); a text value is left alone
+  const st=state._setup;if(!st)return;const cur=String(st.vals[k]==null?"":st.vals[k]).replace(",",".").trim(),n=cur===""?0:parseFloat(cur);if(cur!==""&&!isFinite(n))return;
+  const nv=Math.max(0,Math.round((n+d)*2)/2);setupSet(k,nv?String(nv):"");const i=$("su-"+k);if(i)i.value=nv?String(nv):"";haptic("tap");
+}
+function setupAdd(k){const st=state._setup;if(!st||st.keys.includes(k))return;st.keys=st.keys.concat([k]);setupRedraw();const i=$("su-"+k);if(i)i.focus();}
+function setupSave(){
+  const st=state._setup;if(!st)return;const d=state.data,g=activeGymName(),out={};
+  Object.keys(st.vals).forEach(k=>{const v=String(st.vals[k]==null?"":st.vals[k]).trim();if(v)out[k]=v;});
+  const gym=Object.assign({},(d.machineSettings||{})[g]||{});if(Object.keys(out).length)gym[st.name]=out;else delete gym[st.name];
+  d.machineSettings=Object.assign({},d.machineSettings||{},{[g]:gym});save();haptic("done");closeSheet();render();toast(Object.keys(out).length?"Setup saved · "+g:"Setup cleared");
+}
 function rirOfSet(s){
   if(!s||s.type==="W")return null;const v=String(s.rpe==null?"":s.rpe).trim();if(!v)return null;
   if(v==="4+")return 4;const n=parseFloat(v);if(isNaN(n))return null;
@@ -9864,7 +9927,7 @@ The Garage is a fleet that unlocks with real milestones (sessions, streak, lifet
 The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did: tonight is the day after the last plan day you completed. The rest days after it pass by themselves, one per calendar day; a training day is never skipped, so miss three days and the next workout is still the next training day. Log rest day on Gotham marks it done at once (it counts for your streak and calendar; Undo in the toast). Train anyway on a rest day starts the next plan day. A Free Session or a session from another split never moves the cycle.
 
 ## TOOLS DURING A SESSION: SKIP, REORDER, SWAP, WARM-UP RAMP, PLATE MATHS
-The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (save seat, pin, pad), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. Warm-up ramp opens a sheet: type your top set (kilos × reps, prefilled from the first set), pick 1 to 5 warm-up sets and it lists each warm-up weight × reps, rounded to what you can load (plates per side on a barbell); Add puts them on the lift as warm-up sets. Your choice of how many is remembered per lift, and the Forge in the Lab uses the same ramp. When a lift trains a muscle that is still cold, the button shows a dot and the menu lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
+The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (seat, pads, handles and more with + / − steppers, saved per machine per gym; also the Setup strip on every machine or cable lift's focus card), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. Warm-up ramp opens a sheet: type your top set (kilos × reps, prefilled from the first set), pick 1 to 5 warm-up sets and it lists each warm-up weight × reps, rounded to what you can load (plates per side on a barbell); Add puts them on the lift as warm-up sets. Your choice of how many is remembered per lift, and the Forge in the Lab uses the same ramp. When a lift trains a muscle that is still cold, the button shows a dot and the menu lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
 
 ## DATA CONTROL: ARCHIVING OLD MACHINE WEIGHTS, BACKUP, RESTORE AND CSV EXPORT
 Settings → Data control (also Profile → the Backup tile). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now (progress photos go into the file at full size), Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first; photos included).
@@ -12736,11 +12799,15 @@ function lgDoneRow(e,ei){
     ${hit?`<span class="lg2-tag">+${fmtKg(inc)} kg next</span>`:""}${dsx}</div>`;
 }
 /* ---- focus card ---- */
+function lgSetupStrip(e,ei){   // the machine's saved setup at this gym, one tap to edit (empty: an invitation)
+  const t=machineSetting(e.name);
+  return `<button class="lg2-setup${t?"":" empty"}" onclick="openSetup(${ei})" aria-label="Machine setup: ${esc(t||"none saved")}">${GP.icon("wrench")}<span class="k">Setup</span><span class="v">${esc(t||"Seat, pads, handles: tap to save")}</span>${GP.icon("chevR")}</button>`;
+}
+const exBrandTitle=(ex,name)=>{if(!ex.br)return name;const pre=ex.br==="Arsenal Strength"?"Arsenal ":ex.br+" ";return name.startsWith(pre)?name.slice(pre.length):name;};
 function lgChips(e,ex,m,p){
   const rec=Math.round(getRecovery(m)),cap=rec<60,wk=lgWeekly(m),L=VL[m]||{mev:8,mav:14,mrv:20},z=zoneOf(m,wk).key,nm=esc(MNAME[m]||m||"Muscle");
   const tone={low:"warn",grow:"ok",high:"gold",over:"bad"}[z]||"";
-  let ms="";try{const eq=(ex.eq||"").toLowerCase();if(["machine","cable","smith","lever","plate-loaded"].includes(eq)){const v=machineSetting(e.name);if(v)ms=`<button class="lg2-chip" onclick="setMachineSetting(${esc(JSON.stringify(e.name))})">${GP.icon("wrench")}${esc(v)}</button>`;}}catch(_){}
-  return `<div class="lg2-chips"><span class="lg2-chip ${cap?"warn":"rest"}">${GP.recRing(rec,14)}${nm} ${rec}%${cap?" · cap at 2 RIR":""}</span><span class="lg2-chip ${tone}">${nm} ${wk} / ${L.mav} MAV</span>${ms}</div>`;
+  return `<div class="lg2-chips"><span class="lg2-chip ${cap?"warn":"rest"}">${GP.recRing(rec,14)}${nm} ${rec}%${cap?" · cap at 2 RIR":""}</span><span class="lg2-chip ${tone}">${nm} ${wk} / ${L.mav} MAV</span></div>`;
 }
 function lgTiles(e,ex,m){
   const p=progressionFor(e.name),L=lgLast(e.name),lb=lastBestSet(e.name),pr=state.data.prs[e.name]||null;
@@ -12805,8 +12872,8 @@ function lgFocus(ses,fei){
   const wu=warmupSuggest(fei),wk=(e.sets.filter(s=>s.type!=="W"&&kgNum(s.w)>0).map(s=>kgNum(s.w)))[0]||0,pl=isBar&&wk?lgPlates(wk):"";
   return `<section class="lg2-hero" id="lgfocus">
     <div class="lg2-xh"><div class="exwrap lg2-thumb" id="lgfig" onclick="lgDetail(${fei})" role="button" aria-label="Exercise details"><div class="figlayer">${figLayerHtml(ex)}</div></div>
-      <div class="mn"><div class="eyr"><div class="eb">${fei+1} of ${ses.exercises.length} · Plan ${esc(lgPlan(e))}</div><button class="lg2-ibtn sm" data-hx onclick="lgExMenu(${fei})" aria-label="Exercise options">${GP.icon("more")}</button></div><h2>${esc(e.name)}</h2></div></div>
-    ${lgChips(e,ex,m)}${lgTiles(e,ex,m)}
+      <div class="mn"><div class="eyr"><div class="eb">${fei+1} of ${ses.exercises.length} · Plan ${esc(lgPlan(e))}</div><button class="lg2-ibtn sm" data-hx onclick="lgExMenu(${fei})" aria-label="Exercise options">${GP.icon("more")}</button></div>${ex.br?`<div class="lg2-br">${esc(ex.br)}</div>`:""}<h2>${esc(exBrandTitle(ex,e.name))}</h2></div></div>
+    ${lgChips(e,ex,m)}${setupEq(ex)?lgSetupStrip(e,fei):""}${lgTiles(e,ex,m)}
     <div class="lg2-gh"><span>Set</span><span>${ex.bw?"+KG":"KG"}</span><span>Reps</span><span></span></div>
     ${lgRows(e,fei,ex)}
     <div class="lg2-hint"><button class="lg2-b3" data-hx onclick="addSet(${fei})">${GP.icon("plus")}Add set</button><button class="lg2-b3${wu?" hot":""}" data-hx onclick="quickRamp(${fei})">${GP.icon("ramp")}Warm-up ramp</button></div>
@@ -12851,7 +12918,7 @@ function lgExMenu(ei){
     ${it("book","Exercise details",`lgDetail(${ei})`,"Muscles, cues, history")}${it("image","Choose picture",`lgPic(${ei})`)}
     ${it("ramp","Warm-up ramp",`quickRamp(${ei})`,wu?"Suggested: "+esc(wu.muscles)+" still cold":"")}${wu?it("skip","Skip warm-up suggestion",`dismissWarm(${ei})`):""}
     ${it("down","Fill from last time",`fillLast(${ei})`)}${it("swap","Swap exercise",`openSwap(${ei})`,"Same primary muscle")}${it("link","Pair as superset",`openPair(${ei})`)}${it("bolt","Intensity technique",`openProtocolSheet(${ei})`)}
-    ${isBar?it("dumbbell","Plate maths",`openPlateSheet(${ei})`):""}${mach?it("wrench","Machine setup",`setMachineSetting(${q})`,ms?esc(ms):"Save seat, pin, pad"):""}
+    ${isBar?it("dumbbell","Plate maths",`openPlateSheet(${ei})`):""}${mach?it("wrench","Machine setup",`openSetup(${ei})`,ms?esc(ms):"Seat, pads, handles"):""}
     ${it("bulb","Form cues",`showCues(${q})`)}${it("sliders","Reorder lifts","openReorder()")}
     ${it("skip","Skip tonight",`openSkipEx(${ei})`)}${it("x","Remove exercise",`removeExercise(${ei})`)}</div>`);
 }

@@ -325,3 +325,6 @@ Profile → Gyms / Settings → Manage gyms (`openGyms`): one card per gym (sess
 
 ## 30 · Brand machines (2026-10-26)
 `BRAND_EX` (generated from movement templates: muscles, heads, cues) adds 108 machines from Copenhagen Gym's brands — Panatta (39), Hammer Strength (41, the official plate-loaded list), Cybex (14), Arsenal Strength (9), BootyBuilder (5) — plus a generic Machine Incline Curl, pushed into `CORE_EX`. Each has `br`; `exBrandShown` keeps a brand's machines out of the add / swap lists unless the active gym has that brand (Gyms → Equipment → brands) or it's searched by name; `exBrandRank` lists the gym's machines first. Machine Back Extension fixed (erectors, not lats). QA: `scripts/qa/machines.mjs` (6).
+
+## 31 · Machine setup on screen (GP:SETUP, 2026-10-26)
+`d.machineSettings[gym][lift]` is now an object (`{seat, back, chest, thigh, shin, foot, handles, range, pin, note}`; an older string is read as the note). Every machine / cable / Smith lift's focus card shows the Setup strip (`lgSetupStrip`, the saved setup or an invitation); the sheet (`openSetup`) starts with the fields the movement needs (`SETUP_DEF` by `movePattern`), + / − steppers, more fields one tap away, a note, one gold Save; per gym. A brand machine shows its brand line above a shortened title (`exBrandTitle`). QA: `scripts/qa/setup.mjs` (8).
