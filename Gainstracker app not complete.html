@@ -1249,12 +1249,11 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .p3-cl .sw.qk{background:none;box-shadow:none;outline:1.5px dashed rgba(242,193,78,.75);outline-offset:-2px}
 /* ===== /GP:QUICKLOG ===== */
 /* ===== GP:HISTORY (2026-10-25) ===== */
-/* The per-set "last" line under each working set of the focus card: what was lifted on that set in the newest session of the lift (tx3 label, Bebas numerals),
-   with an amber "other gym" chip when this gym has no history of the lift. Aligned under the kg / reps boxes (row padding 6 + set column 38 + gap 8). */
+/* The per-set "last" line under each working set of the focus card: what was lifted on that set in the newest session of the lift at this gym (tx3 label,
+   Bebas numerals). Aligned under the kg / reps boxes (row padding 6 + set column 38 + gap 8). */
 .lg2-last{display:flex;align-items:baseline;gap:5px;margin:3px 0 5px;padding-left:52px;font:500 11.5px/16px var(--body);color:var(--tx3)}
 .lg2-last b{font-family:var(--num);font-weight:400;font-size:15px;line-height:16px;letter-spacing:.02em;color:var(--tx2)}
 .lg2-last i{font-style:normal}
-.lg2-last .og{align-self:center;margin-left:4px;padding:0 6px;border-radius:5px;background:var(--tint-warn);color:var(--warn);font:600 10.5px/16px var(--body)}
 .lg2-last.dn{opacity:.55}
 /* ===== /GP:HISTORY ===== */
 /* ===== GP:RAMP (2026-10-25) ===== */
@@ -1312,6 +1311,23 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .pi .pi-gp b{color:var(--tx1)}
 .pi-cta{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:10px;margin:16px 0 0}
 /* ===== /GP:DARK ===== */
+/* ===== GP:GYMS (2026-10-26) ===== */
+/* The gym manager: one card per gym (active = gold edge), its numbers, its brands, and Use / Equipment / Reset weights / Delete. */
+.gy .gy-card{padding:12px 14px;margin:0 0 10px}
+.gy .gy-card.on{box-shadow:inset 0 0 0 1.5px rgba(242,193,78,.55),var(--hl)}
+.gy-h{display:flex;gap:11px;align-items:flex-start}
+.gy-h .lead{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--tint-gold);color:var(--gold-ink)}
+.gy-h .lead .gi{width:17px;height:17px}
+.gy-h .main{min-width:0;flex:1}
+.gy-h .gh-t2{white-space:normal}
+.gy .gy-br{margin-top:7px}
+.gy-a{display:flex;gap:6px;margin-top:11px}
+.gy-a .btn{flex:1 1 0;min-width:0;padding-inline:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gy-a .gy-del{flex:0 0 44px;padding:0;color:var(--bad)}
+.gy-a .gy-del .gi{width:17px;height:17px}
+.gy .gy-add{width:100%;margin-top:4px}
+.gy .gy-n{margin:12px 2px 2px;color:var(--tx3)}
+/* ===== /GP:GYMS ===== */
 /* ===== GP:FOCUS (2026-10-22) ===== */
 /* Training focus sheet: a 3-column muscle picker (gold ring + gold rank coin = chosen), sets per week before → after on the shared landmark bar, each day's new opening lifts, one gold Apply. Colours keep their one meaning (gold = the choice and the action, green = more sets, muted = fewer). */
 .fc .fc-note{margin:0 2px 14px;font-size:13px;line-height:18px;color:var(--tx2)}
@@ -3249,6 +3265,11 @@ const MIGRATIONS=[
     const lc=x=>String(x||"").toLowerCase().trim(),splits=d.splits||[];
     const old=splits.filter(sp=>sp&&sp.id!==CYCLE8V2.id&&(sp.id===CYCLE8.id||lc(sp.name)===lc(CYCLE8.name))).map(sp=>sp.id);
     return Object.assign({},d,{splits:splits.map(sp=>sp&&sp.id===CYCLE8V2.id?Object.assign({},sp,{from:[...new Set((sp.from||[]).concat(old))]}):sp)});
+  }},
+  // v5 (2026-10-26) — gyms can now be deleted: pin the gym that unstamped (older) sessions belong to, so their weights never move to another gym.
+  {v:5,name:"legacy gym pinned",run:d=>{
+    const u=d.u||{};if(u.legacyGym)return d;
+    return Object.assign({},d,{u:Object.assign({},u,{legacyGym:(u.gyms||[])[0]||u.activeGym||""})});
   }}
 ];
 function migrateData(data){
@@ -3336,12 +3357,14 @@ function _drainToasts(){
   const t=$("toast");if(!t)return;
   if(!_toastQ.length)return;
   const msg=_toastQ.shift();_toastBusy=true;
+  const tok=t._tok=(t._tok||0)+1;   // an Undo toast that takes over owns the element: this one's timers stand down
   t.textContent=msg;t.classList.add("on");
   const dur=Math.min(5200,Math.max(2500,1000+msg.length*60)); // longer lines linger longer
   clearTimeout(t._t);
   t._t=setTimeout(()=>{
+    if(t._tok!==tok)return;
     t.classList.remove("on");
-    setTimeout(()=>{_toastBusy=false;_drainToasts();},420);   // fade-out + breath before the next
+    setTimeout(()=>{if(t._tok!==tok)return;_toastBusy=false;_drainToasts();},420);   // fade-out + breath before the next
   },dur);
 }
 /* a toast with one action (Undo): own slot, bypasses the queue, replaced by the next normal toast */
@@ -3350,7 +3373,8 @@ function toastUndo(msg,fn,label){
   clearTimeout(t._t);_toastQ.length=0;_toastBusy=true;
   t.innerHTML=`<span>${esc(msg)}</span><button class="chip tundo" type="button">${esc(label||"Undo")}</button>`;
   t.classList.add("on");t.style.pointerEvents="auto";
-  const done=()=>{clearTimeout(t._t);t.classList.remove("on");t.style.pointerEvents="";setTimeout(()=>{_toastBusy=false;t.textContent="";_drainToasts();},420);};
+  const tok=t._tok=(t._tok||0)+1;   // a newer toast owns the element now: this one's late cleanup must not wipe it (it used to delete a fresh Undo button)
+  const done=()=>{if(t._tok!==tok)return;clearTimeout(t._t);t.classList.remove("on");t.style.pointerEvents="";setTimeout(()=>{if(t._tok!==tok)return;_toastBusy=false;t.textContent="";_drainToasts();},420);};
   t.querySelector("button").onclick=()=>{done();fn();};
   t._t=setTimeout(done,6000);
 }
@@ -3805,7 +3829,11 @@ function setE1RM(ex,s){const load=setLoad(ex,s.w),reps=+s.r||0;if(!reps)return 0
 /* ========================= LAST SETS (PREVIOUS column) ========================= */
 /* Workouts of the ACTIVE gym only — a split reused across gyms must never show another gym's
    numbers (machine weights differ). Legacy entries with no gym stamp belong to the first gym. */
-function gymWs(){const d=state.data,g=d.u.activeGym||((d.u.gyms||[])[0]||"");const home=(d.u.gyms||[])[0]||g;return (d.workouts||[]).filter(w=>(w.gym||home)===g);}
+// A workout's gym: its own stamp, else the LEGACY gym (u.legacyGym, pinned by migration v5 to the first gym the app ever had), so deleting or
+// reordering gyms can never hand old unstamped sessions (and their weights) to another gym.
+const gymOf=w=>(w&&w.gym)||state.data.u.legacyGym||((state.data.u.gyms||[])[0])||"";
+const activeGymName=()=>state.data.u.activeGym||((state.data.u.gyms||[])[0])||"";
+function gymWs(){const g=activeGymName();return (state.data.workouts||[]).filter(w=>gymOf(w)===g);}
 // Per-exercise "reset point": new equipment (different weights, different feel) shouldn't make
 // the app compare tonight's first lift against numbers set on a machine that no longer exists.
 // Nothing is deleted — old sets stay in the workout record forever — this just tells every
@@ -3824,7 +3852,7 @@ function unarchiveExercise(name){
    Every reader goes through lastOuting(name): the focus card's Last time and Target, the per-set "last" lines, Up next, Later, the done row, swaps,
    fill-from-last, plan set counts, the summary's vs-last and Alfred, so no two screens can disagree.
    · the newest session of the lift BY DATE (the array is newest-first, but imports and back-dated "Mark as done" entries can break that order);
-   · at the gym you're in; only when this gym has none, the newest from any gym, flagged otherGym (machines differ; records stay per gym);
+   · at the gym you're in ONLY (machines differ; a new gym starts empty, user 2026-10-26), after that gym's reset point (d.gymReset[gym]);
    · the same lift name, case- and space-insensitive, never through EX_ALIAS: an alias shares a library entry, not the weights
      (High-to-Low Cable Row is not a Seated Cable Row); only after the lift's reset point (exReset);
    · an outing needs a real working set; "Mark as done" sessions (est sets) never count. opt.before = a workout: only outings older than it. */
@@ -3842,16 +3870,15 @@ function loIndex(){   // lift key -> [{t,w,e}] newest first; rebuilt when the hi
 function lastOuting(name,opt){
   const list=loIndex().get(exKey(name));if(!list)return null;
   const cut=exResetAt(name),c=cut?new Date(cut).getTime():0,b=opt&&opt.before,bt=b?new Date(b.date).getTime():Infinity;
-  const u=state.data.u,home=(u.gyms||[])[0]||"",gym=u.activeGym||home;let any=null;
+  const gym=activeGymName(),gr=(state.data.gymReset||{})[gym],gc=gr?new Date(gr).getTime():0;
   for(const x of list){
-    if(x.t<c)break;   // newest first: everything after this is from before the reset
+    if(x.t<c||x.t<gc)break;   // newest first: everything after this is from before the lift's or the gym's reset
+    if(gymOf(x.w)!==gym)continue;
     if(b&&(x.w===b||(b.id&&x.w.id===b.id)||x.t>bt))continue;
     if(x.e.sets.some(s=>s&&s.est)||!x.e.sets.some(s=>s&&s.type!=="W"&&+s.r>0))continue;
-    const g=x.w.gym||home,o={sets:x.e.sets,date:x.w.date,gym:g,otherGym:g!==gym,w:x.w};
-    if(!o.otherGym)return o;
-    if(!any)any=o;
+    return {sets:x.e.sets,date:x.w.date,gym,w:x.w};
   }
-  return any;
+  return null;
 }
 function lastSetFor(name){const o=lastOuting(name);return o?o.sets:null;}
 // prevW / prevR / prevType on each set from the newest outing: working set i <- its working set i (extra sets <- its last working set),
@@ -4270,7 +4297,7 @@ function switchGym(gym){const d=state.data;gym=(gym||"").trim();if(!gym)return;
   if(d.activeGymSplits[gym])d.activeSplitId=d.activeGymSplits[gym];
   save();}
 function setSessionGym(gym){if(state.session)state.session.gym=gym;switchGym(gym);haptic("tap");render();}
-function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Different machines mean different PRs. Name the gym:",ok:"Add"}).then(n=>{n=(n||"").trim();if(!n)return;switchGym(n);if(state.session)state.session.gym=n;if(fromSettings)openSettings();else render();});}
+function promptAddGym(fromSettings){appPrompt({title:"Add a gym",body:"Weights and records are kept per gym, so a new gym starts empty. Name the gym:",ok:"Add"}).then(n=>{n=(n||"").trim();if(!n)return;switchGym(n);if(state.session)state.session.gym=n;render();openGym(n);});}
 
 /* ========================= LOGGING INTERACTIONS ========================= */
 function setField(ei,si,f,v){state.session.exercises[ei].sets[si][f]=f==="w"&&typeof v==="string"?v.replace(",","."):v;saveSessionSoon();}   // a typed comma decimal is stored with a dot (kgNum still reads old commas) // no render (Rule 1 spirit); debounced backup
@@ -5012,7 +5039,7 @@ function checkWeightAnomaly(ei,si){
   const w=kgNum(s.w);if(!w||w<=0)return;
   ses._anomalyAsked=ses._anomalyAsked||{};if(ses._anomalyAsked[e.name])return; // once per exercise per session
   const ex=exFor(e.name);
-  const lb=lastBestSet(e.name);if(!lb||!lb.w||lb.otherGym)return;   // another gym's numbers are no baseline for this gym's machine
+  const lb=lastBestSet(e.name);if(!lb||!lb.w)return;
   const cut=exResetAt(e.name);
   if(cut&&lb.date&&new Date(lb.date).getTime()<new Date(cut).getTime())return; // archived — no fair baseline to compare against yet
   const lw=setLoad(ex,lb.w),cw=setLoad(ex,w);
@@ -5042,7 +5069,7 @@ function answerWeightCheck(name,answer){
 function lastBestSet(name,opt){   // the best WORKING set (by e1RM) of the newest outing: what the Target and the progression rule read
   const o=lastOuting(name,opt);if(!o)return null;const ex=exFor(name);let best=null,bv=-1;
   o.sets.forEach(s=>{if(s.type==="W"||s.est)return;const reps=+s.r||0;if(!reps)return;const v=setE1RM(ex,s);if(v>=bv){bv=v;best=s;}});
-  return best?{w:kgNum(best.w)||0,r:+best.r||0,date:o.date,e1:bv,otherGym:o.otherGym}:null;
+  return best?{w:kgNum(best.w)||0,r:+best.r||0,date:o.date,e1:bv}:null;
 }
 /* ===== ONE PROGRESSION RULE (user decision 2026-10-19) — every suggestion path reads progressionFor/progressionFrom =====
    Plan ranges are 5–10. A WORKING set (warm-ups never count) that reaches the top of the range (10+) earns more weight
@@ -5431,16 +5458,21 @@ function openGym(gymName){
   const gn=gymName||state.data.u.activeGym||"";state._gymEditName=gn;
   const g=(state.data.gymEquipment||{})[gn]||{equip:{}};
   const chips=GYM_EQUIP.map(([k,l])=>`<button class="chip g gymeq ${g.equip[k]!==false?'on':''}" data-k="${k}" onclick="toggleGymEq('${k}')">${l}</button>`).join("");
+  state._gymBr=(g.brands||(/copenhagen/i.test(gn)?["Panatta","Hammer Strength","BootyBuilder","Cybex","Arsenal Strength"]:[])).slice();   // Copenhagen Gym (Valby): its machine brands, preselected
+  const brands=GYM_BRANDS.map(b=>`<button class="chip gymbr${state._gymBr.includes(b)?" on":""}" data-b="${esc(b)}" onclick="toggleGymBr(this.dataset.b)">${esc(b)}</button>`).join("");
   openSheet(`<div class="ttl" style="display:flex;align-items:center">${secIcon('suit')}Equipment — ${esc(gn)}</div>
     <div class="mini" style="margin:-2px 0 9px;color:var(--text2)">Tell the app what's at <b>${esc(gn)}</b> and it only suggests exercises you can actually do there.</div>
     <label class="mini" style="display:block;margin-bottom:5px">Equipment available <span style="color:var(--text3)">(all on = no filter)</span></label>
     <div class="row" style="flex-wrap:wrap;gap:7px">${chips}</div>
+    <label class="mini" style="display:block;margin:14px 0 5px">Machine brands <span style="color:var(--text3)">(their machines show first when you add or swap a lift)</span></label>
+    <div class="row" style="flex-wrap:wrap;gap:7px">${brands}</div>
     <button class="btn gold" style="margin-top:12px" onclick="saveGym()">Save equipment</button>
     <button class="btn ghost sm" style="margin-top:6px" onclick="closeSheet()">Cancel</button>`);
   state._gymTmp=Object.assign({},g.equip);
 }
+function toggleGymBr(b){const a=state._gymBr||[];state._gymBr=a.includes(b)?a.filter(x=>x!==b):a.concat([b]);document.querySelectorAll(".gymbr").forEach(x=>x.classList.toggle("on",state._gymBr.includes(x.getAttribute("data-b"))));}
 function toggleGymEq(k){state._gymTmp=state._gymTmp||{};state._gymTmp[k]=state._gymTmp[k]===false?true:false;document.querySelectorAll(".gymeq").forEach(b=>{const kk=b.getAttribute("data-k");b.classList.toggle("on",state._gymTmp[kk]!==false);});}
-function saveGym(){const gn=state._gymEditName||state.data.u.activeGym||"";state.data.gymEquipment=state.data.gymEquipment||{};const eqNew=Object.assign({},state._gymTmp||{});state.data.gymEquipment[gn]={equip:eqNew};state.gymFilter=true;save();haptic("done");closeSheet();toast("Equipment saved for "+gn);render();}
+function saveGym(){const gn=state._gymEditName||state.data.u.activeGym||"";state.data.gymEquipment=state.data.gymEquipment||{};const eqNew=Object.assign({},state._gymTmp||{});state.data.gymEquipment=Object.assign({},state.data.gymEquipment,{[gn]:{equip:eqNew,brands:(state._gymBr||[]).slice()}});state.gymFilter=true;save();haptic("done");closeSheet();toast("Equipment saved for "+gn);render();}
 function openPicker(multi){
   state._sheetKind=null;
   state.pickerMulti=multi||null;
@@ -7390,7 +7422,55 @@ function openStrengthLift(l){   // the variations behind one Strength row: what 
     ${rows?`<section class="s2 gh-list">${rows}</section>`:""}
     <p class="t-xs sv-note">Factors are cautious: a machine is more likely to understate your lift than to flatter it, and a converted lift stops at the Elite tier. Dumbbell, cable and single-leg lifts are not converted.</p></div>`);
 }
-function openGyms(){openSheet(`<div class="ttl">Gyms</div>${gymCampaignsCard()}<button class="btn" style="margin-top:12px" onclick="closeSheet()">Close</button>`);}
+/* ===== GYMS (2026-10-26): use, equipment & brands, reset weights & records, delete — every change with Undo ===== */
+const GYM_BRANDS=["Panatta","Hammer Strength","BootyBuilder","Cybex","Arsenal Strength"];
+function openGyms(){openSheet(gymsSheet());state._sheetKind="gyms";}
+function gymsRefresh(){const sh=$("sheet");if(state._sheetKind!=="gyms"||!sh||!sh.classList.contains("on"))return;const sc=sh.scrollTop;sh.innerHTML=gymsSheet();sh.scrollTop=sc;}
+function gymsSheet(){
+  const d=state.data,u=d.u,gyms=u.gyms||[],act=activeGymName(),js=g=>esc(JSON.stringify(g));
+  const rows=gyms.map(g=>{const st=gymStats(g),prs=Object.keys((d.prsByGym||{})[g]||{}).filter(n=>((d.prsByGym[g]||{})[n]||{}).orm>0).length,
+      br=(((d.gymEquipment||{})[g]||{}).brands||[]),rs=(d.gymReset||{})[g],on=g===act;
+    return `<section class="s2 gy-card${on?" on":""}"><div class="gy-h"><span class="lead">${GP.icon("map")}</span><div class="main"><div class="gh-t1">${esc(g)}${on?' <span class="tag ok">Active</span>':""}</div>
+      <div class="gh-t2">${st.sessions} session${st.sessions===1?"":"s"} · ${prs} record${prs===1?"":"s"}${st.last?" · last "+esc(p3Date(st.last)):""}${rs?" · reset "+esc(p3Date(rs)):""}</div>
+      ${br.length?`<div class="gm-chips gy-br">${br.map(x=>`<span class="gm-chip">${esc(x)}</span>`).join("")}</div>`:""}</div></div>
+      <div class="gy-a">${on?"":`<button class="btn sm" onclick="gymUse(${js(g)})">Use</button>`}<button class="btn sm" onclick="openGym(${js(g)})">Equipment</button>
+        <button class="btn sm" onclick="gymResetAsk(${js(g)})">Reset</button><button class="btn sm gy-del" onclick="gymDeleteAsk(${js(g)})" aria-label="Delete ${esc(g)}">${gmIc("trash")}</button></div></section>`;}).join("");
+  return `<div class="gh gy">${shHd("Gyms",{ic:"map",sub:"Weights and records are kept per gym"})}${rows}
+    <button class="btn btn-1 gy-add" onclick="promptAddGym(false)">${GP.icon("plus")}Add gym</button>
+    <p class="t-xs gy-n">Reset weights wipes a gym's records and last weights so every lift starts fresh there; your sessions stay in history (volume, calendar, streak). Delete removes the gym the same way.</p></div>`;
+}
+function gymUse(g){switchGym(g);haptic("tap");gymsRefresh();render();toast("Training at "+g);}
+function gymResetAsk(g){
+  appConfirm({title:"Reset "+g+"?",body:"Its records and last weights are wiped, so every lift starts fresh there. Your sessions stay in history: volume, calendar and streak don't change.",ok:"Reset weights",danger:true}).then(ok=>{if(ok)gymReset(g);});
+}
+function gymSnap(g){const d=state.data;return {prs:(d.prsByGym||{})[g],reset:(d.gymReset||{})[g],equip:(d.gymEquipment||{})[g],split:(d.activeGymSplits||{})[g],machine:(d.machineSettings||{})[g],gyms:(d.u.gyms||[]).slice(),active:d.u.activeGym};}
+function gymRestore(g,sn){   // Undo for reset and delete: every piece goes back exactly
+  const d=state.data,put=(k,v)=>{d[k]=Object.assign({},d[k]||{});if(v===undefined)delete d[k][g];else d[k][g]=v;};
+  put("prsByGym",sn.prs);put("gymReset",sn.reset);put("gymEquipment",sn.equip);put("activeGymSplits",sn.split);put("machineSettings",sn.machine);
+  d.u.gyms=sn.gyms;if(sn.active)switchGym(sn.active);else save();
+  d.prs=(d.prsByGym||{})[activeGymName()]||d.prs;save();gymsRefresh();render();toast("Gym restored");
+}
+function gymReset(g){
+  const d=state.data,sn=gymSnap(g);
+  d.prsByGym=Object.assign({},d.prsByGym||{},{[g]:{}});
+  d.gymReset=Object.assign({},d.gymReset||{},{[g]:new Date(now()).toISOString()});
+  if(activeGymName()===g)d.prs=d.prsByGym[g];
+  save();haptic("done");gymsRefresh();render();
+  toastUndo("Weights and records reset · "+g,()=>gymRestore(g,sn),"Undo");
+}
+function gymDeleteAsk(g){
+  if((state.data.u.gyms||[]).length<2){toast("Add your new gym first, then delete this one");return;}
+  appConfirm({title:"Delete "+g+"?",body:"The gym, its records, weights, equipment and machine settings go. Your sessions there stay in history (volume, calendar, streak).",ok:"Delete gym",danger:true}).then(ok=>{if(ok)gymDelete(g);});
+}
+function gymDelete(g){
+  const d=state.data,sn=gymSnap(g),rest=(d.u.gyms||[]).filter(x=>x!==g),strip=k=>{const o=Object.assign({},d[k]||{});delete o[g];d[k]=o;};
+  if(!rest.length)return;
+  strip("prsByGym");strip("gymEquipment");strip("activeGymSplits");strip("machineSettings");
+  d.gymReset=Object.assign({},d.gymReset||{},{[g]:new Date(now()).toISOString()});   // if a gym with this name is ever added again, it starts empty too
+  d.u.gyms=rest;if(activeGymName()===g||d.u.activeGym===g)switchGym(rest[0]);
+  save();haptic("done");gymsRefresh();render();
+  toastUndo("Deleted "+g,()=>gymRestore(g,sn),"Undo");
+}
 /* ===== BODY (Profile, wave 7) =====
    ONE home for bodyweight. A one-tap weigh-in prefilled with the current value, the 12-week trend of weekly averages, and relative strength over time: the Big-3 barbell-equivalent e1RM
    (the same liftEstimate the Strength card reads) divided by the bodyweight of that week. bwSet() is the only writer (Settings uses it too): d.bwLog keeps its {date,kg} shape with one entry
@@ -7517,60 +7597,8 @@ function weakestMuscle(){let weak=null,wl=999;M12.forEach(m=>{if((state.data.mus
 function gymStats(gymName){
   const ws=state.data.workouts||[];
   let sessions=0,vol=0,first=null,last=null;
-  ws.forEach(w=>{if((w.gym||"")===(gymName||"")){sessions++;vol+=w.totalVol||0;const t=w.date;if(!first||t<first)first=t;if(!last||t>last)last=t;}});
+  ws.forEach(w=>{if(gymOf(w)===(gymName||"")){sessions++;vol+=w.totalVol||0;const t=w.date;if(!first||t<first)first=t;if(!last||t>last)last=t;}});
   return {sessions,vol:Math.round(vol),first,last};
-}
-function gymCampaignsCard(){
-  const d=state.data,u=d.u;
-  const gyms=u.gyms||[];if(!gyms.length)return "";
-  const active=u.activeGym||gyms[0];
-  let html=`<div class="card" style="border-color:rgba(232,197,106,.3)">
-    <div class="ttl" style="display:flex;align-items:center;gap:8px;margin-bottom:2px">🏛️ Gym Campaigns <span class="chip on" style="font-size:10px">${gyms.length} base${gyms.length===1?"":"s"}</span></div>
-    <div class="mini" style="margin:-2px 0 12px;color:var(--text2)">Each gym is its own record book — PRs, equipment and sessions stored separately.</div>`;
-  gyms.forEach(g=>{
-    const isAct=g===active;
-    const st=gymStats(g);
-    const prCount=Object.keys((d.prsByGym&&d.prsByGym[g])||{}).filter(n=>(d.prsByGym[g][n]||{}).orm>0).length;
-    const hasEquip=d.gymEquipment&&d.gymEquipment[g]&&Object.keys(d.gymEquipment[g].equip||{}).length>0;
-    const fmt=dt=>dt?new Date(dt).toLocaleDateString('en-GB',{month:'short',year:'2-digit'}):"";
-    const range=st.first&&st.last?fmt(st.first)+(st.first===st.last?"":" → "+(isAct?"now":fmt(st.last))):"";
-    const boundSplitId=(d.activeGymSplits||{})[g];
-    const boundSplit=boundSplitId&&(d.splits||[]).find(s=>s.id===boundSplitId);
-    if(isAct){
-      html+=`<div style="border:1.5px solid var(--gold-dim);border-radius:14px;padding:13px;margin-bottom:10px;background:linear-gradient(135deg,rgba(232,197,106,.1),rgba(180,140,60,.04))">
-        <div class="row sp" style="margin-bottom:8px">
-          <div>
-            <div style="font-family:var(--disp);font-weight:650;font-size:17px;color:var(--gold2);letter-spacing:.04em">${esc(g)}</div>
-            <div class="mini" style="display:flex;align-items:center;gap:5px;margin-top:2px"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></span><b style="color:var(--green)">ACTIVE BASE</b></div>
-          </div>
-          <button class="btn ghost sm" style="width:auto;font-size:11px;border-color:var(--gold-dim);color:var(--gold2)" onclick="openGym('${esc(g).replace(/'/g,"\\'")}')">⚙️ Equipment</button>
-        </div>
-        <div class="row" style="gap:0;border:1px solid rgba(232,197,106,.2);border-radius:10px;overflow:hidden;margin-bottom:7px">
-          ${[['🎯',st.sessions,'sessions'],['🏋️',fmtNum(st.vol)+'kg','volume'],['🏆',prCount,'PRs set']].map(([ic,v,l],i)=>`<div class="center" style="flex:1;padding:9px 4px;border-left:${i?'1px solid rgba(232,197,106,.15)':'none'}"><div style="font-family:var(--num);font-weight:400;font-size:20px;color:var(--gold2)">${v}</div><div class="mini" style="color:var(--text3)">${l}</div></div>`).join("")}
-        </div>
-        ${range?`<div class="mini" style="color:var(--text3)">📅 ${range}</div>`:""}
-        ${boundSplit?`<div class="mini" style="color:var(--gold2);margin-top:4px">🗂️ <b>${esc(boundSplit.name)}</b> · ${boundSplit.days.length}d split</div>`:`<div class="mini" style="color:var(--text3);margin-top:4px">🗂️ No split bound — set one active on the Mission tab</div>`}
-        ${hasEquip?`<div class="mini" style="color:var(--gold-dim);margin-top:3px">⚙️ Equipment profile saved</div>`:`<div class="mini" style="color:var(--text3);margin-top:3px">⚙️ No equipment profile — tap to add one</div>`}
-      </div>`;
-    }else{
-      html+=`<div style="border:1px solid var(--border2);border-radius:12px;padding:11px;margin-bottom:8px;background:var(--bg2)">
-        <div class="row sp">
-          <div>
-            <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(g)}</div>
-            <div class="mini" style="color:var(--text3);margin-top:2px">📦 Chapter closed · ${st.sessions} sessions · ${prCount} PRs frozen</div>
-          </div>
-          <button class="chip" style="width:auto;font-size:11px" onclick="switchGym('${esc(g).replace(/'/g,"\\'")}');render()">Switch here</button>
-        </div>
-        <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:7px">
-          ${st.vol?`<span class="mini" style="color:var(--text3)">📦 <b style="color:var(--text)">${fmtNum(st.vol)}kg</b> lifetime</span>`:""}
-          ${range?`<span class="mini" style="color:var(--text3)">📅 ${range}</span>`:""}
-          ${boundSplit?`<span class="mini" style="color:var(--text3)">🗂️ <b style="color:var(--text)">${esc(boundSplit.name)}</b></span>`:""}
-        </div>
-      </div>`;
-    }
-  });
-  html+=`<button class="btn ghost sm" style="width:100%;margin-top:4px;border-color:rgba(232,197,106,.3);color:var(--gold2)" onclick="promptAddGym(false)">＋ Start a new gym campaign</button></div>`;
-  return html;
 }
 
 function _splitSheetInner(){
@@ -9788,7 +9816,7 @@ A dock is one sideways-scrolling row of tiles under a tab's hero, each with a pi
 Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). Then a short briefing (tonight's day, one line from the dark side, the muscles on the anatomy and my targets; Begin or Cancel) leads to the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. Finishing shows the suit for a moment: the muscles you trained in gold, the rest in their recovery colour (green ready, amber recovering, red fatigued), with a closing line. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (the recovery map, weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
 
 ## LOGGING SETS: THE FOCUS CARD, RIR TILES AND SET TYPES
-The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan, the Target, Last time and e1RM boxes, then one row per set with the set badge (tap to cycle the set type), kilos, reps and the tick. Empty kilos and reps show the target as ghost values (last time +1 rep, or more weight once you hit 10), and one tap on the tick logs them as they are. Under every working set a small "last 90 × 7" line shows exactly what you lifted on that set in your newest session of the lift, from any day or split, at this gym; only when this gym has none does it use another gym's (marked "other gym"). RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
+The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan, the Target, Last time and e1RM boxes, then one row per set with the set badge (tap to cycle the set type), kilos, reps and the tick. Empty kilos and reps show the target as ghost values (last time +1 rep, or more weight once you hit 10), and one tap on the tick logs them as they are. Under every working set a small "last 90 × 7" line shows exactly what you lifted on that set in your newest session of the lift, from any day or split, at this gym only (a new gym starts empty). Profile → Gyms (or Settings → Manage gyms) lists your gyms: Use, Equipment (equipment and machine brands; their machines show first when you add or swap a lift), Reset weights (wipes that gym's records and last weights, history stays) and Delete, each with Undo. RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
 
 ## PLAN TARGETS AND THE PROGRESSION RULE (WHEN TO ADD WEIGHT)
 A plan day shows each lift's target as sets × rep range, e.g. "PLAN 2 × 5–10" on the focus card (some are optional tonight). Plan ranges are 5–10 reps and ONE progression rule runs everywhere — the focus card's Target box, the exercise detail, the finish summary's Targets and my comments after a set. Only a WORKING set counts: warm-up sets never do. If your best working set reached the top of the range (10 or more reps), add weight (2.5 kg, or 5 kg from 60 kg up) and restart at about 6 reps. At 5–9 reps keep the same load and add one rep. A custom plan with a higher top (say 12–15) moves the add-weight point up with it. Suggested weights show one decimal where needed (72.5 kg, not 73). The Target box shows the next target, for example 67.5 × 10 with "hit 10 → +5 kg" under it.
@@ -12050,8 +12078,8 @@ function settingsHtml(){
       <div class="st-r"><span>Effort scale</span>${seg("metric",[["rir","RIR"],["rpe","RPE"]],u.metric)}</div>
     </section>
     <span class="eyebrow st-g">Gyms</span>
-    <section class="s2 st-list"><div class="st-chips">${(u.gyms||[]).map(g=>`<button class="chip${u.activeGym===g?" on":""}" data-g="${esc(g)}" onclick="stGym(this.dataset.g)">${esc(g)}</button>`).join("")}<button class="chip" onclick="promptAddGym(true)">${GP.icon("plus")}Add gym</button></div>
-      <div class="st-note">Records are tracked separately per gym.</div></section>
+    <section class="s2 st-list"><div class="st-chips">${(u.gyms||[]).map(g=>`<button class="chip${u.activeGym===g?" on":""}" data-g="${esc(g)}" onclick="stGym(this.dataset.g)">${esc(g)}</button>`).join("")}<button class="chip" onclick="promptAddGym(true)">${GP.icon("plus")}Add gym</button><button class="chip" onclick="openGyms()">${GP.icon("sliders")}Manage gyms</button></div>
+      <div class="st-note">Weights and records are kept per gym.</div></section>
     <span class="eyebrow st-g">Alfred</span>
     <section class="s2 st-list">
       <div class="st-r"><span>Voice</span>${seg("coachVoice",[[true,"On"],[false,"Off"]],!!u.coachVoice)}</div>
@@ -12521,7 +12549,7 @@ function lgRx(name){if(LG_ISO.test(name))return LG_RX.iso;return["quads","hamstr
 function lgCap(e){const m=lgMuscle(e);return !!m&&getRecovery(m)<60;}
 function lgPlan(e){const n=(e.sets||[]).filter(s=>s.type!=="W").length;return e.plan?`${+e.plan.s||n} × ${e.plan.r||""}${e.plan.opt?" · optional":""}`:`${n} set${n===1?"":"s"}`;}
 /* last outing of a lift on this gym (working sets, newest first, respects the archive cut) */
-function lgLast(name){const o=lastOuting(name);if(!o)return null;const sets=o.sets.filter(s=>s.type!=="W"&&+s.r>0&&!s.est);return sets.length?{date:o.date,sets,otherGym:o.otherGym}:null;}
+function lgLast(name){const o=lastOuting(name);if(!o)return null;const sets=o.sets.filter(s=>s.type!=="W"&&+s.r>0&&!s.est);return sets.length?{date:o.date,sets}:null;}
 function lgSessionSets(m){let c=0;(state.session.exercises||[]).forEach(e=>{if(e._skip)return;const ex=exFor(e.name),n=(e.sets||[]).filter(s=>s.type!=="W"&&s.done).length;if((ex.p||[]).map(MM_NORM).includes(m))c+=n;else if((ex.s||[]).map(MM_NORM).includes(m))c+=n*.5;});return c;}
 const lgWeekly=m=>Math.round(weeklySets(m)+perWeek(lgSessionSets(m)));
 function lgDayInfo(ses){const sp=(state.data.splits||[]).find(s=>s.id===ses.srcSplit);return sp&&ses.srcDay!=null?`Day ${ses.srcDay+1} of ${sp.days.length}`:"Free session";}
@@ -12708,7 +12736,7 @@ function lgTiles(e,ex,m){
   if(p){const inc=p.inc||(ex.bw?2.5:(p.w>=60?5:2.5));tv=`<b class="num">${lgNum(p.w,ex)}<i>×</i>${p.r}</b>`;ts=p.add?`+${fmtKg(inc)} kg earned · reset to ${p.r}`:`hit ${p.top} → +${fmtKg(inc)} kg`;}
   let lv='<b class="num">—</b>',ls="no history yet";
   if(lb){let bi=0,bv=-1;L.sets.forEach((s,i)=>{const v=setE1RM(ex,s);if(v>=bv){bv=v;bi=i;}});const others=L.sets.filter((s,i)=>i!==bi).map(s=>s.r).slice(0,2),rir=rirOfSet(L.sets[bi]);
-    lv=`<b class="num">${lgNum(lb.w,ex)}<i>×</i>${lb.r}</b>`;ls=lb.otherGym?"other gym · "+Math.round(daysSince(L.date))+"d ago":(others.length?"then ×"+others.join(", "):Math.round(daysSince(L.date))+"d ago")+(rir!=null?" · RIR "+rir:"");}
+    lv=`<b class="num">${lgNum(lb.w,ex)}<i>×</i>${lb.r}</b>`;ls=(others.length?"then ×"+others.join(", "):Math.round(daysSince(L.date))+"d ago")+(rir!=null?" · RIR "+rir:"");}
   let cur=0;(e.sets||[]).forEach(s=>{if(s.type!=="W"&&s.done&&setLogged(e.name,s))cur=Math.max(cur,setE1RM(ex,s));});
   const best=pr&&pr.orm||0,val=cur||(lb?lb.e1:0),isPR=cur>0&&best>0&&cur>best+.01;
   const es=isPR?`PR +${Math.round(cur-best)}`:best?`best ${Math.round(best)}`:"no record yet";
@@ -12719,7 +12747,7 @@ function lgTiles(e,ex,m){
 }
 function lgPlates(kg){const bar=state.data.u.barWeight||20,pl=((state.data.plates&&state.data.plates.length)?state.data.plates.slice():[25,20,15,10,5,2.5,1.25]).sort((a,b)=>b-a);let per=(kg-bar)/2;if(per<=0)return"";const used=[];pl.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});return used.length?used.join(" + "):"";}
 function lgRows(e,ei,ex){
-  const ses=state.session,gs=lgGhosts(e),act=e.sets.findIndex(s=>!s.done),og=!!(lastOuting(e.name)||{}).otherGym;let lastDone=-1;e.sets.forEach((s,i)=>{if(s.done&&s.type!=="W")lastDone=i;});
+  const ses=state.session,gs=lgGhosts(e),act=e.sets.findIndex(s=>!s.done);let lastDone=-1;e.sets.forEach((s,i)=>{if(s.done&&s.type!=="W")lastDone=i;});
   let h="",wn=0;
   e.sets.forEach((s,si)=>{
     const isW=s.type==="W";if(!isW)wn++;
@@ -12732,7 +12760,7 @@ function lgRows(e,ei,ex){
       <div class="lg2-cell"><input data-fid="${ei}-${si}-w" inputmode="decimal" value="${esc(lgHas(s.w)?s.w:"")}" placeholder="${esc(g?g.w:"")}" oninput="setField(${ei},${si},'w',this.value)" aria-label="Set ${wn} kilograms"/>${dchip("w")}</div>
       <div class="lg2-cell"><input data-fid="${ei}-${si}-r" inputmode="numeric" value="${esc(lgHas(s.r)?s.r:"")}" placeholder="${esc(g?g.r:(e.plan&&e.plan.r)||"")}" oninput="setField(${ei},${si},'r',this.value)" aria-label="Set ${wn} reps"/>${dchip("r")}</div>
       <div class="sdone lg2-ck${s.done?" on":""}" role="button" aria-label="Log set ${wn}" onclick="toggleDone(${ei},${si})">${GP.icon("check")}</div></div>`;
-    if(!isW&&(lgHas(s.prevW)||lgHas(s.prevR)))h+=`<div class="lg2-last${s.done?" dn":""}"><span>last</span><b>${esc(lgHas(s.prevW)?lgNum(s.prevW,ex):"–")}</b><i>×</i><b>${esc(lgHas(s.prevR)?String(s.prevR):"–")}</b>${og?'<span class="og">other gym</span>':""}</div>`;
+    if(!isW&&(lgHas(s.prevW)||lgHas(s.prevR)))h+=`<div class="lg2-last${s.done?" dn":""}"><span>last</span><b>${esc(lgHas(s.prevW)?lgNum(s.prevW,ex):"–")}</b><i>×</i><b>${esc(lgHas(s.prevR)?String(s.prevR):"–")}</b></div>`;
     if(g&&g.why&&!s.done)h+=`<div class="lg2-why">${GP.icon("alert")}<span>${esc(g.why)}</span></div>`;
     if(s.done&&!isW&&(si===lastDone||ses._rirOpen===ei+":"+si)){
       const cur=rirOfSet(s);

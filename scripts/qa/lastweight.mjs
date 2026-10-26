@@ -29,9 +29,9 @@ try {
     ];
     save();
   }, CP);
-  const lo = await ev((CP) => { const o = lastOuting(CP); return o && { w: o.sets.filter((s) => s.type !== 'W').map((s) => s.w + 'x' + s.r), other: o.otherGym }; }, CP);
-  ok('newest real outing at THIS gym (a newer quick log and a newer other-gym session are skipped)', lo && lo.w.join() === '100x8,95x7' && !lo.other, lo);
-  ok('other-gym fallback only when this gym has none (flagged)', await ev(() => { const o = lastOuting('Machine Shoulder Press'); return o && o.otherGym && o.sets[0].w === '50'; }), null);
+  const lo = await ev((CP) => { const o = lastOuting(CP); return o && { w: o.sets.filter((s) => s.type !== 'W').map((s) => s.w + 'x' + s.r), gym: o.gym }; }, CP);
+  ok('newest real outing at THIS gym (a newer quick log and a newer other-gym session are skipped)', lo && lo.w.join() === '100x8,95x7' && lo.gym === 'Fitness X', lo);
+  ok('strictly per gym: a lift only done at another gym has no last time here (a new gym starts empty)', await ev(() => lastOuting('Machine Shoulder Press') === null), null);
   ok('case- and space-insensitive name match', await ev((CP) => { const o = lastOuting('  ' + CP.toLowerCase() + ' '); return o && o.sets[1].w === '100'; }, CP), null);
   ok('never through EX_ALIAS: High-to-Low Cable Row keeps its own 60 kg (not the Seated Cable Row\'s 80)', await ev(() => lastOuting('High-to-Low Cable Row').sets[0].w === '60'), null);
   ok('lastBestSet / progression read the same outing', await ev((CP) => { const b = lastBestSet(CP), p = progressionFor(CP); return b.w === 100 && b.r === 8 && p && p.w === 100 && p.r === 9; }, CP), null);
@@ -61,8 +61,8 @@ try {
   if (A.out) { await sleep(300); const el = await P.$('#lgfocus'); if (el) await el.screenshot({ path: path.join(A.out, 'focus-last-lines.png') }); }
   const sw = await ev((CP) => { const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === CP); swapExercise(ei, 'Incline Machine Chest Press'); return ses.exercises[ei].sets.map((s) => s.prevW + ':' + s.prevR); }, CP);
   ok('swap: the new lift shows ITS last numbers per set, none of the old lift\'s', sw.join() === '70:9,70:8,70:8', sw);
-  const sh = await ev(() => { const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === 'Machine Shoulder Press'); if (ei < 0) return { none: true }; state.session._focusEi = ei; try { focusEx(ei); } catch (e) {} render(); const f = document.getElementById('lgfocus'); return { og: !!(f && f.querySelector('.lg2-last .og')), tile: [...f.querySelectorAll('.lg2-kpi')].map((k) => k.textContent.replace(/\s+/g, ' ')).join(' | ') }; });
-  ok('a lift only trained at another gym: the rows and the Last time tile say "other gym"', sh.og && /other gym/.test(sh.tile), sh);
+  const sh = await ev(() => { const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === 'Machine Shoulder Press'); if (ei < 0) return { none: true }; state.session._focusEi = ei; try { focusEx(ei); } catch (e) {} render(); const f = document.getElementById('lgfocus'); return { lines: f.querySelectorAll('.lg2-last').length, tile: [...f.querySelectorAll('.lg2-kpi')].map((k) => k.textContent.replace(/\s+/g, ' ')).join(' | ') }; });
+  ok('a lift only trained at another gym: no "last" lines and an empty Last time tile here', sh.lines === 0 && /Last time\s*—\s*no history yet/.test(sh.tile), sh);
   const other = await ev((CP) => {
     state.session = null; state.step = null; const d = state.data;
     d.splits = d.splits.filter((s) => s.id !== 'qa-mine').concat([{ id: 'qa-mine', name: 'Mine', days: [{ name: 'Push', exercises: [CP.toUpperCase()] }] }]);
