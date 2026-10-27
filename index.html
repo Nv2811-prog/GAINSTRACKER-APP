@@ -5262,35 +5262,116 @@ function dismissWarm(ei){
 }
 /* ===== Wave 10 — The Arsenal: swap engine, antagonist/forearm pairing, 1RM test day ===== */
 /* Exercise-swap: replace a lift mid-session with one that trains the same primary muscle. Sets carry over. */
-function openSwap(ei){
-  const e=state.session.exercises[ei];if(!e)return;const cur=exFor(e.name);const prim=(cur.p&&cur.p[0])||null;
-  state._swapEi=ei;state._swapPrim=prim;state._swapQ="";
-  const total=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim).length,mn=prim?MNAME[prim].toLowerCase():"";
-  openSheet(`${shHd("Swap lift",{ic:"swap",sub:esc(e.name),closeLabel:"Close swap list"})}
-    <div class="gh"><p class="t-s px-lede">${total} option${total===1?"":"s"} with the same primary muscle${mn?` (${mn})`:""}. Your logged sets stay put.</p>
+/* The swap list serves a lift in tonight's workout (openSwap) or a lift in the plan editor (openPlanSwap): state._swapCtx says which.
+   Picking a lift that other days of the split also have asks where it applies (swapScopeSheet): only this day, or every day with it. */
+function swapCtx(){
+  const c=state._swapCtx||{kind:"session"};
+  if(c.kind==="plan"){const sp=(state.data.splits||[]).find(x=>x.id===c.id),day=sp&&sp.days[c.i],name=day&&(day.exercises||[])[c.j];
+    return name?{name,taken:new Set(day.exercises),plan:true,pick:J=>`planSwapPick('${c.id}',${c.i},${c.j},${J})`}:null;}
+  const e=state.session&&state.session.exercises[state._swapEi];
+  return e?{name:e.name,taken:new Set(state.session.exercises.map(x=>x.name)),plan:false,pick:J=>`swapPick(${state._swapEi},${J})`}:null;
+}
+function swapSheetOpen(){
+  const c=swapCtx();if(!c)return;const cur=exFor(c.name),prim=(cur.p&&cur.p[0])||null;
+  state._swapPrim=prim;state._swapQ="";
+  const total=EXDB.filter(x=>x.n!==c.name&&(x.p&&x.p[0])===prim).length,mn=prim?MNAME[prim].toLowerCase():"";
+  openSheet(`${shHd("Swap lift",{ic:"swap",sub:esc(c.name),closeLabel:"Close swap list"})}
+    <div class="gh"><p class="t-s px-lede">${total} option${total===1?"":"s"} with the same primary muscle${mn?` (${mn})`:""}. ${c.plan?"Each day keeps its sets × reps.":"Your logged sets stay put."}</p>
       ${shSearch("swap-search",`Search ${mn?mn+" ":""}movements`,"drawSwapList()")}
       <div id="swap-list" class="px-list"></div></div>`);
   drawSwapList();
 }
+function openSwap(ei){if(!(state.session&&state.session.exercises[ei]))return;state._swapEi=ei;state._swapCtx={kind:"session"};swapSheetOpen();}
+function openPlanSwap(id,i,j){state._swapCtx={kind:"plan",id,i,j};swapSheetOpen();}
 function drawSwapList(){
-  const ei=state._swapEi,prim=state._swapPrim;const e=state.session&&state.session.exercises[ei];if(!e)return;
-  const cur=exFor(e.name),raw=($("swap-search")?$("swap-search").value:"").trim(),q=raw.toLowerCase();
-  const inSession=new Set(state.session.exercises.map(x=>x.name));
-  let alts=EXDB.filter(x=>x.n!==e.name&&(x.p&&x.p[0])===prim&&!inSession.has(x.n));
+  const c=swapCtx(),prim=state._swapPrim;if(!c)return;
+  const cur=exFor(c.name),raw=($("swap-search")?$("swap-search").value:"").trim(),q=raw.toLowerCase();
+  const inSession=c.taken;
+  let alts=EXDB.filter(x=>x.n!==c.name&&(x.p&&x.p[0])===prim&&!inSession.has(x.n));
   const gymOn=state.gymFilter&&!!((state.data.gymEquipment||{})[state.data.u.activeGym||""]||{}).equip;
   if(gymOn)alts=alts.filter(x=>gymAllows(x.eq));
   if(q)alts=alts.filter(x=>x.n.toLowerCase().includes(q));
   alts=alts.filter(x=>exBrandShown(x,q));
   alts.sort((a,b)=>exBrandRank(a)-exBrandRank(b)||(a.eq===cur.eq?0:1)-(b.eq===cur.eq?0:1)||a.n.localeCompare(b.n));   // this gym's machines first
   const el=$("swap-list");if(!el)return;
-  const go=J=>`swapExercise(${ei},${J})`;
+  const go=c.pick;
   el.innerHTML=alts.length?alts.map(x=>pxRow(x,{open:go,openLabel:"Swap to",act:go,actLabel:"Swap to",icon:"swap"})).join("")
-    :`<div class="px-empty">${GP.icon("search")}<b>${q?`No match for "${esc(raw)}"`:"No alternatives"}</b><span>${q?"Try another word.":gymOn?"Nothing else in your gym trains this muscle.":"Every other option is already in tonight's session."}</span></div>`;
+    :`<div class="px-empty">${GP.icon("search")}<b>${q?`No match for "${esc(raw)}"`:"No alternatives"}</b><span>${q?"Try another word.":gymOn?"Nothing else in your gym trains this muscle.":c.plan?"Every other option is already on this day.":"Every other option is already in tonight's session."}</span></div>`;
 }
-function swapExercise(ei,name){
-  const e=state.session.exercises[ei];if(!e)return;e.name=name;
-  e.sets=withPrev(name,e.sets||[],true);   // the new lift's own last numbers per set; none = no stale ones from the old lift
-  haptic("done");closeSheet();toast("Swapped to "+name);saveSession();syncSessionToSplit();render();
+/* ===== SWAP ACROSS THE SPLIT (2026-10-27) =====
+   A swapped lift takes over its slot's plan (sets × reps) on every day it changes, so the split's weekly volume never moves (before, the new
+   lift started from last time's set count or 3). Swapping a lift that other days also have asks: only this day, or every day with it. */
+const dayShort=n=>String(n||"").split("·")[0].trim()||"Day";
+function splitDaysWith(sp,name){return ((sp&&sp.days)||[]).map((d,i)=>({d,i})).filter(x=>!isRest(x.d)&&(x.d.exercises||[]).includes(name));}
+function swapInDay(day,from,to){   // replace one lift on a plan day, keeping its slot and its plan; false when the day lacks it or already has the new one
+  const ex=day.exercises||[],j=ex.indexOf(from);if(j<0||ex.includes(to))return false;
+  day.exercises=ex.map((n,k)=>k===j?to:n);
+  if(day.plan&&day.plan[from]){const {[from]:pl,...rest}=day.plan;day.plan={...rest,[to]:pl};}
+  return true;
+}
+const daySnap=days=>days.map(d=>({d,ex:(d.exercises||[]).slice(),pl:d.plan?{...d.plan}:null}));
+const dayRestore=snap=>snap.forEach(x=>{x.d.exercises=x.ex;if(x.pl)x.d.plan=x.pl;else delete x.d.plan;});
+function swapScopeSheet(from,to,dayName,others,onlyFn,allFn){
+  const all=[dayName,...others.map(x=>dayShort(x.d.name))].join(" · ");
+  openSheet(`${shHd("Swap on which days?",{ic:"swap",sub:esc(from)+" → "+esc(to)})}<div class="gh"><p class="t-s px-lede">${others.length} other day${others.length===1?"":"s"} in your split ${others.length===1?"has":"have"} ${esc(from)}. Every day keeps its own sets × reps, so your weekly volume stays the same.</p>
+    <section class="s2 gh-list">${p3Row("swap","Every day with it",esc(all),allFn,1)}${p3Row("calendar","Only "+esc(dayName),"The other days keep "+esc(from),onlyFn)}</section></div>`);
+  state._sheetKind="swapscope";
+}
+function swapPick(ei,name){
+  const ses=state.session,e=ses&&ses.exercises[ei];if(!e)return;
+  const sp=(state.data.splits||[]).find(x=>x.id===ses.srcSplit),here=sp&&sp.days[ses.srcDay],others=sp?splitDaysWith(sp,e.name).filter(x=>x.i!==ses.srcDay):[];
+  if(!others.length){swapExercise(ei,name,"day");return;}
+  const J=esc(JSON.stringify(name));
+  swapScopeSheet(e.name,name,dayShort(here?here.name:"Tonight"),others,`swapExercise(${ei},${J},'day')`,`swapExercise(${ei},${J},'all')`);
+}
+function swapExercise(ei,name,scope){
+  const ses=state.session,e=ses&&ses.exercises[ei];if(!e)return;
+  const from=e.name,oldSets=e.sets,sp=(state.data.splits||[]).find(x=>x.id===ses.srcSplit),here=sp&&sp.days[ses.srcDay]&&!isRest(sp.days[ses.srcDay])?sp.days[ses.srcDay]:null;
+  const days=[here,...(scope==="all"&&sp?splitDaysWith(sp,from).map(x=>x.d).filter(d=>d!==here):[])].filter(Boolean),snap=daySnap(days);
+  e.name=name;e.sets=withPrev(name,e.sets||[],true);   // the new lift's own last numbers per set; none = no stale ones from the old lift
+  const n=days.filter(d=>swapInDay(d,from,name)).length;   // tonight's day + (all) the others: each slot keeps its sets × reps
+  haptic("done");closeSheet();saveSession();syncSessionToSplit();save();render();
+  toastUndo(n>1?`Swapped on ${n} days`:"Swapped to "+name,()=>{e.name=from;e.sets=oldSets;dayRestore(snap);saveSession();save();render();});
+}
+function planSwapPick(id,i,j,name){
+  const sp=(state.data.splits||[]).find(x=>x.id===id),day=sp&&sp.days[i],from=day&&(day.exercises||[])[j];if(!from)return;
+  const others=splitDaysWith(sp,from).filter(x=>x.i!==i),J=esc(JSON.stringify(name));
+  if(!others.length){planSwap(id,i,j,name,"day");return;}
+  swapScopeSheet(from,name,dayShort(day.name),others,`planSwap('${id}',${i},${j},${J},'day')`,`planSwap('${id}',${i},${j},${J},'all')`);
+}
+function planSwap(id,i,j,name,scope){
+  const sp=(state.data.splits||[]).find(x=>x.id===id),day=sp&&sp.days[i],from=day&&(day.exercises||[])[j];if(!from)return;
+  const days=[day,...(scope==="all"?splitDaysWith(sp,from).map(x=>x.d).filter(d=>d!==day):[])],snap=daySnap(days);
+  const n=days.filter(d=>swapInDay(d,from,name)).length;
+  haptic("done");openSplitSheet();splitsChanged();
+  toastUndo(n>1?`Swapped on ${n} days`:"Swapped to "+name,()=>{dayRestore(snap);splitsChanged();});
+}
+/* "Copy lifts to the other Upper days": a day's sibling days (same first word in the name, sharing at least half their lifts) take over its
+   swaps slot by slot. Lifts both days have anchor the match; between anchors the leftovers pair up in order (old → new) and each day keeps
+   its own sets × reps for the slot. A lift only the other day has (e.g. its extra Reverse Pec Deck) stays; nothing is added or dropped. */
+function liftSwapsBetween(src,dst){   // [[old on dst, new from src], ...]
+  const n=src.length,m=dst.length,L=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let a=n-1;a>=0;a--)for(let b=m-1;b>=0;b--)L[a][b]=src[a]===dst[b]?L[a+1][b+1]+1:Math.max(L[a+1][b],L[a][b+1]);
+  const pairs=[];let a=0,b=0,gs=[],gd=[];
+  const flush=()=>{for(let k=0;k<Math.min(gs.length,gd.length);k++)pairs.push([gd[k],gs[k]]);gs=[];gd=[];};
+  while(a<n&&b<m){if(src[a]===dst[b]){flush();a++;b++;}else if(L[a+1][b]>=L[a][b+1])gs.push(src[a++]);else gd.push(dst[b++]);}
+  while(a<n)gs.push(src[a++]);while(b<m)gd.push(dst[b++]);flush();
+  return pairs.filter(([,nw])=>!dst.includes(nw));
+}
+function daySiblings(sp,i){
+  const day=sp.days[i],key=w=>String(w||"").trim().split(/\s+/)[0].toLowerCase(),k=key(day&&day.name),src=(day&&day.exercises)||[];
+  if(!k||isRest(day)||!src.length)return [];
+  return sp.days.map((d,x)=>({d,i:x})).filter(o=>{if(o.i===i||isRest(o.d)||key(o.d.name)!==k)return false;
+    const ex=o.d.exercises||[],shared=ex.filter(n=>src.includes(n)).length;return shared*2>=Math.min(ex.length,src.length);});
+}
+function copyDayLifts(id,i){
+  const sp=(state.data.splits||[]).find(x=>x.id===id),day=sp&&sp.days[i];if(!day)return;
+  const sib=daySiblings(sp,i),snap=daySnap(sib.map(o=>o.d)),done=new Set();
+  sib.forEach(o=>liftSwapsBetween(day.exercises||[],o.d.exercises||[]).forEach(([from,to])=>{if(swapInDay(o.d,from,to))done.add(from+"→"+to);}));
+  const n=done.size;haptic(n?"done":"tap");splitsChanged();
+  if(!n){toast(sib.map(o=>dayShort(o.d.name)).join(" and ")+" already match "+dayShort(day.name));return 0;}
+  toastUndo(`${n} swap${n===1?"":"s"} copied to ${sib.map(o=>dayShort(o.d.name)).join(" · ")}, sets kept`,()=>{dayRestore(snap);splitsChanged();});
+  return n;
 }
 /* Antagonist / forearm pairing — the only superset-style tool, kept purposeful:
    pair a lift with its true antagonist (or the other forearm side) and run them back-to-back. */
@@ -8931,7 +9012,7 @@ function gmLiftRow(sp,i,day,j){
     s=ghSetsOf(day,n),r=(pl&&pl.r)||GM_REPS,safe=esc(n).replace(/'/g,""),last=day.exercises.length-1;
   const panel=open?`<div class="gm-pe"><div class="gm-step"><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s-1}})" aria-label="Fewer sets"${s<=1?" disabled":""}>${gmIc("minus")}</button><span><b class="num${state._gmTick&&state._gmTick.k===id+"|"+i+"|"+j&&state._gmTick.d?(state._gmTick.d>0?" tk-up":" tk-dn"):""}">${s}</b> sets</span><button class="btn-i sm" onclick="gmPlanSet(${js},{s:${s+1}})" aria-label="More sets"${s>=GM_MAX_SETS?" disabled":""}>${GP.icon("plus")}</button></div>
       <div class="gm-chips">${GM_REP_PRESETS.map(p=>`<button class="chip${r===p?" on":""}" onclick="gmPlanSet(${js},{r:'${p}'})">${p} reps</button>`).join("")}<button class="chip${pl&&pl.opt?" on":""}" onclick="gmPlanSet(${js},{opt:${pl&&pl.opt?0:1}})">Optional</button></div>
-      <div class="gm-drow"><span class="t-xs">Order · remove</span><div class="gm-mv"><button class="btn-i sm" onclick="gmMoveEx(${js},-1)" aria-label="Move lift up"${j===0?" disabled":""}>${gmIc("up")}</button><button class="btn-i sm" onclick="gmMoveEx(${js},1)" aria-label="Move lift down"${j===last?" disabled":""}>${gmIc("down")}</button><button class="btn-i sm" onclick="gmRmEx(${js})" aria-label="Remove lift">${GP.icon("x")}</button></div></div></div>`:"";
+      <div class="gm-drow"><span class="t-xs">Swap · order · remove</span><div class="gm-mv"><button class="btn-i sm" onclick="openPlanSwap(${js})" aria-label="Swap lift">${GP.icon("swap")}</button><button class="btn-i sm" onclick="gmMoveEx(${js},-1)" aria-label="Move lift up"${j===0?" disabled":""}>${gmIc("up")}</button><button class="btn-i sm" onclick="gmMoveEx(${js},1)" aria-label="Move lift down"${j===last?" disabled":""}>${gmIc("down")}</button><button class="btn-i sm" onclick="gmRmEx(${js})" aria-label="Remove lift">${GP.icon("x")}</button></div></div></div>`:"";
   return `<div class="gm-lift"><div class="gm-lh"><div class="gm-lm" onclick="openExDetail('${safe}')">${thumb(ex,2)}<div class="gm-ln"><div class="gh-t1">${esc(n)}</div>${splitExHint(n)}</div></div>
     <button class="gm-tgt${pl?"":" dflt"}${open?" on":""}" onclick="gmPlanEd(${js})" aria-expanded="${open}" aria-label="Sets and reps for ${esc(n)}">${s} × ${esc(r)}${pl&&pl.opt?" opt":""}</button></div>${panel}</div>`;
 }
@@ -8943,7 +9024,7 @@ function gmDayEd(sp,i){
   const chips=gmChips(day,4);
   return `<div class="gm-dayed">${head}<div class="gm-drow"><div class="gm-chips">${chips||'<span class="t-xs">No lifts yet</span>'}</div>${mv}</div>
     ${(day.exercises||[]).map((_,j)=>gmLiftRow(sp,i,day,j)).join("")}
-    <div class="gm-drow gm-acts"><button class="btn sm" onclick="addDayExercise('${id}',${i})">${GP.icon("plus")}Add lifts</button><button class="btn sm" onclick="toggleRestDay('${id}',${i})">Make rest</button></div></div>`;
+    <div class="gm-drow gm-acts"><button class="btn sm" onclick="addDayExercise('${id}',${i})">${GP.icon("plus")}Add lifts</button><button class="btn sm" onclick="toggleRestDay('${id}',${i})">Make rest</button></div>${(sib=>sib.length?`<div class="gm-drow gm-acts"><button class="btn sm" onclick="copyDayLifts('${id}',${i})">${gmIc("copy")}Copy lifts to ${esc(sib.map(o=>dayShort(o.d.name)).join(", "))}</button></div>`:"")(daySiblings(sp,i))}</div>`;
 }
 function scheduleEditorHtml(){
   const d=state.data,n=trainingDayCount();
@@ -10089,8 +10170,11 @@ The Garage is a fleet that unlocks with real milestones (sessions, streak, lifet
 ## THE 8-DAY CYCLE AND LOGGING A REST DAY
 The default plan is the 8-Day Cycle · Upper / Lower: Upper A (Wingspan), Lower A (Foundation), Rest, Upper B (Shoulder Armor), Lower B (Backbone), Rest, Upper C (Chest Plate), Rest — five sessions, three rest days. It follows what you actually did: tonight is the day after the last plan day you completed. The rest days after it pass by themselves, one per calendar day; a training day is never skipped, so miss three days and the next workout is still the next training day. Log rest day on Gotham marks it done at once (it counts for your streak and calendar; Undo in the toast). Train anyway on a rest day starts the next plan day. A Free Session or a session from another split never moves the cycle.
 
+## CHANGING LIFTS ACROSS THE SPLIT
+MISSION → Edit plan: tap a lift's sets × reps to open it; Swap (next to the order arrows) picks another lift and asks Every day with it or Only this day, like the swap in a workout. Each changed day keeps its own sets × reps for that slot, so the plan's weekly volume does not change. A day with sibling days (same first word, e.g. Upper A, Upper B, Upper C or Lower A, Lower B) has Copy lifts to Upper B, Upper C: one tap gives those days the same swaps slot by slot, each keeping its own sets; a lift only they have (like Reverse Pec Deck) stays. Undo is in the toast.
+
 ## TOOLS DURING A SESSION: SKIP, REORDER, SWAP, WARM-UP RAMP, PLATE MATHS
-The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (seat, pads, handles and more with + / − steppers, saved per machine per gym; also the Setup strip on every machine or cable lift's focus card), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. Warm-up ramp opens a sheet: type your top set (kilos × reps, prefilled from the first set), pick 1 to 5 warm-up sets and it lists each warm-up weight × reps, rounded to what you can load (plates per side on a barbell); Add puts them on the lift as warm-up sets. Your choice of how many is remembered per lift, and the Forge in the Lab uses the same ramp. When a lift trains a muscle that is still cold, the button shows a dot and the menu lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
+The ⋯ Exercise options button on the focus card opens: Exercise details (muscles, cues, history), Choose picture, Warm-up ramp, Fill from last time, Swap exercise (another lift for the same primary muscle; sets carry over; when other days of your split have the same lift it asks Every day with it or Only this day, and each day keeps its own sets × reps for that slot, so weekly volume stays the same), Edit exercise (brand, equipment, muscle parts), Pair as superset, Intensity technique, Plate maths (barbells: plates per side for a target weight, using the bar weight in Settings), Machine setup (seat, pads, handles and more with + / − steppers, saved per machine per gym; also the Setup strip on every machine or cable lift's focus card), Form cues, Reorder lifts, Skip tonight (pick a reason: logged, not judged) and Remove exercise. Warm-up ramp opens a sheet: type your top set (kilos × reps, prefilled from the first set), pick 1 to 5 warm-up sets and it lists each warm-up weight × reps, rounded to what you can load (plates per side on a barbell); Add puts them on the lift as warm-up sets. Your choice of how many is remembered per lift, and the Forge in the Lab uses the same ramp. When a lift trains a muscle that is still cold, the button shows a dot and the menu lets you skip the suggestion. Add set and Warm-up ramp also sit under the sets; Reorder, Add exercise, Analysis, Session notes, Finish workout and Discard session are at the bottom of the screen.
 
 ## DATA CONTROL: ARCHIVING OLD MACHINE WEIGHTS, BACKUP, RESTORE AND CSV EXPORT
 Settings → Data control (also Profile → the Backup tile). Archive an exercise when equipment changes: tonight's first set stops being compared with the old machine's numbers and "last time" starts fresh. Nothing is deleted; Restore brings it back. Archive everything does it for all lifts. The same sheet has Back up now (progress photos go into the file at full size), Restore from a backup, Export workouts (CSV) and, under Danger zone, Erase all data (back up first; photos included).

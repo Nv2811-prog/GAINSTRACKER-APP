@@ -72,8 +72,11 @@ try {
   await ev(() => { const i = document.getElementById('swap-search'); i.value = ''; drawSwapList(); }); await sleep(100);
   const before = await ev(() => state.session.exercises[0].name);
   await tap('#swap-list .px-row .px-add'); await sleep(450);
+  // the lift is on other days of the split too, so the swap asks where it applies (swapall.mjs covers both answers)
+  const asked = await ev(() => state._sheetKind === 'swapscope');
+  if (asked) { await tap('#sheet .gh-row:last-child'); await sleep(450); }
   const after = await ev(() => ({ n: state.session.exercises[0].name, open: document.getElementById('sheet').classList.contains('on') }));
-  check('swap: a tap swaps the lift and closes the sheet', after.n !== before && !after.open, JSON.stringify({ before, after }));
+  check('swap: a tap swaps the lift (after "which days?" when other days have it) and closes the sheet', asked && after.n !== before && !after.open, JSON.stringify({ asked, before, after }));
   await reset();
 
   // ---- add-exercise picker -> empty state offers Create -> creator keeps its draft across the picture picker ----

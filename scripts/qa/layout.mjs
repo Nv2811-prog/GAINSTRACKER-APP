@@ -54,7 +54,7 @@ const COMMON = [
   ['sheet oracle', 'openOracle()', SHEET], ['sheet trophy room', 'openTrophyRoom()', SHEET], ['sheet contracts', 'openContracts()', SHEET], ['sheet simulator', 'openSimulator()', SHEET], ['sheet focus', 'openFocus()', SHEET],
   ['sheet plate calculator', 'openPlateSheet(-1)', SHEET], ['sheet 1RM test day', 'openTestDay()', SHEET],
   ['sheet add exercise', 'openPicker()', SHEET], ['sheet add exercise, no match', "openPicker();document.getElementById('ex-search').value='zzq';updateExList()", SHEET],
-  ['sheet custom exercise', "openPicker();openCustomCreator('Cable Y Raise')", SHEET], ['sheet edit exercise', "openExEditor('Lat Pulldown (Wide Grip)')", SHEET],
+  ['sheet custom exercise', "openPicker();openCustomCreator('Cable Y Raise')", SHEET], ['sheet edit exercise', "openExEditor('Lat Pulldown (Wide Grip)')", SHEET], ['sheet plan swap', "openSplitSheet();openPlanSwap(state.data.activeSplitId,0,0)", SHEET],
   ['sheet edit exercise + part info', "openExEditor('Lat Pulldown (Wide Grip)');cxInfo('triceps','long')", SHEET], ['sheet picture picker', "openPicPicker('Bench Press (Barbell)','x')", SHEET],
   ['sheet rank ladder', 'openRankLadder()', OVERLAY],
   ['overlay alfred chat', 'openAlfredChat()', OVERLAY]
@@ -62,7 +62,7 @@ const COMMON = [
 const LIVE = [
   ['step readiness', '(()=>{const {sp,i}=__qa.nextDay();startWorkout(sp.id,i);})()', 'step'], ['step logging', '__qa.startLogging(2)', 'step'],
   ['step logging + exercise sheet', '__qa.startLogging(2);openExDetail(state.session.exercises[0].name)', SHEET], ['step logging + plate sheet', '__qa.startLogging(1);openPlateSheet(0)', SHEET], ['step logging + warm-up ramp sheet', '__qa.startLogging(1);openRamp(0)', SHEET],
-  ['step logging + swap sheet', '__qa.startLogging(2);openSwap(0)', SHEET], ['step logging + running order sheet', '__qa.startLogging(2);openReorder()', SHEET], ['step logging + skip sheet', '__qa.startLogging(2);openSkipEx(0)', SHEET],
+  ['step logging + swap sheet', '__qa.startLogging(2);openSwap(0)', SHEET], ['step logging + swap: which days', "__qa.startLogging(1);(function(){const e=state.session.exercises[0],p=exFor(e.name).p[0],a=EXDB.find(x=>x.p&&x.p[0]===p&&x.n!==e.name&&!x.br);openSwap(0);swapPick(0,a.n);})()", SHEET], ['step logging + running order sheet', '__qa.startLogging(2);openReorder()', SHEET], ['step logging + skip sheet', '__qa.startLogging(2);openSkipEx(0)', SHEET],
   ['home with a live session', "__qa.startLogging(2);state.minimized=true;state.step=null;go('gotham')", TAB], ['mission with a live session', "__qa.startLogging(2);state.minimized=true;state.step=null;go('mission')", TAB],
   ['step summary', '__qa.startLogging(3);__qa.finish()', 'step']
 ];
