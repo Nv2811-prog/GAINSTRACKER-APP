@@ -23,11 +23,11 @@ try {
   ok('old "102,5" history: last best 102.5 × 8, its e1RM, the target 102.5 × 9, real volume, and the stored text untouched', hist.lb && hist.lb[0] === 102.5 && hist.lb[2] === Math.round(102.5 * (1 + 8 / 30)) && hist.p[0] === 102.5 && hist.p[1] === 9 && hist.vol > 800 && hist.kept === '102,5', hist);
   const ui = await ev((CP) => {
     const sp = state.data.splits.find((s) => s.id === 'cycle8v2'); __qa.clear(); startWorkout(sp.id, 3); setReadiness('okay'); beginPatrol();
-    const ei = state.session.exercises.findIndex((x) => x.name === CP); state.session._focusEi = ei; try { focusEx(ei); } catch (e) {} render();
+    const ei = state.session.exercises.findIndex((x) => x.name === CP); state.session._focusEi = ei; state._lgInfo = true; try { focusEx(ei); } catch (e) {} render();   // the tiles are behind the fold line
     const f = document.getElementById('lgfocus'), last = [...f.querySelectorAll('.lg2-last')].map((x) => x.textContent.replace(/\s+/g, '')), tile = [...f.querySelectorAll('.lg2-kpi')].map((k) => k.textContent.replace(/\s+/g, ' '));
     return { last, tile: tile.join(' | ') };
   }, CP);
-  ok('the focus card reads it: "last 102.5 × 8 / 97.5 × 7", Last time 102.5', ui.last[0] === 'last102.5×8' && ui.last[1] === 'last97.5×7' && /Lasttime102\.5×8/.test(ui.tile.replace(/\s+/g, '')), ui);
+  ok('the focus card reads it: "last 102.5 × 8 / 97.5 × 7", Last time 102.5', ui.last[0].startsWith('last102.5×8') && ui.last[1].startsWith('last97.5×7') && /Lasttime102\.5×8/.test(ui.tile.replace(/\s+/g, '')), ui);
   // typing a comma now stores a dot; finishing a session that still holds an old comma (a restored session) counts it
   const fin = await ev((CP) => {
     const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === CP); setField(ei, 0, 'w', '105,5'); setField(ei, 0, 'r', '8');

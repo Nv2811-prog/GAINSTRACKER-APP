@@ -168,14 +168,16 @@ const CORE=new Set(new Function(coreTxt+'\nreturn CORE_EX;')().map(e=>e.n));
 
 // ===== seedSets honours the plan's set count, and every set carries its row's last numbers =====
 {const fn=js.slice(js.indexOf('function withPrev('),js.indexOf('/* ========================= SCIENCE-BASED FATIGUE'))+js.slice(js.indexOf('function seedSets('),js.indexOf('function setReadiness('));
- const c={};vm.createContext(c);vm.runInContext('function lastSetFor(){return [{w:20,r:10,type:"W"},{w:80,r:7,type:"NRM"},{w:80,r:6,type:"NRM"},{w:75,r:8,type:"NRM"}];}\n'+fn,c);
+ const c={};vm.createContext(c);vm.runInContext('var WC=0;function warmCountOf(){return WC;}function lastWarmups(){return [{w:20,r:10,type:"W"}];}function lastSetFor(){return [{w:20,r:10,type:"W"},{w:80,r:7,type:"NRM"},{w:80,r:6,type:"NRM"},{w:75,r:8,type:"NRM"}];}\n'+fn,c);
  const five=vm.runInContext('seedSets("x",{s:5,r:"5–10"})',c);
  ok(five.length===5&&five[2].prevW===75&&five[3].prevW===75&&five[4].prevR===8&&five.every(s=>s.type==="NRM"&&s.w===""),'plan 5 sets after a 3-set session → the extra sets show the last working set (never blank)');
  const sw=vm.runInContext('withPrev("x",[{type:"NRM",prevW:999,prevR:1},{type:"W",prevW:999}],true)',c);
  ok(sw[0].prevW===80&&sw[1].prevW===20,'withPrev re-stamps working and warm-up sets from the newest outing');
  const two=vm.runInContext('seedSets("x",{s:2,r:"5–8"})',c);
  ok(two.length===2&&two[0].prevW===80&&two[1].prevR===6,'plan 2 sets → exactly 2 sets, last session\'s working numbers shown');
- ok(vm.runInContext('seedSets("x").length',c)===4,'no plan → old behaviour (copies last session)');}
+ ok(vm.runInContext('seedSets("x").length',c)===3,'no plan → copies last session\'s working sets');
+ const kept=vm.runInContext('WC=2;seedSets("x",{s:2,r:"5–8"})',c);
+ ok(kept.length===4&&kept[0].type==="W"&&kept[0].prevW===20&&kept[1].type==="W"&&kept[2].prevW===80&&kept[3].prevR===6,'kept warm-ups sit above the plan\'s working sets, and working set 1 is still last time\'s set 1');}
 
 // ===== Import code round-trip (carries the plan, rejects junk targets) =====
 {const blk=js.slice(js.indexOf('function encodeSplit('),js.indexOf('function shareSplit('));

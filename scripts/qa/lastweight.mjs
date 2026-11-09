@@ -43,24 +43,24 @@ try {
     __qa.clear(); const sp = state.data.splits.find((s) => s.id === 'cycle8v2'); startWorkout(sp.id, 3);
     const e = state.session.exercises.find((x) => x.name === CP); return e.sets.map((s) => [s.type, s.prevW, s.prevR].join(':'));
   }, CP);
-  ok('Upper B: every set of the chest press carries Upper A\'s numbers (100 × 8, 95 × 7)', ub.join() === 'NRM:100:8,NRM:95:7', ub);
+  ok('Upper B: every set of the chest press carries Upper A\'s numbers (warm-up 20 × 10 kept, 100 × 8, 95 × 7)', ub.join() === 'W:20:10,NRM:100:8,NRM:95:7', ub);
   const more = await ev((CP) => { const e = state.session.exercises.find((x) => x.name === CP); addSet(state.session.exercises.indexOf(e)); const s = e.sets[e.sets.length - 1]; return [s.prevW, s.prevR].join(':'); }, CP);
   ok('a set beyond last time\'s count shows the last working set (never blank)', more === '95:7', more);
   const seeded = await ev((CP) => seedSets(CP, { s: 4, r: '5–10' }).map((s) => s.prevW + ':' + s.prevR), CP);
-  ok('a plan of 4 sets after a 2-set session: sets 3 and 4 show 95 × 7', seeded.join() === '100:8,95:7,95:7,95:7', seeded);
+  ok('a plan of 4 sets after a 2-set session: sets 3 and 4 show 95 × 7', seeded.join() === '20:10,100:8,95:7,95:7,95:7', seeded);
   // the focus card renders a "last" line under every working set
   const card = await ev((CP) => {
-    const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === CP); ses._focusEi = ei; state.step = 'logging'; try { focusEx(ei); } catch (e) {} render();
+    const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === CP); ses._focusEi = ei; state.step = 'logging'; state._lgInfo = true; try { focusEx(ei); } catch (e) {} render();   // the tiles are behind the fold line
     const f = document.getElementById('lgfocus'); if (!f) return { none: true };
     const rows = f.querySelectorAll('.lg2-sr:not(.w)').length, lines = [...f.querySelectorAll('.lg2-last')].map((x) => x.textContent.replace(/\s+/g, ' ').trim());
     const tile = [...f.querySelectorAll('.lg2-kpi')].find((k) => /Last time/i.test(k.textContent));
     return { rows, lines, tile: tile && tile.textContent.replace(/\s+/g, ' ').trim(), title: f.querySelector('h2').textContent };
   }, CP);
-  ok('focus card: one "last" line per working set, with that set\'s numbers', card.title === CP && card.rows === 3 && card.lines.length === 3 && card.lines[0].replace(/\s+/g, '') === 'last100×8' && card.lines[1].replace(/\s+/g, '') === 'last95×7', card);
+  ok('focus card: one "last" line per working set, with that set\'s numbers', card.title === CP && card.rows === 3 && card.lines.length === 3 && card.lines[0].replace(/\s+/g, '').startsWith('last100×8') && card.lines[1].replace(/\s+/g, '').startsWith('last95×7'), card);
   ok('focus card: the Last time tile agrees (100 × 8)', /100\s*×\s*8/.test(card.tile || ''), card.tile);
   if (A.out) { await sleep(300); const el = await P.$('#lgfocus'); if (el) await el.screenshot({ path: path.join(A.out, 'focus-last-lines.png') }); }
   const sw = await ev((CP) => { const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === CP); swapExercise(ei, 'Incline Machine Chest Press'); return ses.exercises[ei].sets.map((s) => s.prevW + ':' + s.prevR); }, CP);
-  ok('swap: the new lift shows ITS last numbers per set, none of the old lift\'s', sw.join() === '70:9,70:8,70:8', sw);
+  ok('swap: the new lift shows ITS last numbers per set, none of the old lift\'s (its warm-up row has none)', sw.join() === 'null:null,70:9,70:8,70:8', sw);
   const sh = await ev(() => { const ses = state.session, ei = ses.exercises.findIndex((x) => x.name === 'Machine Shoulder Press'); if (ei < 0) return { none: true }; state.session._focusEi = ei; try { focusEx(ei); } catch (e) {} render(); const f = document.getElementById('lgfocus'); return { lines: f.querySelectorAll('.lg2-last').length, tile: [...f.querySelectorAll('.lg2-kpi')].map((k) => k.textContent.replace(/\s+/g, ' ')).join(' | ') }; });
   ok('a lift only trained at another gym: no "last" lines and an empty Last time tile here', sh.lines === 0 && /Last time\s*—\s*no history yet/.test(sh.tile), sh);
   const other = await ev((CP) => {

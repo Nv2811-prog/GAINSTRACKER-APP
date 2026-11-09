@@ -48,7 +48,7 @@ try {
     const ei = state.session.exercises.findIndex((x) => x.name === CP); state.session._focusEi = ei; try { focusEx(ei); } catch (e) {} __qa.clear(); render();
   }, CP);
   await sleep(500);
-  await tapSel('#lgfocus .lg2-hint .lg2-b3', 'Warm-up ramp');
+  await tapSel('#lgfocus .lg2-hint .lg2-b3', 'Ramp');
   const s1 = await ev(() => { const sh = $('sheet'), st = state._rp; return { kind: state._sheetKind, w: st && st.w, r: st && st.r, n: st && st.n, rows: sh.querySelectorAll('#rp-body .px-rr:not(.fg-work)').length, on: (sh.querySelector('.rp-n .chip.on') || {}).textContent, go: (sh.querySelector('.rp-go') || {}).textContent }; });
   ok('the Warm-up ramp button opens the sheet, top set prefilled from the first set (100 × 9 target), 3 warm-ups for the first lift', s1.kind === 'ramp' && s1.w === '100' && s1.r === '9' && s1.n === 3 && s1.rows === 3 && s1.on === '3' && /Add 3 warm-up sets/.test(s1.go || ''), s1);
   if (A.out) { await sleep(300); await P.screenshot({ path: path.join(A.out, 'ramp-sheet.png') }); }
@@ -62,7 +62,7 @@ try {
   ok('typing the top weight updates the ramp and keeps the field focused', s3.focus === 'Top set kilograms' && s3.top === '120' && s3.first === '60', s3);
   await tapSel('#sheet .rp-go');
   const s4 = await ev((CP) => { const e = state.session.exercises.find((x) => x.name === CP); return { sets: e.sets.map((s) => s.type + ':' + s.w + 'x' + s.r), sheet: $('sheet').classList.contains('on'), toast: $('toast').textContent }; }, CP);
-  ok('Add puts the warm-ups first as W sets (60 × 8, 90 × 3), working sets untouched, sheet closes, toast', s4.sets.slice(0, 2).join() === 'W:60x8,W:90x3' && s4.sets.length === 4 && s4.sets.slice(2).every((x) => !x.startsWith('W:')) && !s4.sheet && /2 warm-up sets added/.test(s4.toast), s4);
+  ok('Add puts the warm-ups first as W sets (60 × 8, 90 × 3), working sets untouched, sheet closes, toast', s4.sets.slice(0, 2).join() === 'W:60x8,W:90x3' && s4.sets.length === 4 && s4.sets.slice(2).every((x) => !x.startsWith('W:')) && !s4.sheet && /2 warm-ups on every day with it/.test(s4.toast), s4);
   // a logged warm-up stays; un-done ones are replaced, never stacked
   await ev((CP) => { const e = state.session.exercises.find((x) => x.name === CP); e.sets[0].done = true; render(); openRamp(state.session.exercises.indexOf(e)); }, CP);
   const s5a = await ev(() => state._rp.n);

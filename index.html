@@ -1281,6 +1281,8 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .lg2-last{display:flex;align-items:baseline;gap:5px;margin:3px 0 5px;padding-left:52px;font:500 11.5px/16px var(--body);color:var(--tx3)}
 .lg2-last b{font-family:var(--num);font-weight:400;font-size:15px;line-height:16px;letter-spacing:.02em;color:var(--tx2)}
 .lg2-last i{font-style:normal}
+.lg2-last .to{margin-left:8px}
+.lg2-last .am{color:var(--tx1)}
 .lg2-last.dn{opacity:.55}
 /* ===== /GP:HISTORY ===== */
 /* ===== GP:RAMP (2026-10-25) ===== */
@@ -1362,6 +1364,21 @@ svg.p3t.mini{width:64px;height:26px;flex:none}
 .lg2-setup .v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 14px/1.2 var(--body)}
 .lg2-setup.empty .v{font-weight:500;color:var(--tx3)}
 .lg2-setup>.gi:last-child{flex:none;width:14px;height:14px;color:var(--tx3)}
+.lg2-fold{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;margin-top:8px;padding:8px 12px;border:0;border-radius:12px;background:none;box-shadow:inset 0 0 0 1px var(--hair);color:var(--tx2);text-align:left;font:500 13px/1.3 var(--body)}
+.lg2-fold span{flex:1;min-width:0}
+.lg2-fold>svg{flex:none}
+.lg2-fold>.gi{width:14px;height:14px;color:var(--tx3);transition:transform .2s}
+.lg2-fold[aria-expanded="true"]>.gi{transform:rotate(180deg)}
+.lg2-fold.warn{color:var(--warn)}
+.lg2-fold+.lg2-gh{margin-top:12px}
+.lg2-nudge{margin-top:2px;padding:0 6px}
+.lg2-nudge .g{display:flex;align-items:center;height:36px;border-radius:10px;background:rgba(150,178,222,.07)}
+.lg2-nudge button{position:relative;flex:1 1 0;min-width:0;height:36px;display:grid;place-items:center;padding:0;border:0;border-radius:10px;background:none;color:var(--tx1)}
+.lg2-nudge button::after{content:"";position:absolute;inset:-4px 0}
+.lg2-nudge button .gi{width:16px;height:16px}
+.lg2-nudge i{flex:none;font:600 12px/1 var(--body);font-style:normal;color:var(--tx3)}
+.lg2-ss .eyebrow{margin-bottom:8px}
+.lg2-ssa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
 .lg2-xh .lg2-br{margin:4px 0 -2px;font:650 10.5px/1.2 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink)}
 .su .su-list{padding:2px 14px}
 .su-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:56px;border-top:1px solid var(--hair)}
@@ -2269,7 +2286,7 @@ b.fc-rk{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0
 .lg2-kpi .eb.nc{text-transform:none;letter-spacing:.02em}
 .lg2-kpi.pr .num{color:var(--gold-ink)}.lg2-kpi.pr .sb{color:var(--gold-ink)}
 /* set grid: [set][KG][REPS][✓ 52] fits 375 */
-.lg2-gh,.lg2-sr{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(0,1fr) 52px;gap:8px;align-items:center}
+.lg2-gh,.lg2-sr,.lg2-nudge{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(0,1fr) 52px;gap:8px;align-items:center}
 .lg2-gh{padding:0 6px 7px}
 .lg2-gh span{font:600 11px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);text-align:center}
 .lg2-sr{padding:6px;border-radius:15px;position:relative;margin-top:2px}
@@ -2278,6 +2295,7 @@ b.fc-rk{background:var(--tint-gold);color:var(--gold-ink);box-shadow:inset 0 0 0
 .lg2-cell{position:relative;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--g4);box-shadow:inset 0 0 0 1px var(--hair2);min-width:0;font:650 21px/1 var(--body);font-variant-numeric:tabular-nums;color:var(--tx1)}
 .lg2-cell input{flex:1 1 0;min-width:0;width:100%;height:100%;padding:0 2px;border:0;border-radius:12px;background:transparent;box-shadow:none;text-align:center;font:650 21px/1 var(--body);font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--tx1)}
 .lg2-cell input::placeholder{color:rgba(168,179,198,.5);font-weight:500;opacity:1}
+.lg2-sr.act .lg2-cell input::placeholder{color:var(--tx2)}
 .lg2-cell input:focus{outline:none;border:0;background:var(--tint-gold);box-shadow:inset 0 0 0 1.5px var(--gold)}
 .lg2-cell.ghost{color:rgba(168,179,198,.5);font-weight:500}
 .lg2-dlt{flex:none;margin-right:5px;font:700 11px/1 var(--body);font-style:normal;padding:4px 5px;border-radius:6px;letter-spacing:.01em;white-space:nowrap;cursor:pointer}
@@ -3982,25 +4000,33 @@ function loIndex(){   // lift key -> [{t,w,e}] newest first; rebuilt when the hi
   map.forEach(l=>l.sort((a,b)=>b.t-a.t));
   _loIx={sig,ws,map};return map;
 }
-function lastOuting(name,opt){
+function loFind(name,test){   // the first outing (newest first) of a lift at this gym, since its own and the gym's reset, that test() accepts: test's result, or null
   const list=loIndex().get(exKey(name));if(!list)return null;
-  const cut=exResetAt(name),c=cut?new Date(cut).getTime():0,b=opt&&opt.before,bt=b?new Date(b.date).getTime():Infinity;
-  const gym=activeGymName(),gr=(state.data.gymReset||{})[gym],gc=gr?new Date(gr).getTime():0;
+  const cut=exResetAt(name),c=cut?new Date(cut).getTime():0,gym=activeGymName(),gr=(state.data.gymReset||{})[gym],gc=gr?new Date(gr).getTime():0;
   for(const x of list){
-    if(x.t<c||x.t<gc)break;   // newest first: everything after this is from before the lift's or the gym's reset
+    if(x.t<c||x.t<gc)break;   // everything after this is from before the lift's or the gym's reset
     if(gymOf(x.w)!==gym)continue;
-    if(b&&(x.w===b||(b.id&&x.w.id===b.id)||x.t>bt))continue;
-    if(x.e.sets.some(s=>s&&s.est)||!x.e.sets.some(s=>s&&s.type!=="W"&&+s.r>0))continue;
-    return {sets:x.e.sets,date:x.w.date,gym,w:x.w};
+    const r=test(x,gym);if(r)return r;
   }
   return null;
 }
+function lastOuting(name,opt){
+  const b=opt&&opt.before,bt=b?new Date(b.date).getTime():Infinity;
+  return loFind(name,(x,gym)=>{
+    if(b&&(x.w===b||(b.id&&x.w.id===b.id)||x.t>bt))return null;
+    if(x.e.sets.some(s=>s&&s.est)||!x.e.sets.some(s=>s&&s.type!=="W"&&+s.r>0))return null;
+    return {sets:x.e.sets,date:x.w.date,gym,w:x.w};
+  });
+}
+// The newest logged warm-ups of a lift at this gym: not only the last outing, one session without warm-ups must not forget their numbers.
+function lastWarmups(name){return loFind(name,x=>{const w=x.e.sets.filter(s=>s&&s.type==="W"&&(+s.r>0||kgNum(s.w)>0));return w.length?w:null;})||[];}
 function lastSetFor(name){const o=lastOuting(name);return o?o.sets:null;}
-// prevW / prevR / prevType on each set from the newest outing: working set i <- its working set i (extra sets <- its last working set),
-// warm-up j <- its warm-up j. clear: sets with no match lose stale numbers (a swapped lift must not show the old lift's weights).
+// prevW / prevR / prevType on each set from the newest outing: working set i <- its working set i however many warm-ups sit before it (extra sets <- its last working set),
+// a Left set <- its Left sets, a Right set <- its Right sets, warm-up j <- the newest logged warm-up j. clear: sets with no match lose stale numbers (a swapped lift must not show the old lift's weights).
 function withPrev(name,sets,clear){
-  const L=lastSetFor(name)||[],work=L.filter(s=>s.type!=="W"),warm=L.filter(s=>s.type==="W");let wi=0,mi=0;
-  return sets.map(s=>{const src=s.type==="W"?warm[mi++]:(work[wi++]||work[work.length-1]);
+  const work=(lastSetFor(name)||[]).filter(s=>s.type!=="W"),warm=lastWarmups(name),seen={W:0,L:0,R:0,N:0},isSide=t=>t==="L"||t==="R";
+  const pool=k=>{const p=work.filter(s=>k==="N"?!isSide(s.type):s.type===k);return p.length?p:work;};
+  return sets.map(s=>{const k=s.type==="W"||isSide(s.type)?s.type:"N",P=k==="W"?warm:pool(k),i=seen[k]++,src=P[i]||(k==="W"?null:P[P.length-1]);
     return src?Object.assign({},s,{prevW:src.w,prevR:src.r,prevType:src.type||"NRM"}):clear?Object.assign({},s,{prevW:null,prevR:null,prevType:null}):s;});
 }
 
@@ -4314,10 +4340,11 @@ function nextTargetSet(name){const p=progressionFor(name);return p?{w:p.w,r:p.r}
 /* Tapping the tick on an empty working set must never create an empty "done" set: accept the numbers the row
    is already hinting at (last time's prevW/prevR, else the progression target) — or refuse if there is nothing. */
 function fillEmptySet(e,s){
-  if(s.type==="W"||setFilled(e.name,s))return true;
+  if(setFilled(e.name,s))return true;
   const has=v=>v!==""&&v!=null,g=lgGhosts(e)[(e.sets||[]).indexOf(s)];
   if(g){if(!has(s.w)&&has(g.w))s.w=g.w;if(!has(s.r)&&has(g.r))s.r=g.r;}
-  else{const tg=nextTargetSet(e.name);
+  if(s.type==="W")return true;   // a warm-up may be ticked with no numbers; its remembered ones were just filled in
+  if(!g){const tg=nextTargetSet(e.name);
     if(!has(s.w)){const w=has(s.prevW)?s.prevW:(tg&&tg.w?tg.w:"");if(has(w))s.w=String(w);}
     if(!has(s.r)){const r=has(s.prevR)?s.prevR:(tg&&tg.r?tg.r:"");if(has(r))s.r=String(r);}}
   return setFilled(e.name,s);
@@ -4395,11 +4422,13 @@ function freeWorkout(){if(guardLiveSession(freeWorkout))return;try{closeSheet();
 // planned = the split day's target for this lift ({s:sets, r:"5–10"}). With a plan, seed exactly that
 // many working sets (last session's numbers shown per set where they exist) instead of copying last
 // session's set count — otherwise every session starts with the old plan's sets to delete by hand.
-function seedSets(name,planned){   // plan count when the day has one, else last time's sets; every set carries last time's numbers for its row (withPrev)
-  const last=lastSetFor(name),n=planned&&+planned.s>0?Math.round(+planned.s):0,work=(last||[]).filter(s=>s.type!=="W");
+// Warm-ups kept for a lift (every day, every split that has it): d.warmSets[lift]; until you have changed them, what the lift's last outing had.
+function warmCountOf(name){const v=(state.data.warmSets||{})[exKey(name)];return Number.isInteger(v)&&v>=0?Math.min(v,LG_MAX_WARM):(lastSetFor(name)||[]).filter(s=>s.type==="W").length;}
+function seedSets(name,planned){   // kept warm-ups, then the plan's working sets (no plan: last time's); every set carries last time's numbers for its row (withPrev)
+  const work=(lastSetFor(name)||[]).filter(s=>s.type!=="W"),n=planned&&+planned.s>0?Math.round(+planned.s):0;
   const blank=ty=>({w:"",r:"",type:ty||"NRM",done:false,rpe:""});
-  const sets=n?Array.from({length:n},(_,i)=>blank(work[i]&&work[i].type)):last&&last.length?last.map(s=>blank(s.type)):[0,1,2].map(()=>blank());
-  return withPrev(name,sets);
+  const sets=n?Array.from({length:n},(_,i)=>blank(work[i]&&work[i].type)):work.length?work.map(s=>blank(s.type)):[0,1,2].map(()=>blank());
+  return withPrev(name,Array.from({length:warmCountOf(name)},()=>blank("W")).concat(sets));
 }
 function setReadiness(r){state.session.readiness=r;state.step="patrol-intro";render();saveSession();}
 /* Per-gym records: switching the active gym re-points d.prs to that gym's record book, so every PR
@@ -4466,11 +4495,39 @@ const PR_TIER={
   vol   :{rank:2,badge:"📊",kick:"NEW SET VOLUME PR",unit:"kg in one set",accent:"#5ec8c0",fmt:v=>Math.round(v)+"kg"},
   reps  :{rank:1,badge:"🔁",kick:"NEW REP RECORD",unit:"reps · most ever",accent:"#8fa9e8",fmt:v=>v+" reps"}
 };
-function addSet(ei){const ex=state.session.exercises[ei];const last=ex.sets[ex.sets.length-1]||{type:"NRM"};ex.sets=withPrev(ex.name,ex.sets.concat([{w:"",r:"",type:last.type==="W"?"NRM":last.type,done:false,rpe:""}]));render();saveSession();}
-function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push({w:"",r:"",type:"NRM",done:false,rpe:""});render();saveSession();}
-function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;render();}
-function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});render();}
-function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;e._open=true;state.session._focusEi=ei;closeSheet();render();}
+/* SETS ARE NOT LOCKED (2026-11-09). After any change to a lift's rows lgChanged() re-matches every row to last time (lgKeep below) and keeps the change:
+   the working-set count goes to THIS day's plan, the warm-up count to the lift (every day that has it). "Just today" in the message undoes the keeping for tonight's lift. */
+const LG_MAX_WARM=6,lgBlank=ty=>({w:"",r:"",type:ty,done:false,rpe:""});
+function lgVolNote(sp,day,e){   // the plan just grew: say so when it breaks the user's own limits (20 working sets a day, abs not counted; a muscle this lift trains over its weekly MRV)
+  const work=(day.exercises||[]).reduce((a,n)=>a+(fcIsAbs(exFor(n))?0:ghSetsOf(day,n)),0);
+  if(work>FOCUS_DAY_CAP)return `${dayShort(day.name)} is ${work} sets, over your ${FOCUS_DAY_CAP}`;
+  const ex=exFor(e.name),hit=[...(ex.p||[]),...(ex.s||[])],o=gmFcRows(sp,"all").find(t=>t.over&&hit.includes(t.m));
+  return o?`${MNAME[o.m]} ${o.tot} a week, over MRV ${o.L.mrv}`:"";
+}
+function lgKeep(ei){   // true when something was saved (the message with "Just today" is up)
+  const ses=state.session,e=ses&&ses.exercises[ei],d=state.data;if(!e||e._today)return false;
+  const sp=(d.splits||[]).find(x=>x.id===ses.srcSplit),raw=sp&&sp.days[ses.srcDay],day=raw&&!isRest(raw)&&(raw.exercises||[]).includes(e.name)?raw:null,key=exKey(e.name);
+  const n=clamp(e.sets.filter(s=>s.type!=="W").length,1,GM_MAX_SETS),warm=Math.min(e.sets.filter(s=>s.type==="W").length,LG_MAX_WARM),was=day?ghSetsOf(day,e.name):n,grew=n>was,setsMoved=n!==was,warmMoved=warm!==warmCountOf(e.name);
+  if(!setsMoved&&!warmMoved)return false;
+  e._keep0=e._keep0||{pl:day&&day.plan&&day.plan[e.name]?{...day.plan[e.name]}:null,ePl:e.plan?{...e.plan}:null,w:(d.warmSets||{})[key]};   // what "Just today" puts back
+  if(setsMoved){const pl={r:GM_REPS,...((day.plan||{})[e.name]||{}),s:n};day.plan={...day.plan,[e.name]:pl};e.plan={...pl};}
+  if(warmMoved)d.warmSets={...d.warmSets,[key]:warm};
+  save();
+  const msg=[setsMoved?`${dayShort(day.name)}: ${n} set${n===1?"":"s"} saved`:"",warmMoved?(warm?`${warm} warm-up${warm===1?"":"s"} on every day with it`:"No warm-ups on any day with it"):"",grew?lgVolNote(sp,day,e):""].filter(Boolean).join(" · ");
+  toastUndo(msg,()=>{const b=e._keep0;if(!b)return;
+    if(day){if(b.pl)day.plan={...day.plan,[e.name]:b.pl};else if(day.plan){const {[e.name]:_,...rest}=day.plan;day.plan=rest;}}
+    if(b.ePl)e.plan=b.ePl;else delete e.plan;
+    const {[key]:_w,...ws}=d.warmSets||{};d.warmSets=b.w===undefined?ws:{...ws,[key]:b.w};
+    delete e._keep0;e._today=true;save();saveSession();render();},"Just today");
+  return true;
+}
+function lgChanged(ei){const e=state.session.exercises[ei];e.sets=withPrev(e.name,e.sets,true);return lgKeep(ei);}
+function addSet(ei){const ex=state.session.exercises[ei];const t=(ex.sets[ex.sets.length-1]||{type:"NRM"}).type;ex.sets=ex.sets.concat([lgBlank(t==="W"?"NRM":t==="L"?"R":t==="R"?"L":t)]);lgChanged(ei);render();saveSession();}   // left / right sets alternate
+function addWarm(ei){const e=state.session.exercises[ei],i=e.sets.findIndex(s=>s.type!=="W"),at=i<0?e.sets.length:i;e.sets=[...e.sets.slice(0,at),lgBlank("W"),...e.sets.slice(at)];lgChanged(ei);render();saveSession();}   // always above the working sets
+function delSet(ei,si){const ex=state.session.exercises[ei];if(!ex)return;ex.sets.splice(si,1);if(!ex.sets.length)ex.sets.push(lgBlank("NRM"));lgChanged(ei);render();saveSession();}
+function moveSet(ei,si,dir){const arr=state.session.exercises[ei].sets;const j=si+dir;if(j<0||j>=arr.length)return;const t=arr[si];arr[si]=arr[j];arr[j]=t;lgChanged(ei);render();saveSession();}
+function dupSet(ei,si){const arr=state.session.exercises[ei].sets;const s=arr[si];arr.splice(si+1,0,{w:s.w,r:s.r,type:s.type==="W"?"NRM":s.type,done:false,rpe:""});lgChanged(ei);render();saveSession();}
+function setSetType(ei,si,t){const e=state.session.exercises[ei];e.sets[si].type=t;if(t==="W")e.sets=[...e.sets.filter(x=>x.type==="W"),...e.sets.filter(x=>x.type!=="W")];e._open=true;state.session._focusEi=ei;lgChanged(ei);closeSheet();render();saveSession();}
 /* 📌 LIVE PLAN SYNC — anything you change about tonight's line-up (order, swaps, adds, removes)
    is written straight back to the split day it came from, so next time the plan IS how you left it. */
 function syncSessionToSplit(){
@@ -4528,19 +4585,12 @@ function exProgress(e){const working=(e.sets||[]).filter(s=>s.type!=="W");const 
 // Bottom-sheet menu for a single set: change type, reorder, duplicate, delete.
 const STYPE_LABEL={NRM:"Normal",W:"Warm-up",F:"Failure",D:"Drop set",L:"Left",R:"Right"};
 function openSetSheet(ei,si){
-  const ex=state.session.exercises[ei];if(!ex)return;const s=ex.sets[si];const n=ex.sets.length;
-  const chip=(t)=>`<button class="chip ${s.type===t?'on':''}" onclick="setSetType(${ei},${si},'${t}')">${STYPE_LABEL[t]}</button>`;
-  $("sheet").innerHTML=`<div class="ttl" style="margin-bottom:2px">${s.type==='W'?'Warm-up options':'Set '+ex.sets.slice(0,si+1).filter(x=>x.type!=='W').length+' options'}</div>
-    <div class="mini" style="color:var(--text2);margin-bottom:10px">${esc(ex.name)}</div>
-    <label class="lbl">Set type</label>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px">${["NRM","W","F","D","L","R"].map(chip).join("")}</div>
-    <div class="row" style="gap:8px;margin-bottom:8px">
-      <button class="btn ghost sm g" ${si===0?'disabled style="opacity:.4"':''} onclick="moveSet(${ei},${si},-1);closeSheet()">↑ Move up</button>
-      <button class="btn ghost sm g" ${si===n-1?'disabled style="opacity:.4"':''} onclick="moveSet(${ei},${si},1);closeSheet()">↓ Move down</button>
-    </div>
-    <button class="btn ghost sm" style="width:100%;margin-bottom:8px" onclick="dupSet(${ei},${si});closeSheet()">⧉ Duplicate set</button>
-    <button class="btn ghost sm" style="width:100%;color:var(--red);border-color:rgba(232,69,60,.4)" onclick="delSet(${ei},${si});closeSheet()">✕ Delete set</button>`;
-  $("sheet").classList.add("on");$("sheetbg").classList.add("on");
+  const ex=state.session.exercises[ei];if(!ex)return;const s=ex.sets[si],n=ex.sets.length,cur=s.type||"NRM";
+  const chip=t=>`<button class="chip${cur===t?" on":""}" onclick="setSetType(${ei},${si},'${t}')" aria-pressed="${cur===t}">${STYPE_LABEL[t]}</button>`;
+  openSheet(`${shHd(cur==="W"?"Warm-up options":"Set "+ex.sets.slice(0,si+1).filter(x=>x.type!=="W").length+" options",{ic:"sliders",sub:esc(ex.name)})}
+    <div class="gh lg2-ss"><div class="eyebrow">Set type</div><div class="cx-chips">${["NRM","W","F","D","L","R"].map(chip).join("")}</div>
+      <div class="lg2-ssa"><button class="btn sm"${si===0?" disabled":""} onclick="moveSet(${ei},${si},-1);closeSheet()">${gmIc("up")}Move up</button><button class="btn sm"${si===n-1?" disabled":""} onclick="moveSet(${ei},${si},1);closeSheet()">${gmIc("down")}Move down</button>
+        <button class="btn sm" onclick="dupSet(${ei},${si});closeSheet()">${gmIc("copy")}Duplicate set</button><button class="btn sm danger" onclick="delSet(${ei},${si});closeSheet()">${gmIc("trash")}Delete set</button></div></div>`);
 }
 function removeExercise(ei){appConfirm({title:"Remove exercise",body:"Remove this exercise from the session? It also leaves tonight's split day.",ok:"Remove",danger:true}).then(ok=>{if(ok){state.session.exercises.splice(ei,1);syncSessionToSplit();render();saveSession();}});}
 // Supersets/circuits: link this exercise with the next into one back-to-back group.
@@ -5328,7 +5378,7 @@ function swapExercise(ei,name,scope){
   const ses=state.session,e=ses&&ses.exercises[ei];if(!e)return;
   const from=e.name,oldSets=e.sets,sp=(state.data.splits||[]).find(x=>x.id===ses.srcSplit),here=sp&&sp.days[ses.srcDay]&&!isRest(sp.days[ses.srcDay])?sp.days[ses.srcDay]:null;
   const days=[here,...(scope==="all"&&sp?splitDaysWith(sp,from).map(x=>x.d).filter(d=>d!==here):[])].filter(Boolean),snap=daySnap(days);
-  e.name=name;e.sets=withPrev(name,e.sets||[],true);   // the new lift's own last numbers per set; none = no stale ones from the old lift
+  e.name=name;e.sets=withPrev(name,e.sets||[],true);delete e._keep0;delete e._today;   // the new lift's own last numbers per set; none = no stale ones from the old lift
   const n=days.filter(d=>swapInDay(d,from,name)).length;   // tonight's day + (all) the others: each slot keeps its sets × reps
   haptic("done");closeSheet();saveSession();syncSessionToSplit();save();render();
   toastUndo(n>1?`Swapped on ${n} days`:"Swapped to "+name,()=>{e.name=from;e.sets=oldSets;dayRestore(snap);saveSession();save();render();});
@@ -10135,7 +10185,7 @@ A dock is one sideways-scrolling row of tiles under a tab's hero, each with a pi
 Tap Start Patrol on the Gotham tonight card (or Start on a day under MISSION). Pick the gym (records are kept per gym) and answer the readiness check: FRESH, OKAY or TIRED — it only nudges weight suggestions (about +2.5% fresh, −3% tired). Then a short briefing (tonight's day, one line from the dark side, the muscles on the anatomy and my targets; Begin or Cancel) leads to the logging screen. Tick each set as you finish it; the rest timer runs in the header strip (+30 and skip; length in Settings). Finish when done — unlogged working sets trigger a "Leave the field?" prompt. Finishing shows the suit for a moment: the muscles you trained in gold, the rest in their recovery colour (green ready, amber recovering, red fatigued), with a closing line. The summary is three slides (Next and Back): the session and its records; Muscles & lifts (the recovery map, weekly sets against MEV, MAV and MRV, then lift by lift against last time); and Targets for next time, Session effort (RPE 1–10, which feeds the workload ratio), my review, how-did-it-feel chips and notes, with Save card and Share with allies. Done returns to Gotham. Minimising a session keeps it alive while you browse.
 
 ## LOGGING SETS: THE FOCUS CARD, RIR TILES AND SET TYPES
-The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan, the Target, Last time and e1RM boxes, then one row per set with the set badge (tap to cycle the set type), kilos, reps and the tick. Empty kilos and reps show the target as ghost values (last time +1 rep, or more weight once you hit 10), and one tap on the tick logs them as they are. Under every working set a small "last 90 × 7" line shows exactly what you lifted on that set in your newest session of the lift, from any day or split, at this gym only (a new gym starts empty). Profile → Gyms (or Settings → Manage gyms) lists your gyms: Use, Equipment (equipment and machine brands; their machines show first when you add or swap a lift), Reset weights (wipes that gym's records and last weights, history stays) and Delete, each with Undo. RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
+The logging screen has a header strip (sets done of total, change against the last session, elapsed time and the rest timer) above a focus card for the current lift: its plan and machine setup, one folded line with recovery, weekly sets and e1RM (tap it for the Target, Last time and e1RM boxes), then one row per set with the set badge (tap it for the set type, move, duplicate or delete), kilos, reps and the tick. Empty boxes show today's aim for that set (its own number last time +1 rep, or more weight once you hit 10), and one tap on the tick logs it. If you lift a different weight, the next sets follow what you just did. Under every working set a small line says "last 90 × 7 aim 90 × 8": what you lifted on that same set in your newest session of the lift, from any day or split, at this gym only (a new gym starts empty). Set 1 always matches last time's set 1 however many warm-ups come before it, and Left matches Left, Right matches Right. The active row has − and + under its boxes (2.5 kg, 1 rep) so you need no keyboard. Sets are not locked: Add set or deleting a set is saved on that day of the plan. Add warm-up (or the Ramp) keeps that lift's warm-ups on every day of the split with the same lift, showing your last warm-up numbers. The message that pops up has Just today if it is a one-off. Profile → Gyms (or Settings → Manage gyms) lists your gyms: Use, Equipment (equipment and machine brands; their machines show first when you add or swap a lift), Reset weights (wipes that gym's records and last weights, history stays) and Delete, each with Undo. RIR tiles (0, 1, 2, 3, 4+) record reps in reserve with one tap: how many clean reps you had left (0 = nothing left); Settings can switch the metric to RPE. Set types: Normal, Warm-up (W, never counted as working volume), Failure (F), Drop set (D), Left/Right (L, R). Below the card are Up next and Later (the remaining lifts). A weight far off that lift's history triggers a quick "new machine?" check.
 
 ## PLAN TARGETS AND THE PROGRESSION RULE (WHEN TO ADD WEIGHT)
 A plan day shows each lift's target as sets × rep range, e.g. "PLAN 2 × 5–10" on the focus card (some are optional tonight). Plan ranges are 5–10 reps and ONE progression rule runs everywhere — the focus card's Target box, the exercise detail, the finish summary's Targets and my comments after a set. Only a WORKING set counts: warm-up sets never do. If your best working set reached the top of the range (10 or more reps), add weight (2.5 kg, or 5 kg from 60 kg up) and restart at about 6 reps. At 5–9 reps keep the same load and add one rep. A custom plan with a higher top (say 12–15) moves the add-weight point up with it. Suggested weights show one decimal where needed (72.5 kg, not 73). The Target box shows the next target, for example 67.5 × 10 with "hit 10 → +5 kg" under it.
@@ -11885,7 +11935,7 @@ function rampAdd(){   // the new warm-ups replace this lift's un-done warm-ups; 
   const list=warmRamp(e.name,st.w,st.r,st.n);if(!list.length)return;
   const fresh=withPrev(e.name,list.map(x=>({w:String(x.w),r:String(x.r),type:"W",done:false,rpe:""})));
   e.sets=(e.sets||[]).filter(x=>x.type==="W"&&x.done).concat(fresh,(e.sets||[]).filter(x=>x.type!=="W"));
-  closeSheet();haptic("done");render();saveSession();toast(`${list.length} warm-up set${list.length===1?"":"s"} added · ${esc(e.name)}`);
+  const kept=lgChanged(st.fei);closeSheet();haptic("done");render();saveSession();if(!kept)toast(`${list.length} warm-up set${list.length===1?"":"s"} added · ${e.name}`);
 }
 /* ===== ALFRED'S WEEKLY CONTRACT — three concrete goals from your real data, real reward ===== */
 function contractWeekKey(){const t=new Date();t.setHours(0,0,0,0);t.setDate(t.getDate()-((t.getDay()+6)%7));return t.toISOString().slice(0,10);}
@@ -12881,20 +12931,23 @@ function lgVsLast(ses){let now=0,was=0,n=0;(ses.exercises||[]).forEach(e=>{if(e.
 function lgDelta(s){const pw=lgHas(s.prevW)?kgNum(s.prevW):NaN,pr=+s.prevR;if(!(pr>0)||isNaN(pw))return null;const w=kgNum(s.w)||0,r=+s.r||0;
   if(w>pw)return{t:"+"+fmtKg(w-pw)+" kg",c:"up",k:"w"};if(w<pw)return{t:"−"+fmtKg(pw-w)+" kg",c:"dn",k:"w"};
   if(r>pr)return{t:"+"+(r-pr)+(r-pr===1?" rep":" reps"),c:"up",k:"r"};if(r<pr)return{t:"−"+(pr-r)+(r+1===pr?" rep":" reps"),c:"dn",k:"r"};return{t:"=",c:"eq",k:"r"};}
-/* Ghost numbers for every set of a lift: what ✓ commits when the row is untouched. Warm-ups carry their own numbers.
-   Feature B (in-session autoregulation): a working set at RIR 0 that landed 2+ reps under the target lowers the ghosts that follow (−2.5 kg, or −1 rep for light / bodyweight loads). Typed values are never touched. */
+/* Ghost numbers for every set of a lift: what ✓ commits when the row is untouched. Warm-ups show their last logged numbers. A working set aims from ITS OWN numbers last time, by the one progression rule (a drop set repeats them).
+   If you lifted a different weight on the set before, the next sets follow what you just did. Feature B (in-session autoregulation): a working set at RIR 0 that landed 2+ reps under its aim lowers the ghosts that follow (−2.5 kg, or −1 rep for light / bodyweight loads). Typed values are never touched. */
 function lgGhosts(e){
-  const ex=exFor(e.name),tg=nextTargetSet(e.name),out=[];let adj=null,last=null;
+  const ex=exFor(e.name),fallback=nextTargetSet(e.name),out=[];let adj=null,last=null,lastAim=null,lastG=null,carry=null;
   (e.sets||[]).forEach(s=>{
-    if(s.type==="W"){out.push(null);return;}
+    if(s.type==="W"){out.push(lgHas(s.prevW)||lgHas(s.prevR)?{w:lgHas(s.prevW)?String(s.prevW):"",r:lgHas(s.prevR)?String(s.prevR):""}:null);return;}
+    const ty=s.type||"NRM",pv=lgHas(s.prevR)?progressionFrom(e.name,{w:kgNum(s.prevW)||0,r:+s.prevR}):null,aim=pv?{w:pv.w,r:pv.r}:fallback;
     let fresh=false;
-    if(last&&last.done&&tg&&rirOfSet(last)===0&&(+last.r||0)<=tg.r-2){const lw=kgNum(last.w)||0;fresh=true;adj=(ex.bw||lw<30)?{dr:-1,why:`RIR 0 at ${last.r} of ${tg.r} reps`}:{w:Math.round((lw-2.5)*2)/2,why:`RIR 0 at ${last.r} of ${tg.r} reps`};}
+    if(last&&last.done&&lastAim&&rirOfSet(last)===0&&(+last.r||0)<=lastAim.r-2){const lw=kgNum(last.w)||0;fresh=true;adj=(ex.bw||lw<30)?{dr:-1,why:`RIR 0 at ${last.r} of ${lastAim.r} reps`}:{w:Math.round((lw-2.5)*2)/2,why:`RIR 0 at ${last.r} of ${lastAim.r} reps`};}
+    if(last&&last.done&&kgNum(last.w)>0&&(carry||kgNum(last.w)!==kgNum(lastG&&lastG.w)))carry={w:fmtKg(last.w),r:String(+last.r||"")};
     let g=null;
-    if((s.type||"NRM")!=="NRM"&&lgHas(s.prevW)&&lgHas(s.prevR))g={w:String(s.prevW),r:String(s.prevR)};
-    else if(tg)g={w:tg.w?fmtKg(tg.w):(ex.bw?"0":""),r:String(tg.r)};
+    if(ty==="D"&&lgHas(s.prevW)&&lgHas(s.prevR))g={w:String(s.prevW),r:String(s.prevR)};
+    else if(carry)g={...carry};
+    else if(aim)g={w:aim.w?fmtKg(aim.w):(ex.bw?"0":""),r:String(aim.r)};
     else if(lgHas(s.prevW)||lgHas(s.prevR))g={w:lgHas(s.prevW)?String(s.prevW):"",r:lgHas(s.prevR)?String(s.prevR):""};
-    if(g&&adj&&(s.type||"NRM")==="NRM"&&!s.done){if(adj.w!=null)g.w=fmtKg(adj.w);else g.r=String(Math.max(1,(+g.r||1)+adj.dr));if(fresh)g.why=`${adj.why} → ${adj.w!=null?"−2.5 kg":"−1 rep"} on this set`;}
-    out.push(g);last=s;
+    if(g&&adj&&ty==="NRM"&&!s.done){if(adj.w!=null)g.w=fmtKg(adj.w);else g.r=String(Math.max(1,(+g.r||1)+adj.dr));if(fresh)g.why=`${adj.why} → ${adj.w!=null?"−2.5 kg":"−1 rep"} on this set`;}
+    out.push(g);last=s;lastAim=aim;lastG=g;
   });
   return out;
 }
@@ -13001,7 +13054,7 @@ function lgSegTap(ev){const i=ev.target.closest&&ev.target.closest(".seg i");if(
 function lgScrollFocus(){requestAnimationFrame(()=>requestAnimationFrame(()=>{const c=document.querySelector(".lg2-hero"),b=$("lgbar");if(!c)return;const y=c.getBoundingClientRect().top+window.scrollY-(b?b.offsetHeight:0)-10;window.scrollTo({top:Math.max(0,y),behavior:"smooth"});}));}
 function lgToggleNotes(){state._lgNotes=!state._lgNotes;render();}
 /* ---- rest capsule (lives in the strip): idle · running (ring, countdown, +30, skip) · GO ---- */
-function lgNextLine(){const ses=state.session;if(!ses)return"";const fei=activeExIdx(),e=fei>=0?ses.exercises[fei]:null;if(!e)return"all sets in";const si=e.sets.findIndex(s=>!s.done);if(si<0)return"next lift";const g=lgGhosts(e)[si],wn=e.sets.slice(0,si+1).filter(x=>x.type!=="W").length;return(e.sets[si].type==="W"?"warm-up":"set "+wn)+(g&&g.r?" · "+(g.w?g.w+" × ":"")+g.r:"");}
+function lgNextLine(){const ses=state.session;if(!ses)return"";const fei=activeExIdx(),e=fei>=0?ses.exercises[fei]:null;if(!e)return"all sets in";const si=lgActIdx(e);if(si<0)return"next lift";const g=lgGhosts(e)[si],wn=e.sets.slice(0,si+1).filter(x=>x.type!=="W").length;return(e.sets[si].type==="W"?"warm-up":"set "+wn)+(g&&g.r?" · "+(g.w?g.w+" × ":"")+g.r:"");}
 function lgRestSecs(e,s){const c=+state.data.u.restTime||120;if(s&&s.type==="W")return 60;return c!==120?c:lgRx(e.name).tgt;}
 function lgRestInner(){
   const ses=state.session,fei=ses?activeExIdx():-1,e=fei>=0?ses.exercises[fei]:null;
@@ -13057,24 +13110,41 @@ function lgChips(e,ex,m,p){
   const tone={low:"warn",grow:"ok",high:"gold",over:"bad"}[z]||"";
   return `<div class="lg2-chips"><span class="lg2-chip ${cap?"warn":"rest"}">${GP.recRing(rec,14)}${nm} ${rec}%${cap?" · cap at 2 RIR":""}</span><span class="lg2-chip ${tone}">${nm} ${wk} / ${L.mav} MAV</span></div>`;
 }
-function lgTiles(e,ex,m){
-  const p=progressionFor(e.name),L=lgLast(e.name),lb=lastBestSet(e.name),pr=state.data.prs[e.name]||null;
+function lgE1(e,ex){   // tonight's best e1RM on this lift, else last time's, against the record
+  let cur=0;(e.sets||[]).forEach(s=>{if(s.type!=="W"&&s.done&&setLogged(e.name,s))cur=Math.max(cur,setE1RM(ex,s));});
+  const lb=lastBestSet(e.name),best=(state.data.prs[e.name]||{}).orm||0;
+  return {cur,best,val:cur||(lb?lb.e1:0),isPR:cur>0&&best>0&&cur>best+.01};
+}
+function lgToggleInfo(){state._lgInfo=!state._lgInfo;haptic("tap");render();}
+function lgFold(e,ex,m){   // what is not needed mid-set, folded into one line; a tap opens the recovery / volume chips and the three tiles
+  const open=!!state._lgInfo,rec=Math.round(getRecovery(m)),cap=rec<60,L=VL[m]||{mav:14},E=lgE1(e,ex);
+  return `<button class="lg2-fold${cap&&!open?" warn":""}" onclick="lgToggleInfo()" aria-expanded="${open}">${open?"":GP.recRing(rec,14)}<span>${open?"Hide details":`${esc(MNAME[m]||m||"Muscle")} ${rec}%${cap?" · cap at 2 RIR":""} · ${lgWeekly(m)}/${L.mav} sets${E.val?` · e1RM ${Math.round(E.val)}`:""}`}</span>${GP.icon("chevD")}</button>${open?lgChips(e,ex,m)+lgTiles(e,ex):""}`;
+}
+function lgTiles(e,ex){
+  const fw=(e.sets||[]).find(s=>s.type!=="W"),p=(fw&&lgHas(fw.prevR)?progressionFrom(e.name,{w:kgNum(fw.prevW)||0,r:+fw.prevR}):null)||progressionFor(e.name),L=lgLast(e.name),lb=lastBestSet(e.name);
   let tv='<b class="num">—</b>',ts="first time: set a baseline";
   if(p){const inc=p.inc||(ex.bw?2.5:(p.w>=60?5:2.5));tv=`<b class="num">${lgNum(p.w,ex)}<i>×</i>${p.r}</b>`;ts=p.add?`+${fmtKg(inc)} kg earned · reset to ${p.r}`:`hit ${p.top} → +${fmtKg(inc)} kg`;}
   let lv='<b class="num">—</b>',ls="no history yet";
   if(lb){let bi=0,bv=-1;L.sets.forEach((s,i)=>{const v=setE1RM(ex,s);if(v>=bv){bv=v;bi=i;}});const others=L.sets.filter((s,i)=>i!==bi).map(s=>s.r).slice(0,2),rir=rirOfSet(L.sets[bi]);
     lv=`<b class="num">${lgNum(lb.w,ex)}<i>×</i>${lb.r}</b>`;ls=(others.length?"then ×"+others.join(", "):Math.round(daysSince(L.date))+"d ago")+(rir!=null?" · RIR "+rir:"");}
-  let cur=0;(e.sets||[]).forEach(s=>{if(s.type!=="W"&&s.done&&setLogged(e.name,s))cur=Math.max(cur,setE1RM(ex,s));});
-  const best=pr&&pr.orm||0,val=cur||(lb?lb.e1:0),isPR=cur>0&&best>0&&cur>best+.01;
-  const es=isPR?`PR +${Math.round(cur-best)}`:best?`best ${Math.round(best)}`:"no record yet";
+  const {cur,best,val,isPR}=lgE1(e,ex),es=isPR?`PR +${Math.round(cur-best)}`:best?`best ${Math.round(best)}`:"no record yet";
   return `<div class="lg2-kpis">
     <div class="lg2-kpi tgt"><span class="eb">Target</span>${tv}<span class="sb">${ts}</span></div>
     <div class="lg2-kpi"><span class="eb">Last time</span>${lv}<span class="sb">${esc(ls)}</span></div>
     <div class="lg2-kpi${val>0&&best>0&&val>=best*.97?" pr":""}"><span class="eb nc">e1RM</span><b class="num">${val?Math.round(val):"—"}${val?'<small>kg</small>':""}</b><span class="sb">${es}</span></div></div>`;
 }
 function lgPlates(kg){const bar=state.data.u.barWeight||20,pl=((state.data.plates&&state.data.plates.length)?state.data.plates.slice():[25,20,15,10,5,2.5,1.25]).sort((a,b)=>b-a);let per=(kg-bar)/2;if(per<=0)return"";const used=[];pl.forEach(p=>{while(per>=p-1e-9){used.push(p);per-=p;}});return used.length?used.join(" + "):"";}
+function lgActIdx(e){   // the row to do next: the first open one after the last ticked (a warm-up you skip does not hold the cursor), else the first open one
+  const sets=e.sets||[];let d=-1;sets.forEach((s,i)=>{if(s.done)d=i;});const n=sets.findIndex((s,i)=>i>d&&!s.done);return n>=0?n:sets.findIndex(s=>!s.done);
+}
+function lgSel(el){if(el.value)setTimeout(()=>{try{el.select();}catch(e){}},0);}   // tapping a filled box: typing replaces it
+function lgNudge(ei,si,f,d){   // the ± on the active row: from what is typed, else from the aim. In place, no redraw: the page and the keyboard stay put
+  const e=state.session.exercises[ei],s=e.sets[si],g=lgGhosts(e)[si],cur=lgHas(s[f])?kgNum(s[f]):g&&lgHas(g[f])?kgNum(g[f]):0,v=Math.max(0,Math.round((cur+d)*10)/10);
+  s[f]=f==="w"?fmtKg(v):String(Math.round(v));const i=document.querySelector(`[data-fid="${ei}-${si}-${f}"]`);if(i)i.value=s[f];
+  haptic("tap");saveSessionSoon();
+}
 function lgRows(e,ei,ex){
-  const ses=state.session,gs=lgGhosts(e),act=e.sets.findIndex(s=>!s.done);let lastDone=-1;e.sets.forEach((s,i)=>{if(s.done&&s.type!=="W")lastDone=i;});
+  const ses=state.session,gs=lgGhosts(e),act=lgActIdx(e);let lastDone=-1;e.sets.forEach((s,i)=>{if(s.done&&s.type!=="W")lastDone=i;});
   let h="",wn=0;
   e.sets.forEach((s,si)=>{
     const isW=s.type==="W";if(!isW)wn++;
@@ -13084,10 +13154,13 @@ function lgRows(e,ei,ex){
     const ty=s.type||"NRM",tag=isW?"W":ty==="NRM"?String(wn):ty;
     h+=`<div class="${cls}">
       <button class="lg2-sn" onclick="openSetSheet(${ei},${si})" aria-label="Set options">${pr?GP.icon("crown"):tag}</button>
-      <div class="lg2-cell"><input data-fid="${ei}-${si}-w" inputmode="decimal" value="${esc(lgHas(s.w)?s.w:"")}" placeholder="${esc(g?g.w:"")}" oninput="setField(${ei},${si},'w',this.value)" aria-label="Set ${wn} kilograms"/>${dchip("w")}</div>
-      <div class="lg2-cell"><input data-fid="${ei}-${si}-r" inputmode="numeric" value="${esc(lgHas(s.r)?s.r:"")}" placeholder="${esc(g?g.r:(e.plan&&e.plan.r)||"")}" oninput="setField(${ei},${si},'r',this.value)" aria-label="Set ${wn} reps"/>${dchip("r")}</div>
+      <div class="lg2-cell"><input data-fid="${ei}-${si}-w" inputmode="decimal" value="${esc(lgHas(s.w)?s.w:"")}" placeholder="${esc(g?g.w:"")}" onfocus="lgSel(this)" oninput="setField(${ei},${si},'w',this.value)" aria-label="${isW?"Warm-up":"Set "+wn} kilograms"/>${dchip("w")}</div>
+      <div class="lg2-cell"><input data-fid="${ei}-${si}-r" inputmode="numeric" value="${esc(lgHas(s.r)?s.r:"")}" placeholder="${esc(g?g.r:isW?"":(e.plan&&e.plan.r)||"")}" onfocus="lgSel(this)" oninput="setField(${ei},${si},'r',this.value)" aria-label="${isW?"Warm-up":"Set "+wn} reps"/>${dchip("r")}</div>
       <div class="sdone lg2-ck${s.done?" on":""}" role="button" aria-label="Log set ${wn}" onclick="toggleDone(${ei},${si})">${GP.icon("check")}</div></div>`;
-    if(!isW&&(lgHas(s.prevW)||lgHas(s.prevR)))h+=`<div class="lg2-last${s.done?" dn":""}"><span>last</span><b>${esc(lgHas(s.prevW)?lgNum(s.prevW,ex):"–")}</b><i>×</i><b>${esc(lgHas(s.prevR)?String(s.prevR):"–")}</b></div>`;
+    if(si===act&&!s.done){const nud=(f,d,u)=>`<div class="g"><button onclick="lgNudge(${ei},${si},'${f}',${-d})" aria-label="${u} less">${gmIc("minus")}</button><i>${d}</i><button onclick="lgNudge(${ei},${si},'${f}',${d})" aria-label="${u} more">${GP.icon("plus")}</button></div>`;
+      h+=`<div class="lg2-nudge"><span></span>${nud("w",2.5,"2.5 kg")}${nud("r",1,"1 rep")}<span></span></div>`;}
+    if(!isW){const had=lgHas(s.prevW)||lgHas(s.prevR),aim=!s.done&&g&&lgHas(g.r)&&!(String(g.r)===String(s.prevR)&&kgNum(g.w)===kgNum(s.prevW));
+      if(had||aim)h+=`<div class="lg2-last${s.done?" dn":""}">${had?`<span>last</span><b>${esc(lgHas(s.prevW)?lgNum(s.prevW,ex):"–")}</b><i>×</i><b>${esc(lgHas(s.prevR)?String(s.prevR):"–")}</b>`:""}${aim?`<span class="to">aim</span><b class="am">${esc(lgNum(g.w,ex))}</b><i>×</i><b class="am">${esc(g.r)}</b>`:""}</div>`;}
     if(g&&g.why&&!s.done)h+=`<div class="lg2-why">${GP.icon("alert")}<span>${esc(g.why)}</span></div>`;
     if(s.done&&!isW&&(si===lastDone||ses._rirOpen===ei+":"+si)){
       const cur=rirOfSet(s);
@@ -13121,10 +13194,10 @@ function lgFocus(ses,fei){
   return `<section class="lg2-hero" id="lgfocus">
     <div class="lg2-xh"><div class="exwrap lg2-thumb" id="lgfig" onclick="lgDetail(${fei})" role="button" aria-label="Exercise details"><div class="figlayer">${figLayerHtml(ex)}</div></div>
       <div class="mn"><div class="eyr"><div class="eb">${fei+1} of ${ses.exercises.length} · Plan ${esc(lgPlan(e))}</div><button class="lg2-ibtn sm" data-hx onclick="lgExMenu(${fei})" aria-label="Exercise options">${GP.icon("more")}</button></div>${ex.br?`<div class="lg2-br">${esc(ex.br)}</div>`:""}<h2>${esc(exBrandTitle(ex,e.name))}</h2></div></div>
-    ${lgChips(e,ex,m)}${setupEq(ex)?lgSetupStrip(e,fei):""}${lgTiles(e,ex,m)}
+    ${setupEq(ex)?lgSetupStrip(e,fei):""}${lgFold(e,ex,m)}
     <div class="lg2-gh"><span>Set</span><span>${ex.bw?"+KG":"KG"}</span><span>Reps</span><span></span></div>
     ${lgRows(e,fei,ex)}
-    <div class="lg2-hint"><button class="lg2-b3" data-hx onclick="addSet(${fei})">${GP.icon("plus")}Add set</button><button class="lg2-b3${wu?" hot":""}" data-hx onclick="quickRamp(${fei})">${GP.icon("ramp")}Warm-up ramp</button></div>
+    <div class="lg2-hint"><button class="lg2-b3" data-hx onclick="addSet(${fei})">${GP.icon("plus")}Add set</button><button class="lg2-b3" data-hx onclick="addWarm(${fei})">${GP.icon("plus")}Add warm-up</button><button class="lg2-b3${wu?" hot":""}" data-hx onclick="quickRamp(${fei})">${GP.icon("ramp")}Ramp</button></div>
     ${pl?`<div class="lg2-plate" onclick="openPlateSheet(${fei})">${GP.icon("dumbbell")}<span>Per side: <b>${pl}</b> · ${fmtKg(wk)} kg</span></div>`:""}
   </section>`;
 }
@@ -13152,9 +13225,9 @@ function lgLater(list,ses){
   if(!list.length)return"";
   const sec=list.reduce((a,x)=>a+(x.e._skip?0:x.e.sets.filter(s=>s.type!=="W"&&!s.done).length*(lgRx(x.e.name).tgt+45)),0),sets=list.reduce((a,x)=>a+(x.e._skip?0:x.e.sets.filter(s=>s.type!=="W"&&!s.done).length),0),lifts=list.filter(x=>!x.e._skip).length;
   return `<section class="lg2-later"><div class="lh"><h3>Later</h3><span>${lifts} lift${lifts===1?"":"s"} · ${sets} set${sets===1?"":"s"} · ~${Math.max(1,Math.round(sec/60))} min</span><button class="lg2-b3 sm" onclick="openReorder()">Reorder</button></div>
-    ${list.map(x=>{const e=x.e,ex=exFor(e.name),p=progressionFor(e.name),lb=lastBestSet(e.name);
+    ${list.map(x=>{const e=x.e,ex=exFor(e.name),p=progressionFor(e.name),lb=lastBestSet(e.name),aim=lgGhosts(e)[e.sets.findIndex(s=>s.type!=="W")];
       return `<div class="lg2-lr tap${e._skip?" skp":""}" onclick="focusEx(${x.ei})"><span class="idx">${x.ei+1}</span><div class="mn"><div class="nm">${esc(e.name)}${e.group?GP.icon("link","lg2-lk"):""}</div><div class="sub">${e._skip?"Skipped · tap to restore":esc(lgPlan(e))+(lb?" · last "+esc(lgNum(lb.w,ex))+" × "+lb.r:"")}</div></div>
-        <div class="tr">${p&&p.add&&!e._skip?'<span class="lg2-tag">+KG</span>':""}${p&&!e._skip?`<span class="num">${lgNum(p.w,ex)}<i>×</i>${p.r}</span>`:""}</div></div>`;}).join("")}</section>`;
+        <div class="tr">${p&&p.add&&!e._skip?'<span class="lg2-tag">+KG</span>':""}${aim&&aim.r&&!e._skip?`<span class="num">${lgNum(aim.w,ex)}<i>×</i>${esc(aim.r)}</span>`:""}</div></div>`;}).join("")}</section>`;
 }
 /* ---- exercise ⋯ menu: everything the old action row did, one tap away ---- */
 function lgExMenu(ei){
